@@ -10,6 +10,6 @@ func _update(delta: float) -> void:
 		return
 	player.update_movement(delta, false)
 
-    # chạm sàn thì reset
+	# chạm sàn thì reset
 	if player.is_on_floor():
 		return_to_locomotion()

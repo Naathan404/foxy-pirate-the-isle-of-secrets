@@ -22,6 +22,7 @@ var _delay_remaining: float = 0.0
 
 var _configured: bool = false
 
+
 func init(max_sp: float, regen_sp_per_sec: float, regen_delay_sec: float) -> void:
 	if _configured:
 		push_error("StaminaComponent: init() chỉ được gọi 1 lần")
@@ -37,16 +38,19 @@ func init(max_sp: float, regen_sp_per_sec: float, regen_delay_sec: float) -> voi
 
 	stamina_changed.emit(_current_sp, _max_sp)
 
+
 # Tăng thể lực tối đa, không tự hồi thể lực, không cộng dồn cùng 1 nguồn bonus
 func set_max_sp_modifier(source: StringName, bonus: float) -> void:
 	if _configured and not source.is_empty():
 		_max_modifiers[source] = bonus
 		_refresh_max_sp()
 
+
 # loại bỏ bonus
 func remove_max_sp_modifier(source: StringName) -> void:
 	if _max_modifiers.erase(source):
 		_refresh_max_sp()
+
 
 # refresh sp tối đa
 func _refresh_max_sp() -> void:
@@ -57,9 +61,11 @@ func _refresh_max_sp() -> void:
 	_current_sp = minf(_current_sp, _max_sp)
 	stamina_changed.emit(_current_sp, _max_sp)
 
+
 # check có thể tiêu thụ sp không
 func can_consume(cost_sp: float) -> bool:
 	return _configured and cost_sp >= 0.0 and _current_sp >= cost_sp
+
 
 # tiêu thụ sp
 func try_consume(cost_sp: float) -> bool:
@@ -71,9 +77,11 @@ func try_consume(cost_sp: float) -> bool:
 		stamina_changed.emit(_current_sp, _max_sp)
 	return true
 
+
 # bật công tắc hồi sp =)))
 func set_regeneration_enabled(enabled: bool) -> void:
 	_regeneration_enabled = enabled
+
 
 # Update để hồi stamina
 func _physics_process(delta: float) -> void:
@@ -88,8 +96,11 @@ func _physics_process(delta: float) -> void:
 		if _current_sp != previous_sp:
 			stamina_changed.emit(_current_sp, _max_sp)
 
+
 # helpers
 func get_current_sp() -> float:
 	return _current_sp
+
+
 func get_max_sp() -> float:
 	return _max_sp

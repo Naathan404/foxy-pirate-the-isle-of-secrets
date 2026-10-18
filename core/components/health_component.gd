@@ -29,6 +29,7 @@ func init(max_hp: int) -> bool:
 	hp_changed.emit(_current_hp, _max_hp)
 	return true
 
+
 # gọi khi hồi máu -> trả về lượng hp thực sự hồi
 func heal(amount: int) -> int:
 	if not is_alive() or amount <= 0:
@@ -39,6 +40,7 @@ func heal(amount: int) -> int:
 		hp_changed.emit(_current_hp, _max_hp)
 		healed.emit(applied)
 	return applied
+
 
 # gọi khi trừ máu -> trả về lượng hp bị mất
 func take_damage(amount: int) -> int:
@@ -58,7 +60,11 @@ func take_damage(amount: int) -> int:
 # helpers
 func get_current_hp() -> int:
 	return _current_hp
+
+
 func get_max_hp() -> int:
 	return _max_hp
+
+
 func is_alive() -> bool:
 	return _configured and _current_hp > 0

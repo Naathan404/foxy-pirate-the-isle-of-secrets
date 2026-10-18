@@ -1,6 +1,5 @@
 extends PlayerState
 
-
 var direction: Vector3 = Vector3.ZERO
 var active: bool = false
 var completed: bool = false
@@ -10,7 +9,7 @@ func _enter() -> void:
 	active = false
 	completed = false
 	player.dash_buffer_remaining = 0.0
-	
+
 	var free_dash = player.pending_free_dash
 	var free_direction = player.pending_free_dash_direction
 	player.pending_free_dash = false

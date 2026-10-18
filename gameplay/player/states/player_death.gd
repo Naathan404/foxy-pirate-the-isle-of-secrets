@@ -1,5 +1,6 @@
 extends PlayerState
 
+
 # vào death thì terminal luôn
 func _init() -> void:
 	is_terminal = true

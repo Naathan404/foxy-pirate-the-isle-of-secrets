@@ -14,15 +14,18 @@ var obj: Node = null
 func _enter() -> void:
 	pass
 
+
 # Gọi trước khi thoát trạng thái
 func _exit() -> void:
 	pass
+
 
 # Chạy liên tục mỗi lần update vật lý
 func _update(_delta: float) -> void:
 	pass
 
-# 
+
+#
 func update_timer(delta: float) -> bool:
 	if timer <= 0:
 		return false
@@ -30,6 +33,7 @@ func update_timer(delta: float) -> bool:
 	if timer <= 0:
 		return true
 	return false
+
 
 func change_state(new_state: FsmState, priority: int = 0) -> bool:
 	if not is_instance_valid(fsm):

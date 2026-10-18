@@ -3,13 +3,14 @@ extends PlayerState
 @export var hop_speed: float = 15.0
 @export var knockback_speed: float = 10.0
 
+
 # Ngat don va dung di chuyen cho den khi het thoi gian choang.
 func _enter() -> void:
 	timer = player.pending_hit_duration
 	player.dash_buffer_remaining = 0.0
 
 	var vt: Vector2 = -obj.forward() * knockback_speed
-	obj.velocity.x = vt.x 
+	obj.velocity.x = vt.x
 	obj.velocity.z = vt.z
 	obj.velocity.y = hop_speed
 

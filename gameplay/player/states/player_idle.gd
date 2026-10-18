@@ -1,5 +1,6 @@
 extends PlayerState
 
+
 func _enter() -> void:
 	player.play_directional_animation("idle")
 

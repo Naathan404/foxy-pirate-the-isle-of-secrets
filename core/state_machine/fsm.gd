@@ -24,13 +24,23 @@ var _terminal_locked: bool = false
 
 
 # Khởi tạo
-func _init(target_obj: Node = null, state_parent_node: Node = null, initial_state: FsmState = null, debug_mode: bool = false) -> void:
+func _init(
+	target_obj: Node = null,
+	state_parent_node: Node = null,
+	initial_state: FsmState = null,
+	debug_mode: bool = false
+) -> void:
 	if target_obj != null or state_parent_node != null or initial_state != null:
 		setup(target_obj, state_parent_node, initial_state, debug_mode)
 
 
 # Setup fsm
-func setup(target_obj: Node = null, state_parent_node: Node = null, initial_state: FsmState = null, debug_mode: bool = false) -> bool:
+func setup(
+	target_obj: Node = null,
+	state_parent_node: Node = null,
+	initial_state: FsmState = null,
+	debug_mode: bool = false
+) -> bool:
 	if _configured:
 		push_error("Fsm: setup() chỉ được gọi 1 lần")
 		return false
@@ -57,12 +67,12 @@ func setup(target_obj: Node = null, state_parent_node: Node = null, initial_stat
 			return false
 
 		registered[key] = state
-	
+
 	if registered.get(initial_state.name.to_lower()) != initial_state:
 		push_error("Fsm: initial state phải là node con trực tiếp của node States cha")
 		return false
 
-	# gán 
+	# gán
 	obj = target_obj
 	debug = debug_mode
 	states = registered
@@ -73,6 +83,7 @@ func setup(target_obj: Node = null, state_parent_node: Node = null, initial_stat
 	next_state = initial_state
 	_configured = true
 	return true
+
 
 func change_state(new_state: FsmState, priority: int = 0) -> bool:
 	if not _configured or not is_instance_valid(new_state):
@@ -91,6 +102,7 @@ func change_state(new_state: FsmState, priority: int = 0) -> bool:
 	next_state = new_state
 	_pending_priority = priority
 	return true
+
 
 # được goi cùng với update physics
 func _update(delta: float) -> void:
