@@ -16,13 +16,14 @@ enum AimMode { FACING, CURSOR_DIRECTION, CURSON_POSITION }
 @export_range(0.001, 10.0, 0.001) var active_seconds: float = 0.125
 # Hồi phục sau khi ra đòn
 @export_range(0.0, 10.0, 0.001) var recovery_seconds: float = 0.125
-# 
+#
 @export_range(0.0, 60.0, 0.01) var cooldown_seconds: float = 0.0
 #### Config tầm nhấm và thầm bay. Cận chieenns chỉnh trực tiếp oewr hitbox
 @export_range(0.01, 100.0, 0.01) var range_units: float = 1.5
 @export_range(0.0, 10000.0, 1.0) var stamina_cost: float = 0.0
 @export var ammo_id: StringName = &""
 @export_range(0, 100, 1) var ammo_cost: int = 0
+
 
 func is_valid() -> bool:
 	return (
