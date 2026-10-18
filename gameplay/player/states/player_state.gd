@@ -41,7 +41,7 @@ func try_action_transition() -> bool:
 		player.dash_buffer_remaining = 0.0
 		player.action_rejected.emit(&"dash")
 
-	if player_attack_requested:
+	if player.attack_requested:
 		if is_instance_valid(player.attack_controller):
 			return request_state("attack", 10)
 		player.action_rejected.emit(&"normal_attack")

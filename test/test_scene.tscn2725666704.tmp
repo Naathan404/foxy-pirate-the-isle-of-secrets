@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://vqugjaeojcll"]
+
+[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_m5cd5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
+size = Vector3(40, 1, 40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jpyye"]
+size = Vector3(40, 1, 40)
+
+[node name="Test_Scene" type="Node3D" unique_id=622723604]
+
+[node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("1_m5cd5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3174837, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=780258921]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1994664461]
+shape = SubResource("BoxShape3D_jpyye")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1635043827]
+mesh = SubResource("BoxMesh_jpyye")

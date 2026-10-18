@@ -96,14 +96,14 @@ func _create_player() -> Player:
 	player.hurtbox = HurtBox.new()
 	_add_shape(player.hurtbox)
 	player.add_child(player.hurtbox)
-	var visual := Node3D.new()
+	var visual := PlayerVisual.new()
 	visual.name = &"Visual"
 	player.add_child(visual)
 	var fsm := Fsm.new()
 	fsm.name = &"FSM"
 	player.add_child(fsm)
 	var states := Node.new()
-	states.name = &"PlayerStates"
+	states.name = &"States"
 	for state_name in [&"Idle", &"Hit", &"Death"]:
 		var state := FsmState.new()
 		state.name = state_name

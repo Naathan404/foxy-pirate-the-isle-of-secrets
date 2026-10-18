@@ -1,0 +1,399 @@
+[gd_scene format=3 uid="uid://bug5ypktngs38"]
+
+[ext_resource type="Texture2D" uid="uid://dtufe6c6gwjt6" path="res://assets/sprites/foxy/foxy_hat_sprite_sheet.png" id="1_0rjvg"]
+[ext_resource type="Script" uid="uid://digp88v0glq0y" path="res://gameplay/player/player.gd" id="1_rvh5s"]
+[ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="2_6gmdq"]
+[ext_resource type="Resource" uid="uid://dtb5nvjw0g12a" path="res://data/foxy/foxy_data.tres" id="2_av71s"]
+[ext_resource type="Script" uid="uid://451g8wjqjdtv" path="res://gameplay/player/states/player_idle.gd" id="2_lmpvk"]
+[ext_resource type="Script" uid="uid://br2n2o1bqymmo" path="res://gameplay/player/player_visual.gd" id="3_nu5xt"]
+[ext_resource type="Script" uid="uid://d0jtisdjsgu0u" path="res://gameplay/player/states/player_hit.gd" id="3_r3fl6"]
+[ext_resource type="Script" uid="uid://b13a4v7a0hpxx" path="res://gameplay/player/states/player_fall.gd" id="4_ki8u8"]
+[ext_resource type="Script" uid="uid://bd4tscvehscfo" path="res://gameplay/player/states/player_dash.gd" id="5_tj74x"]
+[ext_resource type="Script" uid="uid://coyt7mve374li" path="res://gameplay/player/states/player_death.gd" id="6_6gmdq"]
+[ext_resource type="Script" uid="uid://dhmsjvrmvedhj" path="res://gameplay/player/states/player_run.gd" id="7_rvh5s"]
+[ext_resource type="Script" uid="uid://bn1u27bm1ho6y" path="res://gameplay/player/states/player_attack.gd" id="8_av71s"]
+[ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="9_r3fl6"]
+[ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="11_rvh5s"]
+[ext_resource type="Script" uid="uid://cq25nhncyhun5" path="res://core/components/stamina_component.gd" id="12_av71s"]
+
+[sub_resource type="Animation" id="Animation_0rjvg"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_nu5xt"]
+resource_name = "dash_down"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+
+[sub_resource type="Animation" id="Animation_use70"]
+resource_name = "dash_side"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [7]
+}
+
+[sub_resource type="Animation" id="Animation_r6sj1"]
+resource_name = "dash_up"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [11]
+}
+
+[sub_resource type="Animation" id="Animation_ki8u8"]
+resource_name = "fall_down"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [40]
+}
+
+[sub_resource type="Animation" id="Animation_tj74x"]
+resource_name = "fall_side"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [41]
+}
+
+[sub_resource type="Animation" id="Animation_6gmdq"]
+resource_name = "fall_up"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [42]
+}
+
+[sub_resource type="Animation" id="Animation_k5pue"]
+resource_name = "hit_down"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [24, 28, 32]
+}
+
+[sub_resource type="Animation" id="Animation_uhjhl"]
+resource_name = "hit_side"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [25, 29, 33]
+}
+
+[sub_resource type="Animation" id="Animation_rvh5s"]
+resource_name = "hit_up"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [26, 30, 34]
+}
+
+[sub_resource type="Animation" id="Animation_8ycv0"]
+resource_name = "idle_down"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [16, 20]
+}
+
+[sub_resource type="Animation" id="Animation_7kbwk"]
+resource_name = "idle_right"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [17, 21]
+}
+
+[sub_resource type="Animation" id="Animation_llovj"]
+resource_name = "idle_up"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [18, 22]
+}
+
+[sub_resource type="Animation" id="Animation_8vyi3"]
+resource_name = "run_down"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 4, 8, 12]
+}
+
+[sub_resource type="Animation" id="Animation_lmpvk"]
+resource_name = "run_side"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [1, 5, 9, 13]
+}
+
+[sub_resource type="Animation" id="Animation_r3fl6"]
+resource_name = "run_up"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [2, 6, 10, 14]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_7kbwk"]
+_data = {
+&"RESET": SubResource("Animation_0rjvg"),
+&"dash_down": SubResource("Animation_nu5xt"),
+&"dash_side": SubResource("Animation_use70"),
+&"dash_up": SubResource("Animation_r6sj1"),
+&"fall_down": SubResource("Animation_ki8u8"),
+&"fall_side": SubResource("Animation_tj74x"),
+&"fall_up": SubResource("Animation_6gmdq"),
+&"hit_down": SubResource("Animation_k5pue"),
+&"hit_side": SubResource("Animation_uhjhl"),
+&"hit_up": SubResource("Animation_rvh5s"),
+&"idle_down": SubResource("Animation_8ycv0"),
+&"idle_side": SubResource("Animation_7kbwk"),
+&"idle_up": SubResource("Animation_llovj"),
+&"run_down": SubResource("Animation_8vyi3"),
+&"run_side": SubResource("Animation_lmpvk"),
+&"run_up": SubResource("Animation_r3fl6")
+}
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpyye"]
+height = 2.0031738
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
+size = Vector3(1.2701416, 1.9672241, 1)
+
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "camera")]
+script = ExtResource("1_rvh5s")
+data = ExtResource("2_av71s")
+stamina = NodePath("StaminaComponent")
+hp = NodePath("HealthComponent")
+hurtbox = NodePath("HurtBox")
+camera = NodePath("Camera3D")
+
+[node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
+script = ExtResource("3_nu5xt")
+sprite = NodePath("Sprite3D")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
+offset = Vector2(0, 14)
+pixel_size = 0.0625
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("1_0rjvg")
+hframes = 4
+vframes = 15
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Visual" unique_id=317322072]
+libraries/ = SubResource("AnimationLibrary_7kbwk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=953316873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.50720215, 0)
+shape = SubResource("CapsuleShape3D_jpyye")
+
+[node name="FSM" type="Node" parent="." unique_id=92062524]
+script = ExtResource("2_6gmdq")
+
+[node name="States" type="Node" parent="." unique_id=1838562708]
+
+[node name="Idle" type="Node" parent="States" unique_id=475953533]
+script = ExtResource("2_lmpvk")
+
+[node name="Hit" type="Node" parent="States" unique_id=701961478]
+script = ExtResource("3_r3fl6")
+
+[node name="Fall" type="Node" parent="States" unique_id=716410688]
+script = ExtResource("4_ki8u8")
+
+[node name="Dash" type="Node" parent="States" unique_id=456015376]
+script = ExtResource("5_tj74x")
+
+[node name="Death" type="Node" parent="States" unique_id=1051409788]
+script = ExtResource("6_6gmdq")
+
+[node name="Run" type="Node" parent="States" unique_id=1952489920]
+script = ExtResource("7_rvh5s")
+
+[node name="Attack" type="Node" parent="States" unique_id=1316916218]
+script = ExtResource("8_av71s")
+
+[node name="HurtBox" type="Area3D" parent="." unique_id=953130742 node_paths=PackedStringArray("actor")]
+script = ExtResource("9_r3fl6")
+actor = NodePath("..")
+team = 1
+metadata/_custom_type_script = "uid://bsdpq5t5mpp25"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HurtBox" unique_id=999194323]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.010437012, 0.48361206, 0)
+shape = SubResource("BoxShape3D_jpyye")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=786847308]
+script = ExtResource("11_rvh5s")
+metadata/_custom_type_script = "uid://dsiiopnlfqio7"
+
+[node name="StaminaComponent" type="Node" parent="." unique_id=844824307]
+script = ExtResource("12_av71s")
+metadata/_custom_type_script = "uid://cq25nhncyhun5"
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=342202680]
+transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 20, 20)
+fov = 30.0
+
+[node name="TestHUD" type="CanvasLayer" parent="." unique_id=404690851]
+
+[node name="HP" type="Label" parent="TestHUD" unique_id=700755012]
+offset_left = 6.0
+offset_top = 2.0
+offset_right = 98.0
+offset_bottom = 25.0
+text = "HP: 999/999"
+
+[node name="SP" type="Label" parent="TestHUD" unique_id=868306895]
+offset_left = 6.0
+offset_top = 24.0
+offset_right = 95.0
+offset_bottom = 47.0
+text = "SP: 999/999"

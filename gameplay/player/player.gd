@@ -30,10 +30,10 @@ var pending_hit_duration: float = 0.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 
-@onready var visual: Node3D = $Visual
+@onready var visual: PlayerVisual = $Visual
 @onready var fsm: Fsm = $FSM
 
-@onready var stamina_label: Label = get_node_or_null("TestHUD/Stamina")
+@onready var stamina_label: Label = get_node_or_null("TestHUD/SP")
 @onready var hp_label: Label = get_node_or_null("TestHUD/HP")
 
 
@@ -45,7 +45,7 @@ func _ready() -> void:
 	pending_hit_duration = data.hit_duration
 	if is_instance_valid(stamina):
 		stamina.init(data.max_sp, data.stamina_regen_rate, data.stamina_regen_delay)
-	if not fsm.setup(self, $PlayerStates, $PlayerStates/Idle):
+	if not fsm.setup(self, $States, $States/Idle):
 		set_physics_process(false)
 		return
 	if is_instance_valid(hp):
@@ -168,23 +168,7 @@ func request_attack(action: StringName = &"normal") -> void:
 
 
 func has_attack_animation(prefix: String) -> bool:
-	if not visual.has_method("has_directional_animation"):
-		return false
-	if not visual.call("has_directional_animation", prefix):
-		return false
-	var animated_sprite := visual.get("anim") as AnimatedSprite3D
-	if not is_instance_valid(animated_sprite) or animated_sprite.sprite_frames == null:
-		return false
-	var frames := animated_sprite.sprite_frames
-	for suffix: String in ["down", "up", "side"]:
-		var animation_name := prefix + "_" + suffix
-		if (
-			frames.get_animation_loop(animation_name)
-			or frames.get_frame_count(animation_name) == 0
-			or frames.get_animation_speed(animation_name) <= 0.0
-		):
-			return false
-	return true
+	return is_instance_valid(visual) and visual.has_attack_animation(prefix)
 
 
 func request_free_dash(direction: Vector3) -> bool:
@@ -241,25 +225,13 @@ func update_movement(delta: float, moving: bool) -> void:
 
 
 func play_animation(anim_name: String) -> void:
-	if visual.has_method("play_animation"):
-		visual.call("play_animation", anim_name)
+	if is_instance_valid(visual):
+		visual.play_animation(anim_name)
 
 
 func play_directional_animation(action: String, restart: bool = false) -> void:
-	var facing := last_facing_direction
-	var active_camera := get_active_camera()
-	if is_instance_valid(active_camera):
-		var right := active_camera.global_basis.x
-		var back := active_camera.global_basis.z
-		right.y = 0.0
-		back.y = 0.0
-		facing = Vector3(
-			last_facing_direction.dot(right.normalized()),
-			0.0,
-			last_facing_direction.dot(back.normalized())
-		)
-	if visual.has_method("play_directional"):
-		visual.call("play_directional", action, facing, restart)
+	if is_instance_valid(visual):
+		visual.play_directional(action, last_facing_direction, get_active_camera(), restart)
 
 
 func notify_hit(duration: float = -1.0) -> void:
