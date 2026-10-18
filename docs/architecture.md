@@ -1,22 +1,5 @@
-# Project Architecture
+Cấu trúc dự 
 
-### A> Feature-base modular structure
-- Kiến trúc dự án tuân theo `Feature-based modular structure`, chia folder dựa trên feature, mỗi feature có thể xem là một module riêng
-
-- Mỗi folder như player, bosses, inventory, dialogue... xem như một module gom các scene, script, data và logic liên quan cùng một chức năng vào 1 folder.
-
-- Các module giao tiếp với nhau thông qua signal, các component và manager dùng chung
-
-### B> 3 Nguyên tắc cần tuân thủ:
-```
-a. High cohension: các file liên quan 1 feature nằm cùng nhau
-b. Low coupling: module không tự truy cập lung tung, trực tiếp đến module khác: module giao tiếp qua API rõ ràng, signal hoặc component.
-c. Clear dependency
-```
-
-
-### C> Cây thư mục
-```
 foxy-pirate/
 │
 ├── project.godot
@@ -112,7 +95,30 @@ foxy-pirate/
 │   │   ├── passive/
 │   │   └── charm_data/
 │   │
-│   └── items/
+│   ├── items/
+│	│
+│   ├── inventory/
+│	│
+│   ├── dialogue/
+│	│
+│   ├── economy/
+│	│
+│   ├── shop/
+│	│
+│   ├── forge/
+│	│
+│   ├── save/
+│	│
+│   ├── checkpoint/
+│	│
+│   ├── fast_travel/
+│	│
+│	└── npc/
+│	   ├── pico/
+│	   ├── silas/
+│	   ├── master_tortuga/
+│	   └── madame_croak/
+│
 │
 ├── world/
 │   ├── hub/
@@ -132,22 +138,6 @@ foxy-pirate/
 │   │
 │   ├── smithy_mountain/
 │   └── frostwind_graveyard/
-│
-├── systems/
-│   ├── inventory/
-│   ├── dialogue/
-│   ├── economy/
-│   ├── shop/
-│   ├── forge/
-│   ├── save/
-│   ├── checkpoint/
-│   └── fast_travel/
-│
-├── npc/
-│   ├── pico/
-│   ├── silas/
-│   ├── master_tortuga/
-│   └── madame_croak/
 │
 ├── ui/
 │   ├── hud/
@@ -176,4 +166,3 @@ foxy-pirate/
 	├── conventions.md
 	├── collision_layers.md
 	└── git_workflow.md
-```

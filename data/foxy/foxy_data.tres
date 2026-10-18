@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="PlayerData" format=3 uid="uid://dtb5nvjw0g12a"]
+
+[ext_resource type="Script" uid="uid://bq14wj2ovqs4t" path="res://data/foxy/foxy_data.gd" id="1_cu3kv"]
+
+[resource]
+script = ExtResource("1_cu3kv")
+dash_cost = 50.0
