@@ -31,6 +31,7 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 - Chạy game hoặc scene liên quan đến thay đổi.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.
+- Mỗi test có giới hạn 60 giây. CI báo thất bại khi Godot trả mã lỗi hoặc log có lỗi script/engine.
 - CI import project, chạy test độc lập và smoke test khi có main scene. Bước chưa có nội dung để chạy sẽ báo bỏ qua.
 - Ghi cách chạy và kết quả trong PR; thêm ảnh hoặc video nếu thay đổi UI/gameplay.
 
