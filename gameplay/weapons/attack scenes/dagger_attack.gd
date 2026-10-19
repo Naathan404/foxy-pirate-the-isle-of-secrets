@@ -4,19 +4,16 @@ extends WeaponAttack
 @export var hitbox: HitBox
 @export var forward_offset: float = 0.8
 
+
 # validate trước khi node vào scenetree
 func validate() -> bool:
 	return is_instance_valid(hitbox)
 
 
 func activate() -> void:
-	if (
-		context == null
-		or not is_instance_valid(hitbox)
-		or not is_instance_valid(context.actor)
-	):
+	if context == null or not is_instance_valid(hitbox) or not is_instance_valid(context.actor):
 		return
-	
+
 	super.activate()
 
 	# forward là trục -Z
