@@ -41,7 +41,6 @@ func _process(delta: float) -> void:
 		_ghost_timer = ghost_interval
 
 
-
 func _show_next_ghost() -> void:
 	if ghosts.is_empty() or not is_instance_valid(sprite):
 		return
@@ -54,7 +53,7 @@ func _show_next_ghost() -> void:
 	var g = ghosts[index]
 	if not is_instance_valid(g):
 		return
-	
+
 	var old_tween = _ghost_tweens[index]
 	if old_tween != null:
 		old_tween.kill()
