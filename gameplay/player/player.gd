@@ -9,7 +9,6 @@ signal dash_started
 
 @export var stamina: StaminaComponent
 @export var hp: HealthComponent
-@export var hitbox: HitBox
 @export var hurtbox: HurtBox
 @export var team: int = 1
 @export var weapon_controller: WeaponController
@@ -71,13 +70,9 @@ func _setup_combat() -> void:
 	if is_instance_valid(hurtbox):
 		hurtbox.actor = self
 		hurtbox.team = team
-	if is_instance_valid(hitbox):
-		hitbox.actor = self
-		hitbox.team = team
-		hitbox.end_attack()
 	if is_instance_valid(weapon_controller) and weapon_controller.has_method("setup"):
-		weapon_controller.team = team
-		if not weapon_controller.call("setup", self, stamina, ammo):
+			weapon_controller.team = team
+	if not weapon_controller.call("setup", self, stamina, ammo):
 			push_error("Player: set up vũ khí bị fail")
 
 
@@ -345,17 +340,17 @@ func die() -> void:
 
 
 func cancel_attack() -> void:
-	end_hitbox_attack()
+	#end_hitbox_attack()
 	if is_instance_valid(weapon_controller) and weapon_controller.has_method("cancel"):
 		weapon_controller.call("cancel")
 
 
-func begin_hitbox_attack(amount_hp: int, attack_id: int = 0, tag: StringName = &"normal") -> bool:
-	if dead or not is_instance_valid(hitbox):
-		return false
-	return hitbox.begin_attack(amount_hp, attack_id, tag)
-
-
-func end_hitbox_attack() -> void:
-	if is_instance_valid(hitbox):
-		hitbox.end_attack()
+#func begin_hitbox_attack(amount_hp: int, attack_id: int = 0, tag: StringName = &"normal") -> bool:
+	#if dead or not is_instance_valid(hitbox):
+		#return false
+	#return hitbox.begin_attack(amount_hp, attack_id, tag)
+#
+#
+#func end_hitbox_attack() -> void:
+	#if is_instance_valid(hitbox):
+		#hitbox.end_attack()

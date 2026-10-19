@@ -50,8 +50,8 @@ Trước khi push, đảm bảo working tree sạch, đồng bộ với dev rồ
 ~~~powershell
 git status
 git pull --rebase origin dev
-python -m gdtoolkit.linter core data gameplay systems test ui world
-python -m gdtoolkit.formatter --check core data gameplay systems test ui world
+python -m gdtoolkit.linter core data gameplay test ui world
+python -m gdtoolkit.formatter --check core data gameplay test ui world
 # Chạy game hoặc test liên quan
 
 git push origin <branch-name>

@@ -9,8 +9,8 @@ Chạy tại thư mục gốc với Python đang dùng:
 
 ~~~powershell
 python -m pip install "gdtoolkit==4.5.0"
-python -m gdtoolkit.linter core data gameplay systems test ui world
-python -m gdtoolkit.formatter --check core data gameplay systems test ui world
+python -m gdtoolkit.linter core data gameplay test ui world
+python -m gdtoolkit.formatter --check core data gameplay test ui world
 ~~~
 
 Trên Windows, nếu dùng Python launcher với Python 3.15 đã cài, thay `python` bằng `py -3.15` trong các lệnh trên. CI dùng Python 3.12 qua `actions/setup-python`; không cần đổi CI sang phiên bản Python trên máy cá nhân.

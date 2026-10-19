@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://cq25nhncyhun5" path="res://core/components/stamina_component.gd" id="12_av71s"]
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
+[ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
 length = 0.001
@@ -31,6 +32,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_mqob0"]
@@ -48,6 +61,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [44, 48, 52, 56]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_lqbvs"]
 resource_name = "attack_dagger_side"
@@ -63,6 +88,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [45, 49, 53, 57]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_pt1je"]
@@ -80,6 +117,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [46, 50, 54, 58]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_nu5xt"]
 resource_name = "dash_down"
@@ -95,6 +144,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_use70"]
@@ -112,6 +173,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [7]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_r6sj1"]
 resource_name = "dash_up"
@@ -127,6 +200,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [11]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_ki8u8"]
@@ -144,6 +229,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [40]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_tj74x"]
 resource_name = "fall_side"
@@ -159,6 +256,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [41]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_6gmdq"]
@@ -176,6 +285,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [42]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_k5pue"]
 resource_name = "hit_down"
@@ -191,6 +312,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [24, 28, 32]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_uhjhl"]
@@ -208,6 +341,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [25, 29, 33]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_rvh5s"]
 resource_name = "hit_up"
@@ -223,6 +368,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [26, 30, 34]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_8ycv0"]
@@ -241,6 +398,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [16, 20]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_7kbwk"]
 resource_name = "idle_right"
@@ -257,6 +426,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [17, 21]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_llovj"]
@@ -275,6 +456,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [18, 22]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_8vyi3"]
 resource_name = "run_down"
@@ -291,6 +484,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 4, 8, 12]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="Animation" id="Animation_lmpvk"]
@@ -309,6 +514,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [1, 5, 9, 13]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
+}
 
 [sub_resource type="Animation" id="Animation_r3fl6"]
 resource_name = "run_up"
@@ -325,6 +542,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [2, 6, 10, 14]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite3D:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_0rjvg")]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_7kbwk"]
@@ -455,3 +684,12 @@ offset_top = 24.0
 offset_right = 95.0
 offset_bottom = 47.0
 text = "SP: 999/999"
+
+[node name="Effects" type="Node3D" parent="." unique_id=2014826237]
+
+[node name="DashEffect" parent="Effects" unique_id=292962664 node_paths=PackedStringArray("player", "sprite") instance=ExtResource("18_mqob0")]
+player = NodePath("../..")
+sprite = NodePath("../../Visual/Sprite3D")
+
+[connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
+[connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]
