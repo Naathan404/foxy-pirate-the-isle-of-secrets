@@ -11,7 +11,6 @@ func _run() -> void:
 	var player := _create_player()
 	_expect(player.hp.current_hp == player.data.max_hp, "Player initializes health")
 	_expect(player.hurtbox.actor == player, "HurtBox targets its player")
-	_expect(player.hitbox.actor == player, "HitBox uses its player as source")
 	_expect(player.hurtbox.team == player.team, "HurtBox inherits the player's team")
 	_expect(player.hurtbox.take_damage(null) == 0, "Null damage is ignored")
 	_expect(player.take_damage(0) == 0, "Zero damage is ignored")
@@ -27,17 +26,15 @@ func _run() -> void:
 	damage.source_team = player.team
 	_expect(player.hurtbox.take_damage(damage) == 0, "Friendly damage is ignored")
 	_expect(player.receive_damage(damage) == 0, "Direct context also rejects friendly damage")
-	var defense := DamageModifier.new()
-	root.add_child(defense)
-	player.attack_controller = defense
+	var defense := player.weapon_controller as DamageModifier
+	defense.block_damage = true
 	damage.source_team = player.team + 1
 	damage.attack_id = 7
 	damage.tag = &"heavy"
 	_expect(player.hurtbox.take_damage(damage) == 0, "Defense can block incoming damage")
 	_expect(defense.received_damage == damage, "HurtBox preserves the full damage context")
 	_expect(player.hp.current_hp == 8, "Blocked damage does not reduce health")
-	player.attack_controller = null
-	defense.free()
+	defense.block_damage = false
 
 	var enemy_hitbox := HitBox.new()
 	enemy_hitbox.actor = enemy
@@ -63,18 +60,17 @@ func _run() -> void:
 	_expect(player.hp.current_hp == 4, "New attack can hit the same target again")
 	enemy_hitbox.end_attack()
 
-	_expect(player.begin_hitbox_attack(2), "Player opens an attack window")
+	defense.cancelled = false
 	player.cancel_attack()
-	_expect(not player.hitbox.is_physics_processing(), "Cancel closes the attack window")
-	_expect(player.begin_hitbox_attack(2), "Player can reopen an attack window")
+	_expect(defense.cancelled, "Cancel delegates to weapon controller")
+	defense.cancelled = false
 	damage.source_team = player.team + 1
 	damage.amount_hp = 100
 	_expect(player.hurtbox.take_damage(damage) == 4, "Lethal damage returns remaining health")
 	_expect(player.dead, "Lethal hit kills player")
 	_expect(player.fsm.next_state.name == &"Death", "Lethal hit requests Death")
 	_expect(not player.hurtbox.enabled, "Death disables HurtBox")
-	_expect(not player.hitbox.is_physics_processing(), "Death closes attack window")
-	_expect(not player.begin_hitbox_attack(2), "Dead player cannot attack")
+	_expect(defense.cancelled, "Death cancels weapon controller")
 	_expect(player.hurtbox.take_damage(damage) == 0, "Dead player receives no further damage")
 
 	player.free()
@@ -90,9 +86,8 @@ func _create_player() -> Player:
 	player.add_child(player.hp)
 	player.stamina = StaminaComponent.new()
 	player.add_child(player.stamina)
-	player.hitbox = HitBox.new()
-	_add_shape(player.hitbox)
-	player.add_child(player.hitbox)
+	player.weapon_controller = DamageModifier.new()
+	player.add_child(player.weapon_controller)
 	player.hurtbox = HurtBox.new()
 	_add_shape(player.hurtbox)
 	player.add_child(player.hurtbox)
@@ -133,10 +128,18 @@ func _expect(condition: bool, message: String) -> void:
 
 
 class DamageModifier:
-	extends Node
+	extends WeaponController
 
 	var received_damage: DamageContext
+	var block_damage: bool = false
+	var cancelled: bool = false
 
 	func modify_incoming_damage(amount: int, damage: DamageContext) -> int:
 		received_damage = damage
-		return maxi(0, amount - 1)
+		if block_damage:
+			return maxi(0, amount - 1)
+		return amount
+
+	func cancel() -> void:
+		cancelled = true
+		super.cancel()

@@ -75,7 +75,17 @@ jobs:
           status=0
           for test_file in "${test_files[@]}"; do
             echo "::group::${test_file}"
-            godot --headless --path . --script "$test_file" || status=1
+            test_log=$(mktemp)
+            if ! timeout --kill-after=5s 60s godot --headless --path . --script "$test_file" > "$test_log" 2>&1; then
+              echo "::error::Test failed or timed out: ${test_file}"
+              status=1
+            fi
+            cat "$test_log"
+            if grep -Eq 'SCRIPT ERROR:|ERROR:' "$test_log"; then
+              echo "::error::Godot reported errors in ${test_file}"
+              status=1
+            fi
+            rm -f "$test_log"
             echo "::endgroup::"
           done
           exit "$status"

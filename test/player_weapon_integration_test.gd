@@ -19,7 +19,7 @@ func _run() -> void:
 	floor_body.position.y = -0.5
 	root.add_child(floor_body)
 	var player := _create_player()
-	var controller := player.attack_controller as WeaponController
+	var controller := player.weapon_controller
 	_expect(controller.equipped != null, "Setup equips default weapon")
 	_expect(controller.team == player.team, "Controller inherits player team")
 	_expect(player.can_equip_weapon(), "Idle permits equip")
@@ -138,7 +138,7 @@ func _create_player() -> Player:
 	player.add_child(_create_visual())
 	var controller := WeaponController.new()
 	controller.default_weapon = _create_weapon()
-	player.attack_controller = controller
+	player.weapon_controller = controller
 	player.add_child(controller)
 	root.add_child(player)
 	player.set_physics_process(false)
