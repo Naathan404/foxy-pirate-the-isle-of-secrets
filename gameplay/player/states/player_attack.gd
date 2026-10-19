@@ -71,7 +71,7 @@ func _exit() -> void:
 	accepted = false
 	if is_instance_valid(player.visual):
 		player.visual.reset_animation_speed()
-	player.end_hitbox_attack()
+	#player.end_hitbox_attack()
 	if is_instance_valid(controller):
 		if controller.is_connected("attack_finished", _on_attack_finished):
 			controller.disconnect("attack_finished", _on_attack_finished)

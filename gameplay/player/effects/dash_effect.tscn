@@ -1,0 +1,107 @@
+[gd_scene format=3 uid="uid://c5qllhbgd1hnk"]
+
+[ext_resource type="Script" uid="uid://bxj416xc3ivej" path="res://gameplay/player/effects/dash_effect.gd" id="1_68m4i"]
+
+[sub_resource type="Gradient" id="Gradient_68m4i"]
+offsets = PackedFloat32Array(0, 0.08, 0.56710917, 1)
+colors = PackedColorArray(1, 0.58431375, 0.21960784, 0, 1, 0.37254903, 0.03137255, 1, 0.8509804, 0.45882353, 0.09803922, 0.74509805, 0.65, 0.55, 0.4, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_nn7br"]
+gradient = SubResource("Gradient_68m4i")
+
+[sub_resource type="Curve" id="Curve_0hkyg"]
+_data = [Vector2(0, 0.4), 0.0, 0.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.08), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_cdj4h"]
+curve = SubResource("Curve_0hkyg")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_esbxr"]
+resource_local_to_scene = true
+lifetime_randomness = 0.3
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 0.14834046, 0.98893636)
+spread = 38.0
+initial_velocity_min = 0.6
+initial_velocity_max = 1.6
+angular_velocity_min = -65.0
+angular_velocity_max = 65.0
+gravity = Vector3(0, 0.35, 0)
+damping_min = 1.4
+damping_max = 2.2
+scale_max = 2.3999999
+scale_curve = SubResource("CurveTexture_cdj4h")
+scale_over_velocity_max = 1.0
+color_ramp = SubResource("GradientTexture1D_nn7br")
+
+[sub_resource type="Gradient" id="Gradient_6pud3"]
+offsets = PackedFloat32Array(0, 0.4, 0.82, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.22, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_qwtu1"]
+gradient = SubResource("Gradient_6pud3")
+width = 16
+height = 16
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oo1e7"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("GradientTexture2D_qwtu1")
+texture_filter = 0
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_qm246"]
+material = SubResource("StandardMaterial3D_oo1e7")
+size = Vector2(0.36, 0.36)
+
+[node name="DashEffect" type="Node3D" unique_id=292962664 node_paths=PackedStringArray("ghosts")]
+script = ExtResource("1_68m4i")
+ghost_interval = 0.05
+ghost_lifetime = 0.2
+ghosts = [NodePath("Ghost_1"), NodePath("Ghost_2"), NodePath("Ghost_3"), NodePath("Ghost_4")]
+
+[node name="DashParticle" type="GPUParticles3D" parent="." unique_id=555628705]
+transform = Transform3D(0.4, 0, 0, 0, 0.5, 0, 0, 0, 0.2, 0, 0.047587156, -0.50126785)
+cast_shadow = 0
+emitting = false
+amount = 100
+lifetime = 0.32
+randomness = 0.25
+fixed_fps = 60
+visibility_aabb = AABB(-6, -1, -6, 12, 4, 12)
+process_material = SubResource("ParticleProcessMaterial_esbxr")
+draw_pass_1 = SubResource("QuadMesh_qm246")
+
+[node name="Ghost_1" type="Sprite3D" parent="." unique_id=1809366250]
+offset = Vector2(0, 14)
+pixel_size = 0.0625
+billboard = 1
+texture_filter = 0
+
+[node name="Ghost_2" type="Sprite3D" parent="." unique_id=1926805992]
+offset = Vector2(0, 14)
+pixel_size = 0.0625
+billboard = 1
+texture_filter = 0
+
+[node name="Ghost_3" type="Sprite3D" parent="." unique_id=1508247531]
+offset = Vector2(0, 14)
+pixel_size = 0.0625
+billboard = 1
+texture_filter = 0
+
+[node name="Ghost_4" type="Sprite3D" parent="." unique_id=1498229806]
+offset = Vector2(0, 14)
+pixel_size = 0.0625
+billboard = 1
+texture_filter = 0
