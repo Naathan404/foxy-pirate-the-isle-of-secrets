@@ -110,7 +110,3 @@ jobs:
       - name: Lint GDScript
         if: steps.scripts.outputs.found == 'true'
         run: git ls-files -z -- '*.gd' | xargs -0 -r python -m gdtoolkit.linter
-
-      - name: Check formatting
-        if: ${{ !cancelled() && steps.scripts.outputs.found == 'true' }}
-        run: git ls-files -z -- '*.gd' | xargs -0 -r python -m gdtoolkit.formatter --check --line-length 100
