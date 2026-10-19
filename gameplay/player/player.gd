@@ -13,7 +13,7 @@ signal dash_started
 @export var hurtbox: HurtBox
 @export var team: int = 1
 @export var attack_controller: Node
-@export var ammo: Node
+@export var ammo: AmmoComponent
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
 @export var dash_action: StringName = &"dash"
@@ -21,7 +21,9 @@ signal dash_started
 @export var secondary_attack_action: StringName = &"secondary_attack"
 
 var move_direction: Vector3 = Vector3.ZERO
+# Đứng yên vẫn nhớ hướng để đánh và dash
 var last_facing_direction: Vector3 = Vector3.BACK
+# nuffer nút dash
 var dash_buffer_remaining: float = 0.0
 var attack_requested: bool = false
 var pending_attack_action: StringName = &"normal"
@@ -39,20 +41,33 @@ var pending_free_dash_direction: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	if data == null:
-		push_error("Player: assign a PlayerData resource in the Inspector.")
+		push_error("Player: playerdata chưa được gán")
 		set_physics_process(false)
 		return
-	pending_hit_duration = data.hit_duration
-	if is_instance_valid(stamina):
-		stamina.init(data.max_sp, data.stamina_regen_rate, data.stamina_regen_delay)
 	if not fsm.setup(self, $States, $States/Idle):
 		set_physics_process(false)
 		return
+
+	pending_hit_duration = data.hit_duration
+	_setup_stats()
+	_setup_combat()
+
+
+# Khởi tạo HP, SP và nối signal để cập nhật HUD
+func _setup_stats() -> void:
 	if is_instance_valid(hp):
 		hp.hp_changed.connect(_on_hp_changed)
 		hp.damaged.connect(_on_damaged)
 		hp.died.connect(die)
 		hp.init(data.max_hp)
+
+	if is_instance_valid(stamina):
+		stamina.stamina_changed.connect(_on_stamina_changed)
+		stamina.init(data.max_sp, data.stamina_regen_rate, data.stamina_regen_delay)
+
+
+# HitBox gây damage, HurtBox nhận damage
+func _setup_combat() -> void:
 	if is_instance_valid(hurtbox):
 		hurtbox.actor = self
 		hurtbox.team = team
@@ -61,11 +76,11 @@ func _ready() -> void:
 		hitbox.team = team
 		hitbox.end_attack()
 	if is_instance_valid(attack_controller) and attack_controller.has_method("setup"):
+		if attack_controller is WeaponController:
+			var weapon_controller := attack_controller as WeaponController
+			weapon_controller.team = team
 		if not attack_controller.call("setup", self, stamina, ammo):
-			push_error("Player: weapon setup failed; verify data, attack scene and animations.")
-	if is_instance_valid(stamina) and stamina.has_signal("stamina_changed"):
-		stamina.connect("stamina_changed", _on_stamina_changed)
-		_on_stamina_changed(stamina.current_sp, stamina.get_max_sp())
+			push_error("Player: set up vũ khí bị fail")
 
 
 func _on_stamina_changed(amount: float, maximum: float) -> void:
@@ -79,16 +94,19 @@ func _on_hp_changed(amount: int, maximum: int) -> void:
 
 
 func _on_damaged(_applied_hp: int) -> void:
+	# Đòn chí mạng để state Death xử lý, không vào Hit nữa
 	if hp.is_alive():
 		notify_hit()
 
 
+# Dùng cho damage trực tiếp, ví dụ bẫy hoặc nút test
 func take_damage(amount: int) -> int:
 	var damage := DamageContext.new()
 	damage.amount_hp = amount
 	return receive_damage(damage)
 
 
+# Đòn từ HurtBox đi qua phòng thủ trước rồi mới trừ HP
 func receive_damage(damage: DamageContext) -> int:
 	if dead or not is_instance_valid(hp):
 		return 0
@@ -99,18 +117,18 @@ func receive_damage(damage: DamageContext) -> int:
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
 	var amount := damage.amount_hp
-	if (
-		is_instance_valid(attack_controller)
-		and attack_controller.has_method("modify_incoming_damage")
-	):
-		amount = int(attack_controller.call("modify_incoming_damage", amount, damage))
+	if is_instance_valid(attack_controller):
+		if attack_controller.has_method("modify_incoming_damage"):
+			amount = int(attack_controller.call("modify_incoming_damage", amount, damage))
 	return hp.take_damage(amount)
 
 
 func _physics_process(delta: float) -> void:
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
-	read_input()
+	_read_input()
 	fsm._update(delta)
+
+	# State chọn vận tốc, Player chỉ di chuyển vật lý 1 lần mỗi frame
 	if dead:
 		set_horizontal_velocity(Vector3.ZERO)
 	if not is_on_floor():
@@ -118,17 +136,19 @@ func _physics_process(delta: float) -> void:
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
 	move_and_slide()
+	# Yêu cầu đánh chỉ dùng trong frame này
 	attack_requested = false
 
 
-func read_input() -> void:
+func _read_input() -> void:
 	move_direction = Vector3.ZERO
 	if dead:
 		return
 	var input_vector := Input.get_vector("left", "right", "up", "down")
+	# Đổi WASD sang hướng trong thế giới theo góc camera
 	var right := Vector3.RIGHT
 	var back := Vector3.BACK
-	var active_camera := get_active_camera()
+	var active_camera := _get_active_camera()
 	if is_instance_valid(active_camera):
 		right = active_camera.global_basis.x
 		back = active_camera.global_basis.z
@@ -150,7 +170,7 @@ func read_input() -> void:
 		request_attack(&"secondary")
 
 
-func get_active_camera() -> Camera3D:
+func _get_active_camera() -> Camera3D:
 	if is_instance_valid(camera):
 		return camera
 	return get_viewport().get_camera_3d()
@@ -167,10 +187,72 @@ func request_attack(action: StringName = &"normal") -> void:
 		attack_requested = true
 
 
+# Tạo context cho đòn đánh, hướng ngắm do controller quyết định
+func build_attack_context() -> AttackContext:
+	var context := AttackContext.new()
+	context.actor = self
+	context.team = team
+	context.action = pending_attack_action
+	context.origin = global_position
+	context.direction = Vector3(last_facing_direction.x, 0.0, last_facing_direction.z)
+	if context.direction.is_zero_approx():
+		context.direction = Vector3.BACK
+	context.direction = context.direction.normalized()
+
+	var mouse_target: Variant = _get_mouse_target()
+	if mouse_target is Vector3:
+		context.target_position = mouse_target
+		context.has_target = true
+	return context
+
+
+# Chiếu chuột xuống mặt phẳng XZ ngang nhân vật
+func _get_mouse_target() -> Variant:
+	var active_camera := _get_active_camera()
+	if not is_instance_valid(active_camera):
+		return null
+
+	var mouse_position := get_viewport().get_mouse_position()
+	var ray_start := active_camera.project_ray_origin(mouse_position)
+	var ray_direction := active_camera.project_ray_normal(mouse_position)
+	var ground_plane := Plane(Vector3.UP, global_position.y)
+	return ground_plane.intersects_ray(ray_start, ray_direction)
+
+
+# Không đổi vũ khí khi đang đánh, dash, bị hit hoặc chết
+func can_equip_weapon() -> bool:
+	if dead or not is_instance_valid(fsm):
+		return false
+	# Kiểm tra cả state hiện tại và state đang chờ, ví dụ vừa bị hit
+	var allowed_states := ["idle", "run", "fall"]
+	for state: FsmState in [fsm.current_state, fsm.next_state]:
+		if state == null:
+			continue
+		if state.name.to_lower() not in allowed_states:
+			return false
+	return true
+
+
+# Cho phép state Attack gọi controller, nhưng không đánh khi rơi hoặc bị ngắt
+func can_start_weapon_attack() -> bool:
+	if dead or not is_on_floor() or not is_instance_valid(fsm):
+		return false
+	var allowed_states := ["idle", "run", "attack"]
+	for state: FsmState in [fsm.current_state, fsm.next_state]:
+		if state == null:
+			continue
+		if state.name.to_lower() not in allowed_states:
+			return false
+	return true
+
+
 func has_attack_animation(prefix: String) -> bool:
-	return is_instance_valid(visual) and visual.has_attack_animation(prefix)
+	if not is_instance_valid(visual):
+		return false
+	return visual.has_attack_animation(prefix)
 
 
+# Dash do vũ khí yêu cầu, state Dash sẽ bỏ qua chi phí SP
 func request_free_dash(direction: Vector3) -> bool:
 	if dead or not is_on_floor():
 		return false
@@ -184,16 +266,10 @@ func request_free_dash(direction: Vector3) -> bool:
 	return true
 
 
+# Đổi bộ xử lý đòn đánh cùng animation tương ứng
 func equip_attack(controller: Node, animation_prefix: String) -> bool:
-	if dead or not is_instance_valid(controller):
+	if not can_equip_weapon() or not is_instance_valid(controller):
 		return false
-	if is_instance_valid(fsm):
-		var attack_state := fsm.states.get("attack") as FsmState
-		if (
-			attack_state != null
-			and (fsm.current_state == attack_state or fsm.next_state == attack_state)
-		):
-			return false
 	if (
 		not controller.has_method("try_attack")
 		or not controller.has_method("cancel")
@@ -212,33 +288,39 @@ func update_facing() -> void:
 		last_facing_direction = move_direction
 
 
+# Chỉ sửa vận tốc ngang, giữ nguyên vận tốc rơi theo Y
 func set_horizontal_velocity(value: Vector3) -> void:
 	velocity.x = value.x
 	velocity.z = value.z
 
 
 func update_movement(delta: float, moving: bool) -> void:
-	var target := move_direction * data.move_speed if moving else Vector3.ZERO
-	var rate := data.acceleration if moving else data.deceleration
-	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
-	set_horizontal_velocity(horizontal.move_toward(target, rate * delta))
+	var target_velocity := Vector3.ZERO
+	var change_speed := data.deceleration
+	if moving:
+		target_velocity = move_direction * data.move_speed
+		change_speed = data.acceleration
 
-
-func play_animation(anim_name: String) -> void:
-	if is_instance_valid(visual):
-		visual.play_animation(anim_name)
+	# Tăng hoặc giảm vận tốc từ từ để di chuyển có quán tính
+	var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+	horizontal_velocity = horizontal_velocity.move_toward(target_velocity, change_speed * delta)
+	set_horizontal_velocity(horizontal_velocity)
 
 
 func play_directional_animation(action: String, restart: bool = false) -> void:
 	if is_instance_valid(visual):
-		visual.play_directional(action, last_facing_direction, get_active_camera(), restart)
+		visual.play_directional(action, last_facing_direction, _get_active_camera(), restart)
 
 
+# Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
 func notify_hit(duration: float = -1.0) -> void:
 	if dead:
 		return
 	pending_free_dash = false
-	pending_hit_duration = data.hit_duration if duration < 0.0 else maxf(0.01, duration)
+	if duration < 0.0:
+		pending_hit_duration = data.hit_duration
+	else:
+		pending_hit_duration = maxf(0.01, duration)
 	cancel_attack()
 	var hit_state := fsm.states.get("hit") as FsmState
 	if fsm.current_state == hit_state:
@@ -247,6 +329,7 @@ func notify_hit(duration: float = -1.0) -> void:
 		fsm.change_state(hit_state, 50)
 
 
+# Khóa điều khiển, ngừng hồi SP và hủy đòn trước khi vào Death
 func die() -> void:
 	if dead:
 		return
@@ -254,8 +337,8 @@ func die() -> void:
 	if is_instance_valid(hurtbox):
 		hurtbox.enabled = false
 	pending_free_dash = false
-	if is_instance_valid(stamina) and stamina.has_method("set_regeneration_enabled"):
-		stamina.call("set_regeneration_enabled", false)
+	if is_instance_valid(stamina):
+		stamina.set_regeneration_enabled(false)
 	dash_buffer_remaining = 0.0
 	attack_requested = false
 	cancel_attack()

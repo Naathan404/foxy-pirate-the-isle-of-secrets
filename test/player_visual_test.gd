@@ -32,12 +32,32 @@ func _run() -> void:
 	camera.rotate_y(PI / 2.0)
 	visual._process(0.0)
 	_expect(visual.animation_player.assigned_animation == &"idle_side", "Camera changes facing")
+	camera.rotation = Vector3.ZERO
 	visual.play_directional(&"hit", Vector3.BACK, null, true)
 	visual.animation_player.advance(2.0)
 	visual._process(0.0)
 	_expect(not visual.animation_player.is_playing(), "Completed one-shot does not restart")
 	visual.play_directional(&"hit", Vector3.BACK, null, true)
 	_expect(visual.animation_player.is_playing(), "Explicit restart replays one-shot")
+	_expect(visual.fit_animation_duration(0.5), "Fit attack duration")
+	_expect(is_equal_approx(visual.animation_player.speed_scale, 2.0), "Attack speed is fitted")
+	visual.animation_player.advance(0.1)
+	var progress := visual.animation_player.current_animation_position
+	visual.animation_player.get_animation(&"hit_side").length = 2.0
+	visual.play_directional(&"hit", Vector3.LEFT, camera)
+	_expect(
+		is_equal_approx(visual.animation_player.current_animation_position, progress * 2.0),
+		"Changing direction preserves attack progress"
+	)
+	_expect(
+		is_equal_approx(visual.animation_player.speed_scale, 4.0),
+		"Different directional lengths keep the same fitted duration"
+	)
+	_expect(not visual.fit_animation_duration(0.0), "Reject zero duration")
+	_expect(not visual.fit_animation_duration(-1.0), "Reject negative duration")
+	_expect(not visual.fit_animation_duration(INF), "Reject infinite duration")
+	visual.reset_animation_speed()
+	_expect(is_equal_approx(visual.animation_player.speed_scale, 1.0), "Restore animation speed")
 	_expect(not visual.play_animation(&"missing"), "Missing animation fails safely")
 	visual.free()
 	camera.free()

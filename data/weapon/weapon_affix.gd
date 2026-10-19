@@ -1,8 +1,8 @@
-class_name WeaponAffix
+class_name WeaponForge
 extends Resource
 
 # thuộc tính rèn của vũ khí
-@export var affix_id: StringName = &"pristine"
+@export var forge_id: StringName = &"pristine"
 @export_range(0.01, 5.0, 0.01) var damage_multiplier: float = 1.0
 @export_range(0.01, 5.0, 0.01) var attack_speed_multiplier: float = 1.0
 # thuộc tính rèn đặc trưng
