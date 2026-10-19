@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://q2jqrxyd2k31"]
+
+[ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="1_bhibm"]
+[ext_resource type="Script" uid="uid://ck0gfln5qfrp" path="res://gameplay/weapons/attack scenes/dagger_attack.gd" id="1_sleko"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
+size = Vector3(1.2930908, 1, 1.421875)
+
+[node name="DaggerAttack" type="Node3D" unique_id=1964697998 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("1_sleko")
+hitbox = NodePath("HitBox")
+
+[node name="HitBox" type="Area3D" parent="." unique_id=1658291656 node_paths=PackedStringArray("actor")]
+script = ExtResource("1_bhibm")
+actor = NodePath("..")
+team = 2
+metadata/_custom_type_script = "uid://etrxpr68gxyd"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox" unique_id=1900392975]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.011657715, 0, 0.2109375)
+shape = SubResource("BoxShape3D_jpyye")

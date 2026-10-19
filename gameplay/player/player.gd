@@ -12,7 +12,7 @@ signal dash_started
 @export var hitbox: HitBox
 @export var hurtbox: HurtBox
 @export var team: int = 1
-@export var attack_controller: Node
+@export var weapon_controller: WeaponController
 @export var ammo: AmmoComponent
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
@@ -75,11 +75,9 @@ func _setup_combat() -> void:
 		hitbox.actor = self
 		hitbox.team = team
 		hitbox.end_attack()
-	if is_instance_valid(attack_controller) and attack_controller.has_method("setup"):
-		if attack_controller is WeaponController:
-			var weapon_controller := attack_controller as WeaponController
-			weapon_controller.team = team
-		if not attack_controller.call("setup", self, stamina, ammo):
+	if is_instance_valid(weapon_controller) and weapon_controller.has_method("setup"):
+		weapon_controller.team = team
+		if not weapon_controller.call("setup", self, stamina, ammo):
 			push_error("Player: set up vũ khí bị fail")
 
 
@@ -117,9 +115,9 @@ func receive_damage(damage: DamageContext) -> int:
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
 	var amount := damage.amount_hp
-	if is_instance_valid(attack_controller):
-		if attack_controller.has_method("modify_incoming_damage"):
-			amount = int(attack_controller.call("modify_incoming_damage", amount, damage))
+	if is_instance_valid(weapon_controller):
+		if weapon_controller.has_method("modify_incoming_damage"):
+			amount = int(weapon_controller.call("modify_incoming_damage", amount, damage))
 	return hp.take_damage(amount)
 
 
@@ -278,7 +276,7 @@ func equip_attack(controller: Node, animation_prefix: String) -> bool:
 		return false
 	if not has_attack_animation(animation_prefix):
 		return false
-	attack_controller = controller
+	weapon_controller = controller
 	attack_animation_prefix = animation_prefix
 	return true
 
@@ -348,8 +346,8 @@ func die() -> void:
 
 func cancel_attack() -> void:
 	end_hitbox_attack()
-	if is_instance_valid(attack_controller) and attack_controller.has_method("cancel"):
-		attack_controller.call("cancel")
+	if is_instance_valid(weapon_controller) and weapon_controller.has_method("cancel"):
+		weapon_controller.call("cancel")
 
 
 func begin_hitbox_attack(amount_hp: int, attack_id: int = 0, tag: StringName = &"normal") -> bool:

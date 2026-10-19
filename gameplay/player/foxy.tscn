@@ -15,6 +15,8 @@
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="9_r3fl6"]
 [ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="11_rvh5s"]
 [ext_resource type="Script" uid="uid://cq25nhncyhun5" path="res://core/components/stamina_component.gd" id="12_av71s"]
+[ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
+[ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
 length = 0.001
@@ -29,6 +31,54 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_mqob0"]
+resource_name = "attack_dagger_down"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [44, 48, 52, 56]
+}
+
+[sub_resource type="Animation" id="Animation_lqbvs"]
+resource_name = "attack_dagger_side"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [45, 49, 53, 57]
+}
+
+[sub_resource type="Animation" id="Animation_pt1je"]
+resource_name = "attack_dagger_up"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite3D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [46, 50, 54, 58]
 }
 
 [sub_resource type="Animation" id="Animation_nu5xt"]
@@ -280,6 +330,9 @@ tracks/0/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_7kbwk"]
 _data = {
 &"RESET": SubResource("Animation_0rjvg"),
+&"attack_dagger_down": SubResource("Animation_mqob0"),
+&"attack_dagger_side": SubResource("Animation_lqbvs"),
+&"attack_dagger_up": SubResource("Animation_pt1je"),
 &"dash_down": SubResource("Animation_nu5xt"),
 &"dash_side": SubResource("Animation_use70"),
 &"dash_up": SubResource("Animation_r6sj1"),
@@ -303,12 +356,13 @@ height = 2.0031738
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(1.2701416, 1.9672241, 1)
 
-[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "camera")]
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "camera")]
 script = ExtResource("1_rvh5s")
 data = ExtResource("2_av71s")
 stamina = NodePath("StaminaComponent")
 hp = NodePath("HealthComponent")
 hurtbox = NodePath("HurtBox")
+weapon_controller = NodePath("WeaponController")
 camera = NodePath("Camera3D")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
@@ -377,6 +431,10 @@ metadata/_custom_type_script = "uid://dsiiopnlfqio7"
 [node name="StaminaComponent" type="Node" parent="." unique_id=844824307]
 script = ExtResource("12_av71s")
 metadata/_custom_type_script = "uid://cq25nhncyhun5"
+
+[node name="WeaponController" type="Node" parent="." unique_id=616833111]
+script = ExtResource("16_use70")
+default_weapon = ExtResource("17_r6sj1")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=342202680]
 transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 20, 20)

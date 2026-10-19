@@ -42,7 +42,7 @@ func try_action_transition() -> bool:
 		player.action_rejected.emit(&"dash")
 
 	if player.attack_requested:
-		if is_instance_valid(player.attack_controller):
+		if is_instance_valid(player.weapon_controller):
 			return request_state("attack", 10)
 		player.action_rejected.emit(&"normal_attack")
 	return false

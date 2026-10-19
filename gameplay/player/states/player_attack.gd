@@ -11,7 +11,7 @@ var animation_prefix: String
 func _enter() -> void:
 	accepted = false
 	finished = false
-	controller = player.attack_controller
+	controller = player.weapon_controller
 	animation_prefix = player.attack_animation_prefix
 	player.set_horizontal_velocity(Vector3.ZERO)
 	if player.dead:
