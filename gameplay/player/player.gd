@@ -70,6 +70,8 @@ func _setup_combat() -> void:
 	if is_instance_valid(hurtbox):
 		hurtbox.actor = self
 		hurtbox.team = team
+		hurtbox.collision_layer = CombatLayers.PLAYER_HURTBOX
+		hurtbox.collision_mask = CombatLayers.ENEMY_ATTACK
 	if is_instance_valid(weapon_controller) and weapon_controller.has_method("setup"):
 		weapon_controller.team = team
 	if not weapon_controller.call("setup", self, stamina, ammo):

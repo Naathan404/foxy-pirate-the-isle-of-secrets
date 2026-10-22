@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/enemies/base/enemy_base.gd" id="1_enemy_base"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_base_data.tres" id="2_enemy_data"]
+[ext_resource type="Script" path="res://core/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://core/components/hurtbox_component.gd" id="4_hurtbox"]
+[ext_resource type="Script" path="res://gameplay/enemies/base/enemy_visual.gd" id="5_visual"]
+[ext_resource type="Script" path="res://core/state_machine/fsm.gd" id="6_fsm"]
+[ext_resource type="Script" path="res://gameplay/enemies/base/states/enemy_idle.gd" id="7_idle"]
+[ext_resource type="Script" path="res://gameplay/enemies/base/states/enemy_hit.gd" id="10_hit"]
+[ext_resource type="Script" path="res://gameplay/enemies/base/states/enemy_death.gd" id="11_death"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hurtbox"]
+radius = 0.55
+
+[node name="EnemyBase" type="CharacterBody3D" node_paths=PackedStringArray("hp", "hurtbox", "visual", "direction_pivot", "fsm", "initial_state")]
+script = ExtResource("1_enemy_base")
+data = ExtResource("2_enemy_data")
+collision_layer = 4
+collision_mask = 3
+hp = NodePath("HealthComponent")
+hurtbox = NodePath("Direction/HurtBox")
+visual = NodePath("Visual")
+direction_pivot = NodePath("Direction")
+fsm = NodePath("FSM")
+initial_state = NodePath("States/Idle")
+
+[node name="Visual" type="Node3D" parent="." node_paths=PackedStringArray("sprite", "animation_player")]
+script = ExtResource("5_visual")
+sprite = NodePath("Sprite3D")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual"]
+pixel_size = 0.0625
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Visual"]
+
+[node name="Direction" type="Node3D" parent="."]
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("6_fsm")
+
+[node name="States" type="Node" parent="."]
+
+[node name="Idle" type="Node" parent="States"]
+script = ExtResource("7_idle")
+
+[node name="Hit" type="Node" parent="States"]
+script = ExtResource("10_hit")
+
+[node name="Death" type="Node" parent="States"]
+script = ExtResource("11_death")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="HurtBox" type="Area3D" parent="Direction" node_paths=PackedStringArray("actor")]
+script = ExtResource("4_hurtbox")
+actor = NodePath("../..")
+team = 2
+collision_layer = 16
+collision_mask = 32
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Direction/HurtBox"]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("SphereShape3D_hurtbox")

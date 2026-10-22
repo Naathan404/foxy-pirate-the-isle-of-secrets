@@ -57,6 +57,17 @@ normal_attack={
 
 3d/physics_engine="Jolt Physics"
 
+[layer_names/3d_physics]
+
+layer_1="World"
+layer_2="PlayerBody"
+layer_3="EnemyBody"
+layer_4="PlayerHurtBox"
+layer_5="EnemyHurtBox"
+layer_6="PlayerAttack"
+layer_7="EnemyAttack"
+layer_8="TargetDetector"
+
 [rendering]
 
 rendering_device/driver.windows="d3d12"
