@@ -20,7 +20,7 @@ radius = 0.7998047
 [node name="Crab" unique_id=1674830806 instance=ExtResource("1_base")]
 data = ExtResource("2_data")
 initial_state_name = &"Patrol"
-initial_facing_direction = Vector3(-1, 0, 0)
+initial_facing = 2
 destroy_on_death = true
 show_debug_health = true
 
