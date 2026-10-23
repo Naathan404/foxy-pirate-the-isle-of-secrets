@@ -2,19 +2,26 @@ class_name EnemyBase
 extends CharacterBody3D
 
 ## Setup: assign EnemyData, HealthComponent, Direction/HurtBox, FSM and an initial state.
-## Keep facing-sensitive nodes under Direction. Add optional HitBox, TargetDetector and
-## patrol rays only when that enemy needs them; its scene owns the collider shapes,
+## Keep facing-sensitive nodes under Direction. Add an optional root TargetDetector,
+## HitBox and patrol rays only when that enemy needs them; its scene owns the collider shapes,
 ## animations and behavior states.
 
 signal target_changed(target: Node3D)
 signal damaged(applied_hp: int)
 signal died
 
+enum InitialFacing {
+	DOWN,
+	UP,
+	LEFT,
+	RIGHT,
+}
+
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
 @export var data: EnemyData
 @export var initial_state_name: StringName = &"Idle"
-@export var initial_facing_direction: Vector3 = Vector3.BACK
+@export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var destroy_on_death: bool = false
 
 @export_group("Debug")
@@ -35,7 +42,7 @@ var pending_hit_direction: Vector3 = Vector3.ZERO
 @onready var hurtbox: HurtBox = $Direction/HurtBox
 @onready var active_hitbox: HitBox = get_node_or_null(^"Direction/ActiveHitBox") as HitBox
 @onready var contact_hitbox: HitBox = get_node_or_null(^"Direction/ContactHitBox") as HitBox
-@onready var target_detector: Area3D = get_node_or_null(^"Direction/TargetDetector") as Area3D
+@onready var target_detector: Area3D = get_node_or_null(^"TargetDetector") as Area3D
 @onready var visual: EnemyVisual = $Visual
 @onready var direction_pivot: Node3D = $Direction
 @onready var front_ray: RayCast3D = $Direction/FrontRayCast3D
@@ -55,7 +62,7 @@ func _ready() -> void:
 	_setup_combat()
 	_setup_direction_checks()
 	_setup_target_detector()
-	face_direction(initial_facing_direction)
+	face_direction(_get_initial_facing_direction())
 	var state_parent := initial_state.get_parent()
 	if not fsm.setup(self, state_parent, initial_state):
 		set_physics_process(false)
@@ -136,6 +143,18 @@ func face_direction(direction: Vector3) -> void:
 		direction_pivot.look_at(
 			direction_pivot.global_position + last_facing_direction, Vector3.UP, true
 		)
+
+
+func _get_initial_facing_direction() -> Vector3:
+	match initial_facing:
+		InitialFacing.UP:
+			return Vector3.FORWARD
+		InitialFacing.LEFT:
+			return Vector3.LEFT
+		InitialFacing.RIGHT:
+			return Vector3.RIGHT
+		_:
+			return Vector3.BACK
 
 
 func face_target() -> bool:
@@ -298,7 +317,6 @@ func _validate_directional_components() -> bool:
 		_validate_directional_node(hurtbox, &"HurtBox")
 		and _validate_directional_node(active_hitbox, &"ActiveHitBox")
 		and _validate_directional_node(contact_hitbox, &"ContactHitBox")
-		and _validate_directional_node(target_detector, &"TargetDetector")
 		and _validate_directional_node(front_ray, &"FrontRayCast3D")
 		and _validate_directional_node(ground_ray, &"GroundRayCast3D")
 	)

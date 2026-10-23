@@ -58,8 +58,8 @@ func _run() -> void:
 		"Debug health displays the current and maximum HP"
 	)
 	_expect(
-		enemy.direction_pivot.is_ancestor_of(enemy.target_detector),
-		"TargetDetector is under Direction"
+		not enemy.direction_pivot.is_ancestor_of(enemy.target_detector),
+		"TargetDetector stays centered while the enemy turns"
 	)
 
 	var player := Node3D.new()
@@ -118,7 +118,7 @@ func _create_enemy() -> EnemyBase:
 	var target_detector := Area3D.new()
 	target_detector.name = &"TargetDetector"
 	_add_shape(target_detector)
-	enemy.get_node("Direction").add_child(target_detector)
+	enemy.add_child(target_detector)
 	root.add_child(enemy)
 	enemy.set_physics_process(false)
 	return enemy
