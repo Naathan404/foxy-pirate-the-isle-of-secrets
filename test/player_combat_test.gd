@@ -59,6 +59,23 @@ func _run() -> void:
 	await _physics_steps()
 	_expect(player.hp.current_hp == 4, "New attack can hit the same target again")
 	enemy_hitbox.end_attack()
+	_expect(
+		enemy_hitbox.begin_attack(1, 0, &"contact", HitBox.RehitPolicy.ONCE_PER_CONTACT),
+		"Contact damage starts"
+	)
+	await _physics_steps()
+	_expect(player.hp.current_hp == 3, "Contact damage hits when the player enters")
+	await _physics_steps()
+	_expect(player.hp.current_hp == 3, "Contact damage does not repeat while overlapping")
+	enemy.position = Vector3(20.0, 0.0, 0.0)
+	await _physics_steps()
+	enemy.position = Vector3.ZERO
+	await _physics_steps()
+	_expect(
+		player.hp.current_hp == 2,
+		"Contact damage can hit again after the player leaves and re-enters"
+	)
+	enemy_hitbox.end_attack()
 
 	defense.cancelled = false
 	player.cancel_attack()
@@ -66,7 +83,7 @@ func _run() -> void:
 	defense.cancelled = false
 	damage.source_team = player.team + 1
 	damage.amount_hp = 100
-	_expect(player.hurtbox.take_damage(damage) == 4, "Lethal damage returns remaining health")
+	_expect(player.hurtbox.take_damage(damage) == 2, "Lethal damage returns remaining health")
 	_expect(player.dead, "Lethal hit kills player")
 	_expect(player.fsm.next_state.name == &"Death", "Lethal hit requests Death")
 	_expect(not player.hurtbox.enabled, "Death disables HurtBox")
