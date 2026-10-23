@@ -586,6 +586,9 @@ height = 2.0031738
 size = Vector3(1.2701416, 1.9672241, 1)
 
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "camera")]
+floor_constant_speed = true
+floor_max_angle = 0.83775806
+floor_snap_length = 0.3
 script = ExtResource("1_rvh5s")
 data = ExtResource("2_av71s")
 stamina = NodePath("StaminaComponent")
