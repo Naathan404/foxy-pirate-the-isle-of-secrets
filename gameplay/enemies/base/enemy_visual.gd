@@ -9,12 +9,18 @@ signal animation_finished(animation_name: StringName)
 
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
+@export var hit_flash_color: Color = Color(1.0, 0.45, 0.45, 1.0)
+@export_range(0.01, 1.0, 0.01) var hit_flash_duration: float = 0.08
 
 var _directional_action: StringName = &""
 var _facing: Vector3 = Vector3.BACK
+var _sprite_modulate: Color = Color.WHITE
+var _hit_flash_tween: Tween
 
 
 func _ready() -> void:
+	if is_instance_valid(sprite):
+		_sprite_modulate = sprite.modulate
 	if is_instance_valid(animation_player):
 		animation_player.animation_finished.connect(_on_animation_finished)
 
@@ -45,6 +51,16 @@ func play_directional(action: StringName, direction: Vector3, restart: bool = fa
 
 func has_animation(animation_name: StringName) -> bool:
 	return is_instance_valid(animation_player) and animation_player.has_animation(animation_name)
+
+
+func play_hit_feedback() -> void:
+	if not is_instance_valid(sprite):
+		return
+	if _hit_flash_tween != null:
+		_hit_flash_tween.kill()
+	sprite.modulate = hit_flash_color
+	_hit_flash_tween = create_tween()
+	_hit_flash_tween.tween_property(sprite, "modulate", _sprite_modulate, hit_flash_duration)
 
 
 func _play_directional(restart: bool = false) -> bool:
