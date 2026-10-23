@@ -5,12 +5,14 @@ signal action_rejected(action: StringName)
 signal dash_finished(interrupted: bool)
 signal dash_started
 
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 @export var data: PlayerData
 
 @export var stamina: StaminaComponent
 @export var hp: HealthComponent
 @export var hurtbox: HurtBox
-@export var team: int = 1
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
 @export var weapon_controller: WeaponController
 @export var ammo: AmmoComponent
 @export var attack_animation_prefix: String = "attack_dagger"

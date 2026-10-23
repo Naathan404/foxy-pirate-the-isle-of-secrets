@@ -6,21 +6,27 @@ extends Node3D
 ## Left/right clips are also supported as <action>_left and <action>_right.
 
 signal animation_finished(animation_name: StringName)
+signal death_feedback_finished
 
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
 @export var hit_flash_color: Color = Color(1.0, 0.45, 0.45, 1.0)
-@export_range(0.01, 1.0, 0.01) var hit_flash_duration: float = 0.08
+@export_range(0.01, 1.0, 0.01) var hit_flash_duration: float = 0.12
+@export_range(1.0, 2.0, 0.01) var hit_pulse_scale: float = 1.12
+@export_range(0.01, 2.0, 0.01) var death_fade_duration: float = 0.3
 
 var _directional_action: StringName = &""
 var _facing: Vector3 = Vector3.BACK
 var _sprite_modulate: Color = Color.WHITE
+var _sprite_scale: Vector3 = Vector3.ONE
 var _hit_flash_tween: Tween
+var _death_feedback_tween: Tween
 
 
 func _ready() -> void:
 	if is_instance_valid(sprite):
 		_sprite_modulate = sprite.modulate
+		_sprite_scale = sprite.scale
 	if is_instance_valid(animation_player):
 		animation_player.animation_finished.connect(_on_animation_finished)
 
@@ -59,8 +65,26 @@ func play_hit_feedback() -> void:
 	if _hit_flash_tween != null:
 		_hit_flash_tween.kill()
 	sprite.modulate = hit_flash_color
-	_hit_flash_tween = create_tween()
+	sprite.scale = _sprite_scale * hit_pulse_scale
+	_hit_flash_tween = create_tween().set_parallel()
 	_hit_flash_tween.tween_property(sprite, "modulate", _sprite_modulate, hit_flash_duration)
+	_hit_flash_tween.tween_property(sprite, "scale", _sprite_scale, hit_flash_duration)
+
+
+func play_death_feedback() -> bool:
+	if not is_instance_valid(sprite):
+		return false
+	if _hit_flash_tween != null:
+		_hit_flash_tween.kill()
+	if _death_feedback_tween != null:
+		_death_feedback_tween.kill()
+	sprite.modulate = _sprite_modulate
+	sprite.scale = _sprite_scale
+	_death_feedback_tween = create_tween().set_parallel()
+	_death_feedback_tween.tween_property(sprite, "modulate:a", 0.0, death_fade_duration)
+	_death_feedback_tween.tween_property(sprite, "scale", _sprite_scale * 0.25, death_fade_duration)
+	_death_feedback_tween.finished.connect(_on_death_feedback_finished, CONNECT_ONE_SHOT)
+	return true
 
 
 func _play_directional(restart: bool = false) -> bool:
@@ -79,8 +103,6 @@ func _get_directional_animation_name(action: StringName) -> StringName:
 		var horizontal_suffix := "right" if _facing.x > 0.0 else "left"
 		var horizontal_name := StringName(String(action) + "_" + horizontal_suffix)
 		if animation_player.has_animation(horizontal_name):
-			if is_instance_valid(sprite):
-				sprite.flip_h = false
 			return horizontal_name
 		suffix = "side"
 		flip_side = _facing.x < 0.0
@@ -108,3 +130,7 @@ func _play(animation_name: StringName, restart: bool) -> bool:
 
 func _on_animation_finished(animation_name: StringName) -> void:
 	animation_finished.emit(animation_name)
+
+
+func _on_death_feedback_finished() -> void:
+	death_feedback_finished.emit()

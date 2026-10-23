@@ -8,6 +8,7 @@ extends EnemyState
 @export var turn_at_ledge: bool = true
 @export_range(0.0, 10.0, 0.1) var speed_scale: float = 1.0
 @export var movement_animation: StringName = &"run"
+@export var use_contact_damage: bool = false
 
 @export_group("Random Pause")
 ## Disabled keeps the original continuous patrol behavior.
@@ -35,6 +36,13 @@ func _enter() -> void:
 	_random.randomize()
 	_set_moving_phase()
 	_reset_axis_change_timer()
+	if use_contact_damage:
+		enemy._start_contact_damage()
+
+
+func _exit() -> void:
+	if use_contact_damage:
+		enemy._stop_contact_damage()
 
 
 func _update(delta: float) -> void:

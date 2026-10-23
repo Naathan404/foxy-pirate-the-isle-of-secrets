@@ -16,5 +16,6 @@ extends Resource
 
 @export_group("Hit Reaction")
 @export_range(0.01, 10.0, 0.01) var hit_duration: float = 0.2
+@export_range(0.0, 10.0, 0.01) var hit_recovery_duration: float = 0.3
 @export_range(0.0, 100.0, 0.1) var hit_knockback_speed: float = 6.0
 @export_range(0.0, 100.0, 0.1) var hit_deceleration: float = 30.0

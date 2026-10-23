@@ -16,9 +16,9 @@ func _run() -> void:
 	_expect(is_instance_valid(enemy.visual), "Enemy scene includes an EnemyVisual component")
 	_expect(enemy.hp.current_hp == enemy.data.max_hp, "Enemy initializes health")
 	_expect(enemy.hurtbox.actor == enemy, "Enemy HurtBox targets its owner")
-	_expect(enemy.hitbox.actor == enemy, "Enemy HitBox targets its owner")
+	_expect(enemy.active_hitbox.actor == enemy, "Enemy active HitBox targets its owner")
 	_expect(enemy.hurtbox.team == enemy.team, "Enemy HurtBox inherits team")
-	_expect(enemy.hitbox.team == enemy.team, "Enemy HitBox inherits team")
+	_expect(enemy.active_hitbox.team == enemy.team, "Enemy active HitBox inherits team")
 	_expect(enemy.collision_layer == CombatLayers.ENEMY_BODY, "Enemy uses EnemyBody layer")
 	_expect(enemy.collision_mask == CombatLayers.ENEMY_BODY_MASK, "Enemy body mask is explicit")
 	_expect(
@@ -29,21 +29,34 @@ func _run() -> void:
 		enemy.hurtbox.collision_mask == CombatLayers.PLAYER_ATTACK,
 		"Enemy HurtBox only queries PlayerAttack"
 	)
-	_expect(enemy.hitbox.collision_layer == CombatLayers.ENEMY_ATTACK, "Enemy HitBox uses EnemyAttack")
 	_expect(
-		enemy.hitbox.collision_mask == CombatLayers.PLAYER_HURTBOX,
-		"Enemy HitBox only queries PlayerHurtBox"
+		enemy.active_hitbox.collision_layer == CombatLayers.ENEMY_ATTACK,
+		"Enemy active HitBox uses EnemyAttack"
+	)
+	_expect(
+		enemy.active_hitbox.collision_mask == CombatLayers.PLAYER_HURTBOX,
+		"Enemy active HitBox only queries PlayerHurtBox"
 	)
 	_expect(
 		enemy.target_detector.collision_mask == CombatLayers.PLAYER_BODY,
 		"TargetDetector only queries PlayerBody"
 	)
 	_expect(enemy.direction_pivot.is_ancestor_of(enemy.hurtbox), "HurtBox is under Direction")
-	_expect(enemy.direction_pivot.is_ancestor_of(enemy.hitbox), "HitBox is under Direction")
+	_expect(
+		enemy.direction_pivot.is_ancestor_of(enemy.active_hitbox),
+		"ActiveHitBox is under Direction"
+	)
 	_expect(enemy.direction_pivot.is_ancestor_of(enemy.front_ray), "Front ray is under Direction")
 	_expect(enemy.direction_pivot.is_ancestor_of(enemy.ground_ray), "Ground ray is under Direction")
 	_expect(not enemy.front_ray.enabled, "Front ray is opt-in by default")
 	_expect(not enemy.ground_ray.enabled, "Ground ray is opt-in by default")
+	_expect(not enemy.show_debug_health, "Debug health is disabled by default")
+	enemy.show_debug_health = true
+	_expect(enemy.debug_health_label.visible, "Debug health can be enabled")
+	_expect(
+		enemy.debug_health_label.text == "HP: %d / %d" % [enemy.hp.current_hp, enemy.hp.get_max_hp()],
+		"Debug health displays the current and maximum HP"
+	)
 	_expect(
 		enemy.direction_pivot.is_ancestor_of(enemy.target_detector),
 		"TargetDetector is under Direction"
@@ -60,12 +73,12 @@ func _run() -> void:
 	_expect(enemy.move_toward_target(1.0, 0.0), "Enemy moves toward a distant target")
 	_expect(enemy.velocity.x > 0.0, "Enemy movement points at its target")
 	_expect(
-		enemy.hitbox.global_position.is_equal_approx(enemy.global_position + Vector3.RIGHT),
-		"HitBox rotates to enemy facing"
+		enemy.active_hitbox.global_position.is_equal_approx(enemy.global_position + Vector3.RIGHT),
+		"ActiveHitBox rotates to enemy facing"
 	)
 
-	_expect(enemy.begin_attack(3, &"contact"), "Enemy starts a hitbox attack")
-	enemy.end_attack()
+	_expect(enemy.begin_active_attack(3), "Enemy starts an active attack")
+	enemy.end_active_attack()
 	var damage := DamageContext.new()
 	damage.source = player
 	damage.source_team = enemy.team
@@ -81,10 +94,10 @@ func _run() -> void:
 		enemy.receive_damage(damage) == damage.amount_hp, "Lethal damage consumes remaining health"
 	)
 	_expect(enemy.dead, "Lethal damage kills enemy")
-	_expect(enemy.collision_layer == 0, "Death disables enemy body collisions")
-	_expect(enemy.hurtbox.collision_layer == 0, "Death disables HurtBox collisions")
 	enemy.fsm._update(0.0)
 	_expect(enemy.fsm.current_state.name == &"Death", "Lethal damage enters terminal Death state")
+	_expect(enemy.collision_layer == 0, "Death disables enemy body collisions")
+	_expect(enemy.hurtbox.collision_layer == 0, "Death disables HurtBox collisions")
 	_expect(not enemy.hurtbox.enabled, "Death disables enemy HurtBox")
 	_expect(not enemy.target_detector.monitoring, "Death stops target detection")
 
@@ -97,13 +110,15 @@ func _run() -> void:
 
 func _create_enemy() -> EnemyBase:
 	var enemy := ENEMY_BASE_SCENE.instantiate() as EnemyBase
-	enemy.hitbox = HitBox.new()
-	_add_shape(enemy.hitbox)
-	enemy.hitbox.position = Vector3(0.0, 0.0, 1.0)
-	enemy.direction_pivot.add_child(enemy.hitbox)
-	enemy.target_detector = Area3D.new()
-	_add_shape(enemy.target_detector)
-	enemy.direction_pivot.add_child(enemy.target_detector)
+	var active_hitbox := HitBox.new()
+	active_hitbox.name = &"ActiveHitBox"
+	_add_shape(active_hitbox)
+	active_hitbox.position = Vector3(0.0, 0.0, 1.0)
+	enemy.get_node("Direction").add_child(active_hitbox)
+	var target_detector := Area3D.new()
+	target_detector.name = &"TargetDetector"
+	_add_shape(target_detector)
+	enemy.get_node("Direction").add_child(target_detector)
 	root.add_child(enemy)
 	enemy.set_physics_process(false)
 	return enemy
@@ -131,7 +146,9 @@ func _test_death_animation_cleanup() -> void:
 		"Enemy remains until the death animation has finished"
 	)
 	enemy.visual.animation_finished.emit(&"death_right")
-	_expect(enemy.is_queued_for_deletion(), "Enemy is removed after the death animation")
+	_expect(not enemy.is_queued_for_deletion(), "Enemy remains during death feedback")
+	enemy.visual.death_feedback_finished.emit()
+	_expect(enemy.is_queued_for_deletion(), "Enemy is removed after death feedback")
 
 
 func _expect(condition: bool, message: String) -> void:

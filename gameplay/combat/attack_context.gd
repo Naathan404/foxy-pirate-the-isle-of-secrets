@@ -6,8 +6,10 @@ extends RefCounted
 # Lượng máu thật sự mất
 signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
 
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 var actor: Node3D
-var team: int = 1
+var team: int = Teams.NONE
 var attack_id: int = 0
 var action: StringName = &"normal"
 
