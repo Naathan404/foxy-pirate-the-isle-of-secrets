@@ -53,20 +53,20 @@ normal_attack={
 ]
 }
 
+[layer_names]
+
+3d_physics/layer_1="World"
+3d_physics/layer_2="PlayerBody"
+3d_physics/layer_3="EnemyBody"
+3d_physics/layer_4="PlayerHurtBox"
+3d_physics/layer_5="EnemyHurtBox"
+3d_physics/layer_6="PlayerAttack"
+3d_physics/layer_7="EnemyAttack"
+3d_physics/layer_8="TargetDetector"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
-
-[layer_names/3d_physics]
-
-layer_1="World"
-layer_2="PlayerBody"
-layer_3="EnemyBody"
-layer_4="PlayerHurtBox"
-layer_5="EnemyHurtBox"
-layer_6="PlayerAttack"
-layer_7="EnemyAttack"
-layer_8="TargetDetector"
 
 [rendering]
 
