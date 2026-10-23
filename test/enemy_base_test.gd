@@ -40,6 +40,10 @@ func _run() -> void:
 	)
 	_expect(enemy.direction_pivot.is_ancestor_of(enemy.hurtbox), "HurtBox is under Direction")
 	_expect(enemy.direction_pivot.is_ancestor_of(enemy.hitbox), "HitBox is under Direction")
+	_expect(enemy.direction_pivot.is_ancestor_of(enemy.front_ray), "Front ray is under Direction")
+	_expect(enemy.direction_pivot.is_ancestor_of(enemy.ground_ray), "Ground ray is under Direction")
+	_expect(not enemy.front_ray.enabled, "Front ray is opt-in by default")
+	_expect(not enemy.ground_ray.enabled, "Ground ray is opt-in by default")
 	_expect(
 		enemy.direction_pivot.is_ancestor_of(enemy.target_detector),
 		"TargetDetector is under Direction"

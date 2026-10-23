@@ -9,7 +9,9 @@ extends CharacterBody3D
 ## ray casts, spawn markers, and attack effects. Visual stays outside Direction because
 ## AnimationPlayer expresses its facing through directional animation clips.
 ##
-## Optional: HitBox, TargetDetector, RayCast3D nodes, throwable components, and skills.
+## Optional: HitBox, TargetDetector, throwable components, and skills.
+## FrontRayCast3D and GroundRayCast3D are included but disabled by default; enable
+## and position them only for enemy states that need directional patrol checks.
 ##
 ## Layer/mask convention: EnemyBody only collides with World and PlayerBody;
 ## EnemyHurtBox only receives PlayerAttack; a contact HitBox only queries
@@ -31,6 +33,7 @@ signal died
 @export var ground_ray: RayCast3D
 @export var fsm: Fsm
 @export var initial_state: FsmState
+@export var initial_facing_direction: Vector3 = Vector3.BACK
 @export var team: int = 2
 @export var target_group: StringName = &"player"
 ## When enabled, a dead enemy remains visible until its non-looping death animation finishes.
@@ -52,6 +55,7 @@ func _ready() -> void:
 	_setup_combat()
 	_setup_direction_checks()
 	_setup_target_detector()
+	face_direction(initial_facing_direction)
 	var state_parent := initial_state.get_parent()
 	if not fsm.setup(self, state_parent, initial_state):
 		set_physics_process(false)

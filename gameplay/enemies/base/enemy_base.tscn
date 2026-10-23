@@ -17,7 +17,7 @@ height = 1.8
 [sub_resource type="SphereShape3D" id="SphereShape3D_hurtbox"]
 radius = 0.55
 
-[node name="EnemyBase" type="CharacterBody3D" node_paths=PackedStringArray("hp", "hurtbox", "visual", "direction_pivot", "fsm", "initial_state")]
+[node name="EnemyBase" type="CharacterBody3D" node_paths=PackedStringArray("hp", "hurtbox", "visual", "direction_pivot", "front_ray", "ground_ray", "fsm", "initial_state")]
 script = ExtResource("1_enemy_base")
 data = ExtResource("2_enemy_data")
 collision_layer = 4
@@ -26,6 +26,8 @@ hp = NodePath("HealthComponent")
 hurtbox = NodePath("Direction/HurtBox")
 visual = NodePath("Visual")
 direction_pivot = NodePath("Direction")
+front_ray = NodePath("Direction/FrontRayCast3D")
+ground_ray = NodePath("Direction/GroundRayCast3D")
 fsm = NodePath("FSM")
 initial_state = NodePath("States/Idle")
 
@@ -44,6 +46,16 @@ texture_filter = 0
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Visual"]
 
 [node name="Direction" type="Node3D" parent="."]
+
+[node name="FrontRayCast3D" type="RayCast3D" parent="Direction"]
+enabled = false
+position = Vector3(0, 0.5, 0)
+target_position = Vector3(0, 0, 1)
+
+[node name="GroundRayCast3D" type="RayCast3D" parent="Direction"]
+enabled = false
+position = Vector3(0, 0.5, 0.9)
+target_position = Vector3(0, -1.5, 0)
 
 [node name="FSM" type="Node" parent="."]
 script = ExtResource("6_fsm")
