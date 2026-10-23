@@ -40,7 +40,7 @@ func _run() -> void:
 		"Crab contact HitBox rotates with Direction"
 	)
 	var patrol := crab.get_node_or_null("States/Patrol") as EnemyPatrol
-	_expect(is_instance_valid(patrol), "Crab uses the shared Patrol state")
+	_expect(is_instance_valid(patrol), "Crab Patrol extends the shared Patrol state")
 	_expect(patrol.use_contact_damage, "Crab Patrol owns contact damage activation")
 	_expect(crab.active_hitbox == null, "Crab has no active attack HitBox")
 	_expect(crab.visual.has_animation(&"run_left"), "Crab has directional run animation")
@@ -75,6 +75,10 @@ func _test_hit_reaction() -> void:
 	_expect(crab.fsm.current_state.name == &"Hit", "Crab enters Hit after taking damage")
 	_expect(not crab.contact_hitbox.is_active(), "Hit disables contact damage")
 	_expect(
+		absf(crab.last_facing_direction.x) > absf(crab.last_facing_direction.z),
+		"Crab waits to change patrol axis until Hit has finished"
+	)
+	_expect(
 		String(crab.visual.animation_player.assigned_animation).begins_with("hit_"),
 		"Crab plays its hit animation"
 	)
@@ -91,6 +95,10 @@ func _test_hit_reaction() -> void:
 	crab.fsm._update(0.0)
 	_expect(crab.fsm.current_state.name == &"Patrol", "Crab returns to Patrol after recovery")
 	_expect(crab.contact_hitbox.is_active(), "Patrol restores contact damage after recovery")
+	_expect(
+		absf(crab.last_facing_direction.z) > absf(crab.last_facing_direction.x),
+		"Crab changes patrol from horizontal to vertical after being hit"
+	)
 	crab.free()
 	attacker.free()
 
