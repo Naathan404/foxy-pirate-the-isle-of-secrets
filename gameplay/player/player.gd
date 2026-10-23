@@ -28,6 +28,7 @@ var attack_requested: bool = false
 var pending_attack_action: StringName = &"normal"
 var dead: bool = false
 var pending_hit_duration: float = 0.0
+var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 
@@ -111,6 +112,7 @@ func receive_damage(damage: DamageContext) -> int:
 		return 0
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
+	pending_hit_direction = _get_hit_direction(damage.source)
 	var amount := damage.amount_hp
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
@@ -287,6 +289,15 @@ func update_facing() -> void:
 func set_horizontal_velocity(value: Vector3) -> void:
 	velocity.x = value.x
 	velocity.z = value.z
+
+
+func _get_hit_direction(source: Node) -> Vector3:
+	if source is Node3D:
+		var direction := global_position - (source as Node3D).global_position
+		direction.y = 0.0
+		if not direction.is_zero_approx():
+			return direction.normalized()
+	return -last_facing_direction
 
 
 func update_movement(delta: float, moving: bool) -> void:
