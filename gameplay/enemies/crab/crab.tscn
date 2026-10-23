@@ -24,39 +24,36 @@ initial_facing = 2
 destroy_on_death = true
 show_debug_health = true
 
-[node name="Sprite3D" parent="Visual" index="0"]
+[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
 offset = Vector2(0, 14)
 texture = ExtResource("3_texture")
 hframes = 3
 vframes = 5
 
-[node name="AnimationPlayer" parent="Visual" index="1"]
+[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
 libraries/ = ExtResource("4_anims")
 
-[node name="FrontRayCast3D" parent="Direction" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
 enabled = true
 
-[node name="GroundRayCast3D" parent="Direction" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.9)
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
 enabled = true
 
-[node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_hurtbox")
 
-[node name="ContactHitBox" type="Area3D" parent="Direction" index="3" unique_id=1042209023]
+[node name="ContactHitBox" type="Area3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=1042209023]
 script = ExtResource("5_hitbox")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Direction/ContactHitBox" index="0" unique_id=973233335]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_hitbox")
 
-[node name="Patrol" type="Node" parent="States" index="3" unique_id=779580310]
+[node name="Patrol" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=779580310]
 script = ExtResource("6_patrol")
-use_random_pauses = true
 use_contact_damage = true
 
-[node name="CollisionShape3D" parent="." index="4"]
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8612366, 0)
 shape = SubResource("CylinderShape3D_body")
