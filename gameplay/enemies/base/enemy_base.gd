@@ -1,50 +1,50 @@
 class_name EnemyBase
 extends CharacterBody3D
 
-## Enemy-only character foundation. Player and bosses intentionally use their own roots.
-##
-## Required: Direction, HealthComponent, HurtBox, FSM, and an initial state.
-##
-## Direction owns all facing-sensitive nodes: HurtBox, optional HitBox, TargetDetector,
-## ray casts, spawn markers, and attack effects. Visual stays outside Direction because
-## AnimationPlayer expresses its facing through directional animation clips.
-##
-## Optional: HitBox, TargetDetector, throwable components, and skills.
-## FrontRayCast3D and GroundRayCast3D are included but disabled by default; enable
-## and position them only for enemy states that need directional patrol checks.
-##
-## Layer/mask convention: EnemyBody only collides with World and PlayerBody;
-## EnemyHurtBox only receives PlayerAttack; a contact HitBox only queries
-## PlayerHurtBox; TargetDetector only queries PlayerBody; patrol rays query World.
-## Concrete enemy scenes own their AI states and choose which optional capabilities to attach.
+## Setup: assign EnemyData, HealthComponent, Direction/HurtBox, FSM and an initial state.
+## Keep facing-sensitive nodes under Direction. Add optional HitBox, TargetDetector and
+## patrol rays only when that enemy needs them; its scene owns the collider shapes,
+## animations and behavior states.
 
 signal target_changed(target: Node3D)
 signal damaged(applied_hp: int)
 signal died
 
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 @export var data: EnemyData
-@export var hp: HealthComponent
-@export var hurtbox: HurtBox
-@export var hitbox: HitBox
-@export var target_detector: Area3D
-@export var visual: EnemyVisual
-@export var direction_pivot: Node3D
-@export var front_ray: RayCast3D
-@export var ground_ray: RayCast3D
-@export var fsm: Fsm
-@export var initial_state: FsmState
+@export var initial_state_name: StringName = &"Idle"
 @export var initial_facing_direction: Vector3 = Vector3.BACK
-@export var team: int = 2
-@export var target_group: StringName = &"player"
-## When enabled, a dead enemy remains visible until its non-looping death animation finishes.
 @export var destroy_on_death: bool = false
 
+@export_group("Debug")
+@export var show_debug_health: bool = false:
+	set(value):
+		show_debug_health = value
+		_update_debug_health()
+
+var team: int = Teams.ENEMY
+var target_group: StringName = &"player"
 var target: Node3D
 var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
-var pending_hit_duration: float = 0.0
 var pending_hit_direction: Vector3 = Vector3.ZERO
+
+@onready var hp: HealthComponent = $HealthComponent
+@onready var hurtbox: HurtBox = $Direction/HurtBox
+@onready var active_hitbox: HitBox = get_node_or_null(^"Direction/ActiveHitBox") as HitBox
+@onready var contact_hitbox: HitBox = get_node_or_null(^"Direction/ContactHitBox") as HitBox
+@onready var target_detector: Area3D = get_node_or_null(^"Direction/TargetDetector") as Area3D
+@onready var visual: EnemyVisual = $Visual
+@onready var direction_pivot: Node3D = $Direction
+@onready var front_ray: RayCast3D = $Direction/FrontRayCast3D
+@onready var ground_ray: RayCast3D = $Direction/GroundRayCast3D
+@onready var fsm: Fsm = $FSM
+@onready var initial_state: FsmState = (
+	get_node_or_null(NodePath("States/" + String(initial_state_name))) as FsmState
+)
+@onready var debug_health_label: Label3D = $DebugHealthLabel
 
 
 func _ready() -> void:
@@ -72,7 +72,6 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
-## Shared locomotion API for patrol, chase, charge, and custom enemy states.
 func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.0) -> void:
 	if dead or data == null:
 		return
@@ -162,18 +161,6 @@ func play_animation(animation_name: StringName, restart: bool = false) -> bool:
 	return visual.play_animation(animation_name, restart)
 
 
-## Death state calls this after it has stopped all gameplay behavior.
-## A death animation must not loop, otherwise AnimationPlayer never emits animation_finished.
-func _play_death_animation() -> void:
-	var started := play_directional_animation(&"death", true)
-	if not destroy_on_death:
-		return
-	if not started or not is_instance_valid(visual):
-		queue_free()
-		return
-	visual.animation_finished.connect(_on_death_animation_finished, CONNECT_ONE_SHOT)
-
-
 func has_target() -> bool:
 	return is_instance_valid(target) and not dead
 
@@ -194,24 +181,38 @@ func is_ground_ahead() -> bool:
 	return not is_instance_valid(ground_ray) or not ground_ray.enabled or ground_ray.is_colliding()
 
 
-## Optional contact attack helper. Custom states control exactly when it starts and ends.
-func begin_attack(attack_id: int = 0, tag: StringName = &"contact") -> bool:
+func begin_active_attack(attack_id: int = 0, tag: StringName = &"normal") -> bool:
 	if data == null:
 		return false
-	return begin_attack_with_damage(data.attack_damage, attack_id, tag)
+	return _begin_active_attack_with_damage(data.attack_damage, attack_id, tag)
 
 
-func begin_attack_with_damage(
-	amount_hp: int, attack_id: int = 0, tag: StringName = &"contact"
+func _begin_active_attack_with_damage(
+	amount_hp: int, attack_id: int = 0, tag: StringName = &"normal"
 ) -> bool:
-	if dead or amount_hp <= 0 or not is_instance_valid(hitbox):
+	if dead or amount_hp <= 0 or not is_instance_valid(active_hitbox):
 		return false
-	return hitbox.begin_attack(amount_hp, attack_id, tag)
+	return active_hitbox.begin_attack(amount_hp, attack_id, tag)
 
 
-func end_attack() -> void:
-	if is_instance_valid(hitbox):
-		hitbox.end_attack()
+func end_active_attack() -> void:
+	if is_instance_valid(active_hitbox):
+		active_hitbox.end_attack()
+
+
+func _start_contact_damage() -> bool:
+	if dead or data == null or not is_instance_valid(contact_hitbox):
+		return false
+	contact_hitbox.actor = self
+	contact_hitbox.team = team
+	return contact_hitbox.begin_attack(
+		data.attack_damage, 0, &"contact", HitBox.RehitPolicy.ONCE_PER_CONTACT
+	)
+
+
+func _stop_contact_damage() -> void:
+	if is_instance_valid(contact_hitbox):
+		contact_hitbox.end_attack()
 
 
 func take_damage(amount: int) -> int:
@@ -232,10 +233,8 @@ func receive_damage(damage: DamageContext) -> int:
 
 
 func _notify_hit() -> void:
-	if dead or data == null:
+	if dead:
 		return
-	pending_hit_duration = data.hit_duration
-	end_attack()
 	request_state(&"hit", 50)
 
 
@@ -243,21 +242,9 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
-	_set_horizontal_velocity(Vector3.ZERO)
-	end_attack()
-	collision_layer = 0
-	collision_mask = 0
-	if is_instance_valid(hurtbox):
-		hurtbox.enabled = false
-		hurtbox.collision_layer = 0
-		hurtbox.collision_mask = 0
-	if is_instance_valid(target_detector):
-		target_detector.monitoring = false
-	set_target(null)
-	var entered_death_state := request_state(&"death", 100)
+	if not request_state(&"death", 100):
+		push_error("EnemyBase: dead enemy could not enter Death state")
 	died.emit()
-	if destroy_on_death and not entered_death_state:
-		queue_free()
 
 
 func request_state(state_name: StringName, priority: int = 0) -> bool:
@@ -286,17 +273,35 @@ func _validate_components() -> bool:
 	if not is_instance_valid(fsm) or not is_instance_valid(initial_state):
 		push_error("EnemyBase: FSM and an initial state are required")
 		return false
-	if not _validate_directional_node(hurtbox, &"HurtBox"):
+	if not _validate_required_states():
 		return false
-	if not _validate_directional_node(hitbox, &"HitBox"):
-		return false
-	if not _validate_directional_node(target_detector, &"TargetDetector"):
-		return false
-	if not _validate_directional_node(front_ray, &"FrontRayCast3D"):
-		return false
-	if not _validate_directional_node(ground_ray, &"GroundRayCast3D"):
+	if not _validate_directional_components():
 		return false
 	return true
+
+
+func _validate_required_states() -> bool:
+	var state_parent := initial_state.get_parent()
+	if not is_instance_valid(state_parent):
+		push_error("EnemyBase: initial state must belong to a state parent")
+		return false
+	for state_name: StringName in [&"Hit", &"Death"]:
+		if state_parent.get_node_or_null(NodePath(state_name)) is FsmState:
+			continue
+		push_error("EnemyBase: shared %s state is required" % state_name)
+		return false
+	return true
+
+
+func _validate_directional_components() -> bool:
+	return (
+		_validate_directional_node(hurtbox, &"HurtBox")
+		and _validate_directional_node(active_hitbox, &"ActiveHitBox")
+		and _validate_directional_node(contact_hitbox, &"ContactHitBox")
+		and _validate_directional_node(target_detector, &"TargetDetector")
+		and _validate_directional_node(front_ray, &"FrontRayCast3D")
+		and _validate_directional_node(ground_ray, &"GroundRayCast3D")
+	)
 
 
 func _validate_directional_node(node: Node, component_name: StringName) -> bool:
@@ -309,21 +314,38 @@ func _validate_directional_node(node: Node, component_name: StringName) -> bool:
 
 
 func _setup_stats() -> void:
+	hp.hp_changed.connect(_on_hp_changed)
 	hp.damaged.connect(_on_damaged)
 	hp.died.connect(die)
 	hp.init(data.max_hp)
 
 
 func _setup_combat() -> void:
+	collision_layer = CombatLayers.ENEMY_BODY
+	collision_mask = CombatLayers.ENEMY_BODY_MASK
 	hurtbox.actor = self
 	hurtbox.team = team
 	hurtbox.collision_layer = CombatLayers.ENEMY_HURTBOX
 	hurtbox.collision_mask = CombatLayers.PLAYER_ATTACK
-	if is_instance_valid(hitbox):
-		hitbox.actor = self
-		hitbox.team = team
-		hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
-		hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
+	for damage_hitbox: HitBox in [active_hitbox, contact_hitbox]:
+		if not is_instance_valid(damage_hitbox):
+			continue
+		damage_hitbox.actor = self
+		damage_hitbox.team = team
+		damage_hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
+		damage_hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
+
+
+func _disable_combat_collision() -> void:
+	collision_layer = 0
+	collision_mask = 0
+	if is_instance_valid(hurtbox):
+		hurtbox.enabled = false
+		hurtbox.collision_layer = 0
+		hurtbox.collision_mask = 0
+	if is_instance_valid(target_detector):
+		target_detector.monitoring = false
+	set_target(null)
 
 
 func _setup_target_detector() -> void:
@@ -377,9 +399,17 @@ func _on_damaged(applied_hp: int) -> void:
 		_notify_hit()
 
 
-func _on_death_animation_finished(_animation_name: StringName) -> void:
-	if dead and destroy_on_death:
-		queue_free()
+func _on_hp_changed(_current_hp: int, _maximum_hp: int) -> void:
+	_update_debug_health()
+
+
+func _update_debug_health() -> void:
+	if not is_instance_valid(debug_health_label):
+		return
+	debug_health_label.visible = show_debug_health
+	if not is_instance_valid(hp):
+		return
+	debug_health_label.text = "HP: %d / %d" % [hp.current_hp, hp.get_max_hp()]
 
 
 func _get_hit_direction(source: Node) -> Vector3:

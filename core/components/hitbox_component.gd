@@ -6,8 +6,10 @@ enum RehitPolicy {
 	ONCE_PER_CONTACT,
 }
 
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 @export var actor: Node
-@export var team: int = 1
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.NONE
 
 var _active: bool = false
 var _damage: DamageContext
@@ -55,6 +57,10 @@ func end_attack() -> void:
 	_contact_areas_by_actor.clear()
 	_rehit_policy = RehitPolicy.ONCE_PER_ATTACK
 	set_physics_process(false)
+
+
+func is_active() -> bool:
+	return _active
 
 
 func _on_area_entered(area: Area3D) -> void:
