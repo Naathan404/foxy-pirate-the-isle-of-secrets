@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/enemies/barrel/barrel_bullet.gd" id="1_bullet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/barrel/barrel_bullet.png" id="2_texture"]
+[ext_resource type="Script" path="res://core/components/hitbox_component.gd" id="3_hitbox"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_body"]
+radius = 0.2
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_bounce"]
+bounce = 0.8
+
+[node name="BarrelBullet" type="RigidBody3D"]
+physics_material_override = SubResource("PhysicsMaterial_bounce")
+script = ExtResource("1_bullet")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+pixel_size = 0.0625
+billboard = 1
+texture_filter = 0
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_body")
+
+[node name="HitBox" type="Area3D" parent="."]
+script = ExtResource("3_hitbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox"]
+shape = SubResource("SphereShape3D_body")

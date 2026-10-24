@@ -1,8 +1,10 @@
 class_name HurtBox
 extends Area3D
 
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 @export var actor: Node
-@export var team: int = 2
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.NONE
 
 var enabled: bool = true
 

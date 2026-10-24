@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://y61woas1du77"]
+
+[ext_resource type="Script" uid="uid://ng5o2djy6sh2" path="res://gameplay/enemies/base/enemy_base.gd" id="1_enemy_base"]
+[ext_resource type="Resource" uid="uid://ctj3gaxrwf2dd" path="res://data/enemies/enemy_base_data.tres" id="2_enemy_data"]
+[ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="4_hurtbox"]
+[ext_resource type="Script" uid="uid://du01rxmkvrosk" path="res://gameplay/enemies/base/enemy_visual.gd" id="5_visual"]
+[ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="6_fsm"]
+[ext_resource type="Script" uid="uid://dlt6tk58fbo2m" path="res://gameplay/enemies/base/states/enemy_idle.gd" id="7_idle"]
+[ext_resource type="Script" uid="uid://cqq0wtkbbb4b5" path="res://gameplay/enemies/base/states/enemy_hit.gd" id="10_hit"]
+[ext_resource type="Script" uid="uid://fo0rmk0j4cmd" path="res://gameplay/enemies/base/states/enemy_death.gd" id="11_death"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hurtbox"]
+radius = 0.55
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.45
+height = 1.8
+
+[node name="EnemyBase" type="CharacterBody3D" unique_id=2025135675]
+script = ExtResource("1_enemy_base")
+data = ExtResource("2_enemy_data")
+
+[node name="Visual" type="Node3D" parent="." unique_id=1278788323 node_paths=PackedStringArray("sprite", "animation_player")]
+script = ExtResource("5_visual")
+sprite = NodePath("Sprite3D")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=718327590]
+pixel_size = 0.0625
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Visual" unique_id=1154652120]
+
+[node name="Direction" type="Node3D" parent="." unique_id=1694377466]
+
+[node name="FrontRayCast3D" type="RayCast3D" parent="Direction" unique_id=1756313482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+enabled = false
+target_position = Vector3(0, 0, 1)
+
+[node name="GroundRayCast3D" type="RayCast3D" parent="Direction" unique_id=1575501443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.9)
+enabled = false
+target_position = Vector3(0, -1.5, 0)
+
+[node name="HurtBox" type="Area3D" parent="Direction" unique_id=1648399047]
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Direction/HurtBox" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("SphereShape3D_hurtbox")
+
+[node name="FSM" type="Node" parent="." unique_id=2096166197]
+script = ExtResource("6_fsm")
+
+[node name="States" type="Node" parent="." unique_id=1797154631]
+
+[node name="Idle" type="Node" parent="States" unique_id=1302703013]
+script = ExtResource("7_idle")
+
+[node name="Hit" type="Node" parent="States" unique_id=1311034515]
+script = ExtResource("10_hit")
+
+[node name="Death" type="Node" parent="States" unique_id=1387919266]
+script = ExtResource("11_death")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1670552403]
+script = ExtResource("3_health")
+
+[node name="DebugHealthLabel" type="Label3D" parent="." unique_id=2012842134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+pixel_size = 0.015
+billboard = 1
+modulate = Color(0.55, 1, 0.55, 1)
+outline_size = 4

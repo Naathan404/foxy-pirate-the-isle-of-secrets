@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://b0cb0x0phm3f4"]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Resource" uid="uid://cqwfcn87j88vq" path="res://data/enemies/crab_data.tres" id="2_data"]
+[ext_resource type="Texture2D" uid="uid://dxkc50p2rl15x" path="res://assets/sprites/enemies/crab/crab_sprite_sheet.png" id="3_texture"]
+[ext_resource type="AnimationLibrary" uid="uid://fya1b26i2m6b" path="res://gameplay/enemies/crab/crab_anims.tres" id="4_anims"]
+[ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_hitbox"]
+[ext_resource type="Script" path="res://gameplay/enemies/crab/states/crab_patrol.gd" id="6_patrol"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
+size = Vector3(2.4, 1.2, 2.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
+size = Vector3(1.6, 1, 1.6)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+height = 1.6801147
+radius = 0.7998047
+
+[node name="Crab" unique_id=1674830806 instance=ExtResource("1_base")]
+data = ExtResource("2_data")
+initial_state_name = &"Patrol"
+initial_facing = 2
+destroy_on_death = true
+show_debug_health = true
+
+[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+offset = Vector2(0, 14)
+texture = ExtResource("3_texture")
+hframes = 3
+vframes = 5
+
+[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
+libraries/ = ExtResource("4_anims")
+
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
+enabled = true
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_hurtbox")
+
+[node name="ContactHitBox" type="Area3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=1042209023]
+script = ExtResource("5_hitbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Direction/ContactHitBox" index="0" unique_id=973233335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_hitbox")
+
+[node name="Patrol" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=779580310]
+script = ExtResource("6_patrol")
+use_contact_damage = true
+
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8612366, 0)
+shape = SubResource("CylinderShape3D_body")

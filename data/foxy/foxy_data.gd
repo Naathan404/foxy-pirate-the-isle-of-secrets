@@ -41,4 +41,4 @@ const ANIM = {
 @export_range(0.0, 1.0) var dash_buffer_duration: float = 0.1
 
 @export_group("Hit Reaction")
-@export_range(0.01, 5.0) var hit_duration: float = 0.2
+@export_range(0.01, 5.0) var hit_duration: float = 0.6

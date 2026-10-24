@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://rp5mbciko3vn"]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://b5ulpevi66h1w" path="res://gameplay/enemies/barrel/barrel.gd" id="2_barrel"]
+[ext_resource type="Resource" path="res://data/enemies/barrel_data.tres" id="3_data"]
+[ext_resource type="Texture2D" uid="uid://cbbgv5rfktb6s" path="res://assets/sprites/enemies/barrel/barrel_sprite_sheet.png" id="4_texture"]
+[ext_resource type="AnimationLibrary" uid="uid://m022cu4lshu5" path="res://gameplay/enemies/barrel/barrel_anims.tres" id="5_anims"]
+[ext_resource type="Script" uid="uid://bu5d42kp3g21o" path="res://gameplay/enemies/barrel/states/barrel_idle.gd" id="6_idle"]
+[ext_resource type="Script" uid="uid://d4f1rn1adcpdy" path="res://gameplay/enemies/barrel/states/barrel_shoot.gd" id="7_shoot"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
+size = Vector3(1.8, 1.2, 1.8)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
+radius = 4.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+height = 1.2
+radius = 0.75
+
+[node name="Barrel" unique_id=1050350307 instance=ExtResource("1_base")]
+script = ExtResource("2_barrel")
+bullet_speed = 12.0
+min_bullets_per_volley = 1
+max_bullets_per_volley = 5
+max_bullet_angle_offset_degrees = 6.0
+data = ExtResource("3_data")
+initial_facing = 2
+destroy_on_death = true
+show_debug_health = true
+
+[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+offset = Vector2(0, 15.5)
+texture = ExtResource("4_texture")
+hframes = 3
+vframes = 9
+frame = 18
+
+[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
+libraries/ = ExtResource("5_anims")
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_hurtbox")
+
+[node name="BulletSpawn" type="Marker3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=889465958]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1011593, 0.2)
+
+[node name="Idle" parent="States" parent_id_path=PackedInt32Array(1797154631) index="0" unique_id=1302703013]
+script = ExtResource("6_idle")
+
+[node name="Shoot" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=1159447923]
+script = ExtResource("7_shoot")
+
+[node name="TargetDetector" type="Area3D" parent="." index="4" unique_id=1419563400]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector" index="0" unique_id=1785130377]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_detector")
+
+[node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("CylinderShape3D_body")

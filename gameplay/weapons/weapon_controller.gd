@@ -8,8 +8,11 @@ signal damage_dealt(damage: DamageContext, target: Node, applied_hp: int)
 
 # Các giai đoạn của 1 đòn đánh
 enum Phase { WINDUP, ACTIVE, RECOVERY }
+
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 @export var default_weapon: WeaponData
-@export var team: int = 1
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
 
 var equipped: WeaponInstance
 # Đang đánh thì không nhận đòn mới hoặc đổi vũ khí
