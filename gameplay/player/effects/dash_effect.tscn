@@ -83,25 +83,29 @@ process_material = SubResource("ParticleProcessMaterial_esbxr")
 draw_pass_1 = SubResource("QuadMesh_qm246")
 
 [node name="Ghost_1" type="Sprite3D" parent="." unique_id=1809366250]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
 
 [node name="Ghost_2" type="Sprite3D" parent="." unique_id=1926805992]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
 
 [node name="Ghost_3" type="Sprite3D" parent="." unique_id=1508247531]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
 
 [node name="Ghost_4" type="Sprite3D" parent="." unique_id=1498229806]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0

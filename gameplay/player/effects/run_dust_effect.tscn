@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dgx5c1qlu0dls"]
+
+[ext_resource type="Script" uid="uid://dq5s3mknrqyen" path="res://gameplay/player/effects/run_dust_effect.gd" id="1_1ejdq"]
+[ext_resource type="Texture2D" uid="uid://d4iqme7rpcnvy" path="res://assets/sprites/effects/Dust Particle.png" id="1_pb8ih"]
+
+[sub_resource type="Gradient" id="Gradient_1ejdq"]
+colors = PackedColorArray(0.9829764, 0.78728676, 0.43750682, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
+gradient = SubResource("Gradient_1ejdq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pb8ih"]
+emission_shape = 3
+emission_box_extents = Vector3(0.12, 0.01, 0.08)
+direction = Vector3(0, 1, 0)
+spread = 65.0
+initial_velocity_min = 0.5
+initial_velocity_max = 0.7
+gravity = Vector3(0, 0.3, 0)
+scale_min = 2.0
+scale_max = 3.0
+color_ramp = SubResource("GradientTexture1D_fi5gb")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pb8ih"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_pb8ih")
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_1ejdq"]
+material = SubResource("StandardMaterial3D_pb8ih")
+size = Vector2(0.5, 0.5)
+
+[node name="RunDustEffect" type="Node3D" unique_id=2095352562]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+script = ExtResource("1_1ejdq")
+heel_offset = 0.5
+
+[node name="Particle" type="GPUParticles3D" parent="." unique_id=1241942936]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.05, 0)
+emitting = false
+amount = 25
+amount_ratio = 0.4
+lifetime = 0.35
+process_material = SubResource("ParticleProcessMaterial_pb8ih")
+draw_pass_1 = SubResource("QuadMesh_1ejdq")
