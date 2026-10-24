@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://xdoo8a6qp5po"]
-
-[ext_resource type="Script" uid="uid://boe5rxmapxpg1" path="res://gameplay/player/hud/player_status_hud.gd" id="1_tji38"]
-
-[node name="PlayerStatusHud" type="CanvasLayer" unique_id=400788151]
-script = ExtResource("1_tji38")
