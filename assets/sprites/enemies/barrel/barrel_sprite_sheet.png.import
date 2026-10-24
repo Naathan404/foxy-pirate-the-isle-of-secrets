@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cbbgv5rfktb6s"
-path.s3tc="res://.godot/imported/barrel_sprite_sheet.png-597bf2a5d47dd918cf8ea110a662d48f.s3tc.ctex"
+path="res://.godot/imported/barrel_sprite_sheet.png-597bf2a5d47dd918cf8ea110a662d48f.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/enemies/barrel/barrel_sprite_sheet.png"
-dest_files=["res://.godot/imported/barrel_sprite_sheet.png-597bf2a5d47dd918cf8ea110a662d48f.s3tc.ctex"]
+dest_files=["res://.godot/imported/barrel_sprite_sheet.png-597bf2a5d47dd918cf8ea110a662d48f.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
