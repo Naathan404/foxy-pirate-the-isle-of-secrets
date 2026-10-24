@@ -2,6 +2,8 @@ class_name BarrelBullet
 extends RigidBody3D
 
 @export_range(0.1, 30.0, 0.1, "suffix:s") var lifetime: float = 4.0
+@export_group("Movement")
+@export_range(0.0, 1.0, 0.01) var bounce_strength: float = 0.8
 
 var _source: Node
 var _source_team: int = 0
@@ -25,6 +27,8 @@ func _ready() -> void:
 	_remaining_lifetime = lifetime
 	collision_layer = 0
 	collision_mask = CombatLayers.WORLD
+	if physics_material_override != null:
+		physics_material_override.bounce = bounce_strength
 	linear_velocity = _direction * _speed
 	hitbox.actor = _source
 	hitbox.team = _source_team
