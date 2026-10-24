@@ -120,7 +120,7 @@ func _physics_process(delta: float) -> void:
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	_read_input()
 	fsm._update(delta)
-	
+
 	### test
 	if Input.is_action_just_pressed("test_hit"):
 		take_damage(1)

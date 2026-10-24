@@ -28,6 +28,15 @@ extends CanvasLayer
 @export var hit_texture: Texture2D
 @export var dead_texture: Texture2D
 
+var _health_ratio: float = 1.0
+var _dead: bool = false
+var _hit_remaining: float = 0.0
+var _portrait_position: Vector2
+var _hovered_bar: ArcTooltipBar
+var _hover_time: float = 0.0
+var _mouse_position: Vector2
+var _pointer_inside: bool = false
+
 # Nền, fill, bóng
 @onready var health_capacity: ArcTooltipBar = $HealthCapacity
 @onready var health_fill: TextureProgressBar = $HealthFill
@@ -40,16 +49,6 @@ extends CanvasLayer
 @onready var portrait: TextureRect = $Portrait
 @onready var stat_tooltip: PanelContainer = $StatTooltip
 @onready var tooltip_label: Label = $StatTooltip/Value
-
-var _health_ratio: float = 1.0
-var _dead: bool = false
-var _hit_remaining: float = 0.0
-var _portrait_position: Vector2
-var _hovered_bar: ArcTooltipBar
-var _hover_time: float = 0.0
-var _mouse_position: Vector2
-var _pointer_inside: bool = false
-
 
 func _ready() -> void:
 	_mouse_position = get_viewport().get_mouse_position()

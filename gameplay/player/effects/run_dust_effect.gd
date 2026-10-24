@@ -4,9 +4,9 @@ extends Node3D
 @export_range(0.0, 5.0, 0.01) var minimum_speed: float = 0.2
 @export_range(0.0, 2.0, 0.01) var heel_offset: float = 0.15
 
-@onready var particle: GPUParticles3D = $Particle
-
 var _rest_position: Vector3
+
+@onready var particle: GPUParticles3D = $Particle
 
 
 func _ready() -> void:

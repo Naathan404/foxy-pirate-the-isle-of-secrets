@@ -31,7 +31,7 @@ func _ready() -> void:
 	white_fill.modulate.a = 0.0
 
 
-func set_target(amount: float) -> void:                     
+func set_target(amount: float) -> void:
 	_sync_white_fill()
 	var next_target := clampf(amount, color_fill.min_value, color_fill.max_value)
 	if not _initialized:
@@ -105,7 +105,10 @@ func _start_following() -> void:
 func _try_finish() -> void:
 	if not _following:
 		return
-	if not is_equal_approx(color_fill.value, _target) or not is_equal_approx(white_fill.value, _target):
+	if (
+		not is_equal_approx(color_fill.value, _target)
+		or not is_equal_approx(white_fill.value, _target)
+	):
 		return
 	_stop(_fade_tween)
 	_fade_tween = create_tween()
