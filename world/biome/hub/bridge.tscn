@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://d0fte67sn6yi0"]
+
+[ext_resource type="Texture2D" uid="uid://c0hpmidu42byx" path="res://assets/textures/bridge/bridge.png" id="1_njj0c"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fxrp0"]
+albedo_texture = ExtResource("1_njj0c")
+uv1_scale = Vector3(0.25, 4, 2)
+uv1_offset = Vector3(0.5, 0, 0)
+uv1_triplanar = true
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_1h7xg"]
+material = SubResource("StandardMaterial3D_fxrp0")
+size = Vector3(8, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fxrp0"]
+size = Vector3(8, 0.5, 4)
+
+[node name="Bridge" type="Node3D" unique_id=334634608]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1828208419]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 3.75, 27)
+mesh = SubResource("BoxMesh_1h7xg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D" unique_id=685619455]
+shape = SubResource("BoxShape3D_fxrp0")
