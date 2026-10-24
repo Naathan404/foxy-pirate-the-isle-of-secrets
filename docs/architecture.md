@@ -1,4 +1,4 @@
-Cấu trúc dự 
+Cấu trúc dự án
 
 foxy-pirate/
 │
