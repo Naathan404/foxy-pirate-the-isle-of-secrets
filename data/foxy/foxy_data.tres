@@ -8,4 +8,3 @@ move_speed = 8.0
 acceleration = 20.0
 dash_distance = 5.0
 dash_duration = 0.2
-hit_duration = 0.6
