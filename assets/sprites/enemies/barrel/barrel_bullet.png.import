@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/barrel_bullet.png-37a1f83512b4c2b0bd399a953b7
 
 [params]
 
-compress/mode=0
+compress/mode=3
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

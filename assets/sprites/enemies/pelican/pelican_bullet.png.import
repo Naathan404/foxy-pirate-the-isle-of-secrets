@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/pelican_bullet.png-5641704df537929aa06abde508
 
 [params]
 
-compress/mode=0
+compress/mode=3
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
