@@ -1,6 +1,12 @@
 class_name HitBox
 extends Area3D
 
+signal hit_confirmed(
+	damage: DamageContext,
+	target: Node,
+	applied_hp: int
+)
+
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
 	ONCE_PER_CONTACT,
@@ -76,8 +82,15 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 	# Reserve before dispatch because damage callbacks can cancel the attack.
 	_hit_actors[target_id] = true
-	if hurtbox.take_damage(_damage) <= 0:
+
+	var damage = _damage
+	var target = hurtbox.actor
+	var applied_hp = hurtbox.take_damage(damage)
+	if applied_hp <= 0:
 		_hit_actors.erase(target_id)
+		return
+
+	hit_confirmed.emit(damage, target, applied_hp)
 
 
 func _on_area_exited(area: Area3D) -> void:
