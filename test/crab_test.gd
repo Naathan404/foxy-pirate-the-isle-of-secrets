@@ -1,7 +1,7 @@
 extends SceneTree
 
 const CRAB_SCENE := preload("res://gameplay/enemies/crab/crab.tscn")
-const CRAB_PLAYER_TEST_SCENE := preload("res://test/crab_player_test.tscn")
+const CRAB_PLAYER_TEST_SCENE := preload("res://test/enemy_player_test.tscn")
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
 var _failures: int = 0
