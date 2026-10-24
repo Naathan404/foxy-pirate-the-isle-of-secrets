@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://vqugjaeojcll"]
+[gd_scene format=3 uid="uid://cqq0spbibq5n7"]
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_m5cd5"]
 [ext_resource type="Texture2D" uid="uid://b2mod3odqs0p" path="res://icon.svg" id="2_lr5j1"]

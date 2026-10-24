@@ -9,5 +9,5 @@
 // please increase this counter as a
 // warning for the next person:
 //
-// total_hours_wasted_here = 10
+// total_hours_wasted_here = 24
 ```
