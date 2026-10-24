@@ -63,6 +63,7 @@ func _ready() -> void:
 	_setup_direction_checks()
 	_setup_target_detector()
 	face_direction(_get_initial_facing_direction())
+	_refresh_direction_checks()
 	var state_parent := initial_state.get_parent()
 	if not fsm.setup(self, state_parent, initial_state):
 		set_physics_process(false)
@@ -380,6 +381,12 @@ func _setup_direction_checks() -> void:
 	for ray: RayCast3D in [front_ray, ground_ray]:
 		if is_instance_valid(ray):
 			ray.collision_mask = CombatLayers.WORLD
+
+
+func _refresh_direction_checks() -> void:
+	for ray: RayCast3D in [front_ray, ground_ray]:
+		if is_instance_valid(ray) and ray.enabled:
+			ray.force_raycast_update()
 
 
 func _refresh_target() -> void:
