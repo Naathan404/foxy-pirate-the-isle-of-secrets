@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_cu3kv")
+max_sp = 350.0
 move_speed = 8.0
 acceleration = 25.0
 deceleration = 25.0

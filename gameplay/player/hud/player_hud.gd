@@ -148,7 +148,7 @@ func _on_hp_changed(current: int, maximum: int) -> void:
 func _on_stamina_changed(current: float, maximum: float) -> void:
 	_update_arc(stamina_capacity, stamina_fill, stamina_shadow, maximum, stamina_at_full_arc)
 	stamina_fill_effect.set_target(current)
-	stamina_capacity.set_stat_tooltip("Stamina: %d / %d" % [
+	stamina_capacity.set_stat_tooltip("SP: %d / %d" % [
 		floori(current),
 		floori(maximum)
 	])
