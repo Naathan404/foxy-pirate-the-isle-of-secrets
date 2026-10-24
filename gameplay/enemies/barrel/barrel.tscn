@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://b5ulpevi66h1w" path="res://gameplay/enemies/barrel/barrel.gd" id="2_barrel"]
-[ext_resource type="Resource" path="res://data/enemies/barrel_data.tres" id="3_data"]
+[ext_resource type="Resource" uid="uid://bl2e72ovh1uu8" path="res://data/enemies/barrel_data.tres" id="3_data"]
 [ext_resource type="Texture2D" uid="uid://cbbgv5rfktb6s" path="res://assets/sprites/enemies/barrel/barrel_sprite_sheet.png" id="4_texture"]
 [ext_resource type="AnimationLibrary" uid="uid://m022cu4lshu5" path="res://gameplay/enemies/barrel/barrel_anims.tres" id="5_anims"]
 [ext_resource type="Script" uid="uid://bu5d42kp3g21o" path="res://gameplay/enemies/barrel/states/barrel_idle.gd" id="6_idle"]
@@ -20,7 +20,7 @@ radius = 0.75
 
 [node name="Barrel" unique_id=1050350307 instance=ExtResource("1_base")]
 script = ExtResource("2_barrel")
-bullet_speed = 12.0
+bullet_speed = 10.0
 min_bullets_per_volley = 1
 max_bullets_per_volley = 5
 max_bullet_angle_offset_degrees = 6.0
