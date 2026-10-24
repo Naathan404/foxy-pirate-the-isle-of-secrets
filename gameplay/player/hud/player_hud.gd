@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-const ArcTooltipBar = preload("res://gameplay/player/hud/arc_tooltip_bar.gd")
-
 @export_group("Stat Components")
 @export var health: HealthComponent
 @export var stamina: StaminaComponent
@@ -37,6 +35,8 @@ const ArcTooltipBar = preload("res://gameplay/player/hud/arc_tooltip_bar.gd")
 @onready var stamina_capacity: ArcTooltipBar = $StaminaCapacity
 @onready var stamina_fill: TextureProgressBar = $StaminaFill
 @onready var stamina_shadow: TextureProgressBar = $StaminaShadow
+@onready var health_fill_effect: BarFillEffect = $HealthFillEffect
+@onready var stamina_fill_effect: BarFillEffect = $StaminaFillEffect
 @onready var portrait: TextureRect = $Portrait
 @onready var stat_tooltip: PanelContainer = $StatTooltip
 @onready var tooltip_label: Label = $StatTooltip/Value
@@ -138,7 +138,8 @@ func _update_tooltip(delta: float) -> void:
 
 
 func _on_hp_changed(current: int, maximum: int) -> void:
-	_update_arc(health_capacity, health_fill, health_shadow, current, maximum, health_at_full_arc)
+	_update_arc(health_capacity, health_fill, health_shadow, maximum, health_at_full_arc)
+	health_fill_effect.set_target(current)
 	_health_ratio = clampf(float(current) / maxf(maximum, 1.0), 0.0, 1.0)
 	health_capacity.set_stat_tooltip("HP: %d / %d" % [current, maximum])
 	_dead = maximum > 0 and current <= 0
@@ -146,7 +147,8 @@ func _on_hp_changed(current: int, maximum: int) -> void:
 
 
 func _on_stamina_changed(current: float, maximum: float) -> void:
-	_update_arc(stamina_capacity, stamina_fill, stamina_shadow, current, maximum, stamina_at_full_arc)
+	_update_arc(stamina_capacity, stamina_fill, stamina_shadow, maximum, stamina_at_full_arc)
+	stamina_fill_effect.set_target(current)
 	stamina_capacity.set_stat_tooltip("Stamina: %d / %d" % [
 		floori(current),
 		floori(maximum)
@@ -156,7 +158,7 @@ func _on_stamina_changed(current: float, maximum: float) -> void:
 # Update visual cuar bar, dùng chung cho tất cả các bar hp và stamina
 func _update_arc(
 	capacity: TextureProgressBar, fill: TextureProgressBar, shadow: TextureProgressBar,
-	current: float, maximum: float, points_at_full_arc: float
+	maximum: float, points_at_full_arc: float
 ) -> void:
 
 	var degrees = maximum_arc * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
@@ -170,7 +172,6 @@ func _update_arc(
 	# Nền và shadow luôn đầy, fill được fill theo giá trị value hiện tại
 	capacity.value = maxf(maximum, 0.0)
 	shadow.value = maxf(maximum, 0.0)
-	fill.value = clampf(current, 0.0, maxf(maximum, 0.0))
 
 
 func _on_damaged(_amount: int) -> void:

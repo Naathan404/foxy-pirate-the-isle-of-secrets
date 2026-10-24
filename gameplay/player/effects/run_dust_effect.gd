@@ -14,6 +14,7 @@ func _ready() -> void:
 	particle.emitting = false
 	particle.local_coords = false
 
+
 func _process(_delta: float) -> void:
 	if not is_instance_valid(player) or not is_instance_valid(player.fsm):
 		particle.emitting = false
@@ -30,7 +31,6 @@ func _process(_delta: float) -> void:
 	)
 	if not particle.emitting:
 		return
-
 
 	var behind := -movement.normalized() * heel_offset
 	particle.position = _rest_position + global_basis.inverse() * behind
