@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bonqvqqvistj6"]
+
+[ext_resource type="Script" uid="uid://ckx4a2ubmtvmk" path="res://world/components/decoration/mullti_mesh_decorator.gd" id="1_81ybn"]
+
+[node name="MultiMeshDecorator" type="Area3D" unique_id=339568960]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+script = ExtResource("1_81ybn")
+randomize_on_populate = true
+position_evenness = 0.7
+position_attempts = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1842529601]
