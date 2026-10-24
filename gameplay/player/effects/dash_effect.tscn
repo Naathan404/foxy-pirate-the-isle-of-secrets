@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c5qllhbgd1hnk"]
 
 [ext_resource type="Script" uid="uid://bxj416xc3ivej" path="res://gameplay/player/effects/dash_effect.gd" id="1_68m4i"]
+[ext_resource type="Texture2D" uid="uid://d4iqme7rpcnvy" path="res://assets/sprites/effects/Dust Particle.png" id="2_nn7br"]
 
 [sub_resource type="Gradient" id="Gradient_68m4i"]
 offsets = PackedFloat32Array(0, 0.08, 0.56710917, 1)
@@ -37,23 +38,11 @@ scale_curve = SubResource("CurveTexture_cdj4h")
 scale_over_velocity_max = 1.0
 color_ramp = SubResource("GradientTexture1D_nn7br")
 
-[sub_resource type="Gradient" id="Gradient_6pud3"]
-offsets = PackedFloat32Array(0, 0.4, 0.82, 1)
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.22, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_qwtu1"]
-gradient = SubResource("Gradient_6pud3")
-width = 16
-height = 16
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oo1e7"]
 transparency = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_texture = SubResource("GradientTexture2D_qwtu1")
+albedo_texture = ExtResource("2_nn7br")
 texture_filter = 0
 billboard_mode = 3
 particles_anim_h_frames = 1
@@ -83,25 +72,29 @@ process_material = SubResource("ParticleProcessMaterial_esbxr")
 draw_pass_1 = SubResource("QuadMesh_qm246")
 
 [node name="Ghost_1" type="Sprite3D" parent="." unique_id=1809366250]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
 
 [node name="Ghost_2" type="Sprite3D" parent="." unique_id=1926805992]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
 
 [node name="Ghost_3" type="Sprite3D" parent="." unique_id=1508247531]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
 
 [node name="Ghost_4" type="Sprite3D" parent="." unique_id=1498229806]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 texture_filter = 0
