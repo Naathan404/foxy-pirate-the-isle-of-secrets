@@ -28,6 +28,7 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 
 ## Kiểm thử Godot
 
+- `addons/` là thư mục công cụ cục bộ, không được commit. Không commit cấu hình bật plugin hoặc autoload trỏ vào thư mục này trong `project.godot` (ví dụ `godot_ai` và `_mcp_game_helper`); CI và bản clone mới phải chạy được khi không có addon cục bộ.
 - Chạy game hoặc scene liên quan đến thay đổi.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.

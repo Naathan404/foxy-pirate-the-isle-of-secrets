@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://dgah54dy2j5ek"]
+
+[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_l2d5l"]
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="2_j8q38"]
+[ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="3_j8q38"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="4_starfish"]
+
+[sub_resource type="Environment" id="Environment_test"]
+background_mode = 1
+background_color = Color(0.08, 0.14, 0.22, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.55, 0.68, 0.9, 1)
+ambient_light_energy = 0.7
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(24, 1, 16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.16, 0.35, 0.18, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector3(24, 1, 16)
+
+[node name="EnemyPlayerTest" type="Node3D" unique_id=948675044]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1837540312]
+environment = SubResource("Environment_test")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=384477050]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=123505563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=767860172]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=1398266515]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="Foxy" parent="." unique_id=2043350279 instance=ExtResource("1_l2d5l")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Crab" parent="." unique_id=1497947756 instance=ExtResource("2_j8q38")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8343942, 0, 5.188866)
+collision_layer = 4
+collision_mask = 3
+initial_facing = 0
+
+[node name="Barrel" parent="." unique_id=1351903345 instance=ExtResource("3_j8q38")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.708018, 0, 0)
+max_bullet_angle_offset_degrees = 20.0
+initial_facing = 0
+
+[node name="Starfish" parent="." unique_id=1757268475 instance=ExtResource("4_starfish")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.327168, -9.536743e-07, -3.0028124)

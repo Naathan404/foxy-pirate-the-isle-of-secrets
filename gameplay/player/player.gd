@@ -5,12 +5,14 @@ signal action_rejected(action: StringName)
 signal dash_finished(interrupted: bool)
 signal dash_started
 
+const Teams := preload("res://gameplay/combat/combat_teams.gd")
+
 @export var data: PlayerData
 
 @export var stamina: StaminaComponent
 @export var hp: HealthComponent
 @export var hurtbox: HurtBox
-@export var team: int = 1
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
 @export var weapon_controller: WeaponController
 @export var ammo: AmmoComponent
 @export var attack_animation_prefix: String = "attack_dagger"
@@ -28,6 +30,7 @@ var attack_requested: bool = false
 var pending_attack_action: StringName = &"normal"
 var dead: bool = false
 var pending_hit_duration: float = 0.0
+var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 
@@ -70,6 +73,8 @@ func _setup_combat() -> void:
 	if is_instance_valid(hurtbox):
 		hurtbox.actor = self
 		hurtbox.team = team
+		hurtbox.collision_layer = CombatLayers.PLAYER_HURTBOX
+		hurtbox.collision_mask = CombatLayers.ENEMY_ATTACK
 	if is_instance_valid(weapon_controller) and weapon_controller.has_method("setup"):
 		weapon_controller.team = team
 	if not weapon_controller.call("setup", self, stamina, ammo):
@@ -109,6 +114,7 @@ func receive_damage(damage: DamageContext) -> int:
 		return 0
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
+	pending_hit_direction = _get_hit_direction(damage.source)
 	var amount := damage.amount_hp
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
@@ -120,6 +126,10 @@ func _physics_process(delta: float) -> void:
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	_read_input()
 	fsm._update(delta)
+
+	### test
+	if Input.is_action_just_pressed("test_hit"):
+		take_damage(1)
 
 	# State chọn vận tốc, Player chỉ di chuyển vật lý 1 lần mỗi frame
 	if dead:
@@ -285,6 +295,15 @@ func update_facing() -> void:
 func set_horizontal_velocity(value: Vector3) -> void:
 	velocity.x = value.x
 	velocity.z = value.z
+
+
+func _get_hit_direction(source: Node) -> Vector3:
+	if source is Node3D:
+		var direction := global_position - (source as Node3D).global_position
+		direction.y = 0.0
+		if not direction.is_zero_approx():
+			return direction.normalized()
+	return -last_facing_direction
 
 
 func update_movement(delta: float, moving: bool) -> void:

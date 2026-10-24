@@ -18,6 +18,8 @@
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
 [ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
+[ext_resource type="PackedScene" uid="uid://dgx5c1qlu0dls" path="res://gameplay/player/effects/run_dust_effect.tscn" id="19_lqbvs"]
+[ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
 length = 0.001
@@ -471,7 +473,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_8vyi3"]
 resource_name = "run_down"
-length = 0.8
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -480,7 +482,7 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 4, 8, 12]
@@ -500,7 +502,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_lmpvk"]
 resource_name = "run_side"
-length = 0.8
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -509,7 +511,7 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [1, 5, 9, 13]
@@ -529,7 +531,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_r3fl6"]
 resource_name = "run_up"
-length = 0.8
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -538,7 +540,7 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.39999998, 0.6),
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [2, 6, 10, 14]
@@ -580,17 +582,19 @@ _data = {
 }
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jpyye"]
-height = 2.0031738
+height = 2.2327638
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(1.2701416, 1.9672241, 1)
 
-[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "camera")]
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 groups=["player"] node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "camera")]
 floor_constant_speed = true
 floor_max_angle = 0.83775806
 floor_snap_length = 0.3
 script = ExtResource("1_rvh5s")
 data = ExtResource("2_av71s")
+collision_layer = 2
+collision_mask = 5
 stamina = NodePath("StaminaComponent")
 hp = NodePath("HealthComponent")
 hurtbox = NodePath("HurtBox")
@@ -603,9 +607,10 @@ sprite = NodePath("Sprite3D")
 animation_player = NodePath("AnimationPlayer")
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
+transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
-billboard = 1
+billboard = 2
 shaded = true
 alpha_cut = 1
 texture_filter = 0
@@ -617,7 +622,7 @@ vframes = 15
 libraries/ = SubResource("AnimationLibrary_7kbwk")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=953316873]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.50720215, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.023983002, 0.4617207, 0.002353549)
 shape = SubResource("CapsuleShape3D_jpyye")
 
 [node name="FSM" type="Node" parent="." unique_id=92062524]
@@ -646,10 +651,16 @@ script = ExtResource("7_rvh5s")
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
 
+[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina") instance=ExtResource("20_pt1je")]
+health = NodePath("../HealthComponent")
+stamina = NodePath("../StaminaComponent")
+
 [node name="HurtBox" type="Area3D" parent="." unique_id=953130742 node_paths=PackedStringArray("actor")]
 script = ExtResource("9_r3fl6")
 actor = NodePath("..")
 team = 1
+collision_layer = 8
+collision_mask = 64
 metadata/_custom_type_script = "uid://bsdpq5t5mpp25"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HurtBox" unique_id=999194323]
@@ -673,6 +684,7 @@ transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.70710
 fov = 30.0
 
 [node name="TestHUD" type="CanvasLayer" parent="." unique_id=404690851]
+visible = false
 
 [node name="HP" type="Label" parent="TestHUD" unique_id=700755012]
 offset_left = 6.0
@@ -694,5 +706,15 @@ text = "SP: 999/999"
 player = NodePath("../..")
 sprite = NodePath("../../Visual/Sprite3D")
 
+[node name="RunDustEffect" parent="Effects" unique_id=2095352562 node_paths=PackedStringArray("player") instance=ExtResource("19_lqbvs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
+player = NodePath("../..")
+heel_offset = 0.1
+
+[node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.0216887, 0)
+
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]
+
+[editable path="Effects/RunDustEffect"]
