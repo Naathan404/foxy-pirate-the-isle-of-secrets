@@ -196,12 +196,6 @@ func play_directional_animation(action: StringName, restart: bool = false) -> bo
 	return visual.play_directional(action, last_facing_direction, restart)
 
 
-func play_animation(animation_name: StringName, restart: bool = false) -> bool:
-	if not is_instance_valid(visual):
-		return false
-	return visual.play_animation(animation_name, restart)
-
-
 func has_target() -> bool:
 	return is_instance_valid(target) and not dead
 
