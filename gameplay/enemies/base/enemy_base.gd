@@ -24,6 +24,10 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var destroy_on_death: bool = false
 
+@export_group("External Push")
+## Tốc độ giảm của lực đẩy không gây sát thương.
+@export_range(0.1, 100.0, 0.1) var external_push_deceleration: float = 20.0
+
 @export_group("Debug")
 @export var show_debug_health: bool = false:
 	set(value):
@@ -39,6 +43,7 @@ var dead: bool = false
 ## True after a lethal hit, while the enemy is still playing its hit/recoil reaction.
 var death_pending: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
+var _external_push_velocity: Vector3 = Vector3.ZERO
 
 @onready var hp: HealthComponent = $HealthComponent
 @onready var hurtbox: HurtBox = $Direction/HurtBox
@@ -80,6 +85,17 @@ func _physics_process(delta: float) -> void:
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
 	move_and_slide()
+	if not _external_push_velocity.is_zero_approx():
+		move_and_collide(_external_push_velocity * maxf(0.0, delta))
+		_external_push_velocity = _external_push_velocity.move_toward(
+			Vector3.ZERO, external_push_deceleration * maxf(0.0, delta)
+		)
+
+
+func _apply_external_push(push_velocity: Vector3) -> void:
+	if dead:
+		return
+	_external_push_velocity += Vector3(push_velocity.x, 0.0, push_velocity.z)
 
 
 func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.0) -> void:
@@ -339,7 +355,9 @@ func _validate_directional_node(node: Node, component_name: StringName) -> bool:
 		return true
 	if direction_pivot.is_ancestor_of(node):
 		return true
-	push_error("EnemyBase: %s must be a child of Direction so it rotates with facing" % component_name)
+	push_error(
+		"EnemyBase: %s must be a child of Direction so it rotates with facing" % component_name
+	)
 	return false
 
 

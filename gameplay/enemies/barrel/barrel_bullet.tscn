@@ -11,6 +11,8 @@ bounce = 0.8
 radius = 0.2
 
 [node name="BarrelBullet" type="RigidBody3D" unique_id=1790907855]
+collision_layer = 4
+collision_mask = 7
 physics_material_override = SubResource("PhysicsMaterial_bounce")
 script = ExtResource("1_bullet")
 bounce_strength = 0.95

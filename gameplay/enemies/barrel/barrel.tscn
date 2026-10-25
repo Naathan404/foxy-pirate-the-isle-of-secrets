@@ -34,7 +34,7 @@ offset = Vector2(0, 15.5)
 texture = ExtResource("4_texture")
 hframes = 3
 vframes = 9
-frame = 18
+frame = 22
 
 [node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
 libraries/ = ExtResource("5_anims")
@@ -44,13 +44,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_hurtbox")
 
 [node name="BulletSpawn" type="Marker3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=889465958]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1011593, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1221788, 0.41019458)
 
 [node name="Idle" parent="States" parent_id_path=PackedInt32Array(1797154631) index="0" unique_id=1302703013]
 script = ExtResource("6_idle")
 
 [node name="Shoot" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=1159447923]
 script = ExtResource("7_shoot")
+fire_delay = 1.0
+charge_scale = 1.15
+shake_distance = 0.05
+release_duration = 0.09
 
 [node name="TargetDetector" type="Area3D" parent="." index="4" unique_id=1419563400]
 
