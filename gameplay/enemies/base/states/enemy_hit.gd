@@ -28,6 +28,9 @@ func _update(delta: float) -> void:
 	if enemy.data != null:
 		enemy._damp_horizontal_velocity(delta, enemy.data.hit_deceleration)
 	if update_timer(delta):
+		if enemy.death_pending:
+			enemy.finish_death()
+			return
 		_begin_recovery()
 
 
