@@ -3,6 +3,11 @@ extends Area3D
 
 signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
 signal damage_prepared(damage: DamageContext, target: Node)
+signal hit_confirmed(
+	damage: DamageContext,
+	target: Node,
+	applied_hp: int
+)
 
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
@@ -89,13 +94,15 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 	# Reserve before dispatch because damage callbacks can cancel the attack.
 	_hit_actors[target_id] = true
-	var hit_damage := _damage.create_hit_copy(hurtbox.actor)
-	damage_prepared.emit(hit_damage, hurtbox.actor)
-	var applied_hp := hurtbox.take_damage(hit_damage)
+
+	var damage = _damage
+	var target = hurtbox.actor
+	var applied_hp = hurtbox.take_damage(damage)
 	if applied_hp <= 0:
 		_hit_actors.erase(target_id)
 		return
-	damage_applied.emit(hit_damage, hurtbox.actor, applied_hp)
+
+	hit_confirmed.emit(damage, target, applied_hp)
 
 
 func _on_area_exited(area: Area3D) -> void:

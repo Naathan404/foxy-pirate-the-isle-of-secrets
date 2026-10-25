@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/pelican_02.png-a6e9cd1a45f70eacc871ef325b3313
 
 [params]
 
-compress/mode=0
+compress/mode=3
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

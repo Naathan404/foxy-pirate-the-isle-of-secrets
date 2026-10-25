@@ -55,8 +55,7 @@ foxy-pirate-the-isle-of-secret/
 │       ├── weapon_controller.gd    # Điều khiển các giai đoạn tấn công
 │       └── attack scenes/          # Scene đòn đánh, hiện có dao găm
 ├── test/
-│   ├── test_scene.tscn             # Scene chạy thử bằng F5
-│   └── *_test.gd                   # Test combat, visual và vũ khí
+│   └── enemy_player_test.tscn       # Scene chạy thử nhân vật và quái bằng F5
 ├── ui/                             # Dành cho giao diện
 ├── world/                          # Dành cho thế giới game
 ├── docs/                           # Quy ước và hướng dẫn phát triển
@@ -85,13 +84,11 @@ python -m gdtoolkit.formatter --check --line-length 100 core data gameplay test 
 
 Bỏ `--check` ở lệnh formatter để tự động sửa định dạng.
 
-**Import và chạy test:**
+**Import và kiểm tra khởi động game:**
 
 ```sh
 godot --headless --path . --import
-godot --headless --path . --script test/player_combat_test.gd
-godot --headless --path . --script test/player_visual_test.gd
-godot --headless --path . --script test/player_weapon_integration_test.gd
+godot --headless --path . --quit-after 10
 ```
 
 Xem thêm [hướng dẫn kiểm tra](docs/testing.md). Không commit thư mục cache `.godot/`; giữ các file `.gd.uid` đi kèm script.
@@ -104,6 +101,8 @@ Xem thêm [hướng dẫn kiểm tra](docs/testing.md). Không commit thư mục
 | --- | --- |
 | Hướng dẫn chung | [Development guideline](docs/development_guideline.md) |
 | Tổ chức code và scene | [Kiến trúc](docs/architecture.md) |
+| Luồng Player và state machine hiện tại | [Player business logic](docs/player_business_logic.md) |
+| Trang bị và luồng chiến đấu của vũ khí | [Weapon business logic](docs/weapon_business_logic.md) |
 | Quy tắc đặt tên và định dạng | [Convention](docs/conventions.md) |
 | Nhánh, commit và PR | [Git workflow](docs/git_workflow.md) |
 | Lint và test | [Testing](docs/testing.md) |

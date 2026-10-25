@@ -2,6 +2,10 @@ class_name BarrelBullet
 extends RigidBody3D
 
 @export_range(0.1, 30.0, 0.1, "suffix:s") var lifetime: float = 4.0
+@export_group("Movement")
+@export_range(0.0, 1.0, 0.01) var bounce_strength: float = 0.8
+## Vận tốc đẩy enemy khi đạn va chạm, không gây sát thương.
+@export_range(0.0, 30.0, 0.1) var enemy_push_speed: float = 4.0
 
 var _source: Node
 var _source_team: int = 0
@@ -24,7 +28,14 @@ func launch(source: Node, source_team: int, direction: Vector3, speed: float, da
 func _ready() -> void:
 	_remaining_lifetime = lifetime
 	collision_layer = 0
-	collision_mask = CombatLayers.WORLD
+	collision_mask = CombatLayers.WORLD | CombatLayers.ENEMY_BODY
+	contact_monitor = true
+	max_contacts_reported = 8
+	body_entered.connect(_on_body_entered)
+	if _source is PhysicsBody3D:
+		add_collision_exception_with(_source)
+	if physics_material_override != null:
+		physics_material_override.bounce = bounce_strength
 	linear_velocity = _direction * _speed
 	hitbox.actor = _source
 	hitbox.team = _source_team
@@ -39,6 +50,17 @@ func _physics_process(delta: float) -> void:
 	_remaining_lifetime -= maxf(0.0, delta)
 	if _remaining_lifetime <= 0.0:
 		queue_free()
+
+
+func _on_body_entered(body: Node) -> void:
+	if not body is EnemyBase or body == _source:
+		return
+	var enemy := body as EnemyBase
+	var direction := enemy.global_position - global_position
+	direction.y = 0.0
+	if direction.is_zero_approx():
+		direction = _direction
+	enemy._apply_external_push(direction.normalized() * enemy_push_speed)
 
 
 func _on_hitbox_area_entered(area: Area3D) -> void:
