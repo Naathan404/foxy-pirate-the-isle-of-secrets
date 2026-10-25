@@ -5,17 +5,16 @@ signal action_rejected(action: StringName)
 signal dash_finished(interrupted: bool)
 signal dash_started
 
-const Teams := preload("res://gameplay/combat/combat_teams.gd")
-
 @export var data: PlayerData
 
 @export var stamina: StaminaComponent
 @export var hp: HealthComponent
 @export var hurtbox: HurtBox
-@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = CombatTeams.PLAYER
 @export var weapon_controller: WeaponController
 @export var ammo: AmmoComponent
 @export var charm_socket_manager: CharmSocketManager
+@export var chaos: ChaosComponent
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
 @export var dash_action: StringName = &"dash"
@@ -61,6 +60,8 @@ func _ready() -> void:
 
 # Khởi tạo HP, SP và nối signal để cập nhật HUD
 func _setup_stats() -> void:
+	if is_instance_valid(chaos):
+		chaos.init(data.max_chaos)
 	if is_instance_valid(hp):
 		hp.hp_changed.connect(_on_hp_changed)
 		hp.damaged.connect(_on_damaged)
@@ -79,9 +80,13 @@ func _setup_combat() -> void:
 		hurtbox.team = team
 		hurtbox.collision_layer = CombatLayers.PLAYER_HURTBOX
 		hurtbox.collision_mask = CombatLayers.ENEMY_ATTACK
-	if is_instance_valid(weapon_controller) and weapon_controller.has_method("setup"):
-		weapon_controller.team = team
-	if not weapon_controller.call("setup", self, stamina, ammo):
+	if not is_instance_valid(weapon_controller):
+		push_error("Player: chưa gán WeaponController")
+		return
+	weapon_controller.team = team
+	weapon_controller.chaos = chaos
+	weapon_controller.damage_dealt.connect(_on_weapon_damage_dealt)
+	if not weapon_controller.setup(self, stamina, ammo):
 		push_error("Player: set up vũ khí bị fail")
 
 
@@ -92,6 +97,13 @@ func _setup_charm_system() -> void:
 		push_error("Player: CharmRegistry chưa được gắn dưới CharmSocketManager")
 		return
 	charm_socket_manager.actor = self
+
+
+func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: int) -> void:
+	if dead or not is_instance_valid(chaos) or applied_hp <= 0:
+		return
+	if damage.source == self and target is EnemyBase:
+		chaos.gain(data.chaos_per_hit)
 
 
 func _on_stamina_changed(amount: float, maximum: float) -> void:

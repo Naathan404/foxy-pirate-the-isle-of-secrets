@@ -36,4 +36,34 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 - CI import project, chạy test độc lập và smoke test khi có main scene. Bước chưa có nội dung để chạy sẽ báo bỏ qua.
 - Ghi cách chạy và kết quả trong PR; thêm ảnh hoặc video nếu thay đổi UI/gameplay.
 
+### Chaos và dagger boomerang
+
+[test/chaos_test.gd](../test/chaos_test.gd) kiểm tra contract của
+[Player/ChaosComponent](player_business_logic.md#contract-chaos-point-cp) và
+[dagger boomerang](weapon_business_logic.md#contract-của-dagger-boomerang).
+
+Chạy từ thư mục gốc với Godot 4.7; thay đường dẫn executable theo máy:
+
+~~~powershell
+& 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script res://test/chaos_test.gd
+~~~
+
+Test thành công in `Chaos integration checks: PASS` và trả mã 0. Test dùng scene
+Foxy, Barrel và vật cản vật lý thật để kiểm tra:
+
+- Clamp CP, reset, tiêu toàn bộ khi đầy và vô hiệu hóa khi sức chứa bằng 0.
+- Input chuột phải, đánh hụt không tăng CP, năm hit normal làm đầy thanh và hiện `[RMB]`.
+- Từ chối secondary khi thiếu CP hoặc không có kỹ năng; tiêu CP khi nhận kỹ năng.
+- Chờ windup mới bay, sống sau khi controller kết thúc hoặc hủy đòn đã phóng.
+- Mỗi enemy nhận một hit mỗi lượt đi/về, có báo damage và cộng CP cho cả hai lượt.
+- Quay về khi gặp tường, không gây damage lên enemy phía sau tường ở tình huống test.
+- Bắt dao khi người ném di chuyển, tự hủy khi hết lifetime và hủy dao chưa phóng.
+
+Test tạo bản sao PlayerData riêng và chốt 20 CP/hit cho fixture (20 lượt đi,
+40 sau cả hai lượt). Vì vậy thay đổi CP/hit trong resource Foxy không làm sai
+assertion của test và test không sửa resource cân bằng gameplay dùng chung.
+
+Test headless kiểm tra logic và va chạm, không xác nhận hình ảnh sprite, animation
+hay bố cục HUD. Các phần này vẫn cần xem trực tiếp trong game.
+
 Xem [code convention](conventions.md) và [quy trình PR](git_workflow.md).

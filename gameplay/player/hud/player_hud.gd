@@ -3,6 +3,7 @@ extends CanvasLayer
 @export_group("Stat Components")
 @export var health: HealthComponent
 @export var stamina: StaminaComponent
+@export var chaos: ChaosComponent
 
 @export_group("Arc Layout")
 # Hướng bắt đầu của bar
@@ -49,6 +50,8 @@ var _pointer_inside: bool = false
 @onready var portrait: TextureRect = $Portrait
 @onready var stat_tooltip: PanelContainer = $StatTooltip
 @onready var tooltip_label: Label = $StatTooltip/Value
+@onready var chaos_fill: ProgressBar = $ChaosFill
+@onready var chaos_label: Label = $ChaosLabel
 
 
 func _ready() -> void:
@@ -67,9 +70,14 @@ func _ready() -> void:
 
 	_sync_stats.call_deferred()
 
+	if is_instance_valid(chaos):
+		chaos.chaos_changed.connect(_on_chaos_changed)
+
 
 # sync trạng thái
 func _sync_stats() -> void:
+	if is_instance_valid(chaos):
+		_on_chaos_changed(chaos.current, chaos.maximum)
 	if is_instance_valid(health):
 		_on_hp_changed(health.get_current_hp(), health.get_max_hp())
 	else:
@@ -155,6 +163,16 @@ func _on_stamina_changed(current: float, maximum: float) -> void:
 	_update_arc(stamina_capacity, stamina_fill, stamina_shadow, maximum, stamina_at_full_arc)
 	stamina_fill_effect.set_target(current)
 	stamina_capacity.set_stat_tooltip("SP: %d / %d" % [floori(current), floori(maximum)])
+
+
+func _on_chaos_changed(current: float, maximum: float) -> void:
+	chaos_fill.max_value = maxf(1.0, maximum)
+	chaos_fill.value = current
+	var ready := maximum > 0.0 and current >= maximum
+	chaos_label.text = "CHAOS %d / %d%s" % [
+		floori(current), floori(maximum), "  [RMB]" if ready else ""
+	]
+	chaos_fill.modulate = Color(1.3, 1.1, 1.4) if ready else Color.WHITE
 
 
 # Update visual cuar bar, dùng chung cho tất cả các bar hp và stamina

@@ -12,7 +12,7 @@ Tài liệu này mô tả code hiện tại. Chi tiết về cách thực hiện
 | File | Phần việc chính |
 | --- | --- |
 | [player.gd](../gameplay/player/player.gd) | Đọc input, gọi FSM, di chuyển vật lý, nhận damage và xử lý chết |
-| [foxy.tscn](../gameplay/player/foxy.tscn) | Ghép các state, HP, SP, vũ khí, camera và HUD thành nhân vật Foxy |
+| [foxy.tscn](../gameplay/player/foxy.tscn) | Ghép các state, HP, SP, CP, vũ khí, camera và HUD thành nhân vật Foxy |
 | [fsm.gd](../core/state_machine/fsm.gd) | Giữ state hiện tại, state đang chờ và xét ưu tiên chuyển state |
 | [player_state.gd](../gameplay/player/states/player_state.gd) | Các luật chuyển state dùng chung |
 | [states/](../gameplay/player/states/) | Logic của từng state |
@@ -22,7 +22,7 @@ Tài liệu này mô tả code hiện tại. Chi tiết về cách thực hiện
 ## Từ input đến chuyển động
 
 Khi khởi tạo, Player đăng ký các state, chọn Idle làm state đầu tiên, khởi tạo đầy
-HP/SP rồi thiết lập HurtBox và vũ khí. Thiếu PlayerData hoặc setup FSM thất bại thì
+HP/SP, đặt CP về 0 rồi thiết lập HurtBox và vũ khí. Thiếu PlayerData hoặc setup FSM thất bại thì
 Player ngừng cập nhật vật lý.
 
 Mỗi physics tick chạy theo thứ tự:
@@ -48,11 +48,12 @@ chạy thẳng. Khi thả phím, nhân vật giảm tốc dần. Hướng nhìn 
 | WASD | Cập nhật hướng di chuyển; state quyết định có cho di chuyển hay không |
 | Shift | Ghi nhớ yêu cầu dash trong 0,1 giây |
 | Chuột trái | Yêu cầu đánh thường trong tick hiện tại |
+| Chuột phải | Input Map `secondary_attack` → `request_attack(&"secondary")`; controller yêu cầu đầy CP |
 | T | Nút debug: gây 1 damage sau bước cập nhật FSM |
 
 Dash và đánh chỉ nhận lúc vừa nhấn, không lặp khi giữ nút. Yêu cầu đánh không được
 giữ lại: nhấn khi đang Attack, Dash, Hit hoặc Fall sẽ không tự đánh khi state đó
-kết thúc. Đòn phụ có API nhưng chưa được gán input.
+kết thúc. Nếu nhấn cả hai nút chuột cùng tick, đòn thường được ưu tiên trong `_read_input()`.
 
 ## FSM chuyển state như thế nào?
 
@@ -122,6 +123,41 @@ Khi nhận `attack_finished`, state đánh dấu đòn đã xong và yêu cầu 
 trong lần cập nhật sau. Thoát Attack sẽ trả tốc độ animation về bình thường,
 ngắt kết nối signal và hủy phần đòn còn lại.
 
+### Contract chaos point (CP)
+
+[ChaosComponent](../core/components/chaos_component.gd) là component riêng của Player,
+được gán qua `Player.chaos`, `WeaponController.chaos` và `PlayerHUD.chaos` trong Foxy.
+`_setup_stats()` gọi `chaos.init(data.max_chaos)`; `_setup_combat()` gán chaos cho
+controller và nối `damage_dealt` trước khi gọi setup vũ khí.
+
+| API | Hành vi / giá trị trả về |
+| --- | --- |
+| `current: float`, `maximum: float` | CP hiện tại và sức chứa; cập nhật qua API để giữ signal đồng bộ |
+| `init(capacity: float) -> void` | Clamp sức chứa tối thiểu 0, reset current về 0, luôn phát signal |
+| `gain(amount: float) -> void` | Bỏ qua phần âm, clamp current trong `[0, maximum]`; chỉ phát signal nếu current đổi |
+| `is_full() -> bool` | True khi maximum > 0 và current >= maximum; sức chứa 0 vô hiệu hóa kỹ năng |
+| `try_consume_full() -> bool` | Chưa đầy: false và giữ nguyên; đầy: đặt current = 0, phát signal và trả true |
+| `chaos_changed(current: float, maximum: float)` | Signal cho HUD và các bên nghe cập nhật giá trị |
+
+Luật tích và dùng CP:
+
+- `PlayerData.max_chaos` mặc định 100, `chaos_per_hit` mặc định 20. Resource
+  `foxy_data.tres` hiện override thành 100 CP/hit.
+- Player chỉ cộng khi còn sống, có chaos, `applied_hp > 0`, nguồn damage là chính
+  Player và target là `EnemyBase`. Lượng cộng cố định theo hit, không nhân damage.
+- Đánh hụt hoặc không gây mất HP không tăng CP. Normal và secondary đều có thể
+  tăng CP; dagger trúng cả lượt đi và về có hai lần cộng CP, luôn clamp ở maximum.
+- CP không tự hồi hoặc giảm theo thời gian. Chuột phải dùng kỹ năng riêng của
+  vũ khí qua `secondary_attack`, chỉ được controller nhận khi thanh đầy.
+- Trừ toàn bộ CP lúc controller nhận đòn sau bước validate/thanh toán, trước khi
+  hết windup. Bị ngắt sau khi đã trả CP không hoàn lại CP.
+- Thiếu CP, thiếu đòn phụ, scene không hợp lệ, busy, cooldown hoặc Player không
+  cho phép đánh sẽ bị từ chối ở bước kiểm tra trước khi tiêu CP.
+
+HUD nghe `chaos_changed`, đồng bộ lại giá trị sau khi ready, hiển thị thanh CP và
+nhãn `CHAOS current / maximum`. Khi đầy và maximum > 0, HUD thêm `[RMB]` và làm sáng
+thanh. Nhãn này báo đủ CP; không bảo đảm actor đang được phép đánh hoặc đã hết cooldown.
+
 ## Nhận sát thương và chết
 
 ```text
@@ -149,6 +185,7 @@ hoặc tự xóa khỏi scene.
 | Chỉ số Foxy hiện tại | Giá trị |
 | --- | --- |
 | HP / SP tối đa | 8 / 350 |
+| CP tối đa / CP mỗi hit gây sát thương | 100 / 100 (resource Foxy override) |
 | Hồi SP | 25 SP/giây, chờ 1 giây sau khi tiêu SP |
 | Tốc độ chạy | 8 đơn vị/giây |
 | Gia tốc / giảm tốc | 25 / 25 |
@@ -173,5 +210,6 @@ sprite khi cần. Bụi chạy, bụi dash và ghost phản hồi trạng thái 
 - `_setup_combat()` gọi setup vũ khí ngoài guard kiểm tra controller, nên cần
   gán controller hợp lệ cho Player.
 
-Hiện chưa có test tự động. Khi kiểm tra trong game, nên thử dash và đánh cùng lúc,
+Đã có [test tích hợp chaos và dagger](../test/chaos_test.gd), xem [cách chạy](testing.md).
+Khi kiểm tra trong game, nên thử dash và đánh cùng lúc,
 dash khi thiếu SP, nhận nhiều đòn liên tiếp và chết giữa lúc đang đánh/dash.

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bm1b8rc7xcdq6"]
 
-[ext_resource type="Script" uid="uid://dlxg0f4p03ka5" path="res://world/biome/hub/hub.gd" id="1_80qyt"]
+[ext_resource type="Script" uid="uid://dlxg0f4p03ka5" path="res://world/hub/scenes/hub.gd" id="1_80qyt"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_tu8fd"]
 [ext_resource type="MeshLibrary" uid="uid://bscwetg41y4ge" path="res://assets/meshes/world.meshlib" id="3_8nuo3"]
 [ext_resource type="PackedScene" uid="uid://3v06vwpc6plb" path="res://gameplay/checkpoint/checkpoint.tscn" id="4_yhk1h"]

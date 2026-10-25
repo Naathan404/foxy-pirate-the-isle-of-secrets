@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_epx0i"]
 [ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="1_nasaw"]
 [ext_resource type="PackedScene" uid="uid://q2jqrxyd2k31" path="res://gameplay/weapons/attack scenes/dagger_attack.tscn" id="1_up41l"]
+[ext_resource type="PackedScene" uid="uid://bu8agnheexxo8" path="res://gameplay/weapons/attack scenes/dagger_throw.tscn" id="4_throw"]
 
 [sub_resource type="Resource" id="Resource_nasaw"]
 script = ExtResource("1_nasaw")
@@ -10,7 +11,17 @@ attack_scene = ExtResource("1_up41l")
 stamina_cost = 1.0
 metadata/_custom_type_script = "uid://bl3xskt8h6bl7"
 
+[sub_resource type="Resource" id="Resource_throw"]
+script = ExtResource("1_nasaw")
+attack_scene = ExtResource("4_throw")
+damage_hp = 3
+windup_seconds = 0.15
+active_seconds = 0.05
+recovery_seconds = 0.2
+range_units = 10.0
+
 [resource]
 script = ExtResource("1_epx0i")
 normal_attack = SubResource("Resource_nasaw")
+secondary_attack = SubResource("Resource_throw")
 metadata/_custom_type_script = "uid://dnv8otqkgp6v5"

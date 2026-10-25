@@ -20,6 +20,7 @@ var busy: bool = false
 var actor: Node3D
 var stamina: StaminaComponent
 var ammo: AmmoComponent
+var chaos: ChaosComponent
 # Giảm cooldown cả những vũ khí không được trang bị
 var _owned: Array[WeaponInstance] = []
 # Hiệu ứng vũ khí đang trang bị
@@ -136,6 +137,8 @@ func try_attack(request: AttackContext) -> bool:
 	var attack := equipped.get_attack(request.action)
 	if attack == null or not attack.is_valid() or not _has_animation(attack.animation_prefix):
 		return false
+	if request.action == &"secondary" and (not is_instance_valid(chaos) or not chaos.is_full()):
+		return false
 	if equipped.unavailable_seconds > 0.0 or equipped.cooldowns.get(request.action, 0.0) > 0.0:
 		return false
 	var snapshot := _make_context(request, attack)
@@ -185,6 +188,9 @@ func try_attack(request: AttackContext) -> bool:
 	elif attack.ammo_cost > 0:
 		paid = ammo.try_consume(attack.ammo_id, attack.ammo_cost)
 	if not paid:
+		cancel()
+		return false
+	if snapshot.action == &"secondary" and not chaos.try_consume_full():
 		cancel()
 		return false
 	snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed

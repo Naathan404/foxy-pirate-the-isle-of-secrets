@@ -8,15 +8,13 @@
 [ext_resource type="Texture2D" uid="uid://cabuc28nwwic7" path="res://assets/ui/player_hud/heart_icon.png" id="6_wbpoy"]
 [ext_resource type="Script" uid="uid://bemaecxbpwqmt" path="res://gameplay/player/hud/arc_tooltip_bar.gd" id="7_tooltip"]
 [ext_resource type="Script" uid="uid://4ok8iolg8l8g" path="res://gameplay/player/hud/bar_fill_effect.gd" id="8_fill_effect"]
+[ext_resource type="Texture2D" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
 shader = ExtResource("5_depth")
 shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
 shader_parameter/border_width = 2.0
 shader_parameter/bevel_strength = 0.22
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wbpoy"]
-load_path = "res://.godot/imported/star_icon.png-f031417fdafece02cd84ca0d1d9e42cf.ctex"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
 content_margin_left = 9.0
@@ -37,10 +35,49 @@ shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 3
 shadow_offset = Vector2(2, 2)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chaos_bg"]
+bg_color = Color(0.13, 0.08, 0.19, 0.95)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.17, 0.4, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chaos_fill"]
+bg_color = Color(0.68, 0.27, 0.94, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
 [node name="PlayerHUD" type="CanvasLayer" unique_id=400788151]
 scale = Vector2(1.25, 1.25)
 transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
+
+[node name="ChaosFill" type="ProgressBar" parent="."]
+offset_left = 16.0
+offset_top = 159.0
+offset_right = 176.0
+offset_bottom = 173.0
+mouse_filter = 2
+show_percentage = false
+theme_override_styles/background = SubResource("StyleBoxFlat_chaos_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_chaos_fill")
+
+[node name="ChaosLabel" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 177.0
+offset_right = 210.0
+offset_bottom = 197.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.86, 0.64, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "CHAOS 0 / 100"
 
 [node name="HealthShadow" type="TextureProgressBar" parent="." unique_id=641189182]
 texture_filter = 1
@@ -212,7 +249,7 @@ offset_right = 55.999992
 offset_bottom = 132.8
 scale = Vector2(0.75, 0.75)
 mouse_filter = 2
-texture = SubResource("CompressedTexture2D_wbpoy")
+texture = ExtResource("9_star")
 
 [node name="Heart_Icon" type="TextureRect" parent="." unique_id=64362042]
 texture_filter = 1
