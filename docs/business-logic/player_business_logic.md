@@ -4,9 +4,6 @@ Player nhận thao tác của người chơi, còn state quyết định nhân v
 từng thời điểm. Khi đang chạy, nhân vật có thể dash hoặc đánh. Khi bị trúng đòn,
 thao tác bị tạm ngắt để xử lý phản ứng Hit.
 
-Tài liệu này mô tả code hiện tại. Chi tiết về cách thực hiện đòn đánh nằm ở
-[Hệ thống vũ khí](weapon_business_logic.md).
-
 ## Code nằm ở đâu?
 
 | File | Phần việc chính |
@@ -209,7 +206,3 @@ sprite khi cần. Bụi chạy, bụi dash và ghost phản hồi trạng thái 
 - Controller nhận đòn phải phát `attack_finished`; Player chưa có timeout dự phòng.
 - `_setup_combat()` gọi setup vũ khí ngoài guard kiểm tra controller, nên cần
   gán controller hợp lệ cho Player.
-
-Đã có [test tích hợp chaos và dagger](../test/chaos_test.gd), xem [cách chạy](testing.md).
-Khi kiểm tra trong game, nên thử dash và đánh cùng lúc,
-dash khi thiếu SP, nhận nhiều đòn liên tiếp và chết giữa lúc đang đánh/dash.

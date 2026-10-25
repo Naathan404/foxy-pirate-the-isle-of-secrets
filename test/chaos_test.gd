@@ -88,7 +88,7 @@ func _run() -> void:
 		await frames(40)
 	check(enemy.hp.current_hp == 95, "Melee must deal damage once per attack")
 	check(player.chaos.current == 100.0, "Five confirmed hits must fill chaos")
-	check(player.get_node("PlayerHUD/ChaosLabel").text.contains("[RMB]"),
+	check(player.get_node("PlayerHUD/ChaosControl/ChaosLabel").text.contains("[RMB]"),
 		"Full chaos must show the activation hint")
 
 	enemy.position.z = -4.0

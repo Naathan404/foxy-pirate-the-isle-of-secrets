@@ -14,7 +14,6 @@ metadata/_custom_type_script = "uid://bl3xskt8h6bl7"
 [sub_resource type="Resource" id="Resource_throw"]
 script = ExtResource("1_nasaw")
 attack_scene = ExtResource("4_throw")
-damage_hp = 3
 windup_seconds = 0.15
 active_seconds = 0.05
 recovery_seconds = 0.2

@@ -35,17 +35,17 @@ thuộc phạm vi hiện tại. Hệ thống chỉ cung cấp API/adapter để 
 
 ```mermaid
 flowchart LR
-    Data[CharmData Resource] --> Registry[CharmRegistry]
-    Registry --> Ownership[Owned Charm IDs]
-    Registry --> Runtime[CharmRuntime + CharmEffect]
-    Loadout[CharmLoadout] --> Manager[CharmSocketManager]
-    Manager --> Runtime
-    Input[Q / Space / E] --> Manager
-    Combat[Combat, HP, SP, Dash, Death] <--> Runtime
-    Safe[Checkpoint / Hub] --> Manager
-    Save[Save system tương lai] <--> Snapshot[CharmProgressionSnapshot]
-    Snapshot <--> Ownership
-    Snapshot <--> Loadout
+	Data[CharmData Resource] --> Registry[CharmRegistry]
+	Registry --> Ownership[Owned Charm IDs]
+	Registry --> Runtime[CharmRuntime + CharmEffect]
+	Loadout[CharmLoadout] --> Manager[CharmSocketManager]
+	Manager --> Runtime
+	Input[Q / Space / E] --> Manager
+	Combat[Combat, HP, SP, Dash, Death] <--> Runtime
+	Safe[Checkpoint / Hub] --> Manager
+	Save[Save system tương lai] <--> Snapshot[CharmProgressionSnapshot]
+	Snapshot <--> Ownership
+	Snapshot <--> Loadout
 ```
 
 Nguồn dữ liệu cân bằng duy nhất là các `.tres` trong
@@ -288,4 +288,3 @@ Các test độc lập chính:
 
 Trước khi merge phải đạt `gdlint`, `gdformat --check`, Godot import/reference check, toàn bộ
 harness Charm, Player combat regression và smoke test scene liên quan.
-
