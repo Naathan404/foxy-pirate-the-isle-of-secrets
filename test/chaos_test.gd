@@ -63,14 +63,22 @@ func _run() -> void:
 	# Keep combat assertions independent from the live balance resource.
 	player.data = player.data.duplicate() as PlayerData
 	player.data.chaos_per_hit = 20.0
+	# Use a private weapon fixture so balancing the live dagger cannot break hit assertions.
+	player.weapon_controller.default_weapon = (
+		player.weapon_controller.default_weapon.duplicate(true) as WeaponData
+	)
+	player.weapon_controller.default_weapon.normal_attack.damage_hp = 1
+	player.weapon_controller.default_weapon.secondary_attack.damage_hp = 3
 	player.position.y = 1.0
 	world.add_child(player)
 	await frames(90)
 	check(player.is_on_floor(), "Player fixture must be grounded")
 	check(player.chaos.current == 0.0, "Player must start with empty chaos")
 	var mouse_events := InputMap.action_get_events("secondary_attack")
-	check(mouse_events.size() == 1 and mouse_events[0].button_index == MOUSE_BUTTON_RIGHT,
-		"Right mouse must trigger secondary attack")
+	check(
+		mouse_events.size() == 1 and mouse_events[0].button_index == MOUSE_BUTTON_RIGHT,
+		"Right mouse must trigger secondary attack"
+	)
 	check(not attack(&"secondary"), "Ability must reject empty chaos")
 	check(attack(&"normal"), "Normal attack must work without chaos")
 	await frames(40)
@@ -88,23 +96,31 @@ func _run() -> void:
 		await frames(40)
 	check(enemy.hp.current_hp == 95, "Melee must deal damage once per attack")
 	check(player.chaos.current == 100.0, "Five confirmed hits must fill chaos")
-	check(player.get_node("PlayerHUD/ChaosControl/ChaosLabel").text.contains("[RMB]"),
-		"Full chaos must show the activation hint")
+	check(
+		player.get_node("PlayerHUD/ChaosControl/ChaosLabel").text.contains("[RMB]"),
+		"Full chaos must show the activation hint"
+	)
 
 	enemy.position.z = -4.0
 	await frames(3)
 	check(attack(&"secondary"), "Full chaos must allow dagger throw")
 	var dagger := thrown_dagger()
-	check(dagger != null and not dagger.launched and not dagger.is_physics_processing(),
-		"Dagger must wait for windup before flying")
+	check(
+		dagger != null and not dagger.launched and not dagger.is_physics_processing(),
+		"Dagger must wait for windup before flying"
+	)
 	check(player.chaos.current == 0.0, "Accepted throw must consume all chaos immediately")
 	check(not attack(&"secondary"), "Busy controller must reject a second throw")
 	await frames(50)
-	check(not player.weapon_controller.busy and is_instance_valid(dagger),
-		"Dagger must survive after the attack animation releases it")
+	check(
+		not player.weapon_controller.busy and is_instance_valid(dagger),
+		"Dagger must survive after the attack animation releases it"
+	)
 	if is_instance_valid(dagger):
 		dagger.cancel()
-		check(not dagger.is_queued_for_deletion(), "Launched dagger must survive attack cancellation")
+		check(
+			not dagger.is_queued_for_deletion(), "Launched dagger must survive attack cancellation"
+		)
 	check(enemy.hp.current_hp == 92, "Thrown dagger must hit the enemy for three damage")
 	check(player.chaos.current == 20.0, "Thrown dagger damage must report a confirmed hit")
 	check(not attack(&"secondary"), "Partial chaos must reject another throw")
@@ -127,7 +143,9 @@ func _run() -> void:
 	player.chaos.gain(100.0)
 	check(attack(&"secondary"), "Throw toward wall must be accepted")
 	await frames(50)
-	check(enemy.hp.current_hp == 89, "Dagger must return at walls without hitting enemies behind them")
+	check(
+		enemy.hp.current_hp == 89, "Dagger must return at walls without hitting enemies behind them"
+	)
 	check(player.chaos.current == 0.0, "Wall hit must not generate chaos")
 	wall.queue_free()
 	await frames(2)
@@ -138,8 +156,10 @@ func _run() -> void:
 	var no_ability := original.duplicate() as WeaponData
 	no_ability.secondary_attack = null
 	player.weapon_controller.equipped.definition = no_ability
-	check(not attack(&"secondary") and player.chaos.is_full(),
-		"Missing weapon ability must not consume chaos")
+	check(
+		not attack(&"secondary") and player.chaos.is_full(),
+		"Missing weapon ability must not consume chaos"
+	)
 	player.weapon_controller.equipped.definition = original
 	# A missed dagger must return after reaching maximum range.
 	enemy.position.x = 10.0
@@ -148,7 +168,10 @@ func _run() -> void:
 	player.position.x = -3.0
 	await frames(65)
 	for child in world.get_children():
-		check(not child is WeaponAttack, "Returning dagger must follow and be caught by a moving thrower")
+		check(
+			not child is WeaponAttack,
+			"Returning dagger must follow and be caught by a moving thrower"
+		)
 
 	player.chaos.gain(100.0)
 	check(attack(&"secondary"), "Lifetime test throw must be accepted")

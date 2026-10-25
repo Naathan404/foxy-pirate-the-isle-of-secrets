@@ -150,12 +150,7 @@ func try_attack(request: AttackContext) -> bool:
 	if equipped.forge != null:
 		cost *= maxf(0.0, equipped.forge.stamina_cost_multiplier)
 		speed = maxf(0.01, equipped.forge.attack_speed_multiplier)
-	if cost > 0.0 and (not is_instance_valid(stamina) or not stamina.can_consume(cost)):
-		return false
-	if (
-		attack.ammo_cost > 0
-		and (not is_instance_valid(ammo) or not ammo.can_consume(attack.ammo_id, attack.ammo_cost))
-	):
+	if not _can_pay_attack_cost(attack, cost):
 		return false
 	# Validate scene trước khi trừ SP hoặc đạn
 	var execution_node := attack.attack_scene.instantiate()
@@ -197,6 +192,21 @@ func try_attack(request: AttackContext) -> bool:
 	# Signal trừ tài nguyên có thể hủy đòn, kiểm tra lại trước khi chạy tiếp
 	if busy and _context == snapshot and _remaining <= 0.0:
 		_advance_phase()
+	return true
+
+
+# Kiểm tra chi phí đã tính sau forge trước khi tạo scene và trừ tài nguyên.
+func _can_pay_attack_cost(attack: AttackData, stamina_cost: float) -> bool:
+	if (
+		stamina_cost > 0.0
+		and (not is_instance_valid(stamina) or not stamina.can_consume(stamina_cost))
+	):
+		return false
+	if (
+		attack.ammo_cost > 0
+		and (not is_instance_valid(ammo) or not ammo.can_consume(attack.ammo_id, attack.ammo_cost))
+	):
+		return false
 	return true
 
 

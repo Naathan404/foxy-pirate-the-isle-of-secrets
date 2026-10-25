@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://baohqkvbgpkt1" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
 [ext_resource type="Texture2D" uid="uid://da8vd3qy1guj8" path="res://assets/ui/player_hud/weapon_skills/dagger_throw.png" id="10_3dwmm"]
 [ext_resource type="Texture2D" uid="uid://c7dcqvh327r74" path="res://assets/ui/player_hud/chaos_bar_progress.png" id="10_ftld4"]
+[ext_resource type="Texture2D" uid="uid://ucgkfciy1uye" path="res://assets/ui/player_hud/chaos_icon.png" id="12_hxn85"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
 shader = ExtResource("5_depth")
@@ -275,7 +276,6 @@ offset_left = 7.200012
 offset_top = -138.4
 offset_right = 91.20007
 offset_bottom = -118.399994
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 12
 text = "CP: 0 / 100"
@@ -331,7 +331,7 @@ radial_fill_degrees = 135.0
 texture_progress = ExtResource("10_ftld4")
 tint_progress = Color(1, 0.98, 0.94, 1)
 
-[node name="ChaosFill" type="TextureProgressBar" parent="ChaosControl"]
+[node name="ChaosFill" type="TextureProgressBar" parent="ChaosControl" unique_id=1451846679]
 texture_filter = 1
 material = SubResource("ShaderMaterial_jpyye")
 layout_mode = 0
@@ -357,7 +357,17 @@ offset_bottom = 39.200012
 mouse_filter = 2
 texture = ExtResource("10_3dwmm")
 
-[node name="ChaosFillEffect" type="Node" parent="." node_paths=PackedStringArray("color_fill", "white_fill")]
+[node name="TextureRect" type="TextureRect" parent="ChaosControl" unique_id=207544922]
+texture_filter = 1
+layout_mode = 0
+offset_left = 12.0
+offset_top = 28.0
+offset_right = 44.0
+offset_bottom = 60.0
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("12_hxn85")
+
+[node name="ChaosFillEffect" type="Node" parent="." unique_id=886936141 node_paths=PackedStringArray("color_fill", "white_fill")]
 script = ExtResource("8_fill_effect")
 color_fill = NodePath("../ChaosControl/ChaosFill")
 white_fill = NodePath("../ChaosControl/ChaosWhiteFill")
