@@ -152,8 +152,33 @@ Luật tích và dùng CP:
   cho phép đánh sẽ bị từ chối ở bước kiểm tra trước khi tiêu CP.
 
 HUD nghe `chaos_changed`, đồng bộ lại giá trị sau khi ready, hiển thị thanh CP và
-nhãn `CHAOS current / maximum`. Khi đầy và maximum > 0, HUD thêm `[RMB]` và làm sáng
-thanh. Nhãn này báo đủ CP; không bảo đảm actor đang được phép đánh hoặc đã hết cooldown.
+nhãn `CP: current / maximum`. Khi đầy và maximum > 0, icon kỹ năng sáng; chưa đầy
+thì icon tối. Trạng thái này chỉ báo đủ CP, không bảo đảm actor đang được phép đánh
+hoặc đã hết cooldown.
+
+### Contract các phần hiển thị HUD
+
+`player_hud.tscn` giữ layout, sprite và các node chỉ số. Logic được chia như sau:
+
+| Script / node | Trách nhiệm và API |
+| --- | --- |
+| [player_hud.gd](../../gameplay/player/hud/player_hud.gd), root `PlayerHUD` | Nhận `health`, `stamina`, `chaos`; nối signal và sync cuối frame để chờ Player khởi tạo chỉ số |
+| [stat_arc.gd](../../gameplay/player/hud/stat_arc.gd), `Stats/HealthArc`, `StaminaArc`, `ChaosArc` | Dùng chung `HudStatArc.set_stat(current: float, maximum: float)` để đồng bộ nền, fill, bóng và tooltip; `sync_preview()` hỗ trợ chạy riêng scene HUD |
+| [hud_portrait.gd](../../gameplay/player/hud/hud_portrait.gd), `StatControl/Portrait` | `set_health(current: int, maximum: int)`, `play_hit_feedback(amount: int)`, `show_death()`; ưu tiên chết → hit → ít máu → khỏe |
+| [hud_tooltip.gd](../../gameplay/player/hud/hud_tooltip.gd), `StatTooltip` | Nhận `hud_layer` và danh sách `bars`, xử lý hover có delay, đổi hệ tọa độ khi scale và giữ panel trong viewport |
+| [bar_fill_effect.gd](../../gameplay/player/hud/bar_fill_effect.gd), `Effects/*FillEffect` | Giữ hiệu ứng màu/trắng khi tăng hoặc giảm chỉ số |
+| [arc_tooltip_bar.gd](../../gameplay/player/hud/arc_tooltip_bar.gd), các node `*Capacity` | Kiểm tra pixel và góc cung dưới con trỏ, lưu nội dung tooltip |
+
+Chỉnh góc bắt đầu, độ dài cung và số điểm tương ứng cung đầy trên từng node
+`Stats/*Arc` trong Inspector, thay vì trên root HUD. Các node này tham chiếu
+capacity, fill, shadow và fill effect qua export. `ChaosArc` có thêm `value_label`
+và `readiness_icon`; script không phụ thuộc trực tiếp vào ChaosComponent.
+Texture phản ứng, ngưỡng ít máu và thời gian hit chỉnh trên `StatControl/Portrait`;
+thời gian chờ tooltip chỉnh trên `StatTooltip`.
+
+[test/hud_test.gd](../../test/hud_test.gd) kiểm tra component thật cập nhật cả ba
+thanh, thay đổi sức chứa, hiệu ứng tăng/giảm, icon CP, hit/heal/death của portrait,
+tooltip trên từng cung có scale và chạy riêng scene HUD không có component.
 
 ## Nhận sát thương và chết
 

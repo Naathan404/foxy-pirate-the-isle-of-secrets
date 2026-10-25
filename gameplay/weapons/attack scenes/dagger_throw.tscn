@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://76tadlwktby0" path="res://assets/sprites/weapons/dagger_spinning/Sword Spinning 03.png" id="3_ogmxt"]
 [ext_resource type="Texture2D" uid="uid://s1if0mgji0hb" path="res://assets/sprites/weapons/dagger_spinning/Sword Spinning 04.png" id="4_8yxsm"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_5bjjf"]
+[ext_resource type="Script" uid="uid://bh8u8ifdhe86v" path="res://gameplay/combat/combat_feedback.gd" id="7_ogmxt"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jpyye"]
 animations = [{
@@ -56,3 +57,9 @@ metadata/_custom_type_script = "uid://etrxpr68gxyd"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox" unique_id=430060942]
 shape = SubResource("SphereShape3D_jpyye")
+
+[node name="CombatFeedback" type="Node" parent="HitBox" unique_id=1433124923 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("7_ogmxt")
+hitbox = NodePath("..")
+hitstop_duration = 0.08
+shake_pixels = 4.0
