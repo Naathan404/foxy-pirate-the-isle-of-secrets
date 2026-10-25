@@ -5,6 +5,8 @@ extends Resource
 @export var charm_id: StringName = &""
 @export var display_name: String = ""
 @export_multiline var description: String = ""
+## Ảnh hiển thị trong ô Charm; có thể để trống khi chưa có asset
+@export var sprite: Texture2D
 @export_enum("Active:0", "Passive:1") var charm_type: int = CharmConstants.CharmType.PASSIVE
 @export var effect_scene: PackedScene
 @export var resource_cost: float = 0.0

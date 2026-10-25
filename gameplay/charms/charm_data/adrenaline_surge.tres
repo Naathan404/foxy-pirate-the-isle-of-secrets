@@ -1,18 +1,19 @@
-[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://pm7d7bi2h3b"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/passive/adrenaline_surge_effect.tscn" id="2_effect"]
+[ext_resource type="Texture2D" uid="uid://74122o0oe2gh" path="res://assets/sprites/charms/adrenaline_surge.png" id="3_arcgc"]
 
 [resource]
 script = ExtResource("1_data")
 charm_id = &"adrenaline_surge"
 display_name = "Adrenaline Surge"
 description = "Defeating a target has a 20% chance to reset Active Charm cooldowns and restore 100 SP."
-charm_type = 1
+sprite = ExtResource("3_arcgc")
 effect_scene = ExtResource("2_effect")
 proc_chance = 0.2
 acquisition_source = &"merchant_or_enemy_drop"
-tags = [&"passive", &"target_defeated", &"cooldown_reset", &"stamina"]
+tags = Array[StringName]([&"passive", &"target_defeated", &"cooldown_reset", &"stamina"])
 effect_params = {
 "restore_sp": 100.0
 }

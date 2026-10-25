@@ -1,26 +1,28 @@
-[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://du77cosi1w4r2"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/arrow_rain_effect.tscn" id="2_effect"]
+[ext_resource type="Texture2D" uid="uid://c5du0fpxyjba0" path="res://assets/sprites/charms/arrow_rain.png" id="3_p1bem"]
 
 [resource]
 script = ExtResource("1_data")
 charm_id = &"arrow_rain"
 display_name = "Arrow Rain"
 description = "Fire 8 arrows toward the cursor over 1.4 seconds."
+sprite = ExtResource("3_p1bem")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
-resource_cost = 100.0
+resource_cost = 300.0
 cooldown_seconds = 6.0
 acquisition_source = &"merchant_or_enemy_drop"
 tags = [&"active", &"projectile"]
 effect_params = {
-"projectile_count": 8,
 "damage_percent": 0.35,
-"volley_duration_seconds": 1.4,
-"projectile_speed": 12.0,
-"range_units": 8.0,
-"projectile_width_units": 0.18,
+"projectile_count": 8,
 "projectile_length_units": 0.6,
-"spawn_forward_offset": 0.6
+"projectile_speed": 12.0,
+"projectile_width_units": 0.18,
+"range_units": 8.0,
+"spawn_forward_offset": 0.6,
+"volley_duration_seconds": 1.4
 }

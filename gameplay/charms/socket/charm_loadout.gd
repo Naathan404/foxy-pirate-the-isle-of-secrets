@@ -13,16 +13,14 @@ func normalize() -> void:
 	)
 	var invalid_socket_ids: Array[int] = []
 	for socket_id: int in equipped_charm_ids.keys():
-		if socket_id < 0 or socket_id >= CharmConstants.MAX_SOCKET_COUNT:
-			invalid_socket_ids.append(socket_id)
-		elif socket_id >= unlocked_socket_count:
+		if not CharmConstants.is_socket_unlocked(socket_id, unlocked_socket_count):
 			invalid_socket_ids.append(socket_id)
 	for socket_id: int in invalid_socket_ids:
 		equipped_charm_ids.erase(socket_id)
 
 
 func set_equipped_charm(socket_id: int, charm_id: StringName) -> bool:
-	if socket_id < 0 or socket_id >= unlocked_socket_count:
+	if not CharmConstants.is_socket_unlocked(socket_id, unlocked_socket_count):
 		return false
 	if charm_id.is_empty():
 		equipped_charm_ids.erase(socket_id)

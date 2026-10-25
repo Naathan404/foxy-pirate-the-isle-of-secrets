@@ -50,7 +50,7 @@ func _get_property_list() -> Array[Dictionary]:
 			"name": "debug_socket",
 			"type": TYPE_INT,
 			"hint": PROPERTY_HINT_ENUM,
-			"hint_string": "Q:0,Space:1,E:2",
+			"hint_string": "Q:0,E:2,Space:1",
 			"usage": PROPERTY_USAGE_EDITOR,
 		},
 		{
@@ -103,7 +103,9 @@ func _setup_sockets() -> void:
 	for socket_id: int in socket_definitions:
 		var socket := CharmSocket.new()
 		socket.setup(socket_id, socket_definitions[socket_id])
-		socket.unlocked = socket_id < loadout.unlocked_socket_count
+		socket.unlocked = CharmConstants.is_socket_unlocked(
+			socket_id, loadout.unlocked_socket_count
+		)
 		_sockets[socket_id] = socket
 
 
@@ -182,7 +184,7 @@ func unlock_next_socket() -> bool:
 		loadout_change_rejected.emit(&"max_socket_count")
 		return false
 	loadout.unlocked_socket_count += 1
-	var socket_id := loadout.unlocked_socket_count - 1
+	var socket_id: int = CharmConstants.SOCKET_UNLOCK_ORDER[loadout.unlocked_socket_count - 1]
 	var socket := _sockets.get(socket_id) as CharmSocket
 	if socket == null:
 		loadout.unlocked_socket_count -= 1
@@ -269,7 +271,7 @@ func _debug_equip_charm(charm_id: StringName, socket_id: int) -> bool:
 	var added_debug_safe_source := not can_change_loadout()
 	if added_debug_safe_source:
 		enter_safe_location(self)
-	while get_unlocked_socket_count() <= socket_id:
+	while not is_socket_unlocked(socket_id):
 		if not unlock_next_socket():
 			_end_debug_loadout_change(added_debug_safe_source)
 			return false

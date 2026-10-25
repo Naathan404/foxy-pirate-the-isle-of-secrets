@@ -152,8 +152,61 @@ Luật tích và dùng CP:
   cho phép đánh sẽ bị từ chối ở bước kiểm tra trước khi tiêu CP.
 
 HUD nghe `chaos_changed`, đồng bộ lại giá trị sau khi ready, hiển thị thanh CP và
-nhãn `CHAOS current / maximum`. Khi đầy và maximum > 0, HUD thêm `[RMB]` và làm sáng
-thanh. Nhãn này báo đủ CP; không bảo đảm actor đang được phép đánh hoặc đã hết cooldown.
+nhãn `CP: current / maximum`. Khi đầy và maximum > 0, icon kỹ năng sáng; chưa đầy
+thì icon tối. Trạng thái này chỉ báo đủ CP, không bảo đảm actor đang được phép đánh
+hoặc đã hết cooldown.
+
+### Contract các phần hiển thị HUD
+
+`player_hud.tscn` giữ layout, sprite và các node chỉ số. Logic được chia như sau:
+
+| Script / node | Trách nhiệm và API |
+| --- | --- |
+| [player_hud.gd](../../gameplay/player/hud/player_hud.gd), root `PlayerHUD` | Nhận `health`, `stamina`, `chaos`; nối signal và sync cuối frame để chờ Player khởi tạo chỉ số |
+| [stat_arc.gd](../../gameplay/player/hud/stat_arc.gd), `Stats/HealthArc`, `StaminaArc`, `ChaosArc` | Dùng chung `HudStatArc.set_stat(current: float, maximum: float)` để đồng bộ nền, fill, bóng và tooltip; `sync_preview()` hỗ trợ chạy riêng scene HUD |
+| [hud_portrait.gd](../../gameplay/player/hud/hud_portrait.gd), `StatControl/Portrait` | `set_health(current: int, maximum: int)`, `play_hit_feedback(amount: int)`, `show_death()`; ưu tiên chết → hit → ít máu → khỏe |
+| [hud_tooltip.gd](../../gameplay/player/hud/hud_tooltip.gd), `StatTooltip` | Nhận `hud_layer` và danh sách `bars`, xử lý hover có delay, đổi hệ tọa độ khi scale và giữ panel trong viewport |
+| [bar_fill_effect.gd](../../gameplay/player/hud/bar_fill_effect.gd), `Effects/*FillEffect` | Giữ hiệu ứng màu/trắng khi tăng hoặc giảm chỉ số |
+| [arc_tooltip_bar.gd](../../gameplay/player/hud/arc_tooltip_bar.gd), các node `*Capacity` | Kiểm tra pixel và góc cung dưới con trỏ, lưu nội dung tooltip |
+| [equipment_control.gd](../../gameplay/player/hud/equipment_control.gd), `EquipmentControl` | Nhận manager qua `bind_manager(manager: CharmSocketManager)`, đọc trạng thái mở ô và cooldown runtime, không tự giảm cooldown |
+
+Chỉnh góc bắt đầu, độ dài cung và số điểm tương ứng cung đầy trên từng node
+`Stats/*Arc` trong Inspector, thay vì trên root HUD. Các node này tham chiếu
+capacity, fill, shadow và fill effect qua export. `ChaosArc` có thêm `value_label`
+và `readiness_icon`; script không phụ thuộc trực tiếp vào ChaosComponent.
+Texture phản ứng, ngưỡng ít máu và thời gian hit chỉnh trên `StatControl/Portrait`;
+thời gian chờ tooltip chỉnh trên `StatTooltip`.
+
+[test/hud_test.gd](../../test/hud_test.gd) kiểm tra component thật cập nhật cả ba
+thanh, thay đổi sức chứa, hiệu ứng tăng/giảm, icon CP, hit/heal/death của portrait,
+tooltip trên từng cung có scale và chạy riêng scene HUD không có component.
+
+### Equipment HUD: mở ô và cooldown
+
+`PlayerHUD.charm_socket_manager` được gán từ Foxy, sau đó HUD gọi
+`equipment.bind_manager()` ở cuối frame để đợi manager khởi tạo. Ô được mở theo
+Q → E → Space: một ô chỉ hiện Q, hai ô hiện Q/E, ba ô hiện cả ba. `Potion_socket`
+luôn hiện; chưa gắn dữ liệu inventory hoặc timer potion.
+
+Mỗi khung Charm có node icon, `Cooldown` và `CooldownLabel`.
+EquipmentControl đọc `manager.is_socket_unlocked(socket_id)` và
+`manager.registry.get_equipped(socket_id)` mỗi frame hiển thị. Chỉ Active Charm
+đang cooldown mới hiện lớp tối theo tỷ lệ thời gian còn lại và số giây làm tròn lên.
+Ô trống, Passive, cooldown kết thúc hoặc bị reset đều ẩn hai lớp này.
+UI không sửa runtime hoặc tạo cooldown riêng; `refresh()` cho phép đồng bộ ngay
+sau thao tác debug. Khi không có manager, chỉ ô potion được hiện.
+
+Icon Q/E/Space lấy `CharmRuntime.definition.sprite` từ Charm đang gắn vào đúng ô.
+Ảnh được giữ tỷ lệ và căn giữa trong rect icon có sẵn; không tự giãn kích thước
+khung. Tháo Charm, khóa ô, mất manager hoặc Charm chưa có sprite sẽ xóa ảnh cũ và
+ẩn node icon, giữ nền của ô đã mở. Icon potion chưa gắn với dữ liệu vật phẩm.
+
+Có thể thử bằng Remote Inspector → `Foxy/CharmSocketManager` → `Debug Socket` và
+`Debug Charm`, không cần inventory. Debug equip tự mở đủ ô theo thứ tự mới.
+Chọn Arrow Rain, nhấn phím socket đã gắn để xem cooldown; chọn `<Unequip>` để tháo.
+
+[test/equipment_test.gd](../../test/equipment_test.gd) kiểm tra mở ô, debug equip,
+cooldown từ activation thật, reset, hết thời gian, tháo charm và ô potion.
 
 ## Nhận sát thương và chết
 
