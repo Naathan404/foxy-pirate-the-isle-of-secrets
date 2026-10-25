@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/double_strike_effect.tscn" id="2_effect"]
+
+[resource]
+script = ExtResource("1_data")
+charm_id = &"double_strike"
+display_name = "Double Strike"
+description = "Normal attacks have a 20% chance to deal double damage."
+charm_type = 1
+effect_scene = ExtResource("2_effect")
+proc_chance = 0.2
+acquisition_source = &"merchant_or_enemy_drop"
+tags = [&"passive", &"outgoing_damage", &"normal_attack", &"proc"]
+effect_params = {
+"damage_multiplier": 2.0
+}

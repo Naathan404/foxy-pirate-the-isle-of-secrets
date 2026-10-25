@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/stat_modifier_charm_effect.tscn" id="2_effect"]
+
+[resource]
+script = ExtResource("1_data")
+charm_id = &"turtle_shell"
+display_name = "Turtle Shell"
+description = "Increase maximum HP by 2 and reduce movement speed by 20%."
+charm_type = 1
+effect_scene = ExtResource("2_effect")
+acquisition_source = &"merchant_or_enemy_drop"
+tags = [&"passive", &"stat_modifier", &"defense"]
+effect_params = {
+"max_hp_flat": 2,
+"move_speed_multiplier": 0.8
+}

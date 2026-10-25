@@ -167,6 +167,7 @@ func try_attack(request: AttackContext) -> bool:
 	_next_attack_id += 1
 	snapshot.attack_id = _next_attack_id
 	# Chỉ bind vũ khí, bind context sẽ tạo vòng tham chiếu
+	snapshot.damage_prepared.connect(_on_damage_prepared)
 	snapshot.damage_applied.connect(_on_damage_applied.bind(snapshot.weapon))
 	_context = snapshot
 	_execution = execution
@@ -200,6 +201,7 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 	result.team = team
 	result.action = request.action
 	result.weapon = equipped
+	result.weapon_category = equipped.definition.category
 	result.origin = actor.global_position
 	result.direction = Vector3(request.direction.x, 0, request.direction.z)
 	result.target_position = request.target_position
@@ -210,6 +212,9 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 		result.damage_hp = maxi(1, roundi(attack.damage_hp * equipped.forge.damage_multiplier))
 		result.range_units *= maxf(0.01, equipped.forge.range_multiplier)
 		result.hitbox_multiplier = maxf(0.01, equipped.forge.hitbox_multiplier)
+	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
+	if is_instance_valid(charm_manager):
+		result.damage_hp = charm_manager.modify_attack_damage(result.damage_hp, result)
 	if attack.aim_mode != AttackData.AimMode.FACING:
 		if not request.has_target:
 			return null
@@ -300,13 +305,41 @@ func modify_incoming_damage(amount_hp: int, damage: DamageContext) -> int:
 	return amount_hp
 
 
+func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
+	if damage == null or damage.source != actor or not is_instance_valid(target):
+		return
+	damage.target = target
+	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
+	if is_instance_valid(charm_manager):
+		damage.amount_hp = charm_manager.modify_outgoing_damage(damage.amount_hp, damage)
+
+
 func _on_damage_applied(
 	damage: DamageContext, target: Node, applied_hp: int, source_weapon: WeaponInstance
 ) -> void:
+	if damage == null or applied_hp <= 0:
+		return
+	damage.target = target
+	damage.target_defeated = _is_target_defeated(target)
 	# Chỉ kích hoạt hiệu ứng nếu vũ khí gây damage vẫn đang được trang bị
 	if source_weapon == equipped and is_instance_valid(_effect):
 		_effect.on_damage_dealt(damage, target, applied_hp)
 	damage_dealt.emit(damage, target, applied_hp)
+	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
+	if is_instance_valid(charm_manager):
+		charm_manager.dispatch_event(&"damage_dealt", [damage, target, applied_hp])
+		if damage.target_defeated:
+			charm_manager.dispatch_event(&"target_defeated", [target, damage])
+
+
+func _is_target_defeated(target: Node) -> bool:
+	if not is_instance_valid(target):
+		return false
+	if target is EnemyBase:
+		return (target as EnemyBase).dead
+	if target.has_method("is_defeated"):
+		return bool(target.call("is_defeated"))
+	return false
 
 
 func _on_dash_started() -> void:

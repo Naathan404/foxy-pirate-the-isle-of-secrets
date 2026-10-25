@@ -8,6 +8,8 @@ var _recovery_remaining: float = 0.0
 
 func _enter() -> void:
 	timer = enemy.data.hit_duration if enemy.data != null else 0.0
+	timer = maxf(timer, enemy.pending_charm_stun_seconds)
+	enemy.pending_charm_stun_seconds = 0.0
 	_is_recovering = false
 	_recovery_remaining = enemy.data.hit_recovery_duration if enemy.data != null else 0.0
 	enemy.end_active_attack()

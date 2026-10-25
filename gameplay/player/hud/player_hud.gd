@@ -50,6 +50,7 @@ var _pointer_inside: bool = false
 @onready var stat_tooltip: PanelContainer = $StatTooltip
 @onready var tooltip_label: Label = $StatTooltip/Value
 
+
 func _ready() -> void:
 	_mouse_position = get_viewport().get_mouse_position()
 	_pointer_inside = get_viewport().get_visible_rect().has_point(_mouse_position)
@@ -108,7 +109,9 @@ func _update_tooltip(delta: float) -> void:
 	var hovered: ArcTooltipBar = null
 	if is_visible() and _pointer_inside:
 		for bar: ArcTooltipBar in [stamina_capacity, health_capacity]:
-			var local_point := bar.get_global_transform_with_canvas().affine_inverse() * _mouse_position
+			var local_point := (
+				bar.get_global_transform_with_canvas().affine_inverse() * _mouse_position
+			)
 			if bar.is_visible_in_tree() and bar._has_point(local_point):
 				hovered = bar
 				break
@@ -129,10 +132,13 @@ func _update_tooltip(delta: float) -> void:
 	var mouse := _mouse_position
 	var visible_rect := to_local * get_viewport().get_visible_rect()
 	var desired := to_local * (mouse + Vector2(14.0, 18.0))
-	stat_tooltip.position = desired.clamp(
-		visible_rect.position,
-		(visible_rect.end - stat_tooltip.size).max(visible_rect.position)
-	).round()
+	stat_tooltip.position = (
+		desired
+		. clamp(
+			visible_rect.position, (visible_rect.end - stat_tooltip.size).max(visible_rect.position)
+		)
+		. round()
+	)
 	stat_tooltip.show()
 
 
@@ -148,18 +154,17 @@ func _on_hp_changed(current: int, maximum: int) -> void:
 func _on_stamina_changed(current: float, maximum: float) -> void:
 	_update_arc(stamina_capacity, stamina_fill, stamina_shadow, maximum, stamina_at_full_arc)
 	stamina_fill_effect.set_target(current)
-	stamina_capacity.set_stat_tooltip("SP: %d / %d" % [
-		floori(current),
-		floori(maximum)
-	])
+	stamina_capacity.set_stat_tooltip("SP: %d / %d" % [floori(current), floori(maximum)])
 
 
 # Update visual cuar bar, dùng chung cho tất cả các bar hp và stamina
 func _update_arc(
-	capacity: TextureProgressBar, fill: TextureProgressBar, shadow: TextureProgressBar,
-	maximum: float, points_at_full_arc: float
+	capacity: TextureProgressBar,
+	fill: TextureProgressBar,
+	shadow: TextureProgressBar,
+	maximum: float,
+	points_at_full_arc: float
 ) -> void:
-
 	var degrees = maximum_arc * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
 
 	# Đồng bộ góc và giá trị

@@ -1,7 +1,6 @@
 class_name ArcTooltipBar
 extends TextureProgressBar
 
-
 var _mask_texture: Texture2D
 var _alpha_mask: BitMap
 var _stat_text: String = ""

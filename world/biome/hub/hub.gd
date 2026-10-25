@@ -5,6 +5,8 @@ extends Node3D
 
 
 func _ready() -> void:
+	if is_instance_valid(_player.charm_socket_manager):
+		_player.charm_socket_manager.enter_safe_location(self)
 	respawn_player()
 
 

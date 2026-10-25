@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_m5cd5"]
 [ext_resource type="Texture2D" uid="uid://b2mod3odqs0p" path="res://icon.svg" id="2_lr5j1"]
+[ext_resource type="Script" path="res://gameplay/charms/socket/charm_test_zone.gd" id="3_charm_test"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(40, 1, 40)
@@ -17,6 +18,10 @@ size = Vector3(40, 1, 40)
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("1_m5cd5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3174837, 0)
+
+[node name="CharmTestZone" type="Node" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("3_charm_test")
+player = NodePath("../Foxy")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=780258921]
 

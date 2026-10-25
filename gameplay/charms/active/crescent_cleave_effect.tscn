@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/active/crescent_cleave_effect.gd" id="1_effect"]
+
+[node name="CrescentCleaveEffect" type="Node"]
+script = ExtResource("1_effect")

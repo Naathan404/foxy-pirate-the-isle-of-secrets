@@ -1,6 +1,9 @@
 class_name HitBox
 extends Area3D
 
+signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_prepared(damage: DamageContext, target: Node)
+
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
 	ONCE_PER_CONTACT,
@@ -35,15 +38,25 @@ func begin_attack(
 	tag: StringName = &"normal",
 	rehit_policy: RehitPolicy = RehitPolicy.ONCE_PER_ATTACK
 ) -> bool:
+	var damage := DamageContext.new()
+	damage.source = actor
+	damage.source_team = team
+	damage.base_amount_hp = amount_hp
+	damage.amount_hp = amount_hp
+	damage.attack_id = attack_id
+	damage.tag = tag
+	return begin_attack_with_context(damage, rehit_policy)
+
+
+func begin_attack_with_context(
+	damage: DamageContext, rehit_policy: RehitPolicy = RehitPolicy.ONCE_PER_ATTACK
+) -> bool:
 	end_attack()
-	if not is_instance_valid(actor) or amount_hp <= 0:
+	if damage == null or not is_instance_valid(damage.source) or damage.amount_hp <= 0:
 		return false
-	_damage = DamageContext.new()
-	_damage.source = actor
-	_damage.source_team = team
-	_damage.amount_hp = amount_hp
-	_damage.attack_id = attack_id
-	_damage.tag = tag
+	actor = damage.source
+	team = damage.source_team
+	_damage = damage
 	_rehit_policy = rehit_policy
 	_active = true
 	set_physics_process(true)
@@ -76,8 +89,13 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 	# Reserve before dispatch because damage callbacks can cancel the attack.
 	_hit_actors[target_id] = true
-	if hurtbox.take_damage(_damage) <= 0:
+	var hit_damage := _damage.create_hit_copy(hurtbox.actor)
+	damage_prepared.emit(hit_damage, hurtbox.actor)
+	var applied_hp := hurtbox.take_damage(hit_damage)
+	if applied_hp <= 0:
 		_hit_actors.erase(target_id)
+		return
+	damage_applied.emit(hit_damage, hurtbox.actor, applied_hp)
 
 
 func _on_area_exited(area: Area3D) -> void:

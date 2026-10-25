@@ -23,6 +23,7 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 @export var initial_state_name: StringName = &"Idle"
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var destroy_on_death: bool = false
+@export var charm_grapple_large: bool = false
 
 @export_group("Debug")
 @export var show_debug_health: bool = false:
@@ -37,6 +38,8 @@ var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
+var pending_charm_stun_seconds: float = 0.0
+var _charm_grapple_tween: Tween
 
 @onready var hp: HealthComponent = $HealthComponent
 @onready var hurtbox: HurtBox = $Direction/HurtBox
@@ -252,6 +255,49 @@ func receive_damage(damage: DamageContext) -> int:
 	return hp.take_damage(damage.amount_hp)
 
 
+func apply_charm_grapple(
+	source: Node3D, stop_distance: float, pull_speed_units_per_second: float, stun_seconds: float
+) -> StringName:
+	if dead or not is_instance_valid(source):
+		return &"miss"
+	if charm_grapple_large or is_in_group("boss"):
+		if not source.has_method("apply_charm_grapple_pull"):
+			return &"miss"
+		var pulled := bool(
+			source.call(
+				"apply_charm_grapple_pull",
+				global_position,
+				stop_distance,
+				pull_speed_units_per_second
+			)
+		)
+		if not pulled:
+			return &"miss"
+		return &"actor_pulled_boss" if is_in_group("boss") else &"actor_pulled_large"
+	var direction := global_position - source.global_position
+	direction.y = 0.0
+	if direction.is_zero_approx():
+		return &"target_hit"
+	pending_hit_direction = direction.normalized()
+	pending_charm_stun_seconds = maxf(pending_charm_stun_seconds, stun_seconds)
+	if not request_state(&"hit", 60):
+		pending_charm_stun_seconds = 0.0
+		return &"target_hit"
+	var destination := source.global_position + direction.normalized() * maxf(0.0, stop_distance)
+	var travel_distance := global_position.distance_to(destination)
+	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+		_charm_grapple_tween.kill()
+	if travel_distance <= 0.001:
+		global_position = destination
+		return &"target_pulled"
+	var duration := travel_distance / maxf(0.01, pull_speed_units_per_second)
+	_charm_grapple_tween = create_tween()
+	_charm_grapple_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_charm_grapple_tween.tween_property(self, "global_position", destination, duration)
+	_charm_grapple_tween.tween_callback(_on_charm_grapple_finished)
+	return &"target_pulled"
+
+
 func _notify_hit() -> void:
 	if dead:
 		return
@@ -262,6 +308,9 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+		_charm_grapple_tween.kill()
+	_charm_grapple_tween = null
 	if not request_state(&"death", 100):
 		push_error("EnemyBase: dead enemy could not enter Death state")
 	died.emit()
@@ -328,7 +377,9 @@ func _validate_directional_node(node: Node, component_name: StringName) -> bool:
 		return true
 	if direction_pivot.is_ancestor_of(node):
 		return true
-	push_error("EnemyBase: %s must be a child of Direction so it rotates with facing" % component_name)
+	push_error(
+		"EnemyBase: %s must be a child of Direction so it rotates with facing" % component_name
+	)
 	return false
 
 
@@ -445,3 +496,7 @@ func _get_hit_direction(source: Node) -> Vector3:
 	if direction.is_zero_approx():
 		return -last_facing_direction
 	return direction.normalized()
+
+
+func _on_charm_grapple_finished() -> void:
+	_charm_grapple_tween = null

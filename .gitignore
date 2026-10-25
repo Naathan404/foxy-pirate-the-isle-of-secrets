@@ -2,3 +2,4 @@
 .godot/
 /android/
 addons/
+.cache_local/

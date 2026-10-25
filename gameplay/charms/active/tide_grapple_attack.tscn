@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/active/tide_grapple_attack.gd" id="1_script"]
+
+[node name="TideGrappleAttack" type="Node3D" node_paths=PackedStringArray("raycast")]
+script = ExtResource("1_script")
+raycast = NodePath("RayCast3D")
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+enabled = false
+collision_mask = 21
+collide_with_areas = true
+collide_with_bodies = true

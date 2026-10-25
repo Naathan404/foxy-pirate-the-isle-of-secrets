@@ -78,6 +78,17 @@ func try_consume(cost_sp: float) -> bool:
 	return true
 
 
+# Hồi SP và trả về lượng thực tế đã hồi, không vượt quá max hiện tại.
+func restore(amount_sp: float) -> float:
+	if not _configured or amount_sp <= 0.0:
+		return 0.0
+	var applied := minf(amount_sp, _max_sp - _current_sp)
+	if applied > 0.0:
+		_current_sp += applied
+		stamina_changed.emit(_current_sp, _max_sp)
+	return applied
+
+
 # bật công tắc hồi sp =)))
 func set_regeneration_enabled(enabled: bool) -> void:
 	_regeneration_enabled = enabled

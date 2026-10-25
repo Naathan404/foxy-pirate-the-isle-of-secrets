@@ -12,6 +12,8 @@ var current_hp: int:
 
 var _current_hp: int = 0
 var _max_hp: int = 0
+var _base_max_hp: int = 0
+var _max_modifiers: Dictionary[StringName, int] = {}
 var _configured: bool = false
 
 
@@ -24,6 +26,7 @@ func init(max_hp: int) -> bool:
 		push_error("HealthComponent: max_hp phải lớn hơn 0")
 		return false
 	_max_hp = max_hp
+	_base_max_hp = max_hp
 	_current_hp = _max_hp
 	_configured = true
 	hp_changed.emit(_current_hp, _max_hp)
@@ -55,6 +58,26 @@ func take_damage(amount: int) -> int:
 	if killed:
 		died.emit()
 	return applied
+
+
+func set_max_hp_modifier(source: StringName, bonus: int) -> void:
+	if _configured and not source.is_empty():
+		_max_modifiers[source] = bonus
+		_refresh_max_hp()
+
+
+func remove_max_hp_modifier(source: StringName) -> void:
+	if _max_modifiers.erase(source):
+		_refresh_max_hp()
+
+
+func _refresh_max_hp() -> void:
+	_max_hp = _base_max_hp
+	for bonus: int in _max_modifiers.values():
+		_max_hp += bonus
+	_max_hp = maxi(1, _max_hp)
+	_current_hp = mini(_current_hp, _max_hp)
+	hp_changed.emit(_current_hp, _max_hp)
 
 
 # helpers

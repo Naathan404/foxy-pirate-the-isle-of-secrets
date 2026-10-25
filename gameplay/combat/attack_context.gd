@@ -5,6 +5,7 @@ extends RefCounted
 
 # Lượng máu thật sự mất
 signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_prepared(damage: DamageContext, target: Node)
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
@@ -20,6 +21,7 @@ var target_position: Vector3
 var has_target: bool = false
 
 var weapon: WeaponInstance
+var weapon_category: int = -1
 
 # chỉ số sau khi rèn
 var damage_hp: int = 1
@@ -33,6 +35,10 @@ func create_damage_context() -> DamageContext:
 	damage.source = actor
 	damage.source_team = team
 	damage.attack_id = attack_id
+	damage.base_amount_hp = damage_hp
 	damage.amount_hp = damage_hp
 	damage.tag = action
+	damage.weapon_category = weapon_category
+	damage.origin = origin
+	damage.direction = direction
 	return damage

@@ -24,10 +24,7 @@ func _process(_delta: float) -> void:
 	movement.y = 0.0
 	var running = player.fsm.current_state == player.fsm.states.get("run")
 	particle.emitting = (
-		running
-		and not player.dead
-		and player.is_on_floor()
-		and movement.length() > minimum_speed
+		running and not player.dead and player.is_on_floor() and movement.length() > minimum_speed
 	)
 	if not particle.emitting:
 		return
