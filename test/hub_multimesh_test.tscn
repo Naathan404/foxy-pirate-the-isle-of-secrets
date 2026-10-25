@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://ckx4a2ubmtvmk" path="res://world/components/decoration/mullti_mesh_decorator.gd" id="6_sx3y8"]
 [ext_resource type="ArrayMesh" uid="uid://jci2vipujt47" path="res://assets/models/kenney_mini_forest/plant.glb" id="7_hq2k8"]
 [ext_resource type="ArrayMesh" uid="uid://dp41kt7ek1l4w" path="res://assets/models/kenney_mini_forest/tree.glb" id="8_48cd4"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="9_s66h5"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -74,7 +75,7 @@ radius = 6.4414063
 script = ExtResource("1_80qyt")
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("2_tu8fd")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -2.7261753, 3.875, -1.1673746)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7261753, 3.875, -1.1673746)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
@@ -128,7 +129,6 @@ generated_multimesh = SubResource("MultiMesh_s66h5")
 source_mesh = ExtResource("7_hq2k8")
 seed = 7
 random_tilt = 6.6
-metadata/_custom_type_script = "uid://br0sa6tal1to5"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlantMultiMeshDecorator" unique_id=927822583]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0547652, 0, 3.0619717)
@@ -149,9 +149,15 @@ seed = 7
 random_tilt = 6.6
 random_scale_min = 2.0
 random_scale_max = 3.0
-metadata/_custom_type_script = "uid://br0sa6tal1to5"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TreeMultiMeshDecorator" unique_id=1210535910]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8658342, 0, 3.0619714)
 shape = SubResource("CylinderShape3D_4py6v")
 debug_color = Color(0, 0.23529412, 0.2784314, 0.92156863)
+
+[node name="Starfish" parent="." unique_id=1294052233 instance=ExtResource("9_s66h5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.270057, 2.0562243, 11.192848)
+
+[node name="Starfish2" parent="." unique_id=1856227157 instance=ExtResource("9_s66h5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.270057, 2.0562243, 0.7657423)
+initial_facing = 3
