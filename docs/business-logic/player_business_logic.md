@@ -168,6 +168,7 @@ hoặc đã hết cooldown.
 | [hud_tooltip.gd](../../gameplay/player/hud/hud_tooltip.gd), `StatTooltip` | Nhận `hud_layer` và danh sách `bars`, xử lý hover có delay, đổi hệ tọa độ khi scale và giữ panel trong viewport |
 | [bar_fill_effect.gd](../../gameplay/player/hud/bar_fill_effect.gd), `Effects/*FillEffect` | Giữ hiệu ứng màu/trắng khi tăng hoặc giảm chỉ số |
 | [arc_tooltip_bar.gd](../../gameplay/player/hud/arc_tooltip_bar.gd), các node `*Capacity` | Kiểm tra pixel và góc cung dưới con trỏ, lưu nội dung tooltip |
+| [equipment_control.gd](../../gameplay/player/hud/equipment_control.gd), `EquipmentControl` | Nhận manager qua `bind_manager(manager: CharmSocketManager)`, đọc trạng thái mở ô và cooldown runtime, không tự giảm cooldown |
 
 Chỉnh góc bắt đầu, độ dài cung và số điểm tương ứng cung đầy trên từng node
 `Stats/*Arc` trong Inspector, thay vì trên root HUD. Các node này tham chiếu
@@ -179,6 +180,33 @@ thời gian chờ tooltip chỉnh trên `StatTooltip`.
 [test/hud_test.gd](../../test/hud_test.gd) kiểm tra component thật cập nhật cả ba
 thanh, thay đổi sức chứa, hiệu ứng tăng/giảm, icon CP, hit/heal/death của portrait,
 tooltip trên từng cung có scale và chạy riêng scene HUD không có component.
+
+### Equipment HUD: mở ô và cooldown
+
+`PlayerHUD.charm_socket_manager` được gán từ Foxy, sau đó HUD gọi
+`equipment.bind_manager()` ở cuối frame để đợi manager khởi tạo. Ô được mở theo
+Q → E → Space: một ô chỉ hiện Q, hai ô hiện Q/E, ba ô hiện cả ba. `Potion_socket`
+luôn hiện; chưa gắn dữ liệu inventory hoặc timer potion.
+
+Mỗi khung Charm có node icon, `Cooldown` và `CooldownLabel`.
+EquipmentControl đọc `manager.is_socket_unlocked(socket_id)` và
+`manager.registry.get_equipped(socket_id)` mỗi frame hiển thị. Chỉ Active Charm
+đang cooldown mới hiện lớp tối theo tỷ lệ thời gian còn lại và số giây làm tròn lên.
+Ô trống, Passive, cooldown kết thúc hoặc bị reset đều ẩn hai lớp này.
+UI không sửa runtime hoặc tạo cooldown riêng; `refresh()` cho phép đồng bộ ngay
+sau thao tác debug. Khi không có manager, chỉ ô potion được hiện.
+
+Icon Q/E/Space lấy `CharmRuntime.definition.sprite` từ Charm đang gắn vào đúng ô.
+Ảnh được giữ tỷ lệ và căn giữa trong rect icon có sẵn; không tự giãn kích thước
+khung. Tháo Charm, khóa ô, mất manager hoặc Charm chưa có sprite sẽ xóa ảnh cũ và
+ẩn node icon, giữ nền của ô đã mở. Icon potion chưa gắn với dữ liệu vật phẩm.
+
+Có thể thử bằng Remote Inspector → `Foxy/CharmSocketManager` → `Debug Socket` và
+`Debug Charm`, không cần inventory. Debug equip tự mở đủ ô theo thứ tự mới.
+Chọn Arrow Rain, nhấn phím socket đã gắn để xem cooldown; chọn `<Unequip>` để tháo.
+
+[test/equipment_test.gd](../../test/equipment_test.gd) kiểm tra mở ô, debug equip,
+cooldown từ activation thật, reset, hết thời gian, tháo charm và ô potion.
 
 ## Nhận sát thương và chết
 

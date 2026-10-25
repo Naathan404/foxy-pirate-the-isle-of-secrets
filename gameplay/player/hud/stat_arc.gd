@@ -52,7 +52,7 @@ func set_stat(current: float, maximum: float) -> void:
 			_shake_readiness_shake()
 		elif not full:
 			_stop_readiness_shake()
-		
+
 		_was_full = full
 
 
@@ -65,28 +65,32 @@ func _shake_readiness_shake() -> void:
 	_stop_readiness_shake()
 
 	readiness_icon.pivot_offset = readiness_icon.size * 0.5
-	
+
 	_punch_tween = create_tween()
 
 	# Phóng lên 20%, rồi thu về scale gốc
-	_punch_tween.tween_property(
-		readiness_icon, "scale", _icon_scale * 1.2, 0.1
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	(
+		_punch_tween
+		. tween_property(readiness_icon, "scale", _icon_scale * 1.2, 0.1)
+		. set_trans(Tween.TRANS_BACK)
+		. set_ease(Tween.EASE_OUT)
+	)
 
-	_punch_tween.tween_property(
-		readiness_icon, "scale", _icon_scale, 0.18
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	(
+		_punch_tween
+		. tween_property(readiness_icon, "scale", _icon_scale, 0.18)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_OUT)
+	)
 
 	_readiness_tween = create_tween()
 	_readiness_tween.set_trans(Tween.TRANS_SINE)
 
 	for angle: float in [-8.0, 8.0, -5.0, 5.0, 0.0]:
 		_readiness_tween.tween_property(
-			readiness_icon,
-			"rotation",
-			_icon_rotation + deg_to_rad(angle),
-			0.1
+			readiness_icon, "rotation", _icon_rotation + deg_to_rad(angle), 0.1
 		)
+
 
 func _stop_readiness_shake() -> void:
 	if _readiness_tween != null and _readiness_tween.is_valid():

@@ -8,9 +8,7 @@ const ADRENALINE_SURGE: CharmData = preload(
 )
 const BACKSTABBER: CharmData = preload("res://gameplay/charms/charm_data/backstabber.tres")
 const ARROW_RAIN: CharmData = preload("res://gameplay/charms/charm_data/arrow_rain.tres")
-const DAGGER_ATTACK_SCENE: PackedScene = preload(
-	"res://gameplay/weapons/attack scenes/dagger_attack.tscn"
-)
+const DAGGER_ATTACK_SCENE_PATH := "res://gameplay/weapons/attack scenes/dagger_attack.tscn"
 
 var _failures: int = 0
 var _damage_event_count: int = 0
@@ -139,7 +137,8 @@ func _test_double_strike_pipeline(
 	context.damage_prepared.connect(controller._on_damage_prepared)
 	context.damage_applied.connect(controller._on_damage_applied.bind(controller.equipped))
 	context.damage_applied.connect(_on_damage_applied)
-	var attack := DAGGER_ATTACK_SCENE.instantiate() as DaggerAttack
+	# Load after autoloads exist; the scene's CombatFeedback uses their singleton names.
+	var attack := load(DAGGER_ATTACK_SCENE_PATH).instantiate() as DaggerAttack
 	attack.context = context
 	world.add_child(attack)
 	attack.activate()

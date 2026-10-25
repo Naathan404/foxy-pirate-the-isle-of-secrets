@@ -4,6 +4,7 @@ extends CanvasLayer
 @export var health: HealthComponent
 @export var stamina: StaminaComponent
 @export var chaos: ChaosComponent
+@export var charm_socket_manager: CharmSocketManager
 
 @onready var health_arc: HudStatArc = $Stats/HealthArc
 @onready var stamina_arc: HudStatArc = $Stats/StaminaArc
@@ -23,6 +24,7 @@ func _ready() -> void:
 		chaos.chaos_changed.connect(chaos_arc.set_stat)
 	# Player khởi tạo chỉ số sau khi các node con ready, nên sync ở cuối frame.
 	_sync_stats.call_deferred()
+	equipment.bind_manager.call_deferred(charm_socket_manager)
 
 
 func _sync_stats() -> void:

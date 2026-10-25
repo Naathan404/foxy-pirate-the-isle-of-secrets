@@ -63,6 +63,10 @@ Mỗi Charm phải thỏa tất cả điều kiện sau:
 6. Passive Charm không được có activation cost hoặc cooldown.
 7. Charm chỉ được xem là playable khi data hợp lệ và có effect scene hợp lệ.
 
+`CharmData.sprite: Texture2D` là ảnh tùy chọn dùng trong ô trang bị HUD. Gán ảnh ở
+trường `Sprite` của từng `.tres` trong Inspector. Ảnh không tham gia validate hoặc
+logic hiệu ứng: chưa có ảnh vẫn trang bị và dùng Charm bình thường.
+
 `charm_id` là khóa dùng cho ownership, loadout, modifier source, proc result và save data.
 Không dùng tên hiển thị hoặc node path làm khóa persistence.
 
@@ -75,11 +79,14 @@ Hệ thống có đúng ba socket theo thứ tự:
 | Socket ID | Input action | Phím mặc định |
 | --- | --- | --- |
 | `Q` | `charm_slot_q` | Q |
-| `SPACE` | `charm_slot_space` | Space |
 | `E` | `charm_slot_e` | E |
+| `SPACE` | `charm_slot_space` | Space |
 
 - Player mới bắt đầu với đúng một socket Q.
-- Socket được mở tuần tự: Q, sau đó Space, sau đó E.
+- Socket được mở tuần tự: Q, sau đó E, sau đó Space, dùng `SOCKET_UNLOCK_ORDER`.
+- ID số vẫn giữ nguyên `Q = 0`, `SPACE = 1`, `E = 2`; thứ tự mở ô không dựa vào ID.
+  Luật normalize và gắn Charm trong loadout cũng dùng thứ tự mở này. Thứ tự áp dụng
+  modifier vẫn giữ Q → Space → E.
 - Không thể có nhiều hơn ba socket.
 - Passive Charm không đăng ký input; input trên socket chứa Passive không kích hoạt action.
 

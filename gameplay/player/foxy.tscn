@@ -21,6 +21,7 @@
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
 [ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
 [ext_resource type="PackedScene" uid="uid://dgx5c1qlu0dls" path="res://gameplay/player/effects/run_dust_effect.tscn" id="19_lqbvs"]
+[ext_resource type="Script" uid="uid://c4fmspxxv4ifk" path="res://gameplay/charms/socket/charm_loadout.gd" id="20_ehmwb"]
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
 [ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
@@ -601,6 +602,11 @@ height = 2.2327638
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(1.2701416, 1.9672241, 1)
 
+[sub_resource type="Resource" id="Resource_ieged"]
+script = ExtResource("20_ehmwb")
+unlocked_socket_count = 3
+metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
+
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "camera") groups=["player"]]
 collision_layer = 2
 collision_mask = 5
@@ -667,10 +673,11 @@ script = ExtResource("7_rvh5s")
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
 
-[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos") instance=ExtResource("20_pt1je")]
+[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager") instance=ExtResource("20_pt1je")]
 health = NodePath("../HealthComponent")
 stamina = NodePath("../StaminaComponent")
 chaos = NodePath("../ChaosComponent")
+charm_socket_manager = NodePath("../CharmSocketManager")
 
 [node name="HurtBox" type="Area3D" parent="." unique_id=953130742 node_paths=PackedStringArray("actor")]
 collision_layer = 8
@@ -700,6 +707,7 @@ default_weapon = ExtResource("17_r6sj1")
 script = ExtResource("16_charm_manager")
 registry = NodePath("CharmRegistry")
 actor = NodePath("..")
+loadout = SubResource("Resource_ieged")
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")

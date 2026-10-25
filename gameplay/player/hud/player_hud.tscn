@@ -16,6 +16,10 @@
 [ext_resource type="Script" uid="uid://diqqixidr2eyy" path="res://gameplay/player/hud/hud_portrait.gd" id="14_portrait"]
 [ext_resource type="Script" uid="uid://welfjuqw50gd" path="res://gameplay/player/hud/hud_tooltip.gd" id="15_tooltip"]
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
+[ext_resource type="Texture2D" uid="uid://bus07n2xlkxvt" path="res://assets/ui/player_hud/charrm_ui/charm_socket_q.png" id="17_01apl"]
+[ext_resource type="Texture2D" uid="uid://cotkjiuquib8w" path="res://assets/ui/player_hud/charrm_ui/potion_socket.png" id="17_lpsrg"]
+[ext_resource type="Texture2D" uid="uid://b0ah05f56tanf" path="res://assets/ui/player_hud/charrm_ui/charm_socket_space.png" id="18_gpu53"]
+[ext_resource type="Texture2D" uid="uid://beqqmnur4t64u" path="res://assets/ui/player_hud/charrm_ui/charm_socket_e.png" id="19_khbku"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
 shader = ExtResource("5_depth")
@@ -47,9 +51,6 @@ shader = ExtResource("5_depth")
 shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
 shader_parameter/border_width = 2.0
 shader_parameter/bevel_strength = 0.22000001045
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hxn85"]
-load_path = "res://.godot/imported/charm_socket.png-3249a5aed7415fc535a31bbd3399d440.ctex"
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=400788151]
 scale = Vector2(1.25, 1.25)
@@ -424,6 +425,7 @@ offset_left = 10.0
 offset_top = 390.0
 offset_right = 50.0
 offset_bottom = 430.0
+mouse_filter = 2
 script = ExtResource("16_dv5bc")
 
 [node name="Q_socket" type="TextureRect" parent="EquipmentControl" unique_id=451445646]
@@ -432,7 +434,38 @@ layout_mode = 0
 offset_top = 73.6
 offset_right = 64.0
 offset_bottom = 137.6
-texture = SubResource("CompressedTexture2D_hxn85")
+mouse_filter = 2
+texture = ExtResource("17_01apl")
+
+[node name="Q_icon" type="TextureRect" parent="EquipmentControl/Q_socket" unique_id=1618406675]
+texture_filter = 1
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 63.999996
+mouse_filter = 2
+
+[node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/Q_socket" unique_id=1013245374]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+max_value = 1.0
+step = 0.0
+fill_mode = 4
+tint_progress = Color(0, 0, 0, 0.75)
+
+[node name="CooldownLabel" type="Label" parent="EquipmentControl/Q_socket" unique_id=160201000]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SPACE_socket" type="TextureRect" parent="EquipmentControl" unique_id=2076894011]
 texture_filter = 1
@@ -441,7 +474,38 @@ offset_left = 43.2
 offset_top = 32.0
 offset_right = 107.2
 offset_bottom = 96.0
-texture = SubResource("CompressedTexture2D_hxn85")
+mouse_filter = 2
+texture = ExtResource("18_gpu53")
+
+[node name="SPACE_icon" type="TextureRect" parent="EquipmentControl/SPACE_socket" unique_id=1004234284]
+texture_filter = 1
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+
+[node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/SPACE_socket" unique_id=560352290]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+max_value = 1.0
+step = 0.0
+fill_mode = 4
+tint_progress = Color(0, 0, 0, 0.75)
+
+[node name="CooldownLabel" type="Label" parent="EquipmentControl/SPACE_socket" unique_id=926883227]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="E_socket" type="TextureRect" parent="EquipmentControl" unique_id=1852458926]
 texture_filter = 1
@@ -450,7 +514,38 @@ offset_left = 86.399994
 offset_top = 73.6
 offset_right = 150.4
 offset_bottom = 137.6
-texture = SubResource("CompressedTexture2D_hxn85")
+mouse_filter = 2
+texture = ExtResource("19_khbku")
+
+[node name="E_icon" type="TextureRect" parent="EquipmentControl/E_socket" unique_id=1233280339]
+texture_filter = 1
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+
+[node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/E_socket" unique_id=490836128]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+max_value = 1.0
+step = 0.0
+fill_mode = 4
+tint_progress = Color(0, 0, 0, 0.75)
+
+[node name="CooldownLabel" type="Label" parent="EquipmentControl/E_socket" unique_id=1915906249]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Potion_socket" type="TextureRect" parent="EquipmentControl" unique_id=1503944081]
 texture_filter = 1
@@ -459,4 +554,12 @@ offset_left = 43.2
 offset_top = 115.99999
 offset_right = 107.2
 offset_bottom = 180.0
-texture = SubResource("CompressedTexture2D_hxn85")
+mouse_filter = 2
+texture = ExtResource("17_lpsrg")
+
+[node name="Potion_icon" type="TextureRect" parent="EquipmentControl/Potion_socket" unique_id=1995619653]
+texture_filter = 1
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
