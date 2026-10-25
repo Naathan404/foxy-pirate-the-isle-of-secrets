@@ -3,6 +3,7 @@ extends CanvasLayer
 @export_group("Stat Components")
 @export var health: HealthComponent
 @export var stamina: StaminaComponent
+@export var chaos: ChaosComponent
 
 @export_group("Arc Layout")
 # Hướng bắt đầu của bar
@@ -12,6 +13,11 @@ extends CanvasLayer
 # thông số tối đa
 @export_range(1.0, 1000.0) var health_at_full_arc: float = 20.0
 @export_range(1.0, 10000.0) var stamina_at_full_arc: float = 1000.0
+
+@export_group("Chaos Arc Layout")
+@export_range(0.0, 360.0) var chaos_initial_angle: float = 225.0
+@export_range(1.0, 360.0) var chaos_maximum_arc: float = 135.0
+@export_range(1.0, 10000.0) var chaos_at_full_arc: float = 100.0
 
 @export_group("Tooltip")
 ## Thời gian dừng chuột trên cung trước khi hiện current/max.
@@ -38,17 +44,23 @@ var _mouse_position: Vector2
 var _pointer_inside: bool = false
 
 # Nền, fill, bóng
-@onready var health_capacity: ArcTooltipBar = $HealthCapacity
-@onready var health_fill: TextureProgressBar = $HealthFill
-@onready var health_shadow: TextureProgressBar = $HealthShadow
-@onready var stamina_capacity: ArcTooltipBar = $StaminaCapacity
-@onready var stamina_fill: TextureProgressBar = $StaminaFill
-@onready var stamina_shadow: TextureProgressBar = $StaminaShadow
+@onready var health_capacity: ArcTooltipBar = $Control/HealthCapacity
+@onready var health_fill: TextureProgressBar = $Control/HealthFill
+@onready var health_shadow: TextureProgressBar = $Control/HealthShadow
+@onready var stamina_capacity: ArcTooltipBar = $Control/StaminaCapacity
+@onready var stamina_fill: TextureProgressBar = $Control/StaminaFill
+@onready var stamina_shadow: TextureProgressBar = $Control/StaminaShadow
 @onready var health_fill_effect: BarFillEffect = $HealthFillEffect
 @onready var stamina_fill_effect: BarFillEffect = $StaminaFillEffect
-@onready var portrait: TextureRect = $Portrait
+@onready var portrait: TextureRect = $Control/Portrait
 @onready var stat_tooltip: PanelContainer = $StatTooltip
 @onready var tooltip_label: Label = $StatTooltip/Value
+@onready var chaos_capacity: ArcTooltipBar = $ChaosControl/ChaosCapacity
+@onready var chaos_fill: TextureProgressBar = $ChaosControl/ChaosFill
+@onready var chaos_shadow: TextureProgressBar = $ChaosControl/ChaosShadow
+@onready var chaos_fill_effect: BarFillEffect = $ChaosFillEffect
+@onready var chaos_label: Label = $ChaosControl/ChaosLabel
+@onready var weapon_icon: TextureRect = $ChaosControl/WeaponIcon
 
 
 func _ready() -> void:
@@ -64,12 +76,18 @@ func _ready() -> void:
 		health.died.connect(_on_died)
 	if is_instance_valid(stamina):
 		stamina.stamina_changed.connect(_on_stamina_changed)
+	if is_instance_valid(chaos):
+		chaos.chaos_changed.connect(_on_chaos_changed)
 
 	_sync_stats.call_deferred()
 
 
 # sync trạng thái
 func _sync_stats() -> void:
+	if is_instance_valid(chaos):
+		_on_chaos_changed(chaos.current, chaos.maximum)
+	else:
+		_on_chaos_changed(chaos_fill.value, chaos_fill.max_value)
 	if is_instance_valid(health):
 		_on_hp_changed(health.get_current_hp(), health.get_max_hp())
 	else:
@@ -108,7 +126,7 @@ func _on_mouse_exited() -> void:
 func _update_tooltip(delta: float) -> void:
 	var hovered: ArcTooltipBar = null
 	if is_visible() and _pointer_inside:
-		for bar: ArcTooltipBar in [stamina_capacity, health_capacity]:
+		for bar: ArcTooltipBar in [chaos_capacity, stamina_capacity, health_capacity]:
 			var local_point := (
 				bar.get_global_transform_with_canvas().affine_inverse() * _mouse_position
 			)
@@ -143,7 +161,15 @@ func _update_tooltip(delta: float) -> void:
 
 
 func _on_hp_changed(current: int, maximum: int) -> void:
-	_update_arc(health_capacity, health_fill, health_shadow, maximum, health_at_full_arc)
+	_update_arc(
+		health_capacity,
+		health_fill,
+		health_shadow,
+		maximum,
+		health_at_full_arc,
+		initial_angle,
+		maximum_arc
+	)
 	health_fill_effect.set_target(current)
 	_health_ratio = clampf(float(current) / maxf(maximum, 1.0), 0.0, 1.0)
 	health_capacity.set_stat_tooltip("HP: %d / %d" % [current, maximum])
@@ -152,24 +178,53 @@ func _on_hp_changed(current: int, maximum: int) -> void:
 
 
 func _on_stamina_changed(current: float, maximum: float) -> void:
-	_update_arc(stamina_capacity, stamina_fill, stamina_shadow, maximum, stamina_at_full_arc)
+	_update_arc(
+		stamina_capacity,
+		stamina_fill,
+		stamina_shadow,
+		maximum,
+		stamina_at_full_arc,
+		initial_angle,
+		maximum_arc
+	)
 	stamina_fill_effect.set_target(current)
 	stamina_capacity.set_stat_tooltip("SP: %d / %d" % [floori(current), floori(maximum)])
 
 
-# Update visual cuar bar, dùng chung cho tất cả các bar hp và stamina
+func _on_chaos_changed(current: float, maximum: float) -> void:
+	# Chaos giữ góc và chiều cung riêng do layout nằm quanh icon ở góc phải.
+	_update_arc(
+		chaos_capacity,
+		chaos_fill,
+		chaos_shadow,
+		maximum,
+		chaos_at_full_arc,
+		chaos_initial_angle,
+		chaos_maximum_arc
+	)
+	chaos_fill_effect.set_target(current)
+	var ready := maximum > 0.0 and current >= maximum
+	var stat_text := "CP: %d / %d" % [floori(current), floori(maximum)]
+	chaos_capacity.set_stat_tooltip(stat_text + ("  [RMB]" if ready else ""))
+	chaos_label.text = stat_text + ("  [RMB]" if ready else "")
+	weapon_icon.modulate = Color.WHITE if ready else Color(0.55, 0.55, 0.55)
+
+
+# Đồng bộ nền, bóng và cung fill cho HP, SP và CP; mỗi nhóm giữ layout riêng.
 func _update_arc(
 	capacity: TextureProgressBar,
 	fill: TextureProgressBar,
 	shadow: TextureProgressBar,
 	maximum: float,
-	points_at_full_arc: float
+	points_at_full_arc: float,
+	start_angle: float,
+	arc_degrees: float
 ) -> void:
-	var degrees = maximum_arc * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
+	var degrees = arc_degrees * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
 
 	# Đồng bộ góc và giá trị
 	for bar: TextureProgressBar in [capacity, fill, shadow]:
-		bar.radial_initial_angle = initial_angle
+		bar.radial_initial_angle = start_angle
 		bar.radial_fill_degrees = degrees
 		bar.max_value = maxf(maximum, 1.0)
 

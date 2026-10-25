@@ -20,6 +20,7 @@ var busy: bool = false
 var actor: Node3D
 var stamina: StaminaComponent
 var ammo: AmmoComponent
+var chaos: ChaosComponent
 # Giảm cooldown cả những vũ khí không được trang bị
 var _owned: Array[WeaponInstance] = []
 # Hiệu ứng vũ khí đang trang bị
@@ -136,6 +137,8 @@ func try_attack(request: AttackContext) -> bool:
 	var attack := equipped.get_attack(request.action)
 	if attack == null or not attack.is_valid() or not _has_animation(attack.animation_prefix):
 		return false
+	if request.action == &"secondary" and (not is_instance_valid(chaos) or not chaos.is_full()):
+		return false
 	if equipped.unavailable_seconds > 0.0 or equipped.cooldowns.get(request.action, 0.0) > 0.0:
 		return false
 	var snapshot := _make_context(request, attack)
@@ -147,12 +150,7 @@ func try_attack(request: AttackContext) -> bool:
 	if equipped.forge != null:
 		cost *= maxf(0.0, equipped.forge.stamina_cost_multiplier)
 		speed = maxf(0.01, equipped.forge.attack_speed_multiplier)
-	if cost > 0.0 and (not is_instance_valid(stamina) or not stamina.can_consume(cost)):
-		return false
-	if (
-		attack.ammo_cost > 0
-		and (not is_instance_valid(ammo) or not ammo.can_consume(attack.ammo_id, attack.ammo_cost))
-	):
+	if not _can_pay_attack_cost(attack, cost):
 		return false
 	# Validate scene trước khi trừ SP hoặc đạn
 	var execution_node := attack.attack_scene.instantiate()
@@ -187,10 +185,28 @@ func try_attack(request: AttackContext) -> bool:
 	if not paid:
 		cancel()
 		return false
+	if snapshot.action == &"secondary" and not chaos.try_consume_full():
+		cancel()
+		return false
 	snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed
 	# Signal trừ tài nguyên có thể hủy đòn, kiểm tra lại trước khi chạy tiếp
 	if busy and _context == snapshot and _remaining <= 0.0:
 		_advance_phase()
+	return true
+
+
+# Kiểm tra chi phí đã tính sau forge trước khi tạo scene và trừ tài nguyên.
+func _can_pay_attack_cost(attack: AttackData, stamina_cost: float) -> bool:
+	if (
+		stamina_cost > 0.0
+		and (not is_instance_valid(stamina) or not stamina.can_consume(stamina_cost))
+	):
+		return false
+	if (
+		attack.ammo_cost > 0
+		and (not is_instance_valid(ammo) or not ammo.can_consume(attack.ammo_id, attack.ammo_cost))
+	):
+		return false
 	return true
 
 

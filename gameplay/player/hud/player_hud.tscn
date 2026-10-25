@@ -8,15 +8,16 @@
 [ext_resource type="Texture2D" uid="uid://cabuc28nwwic7" path="res://assets/ui/player_hud/heart_icon.png" id="6_wbpoy"]
 [ext_resource type="Script" uid="uid://bemaecxbpwqmt" path="res://gameplay/player/hud/arc_tooltip_bar.gd" id="7_tooltip"]
 [ext_resource type="Script" uid="uid://4ok8iolg8l8g" path="res://gameplay/player/hud/bar_fill_effect.gd" id="8_fill_effect"]
+[ext_resource type="Texture2D" uid="uid://baohqkvbgpkt1" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
+[ext_resource type="Texture2D" uid="uid://da8vd3qy1guj8" path="res://assets/ui/player_hud/weapon_skills/dagger_throw.png" id="10_3dwmm"]
+[ext_resource type="Texture2D" uid="uid://c7dcqvh327r74" path="res://assets/ui/player_hud/chaos_bar_progress.png" id="10_ftld4"]
+[ext_resource type="Texture2D" uid="uid://ucgkfciy1uye" path="res://assets/ui/player_hud/chaos_icon.png" id="12_hxn85"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
 shader = ExtResource("5_depth")
 shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
 shader_parameter/border_width = 2.0
 shader_parameter/bevel_strength = 0.22
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wbpoy"]
-load_path = "res://.godot/imported/star_icon.png-f031417fdafece02cd84ca0d1d9e42cf.ctex"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
 content_margin_left = 9.0
@@ -37,53 +38,70 @@ shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 3
 shadow_offset = Vector2(2, 2)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jpyye"]
+shader = ExtResource("5_depth")
+shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
+shader_parameter/border_width = 2.0
+shader_parameter/bevel_strength = 0.22
+
 [node name="PlayerHUD" type="CanvasLayer" unique_id=400788151]
 scale = Vector2(1.25, 1.25)
 transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
 
-[node name="HealthShadow" type="TextureProgressBar" parent="." unique_id=641189182]
+[node name="Control" type="Control" parent="." unique_id=205009594]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -3.2
+offset_top = 2.3999999
+offset_right = 36.8
+offset_bottom = 42.4
+scale = Vector2(1, 0.952)
+
+[node name="HealthShadow" type="TextureProgressBar" parent="Control" unique_id=641189182]
 texture_filter = 1
-offset_left = -10.599999
-offset_top = 12.4
-offset_right = 121.4
-offset_bottom = 144.4
+layout_mode = 0
+offset_left = -13.8
+offset_top = 3.600006
+offset_right = 118.2
+offset_bottom = 135.6
 scale = Vector2(1.035, 1.035)
 mouse_filter = 2
 max_value = 8.0
 value = 8.0
 fill_mode = 5
 radial_initial_angle = 200.0
-radial_fill_degrees = 180.0
+radial_fill_degrees = 225.0
 texture_progress = ExtResource("2_qfbhl")
-tint_progress = Color(0.035, 0.03, 0.065, 0.65)
+tint_progress = Color(0.03529412, 0.03137255, 0.06666667, 0.6509804)
 
-[node name="HealthCapacity" type="TextureProgressBar" parent="." unique_id=1760465858]
+[node name="HealthCapacity" type="TextureProgressBar" parent="Control" unique_id=1760465858]
 texture_filter = 1
 material = SubResource("ShaderMaterial_depth")
-offset_left = -13.6
-offset_top = 10.4
-offset_right = 118.4
-offset_bottom = 142.4
+layout_mode = 0
+offset_left = -16.8
+offset_top = 1.6000061
+offset_right = 115.2
+offset_bottom = 133.6
 scale = Vector2(1.035, 1.035)
 mouse_filter = 2
 max_value = 8.0
 value = 8.0
 fill_mode = 5
 radial_initial_angle = 200.0
-radial_fill_degrees = 180.0
+radial_fill_degrees = 225.0
 texture_progress = ExtResource("2_qfbhl")
 tint_progress = Color(0.29411766, 0.1882353, 0.25882354, 1)
 script = ExtResource("7_tooltip")
 
-[node name="HealthWhiteFill" type="TextureProgressBar" parent="." unique_id=899226297]
-visible = false
+[node name="HealthWhiteFill" type="TextureProgressBar" parent="Control" unique_id=899226297]
 texture_filter = 1
 material = SubResource("ShaderMaterial_depth")
-offset_left = -13.6
-offset_top = 10.4
-offset_right = 118.4
-offset_bottom = 142.4
+layout_mode = 0
+offset_left = -15.999998
+offset_top = 0.8403364
+offset_right = 116.0
+offset_bottom = 132.84033
 scale = Vector2(1.035, 1.035)
 mouse_filter = 2
 max_value = 8.0
@@ -91,17 +109,18 @@ step = 0.0
 value = 8.0
 fill_mode = 5
 radial_initial_angle = 200.0
-radial_fill_degrees = 180.0
+radial_fill_degrees = 225.0
 texture_progress = ExtResource("2_qfbhl")
 tint_progress = Color(1, 0.98, 0.94, 1)
 
-[node name="HealthFill" type="TextureProgressBar" parent="." unique_id=2049828053]
+[node name="HealthFill" type="TextureProgressBar" parent="Control" unique_id=2049828053]
 texture_filter = 1
 material = SubResource("ShaderMaterial_depth")
-offset_left = -13.6
-offset_top = 10.4
-offset_right = 118.4
-offset_bottom = 142.4
+layout_mode = 0
+offset_left = -16.8
+offset_top = 1.6000061
+offset_right = 115.2
+offset_bottom = 133.6
 scale = Vector2(1.035, 1.035)
 mouse_filter = 2
 max_value = 8.0
@@ -112,12 +131,13 @@ radial_fill_degrees = 180.0
 texture_progress = ExtResource("2_qfbhl")
 tint_progress = Color(1, 0.15786946, 0.19423172, 1)
 
-[node name="StaminaShadow" type="TextureProgressBar" parent="." unique_id=27609384]
+[node name="StaminaShadow" type="TextureProgressBar" parent="Control" unique_id=27609384]
 texture_filter = 1
-offset_left = 8.400003
-offset_top = 29.800001
-offset_right = 104.4
-offset_bottom = 125.8
+layout_mode = 0
+offset_left = 5.2000027
+offset_top = 21.0
+offset_right = 101.200005
+offset_bottom = 117.000015
 scale = Vector2(1.01, 1.01)
 mouse_filter = 2
 max_value = 300.0
@@ -125,17 +145,18 @@ step = 0.0
 value = 300.0
 fill_mode = 5
 radial_initial_angle = 200.0
-radial_fill_degrees = 180.0
+radial_fill_degrees = 225.0
 texture_progress = ExtResource("3_nc5hm")
 tint_progress = Color(0.035, 0.03, 0.065, 0.65)
 
-[node name="StaminaCapacity" type="TextureProgressBar" parent="." unique_id=243615673]
+[node name="StaminaCapacity" type="TextureProgressBar" parent="Control" unique_id=243615673]
 texture_filter = 1
 material = SubResource("ShaderMaterial_depth")
-offset_left = 6.4000053
-offset_top = 28.8
-offset_right = 102.40001
-offset_bottom = 124.8
+layout_mode = 0
+offset_left = 3.2000048
+offset_top = 20.0
+offset_right = 99.200005
+offset_bottom = 116.000015
 scale = Vector2(1.01, 1.01)
 mouse_filter = 2
 max_value = 300.0
@@ -143,15 +164,16 @@ step = 0.0
 value = 300.0
 fill_mode = 5
 radial_initial_angle = 200.0
-radial_fill_degrees = 180.0
+radial_fill_degrees = 225.0
 texture_progress = ExtResource("3_nc5hm")
 tint_progress = Color(0.14509805, 0.24313726, 0.28235295, 1)
 script = ExtResource("7_tooltip")
 
-[node name="StaminaWhiteFill" type="TextureProgressBar" parent="." unique_id=31840758]
+[node name="StaminaWhiteFill" type="TextureProgressBar" parent="Control" unique_id=31840758]
 visible = false
 texture_filter = 1
 material = SubResource("ShaderMaterial_depth")
+layout_mode = 0
 offset_left = 6.4000053
 offset_top = 28.8
 offset_right = 102.40001
@@ -163,17 +185,18 @@ step = 0.0
 value = 300.0
 fill_mode = 5
 radial_initial_angle = 200.0
-radial_fill_degrees = 180.0
+radial_fill_degrees = 225.0
 texture_progress = ExtResource("3_nc5hm")
 tint_progress = Color(1, 0.98, 0.94, 1)
 
-[node name="StaminaFill" type="TextureProgressBar" parent="." unique_id=1401183928]
+[node name="StaminaFill" type="TextureProgressBar" parent="Control" unique_id=1401183928]
 texture_filter = 1
 material = SubResource("ShaderMaterial_depth")
-offset_left = 6.4000053
-offset_top = 28.8
-offset_right = 102.40001
-offset_bottom = 124.8
+layout_mode = 0
+offset_left = 3.2000048
+offset_top = 20.0
+offset_right = 99.200005
+offset_bottom = 116.000015
 scale = Vector2(1.01, 1.01)
 mouse_filter = 2
 max_value = 300.0
@@ -185,43 +208,46 @@ radial_fill_degrees = 180.0
 texture_progress = ExtResource("3_nc5hm")
 tint_progress = Color(1.92523e-07, 0.8071112, 0.72439545, 1)
 
-[node name="HealthFillEffect" type="Node" parent="." unique_id=1923965799 node_paths=PackedStringArray("color_fill", "white_fill")]
-script = ExtResource("8_fill_effect")
-color_fill = NodePath("../HealthFill")
-white_fill = NodePath("../HealthWhiteFill")
-
-[node name="StaminaFillEffect" type="Node" parent="." unique_id=911174400 node_paths=PackedStringArray("color_fill", "white_fill")]
-script = ExtResource("8_fill_effect")
-color_fill = NodePath("../StaminaFill")
-white_fill = NodePath("../StaminaWhiteFill")
-
-[node name="Portrait" type="TextureRect" parent="." unique_id=1664021248]
+[node name="Portrait" type="TextureRect" parent="Control" unique_id=1664021248]
 texture_filter = 1
-offset_left = 22.4
-offset_top = 49.599995
-offset_right = 90.4
-offset_bottom = 111.59999
+layout_mode = 0
+offset_left = 19.200003
+offset_top = 40.799973
+offset_right = 87.200005
+offset_bottom = 102.79991
 mouse_filter = 2
 texture = ExtResource("4_nc5hm")
 
-[node name="Stamina_Icon" type="TextureRect" parent="." unique_id=993706071]
+[node name="Stamina_Icon" type="TextureRect" parent="Control" unique_id=993706071]
 texture_filter = 1
-offset_left = 23.999994
-offset_top = 100.8
-offset_right = 55.999992
-offset_bottom = 132.8
+layout_mode = 0
+offset_left = 20.799997
+offset_top = 92.0
+offset_right = 52.799995
+offset_bottom = 124.0
 scale = Vector2(0.75, 0.75)
 mouse_filter = 2
-texture = SubResource("CompressedTexture2D_wbpoy")
+texture = ExtResource("9_star")
 
-[node name="Heart_Icon" type="TextureRect" parent="." unique_id=64362042]
+[node name="Heart_Icon" type="TextureRect" parent="Control" unique_id=64362042]
 texture_filter = 1
-offset_left = 12.800001
-offset_top = 115.99999
-offset_right = 44.800003
-offset_bottom = 148.0
+layout_mode = 0
+offset_left = 9.6
+offset_top = 107.199936
+offset_right = 41.6
+offset_bottom = 139.19994
 mouse_filter = 2
 texture = ExtResource("6_wbpoy")
+
+[node name="HealthFillEffect" type="Node" parent="." unique_id=1923965799 node_paths=PackedStringArray("color_fill", "white_fill")]
+script = ExtResource("8_fill_effect")
+color_fill = NodePath("../Control/HealthFill")
+white_fill = NodePath("../Control/HealthWhiteFill")
+
+[node name="StaminaFillEffect" type="Node" parent="." unique_id=911174400 node_paths=PackedStringArray("color_fill", "white_fill")]
+script = ExtResource("8_fill_effect")
+color_fill = NodePath("../Control/StaminaFill")
+white_fill = NodePath("../Control/StaminaWhiteFill")
 
 [node name="StatTooltip" type="PanelContainer" parent="." unique_id=1913083073]
 z_index = 100
@@ -234,3 +260,114 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
 layout_mode = 2
 theme_override_colors/font_color = Color(0.98, 0.96, 0.9, 1)
 theme_override_font_sizes/font_size = 14
+
+[node name="ChaosControl" type="Control" parent="." unique_id=1488264354]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 919.99994
+offset_top = 517.6
+offset_right = 920.99994
+offset_bottom = 537.6
+mouse_filter = 2
+
+[node name="ChaosLabel" type="Label" parent="ChaosControl" unique_id=1307458076]
+layout_mode = 0
+offset_left = 7.200012
+offset_top = -138.4
+offset_right = 91.20007
+offset_bottom = -118.399994
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "CP: 0 / 100"
+horizontal_alignment = 2
+
+[node name="ChaosShadow" type="TextureProgressBar" parent="ChaosControl" unique_id=258191833]
+texture_filter = 1
+layout_mode = 0
+offset_left = -2.3999264
+offset_top = -39.999966
+offset_right = 93.600075
+offset_bottom = 56.000034
+mouse_filter = 2
+value = 100.0
+fill_mode = 4
+radial_initial_angle = 225.0
+radial_fill_degrees = 135.0
+texture_progress = ExtResource("10_ftld4")
+tint_progress = Color(0.03529412, 0.03137255, 0.06666667, 0.6509804)
+
+[node name="ChaosCapacity" type="TextureProgressBar" parent="ChaosControl" unique_id=876486984]
+texture_filter = 1
+material = SubResource("ShaderMaterial_jpyye")
+layout_mode = 0
+offset_left = 0.80006385
+offset_top = -43.199986
+offset_right = 96.800064
+offset_bottom = 52.800014
+mouse_filter = 2
+value = 100.0
+fill_mode = 4
+radial_initial_angle = 225.0
+radial_fill_degrees = 135.0
+texture_progress = ExtResource("10_ftld4")
+tint_progress = Color(0.29411766, 0.1882353, 0.25882354, 1)
+script = ExtResource("7_tooltip")
+
+[node name="ChaosWhiteFill" type="TextureProgressBar" parent="ChaosControl" unique_id=386422248]
+visible = false
+texture_filter = 1
+material = SubResource("ShaderMaterial_jpyye")
+layout_mode = 0
+offset_left = 0.80006385
+offset_top = -43.199986
+offset_right = 96.800064
+offset_bottom = 52.800014
+mouse_filter = 2
+step = 0.0
+value = 100.0
+fill_mode = 4
+radial_initial_angle = 225.0
+radial_fill_degrees = 135.0
+texture_progress = ExtResource("10_ftld4")
+tint_progress = Color(1, 0.98, 0.94, 1)
+
+[node name="ChaosFill" type="TextureProgressBar" parent="ChaosControl" unique_id=1451846679]
+texture_filter = 1
+material = SubResource("ShaderMaterial_jpyye")
+layout_mode = 0
+offset_left = 0.80006385
+offset_top = -43.199986
+offset_right = 96.800064
+offset_bottom = 52.800014
+mouse_filter = 2
+step = 0.0
+fill_mode = 4
+radial_initial_angle = 225.0
+radial_fill_degrees = 135.0
+texture_progress = ExtResource("10_ftld4")
+tint_progress = Color(1, 0.60784316, 0.28235295, 1)
+
+[node name="WeaponIcon" type="TextureRect" parent="ChaosControl" unique_id=763200509]
+texture_filter = 1
+layout_mode = 0
+offset_left = 15.200012
+offset_top = -28.799988
+offset_right = 83.20001
+offset_bottom = 39.200012
+mouse_filter = 2
+texture = ExtResource("10_3dwmm")
+
+[node name="TextureRect" type="TextureRect" parent="ChaosControl" unique_id=207544922]
+texture_filter = 1
+layout_mode = 0
+offset_left = 12.0
+offset_top = 28.0
+offset_right = 44.0
+offset_bottom = 60.0
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("12_hxn85")
+
+[node name="ChaosFillEffect" type="Node" parent="." unique_id=886936141 node_paths=PackedStringArray("color_fill", "white_fill")]
+script = ExtResource("8_fill_effect")
+color_fill = NodePath("../ChaosControl/ChaosFill")
+white_fill = NodePath("../ChaosControl/ChaosWhiteFill")

@@ -18,20 +18,22 @@
 [ext_resource type="Script" uid="uid://byhka8abge5xp" path="res://gameplay/charms/socket/charm_socket_manager.gd" id="16_charm_manager"]
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Script" uid="uid://c1ofpsqxwk0l6" path="res://gameplay/charms/base/charm_registry.gd" id="17_charm_registry"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/crescent_cleave.tres" id="charm_crescent"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/endurance_vessel.tres" id="charm_endurance"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/gale_pace.tres" id="charm_gale"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/double_strike.tres" id="charm_double_strike"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
 [ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
 [ext_resource type="PackedScene" uid="uid://dgx5c1qlu0dls" path="res://gameplay/player/effects/run_dust_effect.tscn" id="19_lqbvs"]
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
+[ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/crescent_cleave.tres" id="charm_crescent"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/double_strike.tres" id="charm_double_strike"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/endurance_vessel.tres" id="charm_endurance"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/gale_pace.tres" id="charm_gale"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
 length = 0.001
@@ -599,7 +601,7 @@ height = 2.2327638
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(1.2701416, 1.9672241, 1)
 
-[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "camera") groups=["player"]]
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "camera") groups=["player"]]
 collision_layer = 2
 collision_mask = 5
 floor_constant_speed = true
@@ -612,6 +614,7 @@ hp = NodePath("HealthComponent")
 hurtbox = NodePath("HurtBox")
 weapon_controller = NodePath("WeaponController")
 charm_socket_manager = NodePath("CharmSocketManager")
+chaos = NodePath("ChaosComponent")
 camera = NodePath("Camera3D")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
@@ -664,9 +667,10 @@ script = ExtResource("7_rvh5s")
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
 
-[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina") instance=ExtResource("20_pt1je")]
+[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos") instance=ExtResource("20_pt1je")]
 health = NodePath("../HealthComponent")
 stamina = NodePath("../StaminaComponent")
+chaos = NodePath("../ChaosComponent")
 
 [node name="HurtBox" type="Area3D" parent="." unique_id=953130742 node_paths=PackedStringArray("actor")]
 collision_layer = 8
@@ -699,7 +703,10 @@ actor = NodePath("..")
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")
-definitions = Array[CharmData]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_adrenaline"), ExtResource("charm_backstabber")])
+definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_adrenaline"), ExtResource("charm_backstabber")])
+
+[node name="ChaosComponent" type="Node" parent="." unique_id=2085136369]
+script = ExtResource("21_chaos")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=342202680]
 transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 20, 20)

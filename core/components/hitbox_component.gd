@@ -14,10 +14,8 @@ enum RehitPolicy {
 	ONCE_PER_CONTACT,
 }
 
-const Teams := preload("res://gameplay/combat/combat_teams.gd")
-
 @export var actor: Node
-@export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.NONE
+@export_enum("None:0", "Player:1", "Enemy:2") var team: int = CombatTeams.NONE
 
 var _active: bool = false
 var _damage: DamageContext
@@ -95,13 +93,18 @@ func _on_area_entered(area: Area3D) -> void:
 	# Reserve before dispatch because damage callbacks can cancel the attack.
 	_hit_actors[target_id] = true
 
-	var damage = _damage
 	var target = hurtbox.actor
+	# Each target needs its own snapshot for charm modifiers and proc results.
+	var damage := _damage.create_hit_copy(target)
+	damage_prepared.emit(damage, target)
+	if not _active or not is_instance_valid(target):
+		return
 	var applied_hp = hurtbox.take_damage(damage)
 	if applied_hp <= 0:
 		_hit_actors.erase(target_id)
 		return
 
+	damage_applied.emit(damage, target, applied_hp)
 	hit_confirmed.emit(damage, target, applied_hp)
 
 

@@ -28,6 +28,10 @@ const ANIM = {
 @export_range(0.0, 100.0) var stamina_regen_rate: float = 25.0
 @export_range(0.0, 10.0) var stamina_regen_delay: float = 1.0
 
+@export_group("Chaos - CP")
+@export_range(0.0, 100.0) var max_chaos: float = 100.0
+@export_range(0.0, 100.0) var chaos_per_hit: float = 20.0
+
 @export_group("Movement")
 @export_range(0.0, 100.0) var move_speed: float = 7.0
 @export_range(0.0, 100.0) var acceleration: float = 18.0
