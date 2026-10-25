@@ -25,8 +25,6 @@ func _enter() -> void:
 
 func _exit() -> void:
 	enemy._stop_contact_damage()
-	if is_instance_valid(enemy.hurtbox) and not enemy.dead:
-		enemy.hurtbox.enabled = true
 	if not _patrol_direction.is_zero_approx():
 		enemy.face_direction(_patrol_direction)
 
@@ -78,8 +76,6 @@ func _update_charge(delta: float) -> void:
 	if not _timer_finished(delta):
 		return
 	_phase = AttackPhase.DASH
-	if is_instance_valid(enemy.hurtbox):
-		enemy.hurtbox.enabled = false
 	enemy.play_directional_animation(&"attack", true)
 	enemy._start_contact_damage()
 
@@ -97,8 +93,6 @@ func _update_dash(delta: float) -> void:
 
 func _finish_dash() -> void:
 	enemy._stop_contact_damage()
-	if is_instance_valid(enemy.hurtbox):
-		enemy.hurtbox.enabled = true
 	enemy.stop_movement()
 	if enemy.has_target():
 		_begin_attack_cycle()
