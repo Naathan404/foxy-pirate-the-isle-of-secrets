@@ -36,6 +36,8 @@ var target: Node3D
 var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
+## True after a lethal hit, while the enemy is still playing its hit/recoil reaction.
+var death_pending: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
 
 @onready var hp: HealthComponent = $HealthComponent
@@ -259,7 +261,16 @@ func _notify_hit() -> void:
 
 
 func die() -> void:
-	if dead:
+	if dead or death_pending:
+		return
+	# HealthComponent emits `damaged` before `died`, so the fatal blow has already
+	# requested Hit. Keep this fallback for callers that invoke die() directly.
+	death_pending = true
+	_notify_hit()
+
+
+func finish_death() -> void:
+	if dead or not death_pending:
 		return
 	dead = true
 	if not request_state(&"death", 100):
@@ -420,8 +431,8 @@ func _on_target_body_exited(body: Node3D) -> void:
 
 func _on_damaged(applied_hp: int) -> void:
 	damaged.emit(applied_hp)
-	if hp.is_alive():
-		_notify_hit()
+	# Even a lethal blow must first play the hit animation and recoil.
+	_notify_hit()
 
 
 func _on_hp_changed(_current_hp: int, _maximum_hp: int) -> void:
