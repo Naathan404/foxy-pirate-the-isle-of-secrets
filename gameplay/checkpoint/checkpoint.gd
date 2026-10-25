@@ -16,15 +16,12 @@ static var _current_id: String = ""
 func _ready() -> void:
 	add_to_group("spawn_points")
 	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
 	_sprite.play("turn" if is_active() else "idle")
 
 
 func is_active() -> bool:
-	return (
-		owner != null
-		and _current_id == id
-		and _current_scene == owner.scene_file_path
-	)
+	return owner != null and _current_id == id and _current_scene == owner.scene_file_path
 
 
 func get_spawn_position() -> Vector3:
@@ -37,11 +34,17 @@ func deactivate_visual() -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	if not (body is Player) or is_active():
+	if not body is Player:
+		return
+	var player := body as Player
+	if is_instance_valid(player.charm_socket_manager):
+		player.charm_socket_manager.enter_safe_location(self)
+	if is_active():
 		return
 
 	if owner == null or owner.scene_file_path.is_empty():
-		push_warning("Checkpoint '%s' chưa nằm trong scene hợp lệ." % id)
+		if is_inside_tree():
+			push_warning("Checkpoint '%s' chưa nằm trong scene hợp lệ." % id)
 		return
 
 	for node in get_tree().get_nodes_in_group("spawn_points"):
@@ -52,3 +55,11 @@ func _on_body_entered(body: Node3D) -> void:
 	_current_id = id
 	_sprite.play("turn")
 	activated.emit(id)
+
+
+func _on_body_exited(body: Node3D) -> void:
+	if not body is Player:
+		return
+	var player := body as Player
+	if is_instance_valid(player.charm_socket_manager):
+		player.charm_socket_manager.exit_safe_location(self)

@@ -10,6 +10,13 @@ func validate() -> bool:
 	return is_instance_valid(hitbox)
 
 
+func _ready() -> void:
+	if not hitbox.damage_prepared.is_connected(_on_damage_prepared):
+		hitbox.damage_prepared.connect(_on_damage_prepared)
+	if not hitbox.damage_applied.is_connected(_on_damage_applied):
+		hitbox.damage_applied.connect(_on_damage_applied)
+
+
 func activate() -> void:
 	if context == null or not is_instance_valid(hitbox) or not is_instance_valid(context.actor):
 		return
@@ -22,12 +29,20 @@ func activate() -> void:
 	hitbox.position.z = -forward_offset
 	hitbox.scale = Vector3.ONE * context.hitbox_multiplier
 
-	hitbox.actor = context.actor
-	hitbox.team = context.team
-	hitbox.begin_attack(context.damage_hp, context.attack_id, context.action)
+	hitbox.begin_attack_with_context(context.create_damage_context())
 
 
 func deactivate() -> void:
 	super.deactivate()
 	if is_instance_valid(hitbox):
 		hitbox.end_attack()
+
+
+func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
+	if context != null:
+		context.damage_prepared.emit(damage, target)
+
+
+func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: int) -> void:
+	if context != null:
+		context.damage_applied.emit(damage, target, applied_hp)

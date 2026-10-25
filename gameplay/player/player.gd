@@ -15,6 +15,7 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 @export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
 @export var weapon_controller: WeaponController
 @export var ammo: AmmoComponent
+@export var charm_socket_manager: CharmSocketManager
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
 @export var dash_action: StringName = &"dash"
@@ -33,9 +34,11 @@ var pending_hit_duration: float = 0.0
 var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
+var _charm_grapple_tween: Tween
 
 @onready var visual: PlayerVisual = $Visual
 @onready var fsm: Fsm = $FSM
+@onready var charm_registry: CharmRegistry = get_node_or_null("CharmSocketManager/CharmRegistry")
 
 @onready var stamina_label: Label = get_node_or_null("TestHUD/SP")
 @onready var hp_label: Label = get_node_or_null("TestHUD/HP")
@@ -53,6 +56,7 @@ func _ready() -> void:
 	pending_hit_duration = data.hit_duration
 	_setup_stats()
 	_setup_combat()
+	_setup_charm_system()
 
 
 # Khởi tạo HP, SP và nối signal để cập nhật HUD
@@ -79,6 +83,15 @@ func _setup_combat() -> void:
 		weapon_controller.team = team
 	if not weapon_controller.call("setup", self, stamina, ammo):
 		push_error("Player: set up vũ khí bị fail")
+
+
+func _setup_charm_system() -> void:
+	if not is_instance_valid(charm_socket_manager):
+		return
+	if not is_instance_valid(charm_registry):
+		push_error("Player: CharmRegistry chưa được gắn dưới CharmSocketManager")
+		return
+	charm_socket_manager.actor = self
 
 
 func _on_stamina_changed(amount: float, maximum: float) -> void:
@@ -119,7 +132,12 @@ func receive_damage(damage: DamageContext) -> int:
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
 			amount = int(weapon_controller.call("modify_incoming_damage", amount, damage))
-	return hp.take_damage(amount)
+	if is_instance_valid(charm_socket_manager):
+		amount = charm_socket_manager.modify_incoming_damage(amount, damage)
+	var applied_hp := hp.take_damage(amount)
+	if applied_hp > 0 and is_instance_valid(charm_socket_manager):
+		charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
+	return applied_hp
 
 
 func _physics_process(delta: float) -> void:
@@ -269,6 +287,30 @@ func request_free_dash(direction: Vector3) -> bool:
 	return true
 
 
+func apply_charm_grapple_pull(
+	target_position: Vector3, stop_distance: float, pull_speed_units_per_second: float
+) -> bool:
+	if dead:
+		return false
+	var direction := target_position - global_position
+	direction.y = 0.0
+	if direction.is_zero_approx():
+		return false
+	var destination := target_position - direction.normalized() * maxf(0.0, stop_distance)
+	var travel_distance := global_position.distance_to(destination)
+	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+		_charm_grapple_tween.kill()
+	if travel_distance <= 0.001:
+		global_position = destination
+		return true
+	var duration := travel_distance / maxf(0.01, pull_speed_units_per_second)
+	_charm_grapple_tween = create_tween()
+	_charm_grapple_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_charm_grapple_tween.tween_property(self, "global_position", destination, duration)
+	_charm_grapple_tween.tween_callback(_on_charm_grapple_finished)
+	return true
+
+
 # Đổi bộ xử lý đòn đánh cùng animation tương ứng
 func equip_attack(controller: Node, animation_prefix: String) -> bool:
 	if not can_equip_weapon() or not is_instance_valid(controller):
@@ -310,7 +352,7 @@ func update_movement(delta: float, moving: bool) -> void:
 	var target_velocity := Vector3.ZERO
 	var change_speed := data.deceleration
 	if moving:
-		target_velocity = move_direction * data.move_speed
+		target_velocity = move_direction * _get_move_speed()
 		change_speed = data.acceleration
 
 	# Tăng hoặc giảm vận tốc từ từ để di chuyển có quán tính
@@ -349,6 +391,9 @@ func die() -> void:
 	if is_instance_valid(hurtbox):
 		hurtbox.enabled = false
 	pending_free_dash = false
+	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+		_charm_grapple_tween.kill()
+	_charm_grapple_tween = null
 	if is_instance_valid(stamina):
 		stamina.set_regeneration_enabled(false)
 	dash_buffer_remaining = 0.0
@@ -362,6 +407,25 @@ func cancel_attack() -> void:
 	#end_hitbox_attack()
 	if is_instance_valid(weapon_controller) and weapon_controller.has_method("cancel"):
 		weapon_controller.call("cancel")
+
+
+func _on_charm_grapple_finished() -> void:
+	_charm_grapple_tween = null
+
+
+func _get_move_speed() -> float:
+	if data == null:
+		return 0.0
+	var stats: Dictionary[StringName, float] = {
+		&"move_speed_flat": 0.0,
+		&"move_speed_multiplier": 1.0,
+	}
+	if is_instance_valid(charm_socket_manager):
+		charm_socket_manager.modify_stats(stats)
+	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
+	return maxf(
+		0.0, (data.move_speed + stats[&"move_speed_flat"]) * stats[&"move_speed_multiplier"]
+	)
 
 #func begin_hitbox_attack(amount_hp: int, attack_id: int = 0, tag: StringName = &"normal") -> bool:
 #if dead or not is_instance_valid(hitbox):

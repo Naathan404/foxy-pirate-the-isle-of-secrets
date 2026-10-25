@@ -44,7 +44,6 @@ func set_target(amount: float) -> void:
 		return
 	var rising := next_target > _target
 	if _active and rising != _rising:
-
 		_stop(_delay_tween)
 		_stop(_follow_tween)
 		_active = false

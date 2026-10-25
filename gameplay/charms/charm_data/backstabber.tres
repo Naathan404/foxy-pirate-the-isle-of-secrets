@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/backstabber_effect.tscn" id="2_effect"]
+
+[resource]
+script = ExtResource("1_data")
+charm_id = &"backstabber"
+display_name = "Backstabber"
+description = "Melee normal attacks from behind deal 50% bonus damage."
+charm_type = 1
+effect_scene = ExtResource("2_effect")
+acquisition_source = &"merchant_or_enemy_drop"
+tags = [&"passive", &"outgoing_damage", &"normal_attack", &"melee", &"positional"]
+effect_params = {
+"behind_dot_threshold": 0.0,
+"damage_multiplier": 1.5
+}
