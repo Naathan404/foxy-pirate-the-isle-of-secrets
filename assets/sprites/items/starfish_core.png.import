@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ucgkfciy1uye"
-path="res://.godot/imported/chaos_icon.png-236dd9322971a21a4955ebebb80a42e2.ctex"
+uid="uid://b0gikxempkii2"
+path="res://.godot/imported/starfish_core.png-fba79b96a906bfc95ac54489e2d6d00a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/chaos_icon.png"
-dest_files=["res://.godot/imported/chaos_icon.png-236dd9322971a21a4955ebebb80a42e2.ctex"]
+source_file="res://assets/sprites/items/starfish_core.png"
+dest_files=["res://.godot/imported/starfish_core.png-fba79b96a906bfc95ac54489e2d6d00a.ctex"]
 
 [params]
 

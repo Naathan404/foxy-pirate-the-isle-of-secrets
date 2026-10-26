@@ -9,11 +9,11 @@
 [ext_resource type="Script" uid="uid://bemaecxbpwqmt" path="res://gameplay/player/hud/arc_tooltip_bar.gd" id="7_tooltip"]
 [ext_resource type="Script" uid="uid://4ok8iolg8l8g" path="res://gameplay/player/hud/bar_fill_effect.gd" id="8_fill_effect"]
 [ext_resource type="Texture2D" uid="uid://baohqkvbgpkt1" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
-[ext_resource type="Texture2D" uid="uid://da8vd3qy1guj8" path="res://assets/ui/player_hud/weapon_skills/dagger_throw.png" id="10_3dwmm"]
 [ext_resource type="Texture2D" uid="uid://c7dcqvh327r74" path="res://assets/ui/player_hud/chaos_bar_progress.png" id="10_ftld4"]
-[ext_resource type="Texture2D" uid="uid://ucgkfciy1uye" path="res://assets/ui/player_hud/chaos_icon.png" id="12_hxn85"]
 [ext_resource type="Script" uid="uid://bqemuakdoq8ue" path="res://gameplay/player/hud/stat_arc.gd" id="13_arc"]
+[ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
 [ext_resource type="Script" uid="uid://diqqixidr2eyy" path="res://gameplay/player/hud/hud_portrait.gd" id="14_portrait"]
+[ext_resource type="Texture2D" uid="uid://h30qe12s3t4q" path="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png" id="15_gpu53"]
 [ext_resource type="Script" uid="uid://welfjuqw50gd" path="res://gameplay/player/hud/hud_tooltip.gd" id="15_tooltip"]
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
 [ext_resource type="Texture2D" uid="uid://bus07n2xlkxvt" path="res://assets/ui/player_hud/charrm_ui/charm_socket_q.png" id="17_01apl"]
@@ -92,7 +92,7 @@ fill_effect = NodePath("../../Effects/StaminaFillEffect")
 stat_name = "SP"
 points_at_full_arc = 1000.0
 
-[node name="ChaosArc" type="Node" parent="Stats" unique_id=342347951 node_paths=PackedStringArray("capacity", "fill", "shadow", "fill_effect", "value_label", "readiness_icon")]
+[node name="ChaosArc" type="Node" parent="Stats" unique_id=342347951 node_paths=PackedStringArray("capacity", "fill", "shadow", "fill_effect", "value_label", "readiness_icon", "readiness_icon_2")]
 script = ExtResource("13_arc")
 capacity = NodePath("../../ChaosControl/ChaosCapacity")
 fill = NodePath("../../ChaosControl/ChaosFill")
@@ -103,7 +103,8 @@ initial_angle = 225.0
 maximum_arc = 135.0
 points_at_full_arc = 100.0
 value_label = NodePath("../../ChaosControl/ChaosLabel")
-readiness_icon = NodePath("../../ChaosControl/WeaponIcon")
+readiness_icon = NodePath("../../ChaosControl/WeaponFrame/WeaponIcon")
+readiness_icon_2 = NodePath("../../ChaosControl/TextureRect")
 
 [node name="StatControl" type="Control" parent="." unique_id=205009594]
 layout_mode = 3
@@ -314,10 +315,11 @@ theme_override_font_sizes/font_size = 14
 [node name="ChaosControl" type="Control" parent="." unique_id=1488264354]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 919.99994
-offset_top = 517.6
-offset_right = 920.99994
-offset_bottom = 537.6
+offset_left = 903.2001
+offset_top = 499.19998
+offset_right = 904.2001
+offset_bottom = 519.19995
+scale = Vector2(1.25, 1.25)
 mouse_filter = 2
 
 [node name="ChaosLabel" type="Label" parent="ChaosControl" unique_id=1307458076]
@@ -392,31 +394,41 @@ offset_right = 96.800064
 offset_bottom = 52.800014
 mouse_filter = 2
 step = 0.0
+value = 50.0
 fill_mode = 4
 radial_initial_angle = 225.0
 radial_fill_degrees = 135.0
 texture_progress = ExtResource("10_ftld4")
-tint_progress = Color(1, 0.60784316, 0.28235295, 1)
+tint_progress = Color(1, 0, 0, 1)
 
-[node name="WeaponIcon" type="TextureRect" parent="ChaosControl" unique_id=763200509]
+[node name="WeaponFrame" type="TextureRect" parent="ChaosControl" unique_id=194582993]
 texture_filter = 1
 layout_mode = 0
-offset_left = 15.200012
-offset_top = -28.799988
-offset_right = 83.20001
-offset_bottom = 39.200012
+offset_left = 13.439921
+offset_top = -37.119995
+offset_right = 93.43992
+offset_bottom = 42.880005
+texture = ExtResource("14_01apl")
+
+[node name="WeaponIcon" type="TextureRect" parent="ChaosControl/WeaponFrame" unique_id=763200509]
+texture_filter = 1
+layout_mode = 0
+offset_right = 72.0
+offset_bottom = 72.0
+pivot_offset_ratio = Vector2(0.5, 0.5)
 mouse_filter = 2
-texture = ExtResource("10_3dwmm")
+texture = ExtResource("15_gpu53")
+stretch_mode = 5
 
 [node name="TextureRect" type="TextureRect" parent="ChaosControl" unique_id=207544922]
 texture_filter = 1
 layout_mode = 0
-offset_left = 12.0
-offset_top = 28.0
-offset_right = 44.0
-offset_bottom = 60.0
-scale = Vector2(0.75, 0.75)
-texture = ExtResource("12_hxn85")
+offset_left = 11.200098
+offset_top = 24.800001
+offset_right = 59.200096
+offset_bottom = 72.8
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("14_01apl")
 
 [node name="EquipmentControl" type="Control" parent="." unique_id=143244385]
 layout_mode = 3

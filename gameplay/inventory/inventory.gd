@@ -150,6 +150,44 @@ func remove_from_slot(index: int, amount: int) -> int:
 	return removed
 
 
+## Kéo thả trong cùng túi: chuyển ô, cộng dồn hoặc đổi chỗ hai loại khác nhau.
+func can_move_item(from_index: int, to_index: int) -> bool:
+	var source: InventorySlot = get_slot(from_index)
+	var target: InventorySlot = get_slot(to_index)
+	if source == null or target == null or from_index == to_index or source.is_empty():
+		return false
+	if target.is_empty():
+		return true
+	if source.item.item_id == target.item.item_id:
+		return not target.is_full()
+	return true
+
+
+## Chỉ thay đổi dữ liệu khi thả hợp lệ; giữ nguyên các đối tượng ô.
+func move_item(from_index: int, to_index: int) -> bool:
+	if not can_move_item(from_index, to_index):
+		return false
+
+	var source: InventorySlot = slots[from_index]
+	var target: InventorySlot = slots[to_index]
+	if not target.is_empty() and source.item.item_id == target.item.item_id:
+		var moved: int = mini(source.quantity, target.item.max_stack - target.quantity)
+		target.quantity += moved
+		source.quantity -= moved
+		if source.quantity == 0:
+			source.item = null
+	else:
+		var target_item: BaseItem = target.item if not target.is_empty() else null
+		var target_quantity: int = target.quantity if target_item != null else 0
+		target.item = source.item
+		target.quantity = source.quantity
+		source.item = target_item
+		source.quantity = target_quantity
+
+	changed.emit()
+	return true
+
+
 ## Làm rỗng túi nhưng giữ nguyên số ô và các đối tượng InventorySlot
 func clear() -> void:
 	var had_items: bool = false

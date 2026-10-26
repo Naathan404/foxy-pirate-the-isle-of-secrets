@@ -16,6 +16,7 @@ extends Node
 @export_group("Optional Indicators")
 @export var value_label: Label
 @export var readiness_icon: TextureRect
+@export var readiness_icon_2: TextureRect
 @export var unavailable_tint: Color = Color(0.55, 0.55, 0.55)
 
 var _was_full: bool = false
@@ -48,10 +49,17 @@ func set_stat(current: float, maximum: float) -> void:
 		var full := maximum > 0.0 and current >= maximum
 		readiness_icon.modulate = Color.WHITE if full else unavailable_tint
 
+		if is_instance_valid(readiness_icon_2):
+			readiness_icon_2.modulate = Color.WHITE
+
 		if full and not _was_full:
 			_shake_readiness_shake()
+			if is_instance_valid(readiness_icon_2):
+				readiness_icon_2.modulate = Color.RED
 		elif not full:
 			_stop_readiness_shake()
+			if is_instance_valid(readiness_icon_2):
+				readiness_icon_2.modulate = Color.WHITE
 
 		_was_full = full
 

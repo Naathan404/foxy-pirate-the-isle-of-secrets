@@ -46,8 +46,11 @@ func _ready() -> void:
 
 	for index in range(inventory.slots.size()):
 		var slot_ui = SLOT_SCENE.instantiate() as InventorySlotUI
+		slot_ui.inventory = inventory
+		slot_ui.slot_index = index
 		grid.add_child(slot_ui)
 		slot_ui.clicked.connect(_on_slot_clicked.bind(index))
+		slot_ui.item_dropped.connect(_on_item_dropped)
 		slot_uis.append(slot_ui)
 		slot_ui.refresh(inventory.slots[index])
 
@@ -75,6 +78,11 @@ func refresh() -> void:
 func _on_slot_clicked(index: int) -> void:
 	selected_slot_index = index
 	_refresh_item_info()
+
+
+func _on_item_dropped(from_index: int, to_index: int) -> void:
+	if inventory.move_item(from_index, to_index):
+		_on_slot_clicked(to_index)
 
 
 func _refresh_item_info() -> void:
@@ -118,6 +126,7 @@ func _select_tab(index: int) -> void:
 	if index < 0 or index >= buttons.size():
 		return
 
+	_cancel_inventory_drag()
 	tabs.current_tab = index
 
 	for i in range(buttons.size()):
@@ -143,9 +152,19 @@ func open_inventory() -> void:
 func close_inventory() -> void:
 	if not _is_open:
 		return
+	_cancel_inventory_drag()
 	_is_open = false
 	hide()
 	Input.mouse_mode = _previous_mouse_mode
+
+
+func _cancel_inventory_drag() -> void:
+	var viewport: Viewport = get_viewport()
+	if not viewport.gui_is_dragging():
+		return
+	var data: Variant = viewport.gui_get_drag_data()
+	if data is Dictionary and data.get("inventory") == inventory:
+		viewport.gui_cancel_drag()
 
 
 func toggle_inventory() -> void:
