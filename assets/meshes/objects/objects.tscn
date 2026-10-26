@@ -3,6 +3,7 @@
 [ext_resource type="ArrayMesh" uid="uid://c40mcc7gh2vfn" path="res://assets/models/kenney_mini_forest/fence.glb" id="1_pchn8"]
 [ext_resource type="ArrayMesh" uid="uid://dp41kt7ek1l4w" path="res://assets/models/kenney_mini_forest/tree.glb" id="2_7pif6"]
 [ext_resource type="ArrayMesh" uid="uid://dkg1rja2q8keg" path="res://assets/models/kenney_mini_forest/tent.glb" id="3_pchn8"]
+[ext_resource type="ArrayMesh" uid="uid://cq5gx704ya5sq" path="res://assets/models/kenney_survival_kit/campfire-pit.glb" id="4_eq0v7"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1h7xg"]
 size = Vector3(2.5, 1, 0.5)
@@ -12,6 +13,9 @@ height = 6.0
 radius = 1.5
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ltl8y"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_eq0v7"]
+size = Vector3(2.5, 1, 2.5)
 
 [node name="Objects" type="Node3D" unique_id=2033362518]
 
@@ -44,3 +48,13 @@ mesh = ExtResource("3_pchn8")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Tent/StaticBody3D" unique_id=1714041678]
 transform = Transform3D(5, 0, 0, 0, 4, 0, 0, 0, 5, 0, 2, 0)
 shape = SubResource("BoxShape3D_ltl8y")
+
+[node name="Camppit" type="MeshInstance3D" parent="." unique_id=405243329]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+mesh = ExtResource("4_eq0v7")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Camppit" unique_id=1065798763]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Camppit/StaticBody3D" unique_id=850354597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_eq0v7")
