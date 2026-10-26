@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b2mod3odqs0p" path="res://icon.svg" id="2_lr5j1"]
 [ext_resource type="Script" uid="uid://bn4vgm32nbrx1" path="res://gameplay/charms/socket/charm_test_zone.gd" id="3_charm_test"]
 [ext_resource type="PackedScene" uid="uid://bqt066tkjp3c1" path="res://gameplay/inventory/item_pickup.tscn" id="4_gaudv"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/consumables/starfish_core.tres" id="5_hldr7"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(40, 1, 40)
@@ -37,3 +38,7 @@ transform = Transform3D(0.9529472, 0.19914868, -0.22854185, 0, 0.7539246, 0.6569
 
 [node name="ItemPickup" parent="." unique_id=1605440793 instance=ExtResource("4_gaudv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4904127, 1.499999, 5.978345)
+
+[node name="ItemPickup2" parent="." unique_id=1821165179 instance=ExtResource("4_gaudv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9431028, 1.499999, 5.978345)
+item = ExtResource("5_hldr7")

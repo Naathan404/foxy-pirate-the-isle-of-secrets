@@ -9,8 +9,8 @@ extends Area3D
 @export_range(0.0, 0.3, 0.01) var pulse_amount: float = 0.08
 @export_range(0.0, 1.0, 0.01) var float_height: float = 0.2
 @export_range(0.0, 1.0, 0.01) var bob_height: float = 0.35
-@export_range(0.2, 5.0, 0.1) var cycle_duration: float = 1.6
-@export_range(0.2, 5.0, 0.1) var scale_cycle_duration: float = 0.8
+@export_range(0.2, 5.0, 0.1) var cycle_duration: float = 1.2
+@export_range(0.2, 5.0, 0.1) var scale_cycle_duration: float = 0.6
 
 var _idle_tween: Tween
 
@@ -18,6 +18,9 @@ var _idle_tween: Tween
 
 
 func _ready() -> void:
+	if item != null:
+		sprite.texture = item.icon
+
 	if not idle_animation_enabled:
 		return
 

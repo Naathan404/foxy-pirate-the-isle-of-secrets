@@ -219,7 +219,7 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 3)
 
 [node name="SeaWater" parent="." unique_id=785709136 instance=ExtResource("5_en8wc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0012025833, -6.014505, -0.00055122375)
 
 [node name="Bridge" type="Node3D" parent="." unique_id=458090182]
 
