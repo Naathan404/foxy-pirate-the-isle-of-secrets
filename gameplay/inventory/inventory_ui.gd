@@ -1,32 +1,20 @@
 class_name InventoryUI
 extends CanvasLayer
 
+const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot_ui.tscn")
+
 # túi dữ liệu
 @export var inventory: Inventory
 @export var toggle_action: StringName = &"inventory"
-
-const SLOT_SCENE: PackedScene = preload(
-	"res://gameplay/inventory/inventory_slot_ui.tscn"
-)
-
-@onready var grid: GridContainer = $PanelContainer/MarginContainer/Tabs/Material/Content/ItemScroll/GridContainer
-@onready var tabs: TabContainer = $PanelContainer/MarginContainer/Tabs
-@onready var material_button: TextureButton = $TabButtons/MaterialButton
-@onready var equipment_button: TextureButton = $TabButtons/EquipmentButton
-@onready var notes_button: TextureButton = $TabButtons/NotesButton
-@onready var info_layout: VBoxContainer = $PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer
-@onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
-@onready var item_name: Label = info_layout.get_node("ItemName")
-@onready var item_type: Label = info_layout.get_node("ItemType")
-@onready var item_description: Label = info_layout.get_node("Description")
-@onready var item_quantity: Label = info_layout.get_node("Quantity")
 
 var blue_button = preload("res://assets/ui/player_hud/inventory/blue_button.png")
 var disable_blue_button = preload("res://assets/ui/player_hud/inventory/disable_blue_button.png")
 var white_button = preload("res://assets/ui/player_hud/inventory/white_button.png")
 var disable_white_button = preload("res://assets/ui/player_hud/inventory/disable_white_button.png")
 var orange_button = preload("res://assets/ui/player_hud/inventory/orange_button.png")
-var disable_orange_button = preload("res://assets/ui/player_hud/inventory/disable_orange_button.png")
+var disable_orange_button = preload(
+	"res://assets/ui/player_hud/inventory/disable_orange_button.png"
+)
 
 # các ô hiển thị trên giao diện tương ứng với inventory
 var slot_uis: Array[InventorySlotUI] = []
@@ -34,6 +22,20 @@ var selected_slot_index: int = -1
 
 var _is_open: bool = false
 var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
+
+@onready var tabs: TabContainer = $PanelContainer/MarginContainer/Tabs
+@onready var grid: GridContainer = tabs.get_node("Material/Content/ItemScroll/GridContainer")
+@onready var material_button: TextureButton = $TabButtons/MaterialButton
+@onready var equipment_button: TextureButton = $TabButtons/EquipmentButton
+@onready var notes_button: TextureButton = $TabButtons/NotesButton
+@onready var info_layout: VBoxContainer = tabs.get_node(
+	"Material/Content/ItemInfo/MarginContainer/VBoxContainer"
+)
+@onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
+@onready var item_name: Label = info_layout.get_node("ItemName")
+@onready var item_type: Label = info_layout.get_node("ItemType")
+@onready var item_description: Label = info_layout.get_node("Description")
+@onready var item_quantity: Label = info_layout.get_node("Quantity")
 
 
 func _ready() -> void:
@@ -102,18 +104,13 @@ func _on_equipment_button_pressed() -> void:
 	_select_tab(1)
 
 
-
 func _on_notes_button_pressed() -> void:
 	_select_tab(2)
 
 
 func _select_tab(index: int) -> void:
-	var buttons: Array[TextureButton] = [
-		material_button, equipment_button, notes_button
-	]
-	var active_textures: Array[Texture2D] = [
-		orange_button, blue_button, white_button
-	]
+	var buttons: Array[TextureButton] = [material_button, equipment_button, notes_button]
+	var active_textures: Array[Texture2D] = [orange_button, blue_button, white_button]
 	var inactive_textures: Array[Texture2D] = [
 		disable_orange_button, disable_blue_button, disable_white_button
 	]
@@ -126,9 +123,7 @@ func _select_tab(index: int) -> void:
 	for i in range(buttons.size()):
 		var selected: bool = i == index
 		buttons[i].set_pressed_no_signal(selected)
-		buttons[i].texture_normal = (
-			active_textures[i] if selected else inactive_textures[i]
-		)
+		buttons[i].texture_normal = (active_textures[i] if selected else inactive_textures[i])
 		buttons[i].modulate = Color.WHITE if selected else Color.GRAY
 
 

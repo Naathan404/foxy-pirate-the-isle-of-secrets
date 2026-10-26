@@ -18,7 +18,7 @@ func refresh(slot: InventorySlot) -> void:
 		icon.texture = null
 		quantity_label.hide()
 		return
-	
+
 	icon.texture = slot.item.icon
 	quantity_label.text = str(slot.quantity)
 

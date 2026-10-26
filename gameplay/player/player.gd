@@ -34,8 +34,8 @@ var pending_hit_duration: float = 0.0
 var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
-var _charm_grapple_tween: Tween
 var blocked: bool = false
+var _charm_grapple_tween: Tween
 
 @onready var visual: PlayerVisual = $Visual
 @onready var fsm: Fsm = $FSM

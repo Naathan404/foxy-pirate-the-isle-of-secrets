@@ -6,10 +6,10 @@ extends Resource
 
 
 func is_full() -> bool:
-    if item == null: 
-        return false
-    return quantity >= item.max_stack
+	if item == null:
+		return false
+	return quantity >= item.max_stack
 
 
 func is_empty() -> bool:
-    return quantity <= 0 or item == null
+	return quantity <= 0 or item == null

@@ -30,10 +30,16 @@ func _run() -> void:
 	player._read_input()
 	Input.action_release(&"right")
 	_check(player.move_direction == Vector3.ZERO, "Opening inventory clears movement input")
-	_check(not player.attack_requested and player.dash_buffer_remaining == 0.0, "Clear pending attacks and dash")
+	_check(
+		not player.attack_requested and player.dash_buffer_remaining == 0.0,
+		"Clear pending attacks and dash"
+	)
 	player.request_attack()
 	player.request_dash()
-	_check(not player.attack_requested and player.dash_buffer_remaining == 0.0, "Reject new combat requests while open")
+	_check(
+		not player.attack_requested and player.dash_buffer_remaining == 0.0,
+		"Reject new combat requests while open"
+	)
 
 	var previous_y: float = player.position.y
 	player.velocity.y = -1.0
@@ -58,7 +64,10 @@ func _run() -> void:
 	ui.open_inventory()
 	ui.close_inventory()
 	ui.close_inventory()
-	_check(not ui.is_open() and Input.mouse_mode == mouse_mode_before, "Repeated open/close calls are safe")
+	_check(
+		not ui.is_open() and Input.mouse_mode == mouse_mode_before,
+		"Repeated open/close calls are safe"
+	)
 
 	Input.action_press(&"right")
 	player._read_input()
