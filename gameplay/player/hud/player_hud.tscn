@@ -10,6 +10,8 @@
 [ext_resource type="Script" uid="uid://4ok8iolg8l8g" path="res://gameplay/player/hud/bar_fill_effect.gd" id="8_fill_effect"]
 [ext_resource type="Texture2D" uid="uid://baohqkvbgpkt1" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
 [ext_resource type="Texture2D" uid="uid://c7dcqvh327r74" path="res://assets/ui/player_hud/chaos_bar_progress.png" id="10_ftld4"]
+[ext_resource type="Texture2D" uid="uid://d1u05p8lj7kvt" path="res://assets/ui/player_hud/low_hp_portrait.png" id="10_khbku"]
+[ext_resource type="Texture2D" uid="uid://caivf64g34hha" path="res://assets/ui/player_hud/hit_portrait.png" id="11_1wee6"]
 [ext_resource type="Script" uid="uid://bqemuakdoq8ue" path="res://gameplay/player/hud/stat_arc.gd" id="13_arc"]
 [ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
 [ext_resource type="Script" uid="uid://diqqixidr2eyy" path="res://gameplay/player/hud/hud_portrait.gd" id="14_portrait"]
@@ -275,6 +277,9 @@ offset_bottom = 102.79991
 mouse_filter = 2
 texture = ExtResource("4_nc5hm")
 script = ExtResource("14_portrait")
+healthy_texture = ExtResource("4_nc5hm")
+low_health_texture = ExtResource("10_khbku")
+hit_texture = ExtResource("11_1wee6")
 
 [node name="Stamina_Icon" type="TextureRect" parent="StatControl" unique_id=993706071]
 texture_filter = 1
