@@ -15,7 +15,9 @@
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="9_r3fl6"]
 [ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="11_rvh5s"]
 [ext_resource type="Script" uid="uid://cq25nhncyhun5" path="res://core/components/stamina_component.gd" id="12_av71s"]
+[ext_resource type="Script" uid="uid://cegglbna6qng8" path="res://gameplay/inventory/inventory.gd" id="15_lycwo"]
 [ext_resource type="Script" uid="uid://byhka8abge5xp" path="res://gameplay/charms/socket/charm_socket_manager.gd" id="16_charm_manager"]
+[ext_resource type="PackedScene" uid="uid://dqmnkxuwherpm" path="res://gameplay/inventory/inventory_ui.tscn" id="16_nbuib"]
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Script" uid="uid://c1ofpsqxwk0l6" path="res://gameplay/charms/base/charm_registry.gd" id="17_charm_registry"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
@@ -25,8 +27,8 @@
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
 [ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
+[ext_resource type="Resource" uid="uid://pm7d7bi2h3b" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
+[ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/crescent_cleave.tres" id="charm_crescent"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/double_strike.tres" id="charm_double_strike"]
@@ -34,7 +36,7 @@
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/gale_pace.tres" id="charm_gale"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
+[ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
 length = 0.001
@@ -607,7 +609,7 @@ script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
 metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
 
-[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "camera") groups=["player"]]
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "inventory_ui", "camera") groups=["player"]]
 collision_layer = 2
 collision_mask = 5
 floor_constant_speed = true
@@ -621,6 +623,7 @@ hurtbox = NodePath("HurtBox")
 weapon_controller = NodePath("WeaponController")
 charm_socket_manager = NodePath("CharmSocketManager")
 chaos = NodePath("ChaosComponent")
+inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
@@ -690,6 +693,13 @@ metadata/_custom_type_script = "uid://bsdpq5t5mpp25"
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HurtBox" unique_id=999194323]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.010437012, 0.48361206, 0)
 shape = SubResource("BoxShape3D_jpyye")
+
+[node name="Inventory" type="Node" parent="." unique_id=1718891682]
+script = ExtResource("15_lycwo")
+capacity = 30
+
+[node name="InventoryUI" parent="." unique_id=333365260 node_paths=PackedStringArray("inventory") instance=ExtResource("16_nbuib")]
+inventory = NodePath("../Inventory")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=786847308]
 script = ExtResource("11_rvh5s")

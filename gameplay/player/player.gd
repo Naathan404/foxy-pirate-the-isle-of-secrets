@@ -15,6 +15,7 @@ signal dash_started
 @export var ammo: AmmoComponent
 @export var charm_socket_manager: CharmSocketManager
 @export var chaos: ChaosComponent
+@export var inventory_ui: InventoryUI
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
 @export var dash_action: StringName = &"dash"
@@ -34,6 +35,7 @@ var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var _charm_grapple_tween: Tween
+var blocked: bool = false
 
 @onready var visual: PlayerVisual = $Visual
 @onready var fsm: Fsm = $FSM
@@ -155,6 +157,10 @@ func receive_damage(damage: DamageContext) -> int:
 func _physics_process(delta: float) -> void:
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	_read_input()
+
+	if blocked:
+		return
+
 	fsm._update(delta)
 
 	### test
@@ -175,6 +181,10 @@ func _physics_process(delta: float) -> void:
 
 func _read_input() -> void:
 	move_direction = Vector3.ZERO
+	if is_gameplay_input_blocked():
+		attack_requested = false
+		dash_buffer_remaining = 0.0
+		return
 	if dead:
 		return
 	var input_vector := Input.get_vector("left", "right", "up", "down")
@@ -203,6 +213,10 @@ func _read_input() -> void:
 		request_attack(&"secondary")
 
 
+func is_gameplay_input_blocked() -> bool:
+	return blocked or (is_instance_valid(inventory_ui) and inventory_ui.is_open())
+
+
 func _get_active_camera() -> Camera3D:
 	if is_instance_valid(camera):
 		return camera
@@ -210,12 +224,12 @@ func _get_active_camera() -> Camera3D:
 
 
 func request_dash() -> void:
-	if not dead:
+	if not dead and not is_gameplay_input_blocked():
 		dash_buffer_remaining = data.dash_buffer_duration
 
 
 func request_attack(action: StringName = &"normal") -> void:
-	if not dead:
+	if not dead and not is_gameplay_input_blocked():
 		pending_attack_action = action
 		attack_requested = true
 
@@ -400,6 +414,8 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	if is_instance_valid(inventory_ui):
+		inventory_ui.close_inventory()
 	if is_instance_valid(hurtbox):
 		hurtbox.enabled = false
 	pending_free_dash = false

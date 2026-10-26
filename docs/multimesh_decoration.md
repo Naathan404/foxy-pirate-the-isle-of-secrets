@@ -37,7 +37,7 @@ designer cần chỉnh: vùng collision.
    - `ConvexPolygonShape3D` hoặc `ConcavePolygonShape3D` dùng cho mặt phức tạp.
 4. Chọn root `MultiMeshDecorator` và gán `Source Mesh`.
    - Nguồn là một resource `Mesh`; nên tách mesh từ GLB và lưu `.tres` khi cần
-     dùng lại.
+	 dùng lại.
 5. Chỉnh thông số và bấm **Populate** trong Inspector.
 6. Lưu scene map để lưu kết quả đã sinh.
 
