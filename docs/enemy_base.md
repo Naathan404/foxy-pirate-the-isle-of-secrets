@@ -62,12 +62,12 @@ bắt đầu `Patrol`, nhưng `Hit` và `Death` vẫn phải là node cùng cấ
 
 ```mermaid
 flowchart TD
-    A[EnemyBase physics tick] --> B[FSM áp dụng next state]
-    B --> C[State update: vận tốc animation request mới]
-    C --> D{dead?}
-    D -->|Có| E[Dừng tick: Death sở hữu trạng thái cuối]
-    D -->|Không| F[Áp gravity hoặc reset Y âm khi đứng sàn]
-    F --> G[move_and_slide đúng một lần]
+	A[EnemyBase physics tick] --> B[FSM áp dụng next state]
+	B --> C[State update: vận tốc animation request mới]
+	C --> D{dead?}
+	D -->|Có| E[Dừng tick: Death sở hữu trạng thái cuối]
+	D -->|Không| F[Áp gravity hoặc reset Y âm khi đứng sàn]
+	F --> G[move_and_slide đúng một lần]
 ```
 
 State **không** tự gọi `move_and_slide()`. State chỉ dùng Base để đặt vận tốc
@@ -118,16 +118,16 @@ FSM từ chối mọi state khác.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> InitialBehavior
-    InitialBehavior --> CustomBehavior: luật enemy yêu cầu
-    CustomBehavior --> InitialBehavior: return_to_behavior()
-    InitialBehavior --> Hit: damage, HP còn
-    CustomBehavior --> Hit: damage, HP còn
-    Hit --> InitialBehavior: hết recoil và recovery
-    InitialBehavior --> Death: HP = 0
-    CustomBehavior --> Death: HP = 0
-    Hit --> Death: HP = 0
-    Death --> [*]: chỉ khi Destroy On Death bật và feedback xong
+	[*] --> InitialBehavior
+	InitialBehavior --> CustomBehavior: luật enemy yêu cầu
+	CustomBehavior --> InitialBehavior: return_to_behavior()
+	InitialBehavior --> Hit: damage, HP còn
+	CustomBehavior --> Hit: damage, HP còn
+	Hit --> InitialBehavior: hết recoil và recovery
+	InitialBehavior --> Death: HP = 0
+	CustomBehavior --> Death: HP = 0
+	Hit --> Death: HP = 0
+	Death --> [*]: chỉ khi Destroy On Death bật và feedback xong
 ```
 
 `InitialBehavior` không phải node mới: nó là initial state cấu hình trên root.
@@ -138,16 +138,16 @@ trở về `Patrol` sau Hit, trừ khi state riêng chủ động yêu cầu beh
 
 ```mermaid
 flowchart TD
-    A[HitBox overlap HurtBox] --> B[HurtBox lọc enabled actor team damage]
-    B --> C[EnemyBase.receive_damage]
-    C --> D[Lọc dead HP self-hit cùng team]
-    D --> E[Lưu pending hit direction từ source tới enemy]
-    E --> F[HealthComponent.take_damage]
-    F --> G[hp_changed: cập nhật DebugHealthLabel]
-    G --> H[damaged: emit EnemyBase.damaged]
-    H --> I{HP còn?}
-    I -->|Có| J[queue Hit priority 50]
-    I -->|Không| K[died: dead true, queue Death terminal]
+	A[HitBox overlap HurtBox] --> B[HurtBox lọc enabled actor team damage]
+	B --> C[EnemyBase.receive_damage]
+	C --> D[Lọc dead HP self-hit cùng team]
+	D --> E[Lưu pending hit direction từ source tới enemy]
+	E --> F[HealthComponent.take_damage]
+	F --> G[hp_changed: cập nhật DebugHealthLabel]
+	G --> H[damaged: emit EnemyBase.damaged]
+	H --> I{HP còn?}
+	I -->|Có| J[queue Hit priority 50]
+	I -->|Không| K[died: dead true, queue Death terminal]
 ```
 
 `HealthComponent` phát `hp_changed`, rồi `damaged`, sau cùng mới `died` khi HP
@@ -242,7 +242,7 @@ EnemyBase (CharacterBody3D)
 ├── HealthComponent
 ├── DebugHealthLabel
 └── TargetDetector (Area3D)        [tùy chọn]
-    └── CollisionShape3D
+	└── CollisionShape3D
 ```
 
 `EnemyBase` kiểm tra lúc chạy rằng có `EnemyData`, `HealthComponent`,

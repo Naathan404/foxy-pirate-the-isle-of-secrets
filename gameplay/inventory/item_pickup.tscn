@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bqt066tkjp3c1"]
+
+[ext_resource type="Texture2D" uid="uid://cnpjgqqnym7p4" path="res://assets/sprites/items/healing_potion.png" id="1_q7m61"]
+[ext_resource type="Script" uid="uid://24w7wd4t1fs3" path="res://gameplay/inventory/item_pickup.gd" id="1_wcvja"]
+[ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="2_y770h"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_wcvja"]
+radius = 0.6419367
+
+[node name="ItemPickup" type="Area3D" unique_id=1605440793]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_wcvja")
+item = ExtResource("2_y770h")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1888093459]
+transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
+pixel_size = 0.036
+billboard = 2
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("1_q7m61")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=478981975]
+shape = SubResource("SphereShape3D_wcvja")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://ddu3mubhw4y6n"]
+
+[ext_resource type="Script" uid="uid://b03gmcx2kf6go" path="res://gameplay/inventory/inventory_slot_ui.gd" id="1_u5xhv"]
+[ext_resource type="Texture2D" uid="uid://dv40a00uxu68y" path="res://assets/ui/player_hud/inventory/inventory_slot.png" id="2_rjo3g"]
+[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="3_rjo3g"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_qajpg"]
+line_spacing = 0.0
+font = ExtResource("3_rjo3g")
+font_size = 36
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[node name="InventorySlotUI" type="PanelContainer" unique_id=515379981]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 128.0
+offset_bottom = 128.0
+script = ExtResource("1_u5xhv")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1079686084]
+texture_filter = 1
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_rjo3g")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1928762802]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Icon" type="TextureRect" parent="MarginContainer" unique_id=2131402762]
+texture_filter = 1
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuantityLabel" type="Label" parent="MarginContainer" unique_id=806705806]
+layout_mode = 2
+size_flags_vertical = 8
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 8)
+text = "99"
+label_settings = SubResource("LabelSettings_qajpg")
+horizontal_alignment = 2
+vertical_alignment = 2

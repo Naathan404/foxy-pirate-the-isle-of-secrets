@@ -380,6 +380,8 @@ func reset_active_cooldowns() -> void:
 
 
 func _handle_slot_input() -> void:
+	if actor is Player and (actor as Player).is_gameplay_input_blocked():
+		return
 	for socket_id: int in _sockets:
 		var socket := _sockets[socket_id] as CharmSocket
 		if socket != null and Input.is_action_just_pressed(socket.input_action):

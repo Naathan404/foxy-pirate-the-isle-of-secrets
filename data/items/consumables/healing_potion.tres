@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://c7pbeev7mghjm"]
+
+[ext_resource type="Texture2D" uid="uid://cnpjgqqnym7p4" path="res://assets/sprites/items/healing_potion.png" id="1_2wega"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_8gv4y"]
+
+[resource]
+script = ExtResource("1_8gv4y")
+item_id = "healing_potion"
+display_name = "Healing Potion"
+icon = ExtResource("1_2wega")
+description = "Heal 5HP."
+max_stack = 99
+metadata/_custom_type_script = "uid://ctgfs8oma6tdq"
