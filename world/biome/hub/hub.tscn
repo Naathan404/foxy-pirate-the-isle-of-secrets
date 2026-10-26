@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cqqm4y2n8p5sk"]
 
 [ext_resource type="Script" uid="uid://dlxg0f4p03ka5" path="res://world/hub/scenes/hub.gd" id="1_f6j8g"]
-[ext_resource type="MeshLibrary" uid="uid://bscwetg41y4ge" path="res://assets/meshes/world.meshlib" id="2_cge4j"]
+[ext_resource type="MeshLibrary" uid="uid://bscwetg41y4ge" path="res://assets/meshes/world/world.meshlib" id="2_cge4j"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_fxrp0"]
 [ext_resource type="Texture2D" uid="uid://c0hpmidu42byx" path="res://assets/textures/bridge/bridge.png" id="3_cge4j"]
 [ext_resource type="PackedScene" uid="uid://3v06vwpc6plb" path="res://gameplay/checkpoint/checkpoint.tscn" id="3_kouyd"]

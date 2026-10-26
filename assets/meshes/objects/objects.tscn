@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://bhntlhbcpsili"]
+
+[ext_resource type="ArrayMesh" uid="uid://c40mcc7gh2vfn" path="res://assets/models/kenney_mini_forest/fence.glb" id="1_pchn8"]
+[ext_resource type="ArrayMesh" uid="uid://dp41kt7ek1l4w" path="res://assets/models/kenney_mini_forest/tree.glb" id="2_7pif6"]
+[ext_resource type="ArrayMesh" uid="uid://dkg1rja2q8keg" path="res://assets/models/kenney_mini_forest/tent.glb" id="3_pchn8"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1h7xg"]
+size = Vector3(2.5, 1, 0.5)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_7pif6"]
+height = 6.0
+radius = 1.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ltl8y"]
+
+[node name="Objects" type="Node3D" unique_id=2033362518]
+
+[node name="Fence" type="MeshInstance3D" parent="." unique_id=680794087]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = ExtResource("1_pchn8")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Fence" unique_id=442067592]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Fence/StaticBody3D" unique_id=2010131084]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_1h7xg")
+
+[node name="Tree" type="MeshInstance3D" parent="." unique_id=1489310928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 0)
+mesh = ExtResource("2_7pif6")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Tree" unique_id=1318256485]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tree/StaticBody3D" unique_id=887087744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, 0)
+shape = SubResource("CylinderShape3D_7pif6")
+
+[node name="Tent" type="MeshInstance3D" parent="." unique_id=1100148783]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1, 0)
+mesh = ExtResource("3_pchn8")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Tent" unique_id=254661372]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tent/StaticBody3D" unique_id=1714041678]
+transform = Transform3D(5, 0, 0, 0, 4, 0, 0, 0, 5, 0, 2, 0)
+shape = SubResource("BoxShape3D_ltl8y")

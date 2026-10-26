@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dlxg0f4p03ka5" path="res://world/hub/scenes/hub.gd" id="1_80qyt"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_tu8fd"]
-[ext_resource type="MeshLibrary" uid="uid://bscwetg41y4ge" path="res://assets/meshes/world.meshlib" id="3_8nuo3"]
+[ext_resource type="MeshLibrary" uid="uid://bscwetg41y4ge" path="res://assets/meshes/world/world.meshlib" id="3_8nuo3"]
 [ext_resource type="PackedScene" uid="uid://3v06vwpc6plb" path="res://gameplay/checkpoint/checkpoint.tscn" id="4_yhk1h"]
 [ext_resource type="Texture2D" uid="uid://c0hpmidu42byx" path="res://assets/textures/bridge/bridge.png" id="5_k1rw3"]
 [ext_resource type="Script" uid="uid://ckx4a2ubmtvmk" path="res://world/components/decoration/mullti_mesh_decorator.gd" id="6_sx3y8"]
