@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://yp4kcso8yfap"]
+
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_e5qyu"]
+[ext_resource type="Texture2D" uid="uid://b7d5lwhywmo6x" path="res://assets/sprites/items/crab_claw.png" id="1_n2n28"]
+
+[resource]
+script = ExtResource("1_e5qyu")
+item_id = "crab_claw"
+display_name = "Crab Claw"
+icon = ExtResource("1_n2n28")
+description = "A sturdy claw obtained by defeating a crab."
+max_stack = 10
+metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

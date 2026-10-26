@@ -39,6 +39,7 @@ var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	hide()
 	if inventory == null:
 		push_error("Chưa gán inventory cho ui")
@@ -98,10 +99,9 @@ func _refresh_item_info() -> void:
 
 	item_icon.texture = slot.item.icon
 	item_name.text = slot.item.display_name
-	# BaseItem chưa có thuộc tính phân loại; tạm dùng nhãn chung.
-	item_type.text = ""
+	item_type.text = GlobalConstants.ItemType.keys()[slot.item.type]
 	item_description.text = slot.item.description
-	item_quantity.text = "%d" % slot.quantity
+	item_quantity.text = "%d/%d" % [slot.quantity, slot.item.max_stack]
 
 
 func _on_material_button_pressed() -> void:
@@ -142,6 +142,8 @@ func open_inventory() -> void:
 	var player := get_parent() as Player
 	if player != null and player.dead:
 		return
+	if not get_node("/root/GameManager").enter_inventory():
+		return
 	_previous_mouse_mode = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_is_open = true
@@ -156,6 +158,7 @@ func close_inventory() -> void:
 	_is_open = false
 	hide()
 	Input.mouse_mode = _previous_mouse_mode
+	get_node("/root/GameManager").exit_inventory()
 
 
 func _cancel_inventory_drag() -> void:
@@ -181,3 +184,4 @@ func is_open() -> bool:
 func _exit_tree() -> void:
 	if _is_open:
 		Input.mouse_mode = _previous_mouse_mode
+		get_node("/root/GameManager").exit_inventory()

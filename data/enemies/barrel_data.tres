@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://bl2e72ovh1uu8"]
 
 [ext_resource type="Script" uid="uid://bh64oflsqtaty" path="res://data/enemies/enemy_data.gd" id="1_enemy_data"]
+[ext_resource type="Resource" uid="uid://c8qmnr7cm6o2u" path="res://data/items/consumables/gunpowder_bag.tres" id="1_xf58d"]
 
 [resource]
 script = ExtResource("1_enemy_data")
@@ -10,3 +11,4 @@ deceleration = 0.0
 hit_recovery_duration = 0.35
 hit_knockback_speed = 4.0
 hit_deceleration = 20.0
+drop_item = ExtResource("1_xf58d")

@@ -19,6 +19,8 @@ enum InitialFacing {
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
+const ITEM_PICKUP_SCENE: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
+
 @export var data: EnemyData
 @export var initial_state_name: StringName = &"Idle"
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
@@ -318,6 +320,7 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	_drop_loot.call_deferred()
 	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
 		_charm_grapple_tween.kill()
 	_charm_grapple_tween = null
@@ -510,3 +513,27 @@ func _get_hit_direction(source: Node) -> Vector3:
 
 func _on_charm_grapple_finished() -> void:
 	_charm_grapple_tween = null
+
+
+# drop itemmm =========
+func _drop_loot() -> void:
+	if data == null or data.drop_item == null or data.drop_quantity <= 0:
+		return
+
+	if data.drop_chance <= 0.0:
+		return
+	if data.drop_chance < 1.0 and randf() >= data.drop_chance:
+		return
+	if not is_inside_tree():
+		return
+	var loot_parent: Node = get_parent()
+	if loot_parent == null or loot_parent.is_queued_for_deletion():
+		return
+
+	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
+	# gán trước add_child để _ready của pickup lấy đúng icon
+	pickup.item = data.drop_item
+	pickup.quantity = data.drop_quantity
+	loot_parent.add_child(pickup)
+	pickup.global_position = global_position
+	pickup.play_drop_animation()

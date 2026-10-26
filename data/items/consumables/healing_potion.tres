@@ -9,5 +9,5 @@ item_id = "healing_potion"
 display_name = "Healing Potion"
 icon = ExtResource("1_2wega")
 description = "Heal 5HP."
-max_stack = 99
+type = 2
 metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

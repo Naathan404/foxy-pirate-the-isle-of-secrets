@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://sxyrgnablv7a" path="res://assets/ui/player_hud/inventory/inventory_background.png" id="2_ag10p"]
 [ext_resource type="Texture2D" uid="uid://dv40a00uxu68y" path="res://assets/ui/player_hud/inventory/inventory_slot.png" id="4_6drgk"]
 [ext_resource type="Texture2D" uid="uid://qbww82r5simv" path="res://assets/ui/player_hud/inventory/orange_button.png" id="4_6rn6a"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="5_h7xhg"]
 [ext_resource type="Texture2D" uid="uid://cd8adeiyriaix" path="res://assets/ui/player_hud/inventory/material_icon.png" id="5_hmekt"]
 [ext_resource type="Texture2D" uid="uid://fyw552ym81mv" path="res://assets/ui/player_hud/inventory/blue_button.png" id="5_ymaop"]
 [ext_resource type="Texture2D" uid="uid://ccgws552lcxup" path="res://assets/ui/player_hud/inventory/white_button.png" id="6_xuoha"]
@@ -160,7 +161,7 @@ layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 theme_override_fonts/font = ExtResource("2_0s057")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 25
 text = "999"
 horizontal_alignment = 2
 autowrap_mode = 3
@@ -176,7 +177,7 @@ autowrap_mode = 3
 
 [node name="ItemType" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=807015299]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0, 0.007843138, 1)
+theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
 theme_override_constants/outline_size = 3
 theme_override_fonts/font = ExtResource("2_0s057")
@@ -191,7 +192,8 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("2_0s057")
+theme_override_fonts/font = ExtResource("5_h7xhg")
+theme_override_font_sizes/font_size = 20
 text = "Item description"
 autowrap_mode = 3
 

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://c8qmnr7cm6o2u"]
+
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_shfvp"]
+[ext_resource type="Texture2D" uid="uid://cli5tbl015kp6" path="res://assets/sprites/items/gunpowder_bag.png" id="1_uwkqt"]
+
+[resource]
+script = ExtResource("1_shfvp")
+item_id = "gunpowder_bag"
+display_name = "Gunpowder Bag"
+icon = ExtResource("1_uwkqt")
+description = "A pouch of gunpowder obtained by defeating a powder barrel"
+max_stack = 10
+metadata/_custom_type_script = "uid://ctgfs8oma6tdq"
