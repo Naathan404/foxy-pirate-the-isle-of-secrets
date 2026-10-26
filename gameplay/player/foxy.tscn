@@ -17,10 +17,13 @@
 [ext_resource type="Script" uid="uid://cq25nhncyhun5" path="res://core/components/stamina_component.gd" id="12_av71s"]
 [ext_resource type="Script" uid="uid://cegglbna6qng8" path="res://gameplay/inventory/inventory.gd" id="15_lycwo"]
 [ext_resource type="Script" uid="uid://byhka8abge5xp" path="res://gameplay/charms/socket/charm_socket_manager.gd" id="16_charm_manager"]
+[ext_resource type="Script" uid="uid://0vpaeibrfouv" path="res://gameplay/inventory/inventory_slot.gd" id="16_n85vt"]
 [ext_resource type="PackedScene" uid="uid://dqmnkxuwherpm" path="res://gameplay/inventory/inventory_ui.tscn" id="16_nbuib"]
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Script" uid="uid://c1ofpsqxwk0l6" path="res://gameplay/charms/base/charm_registry.gd" id="17_charm_registry"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="17_r6sj1"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/consumables/starfish_core.tres" id="17_unfpm"]
+[ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="18_7war0"]
 [ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
 [ext_resource type="PackedScene" uid="uid://dgx5c1qlu0dls" path="res://gameplay/player/effects/run_dust_effect.tscn" id="19_lqbvs"]
 [ext_resource type="Script" uid="uid://c4fmspxxv4ifk" path="res://gameplay/charms/socket/charm_loadout.gd" id="20_ehmwb"]
@@ -604,6 +607,18 @@ height = 2.2327638
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(1.2701416, 1.9672241, 1)
 
+[sub_resource type="Resource" id="Resource_vt6mg"]
+script = ExtResource("16_n85vt")
+item = ExtResource("17_unfpm")
+quantity = 14
+metadata/_custom_type_script = "uid://0vpaeibrfouv"
+
+[sub_resource type="Resource" id="Resource_tst5e"]
+script = ExtResource("16_n85vt")
+item = ExtResource("18_7war0")
+quantity = 3
+metadata/_custom_type_script = "uid://0vpaeibrfouv"
+
 [sub_resource type="Resource" id="Resource_ieged"]
 script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
@@ -696,6 +711,7 @@ shape = SubResource("BoxShape3D_jpyye")
 
 [node name="Inventory" type="Node" parent="." unique_id=1718891682]
 script = ExtResource("15_lycwo")
+starting_items = Array[ExtResource("16_n85vt")]([SubResource("Resource_vt6mg"), SubResource("Resource_tst5e")])
 capacity = 30
 
 [node name="InventoryUI" parent="." unique_id=333365260 node_paths=PackedStringArray("inventory") instance=ExtResource("16_nbuib")]

@@ -58,6 +58,11 @@ func _ready() -> void:
 	_setup_stats()
 	_setup_combat()
 	_setup_charm_system()
+	get_node("/root/GameManager").register_player(self)
+
+
+func _exit_tree() -> void:
+	get_node("/root/GameManager").unregister_player(self)
 
 
 # Khởi tạo HP, SP và nối signal để cập nhật HUD
@@ -182,8 +187,7 @@ func _physics_process(delta: float) -> void:
 func _read_input() -> void:
 	move_direction = Vector3.ZERO
 	if is_gameplay_input_blocked():
-		attack_requested = false
-		dash_buffer_remaining = 0.0
+		clear_gameplay_input()
 		return
 	if dead:
 		return
@@ -211,6 +215,12 @@ func _read_input() -> void:
 		and Input.is_action_just_pressed(secondary_attack_action)
 	):
 		request_attack(&"secondary")
+
+
+func clear_gameplay_input() -> void:
+	move_direction = Vector3.ZERO
+	attack_requested = false
+	dash_buffer_remaining = 0.0
 
 
 func is_gameplay_input_blocked() -> bool:

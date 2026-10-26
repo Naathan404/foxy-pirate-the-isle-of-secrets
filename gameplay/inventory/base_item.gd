@@ -6,3 +6,4 @@ extends Resource
 @export var icon: Texture2D = null
 @export_multiline var description: String = &""
 @export_range(1, 99, 1) var max_stack: int = 1
+@export var type: GlobalConstants.ItemType = GlobalConstants.ItemType.Material

@@ -315,9 +315,9 @@ theme_override_font_sizes/font_size = 14
 [node name="ChaosControl" type="Control" parent="." unique_id=1488264354]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 903.2001
+offset_left = 903.19995
 offset_top = 499.19998
-offset_right = 904.2001
+offset_right = 904.19995
 offset_bottom = 519.19995
 scale = Vector2(1.25, 1.25)
 mouse_filter = 2

@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+GameManager="*res://core/autoload/game_manager.gd"
 HitstopController="*uid://dc5my4ay7g00q"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
 

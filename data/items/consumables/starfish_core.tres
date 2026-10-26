@@ -9,4 +9,5 @@ item_id = "starfish_core"
 display_name = "Starfish Core"
 icon = ExtResource("1_84cbb")
 description = "A mysterious core obtained by defeating a starfish."
+max_stack = 10
 metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

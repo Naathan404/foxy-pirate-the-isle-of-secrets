@@ -1,8 +1,10 @@
 class_name Inventory
 extends Node
 
-## UI có thể lắng nghe signal này để cập nhật sau khi túi thay đổi.
+## UI có thể lắng nghe signal này để cập nhật sau khi túi thay đổi
 signal changed
+
+@export var starting_items: Array[InventorySlot] = []
 
 @export_range(20, 40, 1) var capacity: int = 20
 var slots: Array[InventorySlot] = []
@@ -12,6 +14,14 @@ func _ready() -> void:
 	for _c in range(capacity):
 		var slot: InventorySlot = InventorySlot.new()
 		slots.append(slot)
+
+	for entry in starting_items:
+		if entry == null or entry.is_empty():
+			continue
+
+		var leftover: int = add_item(entry.item, entry.quantity)
+		if leftover > 0:
+			push_warning("Không đủ chỗ cho đồ khởi đầu: " + entry.item.display_name)
 
 
 # thêm item, trả về số lượng còn thừa
