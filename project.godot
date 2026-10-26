@@ -11,15 +11,15 @@ config_version=5
 [application]
 
 config/name="foxy-pirate-the-isle-of-secret"
-run/main_scene="res://test/enemy_player_test.tscn"
+run/main_scene="uid://yyr7vg0mg0q4"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-GameManager="*res://core/autoload/game_manager.gd"
 HitstopController="*uid://dc5my4ay7g00q"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
+GameManager="*res://core/autoload/game_manager.gd"
 
 [display]
 

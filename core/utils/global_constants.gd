@@ -3,7 +3,7 @@ extends Node
 
 enum ItemType
 {
-	Material,
-	Equipment,
-	Consumable
+	MATERIAL,
+	EQUIPMENT,
+	CONSUMABLE
 }

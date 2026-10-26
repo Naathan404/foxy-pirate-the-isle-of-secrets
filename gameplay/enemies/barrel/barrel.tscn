@@ -12,7 +12,7 @@
 size = Vector3(1.8, 1.2, 1.8)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
-radius = 4.0
+radius = 6.544922
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
 height = 1.2

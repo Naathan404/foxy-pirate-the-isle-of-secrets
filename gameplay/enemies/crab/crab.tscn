@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dxkc50p2rl15x" path="res://assets/sprites/enemies/crab/crab_sprite_sheet.png" id="3_texture"]
 [ext_resource type="AnimationLibrary" uid="uid://fya1b26i2m6b" path="res://gameplay/enemies/crab/crab_anims.tres" id="4_anims"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_hitbox"]
-[ext_resource type="Script" path="res://gameplay/enemies/crab/states/crab_patrol.gd" id="6_patrol"]
+[ext_resource type="Script" uid="uid://do0lxthoqo85o" path="res://gameplay/enemies/crab/states/crab_patrol.gd" id="6_patrol"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(2.4, 1.2, 2.4)
@@ -25,7 +25,9 @@ destroy_on_death = true
 show_debug_health = true
 
 [node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
 offset = Vector2(0, 14)
+billboard = 2
 texture = ExtResource("3_texture")
 hframes = 3
 vframes = 5

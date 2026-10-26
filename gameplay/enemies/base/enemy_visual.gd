@@ -97,16 +97,19 @@ func _play_directional(restart: bool = false) -> bool:
 func _get_directional_animation_name(action: StringName) -> StringName:
 	if not is_instance_valid(animation_player):
 		return &""
+	var screen_direction := _get_screen_direction()
 	var suffix := "down"
 	var flip_side := false
-	if absf(_facing.x) > absf(_facing.z):
-		var horizontal_suffix := "right" if _facing.x > 0.0 else "left"
+	if absf(screen_direction.x) > absf(screen_direction.z):
+		var horizontal_suffix := "right" if screen_direction.x > 0.0 else "left"
 		var horizontal_name := StringName(String(action) + "_" + horizontal_suffix)
 		if animation_player.has_animation(horizontal_name):
+			if is_instance_valid(sprite):
+				sprite.flip_h = false
 			return horizontal_name
 		suffix = "side"
-		flip_side = _facing.x < 0.0
-	elif _facing.z < 0.0:
+		flip_side = screen_direction.x < 0.0
+	elif screen_direction.z < 0.0:
 		suffix = "up"
 
 	if is_instance_valid(sprite):
@@ -115,6 +118,20 @@ func _get_directional_animation_name(action: StringName) -> StringName:
 	if animation_player.has_animation(animation_name):
 		return animation_name
 	return &""
+
+
+## Chọn clip theo hướng trên màn hình, độc lập với hướng vật lý của enemy.
+func _get_screen_direction() -> Vector3:
+	var camera := get_viewport().get_camera_3d()
+	if not is_instance_valid(camera):
+		return _facing
+	var camera_right: Vector3 = camera.global_basis.x
+	var camera_back: Vector3 = camera.global_basis.z
+	camera_right.y = 0.0
+	camera_back.y = 0.0
+	return Vector3(
+		_facing.dot(camera_right.normalized()), 0.0, _facing.dot(camera_back.normalized())
+	)
 
 
 func _play(animation_name: StringName, restart: bool) -> bool:

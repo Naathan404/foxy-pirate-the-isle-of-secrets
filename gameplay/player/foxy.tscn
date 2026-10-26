@@ -747,21 +747,39 @@ transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.70710
 fov = 30.0
 
 [node name="TestHUD" type="CanvasLayer" parent="." unique_id=404690851]
-visible = false
+
+[node name="Debug" type="Label" parent="TestHUD" unique_id=1025401737]
+offset_left = 1126.0
+offset_top = 6.0
+offset_right = 1186.0
+offset_bottom = 29.0
+text = "DEBUG:"
 
 [node name="HP" type="Label" parent="TestHUD" unique_id=700755012]
-offset_left = 6.0
-offset_top = 2.0
-offset_right = 98.0
-offset_bottom = 25.0
+offset_left = 1031.0
+offset_top = 32.0
+offset_right = 1123.0
+offset_bottom = 55.0
 text = "HP: 999/999"
 
 [node name="SP" type="Label" parent="TestHUD" unique_id=868306895]
-offset_left = 6.0
-offset_top = 24.0
-offset_right = 95.0
-offset_bottom = 47.0
+offset_left = 1031.0
+offset_top = 54.0
+offset_right = 1120.0
+offset_bottom = 77.0
 text = "SP: 999/999"
+
+[node name="Label" type="Label" parent="TestHUD" unique_id=859253722]
+offset_left = 1130.0
+offset_top = 32.0
+offset_right = 1274.0
+offset_bottom = 159.0
+text = "WASD: move
+LMB: Attack
+RMB: Weapon Skill
+Shift: Dash
+Tab: Inventory"
+horizontal_alignment = 2
 
 [node name="Effects" type="Node3D" parent="." unique_id=2014826237]
 

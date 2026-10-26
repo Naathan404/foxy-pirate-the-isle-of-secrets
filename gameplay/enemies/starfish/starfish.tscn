@@ -28,7 +28,9 @@ destroy_on_death = true
 show_debug_health = true
 
 [node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
 offset = Vector2(0, 14.5)
+billboard = 2
 texture = ExtResource("3_texture")
 hframes = 3
 vframes = 12
