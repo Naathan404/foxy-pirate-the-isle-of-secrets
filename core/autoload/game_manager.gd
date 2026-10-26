@@ -9,6 +9,7 @@ enum State { PLAYING, INVENTORY }
 var player: Player
 var inventory: Inventory
 var state: State = State.PLAYING
+var _reload_pending: bool = false
 
 
 func _ready() -> void:
@@ -52,3 +53,28 @@ func exit_inventory() -> void:
 	state = State.PLAYING
 	get_tree().paused = false
 	state_changed.emit(state)
+
+
+func reload_current_scene() -> void:
+	if _reload_pending:
+		return
+	var scene: Node = get_tree().current_scene
+	if not is_instance_valid(scene) or scene.scene_file_path.is_empty():
+		push_warning("GameManager: không có scene đã lưu để reload.")
+		return
+	_reload_pending = true
+	# Đổi scene sau khi callback physics/animation hiện tại đã xử lý xong
+	_reload_scene.call_deferred()
+
+
+func _reload_scene() -> void:
+	if is_instance_valid(player) and is_instance_valid(player.inventory_ui):
+		player.inventory_ui.close_inventory()
+	exit_inventory()
+	get_tree().paused = false
+	get_node("/root/HitstopController").cancel()
+	get_node("/root/ScreenShakeController").cancel()
+	var error: Error = get_tree().reload_current_scene()
+	_reload_pending = false
+	if error != OK:
+		push_error("GameManager: reload scene thất bại: %s" % error_string(error))

@@ -1,5 +1,9 @@
 extends PlayerState
 
+@export_range(0.0, 5.0, 0.1) var reload_delay: float = 1.0
+
+var _reload_requested: bool = false
+
 
 # vào death thì terminal luôn
 func _init() -> void:
@@ -12,8 +16,22 @@ func _enter() -> void:
 	player.attack_requested = false
 	player.cancel_attack()
 	player.set_horizontal_velocity(Vector3.ZERO)
-	player.play_directional_animation("death", true)
+	_reload_requested = false
+	timer = reload_delay
+	if is_instance_valid(player.visual):
+		var action := "death" if player.visual.has_directional_animation("death") else "hit"
+		player.play_directional_animation(action, true)
+		var animator: AnimationPlayer = player.visual.animation_player
+		if is_instance_valid(animator) and animator.has_animation(animator.assigned_animation):
+			var animation: Animation = animator.get_animation(animator.assigned_animation)
+			timer = maxf(timer, animation.length / maxf(absf(animator.speed_scale), 0.01))
 
 
-func _update(_delta: float) -> void:
+func _update(delta: float) -> void:
 	player.set_horizontal_velocity(Vector3.ZERO)
+	if _reload_requested:
+		return
+	timer = maxf(0.0, timer - delta)
+	if timer <= 0.0:
+		_reload_requested = true
+		get_node("/root/GameManager").reload_current_scene()

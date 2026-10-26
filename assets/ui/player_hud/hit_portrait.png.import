@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://caivf64g34hha"
-path="res://.godot/imported/Hurt_Status.png-5472dcc2d87321dfbb1ddb1575bbb5c8.ctex"
+path="res://.godot/imported/hit_portrait.png-71311cf5abad2370442631fefab47e9f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/Hurt_Status.png"
-dest_files=["res://.godot/imported/Hurt_Status.png-5472dcc2d87321dfbb1ddb1575bbb5c8.ctex"]
+source_file="res://assets/ui/player_hud/hit_portrait.png"
+dest_files=["res://.godot/imported/hit_portrait.png-71311cf5abad2370442631fefab47e9f.ctex"]
 
 [params]
 
