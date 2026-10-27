@@ -425,7 +425,7 @@ func die() -> void:
 		return
 	dead = true
 	if is_instance_valid(inventory_ui):
-		inventory_ui.close_inventory()
+		inventory_ui.close_inventory(true)
 	if is_instance_valid(hurtbox):
 		hurtbox.enabled = false
 	pending_free_dash = false

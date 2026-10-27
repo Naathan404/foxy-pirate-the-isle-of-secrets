@@ -20,7 +20,7 @@ func register_player(active_player: Player) -> void:
 	if not is_instance_valid(active_player) or player == active_player:
 		return
 	if is_instance_valid(player) and is_instance_valid(player.inventory_ui):
-		player.inventory_ui.close_inventory()
+		player.inventory_ui.close_inventory(true)
 	player = active_player
 	inventory = player.get_node_or_null("Inventory") as Inventory
 	player_changed.emit(player)
@@ -69,7 +69,7 @@ func reload_current_scene() -> void:
 
 func _reload_scene() -> void:
 	if is_instance_valid(player) and is_instance_valid(player.inventory_ui):
-		player.inventory_ui.close_inventory()
+		player.inventory_ui.close_inventory(true)
 	exit_inventory()
 	get_tree().paused = false
 	get_node("/root/HitstopController").cancel()
