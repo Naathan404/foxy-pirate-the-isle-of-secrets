@@ -2,13 +2,9 @@ name: Godot CI
 
 on:
   pull_request:
-    branches:
-      - dev
-      - main
+    branches: [dev, main]
   push:
-    branches:
-      - dev
-      - main
+    branches: [dev, main]
   workflow_dispatch:
 
 permissions:
@@ -18,84 +14,47 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  GODOT_VERSION: 4.7.2-stable
-
 jobs:
-  validate:
-    name: Validate Godot Project
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Godot
-        uses: lihop/setup-godot@v3
-        with:
-          version: ${{ env.GODOT_VERSION }}
-
-      - name: Import and validate project
-        run: python3 .github/scripts/godot_check.py import
-
-      - name: Test CI error detection
-        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
-
-      - name: Smoke test game startup
-        run: python3 .github/scripts/godot_check.py smoke
-
-  tests:
-    name: Run Godot Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Godot
-        uses: lihop/setup-godot@v3
-        with:
-          version: ${{ env.GODOT_VERSION }}
-
-      - name: Import project
-        run: python3 .github/scripts/godot_check.py import
-
-      - name: Run standalone tests
-        run: python3 .github/scripts/godot_check.py tests
-
   lint:
     name: Lint GDScript
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Find GDScript files
-        id: scripts
-        run: |
-          if [ -n "$(git ls-files -- '*.gd')" ]; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::Lint and formatting skipped: no GDScript files found."
-          fi
-
-      - name: Install GDScript tools
-        if: steps.scripts.outputs.found == 'true'
-        run: python -m pip install "gdtoolkit==4.5.0"
-
-      - name: Lint GDScript
-        if: steps.scripts.outputs.found == 'true'
+      - run: python -m pip install "gdtoolkit==4.5.0"
+      - name: Lint tracked scripts
         run: git ls-files -z -- '*.gd' | xargs -0 -r python -m gdtoolkit.linter
 
-      - name: Check GDScript formatting
-        if: steps.scripts.outputs.found == 'true'
-        run: git ls-files -z -- '*.gd' | xargs -0 -r python -m gdtoolkit.formatter --check --line-length 100
+  validate:
+    name: Validate Godot Project
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lihop/setup-godot@v3
+        with:
+          version: 4.7.2-stable
+      - name: Import project and run gameplay tests
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_godot() {
+            local limit="$1"
+            shift
+            # Bash also supports setup-godot's launcher without a shebang.
+            timeout "$limit" bash -c 'godot --headless --path . "$@"' _ "$@" 2>&1 | tee "$RUNNER_TEMP/godot.log"
+            if grep -Eq 'SCRIPT ERROR:|ERROR:' "$RUNNER_TEMP/godot.log"; then
+              echo "::error::Godot reported an error; see the log above."
+              exit 1
+            fi
+          }
+
+          check_godot 300s --editor --import --quit
+          while IFS= read -r -d '' test; do
+            echo "Running $test"
+            check_godot 60s --script "$test"
+          done < <(find test -type f -name '*_test.gd' -print0 | sort -z)

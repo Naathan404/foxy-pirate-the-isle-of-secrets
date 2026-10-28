@@ -11,17 +11,15 @@ config_version=5
 [application]
 
 config/name="foxy-pirate-the-isle-of-secret"
-run/main_scene="uid://yyr7vg0mg0q4"
+run/main_scene="res://world/tests/test_scene.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-HitstopController="*uid://dc5my4ay7g00q"
+HitstopController="*res://core/autoload/hitstop_controller.gd"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
 GameManager="*res://core/autoload/game_manager.gd"
-Dialogic="*uid://ds2q0uclmolvu"
-_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [dialogic]
 
@@ -41,10 +39,6 @@ window/stretch/aspect="expand"
 [dotnet]
 
 project/assembly_name="foxy-pirate-the-isle-of-secret"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg")
 
 [input]
 

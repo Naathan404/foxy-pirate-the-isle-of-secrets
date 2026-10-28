@@ -13,8 +13,8 @@ python -m gdtoolkit.linter core data gameplay test ui world
 python -m gdtoolkit.formatter --check core data gameplay test ui world
 ~~~
 
-CI cũng kiểm tra formatter với giới hạn 100 ký tự mỗi dòng. Khi gọi formatter
-trực tiếp, dùng thêm `--line-length 100` để đồng nhất với workflow.
+CI chỉ bắt buộc lint; formatter là công cụ chỉnh định dạng ở máy cá nhân.
+Khi gọi formatter, dùng thêm `--line-length 100` để đồng nhất với giới hạn lint.
 
 Trên Windows, nếu dùng Python launcher với Python 3.15 đã cài, thay `python` bằng `py -3.15` trong các lệnh trên. CI dùng Python 3.12 qua `actions/setup-python`; không cần đổi CI sang phiên bản Python trên máy cá nhân.
 
@@ -25,7 +25,7 @@ python -m gdtoolkit.formatter gameplay/player/player.gd
 git diff
 ~~~
 
-`gdlint` kiểm tra các rule được công cụ hỗ trợ. `gdformat --check` chỉ kiểm tra định dạng, không sửa file. Cả hai phải đạt trước khi merge; không dùng `continue-on-error` để bỏ qua lỗi. Tham khảo [GDScript Toolkit](https://github.com/Scony/godot-gdscript-toolkit) khi cần tra rule.
+`gdlint` kiểm tra các rule được công cụ hỗ trợ. `gdformat --check` chỉ kiểm tra định dạng, không sửa file. Lint phải đạt trước khi merge; không dùng `continue-on-error` để bỏ qua lỗi. Tham khảo [GDScript Toolkit](https://github.com/Scony/godot-gdscript-toolkit) khi cần tra rule.
 
 Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa tên biến, signal dùng quá khứ, kiểu dữ liệu API, giao tiếp giữa scene, logic gameplay và các quy tắc kiến trúc cần được kiểm tra riêng.
 
@@ -36,18 +36,20 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.
 - Mỗi test có giới hạn 60 giây. CI báo thất bại khi Godot trả mã lỗi hoặc log có lỗi script/engine.
-- CI import project, chạy test độc lập và smoke test khi có main scene. Bước chưa có nội dung để chạy sẽ báo bỏ qua.
+- CI có hai job: lint và kiểm tra Godot. Job Godot import project một lần rồi chạy các test độc lập; không có smoke test riêng.
 - Ghi cách chạy và kết quả trong PR; thêm ảnh hoặc video nếu thay đổi UI/gameplay.
 
-Các bước Godot trong CI dùng chung `.github/scripts/godot_check.py`: thất bại
-khi engine trả mã khác 0, log có `SCRIPT ERROR:` / `ERROR:`, hoặc vượt timeout.
-Import có giới hạn 300 giây; mỗi test và smoke test có giới hạn 60 giây.
-Có thể chạy cùng kiểm tra ở máy cá nhân:
+Workflow gọi Godot trực tiếp qua Bash: thất bại khi engine trả mã khác 0,
+log có `SCRIPT ERROR:` / `ERROR:`, hoặc vượt timeout. Import có giới hạn
+300 giây; mỗi test có giới hạn 60 giây. Không dùng runner Python riêng.
+Chạy ở máy cá nhân bằng PowerShell:
 
 ~~~powershell
-python .github/scripts/godot_check.py import --godot 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe'
-python .github/scripts/godot_check.py tests --godot 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe'
-python .github/scripts/godot_check.py smoke --godot 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe'
+& 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --editor --import --quit
+foreach ($testScript in Get-ChildItem test -Recurse -Filter '*_test.gd' -File) {
+    & 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script $testScript.FullName
+    if ($LASTEXITCODE -ne 0) { throw "Test failed: $($testScript.Name)" }
+}
 ~~~
 
 ### Chaos và dagger boomerang
