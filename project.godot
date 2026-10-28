@@ -21,6 +21,7 @@ HitstopController="*res://core/autoload/hitstop_controller.gd"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
 GameManager="*res://core/autoload/game_manager.gd"
 Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 AudioManager="*res://core/autoload/audio_manager.gd"
 
 [dialogic]
