@@ -41,7 +41,6 @@ enum SourceUpAxis {
 @export_range(0.0, 1.0, 0.01) var position_evenness: float = 0.7
 @export_range(1, 32, 1) var position_attempts: int = 8
 
-
 var _random := RandomNumberGenerator.new()
 var _generated_output: MultiMeshInstance3D
 
@@ -122,14 +121,22 @@ func _collect_surface_triangles(collision: CollisionShape3D) -> Array[Dictionary
 		if indices.is_empty():
 			for vertex_index in range(0, vertices.size() - 2, 3):
 				_add_triangle(
-					triangles, collision.global_transform, vertices,
-					vertex_index, vertex_index + 1, vertex_index + 2
+					triangles,
+					collision.global_transform,
+					vertices,
+					vertex_index,
+					vertex_index + 1,
+					vertex_index + 2
 				)
 		else:
 			for index_offset in range(0, indices.size() - 2, 3):
 				_add_triangle(
-					triangles, collision.global_transform, vertices,
-					indices[index_offset], indices[index_offset + 1], indices[index_offset + 2]
+					triangles,
+					collision.global_transform,
+					vertices,
+					indices[index_offset],
+					indices[index_offset + 1],
+					indices[index_offset + 2]
 				)
 	return triangles
 
@@ -152,13 +159,18 @@ func _add_triangle(
 	normal /= double_area
 	if surface_direction == SurfaceDirection.UP and normal.dot(Vector3.UP) < up_normal_threshold:
 		return
-	triangles.append({
-		"first": first,
-		"second": second,
-		"third": third,
-		"normal": normal,
-		"weight": double_area * 0.5,
-	})
+	(
+		triangles
+		. append(
+			{
+				"first": first,
+				"second": second,
+				"third": third,
+				"normal": normal,
+				"weight": double_area * 0.5,
+			}
+		)
+	)
 
 
 func _total_weight(triangles: Array[Dictionary]) -> float:
@@ -195,8 +207,9 @@ func _pick_spaced_placement(
 	for _attempt in maxi(1, attempt_count):
 		placement = _sample_placement(_pick_triangle(triangles, total_weight))
 		var position: Vector3 = placement["position"]
-		if minimum_distance <= 0.0 or _is_position_available(
-			position, minimum_distance, position_grid
+		if (
+			minimum_distance <= 0.0
+			or _is_position_available(position, minimum_distance, position_grid)
 		):
 			_register_position(position, minimum_distance, position_grid)
 			return placement
@@ -248,7 +261,9 @@ func _register_position(
 
 func _position_cell(position: Vector3, cell_size: float) -> Vector3i:
 	return Vector3i(
-		floori(position.x / cell_size), floori(position.y / cell_size), floori(position.z / cell_size)
+		floori(position.x / cell_size),
+		floori(position.y / cell_size),
+		floori(position.z / cell_size)
 	)
 
 

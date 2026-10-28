@@ -6,6 +6,11 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot
 # túi dữ liệu
 @export var inventory: Inventory
 @export var toggle_action: StringName = &"inventory"
+@export var potion_component: PotionComponent
+
+@export_group("Interaction Feedback")
+@export_range(0.05, 0.5, 0.01) var open_duration: float = 0.18
+@export_range(0.05, 0.5, 0.01) var close_duration: float = 0.12
 
 var blue_button = preload("res://assets/ui/player_hud/inventory/blue_button.png")
 var disable_blue_button = preload("res://assets/ui/player_hud/inventory/disable_blue_button.png")
@@ -21,8 +26,15 @@ var slot_uis: Array[InventorySlotUI] = []
 var selected_slot_index: int = -1
 
 var _is_open: bool = false
+var _is_closing: bool = false
 var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
+var _transition_tween: Tween
+var _info_tween: Tween
+var _book_scale: Vector2
 
+@onready var panel: PanelContainer = $PanelContainer
+@onready var book_background: TextureRect = $PanelContainer/Background
+@onready var tab_buttons: VBoxContainer = $TabButtons
 @onready var tabs: TabContainer = $PanelContainer/MarginContainer/Tabs
 @onready var grid: GridContainer = tabs.get_node("Material/Content/ItemScroll/GridContainer")
 @onready var material_button: TextureButton = $TabButtons/MaterialButton
@@ -31,6 +43,7 @@ var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 @onready var info_layout: VBoxContainer = tabs.get_node(
 	"Material/Content/ItemInfo/MarginContainer/VBoxContainer"
 )
+@onready var equip_potion_button: TextureButton = info_layout.get_node("EquipPotionButton")
 @onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
 @onready var item_name: Label = info_layout.get_node("ItemName")
 @onready var item_type: Label = info_layout.get_node("ItemType")
@@ -40,6 +53,7 @@ var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_book_scale = book_background.scale
 	hide()
 	if inventory == null:
 		push_error("Chưa gán inventory cho ui")
@@ -74,16 +88,30 @@ func refresh() -> void:
 	for index in range(slot_uis.size()):
 		slot_uis[index].refresh(inventory.slots[index])
 	_refresh_item_info()
+	_update_slot_selection()
 
 
 func _on_slot_clicked(index: int) -> void:
 	selected_slot_index = index
 	_refresh_item_info()
+	_update_slot_selection()
+	if selected_slot_index >= 0:
+		if _info_tween != null and _info_tween.is_valid():
+			_info_tween.kill()
+		info_layout.modulate.a = 0.55
+		_info_tween = create_tween()
+		_info_tween.tween_property(info_layout, "modulate:a", 1.0, 0.12)
+
+
+func _update_slot_selection() -> void:
+	for index in range(slot_uis.size()):
+		slot_uis[index].set_selected(index == selected_slot_index)
 
 
 func _on_item_dropped(from_index: int, to_index: int) -> void:
 	if inventory.move_item(from_index, to_index):
 		_on_slot_clicked(to_index)
+		slot_uis[to_index].play_drop_feedback()
 
 
 func _refresh_item_info() -> void:
@@ -95,6 +123,7 @@ func _refresh_item_info() -> void:
 		item_type.text = ""
 		item_description.text = ""
 		item_quantity.text = ""
+		equip_potion_button.hide()
 		return
 
 	item_icon.texture = slot.item.icon
@@ -102,6 +131,7 @@ func _refresh_item_info() -> void:
 	item_type.text = GlobalConstants.ItemType.keys()[slot.item.type]
 	item_description.text = slot.item.description
 	item_quantity.text = "%d/%d" % [slot.quantity, slot.item.max_stack]
+	equip_potion_button.visible = slot.item is Potion
 
 
 func _on_material_button_pressed() -> void:
@@ -137,26 +167,66 @@ func _select_tab(index: int) -> void:
 
 
 func open_inventory() -> void:
-	if _is_open or not is_instance_valid(inventory):
+	if (_is_open and not _is_closing) or not is_instance_valid(inventory):
 		return
 	var player := get_parent() as Player
 	if player != null and player.dead:
 		return
-	if not get_node("/root/GameManager").enter_inventory():
-		return
-	_previous_mouse_mode = Input.mouse_mode
+	var fresh_open: bool = not _is_open
+	if fresh_open:
+		if not get_node("/root/GameManager").enter_inventory():
+			return
+		_previous_mouse_mode = Input.mouse_mode
+	_kill_transition()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_is_open = true
+	_is_closing = false
 	refresh()
 	show()
+	book_background.pivot_offset = book_background.size * 0.5
+	if fresh_open:
+		panel.modulate.a = 0.0
+		tab_buttons.modulate.a = 0.0
+		book_background.scale = _book_scale * 0.96
+	_transition_tween = create_tween().set_parallel()
+	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_transition_tween.tween_property(panel, "modulate:a", 1.0, open_duration)
+	_transition_tween.tween_property(tab_buttons, "modulate:a", 1.0, open_duration)
+	_transition_tween.tween_property(book_background, "scale", _book_scale, open_duration)
 
 
-func close_inventory() -> void:
+func close_inventory(immediate: bool = false) -> void:
 	if not _is_open:
 		return
+	if _is_closing and not immediate:
+		return
 	_cancel_inventory_drag()
+	_kill_transition()
+	if immediate:
+		_finish_close()
+		return
+	_is_closing = true
+	_transition_tween = create_tween().set_parallel()
+	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_transition_tween.tween_property(panel, "modulate:a", 0.0, close_duration)
+	_transition_tween.tween_property(tab_buttons, "modulate:a", 0.0, close_duration)
+	_transition_tween.tween_property(book_background, "scale", _book_scale * 0.96, close_duration)
+	_transition_tween.chain().tween_callback(_finish_close)
+
+
+func _kill_transition() -> void:
+	if _transition_tween != null and _transition_tween.is_valid():
+		_transition_tween.kill()
+	_transition_tween = null
+
+
+func _finish_close() -> void:
 	_is_open = false
+	_is_closing = false
 	hide()
+	panel.modulate.a = 1.0
+	tab_buttons.modulate.a = 1.0
+	book_background.scale = _book_scale
 	Input.mouse_mode = _previous_mouse_mode
 	get_node("/root/GameManager").exit_inventory()
 
@@ -171,7 +241,9 @@ func _cancel_inventory_drag() -> void:
 
 
 func toggle_inventory() -> void:
-	if _is_open:
+	if _is_closing:
+		open_inventory()
+	elif _is_open:
 		close_inventory()
 	else:
 		open_inventory()
@@ -185,3 +257,15 @@ func _exit_tree() -> void:
 	if _is_open:
 		Input.mouse_mode = _previous_mouse_mode
 		get_node("/root/GameManager").exit_inventory()
+
+
+func _on_equip_potion_button_pressed() -> void:
+	if potion_component == null:
+		return
+
+	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
+	if slot == null or slot.is_empty() or slot.item is not Potion:
+		return
+
+	if potion_component.equip_potion(slot.item as Potion):
+		print("đã trang bị ", slot.item.display_name)

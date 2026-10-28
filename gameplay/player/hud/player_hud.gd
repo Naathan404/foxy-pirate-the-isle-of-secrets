@@ -5,6 +5,7 @@ extends CanvasLayer
 @export var stamina: StaminaComponent
 @export var chaos: ChaosComponent
 @export var charm_socket_manager: CharmSocketManager
+@export var potion_component: PotionComponent
 
 @onready var health_arc: HudStatArc = $Stats/HealthArc
 @onready var stamina_arc: HudStatArc = $Stats/StaminaArc
@@ -25,6 +26,31 @@ func _ready() -> void:
 	# Player khởi tạo chỉ số sau khi các node con ready, nên sync ở cuối frame.
 	_sync_stats.call_deferred()
 	equipment.bind_manager.call_deferred(charm_socket_manager)
+
+	if is_instance_valid(potion_component):
+		potion_component.equipped_potion_changed.connect(_on_equipped_potion_changed)
+		potion_component.potion_used.connect(equipment.feedback_potion_used)
+
+		if is_instance_valid(potion_component.inventory):
+			potion_component.inventory.changed.connect(_refresh_potion_quantity)
+
+		_on_equipped_potion_changed(potion_component.equipped_potion)
+	else:
+		equipment.set_potion_icon(null)
+		equipment.set_potion_quantity(0)
+
+
+func _on_equipped_potion_changed(potion: Potion) -> void:
+	equipment.set_potion_icon(potion)
+	_refresh_potion_quantity()
+
+
+func _refresh_potion_quantity() -> void:
+	var amount: int = 0
+	if is_instance_valid(potion_component):
+		amount = potion_component.get_equipped_quantity()
+
+	equipment.set_potion_quantity(amount)
 
 
 func _sync_stats() -> void:

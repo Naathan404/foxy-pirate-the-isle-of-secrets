@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dtufe6c6gwjt6" path="res://assets/sprites/foxy/foxy_hat_sprite_sheet.png" id="1_0rjvg"]
 [ext_resource type="Script" uid="uid://digp88v0glq0y" path="res://gameplay/player/player.gd" id="1_rvh5s"]
+[ext_resource type="Script" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="2_6gmdq"]
 [ext_resource type="Resource" uid="uid://dtb5nvjw0g12a" path="res://data/foxy/foxy_data.tres" id="2_av71s"]
 [ext_resource type="Script" uid="uid://451g8wjqjdtv" path="res://gameplay/player/states/player_idle.gd" id="2_lmpvk"]
@@ -30,6 +31,7 @@
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
 [ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
+[ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
 [ext_resource type="Resource" uid="uid://pm7d7bi2h3b" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
@@ -624,7 +626,7 @@ script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
 metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
 
-[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "inventory_ui", "camera") groups=["player"]]
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "potion", "inventory_ui", "camera") groups=["player"]]
 collision_layer = 2
 collision_mask = 5
 floor_constant_speed = true
@@ -638,6 +640,7 @@ hurtbox = NodePath("HurtBox")
 weapon_controller = NodePath("WeaponController")
 charm_socket_manager = NodePath("CharmSocketManager")
 chaos = NodePath("ChaosComponent")
+potion = NodePath("PotionComponent")
 inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
 
@@ -691,11 +694,12 @@ script = ExtResource("7_rvh5s")
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
 
-[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager") instance=ExtResource("20_pt1je")]
+[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component") instance=ExtResource("20_pt1je")]
 health = NodePath("../HealthComponent")
 stamina = NodePath("../StaminaComponent")
 chaos = NodePath("../ChaosComponent")
 charm_socket_manager = NodePath("../CharmSocketManager")
+potion_component = NodePath("../PotionComponent")
 
 [node name="HurtBox" type="Area3D" parent="." unique_id=953130742 node_paths=PackedStringArray("actor")]
 collision_layer = 8
@@ -714,8 +718,9 @@ script = ExtResource("15_lycwo")
 starting_items = Array[ExtResource("16_n85vt")]([SubResource("Resource_vt6mg"), SubResource("Resource_tst5e")])
 capacity = 30
 
-[node name="InventoryUI" parent="." unique_id=333365260 node_paths=PackedStringArray("inventory") instance=ExtResource("16_nbuib")]
+[node name="InventoryUI" parent="." unique_id=333365260 node_paths=PackedStringArray("inventory", "potion_component") instance=ExtResource("16_nbuib")]
 inventory = NodePath("../Inventory")
+potion_component = NodePath("../PotionComponent")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=786847308]
 script = ExtResource("11_rvh5s")
@@ -741,6 +746,13 @@ definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtRes
 
 [node name="ChaosComponent" type="Node" parent="." unique_id=2085136369]
 script = ExtResource("21_chaos")
+
+[node name="PotionComponent" type="Node" parent="." unique_id=418433031 node_paths=PackedStringArray("inventory", "health", "stamina")]
+script = ExtResource("39_unfpm")
+inventory = NodePath("../Inventory")
+health = NodePath("../HealthComponent")
+stamina = NodePath("../StaminaComponent")
+metadata/_custom_type_script = "uid://b4jjfhk68ly5q"
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=342202680]
 transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 20, 20)
@@ -792,8 +804,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
 player = NodePath("../..")
 heel_offset = 0.1
 
+[node name="HitEffect" type="Node3D" parent="Effects" node_paths=PackedStringArray("player", "sprite", "visual", "health")]
+script = ExtResource("hit_feedback")
+player = NodePath("../..")
+sprite = NodePath("../../Visual/Sprite3D")
+visual = NodePath("../../Visual")
+health = NodePath("../../HealthComponent")
+
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.0216887, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
 
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]

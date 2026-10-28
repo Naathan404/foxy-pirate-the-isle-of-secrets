@@ -11,7 +11,6 @@ extends WeaponAttack
 @export var catch_distance: float = 0.5
 @export var height_offset: float = 0.9
 
-
 var max_distance: float = 10.0
 var flight_direction: Vector3
 # tính quãng đường lượt đi
@@ -35,8 +34,10 @@ func _ready() -> void:
 func validate() -> bool:
 	return (
 		get_node_or_null("HitBox") is HitBox
-		and speed > 0.0 and return_speed > 0.0
-		and lifetime > 0.0 and catch_distance > 0.0
+		and speed > 0.0
+		and return_speed > 0.0
+		and lifetime > 0.0
+		and catch_distance > 0.0
 	)
 
 
@@ -109,7 +110,6 @@ func _begin_return() -> void:
 		return
 	returning = true
 	_begin_damage_pass()
-
 
 
 func _begin_damage_pass() -> void:

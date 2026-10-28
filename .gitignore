@@ -3,3 +3,4 @@
 /android/
 addons/
 .cache_local/
+__pycache__/

@@ -15,6 +15,7 @@ signal dash_started
 @export var ammo: AmmoComponent
 @export var charm_socket_manager: CharmSocketManager
 @export var chaos: ChaosComponent
+@export var potion: PotionComponent
 @export var inventory_ui: InventoryUI
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
@@ -191,6 +192,8 @@ func _read_input() -> void:
 		return
 	if dead:
 		return
+	if Input.is_action_just_pressed("potion") and is_instance_valid(potion):
+		potion.use_equipped_potion()
 	var input_vector := Input.get_vector("left", "right", "up", "down")
 	# Đổi WASD sang hướng trong thế giới theo góc camera
 	var right := Vector3.RIGHT
@@ -425,7 +428,7 @@ func die() -> void:
 		return
 	dead = true
 	if is_instance_valid(inventory_ui):
-		inventory_ui.close_inventory()
+		inventory_ui.close_inventory(true)
 	if is_instance_valid(hurtbox):
 		hurtbox.enabled = false
 	pending_free_dash = false
