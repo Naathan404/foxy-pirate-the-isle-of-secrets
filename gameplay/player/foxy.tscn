@@ -2,7 +2,6 @@
 
 [ext_resource type="Texture2D" uid="uid://dtufe6c6gwjt6" path="res://assets/sprites/foxy/foxy_hat_sprite_sheet.png" id="1_0rjvg"]
 [ext_resource type="Script" uid="uid://digp88v0glq0y" path="res://gameplay/player/player.gd" id="1_rvh5s"]
-[ext_resource type="Script" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="2_6gmdq"]
 [ext_resource type="Resource" uid="uid://dtb5nvjw0g12a" path="res://data/foxy/foxy_data.tres" id="2_av71s"]
 [ext_resource type="Script" uid="uid://451g8wjqjdtv" path="res://gameplay/player/states/player_idle.gd" id="2_lmpvk"]
@@ -42,6 +41,7 @@
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
+[ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
 length = 0.001
@@ -626,6 +626,28 @@ script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
 metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
 
+[sub_resource type="Gradient" id="Gradient_1ejdq"]
+offsets = PackedFloat32Array(0, 0.12, 1)
+colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
+gradient = SubResource("Gradient_1ejdq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7war0"]
+resource_local_to_scene = true
+emission_shape = 3
+emission_box_extents = Vector3(0.12, 0.01, 0.08)
+direction = Vector3(0, 0.4, 1)
+spread = 35.0
+initial_velocity_min = 0.4
+initial_velocity_max = 0.9
+gravity = Vector3(0, 0.3, 0)
+damping_min = 1.5
+damping_max = 2.5
+scale_min = 0.79999995
+scale_max = 1.5999999
+color_ramp = SubResource("GradientTexture1D_fi5gb")
+
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "charm_socket_manager", "chaos", "potion", "inventory_ui", "camera") groups=["player"]]
 collision_layer = 2
 collision_mask = 5
@@ -804,15 +826,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
 player = NodePath("../..")
 heel_offset = 0.1
 
-[node name="HitEffect" type="Node3D" parent="Effects" node_paths=PackedStringArray("player", "sprite", "visual", "health")]
+[node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
+process_material = SubResource("ParticleProcessMaterial_7war0")
+
+[node name="HitEffect" type="Node3D" parent="Effects" unique_id=210042358 node_paths=PackedStringArray("player", "sprite", "visual", "health")]
 script = ExtResource("hit_feedback")
 player = NodePath("../..")
 sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
-
-[node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
 
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]

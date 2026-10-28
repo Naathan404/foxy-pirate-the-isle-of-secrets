@@ -101,12 +101,17 @@ func _update_cooldown(socket_id: int, runtime: CharmRuntime) -> void:
 
 
 func set_potion_icon(potion: Potion) -> void:
+	if _potion_tween != null and _potion_tween.is_valid():
+		_potion_tween.kill()
+	potion_icon.scale = _potion_rest_scale
+	potion_icon.modulate = Color.WHITE
 	potion_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	potion_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 	if potion == null:
 		potion_icon.texture = null
 		potion_icon.hide()
+		potion_quantity.hide()
 		return
 
 	potion_icon.texture = potion.icon

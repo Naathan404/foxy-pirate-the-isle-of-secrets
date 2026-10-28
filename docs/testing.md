@@ -15,6 +15,7 @@ python -m gdtoolkit.formatter --check core data gameplay test ui world
 
 CI chỉ bắt buộc lint; formatter là công cụ chỉnh định dạng ở máy cá nhân.
 Khi gọi formatter, dùng thêm `--line-length 100` để đồng nhất với giới hạn lint.
+Lint áp dụng cho code của dự án, không áp dụng cho thư viện trong `addons/`.
 
 Trên Windows, nếu dùng Python launcher với Python 3.15 đã cài, thay `python` bằng `py -3.15` trong các lệnh trên. CI dùng Python 3.12 qua `actions/setup-python`; không cần đổi CI sang phiên bản Python trên máy cá nhân.
 
@@ -31,7 +32,10 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 
 ## Kiểm thử Godot
 
-- `addons/` là thư mục công cụ cục bộ, không được commit. Không commit cấu hình bật plugin hoặc autoload trỏ vào thư mục này trong `project.godot` (ví dụ `godot_ai` và `_mcp_game_helper`); CI và bản clone mới phải chạy được khi không có addon cục bộ.
+- `addons/dialogic/` được commit cùng dự án, gồm cả file `.uid`, asset và cấu hình import. Dialogic được bật trong `project.godot`, autoload trỏ tới đường dẫn file để bản clone mới không phụ thuộc cache UID.
+- Các addon khác (ví dụ `godot_ai`) là công cụ cục bộ và vẫn bị Git bỏ qua. Không commit cấu hình bật plugin hay autoload của các công cụ này; CI phải chạy được khi không có chúng.
+- Plugin Godot AI tự thêm lại `_mcp_game_helper` trỏ tới `res://addons/godot_ai/runtime/game_helper.gd` khi bật plugin. Trước khi commit, nên bỏ dòng công cụ cục bộ này khỏi diff. CI cũng loại đúng dòng đó sau checkout, trước khi chạy Godot, để việc plugin ghi lại cấu hình không tiếp tục làm fail import.
+- Bước chuẩn bị trên chỉ bỏ autoload Godot AI có đúng tên và đường dẫn đã biết. Không bỏ các autoload khác, không tắt Dialogic và không lọc lỗi engine khỏi log. Thiếu script/resource gameplay vẫn làm CI fail như trước.
 - Chạy game hoặc scene liên quan đến thay đổi.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.

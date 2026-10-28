@@ -1,5 +1,7 @@
 Cấu trúc dự án
 
+Audio dùng chung: xem [AudioManager — ghi chú triển khai và cách gọi](audio_manager.md).
+
 foxy-pirate/
 │
 ├── project.godot

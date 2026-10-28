@@ -20,6 +20,8 @@ config/icon="res://icon.svg"
 HitstopController="*res://core/autoload/hitstop_controller.gd"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
 GameManager="*res://core/autoload/game_manager.gd"
+Dialogic="*res://addons/dialogic/Core/DialogicGameHandler.gd"
+AudioManager="*res://core/autoload/audio_manager.gd"
 
 [dialogic]
 
@@ -39,6 +41,10 @@ window/stretch/aspect="expand"
 [dotnet]
 
 project/assembly_name="foxy-pirate-the-isle-of-secret"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg")
 
 [input]
 

@@ -1,5 +1,7 @@
 extends WeaponAttack
 
+const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
+
 # Dao boomerang: bay thẳng khi ném, hết tầm hoặc gặp tường thì quay về người ném
 
 # Tốc độ bay đi và bay về
@@ -11,6 +13,12 @@ extends WeaponAttack
 @export var catch_distance: float = 0.5
 @export var height_offset: float = 0.9
 
+@export_group("Game Feel")
+@export_range(0.0, 0.3, 0.01) var launch_recoil: float = 0.14
+@export_range(0.0, 0.3, 0.01) var enemy_recoil: float = 0.18
+@export_range(0.0, 0.05, 0.001) var launch_hitstop: float = 0.022
+@export_range(0.0, 6.0, 0.1) var launch_shake: float = 1.8
+
 var max_distance: float = 10.0
 var flight_direction: Vector3
 # tính quãng đường lượt đi
@@ -21,6 +29,8 @@ var thrower: Node3D
 var age: float = 0.0
 
 @onready var hit_area: HitBox = $HitBox
+@onready var _vfx: Node3D = $ThrowVFX
+@onready var _blade: AnimatedSprite3D = $AnimatedSprite3D
 
 
 # windup
@@ -58,6 +68,8 @@ func activate() -> void:
 	hit_area.scale = Vector3.ONE * context.hitbox_multiplier
 
 	_begin_damage_pass()
+	_vfx.start(_blade)
+	_play_launch_feedback()
 	set_physics_process(true)
 
 
@@ -76,6 +88,7 @@ func _physics_process(delta: float) -> void:
 	age += delta
 	# Dọn dao nếu foxy dead hoặc dao tồn tại quá lâu
 	if not is_instance_valid(thrower) or age >= lifetime:
+		_vfx.finish()
 		queue_free()
 		return
 
@@ -83,6 +96,7 @@ func _physics_process(delta: float) -> void:
 		var target = thrower.global_position + Vector3.UP * height_offset
 		global_position = global_position.move_toward(target, return_speed * delta)
 		if global_position.distance_to(target) <= catch_distance:
+			_vfx.finish(true)
 			queue_free()
 	else:
 		# Giới hạn bước di chuyển để dao không bay quá tầm
@@ -96,6 +110,7 @@ func _physics_process(delta: float) -> void:
 		var hit := get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty():
 			global_position = hit.position
+			_vfx.impact(global_position)
 			_begin_return()
 			return
 		global_position = destination
@@ -109,6 +124,7 @@ func _begin_return() -> void:
 	if returning:
 		return
 	returning = true
+	_vfx.turn()
 	_begin_damage_pass()
 
 
@@ -123,6 +139,38 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 # Chuyển hit đã gây sát thương về context để controller xử lý chaos và hiệu ứng vũ khí
 func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: int) -> void:
 	context.damage_applied.emit(damage, target, applied_hp)
+	if applied_hp > 0:
+		var direction := flight_direction
+		if returning and is_instance_valid(thrower):
+			direction = (thrower.global_position - global_position).normalized()
+		var at := _blade.global_position
+		if (
+			is_instance_valid(target)
+			and target is EnemyBase
+			and is_instance_valid(target.visual)
+			and is_instance_valid(target.visual.sprite)
+		):
+			var sprite: Sprite3D = target.visual.sprite
+			var center := sprite.global_transform * sprite.get_aabb().get_center()
+			at = center + (at - center).limit_length(0.25)
+			_sprite_feedback(sprite).kick(direction, enemy_recoil, true)
+		_vfx.impact(at, direction)
+
+
+func _play_launch_feedback() -> void:
+	if context.actor is Player and is_instance_valid(context.actor.visual.sprite):
+		_sprite_feedback(context.actor.visual.sprite).kick(-flight_direction, launch_recoil)
+	get_node("/root/HitstopController").request(launch_hitstop)
+	get_node("/root/ScreenShakeController").request(launch_shake, 0.1)
+
+
+func _sprite_feedback(sprite: Sprite3D) -> Node:
+	var feedback := sprite.get_node_or_null("DaggerFeedback")
+	if feedback == null:
+		feedback = SPRITE_FEEDBACK.new()
+		feedback.name = "DaggerFeedback"
+		sprite.add_child(feedback)
+	return feedback
 
 
 # HitBox chạm môi trường thì yêu cầu quay về
