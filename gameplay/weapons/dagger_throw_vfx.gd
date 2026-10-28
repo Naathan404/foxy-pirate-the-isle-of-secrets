@@ -4,12 +4,16 @@ extends Node3D
 const ENERGY_SHADER: Shader = preload("res://gameplay/weapons/dagger_energy.gdshader")
 const POOL_SIZE: int = 8
 const SPARK_COUNT: int = 24
+const THROW_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_throw.wav")
+const HIT_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_hit.wav")
 
 @export var outbound_color: Color = Color(1.0, 0.52, 0.12)
 @export var return_color: Color = Color(0.25, 0.85, 1.0)
 @export_range(0.05, 0.5, 0.01) var trail_lifetime: float = 0.19
 @export_range(0.02, 0.5, 0.01) var trail_width: float = 0.19
 @export_range(0.05, 0.4, 0.01) var ghost_lifetime: float = 0.14
+@export_range(-40.0, 0.0, 1.0) var throw_volume_db: float = -9.0
+@export_range(-40.0, 0.0, 1.0) var hit_volume_db: float = -6.0
 
 var _source: AnimatedSprite3D
 var _flying: bool = false
@@ -21,6 +25,8 @@ var _ghost_clock: float = 0.0
 var _next_burst: int = 0
 var _next_ghost: int = 0
 var _next_spark: int = 0
+var _next_cut: int = 0
+var _next_voice: int = 0
 var _last_position: Vector3
 var _points: Array[Vector3] = []
 var _point_ages: Array[float] = []
@@ -36,6 +42,10 @@ var _ribbon_mesh := ImmediateMesh.new()
 var _ribbon_material: ShaderMaterial
 var _aura: MeshInstance3D
 var _glint: MeshInstance3D
+var _cuts: Array[MeshInstance3D] = []
+var _cut_ages: Array[float] = []
+var _cut_directions: Array[Vector3] = []
+var _voices: Array[AudioStreamPlayer3D] = []
 
 
 func _ready() -> void:
@@ -71,6 +81,19 @@ func _ready() -> void:
 		_sparks.append(spark)
 		_spark_ages.append(1.0)
 		_spark_velocities.append(Vector3.ZERO)
+	for index in 4:
+		var cut := _make_quad("ImpactCut%d" % index, 3)
+		cut.hide()
+		_cuts.append(cut)
+		_cut_ages.append(1.0)
+		_cut_directions.append(Vector3.RIGHT)
+		var voice := AudioStreamPlayer3D.new()
+		voice.name = "DaggerVoice%d" % index
+		# Foxy's camera is ~28 units above/behind combat, not at the actor's ears.
+		voice.unit_size = 32.0
+		voice.max_distance = 80.0
+		add_child(voice)
+		_voices.append(voice)
 	set_process(false)
 
 
@@ -85,6 +108,7 @@ func start(source: AnimatedSprite3D) -> void:
 	_aura.show()
 	_glint.show()
 	burst(_last_position, 1.7)
+	_play_sound(THROW_SOUND, _last_position, throw_volume_db)
 	set_process(true)
 
 
@@ -95,8 +119,19 @@ func turn() -> void:
 	burst(_last_position, 1.3)
 
 
-func impact(at: Vector3) -> void:
-	burst(at, 1.5)
+func impact(at: Vector3, direction: Vector3 = Vector3.RIGHT) -> void:
+	burst(at, 1.9)
+	var index := _next_cut
+	_next_cut = (_next_cut + 1) % _cuts.size()
+	_cut_ages[index] = 0.0
+	_cut_directions[index] = direction
+	_cuts[index].global_position = at
+	_cuts[index].show()
+	var material := _cuts[index].material_override as ShaderMaterial
+	material.set_shader_parameter("tint", Color(1.0, 0.93, 0.75))
+	material.set_shader_parameter("progress", 0.0)
+	material.set_shader_parameter("energy", 1.5)
+	_play_sound(HIT_SOUND, at, hit_volume_db)
 
 
 func finish(caught: bool = false) -> void:
@@ -154,6 +189,7 @@ func _process(delta: float) -> void:
 	_update_echoes(delta)
 	_update_bursts(delta)
 	_update_sparks(delta)
+	_update_cuts(delta)
 
 
 func _update_blade(delta: float) -> void:
@@ -276,6 +312,37 @@ func _update_sparks(delta: float) -> void:
 
 func _color() -> Color:
 	return return_color if _returning else outbound_color
+
+
+func _update_cuts(delta: float) -> void:
+	for index in _cuts.size():
+		_cut_ages[index] += delta
+		var progress := clampf(_cut_ages[index] / 0.16, 0.0, 1.0)
+		var cut := _cuts[index]
+		cut.visible = progress < 1.0
+		if not cut.visible:
+			continue
+		_face_camera(cut, 1.0)
+		var direction := _cut_directions[index]
+		var projected := Vector2(
+			direction.dot(cut.global_basis.x), direction.dot(cut.global_basis.y)
+		)
+		var angle := projected.angle() if projected.length_squared() > 0.001 else 0.0
+		cut.rotate_object_local(Vector3.BACK, angle + 0.45)
+		cut.scale *= Vector3(2.3 + progress * 0.5, 0.9, 1.0)
+		var material := cut.material_override as ShaderMaterial
+		material.set_shader_parameter("progress", progress)
+
+
+func _play_sound(stream: AudioStream, at: Vector3, volume: float) -> void:
+	var voice := _voices[_next_voice]
+	_next_voice = (_next_voice + 1) % _voices.size()
+	voice.stop()
+	voice.stream = stream
+	voice.global_position = at
+	voice.volume_db = volume
+	voice.pitch_scale = 0.96 + float(_next_voice) * 0.025
+	voice.play()
 
 
 func _make_material(shape: int) -> ShaderMaterial:

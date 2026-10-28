@@ -24,11 +24,16 @@ void fragment() {
 		float rays = exp(-cross_shape * 38.0) * pow(max(0.0, 1.0 - radius), 2.0);
 		float core = exp(-dot(p, p) * 70.0);
 		mask = rays + core;
-	} else {
+	} else if (shape == 2) {
 		// Ribbon UV.x runs from the fading tail to the bright blade.
 		float edge = pow(max(0.0, 1.0 - abs(p.y)), 1.7);
 		float filament = exp(-p.y * p.y * 95.0);
 		mask = (edge * 0.5 + filament * 0.65) * smoothstep(0.0, 0.22, UV.x);
+	} else {
+		// Directional cut: a hot thin blade and a shorter crossing fracture.
+		float cut = exp(-p.y * p.y * 250.0) * pow(max(0.0, 1.0 - abs(p.x)), 0.45);
+		float crossing = exp(-pow(p.y + p.x * 0.75, 2.0) * 180.0);
+		mask = cut + crossing * max(0.0, 1.0 - radius) * 0.65;
 	}
 	float fade = (1.0 - progress) * (1.0 - progress);
 	ALBEDO = mix(tint.rgb, vec3(1.0), clamp(mask - 0.6, 0.0, 0.65)) * energy;

@@ -1,5 +1,7 @@
 extends WeaponAttack
 
+const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
+
 # Dao boomerang: bay thẳng khi ném, hết tầm hoặc gặp tường thì quay về người ném
 
 # Tốc độ bay đi và bay về
@@ -10,6 +12,12 @@ extends WeaponAttack
 # Khoảng cách đủ gần để coi như người ném đã bắt được dao
 @export var catch_distance: float = 0.5
 @export var height_offset: float = 0.9
+
+@export_group("Game Feel")
+@export_range(0.0, 0.3, 0.01) var launch_recoil: float = 0.14
+@export_range(0.0, 0.3, 0.01) var enemy_recoil: float = 0.18
+@export_range(0.0, 0.05, 0.001) var launch_hitstop: float = 0.022
+@export_range(0.0, 6.0, 0.1) var launch_shake: float = 1.8
 
 var max_distance: float = 10.0
 var flight_direction: Vector3
@@ -61,6 +69,7 @@ func activate() -> void:
 
 	_begin_damage_pass()
 	_vfx.start(_blade)
+	_play_launch_feedback()
 	set_physics_process(true)
 
 
@@ -131,7 +140,37 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: int) -> void:
 	context.damage_applied.emit(damage, target, applied_hp)
 	if applied_hp > 0:
-		_vfx.impact(_blade.global_position)
+		var direction := flight_direction
+		if returning and is_instance_valid(thrower):
+			direction = (thrower.global_position - global_position).normalized()
+		var at := _blade.global_position
+		if (
+			is_instance_valid(target)
+			and target is EnemyBase
+			and is_instance_valid(target.visual)
+			and is_instance_valid(target.visual.sprite)
+		):
+			var sprite: Sprite3D = target.visual.sprite
+			var center := sprite.global_transform * sprite.get_aabb().get_center()
+			at = center + (at - center).limit_length(0.25)
+			_sprite_feedback(sprite).kick(direction, enemy_recoil, true)
+		_vfx.impact(at, direction)
+
+
+func _play_launch_feedback() -> void:
+	if context.actor is Player and is_instance_valid(context.actor.visual.sprite):
+		_sprite_feedback(context.actor.visual.sprite).kick(-flight_direction, launch_recoil)
+	get_node("/root/HitstopController").request(launch_hitstop)
+	get_node("/root/ScreenShakeController").request(launch_shake, 0.1)
+
+
+func _sprite_feedback(sprite: Sprite3D) -> Node:
+	var feedback := sprite.get_node_or_null("DaggerFeedback")
+	if feedback == null:
+		feedback = SPRITE_FEEDBACK.new()
+		feedback.name = "DaggerFeedback"
+		sprite.add_child(feedback)
+	return feedback
 
 
 # HitBox chạm môi trường thì yêu cầu quay về

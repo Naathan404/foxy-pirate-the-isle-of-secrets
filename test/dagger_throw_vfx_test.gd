@@ -23,6 +23,9 @@ func _run() -> void:
 	context.range_units = 4.0
 	dagger.context = context
 	var effect = dagger.get_node("ThrowVFX")
+	# Keep fade assertions independent of the scene's art tuning.
+	effect.trail_lifetime = 0.19
+	effect.ghost_lifetime = 0.14
 	_check(not effect.is_processing(), "No VFX before release")
 	dagger.activate()
 	dagger.set_physics_process(false)
