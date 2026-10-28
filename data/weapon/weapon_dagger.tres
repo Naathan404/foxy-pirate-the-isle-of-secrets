@@ -8,7 +8,6 @@
 [sub_resource type="Resource" id="Resource_nasaw"]
 script = ExtResource("1_nasaw")
 attack_scene = ExtResource("1_up41l")
-stamina_cost = 1.0
 metadata/_custom_type_script = "uid://bl3xskt8h6bl7"
 
 [sub_resource type="Resource" id="Resource_throw"]

@@ -21,6 +21,8 @@ var thrower: Node3D
 var age: float = 0.0
 
 @onready var hit_area: HitBox = $HitBox
+@onready var _vfx: Node3D = $ThrowVFX
+@onready var _blade: AnimatedSprite3D = $AnimatedSprite3D
 
 
 # windup
@@ -58,6 +60,7 @@ func activate() -> void:
 	hit_area.scale = Vector3.ONE * context.hitbox_multiplier
 
 	_begin_damage_pass()
+	_vfx.start(_blade)
 	set_physics_process(true)
 
 
@@ -76,6 +79,7 @@ func _physics_process(delta: float) -> void:
 	age += delta
 	# Dọn dao nếu foxy dead hoặc dao tồn tại quá lâu
 	if not is_instance_valid(thrower) or age >= lifetime:
+		_vfx.finish()
 		queue_free()
 		return
 
@@ -83,6 +87,7 @@ func _physics_process(delta: float) -> void:
 		var target = thrower.global_position + Vector3.UP * height_offset
 		global_position = global_position.move_toward(target, return_speed * delta)
 		if global_position.distance_to(target) <= catch_distance:
+			_vfx.finish(true)
 			queue_free()
 	else:
 		# Giới hạn bước di chuyển để dao không bay quá tầm
@@ -96,6 +101,7 @@ func _physics_process(delta: float) -> void:
 		var hit := get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty():
 			global_position = hit.position
+			_vfx.impact(global_position)
 			_begin_return()
 			return
 		global_position = destination
@@ -109,6 +115,7 @@ func _begin_return() -> void:
 	if returning:
 		return
 	returning = true
+	_vfx.turn()
 	_begin_damage_pass()
 
 
@@ -123,6 +130,8 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 # Chuyển hit đã gây sát thương về context để controller xử lý chaos và hiệu ứng vũ khí
 func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: int) -> void:
 	context.damage_applied.emit(damage, target, applied_hp)
+	if applied_hp > 0:
+		_vfx.impact(_blade.global_position)
 
 
 # HitBox chạm môi trường thì yêu cầu quay về

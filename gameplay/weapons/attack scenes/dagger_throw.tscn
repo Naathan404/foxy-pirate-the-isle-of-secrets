@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://s1if0mgji0hb" path="res://assets/sprites/weapons/dagger_spinning/Sword Spinning 04.png" id="4_8yxsm"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_5bjjf"]
 [ext_resource type="Script" uid="uid://bh8u8ifdhe86v" path="res://gameplay/combat/combat_feedback.gd" id="7_ogmxt"]
+[ext_resource type="Script" uid="uid://c61oe07pse2nr" path="res://gameplay/weapons/dagger_throw_vfx.gd" id="8_vfx"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jpyye"]
 animations = [{
@@ -32,6 +33,7 @@ animations = [{
 radius = 0.7984563
 
 [node name="DaggerThrow" type="Node3D" unique_id=313919360]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 0)
 script = ExtResource("1_throw")
 height_offset = 1.0
 persist_after_release = true
@@ -46,6 +48,14 @@ sprite_frames = SubResource("SpriteFrames_jpyye")
 animation = &"spinning"
 autoplay = "spinning"
 frame_progress = 0.7245511
+speed_scale = 1.8
+
+[node name="ThrowVFX" type="Node3D" parent="." unique_id=2143465647]
+transform = Transform3D(2.1205804, 0, 0, 0, 1, 0, 0, 0, 2.725653, 0, 0, 0)
+script = ExtResource("8_vfx")
+trail_lifetime = 0.35
+trail_width = 0.30000000000000004
+ghost_lifetime = 0.2
 
 [node name="HitBox" type="Area3D" parent="." unique_id=943275801 node_paths=PackedStringArray("actor")]
 collision_layer = 32
