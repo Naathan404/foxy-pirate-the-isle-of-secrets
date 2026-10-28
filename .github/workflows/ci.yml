@@ -34,6 +34,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Remove local Godot AI autoload
+        shell: bash
+        run: |
+          # The local editor plugin recreates this entry, but its addon is not shipped.
+          sed -i '\|^_mcp_game_helper="\*res://addons/godot_ai/runtime/game_helper\.gd"[[:space:]]*$|d' project.godot
       - uses: lihop/setup-godot@v3
         with:
           version: 4.7.2-stable
