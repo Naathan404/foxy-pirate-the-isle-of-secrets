@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dtufe6c6gwjt6" path="res://assets/sprites/foxy/foxy_hat_sprite_sheet.png" id="1_0rjvg"]
 [ext_resource type="Script" uid="uid://digp88v0glq0y" path="res://gameplay/player/player.gd" id="1_rvh5s"]
+[ext_resource type="Script" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="2_6gmdq"]
 [ext_resource type="Resource" uid="uid://dtb5nvjw0g12a" path="res://data/foxy/foxy_data.tres" id="2_av71s"]
 [ext_resource type="Script" uid="uid://451g8wjqjdtv" path="res://gameplay/player/states/player_idle.gd" id="2_lmpvk"]
@@ -803,8 +804,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
 player = NodePath("../..")
 heel_offset = 0.1
 
+[node name="HitEffect" type="Node3D" parent="Effects" node_paths=PackedStringArray("player", "sprite", "visual", "health")]
+script = ExtResource("hit_feedback")
+player = NodePath("../..")
+sprite = NodePath("../../Visual/Sprite3D")
+visual = NodePath("../../Visual")
+health = NodePath("../../HealthComponent")
+
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.0216887, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
 
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]

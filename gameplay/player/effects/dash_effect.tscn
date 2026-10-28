@@ -55,9 +55,9 @@ size = Vector2(0.36, 0.36)
 
 [node name="DashEffect" type="Node3D" unique_id=292962664 node_paths=PackedStringArray("ghosts")]
 script = ExtResource("1_68m4i")
-ghost_interval = 0.025
-ghost_lifetime = 0.24
 ghosts = [NodePath("Ghost_1"), NodePath("Ghost_2"), NodePath("Ghost_3"), NodePath("Ghost_4"), NodePath("Ghost_5"), NodePath("Ghost_6"), NodePath("Ghost_7"), NodePath("Ghost_8")]
+stretch_amount = 1.2
+ring_radius = 1.1
 
 [node name="DashParticle" type="GPUParticles3D" parent="." unique_id=555628705]
 transform = Transform3D(0.4, 0, 0, 0, 0.5, 0, 0, 0, 0.2, 0, 0.047587156, -0.50126785)
@@ -99,18 +99,18 @@ pixel_size = 0.0625
 billboard = 2
 texture_filter = 0
 
-[node name="Ghost_5" type="Sprite3D" parent="."]
+[node name="Ghost_5" type="Sprite3D" parent="." unique_id=1662031144]
 billboard = 2
 texture_filter = 0
 
-[node name="Ghost_6" type="Sprite3D" parent="."]
+[node name="Ghost_6" type="Sprite3D" parent="." unique_id=98014485]
 billboard = 2
 texture_filter = 0
 
-[node name="Ghost_7" type="Sprite3D" parent="."]
+[node name="Ghost_7" type="Sprite3D" parent="." unique_id=677470128]
 billboard = 2
 texture_filter = 0
 
-[node name="Ghost_8" type="Sprite3D" parent="."]
+[node name="Ghost_8" type="Sprite3D" parent="." unique_id=1855964865]
 billboard = 2
 texture_filter = 0

@@ -465,4 +465,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.615982, 8.90625, 34.43802
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.072242, 2.81216, -1.5924034)
 
 [node name="Crate" parent="." unique_id=70792245 instance=ExtResource("18_dxx27")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0216036, 3.5196247, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.285956, 1.9911819, 5.825096)
