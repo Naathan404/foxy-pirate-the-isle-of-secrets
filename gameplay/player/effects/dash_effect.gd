@@ -113,7 +113,7 @@ func _show_next_ghost() -> void:
 		return
 
 	var old_tween = _ghost_tweens[index]
-	if old_tween != null:
+	if old_tween != null and old_tween.is_valid():
 		old_tween.kill()
 
 	g.texture = sprite.texture
@@ -186,7 +186,9 @@ func _stretch_sprite() -> void:
 	var camera := get_viewport().get_camera_3d()
 	var right := camera.global_basis.x if camera != null else Vector3.RIGHT
 	var horizontal: bool = absf(player.last_facing_direction.dot(right.normalized())) > 0.7
-	var factor := Vector3(stretch_amount, 0.9, 1.0) if horizontal else Vector3(0.92, 1.1, 1.0)
+	var factor := (
+		Vector3(stretch_amount, 0.9, 1.0) if horizontal else Vector3(0.92, stretch_amount, 1.0)
+	)
 	_sprite_tween = create_tween()
 	_sprite_tween.tween_property(sprite, "scale", _sprite_rest_scale * factor, 0.045)
 

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bk7dgqdctlcjk"]
+
+[ext_resource type="ArrayMesh" uid="uid://bexospshh5y5a" path="res://assets/models/kenney_platformer_kit/crate.glb" id="1_m5qxr"]
+
+[node name="Crate" type="Node3D" unique_id=70792245]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1816953028]
+mesh = ExtResource("1_m5qxr")
