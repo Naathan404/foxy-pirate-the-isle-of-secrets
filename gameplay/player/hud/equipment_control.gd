@@ -108,7 +108,7 @@ func set_potion_icon(potion: Potion) -> void:
 		potion_icon.texture = null
 		potion_icon.hide()
 		return
-	
+
 	potion_icon.texture = potion.icon
 	potion_icon.show()
 
@@ -130,10 +130,16 @@ func feedback_potion_used() -> void:
 	potion_icon.scale = _potion_rest_scale
 
 	_potion_tween = create_tween()
-	_potion_tween.tween_property(
-		potion_icon, "scale", _potion_rest_scale * 1.2, 0.08
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	(
+		_potion_tween
+		. tween_property(potion_icon, "scale", _potion_rest_scale * 1.2, 0.08)
+		. set_trans(Tween.TRANS_BACK)
+		. set_ease(Tween.EASE_OUT)
+	)
 
-	_potion_tween.tween_property(
-		potion_icon, "scale", _potion_rest_scale, 0.16
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	(
+		_potion_tween
+		. tween_property(potion_icon, "scale", _potion_rest_scale, 0.16)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_OUT)
+	)

@@ -262,10 +262,10 @@ func _exit_tree() -> void:
 func _on_equip_potion_button_pressed() -> void:
 	if potion_component == null:
 		return
-	
+
 	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
 	if slot == null or slot.is_empty() or slot.item is not Potion:
 		return
-	
+
 	if potion_component.equip_potion(slot.item as Potion):
 		print("đã trang bị ", slot.item.display_name)

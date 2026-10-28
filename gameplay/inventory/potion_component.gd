@@ -1,4 +1,4 @@
-class_name  PotionComponent
+class_name PotionComponent
 extends Node
 
 signal equipped_potion_changed(potion: Potion)
@@ -20,9 +20,9 @@ func equip_potion(potion: Potion) -> bool:
 
 	if not inventory.has_item(potion.item_id):
 		return false
-	
+
 	equipped_potion = potion
-	
+
 	equipped_potion_changed.emit(potion)
 
 	return true
@@ -47,11 +47,12 @@ func use_equipped_potion() -> bool:
 			return false
 		var used_potion = equipped_potion as HealingPotion
 		var healed: int = health.heal(used_potion.heal_amount)
-		if healed <= 0: 
+		if healed <= 0:
 			return false
-	
+
 		inventory.remove_item(used_potion.item_id, 1)
-	
-	potion_used.emit()
-	
-	return true
+
+		potion_used.emit()
+		return true
+
+	return false

@@ -37,15 +37,13 @@ jobs:
           version: ${{ env.GODOT_VERSION }}
 
       - name: Import and validate project
-        run: godot --headless --path . --import
+        run: python3 .github/scripts/godot_check.py import
+
+      - name: Test CI error detection
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
       - name: Smoke test game startup
-        run: |
-          if grep -Eq '^run/main_scene[[:space:]]*=[[:space:]]*"[^"[:space:]]+"' project.godot; then
-            godot --headless --path . --quit-after 10
-          else
-            echo "::notice::Smoke test skipped: project.godot has no main scene yet."
-          fi
+        run: python3 .github/scripts/godot_check.py smoke
 
   tests:
     name: Run Godot Tests
@@ -62,33 +60,10 @@ jobs:
           version: ${{ env.GODOT_VERSION }}
 
       - name: Import project
-        run: godot --headless --path . --import
+        run: python3 .github/scripts/godot_check.py import
 
       - name: Run standalone tests
-        run: |
-          mapfile -d '' test_files < <(find test -type f -name '*_test.gd' -print0 | sort -z)
-          if [ ${#test_files[@]} -eq 0 ]; then
-            echo "::notice::Tests skipped: no test/**/*_test.gd files found."
-            exit 0
-          fi
-
-          status=0
-          for test_file in "${test_files[@]}"; do
-            echo "::group::${test_file}"
-            test_log=$(mktemp)
-            if ! timeout --kill-after=5s 60s godot --headless --path . --script "$test_file" > "$test_log" 2>&1; then
-              echo "::error::Test failed or timed out: ${test_file}"
-              status=1
-            fi
-            cat "$test_log"
-            if grep -Eq 'SCRIPT ERROR:|ERROR:' "$test_log"; then
-              echo "::error::Godot reported errors in ${test_file}"
-              status=1
-            fi
-            rm -f "$test_log"
-            echo "::endgroup::"
-          done
-          exit "$status"
+        run: python3 .github/scripts/godot_check.py tests
 
   lint:
     name: Lint GDScript
@@ -120,3 +95,7 @@ jobs:
       - name: Lint GDScript
         if: steps.scripts.outputs.found == 'true'
         run: git ls-files -z -- '*.gd' | xargs -0 -r python -m gdtoolkit.linter
+
+      - name: Check GDScript formatting
+        if: steps.scripts.outputs.found == 'true'
+        run: git ls-files -z -- '*.gd' | xargs -0 -r python -m gdtoolkit.formatter --check --line-length 100

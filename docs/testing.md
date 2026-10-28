@@ -13,6 +13,9 @@ python -m gdtoolkit.linter core data gameplay test ui world
 python -m gdtoolkit.formatter --check core data gameplay test ui world
 ~~~
 
+CI cũng kiểm tra formatter với giới hạn 100 ký tự mỗi dòng. Khi gọi formatter
+trực tiếp, dùng thêm `--line-length 100` để đồng nhất với workflow.
+
 Trên Windows, nếu dùng Python launcher với Python 3.15 đã cài, thay `python` bằng `py -3.15` trong các lệnh trên. CI dùng Python 3.12 qua `actions/setup-python`; không cần đổi CI sang phiên bản Python trên máy cá nhân.
 
 Để sửa định dạng, bỏ `--check` và chỉ chạy trên file hoặc thư mục thuộc task:
@@ -35,6 +38,17 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 - Mỗi test có giới hạn 60 giây. CI báo thất bại khi Godot trả mã lỗi hoặc log có lỗi script/engine.
 - CI import project, chạy test độc lập và smoke test khi có main scene. Bước chưa có nội dung để chạy sẽ báo bỏ qua.
 - Ghi cách chạy và kết quả trong PR; thêm ảnh hoặc video nếu thay đổi UI/gameplay.
+
+Các bước Godot trong CI dùng chung `.github/scripts/godot_check.py`: thất bại
+khi engine trả mã khác 0, log có `SCRIPT ERROR:` / `ERROR:`, hoặc vượt timeout.
+Import có giới hạn 300 giây; mỗi test và smoke test có giới hạn 60 giây.
+Có thể chạy cùng kiểm tra ở máy cá nhân:
+
+~~~powershell
+python .github/scripts/godot_check.py import --godot 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe'
+python .github/scripts/godot_check.py tests --godot 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe'
+python .github/scripts/godot_check.py smoke --godot 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe'
+~~~
 
 ### Chaos và dagger boomerang
 

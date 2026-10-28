@@ -15,7 +15,7 @@ signal dash_started
 @export var ammo: AmmoComponent
 @export var charm_socket_manager: CharmSocketManager
 @export var chaos: ChaosComponent
-@export var potion:	PotionComponent
+@export var potion: PotionComponent
 @export var inventory_ui: InventoryUI
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D

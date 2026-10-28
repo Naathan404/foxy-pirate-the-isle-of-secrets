@@ -3,11 +3,7 @@ extends Area3D
 
 signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
 signal damage_prepared(damage: DamageContext, target: Node)
-signal hit_confirmed(
-	damage: DamageContext,
-	target: Node,
-	applied_hp: int
-)
+signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: int)
 
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
