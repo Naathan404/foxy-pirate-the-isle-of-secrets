@@ -1,9 +1,11 @@
 """Run the same strict Godot checks locally and in GitHub Actions."""
 
 import argparse
+import errno
 from pathlib import Path
 import re
 import subprocess
+import sys
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -15,8 +17,7 @@ def run_godot(engine, project, arguments, label, timeout):
     print(f"::group::{label}", flush=True)
     command = [engine, "--headless", "--path", str(project), *arguments]
     try:
-        result = subprocess.run(
-            command,
+        run_options = dict(
             cwd=project,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -26,6 +27,15 @@ def run_godot(engine, project, arguments, label, timeout):
             timeout=timeout,
             check=False,
         )
+        try:
+            result = subprocess.run(command, **run_options)
+        except OSError as error:
+            # setup-godot's Linux launcher can be a script without a shebang.
+            # Bash accepts it; direct subprocess execution raises ENOEXEC.
+            if error.errno != errno.ENOEXEC or not sys.platform.startswith("linux"):
+                raise
+            print("::notice::Retrying Godot launcher through Bash (ENOEXEC).", flush=True)
+            result = subprocess.run(["bash", *command], **run_options)
         output = result.stdout or ""
         print(output, end="" if output.endswith("\n") else "\n", flush=True)
         passed = result.returncode == 0 and not GODOT_ERROR.search(
