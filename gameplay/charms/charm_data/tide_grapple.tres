@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://cdmevnqdpo77o"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/tide_grapple_effect.tscn" id="2_effect"]
 
 [resource]
@@ -13,11 +13,11 @@ effect_scene = ExtResource("2_effect")
 resource_cost = 150.0
 cooldown_seconds = 5.0
 acquisition_source = &"fixed_boss_reward"
-tags = [&"active", &"grapple", &"boss_reward"]
+tags = Array[StringName]([&"active", &"grapple", &"boss_reward"])
 effect_params = {
 "damage_multiplier": 2.5,
-"range_units": 4.0,
-"pull_stop_distance": 1.0,
 "pull_speed_units_per_second": 16.0,
+"pull_stop_distance": 1.0,
+"range_units": 4.0,
 "stun_seconds": 1.0
 }
