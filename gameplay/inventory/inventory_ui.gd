@@ -12,6 +12,11 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot
 @export_range(0.05, 0.5, 0.01) var open_duration: float = 0.18
 @export_range(0.05, 0.5, 0.01) var close_duration: float = 0.12
 
+@export var equip_button_texture: Texture
+@export var equip_button_pressed_texture: Texture
+@export var unequip_button_texture: Texture
+@export var unequip_button_pressed_texture: Texture
+
 var blue_button = preload("res://assets/ui/player_hud/inventory/blue_button.png")
 var disable_blue_button = preload("res://assets/ui/player_hud/inventory/disable_blue_button.png")
 var white_button = preload("res://assets/ui/player_hud/inventory/white_button.png")

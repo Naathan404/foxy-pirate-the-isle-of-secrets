@@ -71,4 +71,3 @@ func _sync_stats() -> void:
 func _on_hp_changed(current: int, maximum: int) -> void:
 	health_arc.set_stat(current, maximum)
 	portrait.set_health(current, maximum)
- 

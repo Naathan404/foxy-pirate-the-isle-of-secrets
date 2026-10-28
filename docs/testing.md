@@ -34,6 +34,7 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 
 - `addons/dialogic/` được commit cùng dự án, gồm cả file `.uid`, asset và cấu hình import. Dialogic được bật trong `project.godot`, autoload trỏ tới đường dẫn file để bản clone mới không phụ thuộc cache UID.
 - Các addon khác (ví dụ `godot_ai`) là công cụ cục bộ và vẫn bị Git bỏ qua. Không commit cấu hình bật plugin hay autoload của các công cụ này; CI phải chạy được khi không có chúng.
+- Plugin Godot AI có thể tự thêm lại `_mcp_game_helper` vào `project.godot` khi bật plugin. Trước khi commit, kiểm tra diff và bỏ dòng autoload này; không bỏ qua lỗi import trong CI để che tham chiếu tới file không có trên repo. Dialogic vẫn được commit và bật bình thường.
 - Chạy game hoặc scene liên quan đến thay đổi.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.
