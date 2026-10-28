@@ -8,8 +8,10 @@
 [ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="5_h7xhg"]
 [ext_resource type="Texture2D" uid="uid://cd8adeiyriaix" path="res://assets/ui/player_hud/inventory/material_icon.png" id="5_hmekt"]
 [ext_resource type="Texture2D" uid="uid://fyw552ym81mv" path="res://assets/ui/player_hud/inventory/blue_button.png" id="5_ymaop"]
+[ext_resource type="Texture2D" uid="uid://bt4fkmaxsc7ee" path="res://assets/ui/player_hud/inventory/equip_button.png" id="6_bba17"]
 [ext_resource type="Texture2D" uid="uid://ccgws552lcxup" path="res://assets/ui/player_hud/inventory/white_button.png" id="6_xuoha"]
 [ext_resource type="Texture2D" uid="uid://cw6xrdoynyk1v" path="res://assets/ui/player_hud/inventory/equipment_icon.png" id="7_6drgk"]
+[ext_resource type="Texture2D" uid="uid://bk3yobpmcd77a" path="res://assets/ui/player_hud/inventory/equip_button_press.png" id="7_21gur"]
 [ext_resource type="Texture2D" uid="uid://b5ttbxlcdv1uc" path="res://assets/ui/player_hud/inventory/notes_icon.png" id="9_h7xhg"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n0v5f"]
@@ -197,6 +199,15 @@ theme_override_font_sizes/font_size = 20
 text = "Item description"
 autowrap_mode = 3
 
+[node name="EquipPotionButton" type="TextureButton" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=2009356972]
+texture_filter = 1
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.3
+texture_normal = ExtResource("6_bba17")
+texture_pressed = ExtResource("7_21gur")
+stretch_mode = 5
+
 [node name="Equipment" type="Control" parent="PanelContainer/MarginContainer/Tabs" unique_id=1842808014]
 visible = false
 layout_mode = 2
@@ -270,6 +281,7 @@ offset_bottom = 52.0
 texture = ExtResource("9_h7xhg")
 stretch_mode = 5
 
+[connection signal="pressed" from="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/EquipPotionButton" to="." method="_on_equip_potion_button_pressed"]
 [connection signal="pressed" from="TabButtons/MaterialButton" to="." method="_on_material_button_pressed"]
 [connection signal="pressed" from="TabButtons/EquipmentButton" to="." method="_on_equipment_button_pressed"]
 [connection signal="pressed" from="TabButtons/NotesButton" to="." method="_on_notes_button_pressed"]

@@ -6,6 +6,7 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot
 # túi dữ liệu
 @export var inventory: Inventory
 @export var toggle_action: StringName = &"inventory"
+@export var potion_component: PotionComponent
 
 @export_group("Interaction Feedback")
 @export_range(0.05, 0.5, 0.01) var open_duration: float = 0.18
@@ -42,6 +43,7 @@ var _book_scale: Vector2
 @onready var info_layout: VBoxContainer = tabs.get_node(
 	"Material/Content/ItemInfo/MarginContainer/VBoxContainer"
 )
+@onready var equip_potion_button: TextureButton = info_layout.get_node("EquipPotionButton")
 @onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
 @onready var item_name: Label = info_layout.get_node("ItemName")
 @onready var item_type: Label = info_layout.get_node("ItemType")
@@ -121,6 +123,7 @@ func _refresh_item_info() -> void:
 		item_type.text = ""
 		item_description.text = ""
 		item_quantity.text = ""
+		equip_potion_button.hide()
 		return
 
 	item_icon.texture = slot.item.icon
@@ -128,6 +131,7 @@ func _refresh_item_info() -> void:
 	item_type.text = GlobalConstants.ItemType.keys()[slot.item.type]
 	item_description.text = slot.item.description
 	item_quantity.text = "%d/%d" % [slot.quantity, slot.item.max_stack]
+	equip_potion_button.visible = slot.item is Potion
 
 
 func _on_material_button_pressed() -> void:
@@ -253,3 +257,15 @@ func _exit_tree() -> void:
 	if _is_open:
 		Input.mouse_mode = _previous_mouse_mode
 		get_node("/root/GameManager").exit_inventory()
+
+
+func _on_equip_potion_button_pressed() -> void:
+	if potion_component == null:
+		return
+	
+	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
+	if slot == null or slot.is_empty() or slot.item is not Potion:
+		return
+	
+	if potion_component.equip_potion(slot.item as Potion):
+		print("đã trang bị ", slot.item.display_name)

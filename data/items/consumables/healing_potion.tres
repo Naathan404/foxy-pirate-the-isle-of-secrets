@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://c7pbeev7mghjm"]
+[gd_resource type="Resource" script_class="HealingPotion" format=3 uid="uid://c7pbeev7mghjm"]
 
 [ext_resource type="Texture2D" uid="uid://cnpjgqqnym7p4" path="res://assets/sprites/items/healing_potion.png" id="1_2wega"]
-[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_8gv4y"]
+[ext_resource type="Script" uid="uid://qonqlr0vwppf" path="res://data/items/consumables/healing_potion.gd" id="2_2wega"]
 
 [resource]
-script = ExtResource("1_8gv4y")
+script = ExtResource("2_2wega")
 item_id = "healing_potion"
 display_name = "Healing Potion"
 icon = ExtResource("1_2wega")
-description = "Heal 5HP."
-type = 2
+description = "Heals 5HP."
+type = 1
 metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

@@ -26,8 +26,8 @@ angle_min = -180.0
 angle_max = 180.0
 direction = Vector3(0, 0.14834046, 0.98893636)
 spread = 38.0
-initial_velocity_min = 0.6
-initial_velocity_max = 1.6
+initial_velocity_min = 1.2
+initial_velocity_max = 2.6
 angular_velocity_min = -65.0
 angular_velocity_max = 65.0
 gravity = Vector3(0, 0.35, 0)
@@ -55,9 +55,9 @@ size = Vector2(0.36, 0.36)
 
 [node name="DashEffect" type="Node3D" unique_id=292962664 node_paths=PackedStringArray("ghosts")]
 script = ExtResource("1_68m4i")
-ghost_interval = 0.05
-ghost_lifetime = 0.2
-ghosts = [NodePath("Ghost_1"), NodePath("Ghost_2"), NodePath("Ghost_3"), NodePath("Ghost_4")]
+ghost_interval = 0.025
+ghost_lifetime = 0.24
+ghosts = [NodePath("Ghost_1"), NodePath("Ghost_2"), NodePath("Ghost_3"), NodePath("Ghost_4"), NodePath("Ghost_5"), NodePath("Ghost_6"), NodePath("Ghost_7"), NodePath("Ghost_8")]
 
 [node name="DashParticle" type="GPUParticles3D" parent="." unique_id=555628705]
 transform = Transform3D(0.4, 0, 0, 0, 0.5, 0, 0, 0, 0.2, 0, 0.047587156, -0.50126785)
@@ -96,5 +96,21 @@ texture_filter = 0
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
+billboard = 2
+texture_filter = 0
+
+[node name="Ghost_5" type="Sprite3D" parent="."]
+billboard = 2
+texture_filter = 0
+
+[node name="Ghost_6" type="Sprite3D" parent="."]
+billboard = 2
+texture_filter = 0
+
+[node name="Ghost_7" type="Sprite3D" parent="."]
+billboard = 2
+texture_filter = 0
+
+[node name="Ghost_8" type="Sprite3D" parent="."]
 billboard = 2
 texture_filter = 0

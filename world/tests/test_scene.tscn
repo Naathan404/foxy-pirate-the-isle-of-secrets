@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="14_fkh54"]
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="15_v6ch8"]
 [ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="16_dxx27"]
+[ext_resource type="PackedScene" uid="uid://bqt066tkjp3c1" path="res://gameplay/inventory/item_pickup.tscn" id="17_v6ch8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -458,3 +459,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.04325, -1.09375, -31.6220
 
 [node name="Starfish5" parent="." unique_id=102239392 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.615982, 8.90625, 34.438026)
+
+[node name="ItemPickup" parent="." unique_id=1605440793 instance=ExtResource("17_v6ch8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.072242, 2.81216, -1.5924034)
