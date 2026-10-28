@@ -26,7 +26,6 @@ var _next_burst: int = 0
 var _next_ghost: int = 0
 var _next_spark: int = 0
 var _next_cut: int = 0
-var _next_voice: int = 0
 var _last_position: Vector3
 var _points: Array[Vector3] = []
 var _point_ages: Array[float] = []
@@ -45,7 +44,6 @@ var _glint: MeshInstance3D
 var _cuts: Array[MeshInstance3D] = []
 var _cut_ages: Array[float] = []
 var _cut_directions: Array[Vector3] = []
-var _voices: Array[AudioStreamPlayer3D] = []
 
 
 func _ready() -> void:
@@ -87,13 +85,6 @@ func _ready() -> void:
 		_cuts.append(cut)
 		_cut_ages.append(1.0)
 		_cut_directions.append(Vector3.RIGHT)
-		var voice := AudioStreamPlayer3D.new()
-		voice.name = "DaggerVoice%d" % index
-		# Foxy's camera is ~28 units above/behind combat, not at the actor's ears.
-		voice.unit_size = 32.0
-		voice.max_distance = 80.0
-		add_child(voice)
-		_voices.append(voice)
 	set_process(false)
 
 
@@ -335,14 +326,7 @@ func _update_cuts(delta: float) -> void:
 
 
 func _play_sound(stream: AudioStream, at: Vector3, volume: float) -> void:
-	var voice := _voices[_next_voice]
-	_next_voice = (_next_voice + 1) % _voices.size()
-	voice.stop()
-	voice.stream = stream
-	voice.global_position = at
-	voice.volume_db = volume
-	voice.pitch_scale = 0.96 + float(_next_voice) * 0.025
-	voice.play()
+	get_node("/root/AudioManager").play_sfx_3d(stream, at, volume, randf_range(0.96, 1.035))
 
 
 func _make_material(shape: int) -> ShaderMaterial:

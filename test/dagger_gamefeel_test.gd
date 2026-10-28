@@ -8,6 +8,8 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	var audio := root.get_node("AudioManager")
+	audio.stop_all_sfx()
 	var world := Node3D.new()
 	root.add_child(world)
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
@@ -40,10 +42,11 @@ func _run() -> void:
 	_check(player.visual.sprite.position.x < player_sprite_position.x, "Release recoils sprite")
 	_check(player.global_position == player_position, "Release keeps Player body position")
 	_check(Engine.time_scale < 1.0, "Release requests a short hitstop")
-	_check(effect._voices[0].stream == effect.THROW_SOUND, "Release plays whoosh")
+	var throw_voice: AudioStreamPlayer3D = audio._spatial_pool[0]
+	_check(throw_voice.stream == effect.THROW_SOUND, "Release plays whoosh through AudioManager")
 	_check(
 		(
-			effect._voices[0].max_distance
+			throw_voice.max_distance
 			> player.camera.global_position.distance_to(player.global_position)
 		),
 		"Combat audio reaches the elevated gameplay camera"
@@ -97,7 +100,8 @@ func _run() -> void:
 	_check(enemy.visual.sprite.material_overlay == previous_overlay, "Existing overlay restored")
 	dagger.free()
 	effect._process(0.5)
-	_check(effect.is_queued_for_deletion(), "Audio and impact pool clean up with VFX")
+	_check(effect.is_queued_for_deletion(), "Impact pool cleans up independently of shared audio")
+	audio.stop_all_sfx()
 	root.get_node("HitstopController").cancel()
 	root.get_node("ScreenShakeController").cancel()
 	world.free()
