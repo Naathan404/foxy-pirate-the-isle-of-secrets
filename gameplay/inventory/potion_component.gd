@@ -28,6 +28,18 @@ func equip_potion(potion: Potion) -> bool:
 	return true
 
 
+func is_equipped(potion: Potion) -> bool:
+	return potion != null and equipped_potion != null and equipped_potion.item_id == potion.item_id
+
+
+func unequip_potion() -> bool:
+	if equipped_potion == null:
+		return false
+	equipped_potion = null
+	equipped_potion_changed.emit(null)
+	return true
+
+
 func get_equipped_quantity() -> int:
 	if equipped_potion == null or inventory == null:
 		return 0

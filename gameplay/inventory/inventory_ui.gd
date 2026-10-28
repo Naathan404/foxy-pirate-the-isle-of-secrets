@@ -12,6 +12,7 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot
 @export_range(0.05, 0.5, 0.01) var open_duration: float = 0.18
 @export_range(0.05, 0.5, 0.01) var close_duration: float = 0.12
 
+@export_group("Button textures")
 @export var equip_button_texture: Texture
 @export var equip_button_pressed_texture: Texture
 @export var unequip_button_texture: Texture
@@ -75,6 +76,8 @@ func _ready() -> void:
 		slot_ui.refresh(inventory.slots[index])
 
 	inventory.changed.connect(refresh)
+	if is_instance_valid(potion_component):
+		potion_component.equipped_potion_changed.connect(_on_equipped_potion_changed)
 	_select_tab(0)
 	_refresh_item_info()
 
@@ -136,7 +139,22 @@ func _refresh_item_info() -> void:
 	item_type.text = GlobalConstants.ItemType.keys()[slot.item.type]
 	item_description.text = slot.item.description
 	item_quantity.text = "%d/%d" % [slot.quantity, slot.item.max_stack]
-	equip_potion_button.visible = slot.item is Potion
+
+	equip_potion_button.visible = slot.item is Potion and is_instance_valid(potion_component)
+	if not equip_potion_button.visible:
+		return
+	var equipped = potion_component.is_equipped(slot.item as Potion)
+	equip_potion_button.texture_normal = (
+		unequip_button_texture if equipped else equip_button_texture
+	)
+	equip_potion_button.texture_pressed = (
+		unequip_button_pressed_texture if equipped else equip_button_pressed_texture
+	)
+	equip_potion_button.tooltip_text = "Tháo bình thuốc" if equipped else "Trang bị bình thuốc"
+
+
+func _on_equipped_potion_changed(_potion: Potion) -> void:
+	_refresh_item_info()
 
 
 func _on_material_button_pressed() -> void:
@@ -272,5 +290,8 @@ func _on_equip_potion_button_pressed() -> void:
 	if slot == null or slot.is_empty() or slot.item is not Potion:
 		return
 
-	if potion_component.equip_potion(slot.item as Potion):
-		print("đã trang bị ", slot.item.display_name)
+	var potion := slot.item as Potion
+	if potion_component.is_equipped(potion):
+		potion_component.unequip_potion()
+	else:
+		potion_component.equip_potion(potion)
