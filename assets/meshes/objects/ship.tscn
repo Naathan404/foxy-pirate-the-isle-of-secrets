@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://b26odf3io451h"]
+
+[ext_resource type="ArrayMesh" uid="uid://b8rt8r3svvjpf" path="res://assets/models/coral valley/Pirates-ship/MeowgaByte.glb" id="1_roxik"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1h7xg"]
+size = Vector3(6, 12, 17)
+
+[node name="Ship" type="Node3D" unique_id=552352239]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=175482460]
+mesh = ExtResource("1_roxik")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D" unique_id=426024111]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D" unique_id=1014843596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+shape = SubResource("BoxShape3D_1h7xg")

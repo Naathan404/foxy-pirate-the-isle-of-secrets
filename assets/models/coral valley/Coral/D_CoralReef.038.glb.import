@@ -1,15 +1,15 @@
 [remap]
 
-importer="scene"
+importer="ArrayMesh"
 importer_version=1
-type="PackedScene"
+type="ArrayMesh"
 uid="uid://drep3gkfq13u5"
-path="res://.godot/imported/D_CoralReef.038.glb-84f8364903eb39d48e899ad153590dee.scn"
+path="res://.godot/imported/D_CoralReef.038.glb-84f8364903eb39d48e899ad153590dee.res"
 
 [deps]
 
 source_file="res://assets/models/coral valley/Coral/D_CoralReef.038.glb"
-dest_files=["res://.godot/imported/D_CoralReef.038.glb-84f8364903eb39d48e899ad153590dee.scn"]
+dest_files=["res://.godot/imported/D_CoralReef.038.glb-84f8364903eb39d48e899ad153590dee.res"]
 
 [params]
 
