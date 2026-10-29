@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bus07n2xlkxvt"
-path="res://.godot/imported/charm_socket_q.png-dd092a82cfe79c943985de75931c4aca.ctex"
+uid="uid://cy5vjf8vjy5cr"
+path="res://.godot/imported/tide_low_waring.png-432e3b2108e931c0ea6db3f6369def99.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/charrm_ui/charm_socket_q.png"
-dest_files=["res://.godot/imported/charm_socket_q.png-dd092a82cfe79c943985de75931c4aca.ctex"]
+source_file="res://assets/ui/player_hud/tide_low_waring.png"
+dest_files=["res://.godot/imported/tide_low_waring.png-432e3b2108e931c0ea6db3f6369def99.ctex"]
 
 [params]
 

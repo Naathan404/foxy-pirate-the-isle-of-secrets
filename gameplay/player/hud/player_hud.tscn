@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://4ok8iolg8l8g" path="res://gameplay/player/hud/bar_fill_effect.gd" id="8_fill_effect"]
 [ext_resource type="Texture2D" uid="uid://baohqkvbgpkt1" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
 [ext_resource type="Texture2D" uid="uid://c7dcqvh327r74" path="res://assets/ui/player_hud/chaos_bar_progress.png" id="10_ftld4"]
-[ext_resource type="Texture2D" uid="uid://d1u05p8lj7kvt" path="res://assets/ui/player_hud/low_hp_portrait.png" id="10_khbku"]
+[ext_resource type="Texture2D" path="res://assets/ui/player_hud/30%_status-Sheet.png" id="10_khbku"]
 [ext_resource type="Texture2D" uid="uid://caivf64g34hha" path="res://assets/ui/player_hud/hit_portrait.png" id="11_1wee6"]
 [ext_resource type="Script" uid="uid://bqemuakdoq8ue" path="res://gameplay/player/hud/stat_arc.gd" id="13_arc"]
 [ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
@@ -18,10 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://h30qe12s3t4q" path="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png" id="15_gpu53"]
 [ext_resource type="Script" uid="uid://welfjuqw50gd" path="res://gameplay/player/hud/hud_tooltip.gd" id="15_tooltip"]
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
-[ext_resource type="Texture2D" uid="uid://bus07n2xlkxvt" path="res://assets/ui/player_hud/charrm_ui/charm_socket_q.png" id="17_01apl"]
-[ext_resource type="Texture2D" uid="uid://cotkjiuquib8w" path="res://assets/ui/player_hud/charrm_ui/potion_socket.png" id="17_lpsrg"]
-[ext_resource type="Texture2D" uid="uid://b0ah05f56tanf" path="res://assets/ui/player_hud/charrm_ui/charm_socket_space.png" id="18_gpu53"]
-[ext_resource type="Texture2D" uid="uid://beqqmnur4t64u" path="res://assets/ui/player_hud/charrm_ui/charm_socket_e.png" id="19_khbku"]
+[ext_resource type="Texture2D" uid="uid://c2ply0h057nlq" path="res://assets/ui/player_hud/charrm_ui/charm_socket.png" id="19_01apl"]
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="23_1wee6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
@@ -54,6 +51,34 @@ shader = ExtResource("5_depth")
 shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
 shader_parameter/border_width = 2.0
 shader_parameter/bevel_strength = 0.22000001045
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_low_hp"]
+resource_local_to_scene = true
+atlas = ExtResource("10_khbku")
+region = Rect2(0, 0, 48, 48)
+filter_clip = true
+
+[sub_resource type="Animation" id="Animation_low_hp"]
+resource_name = "low_hp"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:low_health_texture:region")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 0, 48, 48), Rect2(48, 0, 48, 48), Rect2(96, 0, 48, 48), Rect2(144, 0, 48, 48)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_portrait"]
+_data = {
+&"low_hp": SubResource("Animation_low_hp")
+}
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=400788151]
 scale = Vector2(1.25, 1.25)
@@ -279,8 +304,13 @@ mouse_filter = 2
 texture = ExtResource("4_nc5hm")
 script = ExtResource("14_portrait")
 healthy_texture = ExtResource("4_nc5hm")
-low_health_texture = ExtResource("10_khbku")
+low_health_texture = SubResource("AtlasTexture_low_hp")
 hit_texture = ExtResource("11_1wee6")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="StatControl/Portrait"]
+libraries = {
+&"": SubResource("AnimationLibrary_portrait")
+}
 
 [node name="Stamina_Icon" type="TextureRect" parent="StatControl" unique_id=993706071]
 texture_filter = 1
@@ -439,27 +469,31 @@ texture = ExtResource("14_01apl")
 [node name="EquipmentControl" type="Control" parent="." unique_id=143244385]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 10.0
-offset_top = 390.0
-offset_right = 50.0
-offset_bottom = 430.0
+offset_left = -12.8
+offset_top = 371.19998
+offset_right = 27.2
+offset_bottom = 411.19998
+scale = Vector2(1.1, 1)
 mouse_filter = 2
 script = ExtResource("16_dv5bc")
 
 [node name="Q_socket" type="TextureRect" parent="EquipmentControl" unique_id=451445646]
 texture_filter = 1
 layout_mode = 0
-offset_top = 73.6
-offset_right = 64.0
-offset_bottom = 137.6
+offset_left = 15.6
+offset_top = 78.0
+offset_right = 79.59998
+offset_bottom = 142.00003
 mouse_filter = 2
-texture = ExtResource("17_01apl")
+texture = ExtResource("19_01apl")
 
 [node name="Q_icon" type="TextureRect" parent="EquipmentControl/Q_socket" unique_id=1618406675]
 texture_filter = 1
 layout_mode = 0
-offset_right = 64.0
-offset_bottom = 63.999996
+offset_left = 6.945455
+offset_top = 6.800048
+offset_right = 56.945454
+offset_bottom = 56.80005
 mouse_filter = 2
 
 [node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/Q_socket" unique_id=1013245374]
@@ -488,18 +522,20 @@ vertical_alignment = 1
 [node name="SPACE_socket" type="TextureRect" parent="EquipmentControl" unique_id=2076894011]
 texture_filter = 1
 layout_mode = 0
-offset_left = 43.2
+offset_left = 43.0
 offset_top = 32.0
-offset_right = 107.2
+offset_right = 107.0
 offset_bottom = 96.0
 mouse_filter = 2
-texture = ExtResource("18_gpu53")
+texture = ExtResource("19_01apl")
 
 [node name="SPACE_icon" type="TextureRect" parent="EquipmentControl/SPACE_socket" unique_id=1004234284]
 texture_filter = 1
 layout_mode = 0
-offset_right = 64.0
-offset_bottom = 64.0
+offset_left = 6.454545
+offset_top = 7.200024
+offset_right = 56.454544
+offset_bottom = 57.200024
 mouse_filter = 2
 
 [node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/SPACE_socket" unique_id=560352290]
@@ -528,18 +564,20 @@ vertical_alignment = 1
 [node name="E_socket" type="TextureRect" parent="EquipmentControl" unique_id=1852458926]
 texture_filter = 1
 layout_mode = 0
-offset_left = 86.399994
-offset_top = 73.6
-offset_right = 150.4
-offset_bottom = 137.6
+offset_left = 70.0
+offset_top = 78.0
+offset_right = 134.00002
+offset_bottom = 141.99998
 mouse_filter = 2
-texture = ExtResource("19_khbku")
+texture = ExtResource("19_01apl")
 
 [node name="E_icon" type="TextureRect" parent="EquipmentControl/E_socket" unique_id=1233280339]
 texture_filter = 1
 layout_mode = 0
-offset_right = 64.0
-offset_bottom = 64.0
+offset_left = 6.3636417
+offset_top = 7.5999994
+offset_right = 56.36364
+offset_bottom = 57.6
 mouse_filter = 2
 
 [node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/E_socket" unique_id=490836128]
@@ -566,34 +604,35 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Potion_socket" type="TextureRect" parent="EquipmentControl" unique_id=1503944081]
+self_modulate = Color(0.21573097, 0.6000273, 0.5232855, 1)
 texture_filter = 1
 layout_mode = 0
-offset_left = 43.2
-offset_top = 115.99999
-offset_right = 107.2
-offset_bottom = 180.0
+offset_left = 43.0
+offset_top = 124.0
+offset_right = 107.0
+offset_bottom = 187.99998
 mouse_filter = 2
-texture = ExtResource("17_lpsrg")
+texture = ExtResource("19_01apl")
 
 [node name="Potion_icon" type="TextureRect" parent="EquipmentControl/Potion_socket" unique_id=1995619653]
 texture_filter = 1
 layout_mode = 0
-offset_left = 3.6
-offset_top = 3.6
-offset_right = 59.6
-offset_bottom = 59.6
+offset_left = 6.4545445
+offset_top = 7.2
+offset_right = 56.454544
+offset_bottom = 57.2
 pivot_offset = Vector2(0.5, 0.5)
 mouse_filter = 2
 
 [node name="Potion_count" type="Label" parent="EquipmentControl/Potion_socket" unique_id=575894119]
 layout_mode = 0
-offset_left = 26.8
-offset_top = 42.8
-offset_right = 66.8
-offset_bottom = 69.8
+offset_left = 18.818182
+offset_top = 37.6
+offset_right = 58.818184
+offset_bottom = 68.6
 theme_override_constants/outline_size = 3
 theme_override_fonts/font = ExtResource("23_1wee6")
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "99"
 horizontal_alignment = 2
 vertical_alignment = 2

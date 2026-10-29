@@ -1,163 +1,244 @@
 shader_type spatial;
-render_mode cull_back, depth_draw_always;
+render_mode unshaded, cull_back, depth_draw_never;
 
-// Sea surface for topdown pixel art. Four parts:
-//   - 3 Gerstner waves displace the mesh vertices (wave_a/b/c: xy = direction, z = steepness,
-//     w = wavelength)
-//   - depth-based colour via Beer's law: shallow -> color_mid, deep -> color_deep, and where
-//     the water is thinnest at the shore -> white color_foam (reads the depth buffer against
-//     the water surface)
-//   - sparkle streaks: noise stretched along surface_size, pixellated by pixel_size, then
-//     pow + multiply so only the bright peaks survive
-//   - refraction: the depth lookup UV is nudged by noise, making the shoreline ripple over time
-
-uniform float pixel_size = 0.125;
-uniform vec4 color_deep : source_color = vec4(0.384, 0.604, 0.835, 1.0);
-uniform vec4 color_mid : source_color = vec4(0.333, 0.537, 0.827, 1.0);
-uniform vec4 color_foam : source_color = vec4(0.976, 0.996, 1.0, 1.0);
-uniform float beers_law = 1.3;
+// Painted tropical water: world-space pixels, depth colour, moving shore foam,
+// refracted shallows and restrained highlights. Optional screen-space object reflections.
+uniform float pixel_size : hint_range(0.0, 0.5) = 0.16;
+uniform vec4 color_deep : source_color = vec4(0.055, 0.39, 0.52, 1.0);
+uniform vec4 color_mid : source_color = vec4(0.08, 0.64, 0.66, 1.0);
+uniform vec4 color_shallow : source_color = vec4(0.38, 0.82, 0.73, 1.0);
+uniform vec4 color_foam : source_color = vec4(0.9, 0.98, 0.91, 1.0);
+uniform vec4 reflection_tint : source_color = vec4(0.49, 0.75, 0.86, 1.0);
+uniform float beers_law : hint_range(0.05, 2.0) = 0.32;
 uniform float depth_offset = 0.0;
-uniform float refraction = 0.075;
-uniform float foam_amount = 0.04;
-uniform float deep_amount = 0.25;
-// The water glows slightly so it stays readable in a dark scene; set 0 for pure lit water.
-uniform float emission_strength = 0.1;
+uniform float deep_amount : hint_range(0.1, 3.0) = 1.0;
+uniform float refraction : hint_range(0.0, 0.3) = 0.06;
+uniform float foam_amount : hint_range(0.0, 0.15) = 0.045;
+uniform float emission_strength : hint_range(0.0, 0.3) = 0.02;
+uniform float shallow_visibility : hint_range(0.0, 0.6) = 0.24;
+uniform float caustic_strength : hint_range(0.0, 0.5) = 0.12;
+uniform float reflection_strength : hint_range(0.0, 1.0) = 0.2;
+uniform bool object_reflections_enabled = true;
+uniform float object_reflection_strength : hint_range(0.0, 1.0) = 0.45;
+uniform float object_reflection_distance : hint_range(2.0, 48.0) = 24.0;
+uniform int object_reflection_steps : hint_range(8, 64) = 32;
+uniform float object_reflection_thickness : hint_range(0.05, 2.0) = 0.65;
 
-uniform float wave_speed = 0.5;
+uniform float wave_speed : hint_range(0.0, 2.0) = 0.5;
+uniform float wave_height : hint_range(0.0, 0.5) = 0.18;
 uniform vec4 wave_a = vec4(1.0, 0.4, 0.2, 10.0);
-uniform vec4 wave_b = vec4(-0.4, 0.4, -0.3, 10.0);
-uniform vec4 wave_c = vec4(0.4, -1.0, 0.3, 15.0);
+uniform vec4 wave_b = vec4(-0.4, 0.4, 0.12, 7.0);
+uniform vec4 wave_c = vec4(0.4, -1.0, 0.1, 15.0);
 
 uniform vec2 sampler_scale = vec2(0.25, 0.25);
 uniform vec2 sampler_direction = vec2(0.05, -0.04);
-uniform vec2 uv_sampler_scale = vec2(0.02, 0.02);
-uniform float uv_sampler_strength = 0.04;
+uniform vec2 uv_sampler_scale = vec2(0.035, 0.035);
+uniform float uv_sampler_strength = 0.08;
+uniform vec2 surface_size = vec2(24.0, 4.0);
+uniform vec2 surface_direction = vec2(0.32, -0.18);
+uniform vec2 surface_direction2 = vec2(-0.21, 0.27);
+uniform float surface_exp : hint_range(1.0, 12.0) = 4.0;
+uniform float surface_multiplier : hint_range(0.0, 6.0) = 1.3;
+uniform int color_steps : hint_range(2, 12) = 6;
 
-uniform vec2 surface_size = vec2(64.0, 4.0);      // streaks stretched ALONG x -> horizontal waves
-uniform vec2 surface_direction = vec2(1.0, 2.0);
-uniform vec2 surface_direction2 = vec2(-1.0, 2.0);
-uniform float surface_exp = 9.0;
-uniform float surface_multiplier = 5.0;
+uniform sampler2D uv_sampler : filter_linear, repeat_enable;
+uniform sampler2D noise_sampler : hint_default_black, filter_linear, repeat_enable;
+uniform sampler2D depth_texture : hint_depth_texture, filter_nearest, repeat_disable;
+uniform sampler2D screen_texture : hint_screen_texture, filter_linear, repeat_disable;
 
-// How many bands the depth gradient is quantised into. Pixel art steps between colours
-// instead of blending (3 = deep / mid / shallow). Raise it for a softer ramp.
-uniform int color_steps = 3;
+varying vec3 water_world;
+varying vec3 normal_world;
 
-// filter_nearest: the noise has to come out as BLOCKY SQUARES. Linear filtering makes the
-// water smooth and photoreal, which kills the pixel look.
-uniform sampler2D uv_sampler : filter_nearest, repeat_enable;
-uniform sampler2D noise_sampler : hint_default_black, filter_nearest, repeat_enable;
-uniform sampler2D depth_texture : hint_depth_texture;
-
-varying vec3 v_tangent;
-varying vec3 v_binormal;
-varying vec3 v_normal;
-
-// Gerstner wave, vertical amplitude squashed to 0.25 for a calm sea.
-vec4 wave(vec4 parameter, vec2 position, float time, inout vec3 tangent, inout vec3 binormal) {
-	float wave_steepness = parameter.z;
-	float wave_length = parameter.w;
-	float k = 2.0 * 3.14159265359 / wave_length;
-	float c = sqrt(9.8 / k);
-	vec2 d = normalize(parameter.xy);
-	float f = k * (dot(d, position) - c * time);
-	float a = wave_steepness / k;
-	tangent += normalize(vec3(1.0 - d.x * d.x * (wave_steepness * sin(f)), d.x * (wave_steepness * cos(f)), -d.x * d.y * (wave_steepness * sin(f))));
-	binormal += normalize(vec3(-d.x * d.y * (wave_steepness * sin(f)), d.y * (wave_steepness * cos(f)), 1.0 - d.y * d.y * (wave_steepness * sin(f))));
-	return vec4(d.x * (a * cos(f)), a * sin(f) * 0.25, d.y * (a * cos(f)), 0.0);
+vec2 pixel_grid(vec2 position) {
+	float size = max(pixel_size, 0.001);
+	return pixel_size > 0.0 ? (floor(position / size) + 0.5) * size : position;
 }
 
-// The built-in INV_PROJECTION_MATRIX is not available inside a custom function, so it is
-// passed in from fragment().
-float linearize_depth(mat4 inv_proj, vec2 uv, float depth) {
-	vec3 ndc;
-#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
-	ndc = vec3(uv, depth) * 2.0 - 1.0;
-#else
-	ndc = vec3(uv * 2.0 - 1.0, depth);   // Forward+/Mobile: reversed-Z, z is already in [0,1]
-#endif
-	vec4 view = inv_proj * vec4(ndc, 1.0);
-	view.xyz /= view.w;
-	return -view.z;
-}
-
-vec2 pixellate(vec2 v) {
-	if (pixel_size > 0.0) {
-		v = floor(v / pixel_size) * pixel_size;
-	}
-	return v;
+vec3 gerstner(vec4 parameter, vec2 position, float time, inout vec3 dx, inout vec3 dz) {
+	vec2 direction = parameter.xy / max(length(parameter.xy), 0.001);
+	float steepness = clamp(parameter.z, -0.5, 0.5);
+	float k = 6.2831853 / max(abs(parameter.w), 0.2);
+	float phase = k * (dot(direction, position) - sqrt(9.8 / k) * time);
+	float s = sin(phase);
+	float c = cos(phase);
+	float amplitude = steepness / k;
+	dx += vec3(-direction.x * direction.x * steepness * s,
+		direction.x * steepness * c * wave_height, -direction.x * direction.y * steepness * s);
+	dz += vec3(-direction.x * direction.y * steepness * s,
+		direction.y * steepness * c * wave_height, -direction.y * direction.y * steepness * s);
+	return vec3(direction.x * amplitude * c, amplitude * s * wave_height, direction.y * amplitude * c);
 }
 
 void vertex() {
-	vec4 world_vertex = MODEL_MATRIX * vec4(VERTEX, 1.0);
-	float time = -TIME * wave_speed;
-
-	vec4 v = world_vertex;
-	vec3 vt = vec3(0.0);
-	vec3 vb = vec3(0.0);
-	v += wave(wave_a, world_vertex.xz, time, vt, vb);
-	v += wave(wave_b, world_vertex.xz, time, vt, vb);
-	v += wave(wave_c, world_vertex.xz, time, vt, vb);
-	v_tangent = vt;
-	v_binormal = vb;
-	v_normal = normalize(cross(vb, vt));
-
-	vec4 vertex = inverse(MODEL_MATRIX) * v;
-	TANGENT = v_tangent;
-	BINORMAL = v_binormal;
-	NORMAL = v_normal;
-	VERTEX = vertex.xyz;
-	// UV comes from world xz, so the texture stays seamless wherever the mesh is placed.
-	UV = world_vertex.xz;
+	vec3 origin = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 dx = vec3(1.0, 0.0, 0.0);
+	vec3 dz = vec3(0.0, 0.0, 1.0);
+	float time = TIME * wave_speed;
+	vec3 displacement = gerstner(wave_a, origin.xz, time, dx, dz);
+	displacement += gerstner(wave_b, origin.xz, time, dx, dz);
+	displacement += gerstner(wave_c, origin.xz, time, dx, dz);
+	water_world = origin + displacement;
+	normal_world = normalize(cross(dz, dx));
+	VERTEX = (inverse(MODEL_MATRIX) * vec4(water_world, 1.0)).xyz;
+	NORMAL = normalize(transpose(mat3(MODEL_MATRIX)) * normal_world);
+	UV = origin.xz;
 }
 
-float get_surface_flow(vec2 uv, float time) {
-	vec2 uv1 = pixellate(uv + surface_direction * time) / surface_size;
-	// The second layer samples at a scale incommensurate with the first, so the two never fall
-	// into phase. At the same scale the sparkle clusters repeat on a beat and line up in rows.
-	vec2 uv2 = pixellate(uv + surface_direction2 * time) / (surface_size * 0.585) + vec2(0.37, 0.19);
-	float surface = (texture(noise_sampler, uv1).r + texture(noise_sampler, uv2).r) / 2.0;
-	return pow(surface, surface_exp) * surface_multiplier;
+vec3 reconstruct_view(mat4 inverse_projection, vec2 uv, float depth) {
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	vec3 ndc = vec3(uv, depth) * 2.0 - 1.0;
+#else
+	vec3 ndc = vec3(uv * 2.0 - 1.0, depth);
+#endif
+	vec4 position = inverse_projection * vec4(ndc, 1.0);
+	return position.xyz / position.w;
+}
+
+bool is_background(float depth) {
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	return depth > 0.99999;
+#else
+	return depth < 0.00001;
+#endif
+}
+
+vec2 project_to_screen(mat4 projection, vec3 point) {
+	vec4 clip = projection * vec4(point, 1.0);
+	return clip.xy / clip.w * 0.5 + 0.5;
+}
+
+vec4 reflected_scene(vec3 origin, vec3 direction, mat4 projection, mat4 inverse_projection,
+	mat4 inverse_view, float surface_height, vec2 distortion) {
+	int steps = clamp(object_reflection_steps, 8, 64);
+	float stride = max(object_reflection_distance, 0.1) / float(steps);
+	float previous_distance = 0.05;
+	for (int index = 0; index < 64; index++) {
+		if (index >= steps) { break; }
+		float distance = 0.05 + stride * float(index + 1);
+		vec3 point = origin + direction * distance;
+		if (point.z >= -0.05) { break; }
+		vec2 uv = project_to_screen(projection, point);
+		if (any(lessThan(uv, vec2(0.002))) || any(greaterThan(uv, vec2(0.998)))) { break; }
+		float raw_depth = texture(depth_texture, uv).r;
+		if (!is_background(raw_depth)) {
+			vec3 scene = reconstruct_view(inverse_projection, uv, raw_depth);
+			float gap = scene.z - point.z;
+			if (gap >= 0.0) {
+				float near_distance = previous_distance;
+				float far_distance = distance;
+				// Refine depth crossings so thin sprites can be found between coarse steps.
+				for (int refine = 0; refine < 5; refine++) {
+					float middle = (near_distance + far_distance) * 0.5;
+					vec3 candidate = origin + direction * middle;
+					vec2 candidate_uv = project_to_screen(projection, candidate);
+					float candidate_depth = texture(depth_texture, candidate_uv).r;
+					vec3 candidate_scene = reconstruct_view(inverse_projection, candidate_uv, candidate_depth);
+					if (!is_background(candidate_depth) && candidate_scene.z - candidate.z >= 0.0) {
+						far_distance = middle;
+					} else {
+						near_distance = middle;
+					}
+				}
+				vec3 hit = origin + direction * far_distance;
+				vec2 hit_uv = project_to_screen(projection, hit);
+				float hit_depth = texture(depth_texture, hit_uv).r;
+				vec3 hit_scene = reconstruct_view(inverse_projection, hit_uv, hit_depth);
+				vec3 world_hit = (inverse_view * vec4(hit_scene, 1.0)).xyz;
+				float error = abs(hit_scene.z - hit.z);
+				if (!is_background(hit_depth) && world_hit.y > surface_height + 0.03
+					&& error < object_reflection_thickness) {
+					vec2 edge = min(hit_uv, vec2(1.0) - hit_uv);
+					float confidence = smoothstep(0.0, 0.06, min(edge.x, edge.y));
+					confidence *= 1.0 - smoothstep(0.65, 1.0, far_distance / object_reflection_distance);
+					confidence *= 1.0 - smoothstep(object_reflection_thickness * 0.5,
+						object_reflection_thickness, error);
+					vec2 image_uv = clamp(hit_uv + distortion * 0.004, vec2(0.001), vec2(0.999));
+					return vec4(texture(screen_texture, image_uv).rgb, confidence);
+				}
+			}
+		}
+		previous_distance = distance;
+	}
+	return vec4(0.0);
 }
 
 void fragment() {
 	float time = TIME * wave_speed;
-	ROUGHNESS = 1.0;   // no specular sheen: a flat, painted-looking surface
+	vec2 grid = pixel_grid(UV);
+	vec2 flow = sampler_direction * time;
+	float broad_noise = texture(uv_sampler, grid * uv_sampler_scale + flow).r;
+	float cross_noise = texture(uv_sampler, grid * uv_sampler_scale * 1.31 - flow + vec2(0.37, 0.61)).r;
+	vec2 wobble = (vec2(broad_noise, cross_noise) * 2.0 - 1.0) * uv_sampler_strength;
+	// Small screen-space offsets; never pull a foreground object into the water.
+	vec2 refracted_uv = clamp(SCREEN_UV + wobble * refraction * 0.2, vec2(0.001), vec2(0.999));
+	float raw_depth = texture(depth_texture, refracted_uv).r;
+	vec3 floor_view = reconstruct_view(INV_PROJECTION_MATRIX, refracted_uv, raw_depth);
+	vec3 floor_world = (INV_VIEW_MATRIX * vec4(floor_view, 1.0)).xyz;
+	if (!is_background(raw_depth) && (floor_world.y > water_world.y + 0.05 || floor_view.z > VERTEX.z)) {
+		refracted_uv = SCREEN_UV;
+		raw_depth = texture(depth_texture, SCREEN_UV).r;
+		floor_view = reconstruct_view(INV_PROJECTION_MATRIX, SCREEN_UV, raw_depth);
+		floor_world = (INV_VIEW_MATRIX * vec4(floor_view, 1.0)).xyz;
+	}
+	bool no_floor = is_background(raw_depth);
+	float depth = no_floor ? 40.0 : max(water_world.y - floor_world.y + depth_offset, 0.0);
+	float absorption = 1.0 - exp(-depth * beers_law / max(deep_amount, 0.1));
+	// More colour bands with a tiny noise dither prevent large flat contour stripes.
+	float bands = float(max(color_steps - 1, 1));
+	float band = clamp(floor(absorption * bands + 0.5 + (broad_noise - 0.5) * 0.3) / bands, 0.0, 1.0);
+	vec3 colour = mix(color_shallow.rgb, color_mid.rgb, smoothstep(0.0, 0.5, band));
+	colour = mix(colour, color_deep.rgb, smoothstep(0.3, 1.0, band));
+	colour *= 0.94 + broad_noise * 0.12;
+	float swell = sin(dot(grid, vec2(0.92, 0.39)) * 1.7 - time * 0.9 + broad_noise * 5.0);
+	float crossing_swell = sin(dot(grid, vec2(-0.45, 0.89)) * 0.9 + time * 0.8 + cross_noise * 6.0);
+	float currents = smoothstep(0.35, 0.85, swell * 0.65 + crossing_swell * 0.35);
+	colour = mix(colour, color_mid.rgb, currents * 0.065);
+	vec3 below = texture(screen_texture, refracted_uv).rgb;
+	colour = mix(colour, below * color_shallow.rgb, exp(-depth * 0.7) * shallow_visibility);
 
-	// Every lookup goes through the world-space pixel grid, so even the UV noise snaps to that
-	// grid instead of drifting smoothly like real water.
-	vec2 uv_offset = sampler_direction * time;
-	vec2 base_uv = pixellate(UV);
-	vec2 uv_wobble = uv_sampler_strength * (texture(uv_sampler, base_uv * uv_sampler_scale + uv_offset).rg * 2.0 - 1.0);
-	vec2 uv = base_uv + uv_wobble;
-
-	// Refraction: offset the depth lookup by the noise, so the shoreline ripples (in steps).
-	vec2 ref_uv = SCREEN_UV + uv_wobble * refraction * 20.0;
-	float surface_depth = linearize_depth(INV_PROJECTION_MATRIX, SCREEN_UV, FRAGCOORD.z);
-	float depth_sample = linearize_depth(INV_PROJECTION_MATRIX, SCREEN_UV, texture(depth_texture, ref_uv).r);
-	if (depth_sample <= surface_depth - 1.0) {
-		// the refracted sample landed on something ABOVE the water: use the plain depth instead,
-		// otherwise the object gets a ghost outline
-		depth_sample = linearize_depth(INV_PROJECTION_MATRIX, SCREEN_UV, texture(depth_texture, SCREEN_UV).r);
+	// Intersecting light ribbons over shallow sand, fading out in deep water.
+	vec2 floor_grid = no_floor ? grid : pixel_grid(floor_world.xz);
+	float ca = texture(noise_sampler, floor_grid * sampler_scale * 0.25 + flow * 0.7).r;
+	float cb = texture(noise_sampler, floor_grid.yx * sampler_scale * 0.31 - flow * 0.5 + vec2(0.23)).r;
+	float caustics = max(1.0 - smoothstep(0.015, 0.065, abs(ca - 0.5)),
+		1.0 - smoothstep(0.015, 0.065, abs(cb - 0.5)));
+	colour += color_shallow.rgb * caustics * caustic_strength * exp(-depth * 0.45) * smoothstep(0.12, 0.6, depth);
+	if (object_reflections_enabled && object_reflection_strength > 0.0) {
+		vec3 view_normal = normalize((VIEW_MATRIX * vec4(mix(vec3(0.0, 1.0, 0.0), normal_world, 0.2), 0.0)).xyz);
+		vec3 incident = PROJECTION_MATRIX[3][3] > 0.5 ? vec3(0.0, 0.0, -1.0) : normalize(VERTEX);
+		vec3 reflected_direction = normalize(reflect(incident, view_normal));
+		vec4 reflection = reflected_scene(VERTEX + view_normal * 0.04, reflected_direction,
+			PROJECTION_MATRIX, INV_PROJECTION_MATRIX, INV_VIEW_MATRIX, water_world.y, wobble);
+		vec3 reflected_colour = reflection.rgb * vec3(0.78, 0.92, 1.0);
+		colour = mix(colour, reflected_colour, reflection.a * object_reflection_strength);
 	}
 
-	// Beer's law, but POSTERIZED into color_steps discrete bands: a continuous gradient is the
-	// single biggest giveaway that the water is "real" in a world made of sprites.
-	float depth_blend = clamp(exp((depth_sample + VERTEX.z + depth_offset) * -beers_law), 0.0, 1.0);
-	float base_brightness = clamp(1.0 - pow(1.0 - depth_blend, 2.5), 0.0, 1.0);
-	float band = clamp(base_brightness / deep_amount, 0.0, 1.0);
-	float steps = float(max(color_steps - 1, 1));
-	band = round(band * steps) / steps;
-	vec4 color = mix(color_deep, color_mid, band);
+	// Sparse drifting wavelets, rather than uniform rows of white dots.
+	vec2 scale = max(abs(surface_size), vec2(0.1));
+	float n1 = texture(noise_sampler, (grid + surface_direction * time + wobble) / scale).r;
+	float n2 = texture(noise_sampler, (grid.yx + surface_direction2 * time) / (scale * 0.73) + vec2(0.37, 0.19)).r;
+	float wavelet = pow(clamp(max(n1, n2 * 0.92), 0.0, 1.0), max(surface_exp, 1.0));
+	float highlights = smoothstep(0.28, 0.48, wavelet) * surface_multiplier * 0.06;
+	float crest = sin(dot(grid, vec2(0.92, 0.39)) * 4.0 - time * 1.4 + cross_noise * 7.0);
+	float broken_crest = smoothstep(0.94, 0.995, crest) * smoothstep(0.48, 0.78, broad_noise);
+	highlights = max(highlights, broken_crest * surface_multiplier * 0.1);
+	colour = mix(colour, color_foam.rgb, clamp(highlights, 0.0, 0.3));
+	vec3 to_camera = normalize(CAMERA_POSITION_WORLD - water_world);
+	float fresnel = pow(1.0 - max(dot(normalize(normal_world), to_camera), 0.0), 3.0);
+	colour = mix(colour, reflection_tint.rgb, fresnel * reflection_strength);
 
-	// Shore foam: a HARD edge, no soft blend.
-	if (base_brightness >= 1.0 - foam_amount) {
-		color = color_foam;
-	}
-
-	// Sparkle: strictly on/off, giving discrete white pixel clusters instead of a soft bloom.
-	color = mix(color, color_foam, step(0.5, get_surface_flow(uv, time)));
-
-	ALBEDO = color.rgb;
-	EMISSION = color.rgb * emission_strength;
+	// A thin contact edge plus a broken incoming foam band, measured in world units.
+	float width = max(foam_amount * 12.0, 0.001);
+	float shore_noise = texture(noise_sampler, grid * 0.13 + flow * 0.35).r;
+	float contact = 1.0 - smoothstep(0.025, width * (0.35 + shore_noise * 0.7), depth);
+	float shore_phase = depth / width * 5.0 - time * 1.8 + shore_noise * 3.0;
+	float incoming = smoothstep(0.6, 0.92, sin(shore_phase));
+	incoming *= (1.0 - smoothstep(width * 0.7, width * 2.8, depth));
+	incoming *= smoothstep(0.38, 0.7, shore_noise);
+	float foam = max(contact * (0.65 + shore_noise * 0.35), incoming * 0.7);
+	foam *= step(0.0001, foam_amount);
+	colour = mix(colour, color_foam.rgb, clamp(foam, 0.0, 1.0));
+	ALBEDO = colour;
+	EMISSION = colour * emission_strength;
+	ALPHA = 1.0;
 }
