@@ -191,7 +191,7 @@ buffer = PackedFloat32Array(-1.7479966, 0, 3.2839248, 6.026083, 0, 2.4484549, 0,
 script = ExtResource("1_m32iv")
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("2_l3xad")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -2.7261753, 3.875, -1.1673746)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7261753, 3.875, -1.1673746)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
