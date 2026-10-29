@@ -41,6 +41,9 @@ script = ExtResource("4_tide")
 water = NodePath("../SeaWater")
 low_height = 1.5
 high_height = 7.5
+low_duration = 5.0
+rise_duration = 3.0
+fall_duration = 3.0
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=1554009451]
 transform = Transform3D(0.26306993, 0.78078187, 0.56672233, 0.3144715, -0.624727, 0.71471953, 0.9120867, -0.009803204, -0.40988043, 10.266136, 23.039204, -39.183483)

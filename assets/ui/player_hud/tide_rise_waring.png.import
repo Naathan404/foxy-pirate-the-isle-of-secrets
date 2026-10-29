@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0ah05f56tanf"
-path="res://.godot/imported/charm_socket_space.png-7cdfcc8ca46ccbee370e50de01d161da.ctex"
+uid="uid://cs51ya71nexon"
+path="res://.godot/imported/tide_rise_waring.png-213707df07905fda1681170384cb980a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/charrm_ui/charm_socket_space.png"
-dest_files=["res://.godot/imported/charm_socket_space.png-7cdfcc8ca46ccbee370e50de01d161da.ctex"]
+source_file="res://assets/ui/player_hud/tide_rise_waring.png"
+dest_files=["res://.godot/imported/tide_rise_waring.png-213707df07905fda1681170384cb980a.ctex"]
 
 [params]
 

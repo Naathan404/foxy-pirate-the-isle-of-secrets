@@ -26,6 +26,8 @@ Mức Y là tọa độ **world**, không phụ thuộc vị trí node cha. Cont
 smoothstep, giảm tốc ở hai đầu. `water_level_changed` báo mực nước trung bình;
 sóng shader là phần hiển thị, có thể nhô cao/thấp hơn mặt phẳng này.
 
+Thông số màu, bọt bờ, sóng và phản chiếu: xem [Shader nước Coral Valley](shader-docs/water_shader.md).
+
 Mở inventory sẽ pause cả chu kỳ và thời gian chuyển mức; đóng túi thì tiếp tục.
 Controller là node của level, không phải autoload. Mỗi lần reload level, chu kỳ
 khởi động lại từ LOW.

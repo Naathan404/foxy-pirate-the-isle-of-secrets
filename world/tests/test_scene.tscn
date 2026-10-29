@@ -24,12 +24,12 @@ sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
 ground_bottom_color = Color(0.694361, 0.82665706, 0.9260749, 1)
 ground_horizon_color = Color(0.7735731, 0.8808251, 0.9452769, 1)
 
-[sub_resource type="Sky" id="Sky_cge4j"]
+[sub_resource type="Sky" id="Sky_dxx27"]
 sky_material = SubResource("ProceduralSkyMaterial_kouyd")
 
 [sub_resource type="Environment" id="Environment_fxrp0"]
 background_mode = 2
-sky = SubResource("Sky_cge4j")
+sky = SubResource("Sky_dxx27")
 ambient_light_source = 3
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_sky_contribution = 0.53
@@ -199,8 +199,7 @@ script = ExtResource("1_i6gfe")
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -2.7261753, 3.875, -1.1673746)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
-transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
-light_energy = 0.35
+transform = Transform3D(-0.43569398, -0.73731464, 0.51627326, 2.6181812e-09, 0.57357645, 0.8191521, -0.90009475, 0.3568996, -0.24990383, 0, 0, 0)
 shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1626434672]
