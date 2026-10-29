@@ -75,6 +75,26 @@ func is_active() -> bool:
 	return _active
 
 
+## Immediate sample for swept melee, sharing the same per-swing target reservation.
+func sample_shape() -> void:
+	if not _active or not is_inside_tree():
+		return
+	for child in get_children():
+		var collider := child as CollisionShape3D
+		if collider == null or collider.disabled or collider.shape == null:
+			continue
+		var query := PhysicsShapeQueryParameters3D.new()
+		query.shape = collider.shape
+		query.transform = collider.global_transform
+		query.collision_mask = collision_mask
+		query.collide_with_areas = true
+		query.collide_with_bodies = false
+		for result in get_world_3d().direct_space_state.intersect_shape(query, 64):
+			_on_area_entered(result.collider as Area3D)
+			if not _active:
+				return
+
+
 func _on_area_entered(area: Area3D) -> void:
 	if not _active or not area is HurtBox:
 		return

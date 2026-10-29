@@ -27,6 +27,9 @@ var weapon_category: int = -1
 var damage_hp: int = 1
 var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
+var combo_index: int = 0
+var combo_step: MeleeComboStep
+var active_seconds: float = 0.125
 
 
 # Tạo damage context cho 1 lần gây sát thương
@@ -41,4 +44,6 @@ func create_damage_context() -> DamageContext:
 	damage.weapon_category = weapon_category
 	damage.origin = origin
 	damage.direction = direction
+	if combo_step != null:
+		damage.knockback_multiplier = combo_step.knockback_multiplier
 	return damage

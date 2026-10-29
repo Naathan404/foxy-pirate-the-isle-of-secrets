@@ -29,6 +29,7 @@ var last_facing_direction: Vector3 = Vector3.BACK
 # nuffer nút dash
 var dash_buffer_remaining: float = 0.0
 var attack_requested: bool = false
+var attack_buffer_remaining: float = 0.0
 var pending_attack_action: StringName = &"normal"
 var dead: bool = false
 var pending_hit_duration: float = 0.0
@@ -162,7 +163,12 @@ func receive_damage(damage: DamageContext) -> int:
 
 func _physics_process(delta: float) -> void:
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
+	attack_buffer_remaining = maxf(0.0, attack_buffer_remaining - delta)
+	if attack_buffer_remaining <= 0.0:
+		attack_requested = false
 	_read_input()
+	if get_node("/root/HitstopController").is_frozen(self):
+		return
 
 	if blocked:
 		return
@@ -181,8 +187,6 @@ func _physics_process(delta: float) -> void:
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
 	move_and_slide()
-	# Yêu cầu đánh chỉ dùng trong frame này
-	attack_requested = false
 
 
 func _read_input() -> void:
@@ -223,6 +227,9 @@ func _read_input() -> void:
 func clear_gameplay_input() -> void:
 	move_direction = Vector3.ZERO
 	attack_requested = false
+	attack_buffer_remaining = 0.0
+	if is_instance_valid(weapon_controller):
+		weapon_controller.clear_attack_buffer()
 	dash_buffer_remaining = 0.0
 
 
@@ -245,6 +252,16 @@ func request_attack(action: StringName = &"normal") -> void:
 	if not dead and not is_gameplay_input_blocked():
 		pending_attack_action = action
 		attack_requested = true
+		attack_buffer_remaining = 0.18
+		if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
+			var attack := weapon_controller.equipped.get_attack(action)
+			if attack != null:
+				attack_buffer_remaining = attack.input_buffer_seconds
+
+
+func _consume_attack_input() -> void:
+	attack_requested = false
+	attack_buffer_remaining = 0.0
 
 
 # Tạo context cho đòn đánh, hướng ngắm do controller quyết định
@@ -445,6 +462,7 @@ func die() -> void:
 
 
 func cancel_attack() -> void:
+	_consume_attack_input()
 	#end_hitbox_attack()
 	if is_instance_valid(weapon_controller) and weapon_controller.has_method("cancel"):
 		weapon_controller.call("cancel")
