@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HealingPotion" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/items/consumables/healing_potion.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/small_healing_potion.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+heal_amount = 2
+item_id = "small_healing_potion"
+display_name = "Small Healing Potion"
+icon = ExtResource("2_icon")
+description = "Heals 2 HP."
+type = 1

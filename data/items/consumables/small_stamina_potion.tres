@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StaminaPotion" format=3 uid="uid://55f3a575p2bm"]
+
+[ext_resource type="Script" uid="uid://doeun5epnj8ch" path="res://data/items/consumables/stamina_potion.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c2rh3hd8li1c5" path="res://assets/sprites/items/small_stamina_potion.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+restore_amount = 250.0
+item_id = "small_stamina_potion"
+display_name = "Small Stamina Potion"
+icon = ExtResource("2_icon")
+description = "Restores 50 SP."
+type = 1

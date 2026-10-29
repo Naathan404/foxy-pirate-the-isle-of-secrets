@@ -17,6 +17,8 @@ func equip_potion(potion: Potion) -> bool:
 		return false
 	if potion is HealingPotion and health == null:
 		return false
+	if potion is StaminaPotion and stamina == null:
+		return false
 
 	if not inventory.has_item(potion.item_id):
 		return false
@@ -62,9 +64,15 @@ func use_equipped_potion() -> bool:
 		if healed <= 0:
 			return false
 
-		inventory.remove_item(used_potion.item_id, 1)
+	elif equipped_potion is StaminaPotion:
+		if stamina == null:
+			return false
+		var used_potion := equipped_potion as StaminaPotion
+		if stamina.restore(used_potion.restore_amount) <= 0.0:
+			return false
+	else:
+		return false
 
-		potion_used.emit()
-		return true
-
-	return false
+	inventory.remove_item(equipped_potion.item_id, 1)
+	potion_used.emit()
+	return true
