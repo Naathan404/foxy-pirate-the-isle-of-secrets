@@ -1,13 +1,13 @@
 [gd_resource type="AnimationLibrary" format=3 uid="uid://bwnb81tw6fpqn"]
 
-[ext_resource type="Texture2D" uid="uid://boygebnjr0o5t" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_idle_1.png" id="1_idle_1"]
-[ext_resource type="Texture2D" uid="uid://bv2w3sxaomfeq" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_idle_2.png" id="2_idle_2"]
-[ext_resource type="Texture2D" uid="uid://dhn400dmp60xb" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_idle_3.png" id="3_idle_3"]
-[ext_resource type="Texture2D" uid="uid://c5vqgdov6htec" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_idle_4.png" id="4_idle_4"]
-[ext_resource type="Texture2D" uid="uid://lgort084r3my" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_run1.png" id="5_run_1"]
-[ext_resource type="Texture2D" uid="uid://bnrkrs8rreipv" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_run2.png" id="6_run_2"]
-[ext_resource type="Texture2D" uid="uid://d0hxa5die35qb" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_hurt_1.png" id="7_hurt_1"]
-[ext_resource type="Texture2D" uid="uid://d23025q70hc1n" path="res://assets/sprites/enemies/war_lord/war_lord_turtle_hurt_2.png" id="8_hurt_2"]
+[ext_resource type="Texture2D" uid="uid://boygebnjr0o5t" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_1.png" id="1_idle_1"]
+[ext_resource type="Texture2D" uid="uid://bv2w3sxaomfeq" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_2.png" id="2_idle_2"]
+[ext_resource type="Texture2D" uid="uid://dhn400dmp60xb" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_3.png" id="3_idle_3"]
+[ext_resource type="Texture2D" uid="uid://c5vqgdov6htec" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_4.png" id="4_idle_4"]
+[ext_resource type="Texture2D" uid="uid://lgort084r3my" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_run1.png" id="5_run_1"]
+[ext_resource type="Texture2D" uid="uid://bnrkrs8rreipv" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_run2.png" id="6_run_2"]
+[ext_resource type="Texture2D" uid="uid://d0hxa5die35qb" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_hurt_1.png" id="7_hurt_1"]
+[ext_resource type="Texture2D" uid="uid://d23025q70hc1n" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_hurt_2.png" id="8_hurt_2"]
 
 [sub_resource type="Animation" id="Animation_RESET"]
 resource_name = "RESET"
