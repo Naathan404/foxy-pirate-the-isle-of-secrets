@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://ckio67a4p70la"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/passive/life_steal_effect.tscn" id="2_effect"]
 
 [resource]
@@ -8,11 +8,10 @@ script = ExtResource("1_data")
 charm_id = &"life_steal"
 display_name = "Life Steal"
 description = "Normal attacks have a 5% chance to restore 1 HP after dealing damage."
-charm_type = 1
 effect_scene = ExtResource("2_effect")
 proc_chance = 0.05
 acquisition_source = &"merchant_or_enemy_drop"
-tags = [&"passive", &"damage_dealt", &"normal_attack", &"healing"]
+tags = Array[StringName]([&"passive", &"damage_dealt", &"normal_attack", &"healing"])
 effect_params = {
 "heal_hp": 1
 }

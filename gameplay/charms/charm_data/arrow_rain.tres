@@ -15,7 +15,7 @@ effect_scene = ExtResource("2_effect")
 resource_cost = 300.0
 cooldown_seconds = 6.0
 acquisition_source = &"merchant_or_enemy_drop"
-tags = [&"active", &"projectile"]
+tags = Array[StringName]([&"active", &"projectile"])
 effect_params = {
 "damage_percent": 0.35,
 "projectile_count": 8,

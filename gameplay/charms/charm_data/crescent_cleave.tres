@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="CharmData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://c1bl3r46frbfh"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/crescent_cleave_effect.tscn" id="2_effect"]
 
 [resource]
@@ -13,10 +13,10 @@ effect_scene = ExtResource("2_effect")
 resource_cost = 100.0
 cooldown_seconds = 4.0
 acquisition_source = &"merchant_or_enemy_drop"
-tags = [&"active", &"melee"]
+tags = Array[StringName]([&"active", &"melee"])
 effect_params = {
 "damage_multiplier": 2.0,
-"radius_units": 2.8,
 "half_angle_degrees": 90.0,
-"hit_duration_seconds": 0.12
+"hit_duration_seconds": 0.12,
+"radius_units": 2.8
 }
