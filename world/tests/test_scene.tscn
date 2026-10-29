@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="16_dxx27"]
 [ext_resource type="PackedScene" uid="uid://bqt066tkjp3c1" path="res://gameplay/inventory/item_pickup.tscn" id="17_v6ch8"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="18_dxx27"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/war_lord_turtle/war_lord_turtle.tscn" id="19_turtle"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -431,6 +432,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9240055, -1.3013372, -31.99
 
 [node name="Crab" parent="." unique_id=1674830806 instance=ExtResource("15_v6ch8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.845367, -2.9001207, -13.3341465)
+initial_facing = 1
+
+[node name="WarLordTurtle" parent="." instance=ExtResource("19_turtle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, -2.9001207, -13.3341465)
 initial_facing = 1
 
 [node name="Crab2" parent="." unique_id=254688948 instance=ExtResource("15_v6ch8")]

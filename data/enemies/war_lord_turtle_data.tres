@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemies/enemy_data.gd" id="1_enemy_data"]
+
+[resource]
+script = ExtResource("1_enemy_data")
+max_hp = 20
+move_speed = 1.4
+acceleration = 12.0
+deceleration = 18.0
+attack_damage = 1
+hit_duration = 0.28
+hit_recovery_duration = 0.5
+hit_knockback_speed = 3.0
+hit_deceleration = 14.0
