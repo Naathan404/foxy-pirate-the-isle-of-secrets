@@ -3,7 +3,7 @@
 ## 1. Luồng tổng & Quy tắc chung
 
 - **Cấu trúc:** Hub & Spoke (1 Hub + 4 Map nguyên tố).
-- **Tiến trình mở map:** `Castaway Cove (Hub)` ➔ **Bắt buộc qua `Coral Valley` trước** ➔ Mở khóa đồng thời 3 vùng còn lại (đi tự do) ➔ Gom đủ 4 `Ancient Keys` ➔ Mở khu trung tâm tại Hub (`Ancient Stone Tablet`) ➔ `Final Boss`.
+- **Tiến trình mở map:** `Castaway Cove (Hub)` ➔ **Bắt buộc qua `Coral Valley` trước** ➔ Mở khóa đồng thời 3 vùng còn lại (đi tự do) ➔ Gom đủ 4 `Ancient Keys` ➔ Mở khu trung tâm tại Hub (`Ancient Stone Tablet`)
 - **Khu vực ẩn (Secret):** Rải rác các map, chứa `Blueprint` hoặc `Rương` (**100 – 200 Gold**).
 - **Chức năng Checkpoint:** Lưu tiến trình + Đổi Charm.
 - **Flow chuẩn 1 vùng:**
