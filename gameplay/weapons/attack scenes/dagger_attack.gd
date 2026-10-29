@@ -22,6 +22,7 @@ func activate() -> void:
 		return
 
 	super.activate()
+	global_position = context.actor.global_position
 
 	# forward là trục -Z
 	look_at(global_position + context.direction, Vector3.UP)
@@ -30,6 +31,11 @@ func activate() -> void:
 	hitbox.scale = Vector3.ONE * context.hitbox_multiplier
 
 	hitbox.begin_attack_with_context(context.create_damage_context())
+
+
+func tick_active(_delta: float) -> void:
+	if context != null and is_instance_valid(context.actor):
+		global_position = context.actor.global_position
 
 
 func deactivate() -> void:

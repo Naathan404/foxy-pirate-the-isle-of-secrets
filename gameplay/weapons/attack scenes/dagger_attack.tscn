@@ -26,3 +26,6 @@ shape = SubResource("BoxShape3D_jpyye")
 [node name="CombatFeedback" type="Node" parent="HitBox" unique_id=527796340 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("3_igi2i")
 hitbox = NodePath("..")
+hitstop_duration = 0.07
+shake_pixels = 8.0
+shake_duration = 0.2

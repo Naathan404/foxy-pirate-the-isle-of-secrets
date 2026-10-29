@@ -253,6 +253,22 @@ sprite khi cần. Bụi chạy, bụi dash và ghost phản hồi trạng thái 
 
 ## Những điểm cần nhớ khi sửa code
 
+### Bước tiến khi chém
+
+Đòn `normal` được controller chấp nhận sẽ cho Player tiến theo hướng đánh đã
+chốt, mặc định 0.28 đơn vị trong 0.12 giây, giảm tốc dần. Chỉnh tại
+`Foxy/States/Attack` → `Forward Step`; đặt `Step Distance = 0` để tắt.
+
+State chọn vận tốc, Player vẫn dùng `move_and_slide()` một lần mỗi physics
+frame nên có va chạm tường/enemy. Đòn bị từ chối không tạo bước tiến; thoát
+Attack hoặc rời mặt đất sẽ kết thúc bước tiến. Mở inventory giữ nguyên tiến độ.
+Đòn secondary ném dao giữ nguyên vị trí thân Player.
+
+`DaggerAttack` lấy lại vị trí actor khi activate và theo actor trong active
+phase, để hitbox chém không bị bỏ lại tại điểm bắt đầu đòn.
+
+### Quy tắc chuyển trạng thái
+
 - Đổi vũ khí chỉ cho Idle/Run/Fall. Bắt đầu đánh cần trên sàn và chỉ cho
   Idle/Run/Attack. Cả hai đều kiểm tra state hiện tại lẫn state đang chờ.
 - Hit hiện thoát theo timer, dù code có biến theo dõi animation đã kết thúc.
