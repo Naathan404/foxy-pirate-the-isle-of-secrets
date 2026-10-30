@@ -15,18 +15,25 @@ enum InitialFacing {
 	RIGHT,
 }
 
-@export var data: NpcData
+@export_group("Initial State")
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var initial_state_name: StringName = &"Idle"
 
-@export_group("Wander Bounds")
-@export_range(0.0, 100.0, 0.1, "suffix:m") var wander_radius: float = 3.0
+@export_group("Dialogue Presentation")
+@export var dialogue_camera_enabled := true
+@export_range(0.0, 1.0, 0.01) var dialogue_camera_focus_ratio := 0.82
+@export_range(0.5, 1.0, 0.01) var dialogue_camera_fov_scale := 0.84
+@export_range(0.05, 2.0, 0.01, "suffix:s") var dialogue_camera_transition_duration := 0.5
 
 var last_facing_direction: Vector3 = Vector3.BACK
 var is_talking := false
 var _conversation_player: Player
 var _conversation_player_was_blocked := false
-var _wander_origin := Vector3.ZERO
+var _initial_world_position := Vector3.ZERO
+var _dialogue_camera: Camera3D
+var _dialogue_camera_initial_position := Vector3.ZERO
+var _dialogue_camera_initial_fov := 0.0
+var _dialogue_camera_tween: Tween
 
 @onready var visual: NpcVisual = $Visual
 @onready var direction_pivot: Node3D = $Direction
@@ -40,15 +47,19 @@ var _wander_origin := Vector3.ZERO
 
 
 func _ready() -> void:
-	if data == null or not is_instance_valid(initial_state) or not is_instance_valid(fsm):
+	if get_npc_data() == null or not is_instance_valid(initial_state) or not is_instance_valid(fsm):
 		push_error("BaseNpc: missing data, FSM or initial state on %s" % name)
 		set_physics_process(false)
 		return
-	_wander_origin = global_position
+	_initial_world_position = global_position
 	interaction_area.interaction_requested.connect(_on_interaction_requested)
 	face_direction(_get_initial_facing_direction())
 	if not fsm.setup(self, initial_state.get_parent(), initial_state):
 		set_physics_process(false)
+
+
+func _exit_tree() -> void:
+	_restore_dialogue_camera(true)
 
 
 func _physics_process(delta: float) -> void:
@@ -63,12 +74,15 @@ func _physics_process(delta: float) -> void:
 
 
 func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.0) -> void:
+	var npc_data := get_npc_data()
+	if npc_data == null:
+		return
 	var horizontal := Vector3(direction.x, 0.0, direction.z)
 	if not horizontal.is_zero_approx():
 		horizontal = horizontal.normalized()
 		face_direction(horizontal)
-	var target_velocity: Vector3 = horizontal * data.move_speed * maxf(0.0, speed_scale)
-	var rate: float = data.acceleration if not horizontal.is_zero_approx() else data.deceleration
+	var target_velocity: Vector3 = horizontal * npc_data.move_speed * maxf(0.0, speed_scale)
+	var rate: float = npc_data.acceleration if not horizontal.is_zero_approx() else npc_data.deceleration
 	var current_velocity := Vector3(velocity.x, 0.0, velocity.z)
 	current_velocity = current_velocity.move_toward(target_velocity, rate * maxf(0.0, delta))
 	_set_horizontal_velocity(current_velocity)
@@ -122,19 +136,76 @@ func can_be_picked_up() -> bool:
 
 
 func get_npc_data() -> NpcData:
-	return data
+	return null
 
 
-func has_wander_bounds() -> bool:
-	return wander_radius > 0.0
+func get_initial_world_position() -> Vector3:
+	return _initial_world_position
 
 
-func get_wander_origin() -> Vector3:
-	return _wander_origin
+func _focus_dialogue_camera(interactor: Player) -> void:
+	if not dialogue_camera_enabled:
+		return
+	var active_camera := interactor.camera
+	if not is_instance_valid(active_camera):
+		active_camera = get_viewport().get_camera_3d()
+	if not is_instance_valid(active_camera):
+		return
+
+	_stop_dialogue_camera_tween()
+	_dialogue_camera = active_camera
+	_dialogue_camera_initial_position = active_camera.global_position
+	_dialogue_camera_initial_fov = active_camera.fov
+
+	var player_to_npc := global_position - interactor.global_position
+	player_to_npc.y = 0.0
+	var target_position := _dialogue_camera_initial_position + player_to_npc * dialogue_camera_focus_ratio
+	var target_fov := _dialogue_camera_initial_fov * dialogue_camera_fov_scale
+	_dialogue_camera_tween = create_tween().set_parallel()
+	_dialogue_camera_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_dialogue_camera_tween.tween_property(
+		_dialogue_camera, "global_position", target_position, dialogue_camera_transition_duration
+	)
+	_dialogue_camera_tween.tween_property(
+		_dialogue_camera, "fov", target_fov, dialogue_camera_transition_duration
+	)
 
 
-func get_wander_radius() -> float:
-	return wander_radius
+func _restore_dialogue_camera(immediate := false) -> void:
+	if not is_instance_valid(_dialogue_camera):
+		_clear_dialogue_camera_state()
+		return
+
+	_stop_dialogue_camera_tween()
+	if immediate:
+		_dialogue_camera.global_position = _dialogue_camera_initial_position
+		_dialogue_camera.fov = _dialogue_camera_initial_fov
+		_clear_dialogue_camera_state()
+		return
+
+	_dialogue_camera_tween = create_tween().set_parallel()
+	_dialogue_camera_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_dialogue_camera_tween.tween_property(
+		_dialogue_camera, "global_position", _dialogue_camera_initial_position, dialogue_camera_transition_duration
+	)
+	_dialogue_camera_tween.tween_property(
+		_dialogue_camera, "fov", _dialogue_camera_initial_fov, dialogue_camera_transition_duration
+	)
+	_dialogue_camera_tween.set_parallel(false)
+	_dialogue_camera_tween.tween_callback(_clear_dialogue_camera_state)
+
+
+func _stop_dialogue_camera_tween() -> void:
+	if _dialogue_camera_tween != null and _dialogue_camera_tween.is_valid():
+		_dialogue_camera_tween.kill()
+	_dialogue_camera_tween = null
+
+
+func _clear_dialogue_camera_state() -> void:
+	_dialogue_camera = null
+	_dialogue_camera_initial_position = Vector3.ZERO
+	_dialogue_camera_initial_fov = 0.0
+	_dialogue_camera_tween = null
 
 
 func _set_horizontal_velocity(value: Vector3) -> void:
@@ -160,10 +231,16 @@ func _on_interaction_requested(interactor: Player) -> void:
 
 
 func _start_dialogue(interactor: Player) -> void:
-	if is_talking or data.dialogue_timeline.is_empty() or Dialogic.current_timeline != null:
+	var npc_data := get_npc_data()
+	if (
+		is_talking
+		or npc_data == null
+		or npc_data.dialogue_timeline.is_empty()
+		or Dialogic.current_timeline != null
+	):
 		return
-	if not ResourceLoader.exists(data.dialogue_timeline):
-		push_warning("BaseNpc: dialogue timeline not found: %s" % data.dialogue_timeline)
+	if not ResourceLoader.exists(npc_data.dialogue_timeline):
+		push_warning("BaseNpc: dialogue timeline not found: %s" % npc_data.dialogue_timeline)
 		return
 
 	is_talking = true
@@ -173,16 +250,18 @@ func _start_dialogue(interactor: Player) -> void:
 	interactor.clear_gameplay_input()
 	interaction_area.set_interaction_enabled(false)
 	face_target(interactor)
+	_focus_dialogue_camera(interactor)
 	var talk_state := fsm.states.get("talk") as FsmState
 	if is_instance_valid(talk_state):
 		fsm.change_state(talk_state)
 	Dialogic.timeline_ended.connect(_on_dialogue_ended, CONNECT_ONE_SHOT)
-	Dialogic.start(data.dialogue_timeline)
+	Dialogic.start(npc_data.dialogue_timeline)
 	dialogue_started.emit(interactor)
 
 
 func _on_dialogue_ended() -> void:
 	is_talking = false
+	_restore_dialogue_camera()
 	if is_instance_valid(_conversation_player):
 		_conversation_player.blocked = _conversation_player_was_blocked
 		dialogue_finished.emit(_conversation_player)

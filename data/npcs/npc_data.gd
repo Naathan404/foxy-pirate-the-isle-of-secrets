@@ -17,12 +17,3 @@ extends Resource
 ## The default conversation for this NPC. Quest-specific scripts can start a
 ## different timeline when their progression conditions require it.
 @export_file("*.dtl") var dialogue_timeline: String
-
-@export_group("Wander")
-@export var wander_turn_on_wall: bool = true
-@export var wander_turn_at_ledge: bool = true
-@export_range(0.0, 10.0, 0.1) var wander_speed_scale: float = 1.0
-@export_range(0.1, 60.0, 0.1, "suffix:s") var wander_move_duration_min: float = 1.0
-@export_range(0.1, 60.0, 0.1, "suffix:s") var wander_move_duration_max: float = 3.0
-@export_range(0.1, 60.0, 0.1, "suffix:s") var wander_rest_duration_min: float = 1.0
-@export_range(0.1, 60.0, 0.1, "suffix:s") var wander_rest_duration_max: float = 3.0

@@ -23,12 +23,15 @@ Ví dụ hiện có là `MushroomNpc` tại `gameplay/npcs/mushroom/`.
 | [npc_interaction_area.gd](../../gameplay/npcs/base/npc_interaction_area.gd) | Phát hiện Player trong vùng gần, hiển thị prompt từ Input Map và phát signal yêu cầu tương tác. |
 | [npc_state.gd](../../gameplay/npcs/base/states/npc_state.gd) | API state chung qua `npc`. |
 | `npc_idle.gd`, `npc_talk.gd` | State chung đứng yên và khóa movement khi hội thoại. |
-| [npc_wander.gd](../../gameplay/npcs/base/states/npc_wander.gd) | Hành vi tuần tra tái sử dụng, chỉ thêm vào NPC cần tự đi lại. |
-| [npc_data.gd](../../data/npcs/npc_data.gd) | Resource cấu hình độc lập với scene. |
+| [mushroom_npc.gd](../../gameplay/npcs/mushroom/mushroom_npc.gd) | Contract runtime của Nấm: xác thực và trả về `MushroomNpcData` có kiểu đúng. |
+| [mushroom_wander.gd](../../gameplay/npcs/mushroom/states/mushroom_wander.gd) | State tuần tra chỉ dành cho Nấm; đọc cấu hình từ `MushroomNpcData`. |
+| [npc_data.gd](../../data/npcs/npc_data.gd) | Resource base cho các thuộc tính chung của NPC. |
+| [mushroom_npc_data.gd](../../data/npcs/mushroom_npc_data.gd) | Resource kế thừa `NpcData`, chứa Wander settings chỉ của Nấm. |
 
-Nguyên tắc ownership: **Base** sở hữu cơ chế chung; **state** quyết định hành
-vi theo thời điểm; **scene NPC** sở hữu collider, art, animation và state được
-gắn; **data `.tres`** sở hữu các thông số có thể tinh chỉnh.
+Nguyên tắc ownership: **Base** sở hữu cơ chế chung và là abstract, không export
+data; **script NPC cụ thể** export data có kiểu cụ thể; **state** quyết định
+hành vi theo thời điểm; **scene NPC** sở hữu collider, art, animation và state
+được gắn; **data `.tres`** sở hữu toàn bộ thông số có thể tinh chỉnh.
 
 ```text
 BaseNpc (CharacterBody3D)
@@ -48,10 +51,9 @@ BaseNpc (CharacterBody3D)
 ```
 
 `FrontRayCast3D` và `GroundRayCast3D` tắt mặc định trong Base. NPC chỉ bật
-chúng khi state Wander cần quay đầu ở tường hoặc mép vực. Root `BaseNpc` có
-`Wander Radius`, là bán kính theo world unit tính từ vị trí NPC khi scene vào
-world. Chỉnh property này trên instance trong world scene để thay đổi vùng đi
-của riêng instance đó; không cần Area3D hay collider vùng.
+chúng khi state Wander cần quay đầu ở tường hoặc mép vực. `BaseNpc` không sở
+hữu property Wander: NPC không có node `States/Wander` sẽ không có cấu hình
+tuần tra dư thừa trong Inspector.
 
 ## 2. NpcData
 
@@ -63,9 +65,13 @@ Mỗi loại NPC có một Resource riêng trong `data/npcs/`, ví dụ
 | Identity | `display_name`, `description` — metadata cho gameplay/tooling; không thay thế tên hiển thị của Dialogic. |
 | Movement | `move_speed`, `acceleration`, `deceleration`. |
 | Dialogue | `dialogue_timeline` — đường dẫn timeline mặc định `.dtl`. |
-| Wander | quay ở tường/vực, scale tốc độ và khoảng thời gian đi/nghỉ ngẫu nhiên. |
 
-`BaseNpc` và `NpcWander` chỉ đọc các thông số từ `NpcData`. Không đưa collider,
+`NpcData` là resource dành riêng cho NPC. Enemy như Cua dùng `EnemyData` riêng,
+nên không mang `dialogue_timeline` hay bất kỳ cấu hình Dialogue nào.
+`MushroomNpc` export `data: MushroomNpcData` trên chính root của Nấm;
+`MushroomNpcData` kế thừa toàn bộ property base và bổ sung Wander. Vì vậy
+Inspector thể hiện rõ data nào thuộc Base và data nào thuộc Nấm. Resource
+`mushroom_npc_data.tres` là nơi chỉnh các giá trị này. Không đưa collider,
 texture, AnimationLibrary, vị trí spawn hoặc danh sách state vào data vì chúng
 thuộc scene và có thể khác nhau giữa các instance.
 
@@ -90,12 +96,14 @@ Mỗi physics tick, Base gọi FSM, áp dụng gravity khi không đứng sàn, 
 | `turn_around()` | Quay ngược hướng hiện tại. |
 | `play_directional_animation(action)` | Chọn clip `<action>_down`, `_up`, `_left`, `_right`; fallback về clip đúng tên action. |
 
-`NpcWander` luân phiên pha đi/nghỉ theo timer ngẫu nhiên trong data. Khi
-`Wander Radius` lớn hơn 0, mỗi pha đi chọn một điểm ngẫu nhiên trong hình tròn
-tâm ở vị trí spawn, rồi đi tới điểm đó. Điểm đích luôn ở trong bán kính nên
-đường thẳng giữa hai điểm hợp lệ cũng nằm trong vùng. Gặp tường/vực thì state
-chọn lại đích trong vùng, thay vì đi ra ngoài bán kính. Đặt radius bằng 0 chỉ
-khi cần giữ hành vi tuần tra thẳng không giới hạn cũ.
+Wander không phải capability của `BaseNpc`. `MushroomNpcData` sở hữu các group
+`Mushroom Wander Bounds`, `Mushroom Wander Movement`, `Mushroom Wander Timing`;
+`MushroomWander` chỉ đọc chúng để thực thi. Khi `wander_radius` lớn hơn 0, mỗi
+pha đi chọn một điểm ngẫu nhiên trong hình tròn tâm ở vị trí spawn, rồi đi tới
+điểm đó. Điểm đích luôn ở trong bán kính nên đường thẳng giữa hai điểm hợp lệ
+cũng nằm trong vùng. Gặp tường/vực thì state chọn lại đích trong vùng, thay vì
+đi ra ngoài bán kính. Đặt `wander_radius` bằng 0 chỉ khi cần giữ hành vi tuần
+tra thẳng không giới hạn cũ.
 
 ## 4. Tương tác và hội thoại
 
@@ -129,6 +137,28 @@ cutscene hoặc menu muốn pause rộng hơn phải sở hữu luật đó ở 
 `can_be_picked_up()` hiện luôn trả về `false`: Player hiện không có carry
 controller. NPC có luật bị nhặt phải kế thừa Base và bổ sung cơ chế carry hoàn
 chỉnh, không chỉ đổi giá trị trả về.
+
+### Camera hội thoại
+
+Khi hội thoại bắt đầu, `BaseNpc` lưu `global_position` và `fov` hiện tại của
+camera Player, rồi tween camera theo trục ngang về phía NPC và thu nhẹ FOV. Nhờ
+vậy tâm khung hình nằm giữa hai nhân vật, nhưng không đổi rotation top-down hay
+`h_offset`/`v_offset` của `ScreenShakeController`. Khi `Dialogic.timeline_ended`,
+cả vị trí lẫn FOV tween trở về đúng giá trị đã lưu.
+
+Các property presentation này nằm ở instance `BaseNpc`, không ở `NpcData`, để
+từng NPC trong world có thể chọn nhịp dựng cảnh riêng mà không ảnh hưởng data
+di chuyển/hội thoại dùng chung:
+
+| Property | Mặc định | Ý nghĩa |
+| --- | --- | --- |
+| `Dialogue Camera Enabled` | `true` | Bật/tắt toàn bộ hiệu ứng camera. |
+| `Focus Ratio` | `0.42` | Phần khoảng cách Player–NPC mà camera trượt sang phía NPC. |
+| `FOV Scale` | `0.84` | Tỉ lệ FOV khi đang nói; nhỏ hơn 1 là zoom vào. |
+| `Transition Duration` | `0.28s` | Thời gian zoom vào và zoom ra. |
+
+Base cũng phục hồi camera ngay lập tức nếu NPC bị gỡ khỏi scene giữa hội thoại,
+để không để lại camera ở trạng thái focus.
 
 ## 5. Dialogic và cấu trúc lời thoại
 
@@ -165,9 +195,11 @@ chuyên biệt, thay vì sửa trực tiếp BaseNpc.
    `gameplay/npcs/<npc_id>/`.
 4. Thay collider body và InteractionArea theo kích thước thực của NPC.
 5. Gắn state con trực tiếp dưới `States`; đặt `initial_state_name` đúng tên node.
-6. Nếu cần Wander, thêm `NpcWander`, bật raycast cần dùng và có animation
-   `idle_*`/`walk_*` tương ứng. Chọn instance NPC trong world scene và đặt
-   `Wander Radius` theo khu vực cần đi; tâm luôn là vị trí đặt NPC ban đầu.
+6. Nếu NPC có hành vi riêng, tạo class data kế thừa `NpcData` và state trong
+   folder NPC đó. Ví dụ Nấm dùng `MushroomNpcData` + `MushroomWander`, bật
+   raycast cần dùng và đặt `idle_*`/`walk_*`; mọi thông số tuần tra chỉnh trong
+   `mushroom_npc_data.tres`. NPC không Wander không cần subclass data hay state
+   Wander.
 7. Tạo character và timeline trong `dialog/npcs/<npc_id>/`, sau đó gán timeline
    mở đầu vào `NpcData.dialogue_timeline`.
 8. Test prompt, mở hội thoại, chuyển câu bằng action Dialogic hiện hành, kết thúc

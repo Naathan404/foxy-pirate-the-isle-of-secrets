@@ -4,13 +4,13 @@
 [ext_resource type="Script" uid="uid://bjg3sk08hnedx" path="res://gameplay/npcs/mushroom/mushroom_npc.gd" id="2_mushroom"]
 [ext_resource type="Texture2D" uid="uid://ewjudx5nvlow" path="res://assets/sprites/npcs/mushroom/mushroom_sprite_sheet.png" id="3_sprite"]
 [ext_resource type="AnimationLibrary" uid="uid://bpklg1y7pa0dt" path="res://gameplay/npcs/mushroom/mushroom_npc_anims.tres" id="4_anims"]
-[ext_resource type="Script" uid="uid://bthfcjhht7agr" path="res://gameplay/npcs/base/states/npc_wander.gd" id="5_wander"]
+[ext_resource type="Script" uid="uid://b2l0xqypm84f8" path="res://gameplay/npcs/mushroom/states/mushroom_wander.gd" id="5_wander"]
 [ext_resource type="Script" uid="uid://bl01533qto3ma" path="res://gameplay/npcs/base/states/npc_talk.gd" id="6_talk"]
-[ext_resource type="Resource" path="res://data/npcs/mushroom_npc_data.tres" id="7_data"]
+[ext_resource type="Resource" uid="uid://qgmb7iyhowav" path="res://data/npcs/mushroom_npc_data.tres" id="7_data"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mushroom"]
-radius = 0.36
-height = 0.9
+radius = 0.7651367
+height = 1.6671875
 
 [node name="MushroomNpc" unique_id=956736719 instance=ExtResource("1_base")]
 script = ExtResource("2_mushroom")
@@ -34,7 +34,7 @@ enabled = true
 enabled = true
 
 [node name="CollisionShape3D" parent="." index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8335937, 0)
 shape = SubResource("CapsuleShape3D_mushroom")
 
 [node name="Wander" type="Node" parent="States" index="1" unique_id=13578114]
