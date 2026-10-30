@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/npcs/base/npc_base.gd" id="1_base"]
+[ext_resource type="Script" path="res://gameplay/npcs/base/npc_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://core/state_machine/fsm.gd" id="3_fsm"]
+[ext_resource type="Script" path="res://gameplay/npcs/base/states/npc_idle.gd" id="4_idle"]
+[ext_resource type="Script" path="res://gameplay/npcs/base/npc_interaction_area.gd" id="5_interaction"]
+[ext_resource type="Resource" path="res://data/npcs/npc_base_data.tres" id="6_npc_data"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 1.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_interaction"]
+height = 2.0
+radius = 2.0
+
+[node name="BaseNpc" type="CharacterBody3D"]
+collision_layer = 1
+collision_mask = 3
+script = ExtResource("1_base")
+data = ExtResource("6_npc_data")
+
+[node name="Visual" type="Node3D" parent="." node_paths=PackedStringArray("sprite", "animation_player")]
+script = ExtResource("2_visual")
+sprite = NodePath("Sprite3D")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual"]
+pixel_size = 0.0625
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Visual"]
+
+[node name="Direction" type="Node3D" parent="."]
+
+[node name="FrontRayCast3D" type="RayCast3D" parent="Direction"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+enabled = false
+target_position = Vector3(0, 0, 0.8)
+collision_mask = 1
+
+[node name="GroundRayCast3D" type="RayCast3D" parent="Direction"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0.65)
+enabled = false
+target_position = Vector3(0, -1.5, 0)
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.5, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("3_fsm")
+
+[node name="States" type="Node" parent="."]
+
+[node name="Idle" type="Node" parent="States"]
+script = ExtResource("4_idle")
+
+[node name="InteractionArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("5_interaction")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+position = Vector3(0, 1, 0)
+shape = SubResource("CylinderShape3D_interaction")
