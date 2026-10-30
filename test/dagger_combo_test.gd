@@ -18,6 +18,8 @@ func _run() -> void:
 	controller.default_weapon = load("res://data/weapon/weapon_dagger.tres").duplicate(true)
 	_check(controller.setup(actor), "Dagger equips through the existing framework")
 	var attack := controller.equipped.definition.normal_attack
+	# Pin fixture damage so production balance changes do not alter this regression check.
+	attack.combo_steps[2].damage_multiplier = 2.0
 	for step in attack.combo_steps:
 		step.hitstop_seconds = 0.0
 	var targets: Array[CombatDummy] = []
