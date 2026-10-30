@@ -1,7 +1,7 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene format=3 uid="uid://ce6y6jpw24nmu"]
 
-[ext_resource type="PackedScene" path="res://gameplay/player/foxy.tscn" id="1_player"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/starfish.tscn" id="2_enemy"]
+[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="2_enemy"]
 
 [sub_resource type="Environment" id="Environment_arena"]
 background_mode = 1
@@ -12,7 +12,6 @@ ambient_light_energy = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Material_floor"]
 albedo_color = Color(0.3, 0.43, 0.4, 1)
-roughness = 1.0
 
 [sub_resource type="BoxMesh" id="Mesh_floor"]
 size = Vector3(24, 1, 24)
@@ -29,43 +28,43 @@ size = Vector3(1, 3, 8)
 [sub_resource type="BoxShape3D" id="Shape_wall"]
 size = Vector3(1, 3, 8)
 
-[node name="DaggerComboTest" type="Node3D"]
+[node name="DaggerComboTest" type="Node3D" unique_id=1036946614]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1342476564]
 environment = SubResource("Environment_arena")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-55, -30, 0)
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=950441057]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
 shadow_enabled = true
 
-[node name="Floor" type="StaticBody3D" parent="."]
-position = Vector3(0, -0.5, 0)
+[node name="Floor" type="StaticBody3D" parent="." unique_id=185241223]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Floor"]
-mesh = SubResource("Mesh_floor")
+[node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=1606875842]
 material_override = SubResource("Material_floor")
+mesh = SubResource("Mesh_floor")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1925755636]
 shape = SubResource("Shape_floor")
 
-[node name="Wall" type="StaticBody3D" parent="."]
-position = Vector3(5, 1.5, 0)
+[node name="Wall" type="StaticBody3D" parent="." unique_id=1683685729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Wall"]
-mesh = SubResource("Mesh_wall")
+[node name="Mesh" type="MeshInstance3D" parent="Wall" unique_id=1401113308]
 material_override = SubResource("Material_wall")
+mesh = SubResource("Mesh_wall")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall" unique_id=1751445808]
 shape = SubResource("Shape_wall")
 
-[node name="Foxy" parent="." instance=ExtResource("1_player")]
-position = Vector3(0, 0.1, 0)
+[node name="Foxy" parent="." unique_id=141805293 instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
-[node name="Starfish" parent="." instance=ExtResource("2_enemy")]
-position = Vector3(0, 0.1, 4)
+[node name="Starfish" parent="." unique_id=1350469947 instance=ExtResource("2_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 4)
 
-[node name="StarfishLeft" parent="." instance=ExtResource("2_enemy")]
-position = Vector3(-2, 0.1, 4.5)
+[node name="StarfishLeft" parent="." unique_id=1698210464 instance=ExtResource("2_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.1, 4.5)
 
-[node name="StarfishRight" parent="." instance=ExtResource("2_enemy")]
-position = Vector3(2, 0.1, 4.5)
+[node name="StarfishRight" parent="." unique_id=1805481880 instance=ExtResource("2_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.1, 4.5)
