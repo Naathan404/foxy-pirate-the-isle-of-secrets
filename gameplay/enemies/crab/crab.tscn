@@ -6,6 +6,7 @@
 [ext_resource type="AnimationLibrary" uid="uid://fya1b26i2m6b" path="res://gameplay/enemies/crab/crab_anims.tres" id="4_anims"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_hitbox"]
 [ext_resource type="Script" uid="uid://do0lxthoqo85o" path="res://gameplay/enemies/crab/states/crab_patrol.gd" id="6_patrol"]
+[ext_resource type="Script" path="res://gameplay/enemies/crab/crab.gd" id="7_crab"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(2.4, 1.2, 2.4)
@@ -18,6 +19,7 @@ height = 1.6801147
 radius = 0.7998047
 
 [node name="Crab" unique_id=1674830806 instance=ExtResource("1_base")]
+script = ExtResource("7_crab")
 data = ExtResource("2_data")
 initial_state_name = &"Patrol"
 initial_facing = 2

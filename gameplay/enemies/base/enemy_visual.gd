@@ -104,8 +104,9 @@ func _get_directional_animation_name(action: StringName) -> StringName:
 		var horizontal_suffix := "right" if screen_direction.x > 0.0 else "left"
 		var horizontal_name := StringName(String(action) + "_" + horizontal_suffix)
 		if animation_player.has_animation(horizontal_name):
-			if is_instance_valid(sprite):
-				sprite.flip_h = false
+			# Horizontal clips own Sprite3D.flip_h in their Animation tracks.
+			# Do not reset it here: this method runs every frame and would overwrite
+			# the left clip's flip_h=true after AnimationPlayer applies the track.
 			return horizontal_name
 		suffix = "side"
 		flip_side = screen_direction.x < 0.0
