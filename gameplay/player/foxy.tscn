@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
 [ext_resource type="PackedScene" uid="uid://dgx5c1qlu0dls" path="res://gameplay/player/effects/run_dust_effect.tscn" id="19_lqbvs"]
 [ext_resource type="Resource" path="res://data/items/consumables/small_healing_potion.tres" id="19_ycog6"]
-[ext_resource type="Resource" path="res://data/items/consumables/small_stamina_potion.tres" id="20_a64i1"]
+[ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="20_a64i1"]
 [ext_resource type="Script" uid="uid://c4fmspxxv4ifk" path="res://gameplay/charms/socket/charm_loadout.gd" id="20_ehmwb"]
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
 [ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="21_86838"]
@@ -686,6 +686,9 @@ chaos = NodePath("ChaosComponent")
 potion = NodePath("PotionComponent")
 inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
+
+[node name="DrownPoint" type="Marker3D" parent="."]
+position = Vector3(0, 2.3, 0)
 
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
 script = ExtResource("3_nu5xt")

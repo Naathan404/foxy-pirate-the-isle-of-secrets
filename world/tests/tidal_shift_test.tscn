@@ -4,6 +4,10 @@
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="2_q7t1m"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="3_m4gbr"]
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="4_tide"]
+[ext_resource type="Script" uid="uid://y21pp04evlll" path="res://world/gimmick/coral_valley/drowning_area.gd" id="5_drowning"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_water_volume"]
+size = Vector3(200, 128, 200)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_q7t1m"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -32,6 +36,18 @@ metadata/_editor_floor_ = Vector3(0, 2, 0)
 
 [node name="SeaWater" parent="." unique_id=1691806370 instance=ExtResource("2_q7t1m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.462, 7.5, 5.61)
+
+[node name="DrowningArea" type="Area3D" parent="SeaWater" unique_id=1230921898 node_paths=PackedStringArray("water", "volume")]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("5_drowning")
+water = NodePath("..")
+volume = NodePath("CollisionShape3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeaWater/DrowningArea" unique_id=699375717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -64, 0)
+shape = SubResource("BoxShape3D_water_volume")
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("3_m4gbr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.520647, 10.954132, 0)

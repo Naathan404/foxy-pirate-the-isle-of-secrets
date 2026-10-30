@@ -146,6 +146,23 @@ func _run() -> void:
 		"Confirmed melee keeps existing Chaos gain rule"
 	)
 	_check(Engine.time_scale == 1.0, "Real melee hit does not slow global/UI time")
+	_check(hitstop.is_frozen(player), "Confirmed melee hit requests local player hitstop")
+	var phase_remaining := player.weapon_controller._remaining
+	player.weapon_controller._physics_process(0.01)
+	_check(
+		player.weapon_controller._remaining == phase_remaining,
+		"Hitstop holds the actual attack phase clock"
+	)
+	var shake := root.get_node("ScreenShakeController")
+	_check(shake._camera == player.camera, "Melee shake binds the gameplay camera")
+	var world_offset: Vector2 = (
+		Vector2(player.camera.h_offset, player.camera.v_offset) - shake._base_offset
+	)
+	var pixels: float = world_offset.length() / shake._world_units_per_pixel()
+	_check(
+		pixels > 1.0 and pixels <= shake.maximum_pixels + 0.01,
+		"Confirmed hit immediately produces visible, bounded pixel displacement"
+	)
 	enemy.fsm._update(0.0)
 	_check(enemy.velocity.z < 0.0, "Enemy recoil follows locked XZ swing direction")
 	enemy.data.knockback_resistance = 1.0

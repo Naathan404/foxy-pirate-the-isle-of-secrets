@@ -132,7 +132,7 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: int) ->
 		get_node("/root/HitstopController").request_local(
 			context.actor, target as Node3D, step.hitstop_seconds
 		)
-		get_node("/root/ScreenShakeController").request(step.shake_pixels, 0.16 if heavy else 0.1)
+		get_node("/root/ScreenShakeController").request(step.shake_pixels, 0.2 if heavy else 0.14)
 		get_node("/root/AudioManager").play_sfx_3d(
 			HIT_SOUND, at, -8.0 if heavy else -13.0, step.audio_pitch
 		)
