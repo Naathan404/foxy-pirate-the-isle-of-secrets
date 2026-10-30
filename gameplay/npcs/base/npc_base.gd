@@ -41,9 +41,9 @@ var _dialogue_camera_tween: Tween
 @onready var ground_ray: RayCast3D = $Direction/GroundRayCast3D
 @onready var fsm: Fsm = $FSM
 @onready var interaction_area: NpcInteractionArea = $InteractionArea
-@onready var initial_state: FsmState = get_node_or_null(
-	NodePath("States/" + String(initial_state_name))
-) as FsmState
+@onready var initial_state: FsmState = (
+	get_node_or_null(NodePath("States/" + String(initial_state_name))) as FsmState
+)
 
 
 func _ready() -> void:
@@ -82,7 +82,9 @@ func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.
 		horizontal = horizontal.normalized()
 		face_direction(horizontal)
 	var target_velocity: Vector3 = horizontal * npc_data.move_speed * maxf(0.0, speed_scale)
-	var rate: float = npc_data.acceleration if not horizontal.is_zero_approx() else npc_data.deceleration
+	var rate: float = (
+		npc_data.acceleration if not horizontal.is_zero_approx() else npc_data.deceleration
+	)
 	var current_velocity := Vector3(velocity.x, 0.0, velocity.z)
 	current_velocity = current_velocity.move_toward(target_velocity, rate * maxf(0.0, delta))
 	_set_horizontal_velocity(current_velocity)
@@ -159,7 +161,9 @@ func _focus_dialogue_camera(interactor: Player) -> void:
 
 	var player_to_npc := global_position - interactor.global_position
 	player_to_npc.y = 0.0
-	var target_position := _dialogue_camera_initial_position + player_to_npc * dialogue_camera_focus_ratio
+	var target_position := (
+		_dialogue_camera_initial_position + player_to_npc * dialogue_camera_focus_ratio
+	)
 	var target_fov := _dialogue_camera_initial_fov * dialogue_camera_fov_scale
 	_dialogue_camera_tween = create_tween().set_parallel()
 	_dialogue_camera_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -186,7 +190,10 @@ func _restore_dialogue_camera(immediate := false) -> void:
 	_dialogue_camera_tween = create_tween().set_parallel()
 	_dialogue_camera_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_dialogue_camera_tween.tween_property(
-		_dialogue_camera, "global_position", _dialogue_camera_initial_position, dialogue_camera_transition_duration
+		_dialogue_camera,
+		"global_position",
+		_dialogue_camera_initial_position,
+		dialogue_camera_transition_duration
 	)
 	_dialogue_camera_tween.tween_property(
 		_dialogue_camera, "fov", _dialogue_camera_initial_fov, dialogue_camera_transition_duration
