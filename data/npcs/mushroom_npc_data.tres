@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="NpcData" format=3 uid="uid://qgmb7iyhowav"]
+[gd_resource type="Resource" script_class="MushroomNpcData" format=3 uid="uid://qgmb7iyhowav"]
 
-[ext_resource type="Script" uid="uid://f41e4qkmmqke" path="res://data/npcs/npc_data.gd" id="1_npc_data"]
+[ext_resource type="Script" uid="uid://d2ar8kxppxixg" path="res://data/npcs/mushroom_npc_data.gd" id="1_mushroom_data"]
 
 [resource]
-script = ExtResource("1_npc_data")
+script = ExtResource("1_mushroom_data")
 display_name = "Nấm"
 description = "A friendly mushroom who wanders around the village."
 dialogue_timeline = "res://dialog/npcs/mushroom/timelines/greeting.dtl"
