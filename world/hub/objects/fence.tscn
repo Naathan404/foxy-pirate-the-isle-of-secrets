@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://c51l2gtjds5t2"]
+
+[ext_resource type="ArrayMesh" uid="uid://c40mcc7gh2vfn" path="res://assets/models/kenney_mini_forest/fence.glb" id="1_vt6mg"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vt6mg"]
+size = Vector3(1, 0.5, 0.25)
+
+[node name="Fence" type="MeshInstance3D" unique_id=1284612560]
+transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
+mesh = ExtResource("1_vt6mg")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1983586446]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=2082849970]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_vt6mg")
