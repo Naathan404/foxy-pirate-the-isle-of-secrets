@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://y21pp04evlll" path="res://world/gimmick/coral_valley/drowning_area.gd" id="5_drowning"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="6_itkpp"]
 [ext_resource type="PackedScene" uid="uid://djxjvu6e00r3h" path="res://world/gimmick/coral_valley/crate_reset_lever.tscn" id="7_reset"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="8_4g5uf"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_water_volume"]
 size = Vector3(200, 128, 200)
@@ -77,3 +78,9 @@ float_draft = 0.4
 [node name="CrateResetLever" parent="." unique_id=1308475802 node_paths=PackedStringArray("crates") instance=ExtResource("7_reset")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8, 0)
 crates = [NodePath("../Crate")]
+
+[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("8_4g5uf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.313423, 8.981615, 13.534039)
+trigger_id = &"coral_valley_gate_b"
+destination_scene = "uid://yyr7vg0mg0q4"
+destination_trigger_id = &"hub_gate_a"

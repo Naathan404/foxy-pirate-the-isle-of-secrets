@@ -116,6 +116,12 @@ State Attack tạo `AttackContext`, gọi `WeaponController.try_attack()` rồi 
 animation nếu đòn được nhận. Tốc độ animation được chỉnh cho khớp thời gian đòn.
 Sát thương do vũ khí xử lý.
 
+Mỗi đòn lấy hướng từ nhân vật tới con trỏ chuột trên mặt phẳng XZ ngang nhân vật,
+kể cả đòn tiếp theo trong combo. Animation, hitbox và bước tiến dùng cùng hướng
+đã chốt; rê chuột hoặc đổi hướng chạy giữa đòn không xoay đòn hiện tại. Khi trở
+về Run, nhân vật lại quay theo hướng di chuyển. Không có camera hoặc con trỏ nằm
+đúng vị trí nhân vật thì giữ hướng nhìn gần nhất.
+
 Khi nhận `attack_finished`, state đánh dấu đòn đã xong và yêu cầu quay về di chuyển
 trong lần cập nhật sau. Thoát Attack sẽ trả tốc độ animation về bình thường,
 ngắt kết nối signal và hủy phần đòn còn lại.

@@ -99,6 +99,9 @@ func _run() -> void:
 
 
 func _start_attack(player: Player, action: StringName = &"normal") -> void:
+	# Keep this movement/collision fixture aimed right under mouse-directed attacks.
+	var target: Vector3 = player._get_mouse_target()
+	player._get_active_camera().global_position += player.global_position + Vector3.RIGHT * 5.0 - target
 	player.last_facing_direction = Vector3.RIGHT
 	player.request_attack(action)
 	await _frames(3)

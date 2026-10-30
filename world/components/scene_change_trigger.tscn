@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dmaoemr3iesre"]
+
+[ext_resource type="Script" uid="uid://cga8c40d8wbre" path="res://world/components/scene_change_trigger.gd" id="1_trigger"]
+
+[sub_resource type="BoxShape3D" id="Box_trigger"]
+size = Vector3(2, 2, 2)
+
+[node name="SceneChangeTrigger" type="Area3D" unique_id=219025603]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_trigger")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("Box_trigger")
+debug_color = Color(0.9843137, 0, 0.34509805, 1)
+
+[node name="ExitPosition" type="Marker3D" parent="."]
+position = Vector3(0, 0, 2)

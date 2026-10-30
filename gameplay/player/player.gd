@@ -288,7 +288,7 @@ func _consume_attack_input() -> void:
 	attack_buffer_remaining = 0.0
 
 
-# Tạo context cho đòn đánh, hướng ngắm do controller quyết định
+# Chốt hướng đánh theo chuột; thiếu mục tiêu hợp lệ thì giữ hướng nhìn.
 func build_attack_context() -> AttackContext:
 	var context := AttackContext.new()
 	context.actor = self
@@ -304,6 +304,10 @@ func build_attack_context() -> AttackContext:
 	if mouse_target is Vector3:
 		context.target_position = mouse_target
 		context.has_target = true
+		var aim_direction: Vector3 = mouse_target - context.origin
+		aim_direction.y = 0.0
+		if not aim_direction.is_zero_approx():
+			context.direction = aim_direction.normalized()
 	return context
 
 

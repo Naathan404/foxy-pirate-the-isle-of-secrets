@@ -88,8 +88,6 @@ func _update(delta: float) -> void:
 				return
 		if player.attack_requested:
 			var request := player.build_attack_context()
-			if not player.move_direction.is_zero_approx():
-				request.direction = player.move_direction
 			controller.queue_attack(request)
 			player._consume_attack_input()
 		if _combo_step != null:

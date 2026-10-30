@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://world/components/scene_change_trigger.tscn" id="1_trigger"]
+[ext_resource type="PackedScene" path="res://gameplay/player/foxy.tscn" id="2_player"]
+
+[node name="ArrivalMap" type="Node3D"]
+position = Vector3(10, 0, 5)
+rotation = Vector3(0, 1.5707964, 0)
+
+[node name="OtherGate" parent="." instance=ExtResource("1_trigger")]
+position = Vector3(-8, 0, 0)
+trigger_id = &"from_cove"
+
+[node name="ArrivalGate" parent="." instance=ExtResource("1_trigger")]
+position = Vector3(3, 0, -2)
+trigger_id = &"from_hub"
+destination_scene = "res://test/fixtures/scene_transition_destination.tscn"
+
+[node name="Foxy" parent="." instance=ExtResource("2_player")]
+position = Vector3(-5, 0, 0)
