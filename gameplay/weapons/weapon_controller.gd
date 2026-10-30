@@ -3,6 +3,7 @@ extends Node
 
 # Báo đánh xong hoặc bị ngắt để Player thoát state Attack
 signal attack_finished
+signal attack_started(context: AttackContext)
 signal weapon_changed(weapon: WeaponInstance)
 signal damage_dealt(damage: DamageContext, target: Node, applied_hp: int)
 
@@ -38,6 +39,10 @@ var _active: float = 0.0
 var _recovery: float = 0.0
 var _animation_prefix: String = ""
 var _next_attack_id: int = 0
+var _combo_index: int = 0
+var _combo_remaining: float = 0.0
+var _queued_attack: AttackContext
+var _buffer_remaining: float = 0.0
 
 
 # Setup nhân vật, SP, đạn và vũ khí khởi đầu
@@ -91,6 +96,7 @@ func equip(weapon: WeaponInstance) -> bool:
 		_effect.queue_free()
 	_effect = next_effect
 	equipped = weapon
+	reset_combo()
 	if not _owned.has(weapon):
 		_owned.append(weapon)
 	if is_instance_valid(_effect):
@@ -123,6 +129,39 @@ func get_attack_duration() -> float:
 	return _windup + _active + _recovery
 
 
+func queue_attack(request: AttackContext) -> bool:
+	if request == null:
+		return false
+	if not busy or _context == null or _context.combo_step == null or request.action != &"normal":
+		return false
+	# A single slot: repeated presses never extend its lifetime or queue an entire chain.
+	if _queued_attack != null:
+		return true
+	_queued_attack = request
+	_buffer_remaining = equipped.definition.normal_attack.input_buffer_seconds
+	return true
+
+
+func clear_attack_buffer() -> void:
+	_queued_attack = null
+	_buffer_remaining = 0.0
+
+
+func reset_combo() -> void:
+	_combo_index = 0
+	_combo_remaining = 0.0
+	clear_attack_buffer()
+
+
+func can_dash_cancel() -> bool:
+	if not busy or _context == null or _context.combo_step == null:
+		return false
+	return (
+		_phase == Phase.RECOVERY
+		and (_recovery - _remaining >= _recovery * _context.combo_step.dash_cancel_fraction)
+	)
+
+
 # Nhận đòn thì trả true, chỉ trừ SP hoặc đạn 1 lần
 func try_attack(request: AttackContext) -> bool:
 	if busy or request == null or not is_instance_valid(actor) or equipped == null:
@@ -141,6 +180,8 @@ func try_attack(request: AttackContext) -> bool:
 		return false
 	if equipped.unavailable_seconds > 0.0 or equipped.cooldowns.get(request.action, 0.0) > 0.0:
 		return false
+	if request.action != &"normal" or _combo_remaining <= 0.0:
+		_combo_index = 0
 	var snapshot := _make_context(request, attack)
 	if snapshot == null:
 		return false
@@ -162,6 +203,14 @@ func try_attack(request: AttackContext) -> bool:
 	_active = attack.active_seconds / speed
 	_recovery = attack.recovery_seconds / speed
 	_animation_prefix = attack.animation_prefix
+	if snapshot.combo_step != null:
+		var step := snapshot.combo_step
+		_windup = step.windup_seconds / speed
+		_active = step.active_seconds / speed
+		_recovery = step.recovery_seconds / speed
+		if not step.animation_prefix.is_empty():
+			_animation_prefix = step.animation_prefix
+	snapshot.active_seconds = _active
 	_next_attack_id += 1
 	snapshot.attack_id = _next_attack_id
 	# Chỉ bind vũ khí, bind context sẽ tạo vòng tham chiếu
@@ -189,6 +238,9 @@ func try_attack(request: AttackContext) -> bool:
 		cancel()
 		return false
 	snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed
+	clear_attack_buffer()
+	if busy and _context == snapshot:
+		attack_started.emit(snapshot)
 	# Signal trừ tài nguyên có thể hủy đòn, kiểm tra lại trước khi chạy tiếp
 	if busy and _context == snapshot and _remaining <= 0.0:
 		_advance_phase()
@@ -223,9 +275,16 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 	result.target_position = request.target_position
 	result.has_target = request.has_target
 	result.damage_hp = attack.damage_hp
+	if request.action == &"normal" and not attack.combo_steps.is_empty():
+		result.combo_index = _combo_index % attack.combo_steps.size()
+		result.combo_step = attack.combo_steps[result.combo_index]
+		if not result.combo_step.animation_prefix.is_empty():
+			if not _has_animation(result.combo_step.animation_prefix):
+				return null
+		result.damage_hp = maxi(1, roundi(attack.damage_hp * result.combo_step.damage_multiplier))
 	result.range_units = attack.range_units
 	if equipped.forge != null:
-		result.damage_hp = maxi(1, roundi(attack.damage_hp * equipped.forge.damage_multiplier))
+		result.damage_hp = maxi(1, roundi(result.damage_hp * equipped.forge.damage_multiplier))
 		result.range_units *= maxf(0.01, equipped.forge.range_multiplier)
 		result.hitbox_multiplier = maxf(0.01, equipped.forge.hitbox_multiplier)
 	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
@@ -247,9 +306,12 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 
 
 func _physics_process(delta: float) -> void:
+	if get_node("/root/HitstopController").is_frozen(actor):
+		return
 	for weapon: WeaponInstance in _owned:
 		weapon.advance(delta)
 	if not busy:
+		_combo_remaining = maxf(0.0, _combo_remaining - delta)
 		return
 	if (
 		not is_instance_valid(actor)
@@ -262,6 +324,9 @@ func _physics_process(delta: float) -> void:
 	# Chia delta cho từng giai đoạn để frame chậm không làm mất nhịp đánh
 	while busy and budget > 0.0:
 		var step := minf(budget, _remaining)
+		_buffer_remaining = maxf(0.0, _buffer_remaining - step)
+		if _buffer_remaining <= 0.0:
+			clear_attack_buffer()
 		var current := _context
 		if _phase == Phase.ACTIVE:
 			_execution.tick_active(step)
@@ -272,6 +337,8 @@ func _physics_process(delta: float) -> void:
 		budget -= step
 		if _remaining <= 0.000001:
 			_advance_phase()
+		if not is_physics_processing() or get_node("/root/HitstopController").is_frozen(actor):
+			return
 
 
 # Chuyển giai đoạn, bật và tắt đòn đánh
@@ -295,6 +362,7 @@ func _advance_phase() -> void:
 
 # Hủy đòn hiện tại, đạn hoặc phép đã phóng có vòng đời riêng
 func cancel() -> void:
+	reset_combo()
 	_finish(true)
 
 
@@ -303,6 +371,13 @@ func _finish(interrupted: bool) -> void:
 	if not busy:
 		return
 	var execution := _execution
+	var completed_context := _context
+	var queued := _queued_attack if not interrupted else null
+	if not interrupted and completed_context.combo_step != null:
+		var attack := completed_context.weapon.definition.normal_attack
+		_combo_index = (completed_context.combo_index + 1) % attack.combo_steps.size()
+		_combo_remaining = attack.combo_reset_seconds
+	clear_attack_buffer()
 	busy = false
 	_execution = null
 	_context = null
@@ -311,6 +386,8 @@ func _finish(interrupted: bool) -> void:
 			execution.cancel()
 		else:
 			execution.release()
+	if queued != null and try_attack(queued):
+		return
 	attack_finished.emit()
 
 
@@ -359,6 +436,7 @@ func _is_target_defeated(target: Node) -> bool:
 
 
 func _on_dash_started() -> void:
+	reset_combo()
 	if is_instance_valid(_effect):
 		_effect.on_dash_started()
 

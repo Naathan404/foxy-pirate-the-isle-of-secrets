@@ -44,6 +44,7 @@ var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
+var pending_knockback_multiplier: float = 1.0
 var pending_charm_stun_seconds: float = 0.0
 var _charm_grapple_tween: Tween
 var _external_push_velocity: Vector3 = Vector3.ZERO
@@ -80,6 +81,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if get_node("/root/HitstopController").is_frozen(self):
+		return
 	fsm._update(delta)
 	if dead:
 		return
@@ -264,6 +267,11 @@ func receive_damage(damage: DamageContext) -> int:
 	if damage.source == self or damage.source_team == team:
 		return 0
 	pending_hit_direction = _get_hit_direction(damage.source)
+	if damage.is_melee_normal_attack():
+		var direction := Vector3(damage.direction.x, 0.0, damage.direction.z)
+		if not direction.is_zero_approx():
+			pending_hit_direction = direction.normalized()
+	pending_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
 	return hp.take_damage(damage.amount_hp)
 
 
@@ -312,6 +320,9 @@ func apply_charm_grapple(
 
 func _notify_hit() -> void:
 	if dead:
+		return
+	if is_instance_valid(fsm.current_state) and fsm.current_state.name == &"Hit":
+		fsm.current_state._enter()
 		return
 	request_state(&"hit", 50)
 

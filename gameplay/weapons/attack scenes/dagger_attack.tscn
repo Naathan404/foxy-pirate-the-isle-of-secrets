@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="1_bhibm"]
 [ext_resource type="Script" uid="uid://ck0gfln5qfrp" path="res://gameplay/weapons/attack scenes/dagger_attack.gd" id="1_sleko"]
-[ext_resource type="Script" uid="uid://bh8u8ifdhe86v" path="res://gameplay/combat/combat_feedback.gd" id="3_igi2i"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
 size = Vector3(1.6028976, 1, 1.7224426)
@@ -22,7 +21,3 @@ metadata/_custom_type_script = "uid://etrxpr68gxyd"
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox" unique_id=1900392975]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0008659363, 0, 0.3612213)
 shape = SubResource("BoxShape3D_jpyye")
-
-[node name="CombatFeedback" type="Node" parent="HitBox" unique_id=527796340 node_paths=PackedStringArray("hitbox")]
-script = ExtResource("3_igi2i")
-hitbox = NodePath("..")

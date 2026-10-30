@@ -24,8 +24,16 @@ enum AimMode { FACING, CURSOR_DIRECTION, CURSON_POSITION }
 @export var ammo_id: StringName = &""
 @export_range(0, 100, 1) var ammo_cost: int = 0
 
+@export_group("Melee Combo")
+@export var combo_steps: Array[MeleeComboStep] = []
+@export_range(0.0, 1.0, 0.01) var combo_reset_seconds: float = 0.22
+@export_range(0.01, 1.0, 0.01) var input_buffer_seconds: float = 0.32
+
 
 func is_valid() -> bool:
+	for step in combo_steps:
+		if step == null or not step.is_valid():
+			return false
 	return (
 		attack_scene != null
 		and not animation_prefix.is_empty()

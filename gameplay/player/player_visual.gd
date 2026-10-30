@@ -22,6 +22,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if get_node("/root/HitstopController").is_frozen(get_parent()):
+		return
 	# Camera đổi góc thì sprite cũng đổi hướng theo
 	if not _action.is_empty():
 		_update_directional_animation()

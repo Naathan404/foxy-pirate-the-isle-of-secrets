@@ -29,6 +29,14 @@ void fragment() {
 		float edge = pow(max(0.0, 1.0 - abs(p.y)), 1.7);
 		float filament = exp(-p.y * p.y * 95.0);
 		mask = (edge * 0.5 + filament * 0.65) * smoothstep(0.0, 0.22, UV.x);
+	} else if (shape == 4) {
+		// A filled melee crescent, rather than the projectile's thin ribbon filament.
+		float body = smoothstep(0.0, 0.12, UV.y)
+			* (1.0 - smoothstep(0.8, 1.0, UV.y));
+		float core = 1.0 - smoothstep(0.1, 0.38, abs(UV.y - 0.35));
+		float tips = smoothstep(0.0, 0.12, UV.x)
+			* (1.0 - smoothstep(0.88, 1.0, UV.x));
+		mask = (body * 0.9 + core * 0.45) * tips;
 	} else {
 		// Directional cut: a hot thin blade and a shorter crossing fracture.
 		float cut = exp(-p.y * p.y * 250.0) * pow(max(0.0, 1.0 - abs(p.x)), 0.45);
