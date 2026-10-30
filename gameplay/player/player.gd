@@ -187,6 +187,30 @@ func _physics_process(delta: float) -> void:
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
 	move_and_slide()
+	_push_collided_crates()
+
+
+func _push_collided_crates() -> void:
+	if dead or move_direction.is_zero_approx() or not is_on_floor():
+		return
+	# Only deliberate walking pushes; attack lunges, recoil and dash do not.
+	for state: FsmState in [fsm.current_state, fsm.next_state]:
+		if state != null and state.name.to_lower() not in ["idle", "run"]:
+			return
+	for index in get_slide_collision_count():
+		var collision := get_slide_collision(index)
+		var crate := collision.get_collider() as PushableCrate
+		if crate == null:
+			continue
+		var normal := collision.get_normal()
+		# Standing on top and grazing a side are not pushes.
+		if absf(normal.y) > 0.4 or -move_direction.dot(normal) < 0.35:
+			continue
+		var push_speed := minf(crate.push_speed, _get_move_speed())
+		if crate.request_push(move_direction, push_speed):
+			# move_and_slide clears velocity against the crate. Keep the following speed
+			# for the next tick so walking acceleration does not produce a stop/start push.
+			set_horizontal_velocity(move_direction * push_speed)
 
 
 func _read_input() -> void:
