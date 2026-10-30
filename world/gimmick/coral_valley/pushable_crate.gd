@@ -17,9 +17,38 @@ var is_floating: bool = false
 
 var _push_direction: Vector3 = Vector3.ZERO
 var _requested_speed: float = 0.0
+var _reset_transform: Transform3D
+var _initial_settled: bool = false
+var _reset_tween: Tween
 
 @onready var _body_shape: CollisionShape3D = $CollisionShape3D
 @onready var _ground_snap_length: float = floor_snap_length
+@onready var _visual: MeshInstance3D = $MeshInstance3D
+@onready var _visual_scale: Vector3 = _visual.scale
+
+
+func _ready() -> void:
+	_reset_transform = global_transform
+
+
+func get_reset_transform() -> Transform3D:
+	return _reset_transform
+
+
+func reset_to_start() -> void:
+	_push_direction = Vector3.ZERO
+	_requested_speed = 0.0
+	velocity = Vector3.ZERO
+	is_floating = false
+	floor_snap_length = _ground_snap_length
+	global_transform = _reset_transform
+	reset_physics_interpolation()
+	if _reset_tween != null and _reset_tween.is_valid():
+		_reset_tween.kill()
+	_visual.scale = Vector3.ONE * 0.001
+	_reset_tween = create_tween()
+	_reset_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_reset_tween.tween_property(_visual, "scale", _visual_scale, 0.22)
 
 
 func _notification(what: int) -> void:
@@ -53,6 +82,10 @@ func _physics_process(delta: float) -> void:
 		elif velocity.y < 0.0:
 			velocity.y = 0.0
 	move_and_slide()
+	# Capture the first dry resting pose, before any walking push can move the box.
+	if not _initial_settled and is_on_floor() and not is_floating:
+		_reset_transform = global_transform
+		_initial_settled = true
 
 
 func _update_float_velocity(delta: float) -> void:
