@@ -3,7 +3,6 @@
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_l2d5l"]
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="2_j8q38"]
 [ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="3_j8q38"]
-[ext_resource type="PackedScene" uid="uid://dyll2vamer2yd" path="res://gameplay/enemies/war_lord_turtle/war_lord_turtle.tscn" id="4_d8gql"]
 
 [sub_resource type="Environment" id="Environment_test"]
 background_mode = 1
@@ -59,6 +58,3 @@ initial_facing = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.708018, 0, 0)
 max_bullet_angle_offset_degrees = 20.0
 initial_facing = 0
-
-[node name="WarLordTurtle" parent="." unique_id=1259975192 instance=ExtResource("4_d8gql")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.113413, 0.20192409, 1.5712471)
