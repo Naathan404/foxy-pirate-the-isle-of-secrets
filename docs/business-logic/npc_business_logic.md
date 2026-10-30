@@ -48,7 +48,10 @@ BaseNpc (CharacterBody3D)
 ```
 
 `FrontRayCast3D` và `GroundRayCast3D` tắt mặc định trong Base. NPC chỉ bật
-chúng khi state Wander cần quay đầu ở tường hoặc mép vực.
+chúng khi state Wander cần quay đầu ở tường hoặc mép vực. Root `BaseNpc` có
+`Wander Radius`, là bán kính theo world unit tính từ vị trí NPC khi scene vào
+world. Chỉnh property này trên instance trong world scene để thay đổi vùng đi
+của riêng instance đó; không cần Area3D hay collider vùng.
 
 ## 2. NpcData
 
@@ -87,8 +90,12 @@ Mỗi physics tick, Base gọi FSM, áp dụng gravity khi không đứng sàn, 
 | `turn_around()` | Quay ngược hướng hiện tại. |
 | `play_directional_animation(action)` | Chọn clip `<action>_down`, `_up`, `_left`, `_right`; fallback về clip đúng tên action. |
 
-`NpcWander` luân phiên pha đi/nghỉ theo timer ngẫu nhiên trong data. Khi bật
-raycast tương ứng, nó quay lại nếu phía trước có tường hoặc không có đất.
+`NpcWander` luân phiên pha đi/nghỉ theo timer ngẫu nhiên trong data. Khi
+`Wander Radius` lớn hơn 0, mỗi pha đi chọn một điểm ngẫu nhiên trong hình tròn
+tâm ở vị trí spawn, rồi đi tới điểm đó. Điểm đích luôn ở trong bán kính nên
+đường thẳng giữa hai điểm hợp lệ cũng nằm trong vùng. Gặp tường/vực thì state
+chọn lại đích trong vùng, thay vì đi ra ngoài bán kính. Đặt radius bằng 0 chỉ
+khi cần giữ hành vi tuần tra thẳng không giới hạn cũ.
 
 ## 4. Tương tác và hội thoại
 
@@ -159,7 +166,8 @@ chuyên biệt, thay vì sửa trực tiếp BaseNpc.
 4. Thay collider body và InteractionArea theo kích thước thực của NPC.
 5. Gắn state con trực tiếp dưới `States`; đặt `initial_state_name` đúng tên node.
 6. Nếu cần Wander, thêm `NpcWander`, bật raycast cần dùng và có animation
-   `idle_*`/`walk_*` tương ứng.
+   `idle_*`/`walk_*` tương ứng. Chọn instance NPC trong world scene và đặt
+   `Wander Radius` theo khu vực cần đi; tâm luôn là vị trí đặt NPC ban đầu.
 7. Tạo character và timeline trong `dialog/npcs/<npc_id>/`, sau đó gán timeline
    mở đầu vào `NpcData.dialogue_timeline`.
 8. Test prompt, mở hội thoại, chuyển câu bằng action Dialogic hiện hành, kết thúc
