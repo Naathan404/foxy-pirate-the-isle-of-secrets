@@ -6,6 +6,7 @@
 [ext_resource type="AnimationLibrary" uid="uid://bwnb81tw6fpqn" path="res://gameplay/enemies/war_lord_turtle/war_lord_turtle_anims.tres" id="4_anims"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_hitbox"]
 [ext_resource type="Script" uid="uid://b57w3xyerxrgn" path="res://gameplay/enemies/base/states/enemy_patrol.gd" id="6_patrol"]
+[ext_resource type="Script" path="res://gameplay/enemies/war_lord_turtle/war_lord_turtle.gd" id="7_turtle"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(6, 5, 6)
@@ -18,7 +19,11 @@ height = 4.0
 radius = 1.9
 
 [node name="WarLordTurtle" unique_id=1987599701 instance=ExtResource("1_base")]
+script = ExtResource("7_turtle")
 data = ExtResource("2_data")
+patrol_speed_scale = 0.8
+patrol_contact_damage = true
+use_random_axis_patrol = true
 initial_state_name = &"Patrol"
 initial_facing = 2
 destroy_on_death = true
@@ -55,13 +60,10 @@ shape = SubResource("BoxShape3D_hitbox")
 
 [node name="Patrol" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=1957467249]
 script = ExtResource("6_patrol")
-speed_scale = 0.8
-use_contact_damage = true
 use_random_pauses = true
 move_duration_min = 1.4
 pause_duration_min = 0.8
 pause_duration_max = 1.8
-use_random_axis_changes = true
 axis_change_duration_min = 2.0
 
 [node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]

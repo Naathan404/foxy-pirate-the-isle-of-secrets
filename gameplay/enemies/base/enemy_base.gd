@@ -66,6 +66,8 @@ var _external_push_velocity: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if not _validate_components():
 		set_physics_process(false)
 		return
@@ -81,7 +83,14 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if get_node("/root/HitstopController").is_frozen(self):
+	if Engine.is_editor_hint():
+		return
+	var hitstop_controller := get_node_or_null("/root/HitstopController")
+	if (
+		hitstop_controller != null
+		and hitstop_controller.has_method("is_frozen")
+		and bool(hitstop_controller.call("is_frozen", self))
+	):
 		return
 	fsm._update(delta)
 	if dead:
@@ -453,9 +462,10 @@ func _setup_target_detector() -> void:
 
 
 func _setup_direction_checks() -> void:
-	for ray: RayCast3D in [front_ray, ground_ray]:
-		if is_instance_valid(ray):
-			ray.collision_mask = CombatLayers.WORLD
+	if is_instance_valid(front_ray):
+		front_ray.collision_mask = CombatLayers.ENEMY_FRONT_OBSTACLE_MASK
+	if is_instance_valid(ground_ray):
+		ground_ray.collision_mask = CombatLayers.WORLD
 
 
 func _refresh_direction_checks() -> void:

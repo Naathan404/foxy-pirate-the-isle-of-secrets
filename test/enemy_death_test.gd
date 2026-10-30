@@ -3,6 +3,9 @@ extends SceneTree
 const ENEMY_SCENES := [
 	preload("res://gameplay/enemies/starfish/starfish.tscn"),
 	preload("res://gameplay/enemies/barrel/barrel.tscn"),
+	preload("res://gameplay/enemies/crab/elite_crab.tscn"),
+	preload("res://gameplay/enemies/starfish/elite_starfish.tscn"),
+	preload("res://gameplay/enemies/barrel/elite_barrel.tscn"),
 ]
 
 var _failures: Array[String] = []

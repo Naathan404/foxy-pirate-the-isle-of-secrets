@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://bew4onillst0f"]
+
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://data/enemies/elite_crab_data.tres" id="2_data"]
+[ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
+[ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="4_hitbox"]
+[ext_resource type="Script" uid="uid://c42matpmx1epd" path="res://gameplay/enemies/crab/states/elite_crab_patrol.gd" id="5_patrol"]
+[ext_resource type="Script" uid="uid://v5u3xwdr8upp" path="res://gameplay/enemies/crab/states/elite_crab_charge.gd" id="6_charge"]
+[ext_resource type="Script" uid="uid://dehsy4ja64t1" path="res://gameplay/enemies/crab/elite_crab.gd" id="7_elite_crab"]
+
+[sub_resource type="BoxShape3D" id="HurtShape"]
+size = Vector3(4, 1.8, 4)
+
+[sub_resource type="BoxShape3D" id="ContactShape"]
+size = Vector3(2.4, 1.5, 2.4)
+
+[sub_resource type="BoxShape3D" id="SlamShape"]
+size = Vector3(3.4, 1.7, 4)
+
+[sub_resource type="CylinderShape3D" id="BodyShape"]
+height = 2.52
+radius = 1.2
+
+[sub_resource type="CylinderShape3D" id="DetectorShape"]
+radius = 6.7
+
+[node name="EliteCrab" unique_id=1976613988 instance=ExtResource("1_base")]
+script = ExtResource("7_elite_crab")
+player_detection_radius = 6.699999999999999
+patrol_contact_damage = true
+patrol_speed_scale = 1.0
+data = ExtResource("2_data")
+
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+target_position = Vector3(0, 0, 1.5)
+
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 1.35)
+target_position = Vector3(0, -2.25, 0)
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("HurtShape")
+
+[node name="CollisionShape3D" parent="Direction/ContactHitBox" parent_id_path=PackedInt32Array(1042209023) index="0" unique_id=973233335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("ContactShape")
+
+[node name="ActiveHitBox" type="Area3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="4" unique_id=510900516]
+script = ExtResource("4_hitbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Direction/ActiveHitBox" index="0" unique_id=73062186]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("SlamShape")
+
+[node name="Patrol" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=779580310]
+script = ExtResource("5_patrol")
+charge_cooldown = 2.4
+unreachable_target_cooldown = 2.0
+
+[node name="Charge" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=899666673]
+script = ExtResource("6_charge")
+
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.291855, 0)
+shape = SubResource("BodyShape")
+
+[node name="TargetDetector" type="Area3D" parent="." index="7" unique_id=198261817]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector" index="0" unique_id=2124335135]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("DetectorShape")
+
+[node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=798778287]
+script = ExtResource("3_feedback")
+telegraph_ring_radius = 1.8

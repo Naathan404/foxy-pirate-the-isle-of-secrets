@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/barrel.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://data/enemies/elite_barrel_data.tres" id="2_data"]
+[ext_resource type="Script" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
+[ext_resource type="Script" path="res://gameplay/enemies/barrel/states/elite_barrel_idle.gd" id="4_idle"]
+[ext_resource type="Script" path="res://gameplay/enemies/barrel/states/elite_barrel_scattershot.gd" id="5_scattershot"]
+[ext_resource type="Script" path="res://gameplay/enemies/barrel/elite_barrel.gd" id="6_elite_barrel"]
+
+[sub_resource type="BoxShape3D" id="HurtShape"]
+size = Vector3(2.7, 1.8, 2.7)
+
+[sub_resource type="CylinderShape3D" id="BodyShape"]
+height = 1.8
+radius = 1.125
+
+[sub_resource type="CylinderShape3D" id="DetectorShape"]
+height = 2.0
+radius = 9.8
+
+[node name="EliteBarrel" instance=ExtResource("1_base")]
+script = ExtResource("6_elite_barrel")
+data = ExtResource("2_data")
+player_detection_radius = 9.8
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
+show_debug_health = true
+
+[node name="Visual" parent="." index="0"]
+scale = Vector3(1.5, 1.5, 1.5)
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("HurtShape")
+
+[node name="BulletSpawn" parent="Direction" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.683268, 0.615292)
+
+[node name="Idle" parent="States" index="0"]
+script = ExtResource("4_idle")
+
+[node name="Scattershot" type="Node" parent="States"]
+script = ExtResource("5_scattershot")
+
+[node name="CollisionShape3D" parent="." index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BodyShape")
+
+[node name="CollisionShape3D" parent="TargetDetector" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("DetectorShape")
+
+[node name="EliteFeedback" type="Node3D" parent="."]
+script = ExtResource("3_feedback")
+telegraph_ring_radius = 1.55

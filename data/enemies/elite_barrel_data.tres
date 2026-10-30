@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://data/items/consumables/gunpowder_bag.tres" id="2_drop"]
+
+[resource]
+script = ExtResource("1_data")
+max_hp = 12
+move_speed = 0.0
+acceleration = 0.0
+deceleration = 0.0
+attack_damage = 2
+hit_recovery_duration = 0.35
+hit_knockback_speed = 4.0
+knockback_resistance = 0.5
+hit_deceleration = 20.0
+drop_item = ExtResource("2_drop")
+drop_quantity = 3

@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://cqpfjg7sxbddm"]
+
+[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/elite_crab.tscn" id="2_crab"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="3_starfish"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="4_barrel"]
+
+[sub_resource type="Environment" id="Environment_arena"]
+background_mode = 1
+background_color = Color(0.035, 0.05, 0.1, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.45, 0.55, 0.8, 1)
+ambient_light_energy = 0.8
+
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(34, 1, 24)
+
+[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
+albedo_color = Color(0.08, 0.16, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+material = SubResource("FloorMaterial")
+size = Vector3(34, 1, 24)
+
+[node name="EliteEnemyArena" type="Node3D" unique_id=2085540559]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1968519618]
+environment = SubResource("Environment_arena")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1915932289]
+transform = Transform3D(0.8660254, 0.28678823, -0.40957603, 0, 0.81915206, 0.57357645, 0.5, -0.49673176, 0.7094065, 0, 0, 0)
+light_energy = 1.3
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=126380145]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1649242]
+shape = SubResource("FloorShape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=927827113]
+mesh = SubResource("FloorMesh")
+
+[node name="Foxy" parent="." unique_id=751941421 instance=ExtResource("1_player")]
+
+[node name="EliteCrab" parent="." unique_id=1020413726 instance=ExtResource("2_crab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 5)
+
+[node name="EliteStarfish" parent="." unique_id=2061771446 instance=ExtResource("3_starfish")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7)
+initial_facing = 2
+
+[node name="EliteBarrel" parent="." unique_id=361353636 instance=ExtResource("4_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 5)
