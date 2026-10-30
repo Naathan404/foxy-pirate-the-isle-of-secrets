@@ -15,28 +15,40 @@ Scene gốc:
 gameplay/enemies/base/enemy_base.tscn
 ```
 
-Ví dụ sử dụng: `Crab`, `Barrel`, `Starfish` trong
+Ví dụ sử dụng: `Crab`, `Barrel`, `Starfish` và `WarLordTurtle` trong
 `gameplay/enemies/`.
 
 ## 1. Bản đồ code và ownership
 
 | Thành phần | Ownership / trách nhiệm |
 | --- | --- |
-| [enemy_base.tscn](../gameplay/enemies/base/enemy_base.tscn) | Lắp body, Visual, Direction, HurtBox, FSM, state chung, HP và debug label. |
-| [enemy_base.gd](../gameplay/enemies/base/enemy_base.gd) | Điều phối vòng đời, physics, hướng, target, stat/combat layer, damage và yêu cầu state; không chứa luật attack cụ thể. |
-| [enemy_visual.gd](../gameplay/enemies/base/enemy_visual.gd) | Chọn clip theo hướng, flip sprite ngang, feedback hit/death. |
-| [enemy_state.gd](../gameplay/enemies/base/states/enemy_state.gd) | API state: `enemy`, `request_state()` và `return_to_behavior()`. |
+| [enemy_base.tscn](../../gameplay/enemies/base/enemy_base.tscn) | Lắp body, Visual, Direction, HurtBox, FSM, state chung, HP và debug label. |
+| [enemy_base.gd](../../gameplay/enemies/base/enemy_base.gd) | Điều phối vòng đời, physics, hướng, target, stat/combat layer, damage và yêu cầu state; không chứa luật attack cụ thể. |
+| [enemy_visual.gd](../../gameplay/enemies/base/enemy_visual.gd) | Chọn clip theo hướng, flip sprite ngang, feedback hit/death. |
+| [enemy_state.gd](../../gameplay/enemies/base/states/enemy_state.gd) | API state: `enemy`, `request_state()` và `return_to_behavior()`. |
 | `enemy_idle.gd`, `enemy_hit.gd`, `enemy_death.gd` | Hành vi chung đứng yên, phản ứng khi bị đánh và kết thúc vòng đời. |
-| [enemy_patrol.gd](../gameplay/enemies/base/states/enemy_patrol.gd) | State tuần tra tái sử dụng, chỉ thêm vào enemy cần nó. |
-| [fsm.gd](../core/state_machine/fsm.gd) | Đăng ký state, giữ `current_state`/`next_state`, áp dụng priority và khóa terminal state. |
-| [health_component.gd](../core/components/health_component.gd) | Sở hữu HP runtime; phát `hp_changed`, `damaged`, `died`. |
-| [hitbox_component.gd](../core/components/hitbox_component.gd) và [hurtbox_component.gd](../core/components/hurtbox_component.gd) | Lọc va chạm combat, tạo/chuyển `DamageContext`, kiểm soát số lần trúng. |
-| [enemy_data.gd](../data/enemies/enemy_data.gd) | Chỉ số chung được tách khỏi scene/script enemy. |
+| [enemy_patrol.gd](../../gameplay/enemies/base/states/enemy_patrol.gd) | State tuần tra tái sử dụng, chỉ thêm vào enemy cần nó. |
+| [fsm.gd](../../core/state_machine/fsm.gd) | Đăng ký state, giữ `current_state`/`next_state`, áp dụng priority và khóa terminal state. |
+| [health_component.gd](../../core/components/health_component.gd) | Sở hữu HP runtime; phát `hp_changed`, `damaged`, `died`. |
+| [hitbox_component.gd](../../core/components/hitbox_component.gd) và [hurtbox_component.gd](../../core/components/hurtbox_component.gd) | Lọc va chạm combat, tạo/chuyển `DamageContext`, kiểm soát số lần trúng. |
+| [enemy_data.gd](../../data/enemies/enemy_data.gd) | Chỉ số chung được tách khỏi scene/script enemy. |
 
 Nguyên tắc ownership: **Base sở hữu cơ chế**, state sở hữu **quyết định hành
 vi theo thời điểm**, scene enemy sở hữu **collider, animation, data và component
 tùy chọn**. Ví dụ Starfish sở hữu luật khóa vị trí Player rồi dash; Base chỉ
 cung cấp target, di chuyển và contact damage.
+
+### Enemy lớn / elite
+
+`elite` hiện là mô tả thiết kế, không phải một nhánh business logic hay lớp base mới.
+Enemy lớn vẫn kế thừa trực tiếp `EnemyBase`: chỉ số như HP nằm trong `EnemyData`, còn
+kích thước sprite, body collider, HurtBox và ContactHitBox nằm trong scene của enemy.
+`WarLordTurtle` là ví dụ: scene dùng collider lớn hơn, data riêng có HP cao hơn và state
+`EnemyPatrol` dùng lại không đổi luật combat.
+
+Không gán group `boss` hoặc bật `charm_grapple_large` chỉ vì enemy có kích thước lớn.
+Hai cơ chế đó thay đổi kết quả Tide Grapple, nên chỉ dùng khi game design quy định rõ
+enemy là mục tiêu lớn/boss của charm này.
 
 ## 2. Khởi tạo
 
@@ -266,6 +278,11 @@ không còn khớp với hình ảnh.
 7. Chọn `Initial Facing` (`Down`, `Up`, `Left`, `Right`), sau đó chạy scene để
    kiểm tra collider, hướng và animation.
 
+Đặt scene và animation trong `gameplay/enemies/<enemy_name>/`, data trong
+`data/enemies/<enemy_name>_data.tres`, và sprite trong
+`assets/sprites/enemies/<enemy_name>/`. Ví dụ rùa: `war_lord_turtle/` và
+`war_lord_turtle_data.tres`.
+
 `EnemyData` có các nhóm thông số sau:
 
 | Nhóm | Thông số |
@@ -372,9 +389,11 @@ Khi đi ngang, sprite `side` tự flip cho hướng trái. Nếu art có clip ri
 thể dùng `<action>_left` và `<action>_right`; chúng được ưu tiên hơn `side`.
 Ví dụ: `idle_down`, `run_up`, `hit_side`, `charge_left`, `death_right`.
 
-`play_directional_animation()` tự lấy hướng hiện tại của enemy. Với animation
-không theo hướng, gọi `enemy.play_animation(&"spawn")` bằng tên clip chính xác.
-Nên luôn có `idle_*`, `hit_*` và `death_*` tương ứng cho hướng mà enemy dùng;
+`play_directional_animation()` tự lấy hướng hiện tại của enemy. Nếu không tìm thấy
+clip theo hướng, nó tự fallback sang clip đúng tên action. Vì vậy animation không theo
+hướng có thể đặt tên `idle`, `run`, `hit`, `death`; `WarLordTurtle` dùng cách này.
+`enemy.play_animation(&"spawn")` chỉ cần cho clip một lần không thuộc action của state.
+Mỗi action mà state gọi phải có ít nhất một clip hợp lệ, theo hướng hoặc exact action;
 nếu thiếu, state vẫn chạy nhưng không có clip để phát.
 
 ## 14. Raycast, Patrol và debug
