@@ -45,6 +45,7 @@
 [ext_resource type="Resource" uid="uid://ckio67a4p70la" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
 [ext_resource type="Resource" uid="uid://cdmevnqdpo77o" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
+[ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/materials/wooden_arrow.tres" id="Item_wooden_arrow"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
@@ -788,7 +789,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_qa68t"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wtrn1"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -1013,7 +1014,13 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_qa68t")
+process_material = SubResource("ParticleProcessMaterial_wtrn1")
+
+[node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
+player = NodePath("../..")
+weapons = NodePath("../../WeaponController")
+bow_opacity = 0.7
+bow_seconds = 0.15000000000000002
 
 [node name="HitEffect" type="Node3D" parent="Effects" unique_id=210042358 node_paths=PackedStringArray("player", "sprite", "visual", "health")]
 script = ExtResource("hit_feedback")
