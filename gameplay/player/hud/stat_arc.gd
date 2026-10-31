@@ -35,13 +35,17 @@ func _ready() -> void:
 func set_stat(current: float, maximum: float) -> void:
 	var degrees := maximum_arc * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
 	for bar: TextureProgressBar in [capacity, fill, shadow]:
+		if stat_name == "HP":
+			bar.step = 0.0
 		bar.radial_initial_angle = initial_angle
 		bar.radial_fill_degrees = degrees
-		bar.max_value = maxf(maximum, 1.0)
+		bar.max_value = maxf(maximum, 0.01)
 	capacity.value = maxf(maximum, 0.0)
 	shadow.value = maxf(maximum, 0.0)
 	fill_effect.set_target(current)
 	var text := "%s: %d / %d" % [stat_name, floori(current), floori(maximum)]
+	if stat_name == "HP":
+		text = "%s: %s / %s" % [stat_name, String.num(current, 2), String.num(maximum, 2)]
 	capacity.set_stat_tooltip(text)
 	if is_instance_valid(value_label):
 		value_label.text = text

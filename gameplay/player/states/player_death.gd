@@ -21,10 +21,7 @@ func _enter() -> void:
 	if is_instance_valid(player.visual):
 		var action := "death" if player.visual.has_directional_animation("death") else "hit"
 		player.play_directional_animation(action, true)
-		var animator: AnimationPlayer = player.visual.animation_player
-		if is_instance_valid(animator) and animator.has_animation(animator.assigned_animation):
-			var animation: Animation = animator.get_animation(animator.assigned_animation)
-			timer = maxf(timer, animation.length / maxf(absf(animator.speed_scale), 0.01))
+		timer = maxf(timer, player.visual.get_current_animation_duration())
 
 
 func _update(delta: float) -> void:

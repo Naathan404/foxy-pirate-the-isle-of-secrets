@@ -68,6 +68,6 @@ func _sync_stats() -> void:
 		chaos_arc.sync_preview()
 
 
-func _on_hp_changed(current: int, maximum: int) -> void:
+func _on_hp_changed(current: float, maximum: float) -> void:
 	health_arc.set_stat(current, maximum)
 	portrait.set_health(current, maximum)

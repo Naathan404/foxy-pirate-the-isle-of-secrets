@@ -214,7 +214,7 @@ func _test_backstabber(actor: MockActor, world: Node3D, registry: CharmRegistry)
 	stacked.origin = actor.global_position
 	_assert_equal(
 		registry.modify_outgoing_damage(5, stacked),
-		16,
+		15.0,
 		"Charm damage modifiers stack in Q then Space order"
 	)
 	_assert_true(registry.unequip_socket(CharmConstants.SocketId.SPACE), "unequip stacked Double")
@@ -304,7 +304,7 @@ func _find_seed(chance: float, expected: bool) -> int:
 	return 1
 
 
-func _on_damage_applied(damage: DamageContext, _target: Node, _applied_hp: int) -> void:
+func _on_damage_applied(damage: DamageContext, _target: Node, _applied_hp: float) -> void:
 	_damage_event_count += 1
 	_last_damage = damage
 
@@ -365,12 +365,12 @@ class MockTarget:
 	var dead: bool = false
 	var facing_direction: Vector3 = Vector3.BACK
 
-	func setup(max_hp: int) -> void:
+	func setup(max_hp: float) -> void:
 		hp = HealthComponent.new()
 		add_child(hp)
 		hp.init(max_hp)
 
-	func receive_damage(damage: DamageContext) -> int:
+	func receive_damage(damage: DamageContext) -> float:
 		if hp == null:
 			return 0
 		var applied := hp.take_damage(damage.amount_hp)

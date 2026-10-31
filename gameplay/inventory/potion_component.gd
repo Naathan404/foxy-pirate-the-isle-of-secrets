@@ -60,7 +60,7 @@ func use_equipped_potion() -> bool:
 		if health == null:
 			return false
 		var used_potion = equipped_potion as HealingPotion
-		var healed: int = health.heal(used_potion.heal_amount)
+		var healed: float = health.heal(used_potion.heal_amount)
 		if healed <= 0:
 			return false
 

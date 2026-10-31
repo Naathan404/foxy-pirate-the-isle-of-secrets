@@ -67,11 +67,11 @@ func _get_damage_target(collider: Object) -> Node:
 
 func _apply_damage(collider: Object, target: Node) -> void:
 	var damage := context.create_damage_context()
-	var applied_hp := 0
+	var applied_hp := 0.0
 	if collider is HurtBox:
 		applied_hp = (collider as HurtBox).take_damage(damage)
 	elif target.has_method("receive_damage"):
-		applied_hp = int(target.call("receive_damage", damage))
+		applied_hp = float(target.call("receive_damage", damage))
 	if applied_hp > 0:
 		context.damage_applied.emit(damage, target, applied_hp)
 

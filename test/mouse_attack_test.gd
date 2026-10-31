@@ -19,6 +19,8 @@ func _run() -> void:
 	floor_body.position.y = -0.5
 	world.add_child(floor_body)
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
+	# Pin the fixture independently of the forge selected for manual testing.
+	player.get_node("WeaponController").default_forge = null
 	player.position.y = 0.7
 	world.add_child(player)
 	for frame in 12:
@@ -47,6 +49,17 @@ func _run() -> void:
 		"Character faces the accepted attack")
 	_check(state._step_direction.is_equal_approx(expected),
 		"Forward step follows cursor aim")
+	var displacement := Vector3.ZERO
+	for frame in 12:
+		state._update(0.02)
+		var movement := Vector3(player.velocity.x, 0, player.velocity.z)
+		_check(movement.dot(expected) >= -0.0001,
+			"Holding opposite movement never pulls the swing backward")
+		displacement += movement * 0.02
+	_check(displacement.is_equal_approx(expected * state._combo_step.step_distance),
+		"Opposite movement preserves the authored lunge distance without drift")
+	_check(Vector3(player.velocity.x, 0, player.velocity.z).is_zero_approx(),
+		"Recovery stays still after the forward step ends")
 	var visual_facing: Vector3 = player.visual._facing
 	# Moving the camera changes the projected cursor target without changing the mouse.
 	camera.position = player.position + Vector3(10, 10, 0)
@@ -76,6 +89,9 @@ func _run() -> void:
 	player.update_facing()
 	_check(player.last_facing_direction.is_equal_approx(player.move_direction),
 		"Locomotion resumes movement facing")
+	player.update_movement(0.02, true)
+	_check(player.velocity.dot(player.move_direction) > 0.0,
+		"Held movement resumes after leaving Attack")
 	# A cursor directly over the actor must not produce a zero attack direction.
 	var fallback := AimFallbackPlayer.new()
 	var visual := PlayerVisual.new()

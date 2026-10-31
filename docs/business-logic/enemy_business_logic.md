@@ -18,6 +18,28 @@ gameplay/enemies/base/enemy_base.tscn
 Ví dụ sử dụng: `Crab`, `Barrel`, `Starfish` và `WarLordTurtle` trong
 `gameplay/enemies/`.
 
+## HP và cân bằng damage dạng float
+
+`EnemyData.max_hp`, `attack_damage`, HP runtime và các payload damage đều dùng
+`float`. HP hiện tại được cân theo dao Pristine 1.0 damage/hit; ba combo step
+hiện có damage multiplier 1.0. Chưa thay đổi damage vũ khí, tốc độ hay damage enemy.
+
+| Enemy | HP cũ | HP mới | Hit Pristine 1.0 | Hit Heavy Edge 1.3 |
+| --- | --- | --- | --- | --- |
+| Starfish | 3 | 2.6 | 3 | 2 |
+| Crab | 3 | 3.2 | 4 | 3 |
+| Barrel | 3 | 4.0 | 4 | 4 |
+| War Lord Turtle | 20 | 16.0 | 16 | 13 |
+
+Starfish là mục tiêu nhẹ, Crab chịu thêm một hit cơ bản, Barrel có HP cao hơn
+để bù vai trò đứng bắn, còn Turtle giữ vai trò enemy trâu. Đây là mốc cân bằng
+ban đầu theo số hit, cần đánh giá cảm giác chiến đấu trong game. Bảng không tính
+Charm, bỏ lỡ đòn hoặc Doomsday Edge đang gắn thử trên scene Foxy.
+
+HealthComponent xử lý sai số ở đòn kết liễu, không để enemy sống với HP dư gần 0.
+Debug label hiển thị tối đa hai chữ số thập phân; số HP dùng tính toán không bị làm tròn.
+`test/float_combat_test.gd` kiểm tra các mốc trên bằng scene enemy thật.
+
 ## 1. Bản đồ code và ownership
 
 | Thành phần | Ownership / trách nhiệm |

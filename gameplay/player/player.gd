@@ -108,7 +108,7 @@ func _setup_charm_system() -> void:
 	charm_socket_manager.actor = self
 
 
-func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: int) -> void:
+func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	if dead or not is_instance_valid(chaos) or applied_hp <= 0:
 		return
 	if damage.source == self and target is EnemyBase:
@@ -120,26 +120,26 @@ func _on_stamina_changed(amount: float, maximum: float) -> void:
 		stamina_label.text = "SP: " + str(int(amount)) + "/" + str(int(maximum))
 
 
-func _on_hp_changed(amount: int, maximum: int) -> void:
+func _on_hp_changed(amount: float, maximum: float) -> void:
 	if is_instance_valid(hp_label):
-		hp_label.text = "HP: " + str(amount) + "/" + str(maximum)
+		hp_label.text = "HP: %s / %s" % [String.num(amount, 2), String.num(maximum, 2)]
 
 
-func _on_damaged(_applied_hp: int) -> void:
+func _on_damaged(_applied_hp: float) -> void:
 	# Đòn chí mạng để state Death xử lý, không vào Hit nữa
 	if hp.is_alive():
 		notify_hit()
 
 
 # Dùng cho damage trực tiếp, ví dụ bẫy hoặc nút test
-func take_damage(amount: int) -> int:
+func take_damage(amount: float) -> float:
 	var damage := DamageContext.new()
 	damage.amount_hp = amount
 	return receive_damage(damage)
 
 
 # Đòn từ HurtBox đi qua phòng thủ trước rồi mới trừ HP
-func receive_damage(damage: DamageContext) -> int:
+func receive_damage(damage: DamageContext) -> float:
 	if dead or not is_instance_valid(hp):
 		return 0
 	if damage == null or damage.amount_hp <= 0:
@@ -152,7 +152,7 @@ func receive_damage(damage: DamageContext) -> int:
 	var amount := damage.amount_hp
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
-			amount = int(weapon_controller.call("modify_incoming_damage", amount, damage))
+			amount = float(weapon_controller.call("modify_incoming_damage", amount, damage))
 	if is_instance_valid(charm_socket_manager):
 		amount = charm_socket_manager.modify_incoming_damage(amount, damage)
 	var applied_hp := hp.take_damage(amount)
@@ -175,8 +175,7 @@ func _physics_process(delta: float) -> void:
 
 	fsm._update(delta)
 
-	### test
-	if Input.is_action_just_pressed("test_hit"):
+	if OS.is_debug_build() and Input.is_action_just_pressed("test_hit"):
 		take_damage(1)
 
 	# State chọn vận tốc, Player chỉ di chuyển vật lý 1 lần mỗi frame
@@ -513,13 +512,3 @@ func _get_move_speed() -> float:
 	return maxf(
 		0.0, (data.move_speed + stats[&"move_speed_flat"]) * stats[&"move_speed_multiplier"]
 	)
-
-#func begin_hitbox_attack(amount_hp: int, attack_id: int = 0, tag: StringName = &"normal") -> bool:
-#if dead or not is_instance_valid(hitbox):
-#return false
-#return hitbox.begin_attack(amount_hp, attack_id, tag)
-#
-#
-#func end_hitbox_attack() -> void:
-#if is_instance_valid(hitbox):
-#hitbox.end_attack()

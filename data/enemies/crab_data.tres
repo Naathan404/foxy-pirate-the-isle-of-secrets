@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_enemy_data")
+max_hp = 8.0
 move_speed = 2.5
 acceleration = 30.0
 deceleration = 30.0

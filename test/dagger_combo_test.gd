@@ -99,6 +99,8 @@ func _run() -> void:
 	_check(not controller.busy, "Expired input buffer does not trigger an unwanted attack")
 	# Local hitstop must not change global timing, and cancel must restore animation speed.
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
+	# Pin the fixture independently of the forge selected for manual testing.
+	player.get_node("WeaponController").default_forge = null
 	player.position = Vector3(10, 0.7, 0)
 	var floor_body := StaticBody3D.new()
 	var floor_shape := CollisionShape3D.new()
@@ -246,6 +248,6 @@ class CombatDummy:
 	var hurtbox: HurtBox
 	var hits: int = 0
 
-	func receive_damage(damage: DamageContext) -> int:
+	func receive_damage(damage: DamageContext) -> float:
 		hits += 1
 		return damage.amount_hp

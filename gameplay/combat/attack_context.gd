@@ -4,7 +4,7 @@ extends RefCounted
 ### Context chứa ngồn đánh, hướng, mục tiêu, damage
 
 # Lượng máu thật sự mất
-signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
 signal damage_prepared(damage: DamageContext, target: Node)
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
@@ -24,7 +24,7 @@ var weapon: WeaponInstance
 var weapon_category: int = -1
 
 # chỉ số sau khi rèn
-var damage_hp: int = 1
+var damage_hp: float = 1
 var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
 var combo_index: int = 0

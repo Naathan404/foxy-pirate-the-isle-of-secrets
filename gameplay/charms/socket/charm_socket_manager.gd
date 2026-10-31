@@ -346,19 +346,19 @@ func activate_socket(socket_id: int) -> bool:
 	return true
 
 
-func modify_outgoing_damage(amount_hp: int, damage: DamageContext) -> int:
+func modify_outgoing_damage(amount_hp: float, damage: DamageContext) -> float:
 	if not is_instance_valid(registry):
 		return amount_hp
 	return registry.modify_outgoing_damage(amount_hp, damage)
 
 
-func modify_attack_damage(amount_hp: int, attack: AttackContext) -> int:
+func modify_attack_damage(amount_hp: float, attack: AttackContext) -> float:
 	if not is_instance_valid(registry):
 		return amount_hp
 	return registry.modify_attack_damage(amount_hp, attack)
 
 
-func modify_incoming_damage(amount_hp: int, damage: DamageContext) -> int:
+func modify_incoming_damage(amount_hp: float, damage: DamageContext) -> float:
 	if not is_instance_valid(registry):
 		return amount_hp
 	return registry.modify_incoming_damage(amount_hp, damage)

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"swift_flow"
+display_name = "Swift Flow"
+description = "Attack Speed +30%, Damage -20%"
+acquisition_source = &"blacksmith"
+drop_weight = 10.0
+attack_speed_multiplier = 1.30
+damage_multiplier = 0.80

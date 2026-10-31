@@ -137,7 +137,7 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 
 
 # Chuyển hit đã gây sát thương về context để controller xử lý chaos và hiệu ứng vũ khí
-func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: int) -> void:
+func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	context.damage_applied.emit(damage, target, applied_hp)
 	if applied_hp > 0:
 		var direction := flight_direction

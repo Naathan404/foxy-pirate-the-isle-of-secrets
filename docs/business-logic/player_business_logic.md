@@ -227,14 +227,21 @@ HurtBox và Player lọc damage không hợp lệ, tự đánh và damage cùng 
 `take_damage()` nhận damage trực tiếp nhưng vẫn đi qua phòng thủ của vũ khí.
 Nếu phòng thủ chặn hết damage thì không mất HP và không vào Hit.
 
+HP, damage, hồi máu và lượng HP áp dụng trong signal/API đều dùng `float`.
+Forge và Charm giữ phần thập phân xuyên suốt, không làm tròn từng bước hoặc ép
+damage tối thiểu 1 HP. HealthComponent chặn NaN/vô cực, giới hạn damage/heal theo
+HP thực tế, và chuẩn hóa đòn kết liễu gần bằng HP còn lại để tránh dư sai số.
+HUD/debug label chỉ định dạng tối đa hai chữ số thập phân; không sửa HP runtime.
+
 Khi vào Hit, nhân vật bị đẩy ra xa nguồn đánh. Không xác định được nguồn thì đẩy
 ngược hướng nhìn. Nhận thêm damage khi đang Hit chỉ đặt lại timer; không lặp lại
 knockback, cú nhấc lên hay animation. Hit không có khoảng miễn nhiễm sát thương.
 
 Đòn làm HP về 0 đi thẳng vào luồng chết. `die()` lập tức đặt `dead`, tắt HurtBox,
 xóa yêu cầu hành động, ngừng hồi SP, hủy đòn và dừng vận tốc ngang. Death được áp
-dụng ở lần cập nhật FSM tiếp theo. Nhân vật vẫn chịu gravity; chưa có luồng hồi sinh
-hoặc tự xóa khỏi scene.
+dụng ở lần cập nhật FSM tiếp theo. Nhân vật vẫn chịu gravity. Sau ít nhất
+`reload_delay` và đủ thời lượng animation, Death yêu cầu GameManager reload scene
+qua fade; chưa có luồng hồi sinh riêng tại checkpoint.
 
 ## Chỉ số và hiển thị
 
@@ -265,6 +272,11 @@ sprite khi cần. Bụi chạy, bụi dash và ghost phản hồi trạng thái 
 chốt, mặc định 0.28 đơn vị trong 0.12 giây, giảm tốc dần. Chỉnh tại
 `Foxy/States/Attack` → `Forward Step`; đặt `Step Distance = 0` để tắt.
 
+Trong Attack, WASD không cộng vận tốc chạy vào bước tiến. Giữ hướng chạy ngược
+hướng chém cũng không kéo nhân vật lùi lại trong recovery; hết đòn mới tiếp tục
+chạy theo phím đang giữ. Trường `MeleeComboStep.movement_multiplier` đã được bỏ
+cùng các giá trị trong resource dagger; bước tiến chỉ dùng `step_distance` và `step_duration`.
+
 State chọn vận tốc, Player vẫn dùng `move_and_slide()` một lần mỗi physics
 frame nên có va chạm tường/enemy. Đòn bị từ chối không tạo bước tiến; thoát
 Attack hoặc rời mặt đất sẽ kết thúc bước tiến. Mở inventory giữ nguyên tiến độ.
@@ -277,7 +289,8 @@ phase, để hitbox chém không bị bỏ lại tại điểm bắt đầu đò
 
 - Đổi vũ khí chỉ cho Idle/Run/Fall. Bắt đầu đánh cần trên sàn và chỉ cho
   Idle/Run/Attack. Cả hai đều kiểm tra state hiện tại lẫn state đang chờ.
-- Hit hiện thoát theo timer, dù code có biến theo dõi animation đã kết thúc.
+- Hit thoát theo timer stun, độc lập với thời lượng animation. Death hỏi thời lượng
+  qua `PlayerVisual.get_current_animation_duration()` để chờ đủ clip trước khi reload.
 - Controller nhận đòn phải phát `attack_finished`; Player chưa có timeout dự phòng.
 - `_setup_combat()` gọi setup vũ khí ngoài guard kiểm tra controller, nên cần
   gán controller hợp lệ cho Player.

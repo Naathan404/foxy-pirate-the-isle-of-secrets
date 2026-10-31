@@ -122,15 +122,23 @@ cuối cùng về Player để animation quay đúng hướng.
 
 | Chỉ số sau forge | Cách tính |
 | --- | --- |
-| Damage | Damage gốc × damage multiplier, làm tròn và giữ tối thiểu 1 |
+| Damage | Damage gốc × damage multiplier × stamina damage multiplier nếu đòn tiêu hao SP; giữ `float`, không làm tròn hoặc ép tối thiểu 1 |
 | Range | Range gốc × range multiplier, multiplier tối thiểu 0,01 |
 | Kích thước hitbox | Dùng hitbox multiplier, tối thiểu 0,01 |
 | SP tiêu hao | SP gốc × cost multiplier, multiplier tối thiểu 0 |
-| Thời gian từng giai đoạn và cooldown | Giá trị gốc ÷ speed multiplier, multiplier tối thiểu 0,01 |
+| Startup | Windup gốc × windup multiplier ÷ speed multiplier |
+| Active | Active gốc ÷ speed multiplier |
+| Recovery | Recovery gốc × recovery multiplier ÷ speed multiplier |
+| Cooldown | Cooldown gốc ÷ speed multiplier |
 
 Ví dụ, speed multiplier bằng 2 làm thời gian đòn và cooldown còn một nửa.
-Ammo cost không đổi theo forge. Hiện mới có dữ liệu và cách áp chỉ số rèn,
-chưa có luồng thao tác rèn trong game.
+Các hệ số thời gian tối thiểu 0,01. Timing lấy từ combo step nếu có, rồi mới áp forge.
+`AttackData.delivery_type` phân biệt MELEE / PROJECTILE / AREA, độc lập với category
+của vũ khí. Titan Sweep chỉ tăng hitbox của MELEE; True Flight chỉ tăng range của
+PROJECTILE. Range và hitbox multiplier chung vẫn áp dụng như trước.
+
+Ammo cost và CP không đổi theo forge. Pool chung và API rèn được mô tả trong
+[hệ thống forge](weapon_forges.md); chưa có giao diện/thanh toán thợ rèn trong game.
 
 ## Dagger gây sát thương ra sao?
 
@@ -147,9 +155,9 @@ một lần trong mỗi đòn, kể cả có nhiều HurtBox. Nếu damage bị 
 bị đánh dấu là đã trúng nên có thể được xét lại. Policy `ONCE_PER_CONTACT` cho phép
 trúng lại sau khi rời hẳn vùng va chạm rồi quay vào; dagger dùng `ONCE_PER_ATTACK`.
 
-Scene đòn được đặt trong world tại vị trí bắt đầu, không bám theo Player từng tick.
-Tầm cận chiến của dagger phụ thuộc hình dạng hitbox và hitbox multiplier;
-`range_units` không tự kéo dài hitbox.
+Scene đòn được đặt trong world. Dagger combo cập nhật vị trí theo actor khi activate
+và trong ACTIVE; `range_units` quyết định chiều dài vùng quét, còn hitbox multiplier
+scale vùng này. Đòn melee không có combo vẫn dùng hình dạng hitbox đã cấu hình.
 
 Thông số của [dagger hiện tại](../data/weapon/weapon_dagger.tres):
 
@@ -240,7 +248,7 @@ HitBox.hit_confirmed(damage, target, applied_hp)
 → Player xét điều kiện cộng chaos
 ```
 
-`damage: DamageContext`, `target: Node`, `applied_hp: int` là dữ liệu của hit thực tế.
+`damage: DamageContext`, `target: Node`, `applied_hp: float` là dữ liệu của hit thực tế.
 HitBox chỉ phát `hit_confirmed` khi `applied_hp > 0`; scene phải chuyển tiếp đúng một
 lần, không tự cộng chaos hay phát hit khi đánh hụt. DaggerAttack và dagger boomerang
 đều đã nối signal này. Vũ khí mới muốn có chaos và hook damage cũng phải nối tương tự.

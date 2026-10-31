@@ -1,9 +1,9 @@
 class_name HitBox
 extends Area3D
 
-signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
 signal damage_prepared(damage: DamageContext, target: Node)
-signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: int)
+signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: float)
 
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
@@ -32,7 +32,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func begin_attack(
-	amount_hp: int,
+	amount_hp: float,
 	attack_id: int = 0,
 	tag: StringName = &"normal",
 	rehit_policy: RehitPolicy = RehitPolicy.ONCE_PER_ATTACK

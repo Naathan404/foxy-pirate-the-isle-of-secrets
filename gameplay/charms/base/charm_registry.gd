@@ -182,29 +182,29 @@ func advance(delta: float) -> void:
 			runtime.advance(delta)
 
 
-func modify_outgoing_damage(amount_hp: int, damage: DamageContext) -> int:
+func modify_outgoing_damage(amount_hp: float, damage: DamageContext) -> float:
 	var modified_amount := amount_hp
 	# Forge/attack-level modifiers đã được chốt trước; per-hit Charm stack theo Q -> Space -> E.
 	for runtime: CharmRuntime in _get_equipped_runtime_snapshot():
 		if _is_runtime_still_equipped(runtime):
 			modified_amount = runtime.effect.modify_outgoing_damage(modified_amount, damage)
-	return maxi(0, modified_amount)
+	return maxf(0.0, modified_amount)
 
 
-func modify_attack_damage(amount_hp: int, attack: AttackContext) -> int:
+func modify_attack_damage(amount_hp: float, attack: AttackContext) -> float:
 	var modified_amount := amount_hp
 	for runtime: CharmRuntime in _get_equipped_runtime_snapshot():
 		if _is_runtime_still_equipped(runtime):
 			modified_amount = runtime.effect.modify_attack_damage(modified_amount, attack)
-	return maxi(0, modified_amount)
+	return maxf(0.0, modified_amount)
 
 
-func modify_incoming_damage(amount_hp: int, damage: DamageContext) -> int:
+func modify_incoming_damage(amount_hp: float, damage: DamageContext) -> float:
 	var modified_amount := amount_hp
 	for runtime: CharmRuntime in _get_equipped_runtime_snapshot():
 		if _is_runtime_still_equipped(runtime):
 			modified_amount = runtime.effect.modify_incoming_damage(modified_amount, damage)
-	return maxi(0, modified_amount)
+	return maxf(0.0, modified_amount)
 
 
 func modify_stats(stats: Dictionary[StringName, float]) -> void:

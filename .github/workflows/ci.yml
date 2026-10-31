@@ -62,4 +62,4 @@ jobs:
           while IFS= read -r -d '' test; do
             echo "Running $test"
             check_godot 60s --script "$test"
-          done < <(find test -type f -name '*_test.gd' -print0 | sort -z)
+          done < <(find test gameplay/charms -type f -name '*_test.gd' -print0 | sort -z)

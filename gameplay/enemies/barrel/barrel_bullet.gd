@@ -11,18 +11,20 @@ var _source: Node
 var _source_team: int = 0
 var _direction: Vector3 = Vector3.FORWARD
 var _speed: float = 0.0
-var _damage: int = 0
+var _damage: float = 0
 var _remaining_lifetime: float = 0.0
 
 @onready var hitbox: HitBox = $HitBox
 
 
-func launch(source: Node, source_team: int, direction: Vector3, speed: float, damage: int) -> void:
+func launch(
+	source: Node, source_team: int, direction: Vector3, speed: float, damage: float
+) -> void:
 	_source = source
 	_source_team = source_team
 	_direction = Vector3(direction.x, 0.0, direction.z).normalized()
 	_speed = maxf(0.0, speed)
-	_damage = max(0, damage)
+	_damage = maxf(0.0, damage)
 
 
 func _ready() -> void:

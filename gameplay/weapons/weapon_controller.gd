@@ -5,7 +5,7 @@ extends Node
 signal attack_finished
 signal attack_started(context: AttackContext)
 signal weapon_changed(weapon: WeaponInstance)
-signal damage_dealt(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_dealt(damage: DamageContext, target: Node, applied_hp: float)
 
 # Các giai đoạn của 1 đòn đánh
 enum Phase { WINDUP, ACTIVE, RECOVERY }
@@ -13,6 +13,8 @@ enum Phase { WINDUP, ACTIVE, RECOVERY }
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
 @export var default_weapon: WeaponData
+## Optional initial forge; null preserves the unmodified starting weapon.
+@export var default_forge: WeaponForge
 @export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
 
 var equipped: WeaponInstance
@@ -63,13 +65,20 @@ func setup(
 	if default_weapon != null:
 		var starter := WeaponInstance.new()
 		starter.definition = default_weapon
+		starter.forge = default_forge
 		return equip(starter)
 	return true
 
 
 # Kiểm tra vũ khí mới trước, lỗi thì giữ vũ khí cũ
 func equip(weapon: WeaponInstance) -> bool:
-	if busy or not is_instance_valid(actor) or weapon == null or weapon.definition == null:
+	if (
+		busy
+		or not is_instance_valid(actor)
+		or weapon == null
+		or weapon.definition == null
+		or (weapon.forge != null and not weapon.forge.is_valid())
+	):
 		return false
 	if actor.has_method("can_equip_weapon") and not bool(actor.call("can_equip_weapon")):
 		return false
@@ -174,7 +183,12 @@ func try_attack(request: AttackContext) -> bool:
 	):
 		return false
 	var attack := equipped.get_attack(request.action)
-	if attack == null or not attack.is_valid() or not _has_animation(attack.animation_prefix):
+	if (
+		attack == null
+		or not attack.is_valid()
+		or not _has_animation(attack.animation_prefix)
+		or (equipped.forge != null and not equipped.forge.is_valid())
+	):
 		return false
 	if request.action == &"secondary" and (not is_instance_valid(chaos) or not chaos.is_full()):
 		return false
@@ -210,6 +224,9 @@ func try_attack(request: AttackContext) -> bool:
 		_recovery = step.recovery_seconds / speed
 		if not step.animation_prefix.is_empty():
 			_animation_prefix = step.animation_prefix
+	if equipped.forge != null:
+		_windup *= maxf(0.01, equipped.forge.windup_multiplier)
+		_recovery *= maxf(0.01, equipped.forge.recovery_multiplier)
 	snapshot.active_seconds = _active
 	_next_attack_id += 1
 	snapshot.attack_id = _next_attack_id
@@ -281,12 +298,19 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 		if not result.combo_step.animation_prefix.is_empty():
 			if not _has_animation(result.combo_step.animation_prefix):
 				return null
-		result.damage_hp = maxi(1, roundi(attack.damage_hp * result.combo_step.damage_multiplier))
+		result.damage_hp = maxf(0.0, attack.damage_hp * result.combo_step.damage_multiplier)
 	result.range_units = attack.range_units
 	if equipped.forge != null:
-		result.damage_hp = maxi(1, roundi(result.damage_hp * equipped.forge.damage_multiplier))
+		var damage_multiplier := equipped.forge.damage_multiplier
+		if attack.stamina_cost > 0.0 and equipped.forge.stamina_cost_multiplier > 0.0:
+			damage_multiplier *= equipped.forge.stamina_damage_multiplier
+		result.damage_hp = maxf(0.0, result.damage_hp * damage_multiplier)
 		result.range_units *= maxf(0.01, equipped.forge.range_multiplier)
 		result.hitbox_multiplier = maxf(0.01, equipped.forge.hitbox_multiplier)
+		if attack.delivery_type == AttackData.DeliveryType.MELEE:
+			result.hitbox_multiplier *= maxf(0.01, equipped.forge.melee_hitbox_multiplier)
+		elif attack.delivery_type == AttackData.DeliveryType.PROJECTILE:
+			result.range_units *= maxf(0.01, equipped.forge.projectile_range_multiplier)
 	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
 	if is_instance_valid(charm_manager):
 		result.damage_hp = charm_manager.modify_attack_damage(result.damage_hp, result)
@@ -392,9 +416,9 @@ func _finish(interrupted: bool) -> void:
 
 
 # Xử lý phòng thủ trước khi trừ máu
-func modify_incoming_damage(amount_hp: int, damage: DamageContext) -> int:
+func modify_incoming_damage(amount_hp: float, damage: DamageContext) -> float:
 	if is_instance_valid(_effect):
-		return maxi(0, _effect.modify_incoming_damage(amount_hp, damage))
+		return maxf(0.0, _effect.modify_incoming_damage(amount_hp, damage))
 	return amount_hp
 
 
@@ -408,7 +432,7 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 
 
 func _on_damage_applied(
-	damage: DamageContext, target: Node, applied_hp: int, source_weapon: WeaponInstance
+	damage: DamageContext, target: Node, applied_hp: float, source_weapon: WeaponInstance
 ) -> void:
 	if damage == null or applied_hp <= 0:
 		return

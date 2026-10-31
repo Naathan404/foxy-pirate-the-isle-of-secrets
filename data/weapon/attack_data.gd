@@ -2,13 +2,16 @@ class_name AttackData
 extends Resource
 
 enum AimMode { FACING, CURSOR_DIRECTION, CURSON_POSITION }
+enum DeliveryType { MELEE, PROJECTILE, AREA }
 
 # Phần prefix của tên animation
 @export var animation_prefix: String = "attack_dagger"
 # scene thực hiện đòn đnahs
 @export var attack_scene: PackedScene
 @export var aim_mode: AimMode = AimMode.FACING
-@export_range(1, 1000, 1) var damage_hp: int = 1
+## Describes this attack, independently of the owning weapon's category.
+@export var delivery_type: DeliveryType = DeliveryType.MELEE
+@export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
 ### Cấu hình mốc thời gain của đòn đánh
 # Chuẩn bị ra đòn -> không dmg
 @export_range(0.0, 10.0, 0.001) var windup_seconds: float = 0.125
@@ -36,8 +39,10 @@ func is_valid() -> bool:
 			return false
 	return (
 		attack_scene != null
+		and delivery_type in DeliveryType.values()
 		and not animation_prefix.is_empty()
-		and damage_hp > 0
+		and is_finite(damage_hp)
+		and damage_hp > 0.0
 		and windup_seconds >= 0.0
 		and active_seconds > 0.0
 		and recovery_seconds >= 0.0

@@ -17,6 +17,6 @@ func _ready() -> void:
 	hitbox.hit_confirmed.connect(_on_hit_confirmed)
 
 
-func _on_hit_confirmed(_damage: DamageContext, _target: Node, _applied_hp: int) -> void:
+func _on_hit_confirmed(_damage: DamageContext, _target: Node, _applied_hp: float) -> void:
 	HitstopController.request(hitstop_duration)
 	ScreenShakeController.request(shake_pixels, shake_duration)

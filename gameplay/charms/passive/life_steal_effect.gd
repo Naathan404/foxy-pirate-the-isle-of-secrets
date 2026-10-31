@@ -6,10 +6,10 @@ extends ProcCharmEffect
 func setup(owner_actor: Node3D, charm_definition: CharmData, charm_runtime: CharmRuntime) -> bool:
 	if not super.setup(owner_actor, charm_definition, charm_runtime):
 		return false
-	return is_instance_valid(_get_health_component()) and definition.get_param_int(&"heal_hp") > 0
+	return is_instance_valid(_get_health_component()) and definition.get_param_float(&"heal_hp") > 0
 
 
-func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: int) -> void:
+func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) -> void:
 	if damage == null or definition == null or applied_hp <= 0:
 		return
 	if damage.source != actor or not damage.is_normal_attack():
@@ -19,7 +19,7 @@ func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: int) -> v
 	var success := _roll_proc()
 	damage.record_proc(definition.charm_id, success, &"normal_attack_damage_dealt")
 	if success:
-		_get_health_component().heal(definition.get_param_int(&"heal_hp"))
+		_get_health_component().heal(definition.get_param_float(&"heal_hp"))
 
 
 func _get_health_component() -> HealthComponent:

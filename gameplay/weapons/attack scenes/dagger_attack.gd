@@ -108,7 +108,7 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 		context.damage_prepared.emit(damage, target)
 
 
-func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: int) -> void:
+func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	if context != null:
 		context.damage_applied.emit(damage, target, applied_hp)
 	if context == null or context.combo_step == null or applied_hp <= 0:

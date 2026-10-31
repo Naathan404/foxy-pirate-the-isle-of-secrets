@@ -95,6 +95,17 @@ func reset_animation_speed() -> void:
 		animation_player.speed_scale = _base_animation_speed
 
 
+## Full duration at the current playback speed; zero when no clip is assigned.
+func get_current_animation_duration() -> float:
+	if not is_instance_valid(animation_player):
+		return 0.0
+	var animation_name := animation_player.assigned_animation
+	if not animation_player.has_animation(animation_name):
+		return 0.0
+	var animation := animation_player.get_animation(animation_name)
+	return animation.length / maxf(absf(animation_player.speed_scale), 0.01)
+
+
 func _update_directional_animation(restart: bool = false) -> bool:
 	var screen_direction := _get_screen_direction()
 	var suffix := "down"

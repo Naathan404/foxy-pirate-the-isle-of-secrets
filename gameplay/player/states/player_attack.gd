@@ -90,10 +90,6 @@ func _update(delta: float) -> void:
 			var request := player.build_attack_context()
 			controller.queue_attack(request)
 			player._consume_attack_input()
-		if _combo_step != null:
-			player.set_horizontal_velocity(
-				player.move_direction * player._get_move_speed() * _combo_step.movement_multiplier
-			)
 	if accepted and player.is_on_floor():
 		_apply_forward_step(delta)
 	else:
