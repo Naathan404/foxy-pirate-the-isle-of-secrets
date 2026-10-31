@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://dv40a00uxu68y" path="res://assets/ui/player_hud/inventory/inventory_slot.png" id="4_6drgk"]
 [ext_resource type="Texture2D" uid="uid://qbww82r5simv" path="res://assets/ui/player_hud/inventory/orange_button.png" id="4_6rn6a"]
 [ext_resource type="Texture2D" uid="uid://chppgaem57xyj" path="res://assets/ui/player_hud/inventory/unequip_button.png" id="4_n0v5f"]
-[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="5_h7xhg"]
 [ext_resource type="Texture2D" uid="uid://cd8adeiyriaix" path="res://assets/ui/player_hud/inventory/material_icon.png" id="5_hmekt"]
 [ext_resource type="Texture2D" uid="uid://vtvq45yyq371" path="res://assets/ui/player_hud/inventory/unequip_button_press.png" id="5_ntv6s"]
 [ext_resource type="Texture2D" uid="uid://fyw552ym81mv" path="res://assets/ui/player_hud/inventory/blue_button.png" id="5_ymaop"]
@@ -15,6 +14,8 @@
 [ext_resource type="Texture2D" uid="uid://cw6xrdoynyk1v" path="res://assets/ui/player_hud/inventory/equipment_icon.png" id="7_6drgk"]
 [ext_resource type="Texture2D" uid="uid://bk3yobpmcd77a" path="res://assets/ui/player_hud/inventory/equip_button_press.png" id="7_21gur"]
 [ext_resource type="Texture2D" uid="uid://b5ttbxlcdv1uc" path="res://assets/ui/player_hud/inventory/notes_icon.png" id="9_h7xhg"]
+[ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="9_ntv6s"]
+[ext_resource type="PackedScene" uid="uid://c6lni27p5k43v" path="res://gameplay/inventory/equipment_tab.tscn" id="equipment_tab"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n0v5f"]
 
@@ -96,10 +97,11 @@ theme_override_styles/tab_selected = SubResource("StyleBoxEmpty_gv8eq")
 theme_override_styles/tab_disabled = SubResource("StyleBoxEmpty_mgn5m")
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_btrla")
 tab_alignment = 2
-current_tab = 0
+current_tab = 1
 tabs_visible = false
 
 [node name="Material" type="MarginContainer" parent="PanelContainer/MarginContainer/Tabs" unique_id=1098953536]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -168,7 +170,7 @@ stretch_mode = 5
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("2_0s057")
+theme_override_fonts/font = ExtResource("9_ntv6s")
 theme_override_font_sizes/font_size = 25
 text = "999"
 horizontal_alignment = 2
@@ -178,7 +180,7 @@ autowrap_mode = 3
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("2_0s057")
+theme_override_fonts/font = ExtResource("9_ntv6s")
 theme_override_font_sizes/font_size = 20
 text = "ITEM NAME"
 autowrap_mode = 3
@@ -188,7 +190,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("2_0s057")
+theme_override_fonts/font = ExtResource("9_ntv6s")
 text = "Item Type"
 autowrap_mode = 3
 
@@ -200,7 +202,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("5_h7xhg")
+theme_override_fonts/font = ExtResource("9_ntv6s")
 theme_override_font_sizes/font_size = 20
 text = "Item description"
 autowrap_mode = 3
@@ -214,8 +216,7 @@ texture_normal = ExtResource("6_bba17")
 texture_pressed = ExtResource("7_21gur")
 stretch_mode = 5
 
-[node name="Equipment" type="Control" parent="PanelContainer/MarginContainer/Tabs" unique_id=1842808014]
-visible = false
+[node name="Equipment" parent="PanelContainer/MarginContainer/Tabs" unique_id=218277719 instance=ExtResource("equipment_tab")]
 layout_mode = 2
 metadata/_tab_index = 1
 

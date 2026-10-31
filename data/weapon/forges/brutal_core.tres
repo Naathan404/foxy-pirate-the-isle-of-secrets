@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"brutal_core"
+display_name = "Brutal Core"
+description = "Flat Damage +1.0, Attack Speed -40%, Knockback +30%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+flat_damage = 1.0
+attack_speed_multiplier = 0.6
+knockback_multiplier = 1.3

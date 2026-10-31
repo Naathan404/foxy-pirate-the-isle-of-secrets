@@ -55,11 +55,13 @@ var _book_scale: Vector2
 @onready var item_type: Label = info_layout.get_node("ItemType")
 @onready var item_description: Label = info_layout.get_node("Description")
 @onready var item_quantity: Label = info_layout.get_node("Quantity")
+@onready var equipment_tab: Control = tabs.get_node("Equipment")
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_book_scale = book_background.scale
+	_bind_equipment.call_deferred()
 	hide()
 	if inventory == null:
 		push_error("Chưa gán inventory cho ui")
@@ -97,6 +99,13 @@ func refresh() -> void:
 		slot_uis[index].refresh(inventory.slots[index])
 	_refresh_item_info()
 	_update_slot_selection()
+	equipment_tab.refresh()
+
+
+func _bind_equipment() -> void:
+	var player := get_parent() as Player
+	if player != null:
+		equipment_tab.bind_components(player.weapon_controller, player.charm_socket_manager)
 
 
 func _on_slot_clicked(index: int) -> void:
@@ -181,6 +190,8 @@ func _select_tab(index: int) -> void:
 
 	_cancel_inventory_drag()
 	tabs.current_tab = index
+	if index == 1:
+		equipment_tab.refresh()
 
 	for i in range(buttons.size()):
 		var selected: bool = i == index

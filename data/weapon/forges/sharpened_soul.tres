@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"sharpened_soul"
+display_name = "Sharpened Soul"
+description = "Flat Damage +0.5, Attack Speed -20%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+flat_damage = 0.5
+attack_speed_multiplier = 0.8

@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://gameplay/combat/critical_damage_popup.tscn" id="1"]
+
+[node name="NormalDamagePopup" instance=ExtResource("1")]
+modulate = Color(1, 0.93, 0.78, 1)
+outline_modulate = Color(0.18, 0.11, 0.08, 1)
+font_size = 78
+outline_size = 12
+rise_units = 0.55
+lifetime = 0.5
+initial_scale = 0.8
+peak_scale = 1.05
+spawn_jitter = 0.12

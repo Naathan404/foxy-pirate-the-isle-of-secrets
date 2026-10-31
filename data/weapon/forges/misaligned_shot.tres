@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"misaligned_shot"
+display_name = "Misaligned Shot"
+description = "Projectile Speed -40%, Damage -10%"
+forge_group = 1
+acquisition_source = &"blacksmith"
+drop_weight = 2.0
+projectile_speed_multiplier = 0.6
+damage_multiplier = 0.9

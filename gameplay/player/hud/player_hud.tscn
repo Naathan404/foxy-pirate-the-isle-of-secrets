@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
 [ext_resource type="Script" uid="uid://diqqixidr2eyy" path="res://gameplay/player/hud/hud_portrait.gd" id="14_portrait"]
 [ext_resource type="Texture2D" uid="uid://h30qe12s3t4q" path="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png" id="15_gpu53"]
+[ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="15_khbku"]
 [ext_resource type="Script" uid="uid://welfjuqw50gd" path="res://gameplay/player/hud/hud_tooltip.gd" id="15_tooltip"]
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
 [ext_resource type="Texture2D" uid="uid://c2ply0h057nlq" path="res://assets/ui/player_hud/charrm_ui/charm_socket.png" id="19_01apl"]
@@ -364,6 +365,7 @@ offset_top = -138.4
 offset_right = 91.20007
 offset_bottom = -118.399994
 theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_fonts/font = ExtResource("15_khbku")
 theme_override_font_sizes/font_size = 12
 text = "CP: 0 / 100"
 horizontal_alignment = 2
@@ -472,7 +474,7 @@ offset_top = 31.999998
 offset_right = 79.76008
 offset_bottom = 58.0
 theme_override_constants/outline_size = 5
-theme_override_fonts/font = ExtResource("23_1wee6")
+theme_override_fonts/font = ExtResource("15_khbku")
 theme_override_font_sizes/font_size = 25
 text = "999"
 horizontal_alignment = 1

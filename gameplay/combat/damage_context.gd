@@ -16,6 +16,9 @@ var source_team: int = Teams.NONE
 var attack_id: int = 0
 var base_amount_hp: float = 1
 var amount_hp: float = 1
+var critical_rate: float = 0.0
+var critical_damage_multiplier: float = 1.5
+var is_critical: bool = false
 
 # đánh dấu tag loại tấn công, đánh thường != mất máu theo thời gian
 var tag: StringName = &"normal"
@@ -28,6 +31,8 @@ var knockback_multiplier: float = 1.0
 # Mỗi Charm ghi kết quả theo ID để event lặp không roll hoặc áp dụng lần hai.
 var proc_results: Dictionary[StringName, Dictionary] = {}
 
+var _critical_resolved: bool = false
+
 
 func create_hit_copy(hit_target: Node = null) -> DamageContext:
 	var result := DamageContext.new()
@@ -37,12 +42,24 @@ func create_hit_copy(hit_target: Node = null) -> DamageContext:
 	result.attack_id = attack_id
 	result.base_amount_hp = base_amount_hp
 	result.amount_hp = base_amount_hp
+	result.critical_rate = critical_rate
+	result.critical_damage_multiplier = critical_damage_multiplier
 	result.tag = tag
 	result.weapon_category = weapon_category
 	result.origin = origin
 	result.direction = direction
 	result.knockback_multiplier = knockback_multiplier
 	return result
+
+
+## Called once per target hit, before outgoing charm modifiers.
+func resolve_critical() -> void:
+	if _critical_resolved:
+		return
+	_critical_resolved = true
+	is_critical = critical_rate > 0.0 and randf() < clampf(critical_rate, 0.0, 1.0)
+	if is_critical:
+		amount_hp *= maxf(1.0, critical_damage_multiplier)
 
 
 func is_normal_attack() -> bool:

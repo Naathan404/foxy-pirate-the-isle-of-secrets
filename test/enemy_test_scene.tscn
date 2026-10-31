@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cj86kg5fm6gue"]
+[gd_scene format=3 uid="uid://btrv7pm6oj6x3"]
 
 [ext_resource type="Script" uid="uid://dlxg0f4p03ka5" path="res://world/hub/scenes/hub.gd" id="1_m32iv"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_l3xad"]

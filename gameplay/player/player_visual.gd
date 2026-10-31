@@ -10,6 +10,7 @@ signal animation_finished(animation_name: StringName)
 
 var _action: StringName = &""
 var _facing: Vector3 = Vector3.BACK
+var _last_facing_left: bool = true
 var _camera: Camera3D
 # Lưu tốc độ ban đầu để trả lại sau khi đánh
 var _base_animation_speed: float = 1.0
@@ -19,9 +20,13 @@ var _held_progress: float = -1.0
 var _active_sprite: Sprite3D
 var _action_sprites: Dictionary[StringName, Sprite3D] = {}
 
+@onready var _idle_preview: Node = get_node_or_null("SpineIdlePreview")
+
 
 func _ready() -> void:
 	_active_sprite = sprite
+	if is_instance_valid(_idle_preview):
+		_idle_preview.configure_reference(sprite, animation_player)
 	for prefix: StringName in action_sprite_paths:
 		var action_sprite := get_node_or_null(action_sprite_paths[prefix]) as Sprite3D
 		if action_sprite == null:
@@ -141,6 +146,8 @@ func get_current_animation_duration() -> float:
 
 func _update_directional_animation(restart: bool = false) -> bool:
 	var screen_direction := _get_screen_direction()
+	if absf(screen_direction.x) > 0.01:
+		_last_facing_left = screen_direction.x < 0.0
 	var suffix := "down"
 	if absf(screen_direction.x) > absf(screen_direction.z):
 		suffix = "side"
@@ -184,6 +191,10 @@ func _play(animation_name: StringName, restart: bool) -> bool:
 	if not animation_player.has_animation(animation_name):
 		return false
 	_select_action_sprite(animation_name)
+	if is_instance_valid(_idle_preview):
+		_idle_preview.sync_animation(
+			animation_name, sprite, _active_sprite, _camera, _last_facing_left
+		)
 
 	# Không phát lại cùng animation mỗi frame, kể cả khi nó đã chạy xong
 	if animation_player.assigned_animation == animation_name and not restart:

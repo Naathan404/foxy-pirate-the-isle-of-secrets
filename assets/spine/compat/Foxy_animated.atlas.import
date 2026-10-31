@@ -1,0 +1,15 @@
+[remap]
+
+importer="curvature.spine.atlas"
+type="SpineAtlasResource"
+uid="uid://nmco250xjljx"
+path="res://.godot/imported/Foxy_animated.atlas-92da603a54597322ebedbcae219f53db.tres"
+
+[deps]
+
+source_file="res://assets/spine/compat/Foxy_animated.atlas"
+dest_files=["res://.godot/imported/Foxy_animated.atlas-92da603a54597322ebedbcae219f53db.tres"]
+
+[params]
+
+normal_map_prefix="n"

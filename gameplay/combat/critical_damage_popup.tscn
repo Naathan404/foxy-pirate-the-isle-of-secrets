@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://du6rjries5kjq"]
+
+[ext_resource type="Script" uid="uid://c21hf6kvihfpy" path="res://gameplay/combat/critical_damage_popup.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="1_sr5jl"]
+
+[node name="CriticalDamagePopup" type="Label3D" unique_id=2000433017]
+pixel_size = 0.006
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.12, 0.12, 1)
+outline_modulate = Color(0.15, 0.015, 0.015, 1)
+text = "999"
+font = ExtResource("1_sr5jl")
+font_size = 130
+outline_size = 20
+script = ExtResource("1")
+lifetime = 1.0

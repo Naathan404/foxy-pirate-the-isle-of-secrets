@@ -8,7 +8,8 @@ var _failures: Array[String] = []
 
 func _initialize() -> void:
 	_run.call_deferred()
-	create_timer(10.0, true, false, true).timeout.connect(
+	# Several cold Player scene loads must fit inside CI's 60-second per-test limit.
+	create_timer(30.0, true, false, true).timeout.connect(
 		func() -> void:
 			push_error("Scene transition test timed out")
 			quit(1)

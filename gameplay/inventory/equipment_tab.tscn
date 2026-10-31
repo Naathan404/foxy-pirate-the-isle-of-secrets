@@ -1,0 +1,603 @@
+[gd_scene format=3 uid="uid://c6lni27p5k43v"]
+
+[ext_resource type="Script" uid="uid://cvy4vyj0b7usm" path="res://gameplay/inventory/equipment_tab.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2"]
+[ext_resource type="PackedScene" uid="uid://cf04lpri8k1o3" path="res://gameplay/inventory/equipment_slot.tscn" id="3"]
+[ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="3_c1a6h"]
+[ext_resource type="Texture2D" uid="uid://7ipah0ym4wc8" path="res://assets/ui/player_hud/inventory/slot_ui.png" id="5_0k2h7"]
+[ext_resource type="Texture2D" uid="uid://bt4fkmaxsc7ee" path="res://assets/ui/player_hud/inventory/equip_button.png" id="inventory_button"]
+
+[sub_resource type="StyleBoxFlat" id="disabled"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.79, 0.65, 0.57, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="gold"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 0.77, 0.32, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.68, 0.36, 0.16, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="button"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.76, 0.48, 0.36, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.49, 0.25, 0.21, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="frame"]
+content_margin_left = 9.0
+content_margin_top = 6.0
+content_margin_right = 9.0
+content_margin_bottom = 6.0
+bg_color = Color(1, 0.87, 0.75, 0.38)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.71, 0.4, 0.32, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="Theme" id="theme"]
+default_font = ExtResource("2")
+default_font_size = 14
+Button/colors/font_color = Color(0.25, 0.14, 0.13, 1)
+Button/colors/font_disabled_color = Color(0.41, 0.3, 0.27, 1)
+Button/colors/font_hover_color = Color(0.25, 0.14, 0.13, 1)
+Button/colors/font_pressed_color = Color(0.25, 0.14, 0.13, 1)
+Button/styles/disabled = SubResource("disabled")
+Button/styles/hover = SubResource("gold")
+Button/styles/normal = SubResource("button")
+Button/styles/pressed = SubResource("gold")
+Label/colors/font_color = Color(0.25, 0.14, 0.13, 1)
+PanelContainer/styles/panel = SubResource("frame")
+
+[sub_resource type="StyleBoxFlat" id="equipped_frame"]
+content_margin_left = 12.0
+content_margin_top = 7.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 0.87, 0.75, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.71, 0.4, 0.32, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="keycap"]
+content_margin_left = 5.0
+content_margin_top = 0.0
+content_margin_right = 5.0
+content_margin_bottom = 0.0
+bg_color = Color(0.28, 0.24, 0.22, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.72, 0.65, 0.59, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxEmpty" id="action_empty"]
+
+[node name="Equipment" type="Control" unique_id=247571998]
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 0
+theme = SubResource("theme")
+script = ExtResource("1")
+
+[node name="Content" type="HBoxContainer" parent="." unique_id=2005222285]
+layout_mode = 0
+offset_right = 808.0
+offset_bottom = 480.0
+theme_override_constants/separation = 48
+
+[node name="Left" type="VBoxContainer" parent="Content" unique_id=1498310626]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Categories" type="HBoxContainer" parent="Content/Left" unique_id=139711679]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="WeaponsButton" type="Button" parent="Content/Left/Categories" unique_id=725427380]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+toggle_mode = true
+text = "Weapons"
+
+[node name="CharmsButton" type="Button" parent="Content/Left/Categories" unique_id=54030355]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+toggle_mode = true
+text = "Charms"
+
+[node name="CollectionScroll" type="ScrollContainer" parent="Content/Left" unique_id=1541486687]
+custom_minimum_size = Vector2(0, 258)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="CollectionCenter" type="CenterContainer" parent="Content/Left/CollectionScroll" unique_id=1406594258]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ItemGrid" type="GridContainer" parent="Content/Left/CollectionScroll/CollectionCenter" unique_id=1899753152]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 7
+theme_override_constants/v_separation = 6
+columns = 5
+
+[node name="Pagination" type="HBoxContainer" parent="Content/Left" unique_id=626549173]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Previous" type="Button" parent="Content/Left/Pagination" unique_id=1129001370]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 24)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+text = "<"
+
+[node name="PageLabel" type="Label" parent="Content/Left/Pagination" unique_id=522600171]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+text = "1 / 1"
+horizontal_alignment = 1
+
+[node name="Next" type="Button" parent="Content/Left/Pagination" unique_id=277318681]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 24)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+text = ">"
+
+[node name="EquippedFrame" type="PanelContainer" parent="Content/Left" unique_id=1884600484]
+layout_mode = 2
+theme_override_styles/panel = SubResource("equipped_frame")
+
+[node name="Content" type="VBoxContainer" parent="Content/Left/EquippedFrame" unique_id=2110342671]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Heading" type="Label" parent="Content/Left/EquippedFrame/Content" unique_id=1444385426]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 18
+text = "Currently Equipped"
+horizontal_alignment = 1
+
+[node name="EquippedRow" type="HBoxContainer" parent="Content/Left/EquippedFrame/Content" unique_id=1830079294]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Weapon" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=1701504350]
+layout_mode = 2
+theme_override_constants/separation = 3
+alignment = 2
+
+[node name="EquippedWeapon" parent="Content/Left/EquippedFrame/Content/EquippedRow/Weapon" unique_id=1582759862 instance=ExtResource("3")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+
+[node name="Q" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=756994306]
+layout_mode = 2
+theme_override_constants/separation = 3
+alignment = 2
+
+[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" unique_id=2089369510]
+custom_minimum_size = Vector2(22, 16)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("keycap")
+
+[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q/Keycap" unique_id=2046360020]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 11
+text = "Q"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EquippedQ" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" unique_id=1916998293 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Space" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=87900540]
+layout_mode = 2
+theme_override_constants/separation = 3
+alignment = 2
+
+[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" unique_id=290752849]
+custom_minimum_size = Vector2(22, 16)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("keycap")
+
+[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space/Keycap" unique_id=1084692095]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 11
+text = "SPACE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EquippedSpace" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" unique_id=169478051 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="E" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=183300284]
+layout_mode = 2
+theme_override_constants/separation = 3
+alignment = 2
+
+[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" unique_id=15051985]
+custom_minimum_size = Vector2(22, 16)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("keycap")
+
+[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/E/Keycap" unique_id=605645607]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 11
+text = "E"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EquippedE" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" unique_id=462181856 instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Right" type="VBoxContainer" parent="Content" unique_id=1659653199]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Content/Right" unique_id=1656690673]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PortraitFrame" type="PanelContainer" parent="Content/Right/Header" unique_id=1382000063]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=437585027]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Portrait" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=1340957437]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("5_0k2h7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Identity" type="VBoxContainer" parent="Content/Right/Header" unique_id=1167304461]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+
+[node name="ItemTitle" type="Label" parent="Content/Right/Header/Identity" unique_id=1313786875]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+text = "Select a weapon"
+autowrap_mode = 3
+max_lines_visible = 2
+
+[node name="ItemKind" type="Label" parent="Content/Right/Header/Identity" unique_id=506238120]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.17, 0.15, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 16
+text = "WEAPON"
+
+[node name="ItemDescription" type="Label" parent="Content/Right/Header/Identity" unique_id=1260477796]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+max_lines_visible = 2
+
+[node name="Stats" type="PanelContainer" parent="Content/Right" unique_id=255553697]
+custom_minimum_size = Vector2(0, 106)
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="Content/Right/Stats" unique_id=1060444925]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StatsHeading" type="Label" parent="Content/Right/Stats/Content" unique_id=528364376]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 15
+text = "Base Stats"
+
+[node name="StatsGrid" type="GridContainer" parent="Content/Right/Stats/Content" unique_id=1351891084]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 5
+columns = 4
+
+[node name="StatName0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=370606054]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 12
+text = "Attack"
+
+[node name="StatValue0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=420715474]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="StatName1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1347206265]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 12
+text = "Crit Damage"
+
+[node name="StatValue1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1417144512]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="StatName2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1743882071]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 12
+text = "Attack Speed"
+
+[node name="StatValue2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1415244511]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="StatName3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=714609625]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 12
+text = "Knockback"
+
+[node name="StatValue3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1146056389]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="StatName4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=137875389]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 12
+text = "Crit Rate"
+
+[node name="StatValue4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=647589635]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="StatName5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=162944977]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 12
+text = "Range"
+
+[node name="StatValue5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1776814730]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="Forge" type="PanelContainer" parent="Content/Right" unique_id=1669688536]
+custom_minimum_size = Vector2(0, 98)
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="Content/Right/Forge" unique_id=1676430217]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ForgeHeading" type="Label" parent="Content/Right/Forge/Content" unique_id=660420672]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 16
+text = "Forge Attributes"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="ForgeScroll" type="ScrollContainer" parent="Content/Right/Forge/Content" unique_id=860904370]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ForgeRows" type="VBoxContainer" parent="Content/Right/Forge/Content/ForgeScroll" unique_id=1681361133]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+
+[node name="Skill" type="PanelContainer" parent="Content/Right" unique_id=2035021333]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="Content/Right/Skill" unique_id=764757674]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SkillHeading" type="Label" parent="Content/Right/Skill/Content" unique_id=806944078]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 16
+text = "Weapon Skill"
+
+[node name="SkillBody" type="HBoxContainer" parent="Content/Right/Skill/Content" unique_id=37286423]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SkillIcon" type="TextureRect" parent="Content/Right/Skill/Content/SkillBody" unique_id=1625757164]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkillText" type="VBoxContainer" parent="Content/Right/Skill/Content/SkillBody" unique_id=449763366]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+
+[node name="SkillTitle" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=627158131]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+max_lines_visible = 2
+
+[node name="SkillMeta" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=967433307]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 14
+
+[node name="SkillDescription" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=1161621398]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+max_lines_visible = 3
+
+[node name="EquipButton" type="Button" parent="Content/Right" unique_id=275646008]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0, 0, 0, 0)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 0)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 0)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 0)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 0)
+theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("action_empty")
+theme_override_styles/pressed = SubResource("action_empty")
+theme_override_styles/hover = SubResource("action_empty")
+theme_override_styles/disabled = SubResource("action_empty")
+text = "Equipped"
+
+[node name="Artwork" type="TextureRect" parent="Content/Right/EquipButton" unique_id=243900389]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 20.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("inventory_button")
+expand_mode = 1
+stretch_mode = 5

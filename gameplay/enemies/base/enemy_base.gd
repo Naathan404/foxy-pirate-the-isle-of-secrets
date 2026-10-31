@@ -20,6 +20,8 @@ enum InitialFacing {
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
+const CRITICAL_POPUP: PackedScene = preload("res://gameplay/combat/critical_damage_popup.tscn")
+const NORMAL_POPUP: PackedScene = preload("res://gameplay/combat/normal_damage_popup.tscn")
 
 @export var data: EnemyData
 @export var initial_state_name: StringName = &"Idle"
@@ -281,7 +283,14 @@ func receive_damage(damage: DamageContext) -> float:
 		if not direction.is_zero_approx():
 			pending_hit_direction = direction.normalized()
 	pending_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
-	return hp.take_damage(damage.amount_hp)
+	var applied_hp := hp.take_damage(damage.amount_hp)
+	if applied_hp > 0.0:
+		var popup_scene := CRITICAL_POPUP if damage.is_critical else NORMAL_POPUP
+		var popup := popup_scene.instantiate() as Label3D
+		get_parent().add_child(popup)
+		popup.global_position = global_position + Vector3.UP * 1.4
+		popup.call("show_damage", applied_hp)
+	return applied_hp
 
 
 ## Hit and fatal recoil share forge scaling, resistance and boss immunity.

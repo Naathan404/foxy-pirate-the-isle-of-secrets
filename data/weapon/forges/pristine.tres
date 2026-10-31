@@ -7,5 +7,6 @@ script = ExtResource("1_forge")
 forge_id = &"pristine"
 display_name = "Pristine"
 description = "Không thay đổi chỉ số"
+forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 7.0
+drop_weight = 3.0

@@ -62,9 +62,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
 [node name="Starfish" parent="." unique_id=1350469947 instance=ExtResource("2_enemy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 4)
+unreachable_target_ignore_duration = 2.0
 
 [node name="StarfishLeft" parent="." unique_id=1698210464 instance=ExtResource("2_enemy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.1, 4.5)
+unreachable_target_ignore_duration = 2.0
 
 [node name="StarfishRight" parent="." unique_id=1805481880 instance=ExtResource("2_enemy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.1, 4.5)
+unreachable_target_ignore_duration = 2.0

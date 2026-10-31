@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"leviathans_fang"
+display_name = "Leviathan’s Fang"
+description = "Flat Damage +2.0, Attack Speed -60%, Recovery +20%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 1.0
+flat_damage = 2.0
+attack_speed_multiplier = 0.4
+recovery_multiplier = 1.2

@@ -20,6 +20,7 @@ func _run() -> void:
 	world.add_child(floor_body)
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
 	# Pin the fixture independently of the forge selected for manual testing.
+	player.get_node("WeaponController").collection.clear()
 	player.get_node("WeaponController").default_forge = null
 	player.get_node("WeaponController").default_weapon = load(
 		"res://data/weapon/weapon_dagger.tres"
