@@ -1,5 +1,7 @@
 extends SceneTree
 
+const STARFISH: PackedScene = preload("res://gameplay/enemies/starfish/starfish.tscn")
+
 var _failures: int = 0
 
 
@@ -10,7 +12,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var world := Node3D.new()
 	root.add_child(world)
-	var enemy := load("res://gameplay/enemies/starfish/starfish.tscn").instantiate() as EnemyBase
+	var enemy := STARFISH.instantiate() as EnemyBase
 	world.add_child(enemy)
 	enemy.set_physics_process(false)
 	var hit := DamageContext.new()
@@ -62,7 +64,7 @@ func _run() -> void:
 	world.free()
 	var lethal_world := Node3D.new()
 	root.add_child(lethal_world)
-	enemy = load("res://gameplay/enemies/starfish/starfish.tscn").instantiate() as EnemyBase
+	enemy = STARFISH.instantiate() as EnemyBase
 	lethal_world.add_child(enemy)
 	enemy.set_physics_process(false)
 	hit.is_critical = false
@@ -76,7 +78,8 @@ func _run() -> void:
 	lethal_world.free()
 	if _failures == 0:
 		print(
-			"Normal damage popups: actual fractional damage, rejection, critical distinction, lethal hits and cleanup passed"
+			"Normal damage popups: actual fractional damage, rejection, critical distinction, "
+			+ "lethal hits and cleanup passed"
 		)
 	quit(0 if _failures == 0 else 1)
 

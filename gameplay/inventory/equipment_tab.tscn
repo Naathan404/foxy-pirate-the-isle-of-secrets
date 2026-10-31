@@ -4,6 +4,7 @@
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2"]
 [ext_resource type="PackedScene" uid="uid://cf04lpri8k1o3" path="res://gameplay/inventory/equipment_slot.tscn" id="3"]
 [ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="3_c1a6h"]
+[ext_resource type="Texture2D" uid="uid://7ipah0ym4wc8" path="res://assets/ui/player_hud/inventory/slot_ui.png" id="5_0k2h7"]
 [ext_resource type="Texture2D" uid="uid://bt4fkmaxsc7ee" path="res://assets/ui/player_hud/inventory/equip_button.png" id="inventory_button"]
 
 [sub_resource type="StyleBoxFlat" id="disabled"]
@@ -61,6 +62,20 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="Theme" id="theme"]
+default_font = ExtResource("2")
+default_font_size = 14
+Button/colors/font_color = Color(0.25, 0.14, 0.13, 1)
+Button/colors/font_disabled_color = Color(0.41, 0.3, 0.27, 1)
+Button/colors/font_hover_color = Color(0.25, 0.14, 0.13, 1)
+Button/colors/font_pressed_color = Color(0.25, 0.14, 0.13, 1)
+Button/styles/disabled = SubResource("disabled")
+Button/styles/hover = SubResource("gold")
+Button/styles/normal = SubResource("button")
+Button/styles/pressed = SubResource("gold")
+Label/colors/font_color = Color(0.25, 0.14, 0.13, 1)
+PanelContainer/styles/panel = SubResource("frame")
+
 [sub_resource type="StyleBoxFlat" id="equipped_frame"]
 content_margin_left = 12.0
 content_margin_top = 7.0
@@ -74,8 +89,8 @@ border_width_bottom = 1
 border_color = Color(0.71, 0.4, 0.32, 0.85)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
-corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="keycap"]
 content_margin_left = 5.0
@@ -90,22 +105,8 @@ border_width_bottom = 1
 border_color = Color(0.72, 0.65, 0.59, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
-corner_radius_bottom_left = 3
 corner_radius_bottom_right = 3
-
-[sub_resource type="Theme" id="theme"]
-default_font = ExtResource("2")
-default_font_size = 14
-Button/colors/font_color = Color(0.25, 0.14, 0.13, 1)
-Button/colors/font_disabled_color = Color(0.41, 0.3, 0.27, 1)
-Button/colors/font_hover_color = Color(0.25, 0.14, 0.13, 1)
-Button/colors/font_pressed_color = Color(0.25, 0.14, 0.13, 1)
-Button/styles/disabled = SubResource("disabled")
-Button/styles/hover = SubResource("gold")
-Button/styles/normal = SubResource("button")
-Button/styles/pressed = SubResource("gold")
-Label/colors/font_color = Color(0.25, 0.14, 0.13, 1)
-PanelContainer/styles/panel = SubResource("frame")
+corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxEmpty" id="action_empty"]
 
@@ -202,116 +203,109 @@ theme_override_fonts/font = ExtResource("3_c1a6h")
 theme_override_font_sizes/font_size = 20
 text = ">"
 
-[node name="EquippedFrame" type="PanelContainer" parent="Content/Left"]
+[node name="EquippedFrame" type="PanelContainer" parent="Content/Left" unique_id=1884600484]
 layout_mode = 2
 theme_override_styles/panel = SubResource("equipped_frame")
 
-[node name="Content" type="VBoxContainer" parent="Content/Left/EquippedFrame"]
+[node name="Content" type="VBoxContainer" parent="Content/Left/EquippedFrame" unique_id=2110342671]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="Heading" type="Label" parent="Content/Left/EquippedFrame/Content"]
+[node name="Heading" type="Label" parent="Content/Left/EquippedFrame/Content" unique_id=1444385426]
 layout_mode = 2
-mouse_filter = 2
 theme_override_fonts/font = ExtResource("3_c1a6h")
 theme_override_font_sizes/font_size = 18
 text = "Currently Equipped"
 horizontal_alignment = 1
 
-[node name="EquippedRow" type="HBoxContainer" parent="Content/Left/EquippedFrame/Content"]
+[node name="EquippedRow" type="HBoxContainer" parent="Content/Left/EquippedFrame/Content" unique_id=1830079294]
 layout_mode = 2
 theme_override_constants/separation = 18
 alignment = 1
 
-[node name="Weapon" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow"]
+[node name="Weapon" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=1701504350]
 layout_mode = 2
 theme_override_constants/separation = 3
 alignment = 2
 
-[node name="EquippedWeapon" parent="Content/Left/EquippedFrame/Content/EquippedRow/Weapon" instance=ExtResource("3")]
+[node name="EquippedWeapon" parent="Content/Left/EquippedFrame/Content/EquippedRow/Weapon" unique_id=1582759862 instance=ExtResource("3")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(68, 68)
 layout_mode = 2
 
-[node name="Q" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow"]
+[node name="Q" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=756994306]
 layout_mode = 2
 theme_override_constants/separation = 3
 alignment = 2
 
-[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q"]
+[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" unique_id=2089369510]
 custom_minimum_size = Vector2(22, 16)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
 theme_override_styles/panel = SubResource("keycap")
 
-[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q/Keycap"]
+[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q/Keycap" unique_id=2046360020]
 layout_mode = 2
-mouse_filter = 2
-theme_override_fonts/font = ExtResource("2")
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 11
 text = "Q"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EquippedQ" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" instance=ExtResource("3")]
+[node name="EquippedQ" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" unique_id=1916998293 instance=ExtResource("3")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 
-[node name="Space" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow"]
+[node name="Space" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=87900540]
 layout_mode = 2
 theme_override_constants/separation = 3
 alignment = 2
 
-[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space"]
+[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" unique_id=290752849]
 custom_minimum_size = Vector2(22, 16)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
 theme_override_styles/panel = SubResource("keycap")
 
-[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space/Keycap"]
+[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space/Keycap" unique_id=1084692095]
 layout_mode = 2
-mouse_filter = 2
-theme_override_fonts/font = ExtResource("2")
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 11
 text = "SPACE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EquippedSpace" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" instance=ExtResource("3")]
+[node name="EquippedSpace" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" unique_id=169478051 instance=ExtResource("3")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 
-[node name="E" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow"]
+[node name="E" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=183300284]
 layout_mode = 2
 theme_override_constants/separation = 3
 alignment = 2
 
-[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/E"]
+[node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" unique_id=15051985]
 custom_minimum_size = Vector2(22, 16)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
 theme_override_styles/panel = SubResource("keycap")
 
-[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/E/Keycap"]
+[node name="Key" type="Label" parent="Content/Left/EquippedFrame/Content/EquippedRow/E/Keycap" unique_id=605645607]
 layout_mode = 2
-mouse_filter = 2
-theme_override_fonts/font = ExtResource("2")
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 11
 text = "E"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EquippedE" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" instance=ExtResource("3")]
+[node name="EquippedE" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" unique_id=462181856 instance=ExtResource("3")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 
 [node name="Right" type="VBoxContainer" parent="Content" unique_id=1659653199]
@@ -330,11 +324,17 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 
+[node name="TextureRect" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=437585027]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Portrait" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=1340957437]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(46, 46)
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 mouse_filter = 2
+texture = ExtResource("5_0k2h7")
 expand_mode = 1
 stretch_mode = 5
 

@@ -276,7 +276,10 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 	]
 	for i in 6:
 		get_node("%" + "StatValue" + str(i)).text = values[i]
-	%StatsHeading.tooltip_text = "Base attack with forge applied. Combo steps and situational Charm effects are calculated on hit."
+	%StatsHeading.tooltip_text = (
+		"Base attack with forge applied. "
+		+ "Combo steps and situational Charm effects are calculated on hit."
+	)
 	if forge == null:
 		_add_forge_row("No forge applied", 0)
 	else:

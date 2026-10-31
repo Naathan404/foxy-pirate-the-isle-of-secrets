@@ -1,5 +1,7 @@
 extends SceneTree
 
+const SLOT: PackedScene = preload("res://gameplay/inventory/equipment_slot.tscn")
+
 var _failures: int = 0
 
 
@@ -13,9 +15,9 @@ func _run() -> void:
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 7)
 	root.add_child(grid)
-	var slot = load("res://gameplay/inventory/equipment_slot.tscn").instantiate()
+	var slot = SLOT.instantiate()
 	grid.add_child(slot)
-	var other = load("res://gameplay/inventory/equipment_slot.tscn").instantiate()
+	var other = SLOT.instantiate()
 	grid.add_child(other)
 	var artwork := load("res://assets/ui/player_hud/weapon_skills/CP_Dagger.png") as Texture2D
 	slot.present(artwork)
@@ -74,7 +76,8 @@ func _run() -> void:
 	grid.free()
 	if _failures == 0:
 		print(
-			"Equipment slot feedback: pointer hover, press, selection, locked tint, confirmation and fixed geometry passed"
+			"Equipment slot feedback: pointer hover, press, selection, locked tint, "
+			+ "confirmation and fixed geometry passed"
 		)
 	quit(0 if _failures == 0 else 1)
 

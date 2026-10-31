@@ -66,17 +66,24 @@ func _run() -> void:
 	world.free()
 	if _failures == 0:
 		print(
-			"Weapon collection: independent blueprint/ownership flags, grant/revoke, startup, isolation and live inventory passed"
+			(
+				"Weapon collection: independent blueprint/ownership flags, grant/revoke, "
+				+ "startup, isolation and live inventory passed"
+			)
 		)
 	quit(0 if _failures == 0 else 1)
 
 
 func _test_inventory(world: Node3D) -> void:
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
+	# Pin starting inventory so scene checkboxes can be tuned without changing this regression.
+	var controller := player.get_node("WeaponController") as WeaponController
+	controller.collection = [_entry(DAGGER, false, false), _entry(BOW, true, true)]
+	controller.default_weapon = BOW
+	controller.default_forge = null
 	world.add_child(player)
 	player.set_physics_process(false)
 	await process_frame
-	var controller := player.weapon_controller
 	var ui := player.inventory_ui
 	ui.open_inventory()
 	ui._select_tab(1)

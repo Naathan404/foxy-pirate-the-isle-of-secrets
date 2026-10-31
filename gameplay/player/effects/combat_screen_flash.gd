@@ -20,11 +20,11 @@ extends CanvasLayer
 @export_range(0.0, 1.0, 0.01) var bow_opacity: float = 0.07
 @export_range(0.01, 1.0, 0.01) var bow_seconds: float = 0.10
 
-@onready var overlay: ColorRect = $Flash
-
 var _fade: Tween
 var _last_flash_ms: int = -1000000
 var _priority: int = 0
+
+@onready var overlay: ColorRect = $Flash
 
 
 func _ready() -> void:

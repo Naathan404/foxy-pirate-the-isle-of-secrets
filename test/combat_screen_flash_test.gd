@@ -1,5 +1,7 @@
 extends SceneTree
 
+const BOW: WeaponData = preload("res://data/weapon/weapon_bow.tres")
+
 var _failures: int = 0
 
 
@@ -14,13 +16,25 @@ func _run() -> void:
 	world.add_child(player)
 	player.set_physics_process(false)
 	var flash = player.get_node("Effects/CombatScreenFlash")
+	# Use deterministic feedback tuning, independently of the scene's Inspector overrides.
+	flash.intensity_scale = 1.0
+	flash.maximum_opacity = 0.16
+	flash.minimum_interval = 0.25
+	flash.bow_color = Color(0.55, 0.85, 1.0)
+	flash.bow_opacity = 0.07
+	flash.bow_seconds = 0.10
+	flash.elite_color = Color(1.0, 0.78, 0.35)
+	flash.elite_opacity = 0.10
+	flash.elite_seconds = 0.14
+	flash.boss_opacity = 0.16
+	flash.boss_seconds = 0.28
 	var weapons := player.weapon_controller
 	_check(not flash.overlay.visible, "Overlay starts hidden")
 	_check(flash.overlay.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Overlay cannot block input")
 	var context := AttackContext.new()
 	context.actor = player
 	context.weapon = WeaponInstance.new()
-	context.weapon.definition = load("res://data/weapon/weapon_bow.tres")
+	context.weapon.definition = BOW
 	context.projectile_count = 5
 	context.charge_progress = 0.99
 	weapons.charge_released.emit(context)
@@ -45,7 +59,7 @@ func _run() -> void:
 	)
 	_check(flash.overlay.color.r > flash.overlay.color.b, "Defeat flash is gold")
 	var started: int = flash._last_flash_ms
-	context.weapon.definition = load("res://data/weapon/weapon_bow.tres")
+	context.weapon.definition = BOW
 	weapons.charge_released.emit(context)
 	_check(flash._last_flash_ms == started, "Repeated events respect the rate limit")
 	_kill(world, player, "res://gameplay/enemies/starfish/starfish.tscn", true)
@@ -66,6 +80,13 @@ func _run() -> void:
 	flash.intensity_scale = 0.0
 	_kill(world, player, "res://gameplay/enemies/starfish/starfish.tscn", true)
 	_check(not flash.overlay.visible, "Zero intensity disables flashes")
+	flash.intensity_scale = 1.0
+	flash.bow_opacity = 0.7
+	flash._last_flash_ms -= 1000
+	weapons.charge_released.emit(context)
+	_check(
+		is_equal_approx(flash.overlay.color.a, 0.16), "Stronger scene tuning respects opacity cap"
+	)
 	world.free()
 	if _failures == 0:
 		print(

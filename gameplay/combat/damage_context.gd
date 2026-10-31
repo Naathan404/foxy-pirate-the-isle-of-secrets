@@ -19,7 +19,6 @@ var amount_hp: float = 1
 var critical_rate: float = 0.0
 var critical_damage_multiplier: float = 1.5
 var is_critical: bool = false
-var _critical_resolved: bool = false
 
 # đánh dấu tag loại tấn công, đánh thường != mất máu theo thời gian
 var tag: StringName = &"normal"
@@ -31,6 +30,8 @@ var knockback_multiplier: float = 1.0
 
 # Mỗi Charm ghi kết quả theo ID để event lặp không roll hoặc áp dụng lần hai.
 var proc_results: Dictionary[StringName, Dictionary] = {}
+
+var _critical_resolved: bool = false
 
 
 func create_hit_copy(hit_target: Node = null) -> DamageContext:

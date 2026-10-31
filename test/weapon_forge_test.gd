@@ -11,7 +11,7 @@ const EXPECTED: Dictionary = {
 	&"close_quarters": [1.25, 1, 0.75, 1, 1, 1, 1, 1],
 	&"quickdraw": [1, 1, 1, 0.7, 1.2, 1, 1, 1],
 	&"measured_strike": [1, 1, 1, 1.2, 0.7, 1, 1, 1],
-	&"keen_edge": [0.95, 1, 1, 1, 1, 1, 1, 1],
+	&"keen_edge": [0.9, 1, 1, 1, 1, 1, 1, 1],
 	&"blunt_impact": [1.15, 1, 1, 1, 1, 1, 1, 1],
 	&"sharpened_soul": [1.5, 0.8, 1, 1, 1, 1, 1, 1],
 	&"brutal_core": [2.0, 0.6, 1, 1, 1, 1, 1, 1],

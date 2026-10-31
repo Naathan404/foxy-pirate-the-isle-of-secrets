@@ -124,7 +124,8 @@ func _run() -> void:
 	world.free()
 	if _failures == 0:
 		print(
-			"Equipment inventory: data, forge stats, ownership, safe-location guard and four viewport layouts passed"
+			"Equipment inventory: data, forge stats, ownership, "
+			+ "safe-location guard and four viewport layouts passed"
 		)
 	quit(0 if _failures == 0 else 1)
 

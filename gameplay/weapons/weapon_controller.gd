@@ -1,3 +1,5 @@
+# gdlint: disable=max-public-methods
+# Public combat and collection entrypoints remain compatible with existing gameplay callers.
 class_name WeaponController
 extends Node
 

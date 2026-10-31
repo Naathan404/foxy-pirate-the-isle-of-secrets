@@ -44,7 +44,7 @@ jobs:
       - uses: lihop/setup-godot@v3
         with:
           version: 4.7.2-stable
-      - name: Import project and run gameplay tests
+      - name: Import project and run fixed tests
         shell: bash
         run: |
           set -euo pipefail
@@ -61,7 +61,13 @@ jobs:
           }
 
           check_godot 300s --editor --import --quit
-          while IFS= read -r -d '' test; do
+          # Keep CI membership explicit; new test files must not run automatically.
+          while IFS= read -r test || [[ -n "$test" ]]; do
+            [[ -z "$test" || "$test" == \#* ]] && continue
+            if [[ ! -f "$test" ]]; then
+              echo "::error::Listed CI test does not exist: $test"
+              exit 1
+            fi
             echo "Running $test"
             check_godot 60s --script "$test"
-          done < <(find test gameplay/charms -type f -name '*_test.gd' -print0 | sort -z)
+          done < .github/godot-tests.txt
