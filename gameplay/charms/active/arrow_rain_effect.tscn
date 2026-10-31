@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://c568ocgouqi2l"]
 
-[ext_resource type="Script" path="res://gameplay/charms/active/arrow_rain_effect.gd" id="1_effect"]
+[ext_resource type="Script" uid="uid://db557gqj3xhc5" path="res://gameplay/charms/active/arrow_rain_effect.gd" id="1_effect"]
 
-[node name="ArrowRainEffect" type="Node"]
+[node name="ArrowRainEffect" type="Node" unique_id=2116355074]
 script = ExtResource("1_effect")

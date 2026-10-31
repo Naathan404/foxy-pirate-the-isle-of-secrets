@@ -7,6 +7,9 @@ extends CanvasLayer
 @export var charm_socket_manager: CharmSocketManager
 @export var potion_component: PotionComponent
 @export var weapon_controller: WeaponController
+@export var ammo: AmmoComponent
+
+var _displayed_ammo_id: StringName = &""
 
 @onready var health_arc: HudStatArc = $Stats/HealthArc
 @onready var stamina_arc: HudStatArc = $Stats/StaminaArc
@@ -14,9 +17,17 @@ extends CanvasLayer
 @onready var portrait: HudPortrait = $StatControl/Portrait
 @onready var equipment: EquipmentControl = $EquipmentControl
 @onready var weapon_icon: TextureRect = $ChaosControl/WeaponFrame/WeaponIcon
+@onready var ammo_label: Label = $ChaosControl/AmmoLabel
 
 
 func _ready() -> void:
+	if is_instance_valid(ammo):
+		if is_instance_valid(ammo.inventory):
+			# Inventory changes cover every ammo ID, including items not in ammo_items yet.
+			ammo.inventory.changed.connect(_refresh_ammo)
+		else:
+			ammo.ammo_changed.connect(_on_ammo_changed)
+	_refresh_ammo.call_deferred()
 	if is_instance_valid(weapon_controller):
 		weapon_controller.weapon_changed.connect(_on_weapon_changed)
 		_sync_weapon.call_deferred()
@@ -51,10 +62,27 @@ func _sync_weapon() -> void:
 
 func _on_weapon_changed(weapon: WeaponInstance) -> void:
 	var skill: AttackData
+	_displayed_ammo_id = &""
 	if weapon != null and weapon.definition != null:
 		skill = weapon.definition.secondary_attack
+		# Primary ammo takes precedence; secondary supports weapons with skill-only ammo.
+		for attack: AttackData in [weapon.definition.normal_attack, skill]:
+			if attack != null and not attack.ammo_id.is_empty():
+				_displayed_ammo_id = attack.ammo_id
+				break
 	weapon_icon.texture = skill.skill_icon if skill != null else null
 	weapon_icon.visible = weapon_icon.texture != null
+	_refresh_ammo()
+
+
+func _on_ammo_changed(item_id: StringName, _amount: int) -> void:
+	if item_id == _displayed_ammo_id:
+		_refresh_ammo()
+
+
+func _refresh_ammo() -> void:
+	ammo_label.visible = is_instance_valid(ammo) and not _displayed_ammo_id.is_empty()
+	ammo_label.text = str(ammo.get_amount(_displayed_ammo_id)) if ammo_label.visible else ""
 
 
 func _on_equipped_potion_changed(potion: Potion) -> void:

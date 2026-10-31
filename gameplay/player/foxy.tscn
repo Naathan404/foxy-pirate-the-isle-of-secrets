@@ -888,13 +888,14 @@ script = ExtResource("7_rvh5s")
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
 
-[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component", "weapon_controller") instance=ExtResource("20_pt1je")]
+[node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component", "weapon_controller", "ammo") instance=ExtResource("20_pt1je")]
 health = NodePath("../HealthComponent")
 stamina = NodePath("../StaminaComponent")
 chaos = NodePath("../ChaosComponent")
 charm_socket_manager = NodePath("../CharmSocketManager")
 potion_component = NodePath("../PotionComponent")
 weapon_controller = NodePath("../WeaponController")
+ammo = NodePath("../AmmoComponent")
 
 [node name="HurtBox" type="Area3D" parent="." unique_id=953130742 node_paths=PackedStringArray("actor")]
 collision_layer = 8

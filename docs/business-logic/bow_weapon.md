@@ -1,5 +1,23 @@
 # Cung: vũ khí tầm xa thứ hai
 
+## AmmoLabel trên Player HUD
+
+`gameplay/player/hud/player_hud.gd` đọc ammo ID từ đòn thường của vũ khí đang
+trang bị, fallback đòn phụ khi đòn thường không khai báo ammo. Khi đổi vũ khí,
+label `ChaosControl/AmmoLabel` chuyển sang số ammo tương ứng từ `AmmoComponent`.
+Hết đạn hiển thị 0; vũ khí không khai báo ammo thì ẩn và xóa nội dung label.
+Không phụ thuộc category, không hardcode Arrow/Bullet và không giữ bộ đếm riêng.
+
+HUD dùng `Inventory.changed` khi ammo gắn inventory, nên bắn/nhặt/thay đổi stack
+của cả ammo ID chưa nằm trong `ammo_items` đều cập nhật. AmmoComponent độc lập
+dùng signal `ammo_changed`. Đồng bộ lần đầu bằng weapon_changed/deferred sync
+để đúng thứ tự ready của Foxy. `gameplay/player/foxy.tscn` gán export
+`PlayerHUD.ammo` tới `../AmmoComponent`; layout/font/màu của label do người dùng
+tạo trong `player_hud.tscn` được giữ nguyên.
+
+Lần nối AmmoLabel chỉ sửa hai file trên và tài liệu này. Đã rà soát nguồn và format;
+không tạo/chạy test hoặc chạy game theo yêu cầu hiện hành của người dùng.
+
 ## Nâng cấp hình ảnh Stormstring
 
 VFX dùng shader additive có lõi nóng và viền mềm, không còn TorusMesh/SphereMesh

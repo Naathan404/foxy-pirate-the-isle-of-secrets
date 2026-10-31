@@ -4,6 +4,6 @@
 
 [node name="BowVolley" type="Node3D" unique_id=834460377]
 script = ExtResource("1_skill")
-spread_factor = 3.6
+spread_factor = 2.5
 release_shake_base_pixels = 5.0
 release_hitstop_seconds = 0.15

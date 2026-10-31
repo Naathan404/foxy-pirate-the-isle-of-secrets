@@ -464,6 +464,20 @@ offset_bottom = 72.8
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("14_01apl")
 
+[node name="AmmoLabel" type="Label" parent="ChaosControl" unique_id=847852458]
+texture_filter = 1
+layout_mode = 0
+offset_left = 37.76008
+offset_top = 31.999998
+offset_right = 79.76008
+offset_bottom = 58.0
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("23_1wee6")
+theme_override_font_sizes/font_size = 25
+text = "999"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="EquipmentControl" type="Control" parent="." unique_id=143244385]
 layout_mode = 3
 anchors_preset = 0
