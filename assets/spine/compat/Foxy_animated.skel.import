@@ -1,0 +1,14 @@
+[remap]
+
+importer="curvature.spine.binary"
+type="SpineSkeletonFileResource"
+uid="uid://cjyen8sk8fdyb"
+path="res://.godot/imported/Foxy_animated.skel-5bef6e111eda7534dbd014ee452df725.tres"
+
+[deps]
+
+source_file="res://assets/spine/compat/Foxy_animated.skel"
+dest_files=["res://.godot/imported/Foxy_animated.skel-5bef6e111eda7534dbd014ee452df725.tres"]
+
+[params]
+
