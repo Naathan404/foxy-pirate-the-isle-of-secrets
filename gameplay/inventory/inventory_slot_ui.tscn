@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" uid="uid://b03gmcx2kf6go" path="res://gameplay/inventory/inventory_slot_ui.gd" id="1_u5xhv"]
 [ext_resource type="Texture2D" uid="uid://dv40a00uxu68y" path="res://assets/ui/player_hud/inventory/inventory_slot.png" id="2_rjo3g"]
-[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="3_rjo3g"]
+[ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="3_rjo3g"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qajpg"]
 line_spacing = 0.0
 font = ExtResource("3_rjo3g")
-font_size = 36
+font_size = 30
 outline_size = 10
 outline_color = Color(0, 0, 0, 1)
 

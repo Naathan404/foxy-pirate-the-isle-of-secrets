@@ -8,6 +8,8 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var animation_prefix: String = "attack_dagger"
 ## HUD artwork for this skill; secondary attacks supply the player's weapon skill icon.
 @export var skill_icon: Texture2D
+@export var display_name: String = ""
+@export_multiline var description: String = ""
 # scene thực hiện đòn đnahs
 @export var attack_scene: PackedScene
 @export var aim_mode: AimMode = AimMode.FACING

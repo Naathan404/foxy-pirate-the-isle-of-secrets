@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_epx0i"]
 [ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="1_nasaw"]
+[ext_resource type="Texture2D" uid="uid://bskqendkoektx" path="res://assets/sprites/items/equipment/dagger.png" id="1_tjtgk"]
 [ext_resource type="PackedScene" uid="uid://q2jqrxyd2k31" path="res://gameplay/weapons/attack scenes/dagger_attack.tscn" id="1_up41l"]
 [ext_resource type="PackedScene" uid="uid://bu8agnheexxo8" path="res://gameplay/weapons/attack scenes/dagger_throw.tscn" id="4_throw"]
 [ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="5_combo"]
@@ -56,6 +57,8 @@ metadata/_custom_type_script = "uid://bl3xskt8h6bl7"
 [sub_resource type="Resource" id="Resource_throw"]
 script = ExtResource("1_nasaw")
 skill_icon = ExtResource("6_skill_icon")
+display_name = "Returning Dagger"
+description = "Throw your dagger forward. It hits enemies on the way out and returns to your hand."
 attack_scene = ExtResource("4_throw")
 delivery_type = 1
 windup_seconds = 0.15
@@ -65,6 +68,8 @@ range_units = 10.0
 
 [resource]
 script = ExtResource("1_epx0i")
+icon = ExtResource("1_tjtgk")
+description = "A nimble blade for quick combos and a returning throw."
 normal_attack = SubResource("Resource_nasaw")
 secondary_attack = SubResource("Resource_throw")
 metadata/_custom_type_script = "uid://dnv8otqkgp6v5"

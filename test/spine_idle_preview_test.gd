@@ -20,6 +20,7 @@ func _run() -> void:
 	_check(visual.sprite.visible != available, "Exactly one idle renderer is visible")
 	if available:
 		await _check_playback(player, preview)
+		await _check_stable_idle_fit(player, preview)
 		_check_idle_facing(player, preview)
 	for direction in [Vector3.FORWARD, Vector3.RIGHT, Vector3.LEFT]:
 		visual.play_directional(&"idle", direction, player.camera)
@@ -101,6 +102,82 @@ func _check_idle_facing(player: Player, preview: Node3D) -> void:
 			(spine.transform.basis.x.x < 0.0) == (direction.x > 0.0),
 			"Repeated idle entry keeps the correct mirror"
 		)
+
+
+func _check_stable_idle_fit(player: Player, preview: Node3D) -> void:
+	var visual := player.visual
+	var source := visual.sprite
+	var rest_transform := source.transform
+	var fitted: Transform3D = preview.get("_fitted_transform")
+	var bottom: Vector3 = preview.get("_reference_bottom")
+	var height: float = preview.get("_reference_height")
+	var idle := visual.animation_player.get_animation(&"idle_down")
+	var frame: int = int(idle.track_get_key_value(0, 0))
+	var image := source.texture.get_image()
+	var frame_size := Vector2i(image.get_size()) / Vector2i(source.hframes, source.vframes)
+	var used := (
+		image
+		. get_region(
+			Rect2i(
+				Vector2i(frame % source.hframes, frame / source.hframes) * frame_size, frame_size
+			)
+		)
+		. get_used_rect()
+	)
+	var expected_height := used.size.y * source.pixel_size * source.scale.y
+	var expected_bottom := (
+		source.position
+		+ (
+			Vector3.UP
+			* (frame_size.y / 2.0 + source.offset.y - used.end.y)
+			* source.pixel_size
+			* source.scale.y
+		)
+	)
+	_check(
+		is_equal_approx((preview.basis * Vector3.UP * height).length(), expected_height),
+		"Preview parent scale is not applied twice"
+	)
+	_check(
+		(preview.transform * bottom).is_equal_approx(expected_bottom),
+		"Spine feet align to the canonical sprite idle baseline"
+	)
+	for action: StringName in [&"dash", &"attack_dagger", &"attack_bow", &"run", &"hit"]:
+		visual.play_directional(action, Vector3.BACK, player.camera)
+		visual.animation_player.advance(0.0)
+		# Reproduce the outgoing pose while dash stretch / attack recoil is still recovering.
+		source.scale = rest_transform.basis.get_scale() * Vector3(0.92, 1.16, 1.0)
+		source.position = rest_transform.origin + Vector3(0.2, -0.15, 0.1)
+		source.frame = 56
+		visual.play_directional(&"idle", Vector3.BACK, player.camera)
+		_check(preview.visible, "Idle renderer returns after " + String(action))
+		_check(
+			(preview.get("_fitted_transform") as Transform3D).is_equal_approx(fitted),
+			"Idle fit ignores outgoing frame, stretch and recoil after " + String(action)
+		)
+		_check(
+			(preview.get("_reference_bottom") as Vector3).is_equal_approx(bottom),
+			"Foot baseline does not drift after " + String(action)
+		)
+		source.transform = rest_transform
+	var dash_effect := player.get_node("Effects/DashEffect")
+	visual.play_directional(&"dash", Vector3.BACK, player.camera)
+	player.dash_started.emit()
+	await create_timer(0.06).timeout
+	player.dash_finished.emit(false)
+	visual.play_directional(&"idle", Vector3.BACK, player.camera)
+	_check(
+		(preview.get("_fitted_transform") as Transform3D).is_equal_approx(fitted),
+		"Real dash stretch cannot resize the returning idle"
+	)
+	await create_timer(0.15).timeout
+	_check(
+		source.scale.is_equal_approx(rest_transform.basis.get_scale()),
+		"Dash restores sprite scale after idle transition"
+	)
+	_check(not dash_effect.get("_dashing"), "Dash feedback ends normally")
+	source.transform = rest_transform
+	visual.animation_player.advance(0.0)
 
 
 func _check(condition: bool, message: String) -> void:

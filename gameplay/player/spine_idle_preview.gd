@@ -10,10 +10,58 @@ var _spine: Node3D
 var _load_attempted: bool = false
 var _active: bool = false
 var _fitted_transform: Transform3D = Transform3D.IDENTITY
+var _reference_height: float = 0.0
+var _reference_bottom: Vector3 = Vector3.ZERO
+var _fit_ready: bool = false
 
 
 func _ready() -> void:
 	visible = false
+
+
+## Capture the authored idle pose before dash stretch, recoil and animation frames modify it.
+func configure_reference(source: Sprite3D, animator: AnimationPlayer) -> void:
+	var texture: Texture2D = source.texture
+	var frame: int = source.frame
+	if is_instance_valid(animator) and animator.has_animation(&"idle_down"):
+		var idle := animator.get_animation(&"idle_down")
+		var animation_root := animator.get_node(animator.root_node)
+		for track in idle.get_track_count():
+			if (
+				idle.track_get_type(track) != Animation.TYPE_VALUE
+				or idle.track_get_key_count(track) == 0
+			):
+				continue
+			var path := idle.track_get_path(track)
+			if path.get_subname_count() != 1:
+				continue
+			if animation_root.get_node_or_null(NodePath(path.get_concatenated_names())) != source:
+				continue
+			match String(path.get_subname(0)):
+				"frame":
+					frame = int(idle.track_get_key_value(track, 0))
+				"texture":
+					texture = idle.track_get_key_value(track, 0) as Texture2D
+	if texture == null:
+		return
+	var image := texture.get_image()
+	var frame_size := Vector2i(image.get_size()) / Vector2i(source.hframes, source.vframes)
+	var coords := Vector2i(frame % source.hframes, frame / source.hframes)
+	var used := image.get_region(Rect2i(coords * frame_size, frame_size)).get_used_rect()
+	if not used.has_area():
+		used = Rect2i(Vector2i.ZERO, frame_size)
+	var height := float(used.size.y) * source.pixel_size * source.scale.y
+	var bottom := (
+		(float(frame_size.y) / 2.0 + source.offset.y - float(used.end.y))
+		* source.pixel_size
+		* source.scale.y
+	)
+	# The preview has its own authored transform; fitting in Visual coordinates would apply
+	# its vertical scale/offset a second time and move the feet below the sprite's baseline.
+	var inverse := transform.affine_inverse()
+	_reference_height = absf((inverse.basis * Vector3.UP * height).y)
+	_reference_bottom = inverse * (source.position + Vector3.UP * bottom)
+	_fit_ready = false
 
 
 func _process(_delta: float) -> void:
@@ -37,8 +85,9 @@ func sync_animation(
 	if show_preview:
 		show_preview = _ensure_spine()
 	if show_preview and not _active:
-		_fit_to_sprite(source)
-		show_preview = bool(_spine.set_animation(spine_animation, true, 0))
+		if not _fit_ready:
+			_fit_to_sprite()
+		show_preview = _fit_ready and bool(_spine.set_animation(spine_animation, true, 0))
 	_active = show_preview
 	visible = _active
 	source.visible = source == active_sprite and not _active
@@ -51,7 +100,7 @@ func sync_animation(
 	var facing_transform := _fitted_transform
 	if not facing_left:
 		facing_transform.basis.x *= -1.0
-		facing_transform.origin.x = 2.0 * source.position.x - _fitted_transform.origin.x
+		facing_transform.origin.x = 2.0 * _reference_bottom.x - _fitted_transform.origin.x
 	_spine.transform = facing_transform
 	var active_camera := camera
 	if not is_instance_valid(active_camera):
@@ -81,35 +130,24 @@ func _ensure_spine() -> bool:
 		push_warning("Spine idle preview needs the SpineBridge 3.8 playback patch")
 		return false
 	add_child(_spine)
-	_spine.set("shadow_casting", 2) # Double Sided
+	_spine.set("shadow_casting", 2)  # Double Sided
 	_spine.set("skeleton_data_res", load(skeleton_data_path))
 	_spine.pause()
 	return _spine.is_loaded()
 
 
-func _fit_to_sprite(source: Sprite3D) -> void:
-	# Restore a positive scale before recalculating bounds after a mirrored idle.
+func _fit_to_sprite() -> void:
+	# Calibrate once against the initial skeleton bounds, never against a paused animated pose.
 	_spine.transform = Transform3D.IDENTITY
 	_spine.update_skeleton(0.0)
 	var bounds: AABB = _spine.get_aabb()
-	if bounds.size.y <= 0.0:
+	if bounds.size.y <= 0.0 or _reference_height <= 0.0:
 		return
-	var image := source.texture.get_image()
-	var frame_size := Vector2i(image.get_size()) / Vector2i(source.hframes, source.vframes)
-	var frame_rect := Rect2i(source.frame_coords * frame_size, frame_size)
-	var used := image.get_region(frame_rect).get_used_rect()
-	if not used.has_area():
-		used = Rect2i(Vector2i.ZERO, frame_size)
-	var target_height := float(used.size.y) * source.pixel_size * source.scale.y
-	var factor := target_height / bounds.size.y
+	var factor := _reference_height / bounds.size.y
 	_spine.scale = Vector3.ONE * factor
-	var target_bottom := (
-		(float(frame_size.y) / 2.0 + source.offset.y - float(used.end.y))
-		* source.pixel_size
-		* source.scale.y
-	)
 	_spine.position = (
-		Vector3(-bounds.get_center().x * factor, target_bottom - bounds.position.y * factor, 0.0)
-		+ source.position
+		Vector3(-bounds.get_center().x * factor, -bounds.position.y * factor, 0.0)
+		+ _reference_bottom
 	)
 	_fitted_transform = _spine.transform
+	_fit_ready = true

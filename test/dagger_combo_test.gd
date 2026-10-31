@@ -102,6 +102,7 @@ func _run() -> void:
 	# Local hitstop must not change global timing, and cancel must restore animation speed.
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
 	# Pin the fixture independently of the forge selected for manual testing.
+	player.get_node("WeaponController").collection.clear()
 	player.get_node("WeaponController").default_forge = null
 	player.get_node("WeaponController").default_weapon = DAGGER
 	player.position = Vector3(10, 0.7, 0)

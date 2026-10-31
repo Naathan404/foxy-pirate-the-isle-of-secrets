@@ -6,6 +6,7 @@ signal attack_finished
 signal attack_started(context: AttackContext)
 signal charge_released(context: AttackContext)
 signal weapon_changed(weapon: WeaponInstance)
+signal collection_changed
 signal damage_dealt(damage: DamageContext, target: Node, applied_hp: float)
 
 # Các giai đoạn của 1 đòn đánh
@@ -17,6 +18,10 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 ## Optional initial forge; null preserves the unmodified starting weapon.
 @export var default_forge: WeaponForge
 @export_enum("None:0", "Player:1", "Enemy:2") var team: int = Teams.PLAYER
+
+@export_group("Weapon Collection")
+## Initial player flags; copied per controller during setup. Remote Inspector edits apply live.
+@export var collection: Array[WeaponCollectionEntry] = []
 
 var equipped: WeaponInstance
 # Đang đánh thì không nhận đòn mới hoặc đổi vũ khí
@@ -60,6 +65,8 @@ func setup(
 ) -> bool:
 	if is_instance_valid(actor) or not is_instance_valid(owner_actor):
 		return false
+	if not _validate_collection():
+		return false
 	actor = owner_actor
 	stamina = stamina_component
 	ammo = ammo_component
@@ -67,12 +74,19 @@ func setup(
 		actor.connect("dash_started", _on_dash_started)
 	if actor.has_signal("dash_finished"):
 		actor.connect("dash_finished", _on_dash_finished)
+	_initialize_collection()
 	if default_weapon != null:
+		var entry := _find_collection_entry(default_weapon.weapon_id)
+		if entry != null:
+			if entry.owned:
+				return equip(_find_owned_weapon(default_weapon.weapon_id))
+			# Explicit ownership flags take precedence over the preferred starting weapon.
+			return equip(_owned[0]) if not _owned.is_empty() else true
 		var starter := WeaponInstance.new()
 		starter.definition = default_weapon
 		starter.forge = default_forge
 		return equip(starter)
-	return true
+	return equip(_owned[0]) if not _owned.is_empty() else true
 
 
 # Kiểm tra vũ khí mới trước, lỗi thì giữ vũ khí cũ
@@ -113,12 +127,14 @@ func equip(weapon: WeaponInstance) -> bool:
 	reset_combo()
 	if not _owned.has(weapon):
 		_owned.append(weapon)
+	_mark_weapon_owned(weapon)
 	if is_instance_valid(_effect):
 		_effect.actor = actor
 		_effect.weapon = weapon
 		add_child(_effect)
 		_effect.on_equip()
 	weapon_changed.emit(weapon)
+	collection_changed.emit()
 	return true
 
 
@@ -132,6 +148,123 @@ func _has_animation(prefix: String) -> bool:
 func get_aim_mode(action: StringName = &"normal") -> AttackData.AimMode:
 	var attack := equipped.get_attack(action) if equipped != null else null
 	return attack.aim_mode if attack != null else AttackData.AimMode.FACING
+
+
+## Return a snapshot of the owned collection, without exposing its mutable array.
+func get_owned_weapons() -> Array[WeaponInstance]:
+	return _owned.duplicate()
+
+
+func is_blueprint_unlocked(weapon_id: StringName) -> bool:
+	var entry := _find_collection_entry(weapon_id)
+	return entry != null and entry.blueprint_unlocked
+
+
+func is_weapon_owned(weapon_id: StringName) -> bool:
+	return _find_owned_weapon(weapon_id) != null
+
+
+func set_blueprint_unlocked(weapon_id: StringName, unlocked: bool) -> bool:
+	var entry := _find_collection_entry(weapon_id)
+	if entry == null:
+		return false
+	entry.blueprint_unlocked = unlocked
+	return true
+
+
+func set_weapon_owned(weapon_id: StringName, owned: bool) -> bool:
+	var entry := _find_collection_entry(weapon_id)
+	if entry == null:
+		return false
+	entry.owned = owned
+	return true
+
+
+func _validate_collection() -> bool:
+	var ids: Dictionary[StringName, bool] = {}
+	for entry: WeaponCollectionEntry in collection:
+		if entry == null or entry.definition == null or entry.definition.weapon_id.is_empty():
+			push_error("Weapon collection entry requires a weapon definition and stable ID")
+			return false
+		if (
+			ids.has(entry.definition.weapon_id)
+			or (entry.forge != null and not entry.forge.is_valid())
+		):
+			push_error("Weapon collection has a duplicate ID or invalid forge")
+			return false
+		ids[entry.definition.weapon_id] = true
+	return true
+
+
+func _initialize_collection() -> void:
+	var initial := collection.duplicate()
+	collection = []
+	for configured: WeaponCollectionEntry in initial:
+		var entry := configured.duplicate() as WeaponCollectionEntry
+		collection.append(entry)
+		entry.changed.connect(_on_collection_entry_changed.bind(entry))
+		_sync_entry_ownership(entry)
+	notify_property_list_changed()
+
+
+func _find_collection_entry(weapon_id: StringName) -> WeaponCollectionEntry:
+	for entry: WeaponCollectionEntry in collection:
+		if entry != null and entry.definition != null and entry.definition.weapon_id == weapon_id:
+			return entry
+	return null
+
+
+func _find_owned_weapon(weapon_id: StringName) -> WeaponInstance:
+	for weapon: WeaponInstance in _owned:
+		if weapon.definition != null and weapon.definition.weapon_id == weapon_id:
+			return weapon
+	return null
+
+
+## Existing equip callers can still grant loot directly; blueprint permission is independent.
+func _mark_weapon_owned(weapon: WeaponInstance) -> void:
+	var entry := _find_collection_entry(weapon.definition.weapon_id)
+	if entry == null:
+		entry = WeaponCollectionEntry.new()
+		entry.definition = weapon.definition
+		entry.forge = weapon.forge
+		collection.append(entry)
+		entry.changed.connect(_on_collection_entry_changed.bind(entry))
+	entry.owned = true
+
+
+func _on_collection_entry_changed(entry: WeaponCollectionEntry) -> void:
+	_sync_entry_ownership(entry)
+	collection_changed.emit()
+
+
+func _sync_entry_ownership(entry: WeaponCollectionEntry) -> void:
+	if entry.definition == null:
+		return
+	var id := entry.definition.weapon_id
+	if entry.owned:
+		if _find_owned_weapon(id) == null:
+			var weapon := WeaponInstance.new()
+			weapon.definition = entry.definition
+			weapon.forge = entry.forge
+			if weapon.forge == null and default_weapon != null and default_weapon.weapon_id == id:
+				weapon.forge = default_forge
+			_owned.append(weapon)
+		return
+	var removing_equipped := equipped != null and equipped.definition.weapon_id == id
+	if removing_equipped:
+		cancel()
+	for index in range(_owned.size() - 1, -1, -1):
+		if _owned[index].definition.weapon_id == id:
+			_owned.remove_at(index)
+	if removing_equipped:
+		if is_instance_valid(_effect):
+			_effect.on_unequip()
+			_effect.queue_free()
+		_effect = null
+		equipped = null
+		reset_combo()
+		weapon_changed.emit(null)
 
 
 func get_attack_animation_prefix() -> String:

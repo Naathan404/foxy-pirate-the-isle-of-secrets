@@ -52,7 +52,7 @@ func _run() -> void:
 		)
 	enemy.free()
 	_check(is_instance_valid(popup), "Number survives enemy removal")
-	await create_timer(0.85).timeout
+	await create_timer(float(popup.get("lifetime")) + 0.15).timeout
 	_check(not is_instance_valid(popup), "Number frees after animation")
 	world.free()
 	if _failures == 0:

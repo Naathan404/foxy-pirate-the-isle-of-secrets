@@ -25,6 +25,8 @@ var _action_sprites: Dictionary[StringName, Sprite3D] = {}
 
 func _ready() -> void:
 	_active_sprite = sprite
+	if is_instance_valid(_idle_preview):
+		_idle_preview.configure_reference(sprite, animation_player)
 	for prefix: StringName in action_sprite_paths:
 		var action_sprite := get_node_or_null(action_sprite_paths[prefix]) as Sprite3D
 		if action_sprite == null:
