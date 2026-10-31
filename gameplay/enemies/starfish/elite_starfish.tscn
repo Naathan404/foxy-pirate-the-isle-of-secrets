@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://dt27usr75pcn4"]
+
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://data/enemies/elite_starfish_data.tres" id="2_data"]
+[ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
+[ext_resource type="Script" uid="uid://cqfcfxr3o8dx2" path="res://gameplay/enemies/starfish/states/elite_starfish_attack.gd" id="4_attack"]
+[ext_resource type="Script" uid="uid://cbr1chjg1vwxp" path="res://gameplay/enemies/starfish/elite_starfish.gd" id="6_elite_starfish"]
+
+[sub_resource type="BoxShape3D" id="HurtShape"]
+size = Vector3(2.25, 3, 2.25)
+
+[sub_resource type="BoxShape3D" id="ContactShape"]
+size = Vector3(2.25, 3, 2.25)
+
+[sub_resource type="CylinderShape3D" id="DetectorShape"]
+height = 3.0
+radius = 10.1
+
+[sub_resource type="CapsuleShape3D" id="BodyShape"]
+radius = 0.825
+height = 1.65
+
+[node name="EliteStarfish" unique_id=554202254 instance=ExtResource("1_base")]
+script = ExtResource("6_elite_starfish")
+use_random_axis_patrol = true
+axis_change_duration_min = 1.5
+axis_change_duration_max = 4.0
+player_detection_radius = 10.1
+unreachable_target_ignore_duration = 2.0
+data = ExtResource("2_data")
+
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+target_position = Vector3(0, 0, 1.5)
+
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 1.35)
+target_position = Vector3(0, -2.25, 0)
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("HurtShape")
+
+[node name="CollisionShape3D" parent="Direction/ContactHitBox" parent_id_path=PackedInt32Array(896727614) index="0" unique_id=493349818]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("ContactShape")
+
+[node name="Attack" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=370124643]
+script = ExtResource("4_attack")
+dash_count = 3
+preparation_duration = 0.6
+telegraph_duration = 0.35
+dash_duration = 0.55
+recovery_duration = 0.5
+arrival_distance = 0.25
+
+[node name="CollisionShape3D" parent="TargetDetector" parent_id_path=PackedInt32Array(263280503) index="0" unique_id=674138613]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("DetectorShape")
+
+[node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.825, 0)
+shape = SubResource("BodyShape")
+
+[node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=1545226085]
+script = ExtResource("3_feedback")
+telegraph_ring_radius = 1.5

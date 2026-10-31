@@ -86,9 +86,10 @@ func _update_dash(delta: float) -> void:
 	if direction.length() <= target_arrival_distance:
 		_finish_dash()
 		return
-	enemy.move_in_direction(direction, delta, dash_speed_multiplier)
 	if enemy.is_front_blocked() or not enemy.is_ground_ahead():
-		_finish_dash()
+		_abandon_unreachable_dash()
+		return
+	enemy.move_in_direction(direction, delta, dash_speed_multiplier)
 
 
 func _finish_dash() -> void:
@@ -103,6 +104,19 @@ func _finish_dash() -> void:
 
 func _return_to_patrol() -> void:
 	request_state(&"patrol")
+
+
+func _abandon_unreachable_dash() -> void:
+	enemy._stop_contact_damage()
+	enemy.stop_movement()
+	enemy.turn_around()
+	var starfish := enemy as Starfish
+	if starfish != null:
+		starfish.ignore_current_target_after_unreachable_dash()
+	var patrol := get_node_or_null("../Patrol") as StarfishPatrol
+	if patrol != null:
+		patrol.start_unreachable_target_cooldown()
+	_return_to_patrol()
 
 
 func _timer_finished(delta: float) -> bool:

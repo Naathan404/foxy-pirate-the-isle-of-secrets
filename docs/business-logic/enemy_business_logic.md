@@ -15,6 +15,60 @@ Scene gốc:
 gameplay/enemies/base/enemy_base.tscn
 ```
 
+## Danh sách enemy và vai trò gameplay
+
+| Enemy | Hành vi thường | Biến thể elite / lưu ý |
+| --- | --- | --- |
+| **Crab** | Tuần tra trên bốn hướng XZ, đổi trục sau khi sống sót qua một đòn đánh và gây contact damage. | **EliteCrab** phát hiện Foxy, telegraph, charge, rồi slam diện rộng trước khi vào cooldown. Patrol và charge chỉ đi theo bốn hướng. Khi mục tiêu nằm chéo, Crab khóa vị trí đó, đi dọc theo trục Z rồi rẽ 90° theo trục X để đến gần vị trí đã khóa; nó không di chuyển chéo và hủy charge nếu bất kỳ chặng nào gặp tường hoặc mép rơi. |
+| **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
+| **Barrel** | Đứng yên, aim theo bốn hướng, charge rồi bắn burst với độ lệch đạn ngẫu nhiên; sau đó chờ cooldown. | **EliteBarrel** dùng Scattershot: sau telegraph pulse, nó bắn chính xác năm viên theo hình quạt cố định. Damage đạn lấy từ elite data và toàn bộ đạn đang bay bị xóa khi Barrel chết. |
+| **WarLordTurtle** | Archetype enemy lớn độc lập, có data và animation riêng. | Không phải biến thể Turtle elite thứ hai. Luật boss hoặc Tide Grapple chỉ được gán khi game design quy định rõ. |
+
+Mọi elite có 12 HP, 2 attack damage, 50% kháng hất văng và rơi đúng item của enemy thường với số lượng gấp ba.
+Nhận diện thường trực là một overlay shader xanh-trắng trực tiếp trên `Visual/Sprite3D`: mười hai đốm sáng
+nhỏ, trắng ở lõi và cyan ở viền, bay theo quỹ đạo chậm sát quanh elite. Shader đồng bộ UV của từng frame atlas
+và mở rộng đúng mặt phẳng billboard của sprite, nên hiệu ứng luôn khớp hướng, animation frame và ảnh 2D; không
+tạo node, icon, chữ, mesh hay offset world-space cạnh enemy.
+Overlay tắt khi enemy chết. Khói trắng-xám mờ chỉ xuất hiện khi di chuyển. Vì body lớn 1.5×, EliteCrab giảm tốc
+từ 2.5 xuống 1.8 và EliteStarfish giảm từ 2.0 xuống 1.5.
+Telegraph pulse trực tiếp trên sprite gốc của elite trong pha chuẩn bị/wind-up: sprite sáng nhẹ và nở rất ít
+theo nhịp. Đồng thời chỉ một vòng cảnh báo màu vàng-cam xuất hiện trên mặt đất, nhấp nháy trong wind-up và tắt
+ngay trước khi đòn bắt đầu. Nó chỉ cảnh báo, không có collider và không gây damage; không tạo billboard/sprite
+thứ hai hoặc aura hiển thị thường trực.
+Presentation không quyết định thời điểm gây damage; mỗi enemy state vẫn sở hữu vòng đời
+HitBox và contact damage của chính nó. Các scene elite bật `Show Debug Health` để hiện HP
+trong scene test; đây là debug presentation, không phải UI gameplay.
+
+### Cấu hình theo enemy script
+
+Mỗi archetype có root script riêng, kể cả khi chỉ dùng để chứa cấu hình. Scene chỉ gán giá trị
+gameplay, còn script áp dụng chúng vào component lúc `_ready()`; vì vậy level design không cần
+chỉnh trực tiếp `CollisionShape3D` chỉ để đổi vùng nhận diện. Script có `player_detection_radius`
+(`EliteCrab`, `Starfish`/`EliteStarfish`, `Barrel`/`EliteBarrel`) dùng setter để đồng bộ collider
+khi scene chạy. Giá trị mặc định của `CylinderShape3D` trong từng `.tscn` cũng phải trùng export,
+để collision đúng ngay khi scene được mở và khi gameplay bắt đầu.
+
+| Script | Cấu hình đặc trưng |
+| --- | --- |
+| `crab/crab.gd` | Contact damage và speed scale của patrol Crab. |
+| `crab/elite_crab.gd` | `player_detection_radius` cho TargetDetector của EliteCrab. |
+| `starfish/starfish.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector của Starfish và lớp kế thừa elite. |
+| `starfish/elite_starfish.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
+| `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
+| `barrel/elite_barrel.gd` | Số đạn và góc quạt cố định của Scattershot. |
+| `war_lord_turtle/war_lord_turtle.gd` | Speed, contact damage và đổi trục patrol của WarLordTurtle. |
+
+Ví dụ, đổi vùng nhận diện EliteCrab chỉ cần sửa `player_detection_radius` trên node root
+EliteCrab; script cập nhật bán kính `CylinderShape3D` của `TargetDetector` trước khi Base quét
+Player. Collider vẫn là nơi định nghĩa hình dạng và chiều cao, không còn là nơi chứa range gameplay.
+
+### Tránh chồng enemy khi tấn công
+
+`ENEMY_BODY_MASK` bao gồm `ENEMY_BODY`, nên `CharacterBody3D` của các enemy va chạm với nhau.
+`FrontRayCast3D` cũng dùng `WORLD | ENEMY_BODY`: patrol xem enemy phía trước là vật cản, còn
+charge/dash của elite sẽ hủy hoặc quay đầu theo luật state hiện có thay vì chồng lên cùng một vị trí
+của Player. `GroundRayCast3D` chỉ giữ mask `WORLD`, để enemy khác không làm sai kiểm tra mép rơi.
+
 Ví dụ sử dụng: `Crab`, `Barrel`, `Starfish` và `WarLordTurtle` trong
 `gameplay/enemies/`.
 
@@ -62,11 +116,14 @@ cung cấp target, di chuyển và contact damage.
 
 ### Enemy lớn / elite
 
-`elite` hiện là mô tả thiết kế, không phải một nhánh business logic hay lớp base mới.
-Enemy lớn vẫn kế thừa trực tiếp `EnemyBase`: chỉ số như HP nằm trong `EnemyData`, còn
-kích thước sprite, body collider, HurtBox và ContactHitBox nằm trong scene của enemy.
-`WarLordTurtle` là ví dụ: scene dùng collider lớn hơn, data riêng có HP cao hơn và state
-`EnemyPatrol` dùng lại không đổi luật combat.
+Elite không có base class riêng. Mỗi elite kế thừa trực tiếp scene của archetype thường,
+dùng `EnemyData` riêng cho stat và chỉ override collider, state và presentation trong scene đó.
+`EliteFeedback` là component presentation tái sử dụng cho overlay ánh sáng gắn trên sprite gốc, telegraph
+pulse trên sprite gốc, một vòng cảnh báo attack-only trên mặt đất và khói di chuyển; state riêng chỉ bật/tắt
+telegraph, còn `EnemyBase` không biết hoặc không quyết định elite.
+
+`EliteCrab`, `EliteStarfish` và `EliteBarrel` đều có 12 HP, 2 damage và 50% kháng hất văng.
+WarLordTurtle tiếp tục là mẫu enemy lớn riêng, không phải một biến thể Turtle elite thứ hai.
 
 Không gán group `boss` hoặc bật `charm_grapple_large` chỉ vì enemy có kích thước lớn.
 Hai cơ chế đó thay đổi kết quả Tide Grapple, nên chỉ dùng khi game design quy định rõ
@@ -82,7 +139,7 @@ enemy là mục tiêu lớn/boss của charm này.
 2. Nối signal HP và gọi `hp.init(data.max_hp)`.
 3. Gán combat runtime: body, HurtBox và HitBox có mặt nhận layer/mask,
    `actor = self` và team Enemy.
-4. Gán mask World cho hai raycast.
+4. Gán mask `WORLD | ENEMY_BODY` cho FrontRayCast và `WORLD` cho GroundRayCast.
 5. Nếu có `TargetDetector`, gán layer/mask, nối signal enter/exit và quét ngay
    các body đang nằm trong vùng.
 6. Đặt `initial_facing`, xoay `Direction`, force update raycast đang bật.
@@ -341,7 +398,8 @@ state bắn đạn. Không thêm các luật này vào `EnemyBase` hoặc `Enemy
 Enemy cần phát hiện Player thì thêm một `Area3D` **tên chính xác**
 `TargetDetector` ở root, cùng `CollisionShape3D` có bán kính/phạm vi mong muốn.
 Base tự cấu hình layer/mask và chỉ chọn node thuộc group `player`; target gần
-nhất trong vùng được lưu tại `enemy.target`.
+nhất trong vùng được lưu tại `enemy.target`. Starfish có thể tạm tắt detector sau một dash
+không thể đi tiếp; khi hết cooldown, detector bật lại và quét chồng lấp hiện tại.
 
 Trong state, dùng:
 
@@ -373,11 +431,11 @@ layer mặc định trên từng enemy:
 
 | Thành phần | Layer | Mask |
 | --- | --- | --- |
-| Enemy body | `ENEMY_BODY` | World + Player body |
+| Enemy body | `ENEMY_BODY` | World + Player body + Enemy body |
 | HurtBox | `ENEMY_HURTBOX` | Player attack |
 | HitBox | `ENEMY_ATTACK` | Player hurtbox |
 | TargetDetector | `TARGET_DETECTOR` | Player body |
-| Front/Ground raycast | — | World |
+| FrontRayCast / GroundRayCast | — | `WORLD | ENEMY_BODY` / `WORLD` |
 
 `team` là luật combat tách biệt với physics layer: nó ngăn một HitBox gây damage
 cho cùng team. Các tên/layer được khai báo ở
@@ -421,8 +479,9 @@ nếu thiếu, state vẫn chạy nhưng không có clip để phát.
 ## 14. Raycast, Patrol và debug
 
 Thêm `EnemyPatrol` vào `States` nếu cần tuần tra. Bật `FrontRayCast3D` để quay
-khi gặp tường, bật `GroundRayCast3D` để tránh rơi vực. Cả hai raycast đã được
-Base cấu hình mask World và phải ở dưới `Direction`.
+khi gặp tường/enemy, bật `GroundRayCast3D` để tránh rơi vực. Base cấu hình
+FrontRayCast với `WORLD | ENEMY_BODY` và GroundRayCast chỉ với `WORLD`; cả hai
+phải ở dưới `Direction`.
 
 `EnemyPatrol` cho phép:
 
