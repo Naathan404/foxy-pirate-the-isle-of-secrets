@@ -71,6 +71,8 @@ foreach ($testScript in Get-ChildItem test, gameplay/charms -Recurse -Filter '*_
 | [player_state_test.gd](../test/player_state_test.gd) | API thời lượng animation, timer Hit và thời gian chờ Death |
 | [weapon_forge_test.gd](../test/weapon_forge_test.gd) | Pool 17 forge, roll theo seed, mọi category, timing combo/non-combo, SP, hitbox và projectile range |
 | [float_combat_test.gd](../test/float_combat_test.gd) | HP/damage/heal lẻ, signal, HitBox/HurtBox, potion, Charm, HUD và breakpoint HP của bốn enemy |
+| [bow_attack_test.gd](../test/bow_attack_test.gd) | Inventory ammo, bắn khi SP 0, hết tên/refill, animation, đổi dao/cung, projectile qua recovery, tường mỏng, range và forge |
+| [bow_charge_test.gd](../test/bow_charge_test.gd) | Tụ lực cung: tap, hao CP tăng dần, khóa chạy/đổi aim, 6 tên tự bắn, ammo, ngắt và collision Bézier |
 | [charm_active_test.gd](../gameplay/charms/active/charm_active_test.gd) | Arrow Rain, Crescent Cleave và Tide Grapple |
 | [charm_passive_test.gd](../gameplay/charms/passive/charm_passive_test.gd) | Passive Charm thay đổi chỉ số |
 | [charm_event_passive_test.gd](../gameplay/charms/passive/charm_event_passive_test.gd) | Passive Charm theo sự kiện và điều kiện |

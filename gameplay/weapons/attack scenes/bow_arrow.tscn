@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/weapons/attack scenes/bow_arrow.gd" id="1_arrow"]
+[ext_resource type="Script" path="res://core/components/hitbox_component.gd" id="2_hitbox"]
+[ext_resource type="ArrayMesh" path="res://assets/models/kenney_mini_forest/weapon-arrow.glb" id="3_model"]
+
+[sub_resource type="BoxShape3D" id="Shape_arrow"]
+size = Vector3(0.14, 0.14, 0.65)
+
+[node name="BowArrow" type="Node3D" node_paths=PackedStringArray("hitbox")]
+script = ExtResource("1_arrow")
+persist_after_release = true
+hitbox = NodePath("HitBox")
+
+[node name="ArrowModel" type="MeshInstance3D" parent="."]
+scale = Vector3(1.5, 1.5, 1.5)
+mesh = ExtResource("3_model")
+
+[node name="HitBox" type="Area3D" parent="."]
+script = ExtResource("2_hitbox")
+collision_layer = 32
+collision_mask = 16
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox"]
+shape = SubResource("Shape_arrow")

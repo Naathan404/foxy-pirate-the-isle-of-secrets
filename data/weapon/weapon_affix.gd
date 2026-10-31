@@ -24,6 +24,11 @@ enum ForgeGroup { UNIVERSAL, WILDCARD }
 @export_range(0.01, 5.0, 0.01) var projectile_range_multiplier: float = 1.0
 @export_range(0.0, 5.0, 0.01) var stamina_cost_multiplier: float = 1.0
 
+@export_group("Knockback")
+@export_range(0.0, 5.0, 0.01) var knockback_multiplier: float = 1.0
+## Additional multiplier only for attacks delivered as projectiles, including thrown melee weapons.
+@export_range(0.0, 5.0, 0.01) var projectile_knockback_multiplier: float = 1.0
+
 
 func is_valid() -> bool:
 	if forge_id.is_empty() or display_name.is_empty():
@@ -32,6 +37,9 @@ func is_valid() -> bool:
 		return false
 	if not is_finite(stamina_cost_multiplier) or stamina_cost_multiplier < 0.0:
 		return false
+	for multiplier: float in [knockback_multiplier, projectile_knockback_multiplier]:
+		if not is_finite(multiplier) or multiplier < 0.0:
+			return false
 	for multiplier: float in [
 		damage_multiplier,
 		stamina_damage_multiplier,

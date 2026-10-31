@@ -6,15 +6,20 @@ extends CanvasLayer
 @export var chaos: ChaosComponent
 @export var charm_socket_manager: CharmSocketManager
 @export var potion_component: PotionComponent
+@export var weapon_controller: WeaponController
 
 @onready var health_arc: HudStatArc = $Stats/HealthArc
 @onready var stamina_arc: HudStatArc = $Stats/StaminaArc
 @onready var chaos_arc: HudStatArc = $Stats/ChaosArc
 @onready var portrait: HudPortrait = $StatControl/Portrait
 @onready var equipment: EquipmentControl = $EquipmentControl
+@onready var weapon_icon: TextureRect = $ChaosControl/WeaponFrame/WeaponIcon
 
 
 func _ready() -> void:
+	if is_instance_valid(weapon_controller):
+		weapon_controller.weapon_changed.connect(_on_weapon_changed)
+		_sync_weapon.call_deferred()
 	if is_instance_valid(health):
 		health.hp_changed.connect(_on_hp_changed)
 		health.damaged.connect(portrait.play_hit_feedback)
@@ -38,6 +43,18 @@ func _ready() -> void:
 	else:
 		equipment.set_potion_icon(null)
 		equipment.set_potion_quantity(0)
+
+
+func _sync_weapon() -> void:
+	_on_weapon_changed(weapon_controller.equipped)
+
+
+func _on_weapon_changed(weapon: WeaponInstance) -> void:
+	var skill: AttackData
+	if weapon != null and weapon.definition != null:
+		skill = weapon.definition.secondary_attack
+	weapon_icon.texture = skill.skill_icon if skill != null else null
+	weapon_icon.visible = weapon_icon.texture != null
 
 
 func _on_equipped_potion_changed(potion: Potion) -> void:

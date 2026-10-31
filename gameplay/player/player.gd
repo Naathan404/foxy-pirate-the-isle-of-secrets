@@ -29,6 +29,7 @@ var last_facing_direction: Vector3 = Vector3.BACK
 # nuffer nút dash
 var dash_buffer_remaining: float = 0.0
 var attack_requested: bool = false
+var secondary_attack_held: bool = false
 var attack_buffer_remaining: float = 0.0
 var pending_attack_action: StringName = &"normal"
 var dead: bool = false
@@ -214,11 +215,13 @@ func _push_collided_crates() -> void:
 
 func _read_input() -> void:
 	move_direction = Vector3.ZERO
+	secondary_attack_held = false
 	if is_gameplay_input_blocked():
 		clear_gameplay_input()
 		return
 	if dead:
 		return
+	secondary_attack_held = Input.is_action_pressed(secondary_attack_action)
 	if Input.is_action_just_pressed("potion") and is_instance_valid(potion):
 		potion.use_equipped_potion()
 	var input_vector := Input.get_vector("left", "right", "up", "down")
@@ -249,10 +252,13 @@ func _read_input() -> void:
 
 func clear_gameplay_input() -> void:
 	move_direction = Vector3.ZERO
+	secondary_attack_held = false
 	attack_requested = false
 	attack_buffer_remaining = 0.0
 	if is_instance_valid(weapon_controller):
 		weapon_controller.clear_attack_buffer()
+		if weapon_controller.is_charging():
+			weapon_controller.cancel()
 	dash_buffer_remaining = 0.0
 
 

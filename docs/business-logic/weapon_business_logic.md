@@ -257,9 +257,11 @@ Controller chỉ gọi `WeaponEffect.on_damage_dealt()` nếu instance vũ khí 
 đang được trang bị, nhưng luôn chuyển tiếp `damage_dealt`. Do đó dao đang bay vẫn
 có thể cộng chaos sau khi đổi vũ khí, nếu Player còn sống và hit đạt điều kiện.
 
-[AmmoComponent](../gameplay/combat/ammo_component.gd) đã quản lý số đạn theo loại,
-thêm/tiêu đạn và báo `ammo_changed`. Controller hỗ trợ ammo cost nhưng Foxy chưa gắn
-component này; dagger normal dùng SP, secondary dùng CP.
+[AmmoComponent](../../gameplay/combat/ammo_component.gd) quản lý API đạn theo loại,
+thêm/tiêu đạn và báo `ammo_changed`. Foxy đã gắn component này với Inventory:
+số đạn đọc từ item trong túi, không có bộ đếm runtime thứ hai. Cung tiêu hao
+1 `wooden_arrow` và 0 SP mỗi phát. Actor không gắn inventory vẫn dùng bộ đếm
+AmmoComponent độc lập. Xem [bow_weapon.md](bow_weapon.md) để thêm tên và chơi thử.
 
 Khi thêm vũ khí mới, cần kiểm tra layer/mask bên cạnh team. Scene dagger đang dùng
 PLAYER_ATTACK và ENEMY_HURTBOX; đổi team không tự đổi bộ lọc va chạm.

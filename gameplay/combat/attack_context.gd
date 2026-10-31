@@ -27,9 +27,13 @@ var weapon_category: int = -1
 var damage_hp: float = 1
 var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
+## Forge snapshot; the combo step's authored knockback is applied when building damage.
+var knockback_multiplier: float = 1.0
 var combo_index: int = 0
 var combo_step: MeleeComboStep
 var active_seconds: float = 0.125
+var charge_progress: float = 0.0
+var projectile_count: int = 1
 
 
 # Tạo damage context cho 1 lần gây sát thương
@@ -44,6 +48,7 @@ func create_damage_context() -> DamageContext:
 	damage.weapon_category = weapon_category
 	damage.origin = origin
 	damage.direction = direction
+	damage.knockback_multiplier = knockback_multiplier
 	if combo_step != null:
-		damage.knockback_multiplier = combo_step.knockback_multiplier
+		damage.knockback_multiplier *= combo_step.knockback_multiplier
 	return damage

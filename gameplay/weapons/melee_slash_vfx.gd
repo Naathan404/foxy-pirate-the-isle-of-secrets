@@ -38,7 +38,7 @@ func finish() -> void:
 	_released = true
 
 
-func impact(at: Vector3, direction: Vector3, heavy: bool) -> void:
+func impact(at: Vector3, direction: Vector3, heavy: bool, strength: float = 1.0) -> void:
 	if _impact_count >= 8:
 		return
 	_impact_count += 1
@@ -50,7 +50,7 @@ func impact(at: Vector3, direction: Vector3, heavy: bool) -> void:
 	for index in 7 if heavy else 4:
 		var spark := MeshInstance3D.new()
 		var quad := QuadMesh.new()
-		quad.size = Vector2(0.055, 0.22 if heavy else 0.14)
+		quad.size = Vector2(0.055, 0.22 if heavy else 0.14) * strength
 		spark.mesh = quad
 		spark.material_override = material
 		spark.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -61,7 +61,7 @@ func impact(at: Vector3, direction: Vector3, heavy: bool) -> void:
 		var velocity := direction * 0.4 + side * spread + Vector3.UP * (0.3 + absf(spread))
 		var tween := spark.create_tween().set_parallel()
 		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(spark, "global_position", at + velocity * 0.65, 0.18)
+		tween.tween_property(spark, "global_position", at + velocity * 0.65 * strength, 0.18)
 		tween.tween_property(spark, "scale", Vector3.ZERO, 0.18)
 		tween.chain().tween_callback(spark.queue_free)
 

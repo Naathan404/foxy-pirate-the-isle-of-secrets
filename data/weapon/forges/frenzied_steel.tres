@@ -1,12 +1,13 @@
-[gd_resource type="Resource" script_class="WeaponForge" format=3]
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://b56qhly3jy2ka"]
 
-[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
 
 [resource]
 script = ExtResource("1_forge")
 forge_id = &"frenzied_steel"
 display_name = "Frenzied Steel"
-description = "Attack Speed +70%, Damage -40%"
+description = "Attack Speed +70%, Damage -40%, Knockback -60%"
 drop_weight = 3.0
-attack_speed_multiplier = 1.70
-damage_multiplier = 0.60
+damage_multiplier = 0.6
+attack_speed_multiplier = 1.7
+knockback_multiplier = 0.4

@@ -3,6 +3,9 @@ extends RefCounted
 ## Snapshot có thể truy vết cho một lần damage lên đúng một target.
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
+## Keep hit confirmation visible at zero knockback and cap presentation independently of physics.
+const MIN_IMPACT_SCALE: float = 0.45
+const MAX_IMPACT_SCALE: float = 2.0
 
 # Soure gây daamge
 var source: Node
@@ -44,6 +47,14 @@ func create_hit_copy(hit_target: Node = null) -> DamageContext:
 
 func is_normal_attack() -> bool:
 	return tag == &"normal"
+
+
+## Attack strength before target resistance; bosses still receive readable hit confirmation.
+## Square-root scaling preserves differences without doubling every screen effect at +100% KB.
+func get_impact_scale() -> float:
+	if not is_finite(knockback_multiplier) or knockback_multiplier <= 0.0:
+		return MIN_IMPACT_SCALE
+	return clampf(sqrt(knockback_multiplier), MIN_IMPACT_SCALE, MAX_IMPACT_SCALE)
 
 
 func is_melee_normal_attack() -> bool:

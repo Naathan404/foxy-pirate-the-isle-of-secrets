@@ -275,6 +275,20 @@ func receive_damage(damage: DamageContext) -> float:
 	return hp.take_damage(damage.amount_hp)
 
 
+## Hit and fatal recoil share forge scaling, resistance and boss immunity.
+func consume_hit_knockback_velocity() -> Vector3:
+	var multiplier := pending_knockback_multiplier
+	pending_knockback_multiplier = 1.0
+	if data == null or is_in_group("boss"):
+		return Vector3.ZERO
+	var direction := pending_hit_direction
+	if direction.is_zero_approx():
+		direction = -last_facing_direction
+	var speed := data.hit_knockback_speed * maxf(0.0, multiplier)
+	speed *= 1.0 - data.knockback_resistance
+	return direction.normalized() * speed
+
+
 func apply_charm_grapple(
 	source: Node3D, stop_distance: float, pull_speed_units_per_second: float, stun_seconds: float
 ) -> StringName:
@@ -465,7 +479,8 @@ func _refresh_direction_checks() -> void:
 
 
 func _refresh_target() -> void:
-	if not is_instance_valid(target_detector):
+	# Disabling the detector during death can still deliver a queued body_exited callback.
+	if dead or not is_instance_valid(target_detector) or not target_detector.monitoring:
 		return
 	var nearest_target: Node3D = null
 	var nearest_distance := INF

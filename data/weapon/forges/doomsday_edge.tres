@@ -6,7 +6,8 @@
 script = ExtResource("1_forge")
 forge_id = &"doomsday_edge"
 display_name = "Doomsday Edge"
-description = "Damage +100%, Attack Speed -55%"
+description = "Damage +100%, Attack Speed -55%, Knockback +80%"
 drop_weight = 2.0
 damage_multiplier = 2.0
 attack_speed_multiplier = 0.45
+knockback_multiplier = 1.8

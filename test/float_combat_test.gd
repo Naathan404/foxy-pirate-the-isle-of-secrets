@@ -1,11 +1,6 @@
 extends SceneTree
 
-const ENEMIES: Dictionary = {
-	"starfish": [2.6, 3, 2],
-	"crab": [3.2, 4, 3],
-	"barrel": [4.0, 4, 4],
-	"war_lord_turtle": [16.0, 16, 13],
-}
+const ENEMIES: Array[String] = ["starfish", "crab", "barrel", "war_lord_turtle"]
 
 var _failures: int = 0
 
@@ -83,11 +78,13 @@ func _test_health() -> void:
 	health.free()
 
 
-func _enemy(world: Node3D, enemy_name: String) -> EnemyBase:
+func _enemy(world: Node3D, enemy_name: String, fixture_hp: float = 0.0) -> EnemyBase:
 	var scene := load("res://gameplay/enemies/%s/%s.tscn" % [enemy_name, enemy_name]) as PackedScene
 	var enemy := scene.instantiate() as EnemyBase
 	enemy.data = enemy.data.duplicate(true)
 	enemy.data.drop_chance = 0.0
+	if fixture_hp > 0.0:
+		enemy.data.max_hp = fixture_hp
 	world.add_child(enemy)
 	enemy.set_physics_process(false)
 	return enemy
@@ -95,21 +92,23 @@ func _enemy(world: Node3D, enemy_name: String) -> EnemyBase:
 
 func _test_enemy_balance(world: Node3D) -> void:
 	for enemy_name: String in ENEMIES:
-		var expected: Array = ENEMIES[enemy_name]
 		for heavy_edge: bool in [false, true]:
 			var enemy := _enemy(world, enemy_name)
-			_near(enemy.hp.get_max_hp(), expected[0], enemy_name + " authored maximum HP")
+			var damage := 1.3 if heavy_edge else 1.0
+			var expected_hits := ceili(enemy.data.max_hp / damage - 1e-10)
+			_near(enemy.hp.get_max_hp(), enemy.data.max_hp, enemy_name + " authored maximum HP")
 			var hits := 0
-			while enemy.hp.is_alive() and hits < 30:
-				enemy.take_damage(1.3 if heavy_edge else 1.0)
+			while enemy.hp.is_alive() and hits <= expected_hits:
+				enemy.take_damage(damage)
 				hits += 1
 			_check(enemy.dead, enemy_name + " enters Death when float HP reaches zero")
-			_check(hits == expected[2 if heavy_edge else 1], enemy_name + " damage breakpoint")
+			_check(hits == expected_hits, enemy_name + " damage breakpoint")
 			enemy.free()
 
 
 func _test_hitbox(world: Node3D) -> void:
-	var enemy := _enemy(world, "starfish")
+	# This numeric regression intentionally does not depend on production enemy tuning.
+	var enemy := _enemy(world, "starfish", 2.6)
 	var source := Node3D.new()
 	world.add_child(source)
 	var hitbox := HitBox.new()

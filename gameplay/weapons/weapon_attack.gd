@@ -25,6 +25,11 @@ func tick_active(_delta: float) -> void:
 	pass
 
 
+## Optional presentation hook for an attack held before its windup/release.
+func update_charge(_progress: float) -> void:
+	pass
+
+
 # hàm được gọi khi đòn tấn công vừa kết thúc
 func deactivate() -> void:
 	active = false

@@ -6,9 +6,10 @@
 script = ExtResource("1_forge")
 forge_id = &"titan_sweep"
 display_name = "Titan Sweep"
-description = "Hitbox cận chiến +30%, Attack Speed -10%"
+description = "Hitbox cận chiến +30%, Attack Speed -10%, Knockback +25%"
 forge_group = 1
 acquisition_source = &"blacksmith"
 drop_weight = 5.0
 melee_hitbox_multiplier = 1.30
 attack_speed_multiplier = 0.90
+knockback_multiplier = 1.25

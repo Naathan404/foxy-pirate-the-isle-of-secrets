@@ -115,6 +115,7 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 		return
 	var step := context.combo_step
 	var heavy := step.heavy_impact
+	var impact_scale := damage.get_impact_scale()
 	var at := global_position + context.direction + Vector3.UP
 	if target is EnemyBase and is_instance_valid(target.visual.sprite):
 		var sprite: Sprite3D = target.visual.sprite
@@ -124,15 +125,19 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 			feedback = SPRITE_FEEDBACK.new()
 			feedback.name = "DaggerFeedback"
 			sprite.add_child(feedback)
-		feedback.kick(context.direction, 0.08 if heavy else 0.035, true)
+		feedback.kick(
+			context.direction, (0.08 if heavy else 0.035) * impact_scale, true, impact_scale
+		)
 	if is_instance_valid(_vfx):
-		_vfx.impact(at, context.direction, heavy)
+		_vfx.impact(at, context.direction, heavy, impact_scale)
 	if not _impact_played:
 		_impact_played = true
 		get_node("/root/HitstopController").request_local(
-			context.actor, target as Node3D, step.hitstop_seconds
+			context.actor, target as Node3D, step.hitstop_seconds * impact_scale
 		)
-		get_node("/root/ScreenShakeController").request(step.shake_pixels, 0.2 if heavy else 0.14)
+		get_node("/root/ScreenShakeController").request(
+			step.shake_pixels * impact_scale, 0.2 if heavy else 0.14
+		)
 		get_node("/root/AudioManager").play_sfx_3d(
-			HIT_SOUND, at, -8.0 if heavy else -13.0, step.audio_pitch
+			HIT_SOUND, at, (-8.0 if heavy else -13.0) + linear_to_db(impact_scale), step.audio_pitch
 		)

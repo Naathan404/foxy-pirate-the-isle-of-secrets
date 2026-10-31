@@ -4,11 +4,12 @@ extends Node
 # Báo đánh xong hoặc bị ngắt để Player thoát state Attack
 signal attack_finished
 signal attack_started(context: AttackContext)
+signal charge_released(context: AttackContext)
 signal weapon_changed(weapon: WeaponInstance)
 signal damage_dealt(damage: DamageContext, target: Node, applied_hp: float)
 
 # Các giai đoạn của 1 đòn đánh
-enum Phase { WINDUP, ACTIVE, RECOVERY }
+enum Phase { WINDUP, ACTIVE, RECOVERY, CHARGING }
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
@@ -41,6 +42,10 @@ var _active: float = 0.0
 var _recovery: float = 0.0
 var _animation_prefix: String = ""
 var _next_attack_id: int = 0
+var _charging_attack: AttackData
+var _charge_elapsed: float = 0.0
+var _charge_spent: float = 0.0
+var _charge_budget: float = 0.0
 var _combo_index: int = 0
 var _combo_remaining: float = 0.0
 var _queued_attack: AttackContext
@@ -138,6 +143,71 @@ func get_attack_duration() -> float:
 	return _windup + _active + _recovery
 
 
+func is_charging() -> bool:
+	return busy and _phase == Phase.CHARGING
+
+
+func get_attack_windup_duration() -> float:
+	return _windup
+
+
+func aim_charge(request: AttackContext) -> void:
+	if not is_charging() or request == null:
+		return
+	var direction := Vector3(request.direction.x, 0.0, request.direction.z)
+	if direction.is_zero_approx():
+		return
+	_context.direction = direction.normalized()
+	_context.target_position = request.target_position
+	_context.has_target = request.has_target
+
+
+func release_charge() -> bool:
+	if not is_charging():
+		return false
+	var attack := _charging_attack
+	var charging_context := _context
+	var count := 1 + floori(_context.charge_progress * (attack.max_projectiles - 1) + 0.00001)
+	if attack.ammo_cost > 0:
+		count = mini(count, ammo.get_amount(attack.ammo_id) / attack.ammo_cost)
+		if count <= 0 or not ammo.try_consume(attack.ammo_id, count * attack.ammo_cost):
+			cancel()
+			return false
+	# Resource callbacks may interrupt the charge. Never release a cancelled execution.
+	if not is_charging() or _context != charging_context:
+		return false
+	_context.projectile_count = count
+	_context.origin = actor.global_position
+	if _charge_elapsed >= attack.tap_seconds:
+		_windup = 0.0
+	_phase = Phase.WINDUP
+	_remaining = _windup
+	var speed := equipped.forge.attack_speed_multiplier if equipped.forge != null else 1.0
+	equipped.cooldowns[&"secondary"] = attack.cooldown_seconds / maxf(0.01, speed)
+	var released := _context
+	charge_released.emit(released)
+	if busy and _context == released and _remaining <= 0.0:
+		_advance_phase()
+	return true
+
+
+func _tick_charge(delta: float) -> void:
+	var current := _context
+	_charge_elapsed = minf(_charging_attack.charge_seconds, _charge_elapsed + maxf(0.0, delta))
+	var progress := _charge_elapsed / _charging_attack.charge_seconds
+	_context.charge_progress = progress
+	# Cumulative t² expenditure gives a linearly accelerating CP drain.
+	var desired_spent := _charge_budget * progress * progress
+	_charge_spent += chaos.consume(maxf(0.0, desired_spent - _charge_spent))
+	if not is_charging() or _context != current:
+		return
+	_execution.update_charge(progress)
+	if not is_charging() or _context != current:
+		return
+	if chaos.current <= 0.0 or progress >= 1.0:
+		release_charge()
+
+
 func queue_attack(request: AttackContext) -> bool:
 	if request == null:
 		return false
@@ -187,6 +257,7 @@ func try_attack(request: AttackContext) -> bool:
 		attack == null
 		or not attack.is_valid()
 		or not _has_animation(attack.animation_prefix)
+		or (attack.hold_to_charge and request.action != &"secondary")
 		or (equipped.forge != null and not equipped.forge.is_valid())
 	):
 		return false
@@ -211,7 +282,8 @@ func try_attack(request: AttackContext) -> bool:
 	var execution_node := attack.attack_scene.instantiate()
 	var execution := execution_node as WeaponAttack
 	if execution == null or not execution.validate():
-		execution_node.free()
+		if is_instance_valid(execution_node):
+			execution_node.free()
 		return false
 	_windup = attack.windup_seconds / speed
 	_active = attack.active_seconds / speed
@@ -236,30 +308,41 @@ func try_attack(request: AttackContext) -> bool:
 	_context = snapshot
 	_execution = execution
 	execution.context = snapshot
-	_phase = Phase.WINDUP
+	_phase = Phase.CHARGING if attack.hold_to_charge else Phase.WINDUP
 	_remaining = _windup
+	_charging_attack = attack if attack.hold_to_charge else null
+	_charge_elapsed = 0.0
+	_charge_spent = 0.0
+	_charge_budget = chaos.maximum if attack.hold_to_charge else 0.0
 	# Khóa nhận đòn trước khi signal SP hoặc đạn được phát
 	busy = true
 	# Gắn đòn vào thế giới để đạn, phép không chạy theo nhân vật
 	actor.get_parent().add_child(execution)
 	execution.global_position = snapshot.origin
 	var paid := true
-	if cost > 0.0:
+	if cost > 0.0 and not attack.hold_to_charge:
 		paid = stamina.try_consume(cost)
-	elif attack.ammo_cost > 0:
+	elif attack.ammo_cost > 0 and not attack.hold_to_charge:
 		paid = ammo.try_consume(attack.ammo_id, attack.ammo_cost)
 	if not paid:
 		cancel()
 		return false
-	if snapshot.action == &"secondary" and not chaos.try_consume_full():
+	if (
+		snapshot.action == &"secondary"
+		and not attack.hold_to_charge
+		and not chaos.try_consume_full()
+	):
 		cancel()
 		return false
-	snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed
+	if not attack.hold_to_charge:
+		snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed
 	clear_attack_buffer()
 	if busy and _context == snapshot:
 		attack_started.emit(snapshot)
+	if is_charging() and _context == snapshot:
+		_execution.update_charge(0.0)
 	# Signal trừ tài nguyên có thể hủy đòn, kiểm tra lại trước khi chạy tiếp
-	if busy and _context == snapshot and _remaining <= 0.0:
+	if busy and not is_charging() and _context == snapshot and _remaining <= 0.0:
 		_advance_phase()
 	return true
 
@@ -307,10 +390,12 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 		result.damage_hp = maxf(0.0, result.damage_hp * damage_multiplier)
 		result.range_units *= maxf(0.01, equipped.forge.range_multiplier)
 		result.hitbox_multiplier = maxf(0.01, equipped.forge.hitbox_multiplier)
+		result.knockback_multiplier = equipped.forge.knockback_multiplier
 		if attack.delivery_type == AttackData.DeliveryType.MELEE:
 			result.hitbox_multiplier *= maxf(0.01, equipped.forge.melee_hitbox_multiplier)
 		elif attack.delivery_type == AttackData.DeliveryType.PROJECTILE:
 			result.range_units *= maxf(0.01, equipped.forge.projectile_range_multiplier)
+			result.knockback_multiplier *= equipped.forge.projectile_knockback_multiplier
 	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
 	if is_instance_valid(charm_manager):
 		result.damage_hp = charm_manager.modify_attack_damage(result.damage_hp, result)
@@ -343,6 +428,9 @@ func _physics_process(delta: float) -> void:
 		or _execution.is_queued_for_deletion()
 	):
 		cancel()
+		return
+	if is_charging():
+		_tick_charge(delta)
 		return
 	var budget := delta
 	# Chia delta cho từng giai đoạn để frame chậm không làm mất nhịp đánh
@@ -405,6 +493,7 @@ func _finish(interrupted: bool) -> void:
 	busy = false
 	_execution = null
 	_context = null
+	_charging_attack = null
 	if is_instance_valid(execution):
 		if interrupted:
 			execution.cancel()

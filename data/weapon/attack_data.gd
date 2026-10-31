@@ -6,6 +6,8 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 
 # Phần prefix của tên animation
 @export var animation_prefix: String = "attack_dagger"
+## HUD artwork for this skill; secondary attacks supply the player's weapon skill icon.
+@export var skill_icon: Texture2D
 # scene thực hiện đòn đnahs
 @export var attack_scene: PackedScene
 @export var aim_mode: AimMode = AimMode.FACING
@@ -26,6 +28,12 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export_range(0.0, 10000.0, 1.0) var stamina_cost: float = 0.0
 @export var ammo_id: StringName = &""
 @export_range(0, 100, 1) var ammo_cost: int = 0
+
+@export_group("Hold Charge")
+@export var hold_to_charge: bool = false
+@export_range(0.1, 5.0, 0.05) var charge_seconds: float = 1.8
+@export_range(1, 12, 1) var max_projectiles: int = 6
+@export_range(0.0, 0.3, 0.01) var tap_seconds: float = 0.12
 
 @export_group("Melee Combo")
 @export var combo_steps: Array[MeleeComboStep] = []
@@ -52,4 +60,8 @@ func is_valid() -> bool:
 		and ammo_cost >= 0
 		and (ammo_cost == 0 or not ammo_id.is_empty())
 		and not (stamina_cost > 0.0 and ammo_cost > 0)
+		and (
+			not hold_to_charge
+			or (charge_seconds > 0.0 and max_projectiles > 0 and stamina_cost == 0.0)
+		)
 	)

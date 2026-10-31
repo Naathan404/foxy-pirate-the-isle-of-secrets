@@ -17,11 +17,7 @@ func _enter() -> void:
 	enemy.play_directional_animation(&"hit", true)
 	if is_instance_valid(enemy.visual):
 		enemy.visual.play_hit_feedback()
-	var direction := enemy.pending_hit_direction
-	if direction.is_zero_approx():
-		direction = -enemy.last_facing_direction
-	var speed := enemy.data.hit_knockback_speed if enemy.data != null else 0.0
-	enemy._set_horizontal_velocity(direction.normalized() * speed)
+	enemy._set_horizontal_velocity(enemy.consume_hit_knockback_velocity())
 	timer = enemy.data.hit_duration if enemy.data != null else 0.0
 	_recoiling = true
 

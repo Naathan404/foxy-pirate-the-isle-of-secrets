@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="WeaponForge" format=3]
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://cgq8e3x122qh2"]
 
-[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
 
 [resource]
 script = ExtResource("1_forge")
 forge_id = &"cursed_scrap"
 display_name = "Cursed Scrap"
-description = "Attack Speed +35%, Attack Range -20%, Recovery +20%"
+description = "Attack Speed +35%, Attack Range -20%, Recovery +20%, Knockback -25%"
 drop_weight = 5.0
 attack_speed_multiplier = 1.35
-range_multiplier = 0.80
-recovery_multiplier = 1.20
+recovery_multiplier = 1.2
+range_multiplier = 0.8
+knockback_multiplier = 0.75

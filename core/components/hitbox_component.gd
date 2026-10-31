@@ -96,9 +96,13 @@ func sample_shape() -> void:
 
 
 func _on_area_entered(area: Area3D) -> void:
-	if not _active or not area is HurtBox:
+	try_hit(area as HurtBox)
+
+
+## Swept projectiles can submit a sampled target through the same deduplication policy.
+func try_hit(hurtbox: HurtBox) -> void:
+	if not _active or not is_instance_valid(hurtbox):
 		return
-	var hurtbox := area as HurtBox
 	if not is_instance_valid(hurtbox.actor):
 		return
 	var target_id := hurtbox.actor.get_instance_id()

@@ -52,6 +52,9 @@ func _check_death(scene: PackedScene, scenario: String) -> void:
 	var start_position := enemy.global_position
 	enemy.take_damage(enemy.hp.current_hp)
 	_check(enemy.dead and enemy.hp.current_hp == 0, label + ": lethal damage did not mark dead")
+	if is_instance_valid(enemy.target_detector):
+		enemy.target_detector.monitoring = false
+		enemy._refresh_target()
 	_check(enemy.fsm.next_state == death_state, label + ": Death was not requested")
 	for frame in 60:
 		if enemy.fsm.current_state == death_state:

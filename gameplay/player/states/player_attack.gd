@@ -45,6 +45,7 @@ func _enter() -> void:
 	controller.connect("attack_finished", _on_attack_finished)
 	if controller is WeaponController:
 		controller.attack_started.connect(_on_attack_started)
+		controller.charge_released.connect(_on_charge_released)
 	player.update_facing()
 	var context := player.build_attack_context()
 	player._consume_attack_input()
@@ -62,7 +63,11 @@ func _enter() -> void:
 
 	if not controller is WeaponController:
 		player.play_directional_animation(animation_prefix, true)
-	if context.action == &"normal" and player.is_on_floor():
+	if (
+		context.action == &"normal"
+		and context.weapon_category == WeaponData.WeaponCategory.MELEE
+		and player.is_on_floor()
+	):
 		_step_direction = Vector3(context.direction.x, 0.0, context.direction.z).normalized()
 
 
@@ -77,6 +82,16 @@ func _update(delta: float) -> void:
 		if not player.is_on_floor():
 			controller.cancel()
 			return_to_locomotion()
+			return
+		if controller.is_charging():
+			var aim := player.build_attack_context()
+			controller.aim_charge(aim)
+			player.last_facing_direction = aim.direction
+			player.play_directional_animation(animation_prefix)
+			player.visual.hold_animation_pose(0.25)
+			player._consume_attack_input()
+			if not player.secondary_attack_held:
+				controller.release_charge()
 			return
 		if player.dash_buffer_remaining > 0.0 and controller.can_dash_cancel():
 			if (
@@ -109,6 +124,11 @@ func _exit() -> void:
 	if is_instance_valid(controller):
 		if (
 			controller is WeaponController
+			and controller.charge_released.is_connected(_on_charge_released)
+		):
+			controller.charge_released.disconnect(_on_charge_released)
+		if (
+			controller is WeaponController
 			and controller.attack_started.is_connected(_on_attack_started)
 		):
 			controller.attack_started.disconnect(_on_attack_started)
@@ -135,12 +155,27 @@ func _on_attack_started(context: AttackContext) -> void:
 		authored_duration += _combo_step.recovery_seconds
 		_step_time_scale = controller.get_attack_duration() / authored_duration
 	_step_elapsed = 0.0
-	_step_direction = context.direction if context.action == &"normal" else Vector3.ZERO
+	_step_direction = Vector3.ZERO
+	if context.action == &"normal" and context.weapon_category == WeaponData.WeaponCategory.MELEE:
+		_step_direction = context.direction
 	player.last_facing_direction = context.direction
 	animation_prefix = controller.get_attack_animation_prefix()
 	player.play_directional_animation(animation_prefix, true)
+	if controller.is_charging():
+		player.visual.hold_animation_pose(0.25)
+		return
 	if not player.visual.fit_animation_duration(controller.get_attack_duration()):
 		controller.cancel()
+
+
+func _on_charge_released(context: AttackContext) -> void:
+	player.last_facing_direction = context.direction
+	player.visual.reset_animation_speed()
+	player.play_directional_animation(animation_prefix, true)
+	if controller.get_attack_windup_duration() <= 0.0:
+		player.visual.play_animation_from(0.5, controller.get_attack_duration())
+	else:
+		player.visual.fit_animation_duration(controller.get_attack_duration())
 
 
 func _apply_forward_step(delta: float) -> void:

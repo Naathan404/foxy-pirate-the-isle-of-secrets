@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://day6x7bd5e0qu"]
+
+[ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="2_attack"]
+[ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="2_unbbq"]
+[ext_resource type="PackedScene" path="res://gameplay/weapons/attack scenes/bow_arrow.tscn" id="3_arrow"]
+[ext_resource type="PackedScene" uid="uid://bol363uk25tl" path="res://gameplay/weapons/attack scenes/bow_volley.tscn" id="4_volley"]
+[ext_resource type="Texture2D" uid="uid://wovfxsw8vnms" path="res://assets/ui/player_hud/weapon_skills/CP_Stormstring.png" id="5_skill_icon"]
+
+[sub_resource type="Resource" id="Attack_bow"]
+script = ExtResource("2_attack")
+animation_prefix = "attack_bow"
+attack_scene = ExtResource("3_arrow")
+aim_mode = 1
+delivery_type = 1
+windup_seconds = 0.3
+active_seconds = 0.04
+recovery_seconds = 0.26
+cooldown_seconds = 0.6
+range_units = 10.0
+ammo_id = &"wooden_arrow"
+ammo_cost = 1
+
+[sub_resource type="Resource" id="Attack_volley"]
+script = ExtResource("2_attack")
+animation_prefix = "attack_bow"
+skill_icon = ExtResource("5_skill_icon")
+attack_scene = ExtResource("4_volley")
+aim_mode = 1
+delivery_type = 1
+windup_seconds = 0.3
+active_seconds = 0.04
+recovery_seconds = 0.26
+cooldown_seconds = 0.6
+range_units = 10.0
+ammo_id = &"wooden_arrow"
+hold_to_charge = true
+charge_seconds = 2.0
+
+[resource]
+script = ExtResource("1_weapon")
+weapon_id = &"bow"
+display_name = "Bow"
+category = 1
+normal_attack = SubResource("Attack_bow")
+secondary_attack = SubResource("Attack_volley")

@@ -21,6 +21,9 @@ func _run() -> void:
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
 	# Pin the fixture independently of the forge selected for manual testing.
 	player.get_node("WeaponController").default_forge = null
+	player.get_node("WeaponController").default_weapon = load(
+		"res://data/weapon/weapon_dagger.tres"
+	)
 	player.position.y = 0.7
 	world.add_child(player)
 	for frame in 12:
@@ -37,29 +40,40 @@ func _run() -> void:
 	var expected := (target - player.global_position).normalized()
 	player.move_direction = -expected
 	player.last_facing_direction = -expected
-	_check(player.build_attack_context().direction.is_equal_approx(expected),
-		"Cursor aim overrides opposite movement and facing")
+	_check(
+		player.build_attack_context().direction.is_equal_approx(expected),
+		"Cursor aim overrides opposite movement and facing"
+	)
 	var state := player.get_node("States/Attack")
 	player.request_attack()
 	state._enter()
 	_check(state.accepted, "Mouse-aimed attack starts")
-	_check(player.weapon_controller._context.direction.is_equal_approx(expected),
-		"Attack hitbox uses cursor direction")
-	_check(player.last_facing_direction.is_equal_approx(expected),
-		"Character faces the accepted attack")
-	_check(state._step_direction.is_equal_approx(expected),
-		"Forward step follows cursor aim")
+	_check(
+		player.weapon_controller._context.direction.is_equal_approx(expected),
+		"Attack hitbox uses cursor direction"
+	)
+	_check(
+		player.last_facing_direction.is_equal_approx(expected),
+		"Character faces the accepted attack"
+	)
+	_check(state._step_direction.is_equal_approx(expected), "Forward step follows cursor aim")
 	var displacement := Vector3.ZERO
 	for frame in 12:
 		state._update(0.02)
 		var movement := Vector3(player.velocity.x, 0, player.velocity.z)
-		_check(movement.dot(expected) >= -0.0001,
-			"Holding opposite movement never pulls the swing backward")
+		_check(
+			movement.dot(expected) >= -0.0001,
+			"Holding opposite movement never pulls the swing backward"
+		)
 		displacement += movement * 0.02
-	_check(displacement.is_equal_approx(expected * state._combo_step.step_distance),
-		"Opposite movement preserves the authored lunge distance without drift")
-	_check(Vector3(player.velocity.x, 0, player.velocity.z).is_zero_approx(),
-		"Recovery stays still after the forward step ends")
+	_check(
+		displacement.is_equal_approx(expected * state._combo_step.step_distance),
+		"Opposite movement preserves the authored lunge distance without drift"
+	)
+	_check(
+		Vector3(player.velocity.x, 0, player.velocity.z).is_zero_approx(),
+		"Recovery stays still after the forward step ends"
+	)
 	var visual_facing: Vector3 = player.visual._facing
 	# Moving the camera changes the projected cursor target without changing the mouse.
 	camera.position = player.position + Vector3(10, 10, 0)
@@ -69,29 +83,42 @@ func _run() -> void:
 	_check(not next_direction.is_equal_approx(expected), "Fixture changes aim direction")
 	player.move_direction = -next_direction
 	state._update(0.01)
-	_check(player.weapon_controller._context.direction.is_equal_approx(expected),
-		"Current swing stays locked when aim and movement change")
-	_check(player.visual._facing.is_equal_approx(visual_facing),
-		"Current animation keeps its facing")
+	_check(
+		player.weapon_controller._context.direction.is_equal_approx(expected),
+		"Current swing stays locked when aim and movement change"
+	)
+	_check(
+		player.visual._facing.is_equal_approx(visual_facing), "Current animation keeps its facing"
+	)
 	var duration := player.weapon_controller.get_attack_duration()
 	player.weapon_controller._physics_process(duration - 0.04)
 	player.request_attack()
 	state._update(0.01)
-	_check(player.weapon_controller._queued_attack.direction.is_equal_approx(next_direction),
-		"Combo buffer uses new cursor aim instead of movement")
+	_check(
+		player.weapon_controller._queued_attack.direction.is_equal_approx(next_direction),
+		"Combo buffer uses new cursor aim instead of movement"
+	)
 	player.weapon_controller._physics_process(0.05)
 	_check(player.weapon_controller._context.combo_index == 1, "Buffered combo continues")
-	_check(player.weapon_controller._context.direction.is_equal_approx(next_direction),
-		"Next swing uses its own cursor direction")
-	_check(player.last_facing_direction.is_equal_approx(next_direction),
-		"Character turns when next swing starts")
+	_check(
+		player.weapon_controller._context.direction.is_equal_approx(next_direction),
+		"Next swing uses its own cursor direction"
+	)
+	_check(
+		player.last_facing_direction.is_equal_approx(next_direction),
+		"Character turns when next swing starts"
+	)
 	state._exit()
 	player.update_facing()
-	_check(player.last_facing_direction.is_equal_approx(player.move_direction),
-		"Locomotion resumes movement facing")
+	_check(
+		player.last_facing_direction.is_equal_approx(player.move_direction),
+		"Locomotion resumes movement facing"
+	)
 	player.update_movement(0.02, true)
-	_check(player.velocity.dot(player.move_direction) > 0.0,
-		"Held movement resumes after leaving Attack")
+	_check(
+		player.velocity.dot(player.move_direction) > 0.0,
+		"Held movement resumes after leaving Attack"
+	)
 	# A cursor directly over the actor must not produce a zero attack direction.
 	var fallback := AimFallbackPlayer.new()
 	var visual := PlayerVisual.new()
@@ -102,11 +129,15 @@ func _run() -> void:
 	fallback.add_child(fsm)
 	world.add_child(fallback)
 	fallback.last_facing_direction = Vector3.LEFT
-	_check(fallback.build_attack_context().direction.is_equal_approx(Vector3.LEFT),
-		"Coincident cursor target falls back to facing")
+	_check(
+		fallback.build_attack_context().direction.is_equal_approx(Vector3.LEFT),
+		"Coincident cursor target falls back to facing"
+	)
 	fallback.has_mouse_target = false
-	_check(fallback.build_attack_context().direction.is_equal_approx(Vector3.LEFT),
-		"Missing mouse target falls back to facing")
+	_check(
+		fallback.build_attack_context().direction.is_equal_approx(Vector3.LEFT),
+		"Missing mouse target falls back to facing"
+	)
 	world.free()
 	# Let the global audio manager finish the swing sound before shutting down.
 	await create_timer(0.5).timeout
@@ -121,9 +152,9 @@ func _check(condition: bool, message: String) -> void:
 		push_error(message)
 
 
-class AimFallbackPlayer extends Player:
+class AimFallbackPlayer:
+	extends Player
 	var has_mouse_target: bool = true
-
 
 	func _ready() -> void:
 		set_physics_process(false)
