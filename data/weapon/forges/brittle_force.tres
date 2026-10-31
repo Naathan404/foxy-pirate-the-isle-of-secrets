@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"brittle_force"
+display_name = "Brittle Force"
+description = "Damage +50%, Attack Speed -35%, Knockback +20%"
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+damage_multiplier = 1.50
+attack_speed_multiplier = 0.65
+knockback_multiplier = 1.20

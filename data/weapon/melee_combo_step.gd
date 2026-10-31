@@ -7,7 +7,6 @@ extends Resource
 @export_range(0.0, 1.0, 0.005) var recovery_seconds: float = 0.1
 @export_range(0.1, 5.0, 0.05) var damage_multiplier: float = 1.0
 @export_range(0.0, 3.0, 0.05) var knockback_multiplier: float = 0.5
-@export_range(0.0, 1.0, 0.01) var movement_multiplier: float = 0.18
 @export_range(0.0, 0.6, 0.01) var step_distance: float = 0.28
 @export_range(0.02, 0.4, 0.01) var step_duration: float = 0.12
 ## Fraction of recovery that must finish before dash can cancel.

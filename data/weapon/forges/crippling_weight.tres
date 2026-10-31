@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://pegk3pvmhdnm"]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"crippling_weight"
+display_name = "Crippling Weight"
+description = "Damage +70%, Attack Speed -40%, Recovery +15%, Knockback +100%"
+drop_weight = 4.0
+damage_multiplier = 1.7
+attack_speed_multiplier = 0.6
+recovery_multiplier = 1.15
+knockback_multiplier = 2.0

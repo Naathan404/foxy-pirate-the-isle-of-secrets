@@ -1,5 +1,7 @@
 extends SceneTree
 
+const DAGGER: WeaponData = preload("res://data/weapon/weapon_dagger.tres")
+
 var _failures: int = 0
 var _started: Array[int] = []
 
@@ -15,7 +17,7 @@ func _run() -> void:
 	world.add_child(actor)
 	var controller := WeaponController.new()
 	actor.add_child(controller)
-	controller.default_weapon = load("res://data/weapon/weapon_dagger.tres").duplicate(true)
+	controller.default_weapon = DAGGER.duplicate(true)
 	_check(controller.setup(actor), "Dagger equips through the existing framework")
 	var attack := controller.equipped.definition.normal_attack
 	# Pin fixture damage so production balance changes do not alter this regression check.
@@ -99,6 +101,9 @@ func _run() -> void:
 	_check(not controller.busy, "Expired input buffer does not trigger an unwanted attack")
 	# Local hitstop must not change global timing, and cancel must restore animation speed.
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
+	# Pin the fixture independently of the forge selected for manual testing.
+	player.get_node("WeaponController").default_forge = null
+	player.get_node("WeaponController").default_weapon = DAGGER
 	player.position = Vector3(10, 0.7, 0)
 	var floor_body := StaticBody3D.new()
 	var floor_shape := CollisionShape3D.new()
@@ -246,6 +251,6 @@ class CombatDummy:
 	var hurtbox: HurtBox
 	var hits: int = 0
 
-	func receive_damage(damage: DamageContext) -> int:
+	func receive_damage(damage: DamageContext) -> float:
 		hits += 1
 		return damage.amount_hp

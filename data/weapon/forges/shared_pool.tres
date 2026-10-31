@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WeaponForgePool" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_forge_pool.gd" id="1_pool"]
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="2_forge"]
+[ext_resource type="Resource" path="res://data/weapon/forges/pristine.tres" id="3"]
+[ext_resource type="Resource" path="res://data/weapon/forges/heavy_edge.tres" id="4"]
+[ext_resource type="Resource" path="res://data/weapon/forges/swift_flow.tres" id="5"]
+[ext_resource type="Resource" path="res://data/weapon/forges/brittle_force.tres" id="6"]
+[ext_resource type="Resource" path="res://data/weapon/forges/long_reach.tres" id="7"]
+[ext_resource type="Resource" path="res://data/weapon/forges/close_quarters.tres" id="8"]
+[ext_resource type="Resource" path="res://data/weapon/forges/quickdraw.tres" id="9"]
+[ext_resource type="Resource" path="res://data/weapon/forges/measured_strike.tres" id="10"]
+[ext_resource type="Resource" path="res://data/weapon/forges/rusted_blade.tres" id="11"]
+[ext_resource type="Resource" path="res://data/weapon/forges/broken_edge.tres" id="12"]
+[ext_resource type="Resource" path="res://data/weapon/forges/crippling_weight.tres" id="13"]
+[ext_resource type="Resource" path="res://data/weapon/forges/cursed_scrap.tres" id="14"]
+[ext_resource type="Resource" path="res://data/weapon/forges/doomsday_edge.tres" id="15"]
+[ext_resource type="Resource" path="res://data/weapon/forges/frenzied_steel.tres" id="16"]
+[ext_resource type="Resource" path="res://data/weapon/forges/overcharge.tres" id="17"]
+[ext_resource type="Resource" path="res://data/weapon/forges/titan_sweep.tres" id="18"]
+[ext_resource type="Resource" path="res://data/weapon/forges/true_flight.tres" id="19"]
+
+[resource]
+script = ExtResource("1_pool")
+forges = Array[ExtResource("2_forge")]([ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17"), ExtResource("18"), ExtResource("19")])

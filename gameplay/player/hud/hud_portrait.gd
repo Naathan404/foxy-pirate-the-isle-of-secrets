@@ -36,8 +36,8 @@ func _process(delta: float) -> void:
 		set_process(false)
 
 
-func set_health(current: int, maximum: int) -> void:
-	_health_ratio = clampf(float(current) / maxf(maximum, 1.0), 0.0, 1.0)
+func set_health(current: float, maximum: float) -> void:
+	_health_ratio = clampf(float(current) / maxf(maximum, 0.01), 0.0, 1.0)
 	_dead = maximum > 0 and current <= 0
 	if _dead:
 		_hit_remaining = 0.0
@@ -46,7 +46,7 @@ func set_health(current: int, maximum: int) -> void:
 	_update_portrait()
 
 
-func play_hit_feedback(_amount: int) -> void:
+func play_hit_feedback(_amount: float) -> void:
 	if _dead:
 		return
 	_hit_remaining = hit_duration

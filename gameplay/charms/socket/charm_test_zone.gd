@@ -54,14 +54,14 @@ func _configure_test_loadout() -> void:
 
 
 func _validate_equipped_effect(
-	manager: CharmSocketManager, definition: CharmData, previous_max_hp: int, previous_max_sp: float
+	manager: CharmSocketManager, definition: CharmData, previous_max_hp: float, previous_max_sp: float
 ) -> bool:
 	if manager.get_equipped_charm(CharmConstants.SocketId.Q) != definition.charm_id:
 		push_error("CharmTestZone: socket Q does not contain the starting Charm")
 		return false
-	var expected_max_hp := previous_max_hp + definition.get_param_int(&"max_hp_flat")
+	var expected_max_hp := previous_max_hp + definition.get_param_float(&"max_hp_flat")
 	var expected_max_sp := previous_max_sp + definition.get_param_float(&"max_sp_flat")
-	if player.hp.get_max_hp() != maxi(1, expected_max_hp):
+	if player.hp.get_max_hp() != maxf(0.01, expected_max_hp):
 		push_error("CharmTestZone: starting Charm max HP modifier was not applied")
 		return false
 	if not is_equal_approx(player.stamina.get_max_sp(), maxf(0.0, expected_max_sp)):
@@ -84,7 +84,7 @@ func _validate_equipped_effect(
 
 
 func _validate_removed_effect(
-	manager: CharmSocketManager, previous_max_hp: int, previous_max_sp: float
+	manager: CharmSocketManager, previous_max_hp: float, previous_max_sp: float
 ) -> bool:
 	if not manager.get_equipped_charm(CharmConstants.SocketId.Q).is_empty():
 		push_error("CharmTestZone: socket Q was not cleared")

@@ -21,7 +21,7 @@ const ANIM = {
 }
 
 @export_group("Health - HP")
-@export_range(1, 20, 1) var max_hp: int = 8
+@export_range(0.01, 20.0, 0.01) var max_hp: float = 8.0
 
 @export_group("Stamina - SP")
 @export_range(0.0, 1000.0) var max_sp: float = 300.0

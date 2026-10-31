@@ -1,9 +1,9 @@
 class_name HitBox
 extends Area3D
 
-signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
 signal damage_prepared(damage: DamageContext, target: Node)
-signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: int)
+signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: float)
 
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
@@ -32,7 +32,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func begin_attack(
-	amount_hp: int,
+	amount_hp: float,
 	attack_id: int = 0,
 	tag: StringName = &"normal",
 	rehit_policy: RehitPolicy = RehitPolicy.ONCE_PER_ATTACK
@@ -96,9 +96,13 @@ func sample_shape() -> void:
 
 
 func _on_area_entered(area: Area3D) -> void:
-	if not _active or not area is HurtBox:
+	try_hit(area as HurtBox)
+
+
+## Swept projectiles can submit a sampled target through the same deduplication policy.
+func try_hit(hurtbox: HurtBox) -> void:
+	if not _active or not is_instance_valid(hurtbox):
 		return
-	var hurtbox := area as HurtBox
 	if not is_instance_valid(hurtbox.actor):
 		return
 	var target_id := hurtbox.actor.get_instance_id()

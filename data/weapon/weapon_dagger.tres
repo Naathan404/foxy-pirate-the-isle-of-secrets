@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://q2jqrxyd2k31" path="res://gameplay/weapons/attack scenes/dagger_attack.tscn" id="1_up41l"]
 [ext_resource type="PackedScene" uid="uid://bu8agnheexxo8" path="res://gameplay/weapons/attack scenes/dagger_throw.tscn" id="4_throw"]
 [ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="5_combo"]
+[ext_resource type="Texture2D" uid="uid://h30qe12s3t4q" path="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png" id="6_skill_icon"]
 
 [sub_resource type="Resource" id="ComboStep_first"]
 script = ExtResource("5_combo")
@@ -19,7 +20,6 @@ windup_seconds = 0.055
 active_seconds = 0.11
 recovery_seconds = 0.095
 knockback_multiplier = 0.6
-movement_multiplier = 0.14
 step_distance = 0.22
 swing_start_degrees = 70.0
 swing_end_degrees = -65.0
@@ -34,14 +34,13 @@ windup_seconds = 0.11
 active_seconds = 0.14
 recovery_seconds = 0.19
 knockback_multiplier = 1.3
-movement_multiplier = 0.06
 step_distance = 0.32
 step_duration = 0.16
 dash_cancel_fraction = 0.75
-swing_start_degrees = -80.0
-swing_end_degrees = 80.0
-reach_multiplier = 1.15
-slash_width = 0.85
+swing_start_degrees = -90.0
+swing_end_degrees = 90.0
+reach_multiplier = 1.2
+slash_width = 1.0
 slash_color = Color(1, 0.61, 0.22, 1)
 hitstop_seconds = 0.12
 shake_pixels = 7.0
@@ -56,7 +55,9 @@ metadata/_custom_type_script = "uid://bl3xskt8h6bl7"
 
 [sub_resource type="Resource" id="Resource_throw"]
 script = ExtResource("1_nasaw")
+skill_icon = ExtResource("6_skill_icon")
 attack_scene = ExtResource("4_throw")
+delivery_type = 1
 windup_seconds = 0.15
 active_seconds = 0.05
 recovery_seconds = 0.2

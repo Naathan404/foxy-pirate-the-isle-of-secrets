@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bol363uk25tl"]
+
+[ext_resource type="Script" uid="uid://c0pqcqr3mdjav" path="res://gameplay/weapons/attack scenes/bow_volley.gd" id="1_skill"]
+
+[node name="BowVolley" type="Node3D" unique_id=834460377]
+script = ExtResource("1_skill")
+spread_factor = 2.5
+release_shake_base_pixels = 5.0
+release_hitstop_seconds = 0.15

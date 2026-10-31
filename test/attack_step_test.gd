@@ -13,6 +13,11 @@ func _run() -> void:
 	var floor_body := _box(Vector3(0, -0.5, 0), Vector3(30, 1, 30))
 	world.add_child(floor_body)
 	var player := load("res://gameplay/player/foxy.tscn").instantiate() as Player
+	# Pin the fixture independently of the forge selected for manual testing.
+	player.get_node("WeaponController").default_forge = null
+	player.get_node("WeaponController").default_weapon = load(
+		"res://data/weapon/weapon_dagger.tres"
+	)
 	player.position.y = 0.7
 	world.add_child(player)
 	await _frames(12)
@@ -99,6 +104,10 @@ func _run() -> void:
 
 
 func _start_attack(player: Player, action: StringName = &"normal") -> void:
+	# Keep this movement/collision fixture aimed right under mouse-directed attacks.
+	var target: Vector3 = player._get_mouse_target()
+	var aim_offset := player.global_position + Vector3.RIGHT * 5.0 - target
+	player._get_active_camera().global_position += aim_offset
 	player.last_facing_direction = Vector3.RIGHT
 	player.request_attack(action)
 	await _frames(3)

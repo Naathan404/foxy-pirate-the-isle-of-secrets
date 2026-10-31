@@ -9,5 +9,5 @@ restore_amount = 250.0
 item_id = "small_stamina_potion"
 display_name = "Small Stamina Potion"
 icon = ExtResource("2_icon")
-description = "Restores 50 SP."
+description = "Restores 250 SP."
 type = 1

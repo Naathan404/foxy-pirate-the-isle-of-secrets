@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"close_quarters"
+display_name = "Close Quarters"
+description = "Damage +25%, Attack Range -25%, Knockback -40%"
+acquisition_source = &"blacksmith"
+drop_weight = 7.0
+damage_multiplier = 1.25
+range_multiplier = 0.75
+knockback_multiplier = 0.60

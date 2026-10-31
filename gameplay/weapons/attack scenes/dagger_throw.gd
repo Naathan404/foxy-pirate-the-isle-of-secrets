@@ -137,9 +137,10 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 
 
 # Chuyển hit đã gây sát thương về context để controller xử lý chaos và hiệu ứng vũ khí
-func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: int) -> void:
+func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	context.damage_applied.emit(damage, target, applied_hp)
 	if applied_hp > 0:
+		var impact_scale := damage.get_impact_scale()
 		var direction := flight_direction
 		if returning and is_instance_valid(thrower):
 			direction = (thrower.global_position - global_position).normalized()
@@ -153,8 +154,10 @@ func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: int) -> 
 			var sprite: Sprite3D = target.visual.sprite
 			var center := sprite.global_transform * sprite.get_aabb().get_center()
 			at = center + (at - center).limit_length(0.25)
-			_sprite_feedback(sprite).kick(direction, enemy_recoil, true)
-		_vfx.impact(at, direction)
+			_sprite_feedback(sprite).kick(
+				direction, enemy_recoil * impact_scale, true, impact_scale
+			)
+		_vfx.impact(at, direction, impact_scale)
 
 
 func _play_launch_feedback() -> void:

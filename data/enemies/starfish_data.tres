@@ -1,10 +1,11 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://5rciww3j1f7s"]
 
 [ext_resource type="Script" uid="uid://bh64oflsqtaty" path="res://data/enemies/enemy_data.gd" id="1_enemy_data"]
-[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/consumables/starfish_core.tres" id="1_wde34"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="1_wde34"]
 
 [resource]
 script = ExtResource("1_enemy_data")
+max_hp = 5.0
 move_speed = 2.0
 acceleration = 24.0
 deceleration = 30.0

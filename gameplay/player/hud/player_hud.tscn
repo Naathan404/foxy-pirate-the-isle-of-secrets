@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://4ok8iolg8l8g" path="res://gameplay/player/hud/bar_fill_effect.gd" id="8_fill_effect"]
 [ext_resource type="Texture2D" uid="uid://baohqkvbgpkt1" path="res://assets/ui/player_hud/star_icon.png" id="9_star"]
 [ext_resource type="Texture2D" uid="uid://c7dcqvh327r74" path="res://assets/ui/player_hud/chaos_bar_progress.png" id="10_ftld4"]
-[ext_resource type="Texture2D" path="res://assets/ui/player_hud/30%_status-Sheet.png" id="10_khbku"]
+[ext_resource type="Texture2D" uid="uid://dn6lgwsq32t6h" path="res://assets/ui/player_hud/30%_status-Sheet.png" id="10_khbku"]
 [ext_resource type="Texture2D" uid="uid://caivf64g34hha" path="res://assets/ui/player_hud/hit_portrait.png" id="11_1wee6"]
 [ext_resource type="Script" uid="uid://bqemuakdoq8ue" path="res://gameplay/player/hud/stat_arc.gd" id="13_arc"]
 [ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
@@ -26,31 +26,6 @@ shader = ExtResource("5_depth")
 shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
 shader_parameter/border_width = 2.0
 shader_parameter/bevel_strength = 0.30000001425
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
-content_margin_left = 9.0
-content_margin_top = 6.0
-content_margin_right = 9.0
-content_margin_bottom = 6.0
-bg_color = Color(0.30107507, 0.14176068, 0.059525304, 0.96862745)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.74480027, 0.29849133, 0.06959147, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-shadow_color = Color(0, 0, 0, 0.35)
-shadow_size = 3
-shadow_offset = Vector2(2, 2)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_jpyye"]
-shader = ExtResource("5_depth")
-shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
-shader_parameter/border_width = 2.0
-shader_parameter/bevel_strength = 0.22000001045
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_low_hp"]
 resource_local_to_scene = true
@@ -79,6 +54,31 @@ tracks/0/keys = {
 _data = {
 &"low_hp": SubResource("Animation_low_hp")
 }
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+content_margin_left = 9.0
+content_margin_top = 6.0
+content_margin_right = 9.0
+content_margin_bottom = 6.0
+bg_color = Color(0.30107507, 0.14176068, 0.059525304, 0.96862745)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.74480027, 0.29849133, 0.06959147, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 3
+shadow_offset = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jpyye"]
+shader = ExtResource("5_depth")
+shader_parameter/border_color = Color(0.09, 0.08, 0.15, 1)
+shader_parameter/border_width = 2.0
+shader_parameter/bevel_strength = 0.22000001045
 
 [node name="PlayerHUD" type="CanvasLayer" unique_id=400788151]
 scale = Vector2(1.25, 1.25)
@@ -307,10 +307,8 @@ healthy_texture = ExtResource("4_nc5hm")
 low_health_texture = SubResource("AtlasTexture_low_hp")
 hit_texture = ExtResource("11_1wee6")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="StatControl/Portrait"]
-libraries = {
-&"": SubResource("AnimationLibrary_portrait")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="StatControl/Portrait" unique_id=1880750633]
+libraries/ = SubResource("AnimationLibrary_portrait")
 
 [node name="Stamina_Icon" type="TextureRect" parent="StatControl" unique_id=993706071]
 texture_filter = 1
@@ -465,6 +463,20 @@ offset_right = 59.200096
 offset_bottom = 72.8
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("14_01apl")
+
+[node name="AmmoLabel" type="Label" parent="ChaosControl" unique_id=847852458]
+texture_filter = 1
+layout_mode = 0
+offset_left = 37.76008
+offset_top = 31.999998
+offset_right = 79.76008
+offset_bottom = 58.0
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("23_1wee6")
+theme_override_font_sizes/font_size = 25
+text = "999"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="EquipmentControl" type="Control" parent="." unique_id=143244385]
 layout_mode = 3

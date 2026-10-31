@@ -138,7 +138,5 @@ func _on_body_entered(body: Node3D) -> void:
 
 	quantity = inventory.add_item(item, quantity)
 
-	print("Trong túi: ", inventory.count_item(item.item_id), " | Còn dưới đất: ", quantity)
-
 	if quantity == 0:
 		queue_free()

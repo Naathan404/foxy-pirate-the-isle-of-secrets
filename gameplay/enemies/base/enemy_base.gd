@@ -7,7 +7,7 @@ extends CharacterBody3D
 ## animations and behavior states.
 
 signal target_changed(target: Node3D)
-signal damaged(applied_hp: int)
+signal damaged(applied_hp: float)
 signal died
 
 enum InitialFacing {
@@ -235,7 +235,7 @@ func begin_active_attack(attack_id: int = 0, tag: StringName = &"normal") -> boo
 
 
 func _begin_active_attack_with_damage(
-	amount_hp: int, attack_id: int = 0, tag: StringName = &"normal"
+	amount_hp: float, attack_id: int = 0, tag: StringName = &"normal"
 ) -> bool:
 	if dead or amount_hp <= 0 or not is_instance_valid(active_hitbox):
 		return false
@@ -262,13 +262,13 @@ func _stop_contact_damage() -> void:
 		contact_hitbox.end_attack()
 
 
-func take_damage(amount: int) -> int:
+func take_damage(amount: float) -> float:
 	var damage := DamageContext.new()
 	damage.amount_hp = amount
 	return receive_damage(damage)
 
 
-func receive_damage(damage: DamageContext) -> int:
+func receive_damage(damage: DamageContext) -> float:
 	if dead or not is_instance_valid(hp):
 		return 0
 	if damage == null or damage.amount_hp <= 0:
@@ -282,6 +282,20 @@ func receive_damage(damage: DamageContext) -> int:
 			pending_hit_direction = direction.normalized()
 	pending_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
 	return hp.take_damage(damage.amount_hp)
+
+
+## Hit and fatal recoil share forge scaling, resistance and boss immunity.
+func consume_hit_knockback_velocity() -> Vector3:
+	var multiplier := pending_knockback_multiplier
+	pending_knockback_multiplier = 1.0
+	if data == null or is_in_group("boss"):
+		return Vector3.ZERO
+	var direction := pending_hit_direction
+	if direction.is_zero_approx():
+		direction = -last_facing_direction
+	var speed := data.hit_knockback_speed * maxf(0.0, multiplier)
+	speed *= 1.0 - data.knockback_resistance
+	return direction.normalized() * speed
 
 
 func apply_charm_grapple(
@@ -475,7 +489,8 @@ func _refresh_direction_checks() -> void:
 
 
 func _refresh_target() -> void:
-	if not is_instance_valid(target_detector):
+	# Disabling the detector during death can still deliver a queued body_exited callback.
+	if dead or not is_instance_valid(target_detector) or not target_detector.monitoring:
 		return
 	var nearest_target: Node3D = null
 	var nearest_distance := INF
@@ -503,13 +518,13 @@ func _on_target_body_exited(body: Node3D) -> void:
 		_refresh_target()
 
 
-func _on_damaged(applied_hp: int) -> void:
+func _on_damaged(applied_hp: float) -> void:
 	damaged.emit(applied_hp)
 	if hp.is_alive():
 		_notify_hit()
 
 
-func _on_hp_changed(_current_hp: int, _maximum_hp: int) -> void:
+func _on_hp_changed(_current_hp: float, _maximum_hp: float) -> void:
 	_update_debug_health()
 
 
@@ -519,7 +534,9 @@ func _update_debug_health() -> void:
 	debug_health_label.visible = show_debug_health
 	if not is_instance_valid(hp):
 		return
-	debug_health_label.text = "HP: %d / %d" % [hp.current_hp, hp.get_max_hp()]
+	debug_health_label.text = (
+		"HP: %s / %s" % [String.num(hp.current_hp, 2), String.num(hp.get_max_hp(), 2)]
+	)
 
 
 func _get_hit_direction(source: Node) -> Vector3:

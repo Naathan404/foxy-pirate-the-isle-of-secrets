@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"measured_strike"
+display_name = "Measured Strike"
+description = "Startup +20%, Recovery -30%"
+acquisition_source = &"blacksmith"
+drop_weight = 7.0
+windup_multiplier = 1.20
+recovery_multiplier = 0.70

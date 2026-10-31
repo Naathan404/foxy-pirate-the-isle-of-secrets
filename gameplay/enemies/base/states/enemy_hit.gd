@@ -41,14 +41,4 @@ func _begin_recovery() -> void:
 
 
 func _apply_recoil() -> void:
-	if enemy.data == null:
-		return
-	var direction := enemy.pending_hit_direction
-	if direction.is_zero_approx():
-		direction = -enemy.last_facing_direction
-	var strength := enemy.data.hit_knockback_speed * enemy.pending_knockback_multiplier
-	strength *= 1.0 - enemy.data.knockback_resistance
-	if enemy.is_in_group("boss"):
-		strength = 0.0
-	enemy.pending_knockback_multiplier = 1.0
-	enemy._set_horizontal_velocity(direction.normalized() * strength)
+	enemy._set_horizontal_velocity(enemy.consume_hit_knockback_velocity())

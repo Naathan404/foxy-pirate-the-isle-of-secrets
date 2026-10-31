@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://dcji1edjmvej"]
+
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_item"]
+[ext_resource type="Texture2D" uid="uid://ds5hqcelblf8e" path="res://assets/sprites/items/wooden_arrow.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_item")
+item_id = "wooden_arrow"
+display_name = "Wooden Arrow"
+icon = ExtResource("2_icon")
+description = "A simple arrow crafted from wood. Lightweight and reliable, ideal for basic ranged attacks."
+max_stack = 20

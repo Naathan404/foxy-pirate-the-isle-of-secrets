@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://dmwqses0xccjn"]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"broken_edge"
+display_name = "Broken Edge"
+description = "Damage -30%, Startup -40%, Recovery -30%, Knockback -50%"
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+damage_multiplier = 0.7
+windup_multiplier = 0.6
+recovery_multiplier = 0.7
+knockback_multiplier = 0.5
