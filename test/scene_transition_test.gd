@@ -8,10 +8,19 @@ var _failures: Array[String] = []
 
 func _initialize() -> void:
 	_run.call_deferred()
-	create_timer(10.0, true, false, true).timeout.connect(func() -> void: quit(1))
+	create_timer(10.0, true, false, true).timeout.connect(
+		func() -> void:
+			push_error("Scene transition test timed out")
+			quit(1)
+	)
 
 
 func _run() -> void:
+	for scene_path: String in [DESTINATION, ARRIVAL_MAP]:
+		if not ResourceLoader.exists(scene_path, "PackedScene"):
+			push_error("Missing scene transition fixture: %s" % scene_path)
+			quit(1)
+			return
 	var manager := root.get_node("GameManager")
 	manager.fade_out_seconds = 0.03
 	manager.fade_in_seconds = 0.03

@@ -37,8 +37,8 @@ Migration HP/damage/healing sang float và danh sách consumer được cập nh
 
 - `addons/dialogic/` được commit cùng dự án, gồm cả file `.uid`, asset và cấu hình import. Dialogic được bật trong `project.godot`, autoload hiện trỏ tới UID; chạy import trước khi kiểm thử để Godot dựng lại ánh xạ UID.
 - Các addon khác (ví dụ `godot_ai`) là công cụ cục bộ và vẫn bị Git bỏ qua. Không commit cấu hình bật plugin hay autoload của các công cụ này; CI phải chạy được khi không có chúng.
-- Plugin Godot AI tự thêm lại `_mcp_game_helper` trỏ tới `res://addons/godot_ai/runtime/game_helper.gd` khi bật plugin. Trước khi commit, nên bỏ dòng công cụ cục bộ này khỏi diff. CI cũng loại đúng dòng đó sau checkout, trước khi chạy Godot, để việc plugin ghi lại cấu hình không tiếp tục làm fail import.
-- Bước chuẩn bị trên chỉ bỏ autoload Godot AI có đúng tên và đường dẫn đã biết. Không bỏ các autoload khác, không tắt Dialogic và không lọc lỗi engine khỏi log. Thiếu script/resource gameplay vẫn làm CI fail như trước.
+- Plugin Godot AI tự thêm lại `_mcp_game_helper` trỏ tới `res://addons/godot_ai/runtime/game_helper.gd` khi bật plugin. Trước khi commit, nên bỏ autoload này và mục `res://addons/godot_ai/plugin.cfg` khỏi diff. CI cũng loại đúng hai mục đó sau checkout, trước khi chạy Godot, để cấu hình cục bộ không làm fail import hoặc báo thiếu plugin.
+- Bước chuẩn bị trên chỉ bỏ autoload và mục bật plugin Godot AI có đúng tên và đường dẫn đã biết. Không bỏ các autoload hay plugin khác, không tắt Dialogic và không lọc lỗi engine khỏi log. Thiếu script/resource gameplay vẫn làm CI fail như trước.
 - Chạy game hoặc scene liên quan đến thay đổi.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd` hoặc cạnh module trong `gameplay/charms/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại. CI tìm test ở cả hai thư mục.
