@@ -56,6 +56,8 @@ func activate() -> void:
 	if context == null or not is_instance_valid(context.actor):
 		return
 	super.activate()
+	speed *= context.projectile_speed_multiplier
+	return_speed *= context.projectile_speed_multiplier
 	max_distance = context.range_units
 	global_position = context.actor.global_position + Vector3.UP * height_offset
 	launch(context.direction, context.actor)

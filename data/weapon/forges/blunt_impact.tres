@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://g5hhnweavj3s"]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"blunt_impact"
+display_name = "Blunt Impact"
+description = "Damage +15%, Critical Rate -10%, Knockback +20%"
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+damage_multiplier = 1.15
+critical_rate_bonus = -0.1
+knockback_multiplier = 1.2

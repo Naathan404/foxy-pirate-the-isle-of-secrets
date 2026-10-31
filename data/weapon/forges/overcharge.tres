@@ -6,9 +6,9 @@
 script = ExtResource("1_forge")
 forge_id = &"overcharge"
 display_name = "Overcharge"
-description = "Damage của đòn tiêu hao SP +30%, SP Cost +40%"
+description = "Damage +20%, SP Cost +40%"
 forge_group = 1
 acquisition_source = &"blacksmith"
-drop_weight = 6.0
-stamina_damage_multiplier = 1.30
-stamina_cost_multiplier = 1.40
+drop_weight = 3.0
+damage_multiplier = 1.2
+stamina_cost_multiplier = 1.4

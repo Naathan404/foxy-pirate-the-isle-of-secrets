@@ -6,9 +6,10 @@
 script = ExtResource("1_forge")
 forge_id = &"cursed_scrap"
 display_name = "Cursed Scrap"
-description = "Attack Speed +35%, Attack Range -20%, Recovery +20%, Knockback -25%"
-drop_weight = 5.0
-attack_speed_multiplier = 1.35
-recovery_multiplier = 1.2
-range_multiplier = 0.8
-knockback_multiplier = 0.75
+description = "Damage -15%, Attack Speed -15%, Critical Rate -5 điểm %"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 3.0
+damage_multiplier = 0.85
+attack_speed_multiplier = 0.85
+critical_rate_bonus = -0.05

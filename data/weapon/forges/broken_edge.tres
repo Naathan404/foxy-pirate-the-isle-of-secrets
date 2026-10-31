@@ -6,10 +6,9 @@
 script = ExtResource("1_forge")
 forge_id = &"broken_edge"
 display_name = "Broken Edge"
-description = "Damage -30%, Startup -40%, Recovery -30%, Knockback -50%"
+description = "Flat Damage -0.5, Attack Speed -10%"
+forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 5.0
-damage_multiplier = 0.7
-windup_multiplier = 0.6
-recovery_multiplier = 0.7
-knockback_multiplier = 0.5
+drop_weight = 3.0
+flat_damage = -0.5
+attack_speed_multiplier = 0.9

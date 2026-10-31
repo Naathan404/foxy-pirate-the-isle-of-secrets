@@ -25,6 +25,9 @@ var weapon_category: int = -1
 
 # chỉ số sau khi rèn
 var damage_hp: float = 1
+var critical_rate: float = 0.0
+var critical_damage_multiplier: float = 1.5
+var projectile_speed_multiplier: float = 1.0
 var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
 ## Forge snapshot; the combo step's authored knockback is applied when building damage.
@@ -44,6 +47,8 @@ func create_damage_context() -> DamageContext:
 	damage.attack_id = attack_id
 	damage.base_amount_hp = damage_hp
 	damage.amount_hp = damage_hp
+	damage.critical_rate = critical_rate
+	damage.critical_damage_multiplier = critical_damage_multiplier
 	damage.tag = action
 	damage.weapon_category = weapon_category
 	damage.origin = origin

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://bosunetvptxio"]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"keen_edge"
+display_name = "Keen Edge"
+description = "Critical Rate +15%, Damage -10%"
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+damage_multiplier = 0.9
+critical_rate_bonus = 0.15

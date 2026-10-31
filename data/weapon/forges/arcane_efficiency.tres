@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"arcane_efficiency"
+display_name = "Arcane Efficiency"
+description = "Damage -15%, SP Cost -30%"
+forge_group = 1
+acquisition_source = &"blacksmith"
+drop_weight = 2.0
+damage_multiplier = 0.85
+stamina_cost_multiplier = 0.7

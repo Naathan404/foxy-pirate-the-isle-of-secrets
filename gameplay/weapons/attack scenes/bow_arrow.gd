@@ -69,6 +69,7 @@ func activate() -> void:
 	if context == null or not is_instance_valid(context.actor) or context.range_units <= 0.0:
 		return
 	super.activate()
+	speed *= context.projectile_speed_multiplier
 	show()
 	global_position = context.actor.global_position + Vector3.UP * release_height
 	look_at(global_position + context.direction, Vector3.UP)

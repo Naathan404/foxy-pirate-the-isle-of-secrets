@@ -375,6 +375,8 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 	result.target_position = request.target_position
 	result.has_target = request.has_target
 	result.damage_hp = attack.damage_hp
+	result.critical_rate = clampf(equipped.definition.critical_rate, 0.0, 1.0)
+	result.critical_damage_multiplier = equipped.definition.critical_damage_multiplier
 	if request.action == &"normal" and not attack.combo_steps.is_empty():
 		result.combo_index = _combo_index % attack.combo_steps.size()
 		result.combo_step = attack.combo_steps[result.combo_index]
@@ -387,7 +389,13 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 		var damage_multiplier := equipped.forge.damage_multiplier
 		if attack.stamina_cost > 0.0 and equipped.forge.stamina_cost_multiplier > 0.0:
 			damage_multiplier *= equipped.forge.stamina_damage_multiplier
-		result.damage_hp = maxf(0.0, result.damage_hp * damage_multiplier)
+		result.damage_hp = maxf(
+			0.0, result.damage_hp * damage_multiplier + equipped.forge.flat_damage
+		)
+		result.critical_rate = clampf(
+			result.critical_rate + equipped.forge.critical_rate_bonus, 0.0, 1.0
+		)
+		result.projectile_speed_multiplier = equipped.forge.projectile_speed_multiplier
 		result.range_units *= maxf(0.01, equipped.forge.range_multiplier)
 		result.hitbox_multiplier = maxf(0.01, equipped.forge.hitbox_multiplier)
 		result.knockback_multiplier = equipped.forge.knockback_multiplier
@@ -515,6 +523,7 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 	if damage == null or damage.source != actor or not is_instance_valid(target):
 		return
 	damage.target = target
+	damage.resolve_critical()
 	var charm_manager := actor.get("charm_socket_manager") as CharmSocketManager
 	if is_instance_valid(charm_manager):
 		damage.amount_hp = charm_manager.modify_outgoing_damage(damage.amount_hp, damage)

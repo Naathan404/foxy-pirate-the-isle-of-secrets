@@ -12,6 +12,10 @@ enum ForgeGroup { UNIVERSAL, WILDCARD }
 ## Relative chance in the shared pool; zero excludes this forge from random rolls.
 @export_range(0.0, 1000.0, 0.01) var drop_weight: float = 1.0
 @export_range(0.01, 5.0, 0.01) var damage_multiplier: float = 1.0
+@export var flat_damage: float = 0.0
+## Additive probability: 0.15 means +15 percentage points.
+@export_range(-1.0, 1.0, 0.01) var critical_rate_bonus: float = 0.0
+@export_range(0.01, 5.0, 0.01) var projectile_speed_multiplier: float = 1.0
 ## Additional damage multiplier only when the attack pays a positive SP cost.
 @export_range(0.01, 5.0, 0.01) var stamina_damage_multiplier: float = 1.0
 @export_range(0.01, 5.0, 0.01) var attack_speed_multiplier: float = 1.0
@@ -31,6 +35,12 @@ enum ForgeGroup { UNIVERSAL, WILDCARD }
 
 
 func is_valid() -> bool:
+	if (
+		not is_finite(flat_damage)
+		or not is_finite(critical_rate_bonus)
+		or absf(critical_rate_bonus) > 1.0
+	):
+		return false
 	if forge_id.is_empty() or display_name.is_empty():
 		return false
 	if not is_finite(drop_weight) or drop_weight < 0.0:
@@ -42,6 +52,7 @@ func is_valid() -> bool:
 			return false
 	for multiplier: float in [
 		damage_multiplier,
+		projectile_speed_multiplier,
 		stamina_damage_multiplier,
 		attack_speed_multiplier,
 		windup_multiplier,

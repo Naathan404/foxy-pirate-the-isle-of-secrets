@@ -3,42 +3,60 @@ extends SceneTree
 const POOL: WeaponForgePool = preload("res://data/weapon/forges/shared_pool.tres")
 # SP-paying attack: damage, speed, range, startup, recovery, SP, melee hitbox, projectile range.
 const EXPECTED: Dictionary = {
-	&"pristine": [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"heavy_edge": [1.30, 0.80, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"swift_flow": [0.80, 1.30, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"brittle_force": [1.50, 0.65, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"long_reach": [0.88, 1.00, 1.25, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"close_quarters": [1.25, 1.00, 0.75, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"quickdraw": [1.00, 1.00, 1.00, 0.70, 1.20, 1.00, 1.00, 1.00],
-	&"measured_strike": [1.00, 1.00, 1.00, 1.20, 0.70, 1.00, 1.00, 1.00],
-	&"rusted_blade": [0.90, 0.80, 1.50, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"broken_edge": [0.70, 1.00, 1.00, 0.60, 0.70, 1.00, 1.00, 1.00],
-	&"crippling_weight": [1.70, 0.60, 1.00, 1.00, 1.15, 1.00, 1.00, 1.00],
-	&"cursed_scrap": [1.00, 1.35, 0.80, 1.00, 1.20, 1.00, 1.00, 1.00],
-	&"doomsday_edge": [2.00, 0.45, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"frenzied_steel": [0.60, 1.70, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-	&"overcharge": [1.30, 1.00, 1.00, 1.00, 1.00, 1.40, 1.00, 1.00],
-	&"titan_sweep": [1.00, 0.90, 1.00, 1.00, 1.00, 1.00, 1.30, 1.00],
-	&"true_flight": [0.88, 1.10, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25],
+	&"pristine": [1, 1, 1, 1, 1, 1, 1, 1],
+	&"heavy_edge": [1.3, 0.8, 1, 1, 1, 1, 1, 1],
+	&"swift_flow": [0.8, 1.3, 1, 1, 1, 1, 1, 1],
+	&"brittle_force": [1.5, 0.65, 1, 1, 1, 1, 1, 1],
+	&"long_reach": [0.88, 1, 1.25, 1, 1, 1, 1, 1],
+	&"close_quarters": [1.25, 1, 0.75, 1, 1, 1, 1, 1],
+	&"quickdraw": [1, 1, 1, 0.7, 1.2, 1, 1, 1],
+	&"measured_strike": [1, 1, 1, 1.2, 0.7, 1, 1, 1],
+	&"keen_edge": [0.95, 1, 1, 1, 1, 1, 1, 1],
+	&"blunt_impact": [1.15, 1, 1, 1, 1, 1, 1, 1],
+	&"sharpened_soul": [1.5, 0.8, 1, 1, 1, 1, 1, 1],
+	&"brutal_core": [2.0, 0.6, 1, 1, 1, 1, 1, 1],
+	&"leviathans_fang": [3.0, 0.4, 1, 1, 1.2, 1, 1, 1],
+	&"rusted_blade": [0.8, 0.85, 1, 1, 1, 1, 1, 1],
+	&"broken_edge": [0.5, 0.9, 1, 1, 1, 1, 1, 1],
+	&"crippling_weight": [1.6, 0.65, 1, 1, 1.2, 1, 1, 1],
+	&"cursed_scrap": [0.85, 0.85, 1, 1, 1, 1, 1, 1],
+	&"doomsday_edge": [2.0, 0.45, 1, 1, 1, 1, 1, 1],
+	&"frenzied_steel": [0.6, 1.7, 1, 1, 1, 1, 1, 1],
+	&"hollow_edge": [0.5, 1.9, 1, 1, 1, 1, 1, 1],
+	&"overcharge": [1.2, 1, 1, 1, 1, 1.4, 1, 1],
+	&"titan_sweep": [1, 0.9, 1, 1, 1, 1, 1.3, 1],
+	&"true_flight": [0.88, 1.1, 1, 1, 1, 1, 1, 1.25],
+	&"arcane_efficiency": [0.85, 1, 1, 1, 1, 0.7, 1, 1],
+	&"sniper_sight": [1, 0.85, 1, 1, 1, 1, 1, 1.3],
+	&"misaligned_shot": [0.9, 1, 1, 1, 1, 1, 1, 1],
 }
 const WEIGHTS: Dictionary[StringName, int] = {
-	&"pristine": 7,
-	&"heavy_edge": 10,
-	&"swift_flow": 10,
-	&"brittle_force": 5,
-	&"long_reach": 8,
-	&"close_quarters": 7,
-	&"quickdraw": 7,
-	&"measured_strike": 7,
-	&"rusted_blade": 5,
-	&"broken_edge": 5,
-	&"crippling_weight": 4,
-	&"cursed_scrap": 5,
+	&"pristine": 3,
+	&"heavy_edge": 8,
+	&"swift_flow": 8,
+	&"brittle_force": 4,
+	&"long_reach": 6,
+	&"close_quarters": 6,
+	&"quickdraw": 5,
+	&"measured_strike": 5,
+	&"keen_edge": 5,
+	&"blunt_impact": 5,
+	&"sharpened_soul": 5,
+	&"brutal_core": 5,
+	&"leviathans_fang": 1,
+	&"rusted_blade": 4,
+	&"broken_edge": 3,
+	&"crippling_weight": 3,
+	&"cursed_scrap": 3,
 	&"doomsday_edge": 2,
 	&"frenzied_steel": 3,
-	&"overcharge": 6,
-	&"titan_sweep": 5,
-	&"true_flight": 4,
+	&"hollow_edge": 3,
+	&"overcharge": 3,
+	&"titan_sweep": 3,
+	&"true_flight": 3,
+	&"arcane_efficiency": 2,
+	&"sniper_sight": 2,
+	&"misaligned_shot": 2,
 }
 
 var _failures: int = 0
@@ -57,12 +75,12 @@ func _run() -> void:
 	world.free()
 	await create_timer(0.1).timeout
 	if _failures == 0:
-		print("Shared forge pool, all 17 modifiers, all weapon categories and attack timing passed")
+		print("Shared forge pool, all 26 modifiers, all weapon categories and attack timing passed")
 	quit(0 if _failures == 0 else 1)
 
 
 func _test_pool() -> void:
-	_check(POOL.is_valid() and POOL.forges.size() == 17, "Shared pool contains 17 valid forges")
+	_check(POOL.is_valid() and POOL.forges.size() == 26, "Shared pool contains 26 valid forges")
 	var random := RandomNumberGenerator.new()
 	random.seed = 7421
 	var replay := RandomNumberGenerator.new()
@@ -72,7 +90,7 @@ func _test_pool() -> void:
 		var forge := POOL.roll(random)
 		_check(forge == POOL.roll(replay), "Seeded rolls reproduce the same sequence")
 		seen[forge.forge_id] = true
-	_check(seen.size() == 17, "Every forge is reachable in the same pool")
+	_check(seen.size() == 26, "Every forge is reachable in the same pool")
 	_check(POOL.get_forge(&"missing") == null, "Unknown forge ID is absent")
 	var universal_count := 0
 	var total_weight := 0.0
@@ -81,8 +99,8 @@ func _test_pool() -> void:
 		total_weight += forge.drop_weight
 		if forge.forge_group == WeaponForge.ForgeGroup.UNIVERSAL:
 			universal_count += 1
-	_near(total_weight, 100.0, "Weights sum to exactly 100 percent")
-	_check(universal_count == 14, "Pool has 14 Universal and 3 Wildcard entries")
+	_near(total_weight, 102.0, "Authored weights sum to 102 and roll relatively")
+	_check(universal_count == 20, "Pool has 20 Universal and 6 Wildcard entries")
 	var weighted := WeaponForgePool.new()
 	var disabled := POOL.forges[0].duplicate() as WeaponForge
 	var enabled := POOL.forges[1].duplicate() as WeaponForge
@@ -192,6 +210,39 @@ func _test_attacks(world: Node3D) -> void:
 	controller.equipped.forge.damage_multiplier = -1.0
 	_check(not controller.try_attack(AttackContext.new()), "Invalid forge rejects attack")
 	_test_overcharge(controller, chaos)
+	_test_critical_stats(controller)
+
+
+func _test_critical_stats(controller: WeaponController) -> void:
+	var weapon := controller.equipped
+	weapon.definition.critical_rate = 0.05
+	var attack := weapon.definition.normal_attack
+	for fixture: Array in [
+		[&"keen_edge", 0.20],
+		[&"blunt_impact", 0.0],
+		[&"cursed_scrap", 0.0],
+		[&"sniper_sight", 0.10]
+	]:
+		weapon.forge = POOL.get_forge(fixture[0])
+		var context := controller._make_context(AttackContext.new(), attack)
+		_near(context.critical_rate, fixture[1], "Forge adds percentage points and clamps chance")
+		weapon.forge = POOL.get_forge(&"pristine")
+		_near(
+			context.create_damage_context().critical_rate,
+			fixture[1],
+			"Critical chance stays snapshotted"
+		)
+	weapon.definition.critical_rate = 0.95
+	weapon.forge = POOL.get_forge(&"keen_edge")
+	_near(
+		controller._make_context(AttackContext.new(), attack).critical_rate,
+		1.0,
+		"Chance caps at 100 percent"
+	)
+	weapon.definition.critical_rate = 0.05
+	weapon.forge = POOL.get_forge(&"misaligned_shot")
+	var context := controller._make_context(AttackContext.new(), weapon.definition.secondary_attack)
+	_near(context.projectile_speed_multiplier, 0.6, "Projectile speed penalty is snapshotted")
 
 
 func _test_execution(controller: WeaponController, chaos: ChaosComponent) -> void:
@@ -234,9 +285,11 @@ func _test_overcharge(controller: WeaponController, chaos: ChaosComponent) -> vo
 	var normal := weapon.definition.normal_attack
 	normal.stamina_cost = 0.0
 	weapon.definition.secondary_attack.stamina_cost = 0.0
-	_check_overcharge_attack(controller, &"normal", 1.0, 0.0, "Free attack receives no bonus")
+	_check_overcharge_attack(controller, &"normal", 1.2, 0.0, "Free attack receives damage bonus")
 	chaos.gain(chaos.maximum)
-	_check_overcharge_attack(controller, &"secondary", 1.0, 0.0, "CP-only attack receives no bonus")
+	_check_overcharge_attack(
+		controller, &"secondary", 1.2, 0.0, "CP-only attack receives damage bonus"
+	)
 	_near(chaos.current, 0.0, "CP cost remains unchanged")
 	var ammo := AmmoComponent.new()
 	controller.actor.add_child(ammo)
@@ -244,12 +297,12 @@ func _test_overcharge(controller: WeaponController, chaos: ChaosComponent) -> vo
 	controller.ammo = ammo
 	normal.ammo_id = &"forge_test_arrow"
 	normal.ammo_cost = 1
-	_check_overcharge_attack(controller, &"normal", 1.0, 0.0, "Ammo attack receives no bonus")
+	_check_overcharge_attack(controller, &"normal", 1.2, 0.0, "Ammo attack receives damage bonus")
 	_check(ammo.get_amount(&"forge_test_arrow") == 1, "Ammo cost remains unchanged")
 	normal.ammo_cost = 0
 	normal.ammo_id = &""
 	normal.stamina_cost = 10.0
-	_check_overcharge_attack(controller, &"normal", 1.3, 14.0, "SP attack gets bonus and surcharge")
+	_check_overcharge_attack(controller, &"normal", 1.2, 14.0, "SP attack gets bonus and surcharge")
 	controller.stamina.try_consume(controller.stamina.get_current_sp() - 13.0)
 	weapon.cooldowns.clear()
 	_check(not controller.try_attack(AttackContext.new()), "Surcharge cannot exceed available SP")
@@ -257,7 +310,7 @@ func _test_overcharge(controller: WeaponController, chaos: ChaosComponent) -> vo
 	weapon.forge = weapon.forge.duplicate()
 	weapon.forge.stamina_cost_multiplier = 0.0
 	_check_overcharge_attack(
-		controller, &"normal", 1.0, 0.0, "Attack with zero effective SP cost receives no bonus"
+		controller, &"normal", 1.2, 0.0, "Attack with zero effective SP cost receives damage bonus"
 	)
 	_near(
 		POOL.get_forge(&"overcharge").stamina_cost_multiplier,

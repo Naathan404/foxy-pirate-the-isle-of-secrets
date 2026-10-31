@@ -42,5 +42,6 @@ script = ExtResource("1_weapon")
 weapon_id = &"bow"
 display_name = "Bow"
 category = 1
+critical_damage_multiplier = 1.8
 normal_attack = SubResource("Attack_bow")
 secondary_attack = SubResource("Attack_volley")
