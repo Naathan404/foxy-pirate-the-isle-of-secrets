@@ -181,9 +181,9 @@ size_flags_horizontal = 3
 [node name="ItemGrid" type="GridContainer" parent="Content/Left/CollectionScroll/CollectionCenter" unique_id=1899753152]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 7
-theme_override_constants/v_separation = 6
-columns = 5
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+columns = 4
 
 [node name="Pagination" type="HBoxContainer" parent="Content/Left" unique_id=626549173]
 layout_mode = 2
@@ -242,7 +242,6 @@ alignment = 2
 
 [node name="EquippedWeapon" parent="Content/Left/EquippedFrame/Content/EquippedRow/Weapon" unique_id=1582759862 instance=ExtResource("3")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(68, 68)
 layout_mode = 2
 
 [node name="Q" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=756994306]

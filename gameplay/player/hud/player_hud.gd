@@ -18,6 +18,7 @@ var _displayed_ammo_id: StringName = &""
 @onready var equipment: EquipmentControl = $EquipmentControl
 @onready var weapon_icon: TextureRect = $ChaosControl/WeaponFrame/WeaponIcon
 @onready var ammo_label: Label = $ChaosControl/AmmoLabel
+@onready var chaos_indicator: ChaosIndicatorFeedback = $ChaosControl/TextureRect
 
 
 func _ready() -> void:
@@ -39,6 +40,7 @@ func _ready() -> void:
 		stamina.stamina_changed.connect(stamina_arc.set_stat)
 	if is_instance_valid(chaos):
 		chaos.chaos_changed.connect(chaos_arc.set_stat)
+	chaos_indicator.bind_components(chaos, weapon_controller, get_parent() as Player)
 	# Player khởi tạo chỉ số sau khi các node con ready, nên sync ở cuối frame.
 	_sync_stats.call_deferred()
 	equipment.bind_manager.call_deferred(charm_socket_manager)
@@ -111,6 +113,7 @@ func _sync_stats() -> void:
 		chaos_arc.set_stat(chaos.current, chaos.maximum)
 	else:
 		chaos_arc.sync_preview()
+		chaos_indicator.set_stat(chaos_arc.fill.value, chaos_arc.fill.max_value)
 
 
 func _on_hp_changed(current: float, maximum: float) -> void:

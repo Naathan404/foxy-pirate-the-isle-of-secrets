@@ -12,7 +12,7 @@ const UNEQUIP_TEXTURE: Texture2D = preload(
 const UNEQUIP_PRESSED_TEXTURE: Texture2D = preload(
 	"res://assets/ui/player_hud/inventory/unequip_button_press.png"
 )
-const PAGE_SIZE := 20
+const PAGE_SIZE := 12
 const KEYS := ["Q", "SPACE", "E"]
 const FORGE_FIELDS := {
 	"damage_multiplier": "Damage",

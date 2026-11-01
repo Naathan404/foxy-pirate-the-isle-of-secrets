@@ -289,6 +289,8 @@ func receive_damage(damage: DamageContext) -> float:
 	pending_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
 	var applied_hp := hp.take_damage(damage.amount_hp)
 	if applied_hp > 0.0:
+		if is_instance_valid(damage.source) and damage.source.has_signal("combat_activity"):
+			damage.source.emit_signal("combat_activity")
 		if not dead and hp.is_alive():
 			_accumulate_stagger(damage.stagger_damage)
 		var popup_scene := CRITICAL_POPUP if damage.is_critical else NORMAL_POPUP

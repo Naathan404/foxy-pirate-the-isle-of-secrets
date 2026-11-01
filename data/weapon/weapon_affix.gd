@@ -6,7 +6,7 @@ enum ForgeGroup { UNIVERSAL, WILDCARD }
 # thuộc tính rèn của vũ khí
 @export var forge_id: StringName = &"pristine"
 @export var display_name: String = "Pristine"
-@export_multiline var description: String = "Không thay đổi chỉ số"
+@export_multiline var description: String = "Do nothing."
 @export var forge_group: ForgeGroup = ForgeGroup.UNIVERSAL
 @export var acquisition_source: StringName = &""
 ## Relative chance in the shared pool; zero excludes this forge from random rolls.
