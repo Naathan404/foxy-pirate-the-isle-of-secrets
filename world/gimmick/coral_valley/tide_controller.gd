@@ -90,7 +90,12 @@ func get_depth_at(world_position: Vector3) -> float:
 	if is_instance_valid(surface) and surface.mesh != null:
 		var point := surface.to_local(world_position)
 		var bounds := surface.get_aabb()
-		if point.x < bounds.position.x or point.x > bounds.end.x or point.z < bounds.position.z or point.z > bounds.end.z:
+		if (
+			point.x < bounds.position.x
+			or point.x > bounds.end.x
+			or point.z < bounds.position.z
+			or point.z > bounds.end.z
+		):
 			return -INF
 	return get_water_height() - world_position.y
 

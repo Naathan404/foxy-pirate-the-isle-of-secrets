@@ -46,15 +46,15 @@ var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
 var submerged: bool = false
+var pending_hit_direction: Vector3 = Vector3.ZERO
+var pending_knockback_multiplier: float = 1.0
+var pending_charm_stun_seconds: float = 0.0
+var stagger_amount: float = 0.0
 var _surface_collision: Dictionary = {}
 var _surface_process_mode: ProcessMode = Node.PROCESS_MODE_INHERIT
 var _surface_visible: bool = true
 var _surface_hurtbox_enabled: bool = true
 var _surface_detection_frames: int = 0
-var pending_hit_direction: Vector3 = Vector3.ZERO
-var pending_knockback_multiplier: float = 1.0
-var pending_charm_stun_seconds: float = 0.0
-var stagger_amount: float = 0.0
 var _stagger_decay_remaining: float = 0.0
 var _stagger_immunity_remaining: float = 0.0
 var _charm_grapple_tween: Tween
@@ -438,7 +438,7 @@ func set_target(next_target: Node3D) -> void:
 
 ## Water hides an enemy without killing it or resetting its HP.
 ## TidalEnemy keeps processing independently while this subtree is suspended.
-func set_submerged(value: bool) -> void:
+func _set_submerged(value: bool) -> void:
 	if dead or submerged == value:
 		return
 	submerged = value

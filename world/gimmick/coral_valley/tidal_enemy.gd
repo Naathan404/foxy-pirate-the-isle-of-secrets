@@ -76,7 +76,7 @@ func _initialize() -> void:
 	_last_active_position = _home_position
 	_enemy.add_to_group(&"tidal_enemies")
 	if animate_initial_spawn:
-		_enemy.set_submerged(true)
+		_enemy._set_submerged(true)
 	_update_submersion()
 	set_physics_process(true)
 
@@ -89,7 +89,7 @@ func _physics_process(delta: float) -> void:
 	if not is_instance_valid(tide_controller) or not is_instance_valid(tide_controller.water):
 		# A removed water controller must not leave a living enemy suspended forever.
 		_cancel_emergence()
-		_enemy.set_submerged(false)
+		_enemy._set_submerged(false)
 		set_physics_process(false)
 		return
 	_recovery_remaining = maxf(0.0, _recovery_remaining - delta)
@@ -111,13 +111,19 @@ func _update_submersion() -> void:
 			_sinking = true
 			_forced_sink = false
 			_emerging = false
-			_sink_elapsed = (1.0 - clampf(_emerge_elapsed / maxf(0.001, emerge_duration), 0.0, 1.0)) * sink_duration
+			_sink_elapsed = (
+				(1.0 - clampf(_emerge_elapsed / maxf(0.001, emerge_duration), 0.0, 1.0))
+				* sink_duration
+			)
 		return
 	if _sinking:
 		if not _forced_sink and depth <= submerge_depth - hysteresis:
 			_emerging = true
 			_sinking = false
-			_emerge_elapsed = (1.0 - clampf(_sink_elapsed / maxf(0.001, sink_duration), 0.0, 1.0)) * emerge_duration
+			_emerge_elapsed = (
+				(1.0 - clampf(_sink_elapsed / maxf(0.001, sink_duration), 0.0, 1.0))
+				* emerge_duration
+			)
 		return
 	if _enemy.submerged:
 		if _enemy.global_position != _resting_position:
@@ -139,20 +145,28 @@ func _recover_hidden_position() -> bool:
 	for ring in range(1, 4):
 		for index in range(8):
 			var angle := TAU * float(index) / 8.0
-			origins.append(_enemy.global_position + Vector3(cos(angle), 0, sin(angle)) * recovery_radius * float(ring) / 3.0)
+			origins.append(
+				(
+					_enemy.global_position
+					+ Vector3(cos(angle), 0, sin(angle)) * recovery_radius * float(ring) / 3.0
+				)
+			)
 	origins.append(_home_position)
 	for point: Marker3D in recovery_points:
 		if is_instance_valid(point):
 			origins.append(point.global_position)
 	for origin: Vector3 in origins:
-		var ground = Placement.find_floor(_enemy, origin, ground_collision_mask, 2.0, 128.0, ground_clearance)
+		var ground = Placement.find_floor(
+			_enemy, origin, ground_collision_mask, 2.0, 128.0, ground_clearance
+		)
 		if not ground is Vector3:
 			continue
 		# Do not turn a newly placed obstacle into a stair up onto its roof.
 		if ground.y > origin.y + 0.4:
 			continue
-		if not Placement.can_stand(_enemy, _enemy, ground, ground_collision_mask,
-				ground_clearance, reveal_player_distance):
+		if not Placement.can_stand(
+			_enemy, _enemy, ground, ground_collision_mask, ground_clearance, reveal_player_distance
+		):
 			continue
 		_enemy.global_position = ground
 		_resting_position = ground
@@ -165,10 +179,17 @@ func _recover_hidden_position() -> bool:
 func _choose_exit_direction() -> bool:
 	var forward := _enemy.last_facing_direction
 	var distance := maxf(0.8, Placement.body_radius(_enemy))
-	for angle: float in [0.0, PI / 4.0, -PI / 4.0, PI / 2.0, -PI / 2.0, 3.0 * PI / 4.0, -3.0 * PI / 4.0, PI]:
+	for angle: float in [
+		0.0, PI / 4.0, -PI / 4.0, PI / 2.0, -PI / 2.0, 3.0 * PI / 4.0, -3.0 * PI / 4.0, PI
+	]:
 		var direction := forward.rotated(Vector3.UP, angle)
-		if Placement.can_step(_enemy, _enemy, _enemy.global_position + direction * distance,
-				ground_collision_mask, ground_clearance):
+		if Placement.can_step(
+			_enemy,
+			_enemy,
+			_enemy.global_position + direction * distance,
+			ground_collision_mask,
+			ground_clearance
+		):
 			_enemy.face_direction(direction)
 			return true
 	return false
@@ -178,7 +199,12 @@ func _update_stuck_turn(delta: float) -> void:
 	var moved := Placement.horizontal_distance(_enemy.global_position, _last_active_position)
 	_last_active_position = _enemy.global_position
 	var state := _enemy.fsm.current_state
-	if not _enemy.is_on_floor() or _enemy.move_direction.is_zero_approx() or moved > maxf(0.0005, delta * 0.05) or (is_instance_valid(state) and state.name in [&"Hit", &"Death"]):
+	if (
+		not _enemy.is_on_floor()
+		or _enemy.move_direction.is_zero_approx()
+		or moved > maxf(0.0005, delta * 0.05)
+		or (is_instance_valid(state) and state.name in [&"Hit", &"Death"])
+	):
 		_stuck_elapsed = 0.0
 		return
 	_stuck_elapsed += delta
@@ -192,7 +218,7 @@ func _update_stuck_turn(delta: float) -> void:
 func _begin_emergence() -> void:
 	if emerge_duration <= 0.0 or not is_instance_valid(_enemy.visual):
 		_choose_exit_direction()
-		_enemy.set_submerged(false)
+		_enemy._set_submerged(false)
 		return
 	_emerging = true
 	_emerge_elapsed = 0.0
@@ -218,8 +244,14 @@ func _update_emergence(delta: float) -> void:
 	_apply_transition(progress)
 	if progress >= 1.0:
 		# A crate/player may have moved into this spot during the visual effect.
-		if not Placement.can_stand(_enemy, _enemy, _enemy.global_position,
-				ground_collision_mask, ground_clearance, reveal_player_distance):
+		if not Placement.can_stand(
+			_enemy,
+			_enemy,
+			_enemy.global_position,
+			ground_collision_mask,
+			ground_clearance,
+			reveal_player_distance
+		):
 			_emerging = false
 			_sinking = true
 			_forced_sink = true
@@ -231,11 +263,11 @@ func _update_emergence(delta: float) -> void:
 		_choose_exit_direction()
 		_last_active_position = _enemy.global_position
 		_stuck_elapsed = 0.0
-		_enemy.set_submerged(false)
+		_enemy._set_submerged(false)
 
 
 func _begin_sinking() -> void:
-	_enemy.set_submerged(true)
+	_enemy._set_submerged(true)
 	_position_valid = false
 	_recovery_remaining = 0.0
 	if sink_duration <= 0.0 or not is_instance_valid(_enemy.visual):
@@ -272,8 +304,11 @@ func _apply_transition(progress: float) -> void:
 	for index in range(_droplets.size()):
 		var angle := TAU * float(index) / float(_droplets.size())
 		var distance := 0.2 + progress * 0.9
-		_droplets[index].position = Vector3(cos(angle) * distance,
-			0.05 + sin(progress * PI) * (0.35 + (index % 3) * 0.12), sin(angle) * distance)
+		_droplets[index].position = Vector3(
+			cos(angle) * distance,
+			0.05 + sin(progress * PI) * (0.35 + (index % 3) * 0.12),
+			sin(angle) * distance
+		)
 	_effect_material.albedo_color.a = sin(progress * PI) * 0.7
 
 

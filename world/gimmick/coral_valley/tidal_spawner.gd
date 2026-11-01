@@ -176,7 +176,10 @@ func _begin_wave() -> void:
 func _is_safe_position(position: Vector3) -> bool:
 	for node: Node in get_tree().get_nodes_in_group(&"player"):
 		var player := node as Node3D
-		if is_instance_valid(player) and _horizontal_distance(position, player.global_position) < min_player_distance:
+		if (
+			is_instance_valid(player)
+			and _horizontal_distance(position, player.global_position) < min_player_distance
+		):
 			return false
 	for enemy: EnemyBase in _living:
 		if _horizontal_distance(position, enemy.global_position) < min_enemy_distance:
@@ -189,8 +192,14 @@ func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 
 
 func _find_seabed(marker_position: Vector3) -> Variant:
-	return Placement.find_floor(self, marker_position, ground_collision_mask,
-		ground_ray_above, ground_ray_below, ground_clearance)
+	return Placement.find_floor(
+		self,
+		marker_position,
+		ground_collision_mask,
+		ground_ray_above,
+		ground_ray_below,
+		ground_clearance
+	)
 
 
 func _spawn_enemy(point: Marker3D, spawn_position: Vector3, is_elite: bool) -> bool:
@@ -209,8 +218,9 @@ func _spawn_enemy(point: Marker3D, spawn_position: Vector3, is_elite: bool) -> b
 	var spawn_transform := point.global_transform
 	spawn_transform.origin = spawn_position
 	enemy.transform = global_transform.affine_inverse() * spawn_transform
-	if not Placement.can_stand(self, enemy, spawn_position, ground_collision_mask,
-			ground_clearance, min_player_distance):
+	if not Placement.can_stand(
+		self, enemy, spawn_position, ground_collision_mask, ground_clearance, min_player_distance
+	):
 		enemy.free()
 		return false
 	enemy.destroy_on_death = true
