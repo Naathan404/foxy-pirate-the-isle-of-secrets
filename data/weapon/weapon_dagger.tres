@@ -72,6 +72,7 @@ range_units = 10.0
 script = ExtResource("1_epx0i")
 icon = ExtResource("1_tjtgk")
 description = "A nimble blade for quick combos and a returning throw."
+stagger_damage = 28.0
 normal_attack = SubResource("Resource_nasaw")
 secondary_attack = SubResource("Resource_throw")
 metadata/_custom_type_script = "uid://dnv8otqkgp6v5"
