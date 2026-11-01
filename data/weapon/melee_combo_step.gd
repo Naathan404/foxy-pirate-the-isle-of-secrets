@@ -6,6 +6,7 @@ extends Resource
 @export_range(0.02, 1.0, 0.005) var active_seconds: float = 0.1
 @export_range(0.0, 1.0, 0.005) var recovery_seconds: float = 0.1
 @export_range(0.1, 5.0, 0.05) var damage_multiplier: float = 1.0
+@export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 @export_range(0.0, 3.0, 0.05) var knockback_multiplier: float = 0.5
 @export_range(0.0, 0.6, 0.01) var step_distance: float = 0.28
 @export_range(0.02, 0.4, 0.01) var step_duration: float = 0.12
@@ -30,6 +31,8 @@ func is_valid() -> bool:
 		and active_seconds > 0.0
 		and recovery_seconds >= 0.0
 		and damage_multiplier > 0.0
+		and is_finite(stagger_multiplier)
+		and stagger_multiplier >= 0.0
 		and reach_multiplier > 0.0
 		and step_duration > 0.0
 	)

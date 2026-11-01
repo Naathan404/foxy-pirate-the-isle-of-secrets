@@ -36,7 +36,6 @@
 [ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="27_86838"]
 [ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="27_k8ytl"]
 [ext_resource type="Resource" uid="uid://cmpdo81fwpbrg" path="res://data/weapon/forges/doomsday_edge.tres" id="32_pnplv"]
-[ext_resource type="Resource" uid="uid://b56qhly3jy2ka" path="res://data/weapon/forges/frenzied_steel.tres" id="32_qa68t"]
 [ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
 [ext_resource type="Resource" uid="uid://pm7d7bi2h3b" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
@@ -795,7 +794,7 @@ script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_dagger")
 blueprint_unlocked = true
 owned = true
-forge = ExtResource("32_qa68t")
+forge = ExtResource("32_pnplv")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
 [sub_resource type="Resource" id="Resource_34wtv"]
@@ -818,7 +817,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pnplv"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_k8ytl"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -1045,7 +1044,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_pnplv")
+process_material = SubResource("ParticleProcessMaterial_k8ytl")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
 player = NodePath("../..")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"shattering_blow"
+display_name = "Shattering Blow"
+description = "Critical Damage +35%, Stagger +25%, Damage -5%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 4.0
+critical_damage_multiplier = 1.35
+stagger_multiplier = 1.25
+damage_multiplier = 0.95

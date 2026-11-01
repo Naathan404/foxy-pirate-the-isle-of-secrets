@@ -1,50 +1,57 @@
 # Weapon Forges
 
-Shared pool: 20 Universal + 6 Wildcard; all weapon categories may roll any forge. The supplied weights sum to 102; they are preserved and normalized relatively (chance = weight / 102).
+Shared pool: 19 Universal + 6 Wildcard. All weapon categories can roll any entry. The supplied weights sum to 111; chance = weight / 111.
 
 | Group | Forge | Effect | Weight |
 | --- | --- | --- | --- |
-| Universal | Pristine | Không thay đổi chỉ số | 3% |
-| Universal | Heavy Edge | Damage +30%, Attack Speed -20%, Knockback +35% | 8% |
-| Universal | Swift Flow | Attack Speed +30%, Damage -20%, Knockback -30% | 8% |
-| Universal | Brittle Force | Damage +50%, Attack Speed -35%, Knockback +20% | 4% |
-| Universal | Long Reach | Attack Range +25%, Damage -12% | 6% |
-| Universal | Close Quarters | Damage +25%, Attack Range -25%, Knockback -40% | 6% |
-| Universal | Quickdraw | Startup -30%, Recovery +20% | 5% |
-| Universal | Measured Strike | Startup +20%, Recovery -30% | 5% |
-| Universal | Keen Edge | Critical Rate +15 điểm %, Damage -5% | 5% |
-| Universal | Blunt Impact | Damage +15%, Critical Rate -10 điểm %, Knockback +20% | 5% |
-| Universal | Sharpened Soul | Flat Damage +0.5, Attack Speed -20% | 5% |
-| Universal | Brutal Core | Flat Damage +1.0, Attack Speed -40%, Knockback +30% | 5% |
-| Universal | Leviathan’s Fang | Flat Damage +2.0, Attack Speed -60%, Recovery +20% | 1% |
-| Universal | Rusted Blade | Damage -20%, Attack Speed -15%, Knockback -15% | 4% |
-| Universal | Broken Edge | Flat Damage -0.5, Attack Speed -10% | 3% |
-| Universal | Crippling Weight | Damage +60%, Attack Speed -35%, Recovery +20%, Knockback +60% | 3% |
-| Universal | Cursed Scrap | Damage -15%, Attack Speed -15%, Critical Rate -5 điểm % | 3% |
-| Universal | Doomsday Edge | Damage +100%, Attack Speed -55%, Knockback +80% | 2% |
-| Universal | Frenzied Steel | Attack Speed +70%, Damage -40%, Knockback -60% | 3% |
-| Universal | Hollow Edge | Flat Damage -0.5, Attack Speed +90% | 3% |
-| Wildcard | Overcharge | Damage +20%, SP Cost +40% | 3% |
-| Wildcard | Titan Sweep | Melee Hitbox +30%, Attack Speed -10%, Knockback +25% | 3% |
-| Wildcard | True Flight | Projectile Range +25%, Attack Speed +10%, Damage -12%, Projectile Knockback +20% | 3% |
-| Wildcard | Arcane Efficiency | Damage -15%, SP Cost -30% | 2% |
-| Wildcard | Sniper Sight | Projectile Range +30%, Attack Speed -15%, Critical Rate +5 điểm % | 2% |
-| Wildcard | Misaligned Shot | Projectile Speed -40%, Damage -10% | 2% |
+| Universal | Pristine | Damage +8%, Attack Speed +8%, Knockback +8% | 4.0 |
+| Universal | Heavy Edge | Damage +25%, Attack Speed -18%, Knockback +20%, Stagger +15% | 8.0 |
+| Universal | Swift Flow | Attack Speed +30%, Damage -20%, Knockback -20% | 8.0 |
+| Universal | Brittle Force | Damage +45%, Attack Speed -30%, Startup +10% | 4.0 |
+| Universal | Long Reach | Attack Range +25%, Damage -10% | 7.0 |
+| Universal | Close Quarters | Damage +20%, Attack Range -20%, Stagger +15% | 6.0 |
+| Universal | Quickdraw | Startup -25%, Recovery +15% | 6.0 |
+| Universal | Measured Strike | Startup +15%, Recovery -25% | 6.0 |
+| Universal | Keen Edge | Critical Rate +10 pp, Damage -5% | 6.0 |
+| Universal | Precision Edge | Critical Rate +12 pp, Critical Damage -20 pp | 5.0 |
+| Universal | Executioner | Critical Rate +5 pp, Critical Damage +40%, Attack Speed -5% | 5.0 |
+| Universal | Blunt Impact | Damage +15%, Critical Rate -5 pp, Knockback +20%, Stagger +20% | 6.0 |
+| Universal | Concussive Edge | Stagger +45%, Damage -10% | 5.0 |
+| Universal | Anchor Breaker | Knockback +45%, Stagger +20%, Attack Speed -15% | 4.0 |
+| Universal | Shattering Blow | Critical Damage +35%, Stagger +25%, Damage -5% | 4.0 |
+| Universal | Relentless | Recovery -25%, Damage -10% | 5.0 |
+| Universal | Crippling Weight | Damage +45%, Attack Speed -30%, Recovery +15%, Stagger +40% | 3.0 |
+| Universal | Frenzied Steel | Attack Speed +50%, Damage -30%, Stagger -40% | 3.0 |
+| Universal | Doomsday Edge | Damage +75%, Attack Speed -40%, Startup +20%, Knockback +40%, Stagger +40% | 1.0 |
+| Wildcard | Titan Sweep | Melee Hitbox +25%, Attack Speed -10% | 3.0 |
+| Wildcard | Crusher Arc | Melee Hitbox +15%, Stagger +30%, Damage -12% | 3.0 |
+| Wildcard | True Flight | Projectile Range +25%, Projectile Speed +15%, Damage -10% | 3.0 |
+| Wildcard | Sniper Sight | Projectile Range +25%, Critical Rate +7 pp, Attack Speed -15% | 2.0 |
+| Wildcard | Overcharge | Skill Damage +25%, SP Cost +30% | 2.0 |
+| Wildcard | Arcane Efficiency | SP Cost -25%, Skill Damage -10% | 2.0 |
 
 ## Resolution rules
 
-- Damage = max(0, attack damage × combo multiplier × forge damage multiplier + flat damage), followed by existing charm modifiers. Flat damage is applied once per hit, after percentage modifiers from the forge.
-- Attack Speed divides startup, active, recovery and cooldown durations. Startup/Recovery modifiers multiply their own durations before the speed division.
-- Overcharge now grants +20% damage to all attacks; only SP costs increase by 40%. Ammo and CP costs do not change.
-- Critical Rate is configured on WeaponData (default 5%); forge bonuses add percentage points, clamped to 0–100%. Critical damage defaults to ×1.5 and is configurable per weapon.
-- The controller snapshots stats when accepting an attack. Each target hit rolls once before outgoing charm modifiers; hit copies reset the roll. Bow volleys preserve these stats on every arrow. Changing forge during flight cannot change existing attacks.
-- Positive critical damage received by an enemy spawns a red, outlined damage number showing actual HP removed (up to remaining HP), with two decimal places at most. It rises, falls slightly, fades and frees after 0.7 seconds. It belongs to the world so lethal hits remain visible.
-- Melee Hitbox affects MELEE delivery only; Projectile Range/Knockback affect PROJECTILE delivery only. Misaligned Shot slows both outward and return flight of thrown daggers and all bow arrows; melee speed is unaffected by its projectile speed penalty.
-- Knockback multiplies combo knockback and enemy resistance through the existing hit/death path. Existing impact feedback uses the same snapshot.
-- Damage and HP remain fractional; display formatting does not round gameplay values.
+- HP damage = max(0, attack damage * combo damage * forge damage multiplier + flat damage). Secondary weapon skills additionally multiply by `skill_damage_multiplier`, regardless of SP, CP or ammo cost. Existing charm modifiers apply afterward.
+- Overcharge grants +25% skill damage and +30% SP cost. Arcane Efficiency grants -25% SP cost and -10% skill damage. Neither skill modifier affects normal attacks; CP and ammo costs stay unchanged.
+- Critical rate bonuses add percentage points, clamped to 0-100%. Critical damage = max(1, weapon critical multiplier * forge critical multiplier + forge critical bonus). At base x1.5: Precision Edge gives x1.3, Executioner x2.1, Shattering Blow x2.025. Critical hits do not increase stagger.
+- Stagger per hit = WeaponData.stagger_damage * AttackData.stagger_multiplier * combo stagger multiplier * forge stagger multiplier. The combo factor applies only to normal combo attacks. HP damage, knockback, critical damage and stagger are independent.
+- Attack Speed divides startup, active, recovery and cooldown durations. Startup and Recovery modifiers affect their own durations before speed division.
+- Melee Hitbox affects MELEE delivery only; Projectile Range affects PROJECTILE delivery only. Projectile Speed affects arrows and both outward/return travel of thrown daggers.
+- The controller snapshots damage, critical and stagger stats when an attack starts. Target copies and every volley arrow retain that snapshot; later forge changes cannot alter an attack in flight.
+- Enemy HP loss gives visual feedback and damage numbers. Only reaching the stagger threshold enters Hit; full knockback applies on stagger or death. Boss knockback immunity remains unchanged.
+- Retired forge resources stay loadable for existing references, with weight zero and no entry in the shared pool. They cannot appear in new shared-pool rolls.
+- Fractional HP and damage are preserved; display formatting never rounds combat calculations.
+
+## Inspector tuning
+
+- WeaponData: `stagger_damage` (Dagger 20, Bow 35).
+- AttackData and MeleeComboStep: `stagger_multiplier`. Dagger finisher is x1.75, returning dagger x1.25, volley arrows x0.5 each.
+- EnemyData: `stagger_threshold` (normal 60, elite 120, War Lord Turtle 240), `stagger_decay_delay` (1.25s), `stagger_decay_per_second` (30), `stagger_immunity_duration` (1s after recovery).
+- WeaponForge: `stagger_multiplier`, `critical_damage_multiplier`, `critical_damage_bonus`, `skill_damage_multiplier`, plus the existing rate, timing, range and knockback fields.
 
 ## Integration
 
-Assign `WeaponController.default_forge` in Inspector for a fixed initial forge. `WeaponInstance.reforge(pool, rng)` replaces the current forge using the shared weighted pool. It does not change shared weapon definitions or implement payment/NPC UI.
+Assign `WeaponController.default_forge` for a fixed initial forge. `WeaponInstance.reforge(pool, rng)` replaces its forge using the weighted shared pool; it never mutates shared WeaponData. Equipment displays the forged base stagger and critical multiplier.
 
-Run `test/weapon_forge_test.gd` and `test/critical_hit_test.gd` through Godot with `--headless --path . --script <path>`.
+CI membership stays fixed in `.github/godot-tests.txt`; existing forge, enemy, combo and equipment tests were updated for these rules.

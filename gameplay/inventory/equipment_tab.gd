@@ -19,6 +19,10 @@ const FORGE_FIELDS := {
 	"flat_damage": "Flat Damage",
 	"attack_speed_multiplier": "Attack Speed",
 	"critical_rate_bonus": "Crit Rate",
+	"critical_damage_multiplier": "Crit Damage",
+	"critical_damage_bonus": "Crit Damage",
+	"stagger_multiplier": "Stagger",
+	"skill_damage_multiplier": "Skill Damage",
 	"knockback_multiplier": "Knockback",
 	"projectile_knockback_multiplier": "Projectile Knockback",
 	"windup_multiplier": "Startup",
@@ -194,6 +198,8 @@ func _refresh_equipped() -> void:
 
 func _refresh_details() -> void:
 	_action_hint = ""
+	%StaggerName.hide()
+	%StaggerValue.hide()
 	%Portrait.texture = _icon(_selection)
 	%ItemTitle.text = _name(_selection) if _selection != null else "No equipment"
 	%ItemDescription.text = ""
@@ -260,6 +266,13 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 		data.critical_rate + (forge.critical_rate_bonus if forge != null else 0.0), 0.0, 1.0
 	)
 	var knockback := forge.knockback_multiplier if forge != null else 1.0
+	var crit_damage := data.critical_damage_multiplier
+	var stagger := data.stagger_damage * data.normal_attack.stagger_multiplier
+	if forge != null:
+		crit_damage = maxf(
+			1.0, crit_damage * forge.critical_damage_multiplier + forge.critical_damage_bonus
+		)
+		stagger *= forge.stagger_multiplier
 	var reach := data.normal_attack.range_units
 	if forge != null:
 		reach *= forge.range_multiplier
@@ -268,7 +281,7 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 			knockback *= forge.projectile_knockback_multiplier
 	var values := [
 		_number(damage),
-		"x" + _number(data.critical_damage_multiplier),
+		"x" + _number(crit_damage),
 		_signed((speed - 1.0) * 100.0) + "%",
 		"x" + _number(knockback),
 		_number(crit * 100.0) + "%",
@@ -276,19 +289,23 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 	]
 	for i in 6:
 		get_node("%" + "StatValue" + str(i)).text = values[i]
+	%StaggerName.show()
+	%StaggerValue.show()
+	%StaggerValue.text = _number(stagger)
+	%StaggerValue.tooltip_text = "Base stagger with forge applied; combo steps can scale it."
 	%StatsHeading.tooltip_text = (
 		"Base attack with forge applied. "
 		+ "Combo steps and situational Charm effects are calculated on hit."
 	)
 	if forge == null:
-		_add_forge_row("No forge applied", 0)
+		_add_forge_row("No forge applied")
 	else:
 		%ForgeHeading.text = "Forge / " + forge.display_name
 		%ForgeHeading.tooltip_text = forge.description
 		var count := 0
 		for field: String in FORGE_FIELDS:
 			var value := float(forge.get(field))
-			var additive := field in ["flat_damage", "critical_rate_bonus"]
+			var additive := field in ["flat_damage", "critical_rate_bonus", "critical_damage_bonus"]
 			if is_equal_approx(value, 0.0 if additive else 1.0):
 				continue
 			var effect := (
@@ -296,13 +313,16 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 				if field == "flat_damage"
 				else (
 					_signed((value if additive else value - 1.0) * 100.0)
-					+ (" pp" if field == "critical_rate_bonus" else "%")
+					+ (" pp" if additive else "%")
 				)
 			)
-			_add_forge_row(effect + " " + FORGE_FIELDS[field], count)
+			var benefit := value - (0.0 if additive else 1.0)
+			if field in ["windup_multiplier", "recovery_multiplier", "stamina_cost_multiplier"]:
+				benefit = -benefit
+			_add_forge_row(effect + " " + FORGE_FIELDS[field], benefit)
 			count += 1
 		if count == 0:
-			_add_forge_row("Unmodified weapon stats", 0)
+			_add_forge_row("Unmodified weapon stats")
 	var skill := data.secondary_attack
 	if skill != null:
 		%SkillIcon.texture = skill.skill_icon
@@ -310,13 +330,10 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 			skill.display_name if not skill.display_name.is_empty() else "Weapon Skill"
 		)
 		%SkillMeta.text = (
-			"RMB  |  "
-			+ (
 				_number(skill.charge_seconds) + "s charge"
 				if skill.hold_to_charge
-				else _number(skill.cooldown_seconds / speed) + "s cooldown"
+				else ""
 			)
-		)
 		%SkillDescription.text = skill.description
 		%SkillDescription.tooltip_text = skill.description
 	%EquipButton.text = "Equipped" if _is_equipped(weapon) else "Equip Weapon"
@@ -343,8 +360,8 @@ func _show_charm(charm: CharmData) -> void:
 	for i in 6:
 		get_node("%" + "StatValue" + str(i)).text = values[i]
 	%ForgeHeading.text = "Availability"
-	_add_forge_row("Owned" if owned else "Not acquired yet", 0)
-	_add_forge_row("Selected socket: " + KEYS[_socket], 1)
+	_add_forge_row("Owned" if owned else "Not acquired yet")
+	_add_forge_row("Selected socket: " + KEYS[_socket])
 	%SkillHeading.text = "Charm Effect"
 	%SkillIcon.texture = charm.sprite
 	%SkillTitle.text = charm.display_name
@@ -395,16 +412,18 @@ func _equip_selected() -> void:
 			_equipped_slot(_socket).play_equip_feedback()
 
 
-func _add_forge_row(text: String, index: int) -> void:
+func _add_forge_row(text: String, benefit: float = 0.0) -> void:
 	var label := Label.new()
 	label.text = "  " + text
 	label.tooltip_text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_font_size_override("font_size", 12)
 	var style := StyleBoxFlat.new()
-	style.bg_color = (
-		Color(0.75, 0.64, 0.77, 0.65) if index % 2 == 0 else Color(0.62, 0.74, 0.83, 0.65)
-	)
+	style.bg_color = Color(0.76, 0.69, 0.60, 0.45)
+	if benefit > 0.0:
+		style.bg_color = Color(0.60, 0.77, 0.55, 0.70)
+	elif benefit < 0.0:
+		style.bg_color = Color(0.88, 0.56, 0.50, 0.70)
 	style.set_corner_radius_all(3)
 	style.content_margin_top = 2.0
 	style.content_margin_bottom = 2.0

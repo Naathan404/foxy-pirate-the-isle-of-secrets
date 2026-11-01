@@ -16,6 +16,7 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 ## Describes this attack, independently of the owning weapon's category.
 @export var delivery_type: DeliveryType = DeliveryType.MELEE
 @export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
+@export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 ### Cấu hình mốc thời gain của đòn đánh
 # Chuẩn bị ra đòn -> không dmg
 @export_range(0.0, 10.0, 0.001) var windup_seconds: float = 0.125
@@ -53,6 +54,8 @@ func is_valid() -> bool:
 		and not animation_prefix.is_empty()
 		and is_finite(damage_hp)
 		and damage_hp > 0.0
+		and is_finite(stagger_multiplier)
+		and stagger_multiplier >= 0.0
 		and windup_seconds >= 0.0
 		and active_seconds > 0.0
 		and recovery_seconds >= 0.0

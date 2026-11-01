@@ -9,6 +9,6 @@ display_name = "Misaligned Shot"
 description = "Projectile Speed -40%, Damage -10%"
 forge_group = 1
 acquisition_source = &"blacksmith"
-drop_weight = 2.0
+drop_weight = 0.0
 projectile_speed_multiplier = 0.6
 damage_multiplier = 0.9

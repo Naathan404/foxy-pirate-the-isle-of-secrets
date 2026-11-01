@@ -21,6 +21,13 @@ extends Resource
 @export_range(0.0, 1.0, 0.05) var knockback_resistance: float = 0.0
 @export_range(0.0, 100.0, 0.1) var hit_deceleration: float = 30.0
 
+@export_group("Stagger")
+@export_range(1.0, 10000.0, 1.0) var stagger_threshold: float = 60.0
+@export_range(0.0, 10.0, 0.05) var stagger_decay_delay: float = 1.25
+@export_range(0.0, 10000.0, 1.0) var stagger_decay_per_second: float = 30.0
+## Starts after Hit and its recovery finish; damage still applies during immunity.
+@export_range(0.0, 10.0, 0.05) var stagger_immunity_duration: float = 1.0
+
 @export_group("Loot")
 @export var drop_item: BaseItem
 @export_range(1, 99, 1) var drop_quantity: int = 1

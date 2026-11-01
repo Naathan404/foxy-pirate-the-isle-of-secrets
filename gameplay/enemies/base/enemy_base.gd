@@ -48,6 +48,9 @@ var dead: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_knockback_multiplier: float = 1.0
 var pending_charm_stun_seconds: float = 0.0
+var stagger_amount: float = 0.0
+var _stagger_decay_remaining: float = 0.0
+var _stagger_immunity_remaining: float = 0.0
 var _charm_grapple_tween: Tween
 var _external_push_velocity: Vector3 = Vector3.ZERO
 
@@ -94,6 +97,7 @@ func _physics_process(delta: float) -> void:
 		and bool(hitstop_controller.call("is_frozen", self))
 	):
 		return
+	_update_stagger(delta)
 	fsm._update(delta)
 	if dead:
 		return
@@ -285,6 +289,8 @@ func receive_damage(damage: DamageContext) -> float:
 	pending_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
 	var applied_hp := hp.take_damage(damage.amount_hp)
 	if applied_hp > 0.0:
+		if not dead and hp.is_alive():
+			_accumulate_stagger(damage.stagger_damage)
 		var popup_scene := CRITICAL_POPUP if damage.is_critical else NORMAL_POPUP
 		var popup := popup_scene.instantiate() as Label3D
 		get_parent().add_child(popup)
@@ -354,9 +360,40 @@ func _notify_hit() -> void:
 	if dead:
 		return
 	if is_instance_valid(fsm.current_state) and fsm.current_state.name == &"Hit":
-		fsm.current_state._enter()
 		return
 	request_state(&"hit", 50)
+
+
+func _accumulate_stagger(amount: float) -> void:
+	if data == null or not is_finite(amount) or amount <= 0.0:
+		return
+	if _stagger_immunity_remaining > 0.0:
+		return
+	for state: FsmState in [fsm.current_state, fsm.next_state]:
+		if is_instance_valid(state) and state.name == &"Hit":
+			return
+	stagger_amount += amount
+	_stagger_decay_remaining = data.stagger_decay_delay
+	if stagger_amount >= data.stagger_threshold:
+		stagger_amount = 0.0
+		_notify_hit()
+
+
+func _update_stagger(delta: float) -> void:
+	if dead or data == null:
+		return
+	var elapsed := maxf(0.0, delta)
+	_stagger_immunity_remaining = maxf(0.0, _stagger_immunity_remaining - elapsed)
+	var decay_time := maxf(0.0, elapsed - _stagger_decay_remaining)
+	_stagger_decay_remaining = maxf(0.0, _stagger_decay_remaining - elapsed)
+	stagger_amount = maxf(0.0, stagger_amount - data.stagger_decay_per_second * decay_time)
+
+
+func _on_hit_recovery_finished() -> void:
+	stagger_amount = 0.0
+	pending_charm_stun_seconds = 0.0
+	if data != null:
+		_stagger_immunity_remaining = data.stagger_immunity_duration
 
 
 func die() -> void:
@@ -529,8 +566,8 @@ func _on_target_body_exited(body: Node3D) -> void:
 
 func _on_damaged(applied_hp: float) -> void:
 	damaged.emit(applied_hp)
-	if hp.is_alive():
-		_notify_hit()
+	if hp.is_alive() and is_instance_valid(visual):
+		visual.play_hit_feedback()
 
 
 func _on_hp_changed(_current_hp: float, _maximum_hp: float) -> void:

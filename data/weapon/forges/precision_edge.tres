@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"precision_edge"
+display_name = "Precision Edge"
+description = "Critical Rate +12 pp, Critical Damage -20 pp"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 5.0
+critical_rate_bonus = 0.12
+critical_damage_bonus = -0.2

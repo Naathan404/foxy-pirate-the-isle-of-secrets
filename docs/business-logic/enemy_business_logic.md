@@ -212,8 +212,8 @@ stateDiagram-v2
 	[*] --> InitialBehavior
 	InitialBehavior --> CustomBehavior: luật enemy yêu cầu
 	CustomBehavior --> InitialBehavior: return_to_behavior()
-	InitialBehavior --> Hit: damage, HP còn
-	CustomBehavior --> Hit: damage, HP còn
+	InitialBehavior --> Hit: đủ stagger, HP còn
+	CustomBehavior --> Hit: đủ stagger, HP còn
 	Hit --> InitialBehavior: hết recoil và recovery
 	InitialBehavior --> Death: HP = 0
 	CustomBehavior --> Death: HP = 0
@@ -225,36 +225,34 @@ stateDiagram-v2
 `return_to_behavior()` luôn quay về state đó. Vì vậy enemy bắt đầu `Patrol` sẽ
 trở về `Patrol` sau Hit, trừ khi state riêng chủ động yêu cầu behavior khác.
 
-## 5. Damage, Hit và Death
+## 5. Damage, Stagger, Hit và Death
 
-```mermaid
-flowchart TD
-	A[HitBox overlap HurtBox] --> B[HurtBox lọc enabled actor team damage]
-	B --> C[EnemyBase.receive_damage]
-	C --> D[Lọc dead HP self-hit cùng team]
-	D --> E[Lưu pending hit direction từ source tới enemy]
-	E --> F[HealthComponent.take_damage]
-	F --> G[hp_changed: cập nhật DebugHealthLabel]
-	G --> H[damaged: emit EnemyBase.damaged]
-	H --> I{HP còn?}
-	I -->|Có| J[queue Hit priority 50]
-	I -->|Không| K[died: dead true, queue Death terminal]
-```
+Mất HP không tự chuyển enemy vào `Hit`. `HealthComponent.damaged` vẫn phát
+`EnemyBase.damaged` và flash/pulse xác nhận đòn trúng. `receive_damage()` chỉ tích
+`DamageContext.stagger_damage` khi thực sự mất HP và enemy còn sống.
 
-`HealthComponent` phát `hp_changed`, rồi `damaged`, sau cùng mới `died` khi HP
-về 0. Một đòn chí mạng có thể queue Hit trước, nhưng Death terminal được queue
-ngay sau đó và là state sẽ enter. `receive_damage()` trả lượng HP thực sự mất;
-HitBox không giữ lượt trúng nếu kết quả là 0.
+- Ngưỡng `EnemyData.stagger_threshold`: thường 60, elite 120, War Lord Turtle 240.
+- Đủ ngưỡng: reset lượng tích lũy, queue `Hit` priority 50 và áp dụng knockback.
+- Chưa đủ ngưỡng: enemy tiếp tục hành động, không bị ngắt đòn hoặc đẩy lùi qua Hit.
+- Trong Hit/recovery: không tích thêm stagger và không reset thời gian choáng.
+- Khi thoát Hit: reset stagger và kháng tích stagger trong 1 giây mặc định;
+  sát thương HP, feedback và damage popup vẫn hoạt động.
+- Sau 1.25 giây không tích thêm stagger, lượng tích lũy giảm 30 điểm/giây.
+  Các giá trị này chỉnh riêng bằng EnemyData trong Inspector.
+- Stagger độc lập với HP damage và crit. Charm khống chế chủ động vẫn có thể yêu
+  cầu Hit riêng; đây không phải đường nhận damage thông thường.
 
-`Hit` có ownership rõ ràng: kết thúc hai HitBox, phát `hit_*` và feedback,
-đặt recoil theo `pending_hit_direction * hit_knockback_speed`, giảm recoil trong
-`hit_duration`, đứng recovery với `recovery_animation` trong
-`hit_recovery_duration`, rồi mới `return_to_behavior()`.
+`Hit` kết thúc hai HitBox, phát `hit_*`, đặt recoil theo pending direction,
+giảm recoil trong `hit_duration`, đứng hồi phục trong `hit_recovery_duration`,
+rồi `return_to_behavior()`. Knockback đầy đủ chỉ áp dụng khi phá thế hoặc chết;
+quy tắc kháng knockback và boss được giữ nguyên.
 
-`Death` là terminal: dừng movement, dừng hai HitBox, tắt combat/HurtBox/detector
-và xóa target. Nếu `Destroy On Death` tắt, corpse còn trong scene nhưng không
-tương tác combat. Nếu bật, state chờ clip `death_*`, chạy fade/scale feedback,
-rồi mới `queue_free()`.
+`HealthComponent` phát `hp_changed`, `damaged`, rồi `died` khi HP về 0. Đòn kết
+liễu vào `Death` terminal, không cần chờ đủ stagger. `receive_damage()` trả HP
+thực sự mất; HitBox không giữ lượt trúng nếu kết quả bằng 0.
+
+`Death` dừng movement/attack, tắt combat/HurtBox/detector và xóa target.
+`Destroy On Death` quyết định giữ corpse hay chờ animation và fade rồi xóa.
 
 ## 6. Contract khi viết state riêng
 
@@ -293,8 +291,8 @@ func _exit() -> void:
 
 - `EnemyData`: máu, tốc độ, gia tốc/giảm tốc, sát thương và phản lực khi bị
   đánh.
-- `HealthComponent` + `HurtBox`: nhận damage từ Player; khi còn sống thì yêu
-  cầu state `Hit`, khi hết máu thì vào `Death`.
+- `HealthComponent` + `HurtBox`: nhận damage; đủ stagger mới yêu cầu `Hit`,
+  hết HP thì vào `Death` ngay.
 - Di chuyển trên mặt phẳng: `move_in_direction`, `move_forward`,
   `move_toward_target`, `stop_movement`.
 - Hướng nhìn: `face_direction`, `face_target`, `turn_around`. Tất cả node nằm
@@ -370,6 +368,7 @@ không còn khớp với hình ảnh.
 | Movement | `move_speed`, `acceleration`, `deceleration` |
 | Combat | `attack_damage` |
 | Hit Reaction | `hit_duration`, `hit_recovery_duration`, `hit_knockback_speed`, `hit_deceleration` |
+| Stagger | `stagger_threshold`, `stagger_decay_delay`, `stagger_decay_per_second`, `stagger_immunity_duration` |
 
 ## 10. State chung và Patrol tái sử dụng
 

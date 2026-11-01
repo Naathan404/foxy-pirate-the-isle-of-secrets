@@ -1,6 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://x58f66acjf24"]
 
-[ext_resource type="Script" path="res://gameplay/weapons/bow_charge_vfx.gd" id="1_vfx"]
+[ext_resource type="Script" uid="uid://c0ns3d164sepu" path="res://gameplay/weapons/bow_charge_vfx.gd" id="1_vfx"]
 
-[node name="BowChargeVFX" type="Node3D"]
+[node name="BowChargeVFX" type="Node3D" unique_id=1378555746]
 script = ExtResource("1_vfx")
+burst_duration = 0.5
+focus_forward_offset = 0.65
+ring_count = 4
+spark_count = 20
