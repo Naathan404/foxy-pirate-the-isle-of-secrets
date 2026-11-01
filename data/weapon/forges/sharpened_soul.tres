@@ -9,6 +9,6 @@ display_name = "Sharpened Soul"
 description = "Flat Damage +0.5, Attack Speed -20%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 5.0
+drop_weight = 0.0
 flat_damage = 0.5
 attack_speed_multiplier = 0.8

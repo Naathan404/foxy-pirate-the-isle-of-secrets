@@ -4,6 +4,8 @@ extends CharacterBody3D
 signal action_rejected(action: StringName)
 signal dash_finished(interrupted: bool)
 signal dash_started
+## Emitted for confirmed outgoing or incoming damage, including Charm hits.
+signal combat_activity
 
 @export var data: PlayerData
 
@@ -72,6 +74,7 @@ func _exit_tree() -> void:
 func _setup_stats() -> void:
 	if is_instance_valid(chaos):
 		chaos.init(data.max_chaos)
+		combat_activity.connect(chaos.notify_combat_activity)
 	if is_instance_valid(hp):
 		hp.hp_changed.connect(_on_hp_changed)
 		hp.damaged.connect(_on_damaged)
@@ -127,6 +130,7 @@ func _on_hp_changed(amount: float, maximum: float) -> void:
 
 
 func _on_damaged(_applied_hp: float) -> void:
+	combat_activity.emit()
 	# Đòn chí mạng để state Death xử lý, không vào Hit nữa
 	if hp.is_alive():
 		notify_hit()
@@ -175,6 +179,15 @@ func _physics_process(delta: float) -> void:
 		return
 
 	fsm._update(delta)
+	var game_manager = get_node("/root/GameManager")
+	if (
+		not dead
+		and is_instance_valid(chaos)
+		and not is_gameplay_input_blocked()
+		and game_manager.state == game_manager.State.PLAYING
+		and (not is_instance_valid(weapon_controller) or not weapon_controller.is_charging())
+	):
+		chaos.advance(delta)
 
 	if OS.is_debug_build() and Input.is_action_just_pressed("test_hit"):
 		take_damage(1)

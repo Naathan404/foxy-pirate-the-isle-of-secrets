@@ -64,6 +64,7 @@ func activate() -> void:
 		snapshot.damage_hp = context.damage_hp
 		snapshot.critical_rate = context.critical_rate
 		snapshot.critical_damage_multiplier = context.critical_damage_multiplier
+		snapshot.stagger_damage = context.stagger_damage
 		snapshot.projectile_speed_multiplier = context.projectile_speed_multiplier
 		snapshot.range_units = context.range_units
 		snapshot.hitbox_multiplier = context.hitbox_multiplier

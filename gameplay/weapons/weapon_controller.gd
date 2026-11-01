@@ -104,6 +104,8 @@ func equip(weapon: WeaponInstance) -> bool:
 	if actor.has_method("can_equip_weapon") and not bool(actor.call("can_equip_weapon")):
 		return false
 	var definition := weapon.definition
+	if not is_finite(definition.stagger_damage) or definition.stagger_damage < 0.0:
+		return false
 	if definition.normal_attack == null or not definition.normal_attack.is_valid():
 		return false
 	if not _has_animation(definition.normal_attack.animation_prefix):
@@ -512,9 +514,11 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 	result.damage_hp = attack.damage_hp
 	result.critical_rate = clampf(equipped.definition.critical_rate, 0.0, 1.0)
 	result.critical_damage_multiplier = equipped.definition.critical_damage_multiplier
+	result.stagger_damage = equipped.definition.stagger_damage * attack.stagger_multiplier
 	if request.action == &"normal" and not attack.combo_steps.is_empty():
 		result.combo_index = _combo_index % attack.combo_steps.size()
 		result.combo_step = attack.combo_steps[result.combo_index]
+		result.stagger_damage *= result.combo_step.stagger_multiplier
 		if not result.combo_step.animation_prefix.is_empty():
 			if not _has_animation(result.combo_step.animation_prefix):
 				return null
@@ -526,6 +530,16 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 			damage_multiplier *= equipped.forge.stamina_damage_multiplier
 		result.damage_hp = maxf(
 			0.0, result.damage_hp * damage_multiplier + equipped.forge.flat_damage
+		)
+		if request.action == &"secondary":
+			result.damage_hp *= equipped.forge.skill_damage_multiplier
+		result.stagger_damage *= equipped.forge.stagger_multiplier
+		result.critical_damage_multiplier = maxf(
+			1.0,
+			(
+				result.critical_damage_multiplier * equipped.forge.critical_damage_multiplier
+				+ equipped.forge.critical_damage_bonus
+			)
 		)
 		result.critical_rate = clampf(
 			result.critical_rate + equipped.forge.critical_rate_bonus, 0.0, 1.0

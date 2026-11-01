@@ -6,10 +6,9 @@
 script = ExtResource("1_forge")
 forge_id = &"frenzied_steel"
 display_name = "Frenzied Steel"
-description = "Attack Speed +70%, Damage -40%, Knockback -60%"
-forge_group = 0
+description = "Attack Speed +50%, Damage -30%, Stagger -40%"
 acquisition_source = &"blacksmith"
 drop_weight = 3.0
-attack_speed_multiplier = 1.7
-damage_multiplier = 0.6
-knockback_multiplier = 0.4
+damage_multiplier = 0.7
+stagger_multiplier = 0.6
+attack_speed_multiplier = 1.5

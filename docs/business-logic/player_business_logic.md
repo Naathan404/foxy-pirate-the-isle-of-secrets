@@ -138,6 +138,8 @@ controller và nối `damage_dealt` trước khi gọi setup vũ khí.
 | `current: float`, `maximum: float` | CP hiện tại và sức chứa; cập nhật qua API để giữ signal đồng bộ |
 | `init(capacity: float) -> void` | Clamp sức chứa tối thiểu 0, reset current về 0, luôn phát signal |
 | `gain(amount: float) -> void` | Bỏ qua phần âm, clamp current trong `[0, maximum]`; chỉ phát signal nếu current đổi |
+| `notify_combat_activity() -> void` | Reset thời gian chờ trước khi CP giảm; không cộng CP hoặc đổi thanh HUD |
+| `advance(delta: float) -> void` | Player gọi trong gameplay; chỉ trừ CP cho phần thời gian vượt quá khoảng chờ |
 | `is_full() -> bool` | True khi maximum > 0 và current >= maximum; sức chứa 0 vô hiệu hóa kỹ năng |
 | `try_consume_full() -> bool` | Chưa đầy: false và giữ nguyên; đầy: đặt current = 0, phát signal và trả true |
 | `chaos_changed(current: float, maximum: float)` | Signal cho HUD và các bên nghe cập nhật giá trị |
@@ -150,8 +152,18 @@ Luật tích và dùng CP:
   Player và target là `EnemyBase`. Lượng cộng cố định theo hit, không nhân damage.
 - Đánh hụt hoặc không gây mất HP không tăng CP. Normal và secondary đều có thể
   tăng CP; dagger trúng cả lượt đi và về có hai lần cộng CP, luôn clamp ở maximum.
-- CP không tự hồi hoặc giảm theo thời gian. Chuột phải dùng kỹ năng riêng của
-  vũ khí qua `secondary_attack`, chỉ được controller nhận khi thanh đầy.
+- Signal `Player.combat_activity` reset thời gian chờ. Enemy chỉ phát signal này
+  trên nguồn đòn đánh sau khi thực sự mất HP; nhận damage đi qua `hp.damaged`.
+- CP không tự hồi. Sau 5 giây không gây hoặc nhận sát thương thực tế, CP giảm
+  3% sức chứa tối đa mỗi giây, kể cả khi thanh đang đầy. Đánh hụt hoặc damage bị
+  từ chối không reset thời gian chờ. Đòn vũ khí và Charm trúng enemy đều reset.
+- Inventory, pause, chuyển scene, chết, bị khóa gameplay, hitstop và giữ charge
+  skill tạm dừng cả thời gian chờ lẫn passive decay. Việc charge tự tiêu CP theo
+  luật skill hiện có vẫn giữ nguyên.
+- Chỉnh `idle_decay_delay` và `idle_decay_percent_per_second` trên node
+  `Player/ChaosComponent` trong Inspector; đặt tốc độ giảm bằng 0 để tắt decay.
+- Chuột phải dùng kỹ năng riêng của vũ khí qua `secondary_attack`, chỉ được
+  controller nhận khi thanh đầy.
 - Trừ toàn bộ CP lúc controller nhận đòn sau bước validate/thanh toán, trước khi
   hết windup. Bị ngắt sau khi đã trả CP không hoàn lại CP.
 - Thiếu CP, thiếu đòn phụ, scene không hợp lệ, busy, cooldown hoặc Player không
@@ -162,6 +174,18 @@ nhãn `CP: current / maximum`. Khi đầy và maximum > 0, icon kỹ năng sáng
 thì icon tối. Trạng thái này chỉ báo đủ CP, không bảo đảm actor đang được phép đánh
 hoặc đã hết cooldown.
 
+Đèn nhỏ `ChaosControl/TextureRect` có feedback riêng:
+
+- Nhận CP: nảy nhẹ và sáng xanh nhạt; vừa đầy: lóe vàng cam rồi sáng theo nhịp
+  1.2 giây, scale dao động tối đa 5% khi giữ trạng thái sẵn sàng.
+- Bắt đầu passive decay: chớp tím nhạt một lần nhờ `ChaosComponent.decay_started`;
+  sau đó độ sáng giảm theo lượng CP. Trừ CP bởi skill không phát tín hiệu decay.
+- Dùng skill thường: lóe trắng cam và co nhẹ khi đòn được nhận. Skill charge chỉ
+  phát hiệu ứng này khi thả charge, không lặp theo từng lần tiêu CP.
+- Bấm secondary khi thiếu CP: nháy đỏ; các lần từ chối khác không đổi đèn thành đỏ.
+- Tween chỉ tác động lên đèn, giữ nguyên tâm hiển thị và trở về scale/position
+  trong Inspector. Màu và chu kỳ pulse chỉnh trên TextureRect trong Inspector.
+
 ### Contract các phần hiển thị HUD
 
 `player_hud.tscn` giữ layout, sprite và các node chỉ số. Logic được chia như sau:
@@ -170,6 +194,7 @@ hoặc đã hết cooldown.
 | --- | --- |
 | [player_hud.gd](../../gameplay/player/hud/player_hud.gd), root `PlayerHUD` | Nhận `health`, `stamina`, `chaos`; nối signal và sync cuối frame để chờ Player khởi tạo chỉ số |
 | [stat_arc.gd](../../gameplay/player/hud/stat_arc.gd), `Stats/HealthArc`, `StaminaArc`, `ChaosArc` | Dùng chung `HudStatArc.set_stat(current: float, maximum: float)` để đồng bộ nền, fill, bóng và tooltip; `sync_preview()` hỗ trợ chạy riêng scene HUD |
+| [chaos_indicator_feedback.gd](../../gameplay/player/hud/chaos_indicator_feedback.gd), `ChaosControl/TextureRect` | Nhận sự kiện CP, passive decay và weapon skill để chạy feedback riêng; không thay đổi layout hoặc icon skill |
 | [hud_portrait.gd](../../gameplay/player/hud/hud_portrait.gd), `StatControl/Portrait` | `set_health(current: int, maximum: int)`, `play_hit_feedback(amount: int)`, `show_death()`; ưu tiên chết → hit → ít máu → khỏe |
 | [hud_tooltip.gd](../../gameplay/player/hud/hud_tooltip.gd), `StatTooltip` | Nhận `hud_layer` và danh sách `bars`, xử lý hover có delay, đổi hệ tọa độ khi scale và giữ panel trong viewport |
 | [bar_fill_effect.gd](../../gameplay/player/hud/bar_fill_effect.gd), `Effects/*FillEffect` | Giữ hiệu ứng màu/trắng khi tăng hoặc giảm chỉ số |

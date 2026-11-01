@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://xdoo8a6qp5po"]
 
+[ext_resource type="Script" uid="uid://l383y3sp6xa1" path="res://gameplay/player/hud/chaos_indicator_feedback.gd" id="chaos_indicator"]
 [ext_resource type="Script" uid="uid://boe5rxmapxpg1" path="res://gameplay/player/hud/player_hud.gd" id="1_1qgx4"]
 [ext_resource type="Texture2D" uid="uid://dfmeq6capw5cv" path="res://assets/ui/player_hud/hp_bar_progress.png" id="2_qfbhl"]
 [ext_resource type="Texture2D" uid="uid://bxvt628ftu3ij" path="res://assets/ui/player_hud/stamina_bar_progress.png" id="3_nc5hm"]
@@ -121,7 +122,7 @@ fill_effect = NodePath("../../Effects/StaminaFillEffect")
 stat_name = "SP"
 points_at_full_arc = 1000.0
 
-[node name="ChaosArc" type="Node" parent="Stats" unique_id=342347951 node_paths=PackedStringArray("capacity", "fill", "shadow", "fill_effect", "value_label", "readiness_icon", "readiness_icon_2")]
+[node name="ChaosArc" type="Node" parent="Stats" unique_id=342347951 node_paths=PackedStringArray("capacity", "fill", "shadow", "fill_effect", "value_label", "readiness_icon")]
 script = ExtResource("13_arc")
 capacity = NodePath("../../ChaosControl/ChaosCapacity")
 fill = NodePath("../../ChaosControl/ChaosFill")
@@ -133,7 +134,6 @@ maximum_arc = 135.0
 points_at_full_arc = 100.0
 value_label = NodePath("../../ChaosControl/ChaosLabel")
 readiness_icon = NodePath("../../ChaosControl/WeaponFrame/WeaponIcon")
-readiness_icon_2 = NodePath("../../ChaosControl/TextureRect")
 
 [node name="StatControl" type="Control" parent="." unique_id=205009594]
 layout_mode = 3
@@ -465,6 +465,7 @@ offset_right = 59.200096
 offset_bottom = 72.8
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("14_01apl")
+script = ExtResource("chaos_indicator")
 
 [node name="AmmoLabel" type="Label" parent="ChaosControl" unique_id=847852458]
 texture_filter = 1
