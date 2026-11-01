@@ -20,6 +20,9 @@
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="18_dxx27"]
 [ext_resource type="PackedScene" uid="uid://dyll2vamer2yd" path="res://gameplay/enemies/war_lord_turtle/war_lord_turtle.tscn" id="19_turtle"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="20_s3ddc"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="21_0ifmg"]
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="22_qtl4h"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="23_5fcor"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -417,15 +420,20 @@ random_scale_max = 1.5
 
 [node name="Starfish" parent="World" unique_id=1294052233 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.178799, -1.7359796, -2.8156624)
+unreachable_target_ignore_duration = 2.0
 
 [node name="Starfish2" parent="World" unique_id=1234806037 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.813133, -1.7255001, -15.150562)
+unreachable_target_ignore_duration = 2.0
 
 [node name="Starfish3" parent="World" unique_id=1095135621 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9240055, -1.3013372, -31.991348)
+unreachable_target_ignore_duration = 2.0
 
 [node name="Crab" parent="World" unique_id=1674830806 instance=ExtResource("15_v6ch8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.845367, -2.9001207, -13.3341465)
+patrol_contact_damage = true
+patrol_speed_scale = 1.0
 initial_facing = 1
 
 [node name="WarLordTurtle" parent="World" unique_id=530330877 instance=ExtResource("19_turtle")]
@@ -434,12 +442,18 @@ initial_facing = 1
 
 [node name="Crab2" parent="World" unique_id=254688948 instance=ExtResource("15_v6ch8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.968735, -3.130145, -19.817368)
+patrol_contact_damage = true
+patrol_speed_scale = 1.0
 
 [node name="Crab3" parent="World" unique_id=608368041 instance=ExtResource("15_v6ch8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.650835, 0.7945423, -19.478214)
+patrol_contact_damage = true
+patrol_speed_scale = 1.0
 
 [node name="Crab4" parent="World" unique_id=359378703 instance=ExtResource("15_v6ch8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.352066, 6.875, 35.778076)
+patrol_contact_damage = true
+patrol_speed_scale = 1.0
 initial_facing = 0
 
 [node name="Barrel" parent="World" unique_id=1050350307 instance=ExtResource("16_dxx27")]
@@ -456,9 +470,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.156448, -1.6086941, -27.06
 
 [node name="Starfish4" parent="World" unique_id=2105442354 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.04325, -1.09375, -31.622093)
+unreachable_target_ignore_duration = 2.0
 
 [node name="Starfish5" parent="World" unique_id=102239392 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.615982, 8.90625, 34.438026)
+unreachable_target_ignore_duration = 2.0
 
 [node name="ItemPickup" parent="World" unique_id=1605440793 instance=ExtResource("17_v6ch8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.072242, 2.81216, -1.5924034)
@@ -479,3 +495,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.557535, 3.0233512, -2.27748
 trigger_id = &"hub_gate_a"
 destination_scene = "uid://bc7ep6qb7uugy"
 destination_trigger_id = &"coral_valley_gate_b"
+
+[node name="EliteStarfish" parent="." unique_id=554202254 instance=ExtResource("21_0ifmg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.964006, -1.8204966, 5.036312)
+
+[node name="EliteCrab" parent="." unique_id=1976613988 instance=ExtResource("22_qtl4h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.650712, -0.8267536, 29.794418)
+
+[node name="EliteBarrel" parent="." unique_id=763433729 instance=ExtResource("23_5fcor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8243723, 4.4990196, -21.086876)

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bew4onillst0f"]
 
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="1_base"]
-[ext_resource type="Resource" path="res://data/enemies/elite_crab_data.tres" id="2_data"]
+[ext_resource type="Resource" uid="uid://c8bcjh7tos032" path="res://data/enemies/elite_crab_data.tres" id="2_data"]
 [ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="4_hitbox"]
 [ext_resource type="Script" uid="uid://c42matpmx1epd" path="res://gameplay/enemies/crab/states/elite_crab_patrol.gd" id="5_patrol"]
@@ -26,7 +26,7 @@ radius = 6.7
 
 [node name="EliteCrab" unique_id=1976613988 instance=ExtResource("1_base")]
 script = ExtResource("7_elite_crab")
-player_detection_radius = 6.699999999999999
+player_detection_radius = 7.0
 patrol_contact_damage = true
 patrol_speed_scale = 1.0
 data = ExtResource("2_data")

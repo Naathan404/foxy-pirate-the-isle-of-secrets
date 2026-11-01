@@ -1,55 +1,53 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bvsrg4nhhl11v"]
 
-[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/barrel.tscn" id="1_base"]
-[ext_resource type="Resource" path="res://data/enemies/elite_barrel_data.tres" id="2_data"]
-[ext_resource type="Script" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
-[ext_resource type="Script" path="res://gameplay/enemies/barrel/states/elite_barrel_idle.gd" id="4_idle"]
-[ext_resource type="Script" path="res://gameplay/enemies/barrel/states/elite_barrel_scattershot.gd" id="5_scattershot"]
-[ext_resource type="Script" path="res://gameplay/enemies/barrel/elite_barrel.gd" id="6_elite_barrel"]
+[ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="1_base"]
+[ext_resource type="Resource" uid="uid://dyf7rfrxr00hu" path="res://data/enemies/elite_barrel_data.tres" id="2_data"]
+[ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
+[ext_resource type="Script" uid="uid://c40mwcriuuyoo" path="res://gameplay/enemies/barrel/states/elite_barrel_idle.gd" id="4_idle"]
+[ext_resource type="Script" uid="uid://bmcgcwpgw4yx4" path="res://gameplay/enemies/barrel/states/elite_barrel_scattershot.gd" id="5_scattershot"]
+[ext_resource type="Script" uid="uid://bqljh8frmigb4" path="res://gameplay/enemies/barrel/elite_barrel.gd" id="6_elite_barrel"]
 
 [sub_resource type="BoxShape3D" id="HurtShape"]
 size = Vector3(2.7, 1.8, 2.7)
+
+[sub_resource type="CylinderShape3D" id="DetectorShape"]
+radius = 9.8
 
 [sub_resource type="CylinderShape3D" id="BodyShape"]
 height = 1.8
 radius = 1.125
 
-[sub_resource type="CylinderShape3D" id="DetectorShape"]
-height = 2.0
-radius = 9.8
-
-[node name="EliteBarrel" instance=ExtResource("1_base")]
+[node name="EliteBarrel" unique_id=63146857 instance=ExtResource("1_base")]
 script = ExtResource("6_elite_barrel")
-data = ExtResource("2_data")
-player_detection_radius = 9.8
 scattershot_bullet_count = 5
 scattershot_arc_degrees = 50.0
-show_debug_health = true
+player_detection_radius = 10.0
+data = ExtResource("2_data")
 
-[node name="Visual" parent="." index="0"]
-scale = Vector3(1.5, 1.5, 1.5)
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 
-[node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("HurtShape")
 
-[node name="BulletSpawn" parent="Direction" index="3"]
+[node name="BulletSpawn" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=889465958]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.683268, 0.615292)
 
-[node name="Idle" parent="States" index="0"]
+[node name="Idle" parent="States" parent_id_path=PackedInt32Array(1797154631) index="0" unique_id=1302703013]
 script = ExtResource("4_idle")
 
-[node name="Scattershot" type="Node" parent="States"]
+[node name="Scattershot" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1384815200]
 script = ExtResource("5_scattershot")
 
-[node name="CollisionShape3D" parent="." index="5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-shape = SubResource("BodyShape")
-
-[node name="CollisionShape3D" parent="TargetDetector" index="0"]
+[node name="CollisionShape3D" parent="TargetDetector" parent_id_path=PackedInt32Array(1419563400) index="0" unique_id=1785130377]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("DetectorShape")
 
-[node name="EliteFeedback" type="Node3D" parent="."]
+[node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BodyShape")
+
+[node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=1037859984]
 script = ExtResource("3_feedback")
 telegraph_ring_radius = 1.55
