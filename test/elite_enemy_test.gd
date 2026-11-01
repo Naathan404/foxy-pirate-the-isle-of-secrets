@@ -10,6 +10,11 @@ const ELITE_MOVE_SPEEDS := {
 	&"EliteStarfish": 1.5,
 	&"EliteBarrel": 0.0,
 }
+const ELITE_MAX_HP := {
+	&"EliteCrab": 24.0,
+	&"EliteStarfish": 24.0,
+	&"EliteBarrel": 20.0,
+}
 const NORMAL_ENEMY_DATA := {
 	&"EliteCrab": preload("res://data/enemies/crab_data.tres"),
 	&"EliteStarfish": preload("res://data/enemies/starfish_data.tres"),
@@ -101,7 +106,8 @@ func _check_elite(scene_name: StringName, scene: PackedScene) -> void:
 	root.add_child(enemy)
 	await process_frame
 	var label := String(scene_name)
-	_check(enemy.data.max_hp == 12, label + ": expected 12 max HP")
+	var expected_hp: float = ELITE_MAX_HP[scene_name]
+	_check(is_equal_approx(enemy.data.max_hp, expected_hp), label + ": unexpected elite max HP")
 	_check(enemy.data.attack_damage == 2, label + ": expected 2 attack damage")
 	_check(
 		is_equal_approx(enemy.data.move_speed, ELITE_MOVE_SPEEDS[scene_name]),
@@ -206,7 +212,10 @@ func _check_elite(scene_name: StringName, scene: PackedScene) -> void:
 			patrol != null and patrol.use_random_axis_changes,
 			"EliteStarfish: expected random cardinal patrol axes"
 		)
-	_check(enemy.hp.current_hp == 12, label + ": HealthComponent did not use elite HP")
+	_check(
+		is_equal_approx(enemy.hp.current_hp, expected_hp),
+		label + ": HealthComponent did not use elite HP"
+	)
 	var target := Node3D.new()
 	target.position = Vector3(0.0, 0.0, 3.0)
 	root.add_child(target)

@@ -45,10 +45,16 @@ var target: Node3D
 var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
+var submerged: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_knockback_multiplier: float = 1.0
 var pending_charm_stun_seconds: float = 0.0
 var stagger_amount: float = 0.0
+var _surface_collision: Dictionary = {}
+var _surface_process_mode: ProcessMode = Node.PROCESS_MODE_INHERIT
+var _surface_visible: bool = true
+var _surface_hurtbox_enabled: bool = true
+var _surface_detection_frames: int = 0
 var _stagger_decay_remaining: float = 0.0
 var _stagger_immunity_remaining: float = 0.0
 var _charm_grapple_tween: Tween
@@ -88,7 +94,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if Engine.is_editor_hint():
+	if Engine.is_editor_hint() or submerged:
 		return
 	var hitstop_controller := get_node_or_null("/root/HitstopController")
 	if (
@@ -98,6 +104,10 @@ func _physics_process(delta: float) -> void:
 	):
 		return
 	_update_stagger(delta)
+	if _surface_detection_frames > 0:
+		_surface_detection_frames -= 1
+		if _surface_detection_frames == 0:
+			_refresh_target()
 	fsm._update(delta)
 	if dead:
 		return
@@ -114,7 +124,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _apply_external_push(push_velocity: Vector3) -> void:
-	if dead:
+	if dead or submerged:
 		return
 	_external_push_velocity += Vector3(push_velocity.x, 0.0, push_velocity.z)
 
@@ -215,7 +225,7 @@ func play_directional_animation(action: StringName, restart: bool = false) -> bo
 
 
 func has_target() -> bool:
-	return is_instance_valid(target) and not dead
+	return is_instance_valid(target) and not dead and not submerged
 
 
 func _distance_to_target() -> float:
@@ -243,7 +253,7 @@ func begin_active_attack(attack_id: int = 0, tag: StringName = &"normal") -> boo
 func _begin_active_attack_with_damage(
 	amount_hp: float, attack_id: int = 0, tag: StringName = &"normal"
 ) -> bool:
-	if dead or amount_hp <= 0 or not is_instance_valid(active_hitbox):
+	if dead or submerged or amount_hp <= 0 or not is_instance_valid(active_hitbox):
 		return false
 	return active_hitbox.begin_attack(amount_hp, attack_id, tag)
 
@@ -254,7 +264,7 @@ func end_active_attack() -> void:
 
 
 func _start_contact_damage() -> bool:
-	if dead or data == null or not is_instance_valid(contact_hitbox):
+	if dead or submerged or data == null or not is_instance_valid(contact_hitbox):
 		return false
 	contact_hitbox.actor = self
 	contact_hitbox.team = team
@@ -275,7 +285,7 @@ func take_damage(amount: float) -> float:
 
 
 func receive_damage(damage: DamageContext) -> float:
-	if dead or not is_instance_valid(hp):
+	if dead or submerged or not is_instance_valid(hp):
 		return 0
 	if damage == null or damage.amount_hp <= 0:
 		return 0
@@ -318,7 +328,7 @@ func consume_hit_knockback_velocity() -> Vector3:
 func apply_charm_grapple(
 	source: Node3D, stop_distance: float, pull_speed_units_per_second: float, stun_seconds: float
 ) -> StringName:
-	if dead or not is_instance_valid(source):
+	if dead or submerged or not is_instance_valid(source):
 		return &"miss"
 	if charm_grapple_large or is_in_group("boss"):
 		if not source.has_method("apply_charm_grapple_pull"):
@@ -418,10 +428,64 @@ func request_state(state_name: StringName, priority: int = 0) -> bool:
 
 
 func set_target(next_target: Node3D) -> void:
+	if submerged and next_target != null:
+		return
 	if target == next_target:
 		return
 	target = next_target
 	target_changed.emit(target)
+
+
+## Water hides an enemy without killing it or resetting its HP.
+## TidalEnemy keeps processing independently while this subtree is suspended.
+func _set_submerged(value: bool) -> void:
+	if dead or submerged == value:
+		return
+	submerged = value
+	if submerged:
+		_surface_process_mode = process_mode
+		_surface_visible = visible
+		_surface_hurtbox_enabled = hurtbox.enabled
+		end_active_attack()
+		_stop_contact_damage()
+		set_target(null)
+		velocity = Vector3.ZERO
+		move_direction = Vector3.ZERO
+		_external_push_velocity = Vector3.ZERO
+		if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+			_charm_grapple_tween.kill()
+		_charm_grapple_tween = null
+		# Cancel a half-finished attack; resurface in the configured initial state.
+		if is_instance_valid(fsm.current_state):
+			fsm.current_state._exit()
+			fsm.current_state = null
+		fsm.change_state(initial_state, 99)
+		_surface_collision.clear()
+		var colliders: Array[Node] = find_children("*", "CollisionObject3D", true, false)
+		colliders.append(self)
+		for node: Node in colliders:
+			var collider := node as CollisionObject3D
+			_surface_collision[collider] = [collider.collision_layer, collider.collision_mask]
+			collider.collision_layer = 0
+			collider.collision_mask = 0
+		hurtbox.enabled = false
+		hide()
+		process_mode = Node.PROCESS_MODE_DISABLED
+	else:
+		for node: Node in _surface_collision:
+			if not is_instance_valid(node):
+				continue
+			var collider := node as CollisionObject3D
+			var saved: Array = _surface_collision[node]
+			collider.collision_layer = saved[0]
+			collider.collision_mask = saved[1]
+		_surface_collision.clear()
+		hurtbox.enabled = _surface_hurtbox_enabled
+		visible = _surface_visible
+		process_mode = _surface_process_mode
+		# Area overlap lists need a physics tick after collision masks are restored.
+		_surface_detection_frames = 2
+		_refresh_direction_checks()
 
 
 func _validate_components() -> bool:
@@ -538,7 +602,7 @@ func _refresh_direction_checks() -> void:
 
 func _refresh_target() -> void:
 	# Disabling the detector during death can still deliver a queued body_exited callback.
-	if dead or not is_instance_valid(target_detector) or not target_detector.monitoring:
+	if dead or submerged or not is_instance_valid(target_detector) or not target_detector.monitoring:
 		return
 	var nearest_target: Node3D = null
 	var nearest_distance := INF

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="HealingPotion" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="HealingPotion" format=3 uid="uid://ch2ttumamq7po"]
 
-[ext_resource type="Script" path="res://data/items/consumables/healing_potion.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/items/small_healing_potion.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://qonqlr0vwppf" path="res://data/items/consumables/healing_potion.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://crk2ag8p1dwi1" path="res://assets/sprites/items/small_healing_potion.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_script")

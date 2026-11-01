@@ -27,7 +27,7 @@ AudioManager="*res://core/autoload/audio_manager.gd"
 [dialogic]
 
 directories/dch_directory={
-"mushroom/mushroom": "res://dialog/npcs/mushroom/mushroom.dch"
+"mushroom": "res://dialog/npcs/mushroom/mushroom.dch"
 }
 directories/dtl_directory={
 "greeting": "res://dialog/npcs/mushroom/timelines/greeting.dtl"
