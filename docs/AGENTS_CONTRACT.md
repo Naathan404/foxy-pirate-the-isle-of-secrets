@@ -114,7 +114,7 @@ For graphics/animation, gameplay state should request meaningful actions (`play_
 **While coding**
 5. Implement the smallest coherent change, with typed GDScript and explicit ownership.
 6. Ensure signals, node paths, Resources, exports, and initializations are wired correctly.
-7. Use existing tests or a reproducible manual verification scenario for nontrivial behavior. Per user instruction, do not create additional tests or CI checks unless explicitly requested. CI runs lint and the fixed suite in `.github/godot-tests.txt`; do not expand that list or restore automatic test discovery without an explicit user request. Project import remains a prerequisite for running the fixed Godot tests.
+7. Use the existing fixed tests or manual verification for nontrivial behavior. Per user instruction, do not add test files, test cases/assertions inside existing tests, workflow steps, jobs, or CI checks unless explicitly requested. Routine feature work must not expand test coverage automatically. Update existing expected values only as needed for an explicitly requested behavior change. CI runs lint and the fixed suite in `.github/godot-tests.txt`; do not expand that list or restore automatic discovery without an explicit user request. Respect intentionally deleted tests; remove their stale manifest entries instead of recreating them. Project import remains a prerequisite for running the fixed Godot tests.
 8. Keep changes limited to the task. If a blocker requires a breaking change or unapproved architecture shift, explain it instead of silently proceeding.
 
 **After coding**
