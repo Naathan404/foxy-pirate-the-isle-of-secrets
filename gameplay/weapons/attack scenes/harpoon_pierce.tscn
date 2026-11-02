@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://cv4ixl8bin2s3"]
+
+[ext_resource type="Script" uid="uid://ba821ecbwhvly" path="res://gameplay/weapons/attack scenes/harpoon_pierce.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="2_hitbox"]
+[ext_resource type="PackedScene" path="res://gameplay/weapons/harpoon_thrust_vfx.tscn" id="3_vfx"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.62, 1.3, 1.2)
+
+[node name="HarpoonPierce" type="Node3D" unique_id=2118348699 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("1_script")
+hitbox = NodePath("HitBox")
+dash_attack = true
+thrust_width = 0.62
+
+[node name="HitBox" type="Area3D" parent="." unique_id=2088298427]
+collision_layer = 32
+collision_mask = 16
+script = ExtResource("2_hitbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox" unique_id=1500546605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, -0.72)
+shape = SubResource("Shape")
+
+[node name="ThrustVFX" parent="." unique_id=985981815 instance=ExtResource("3_vfx")]

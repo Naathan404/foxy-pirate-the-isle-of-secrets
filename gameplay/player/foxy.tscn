@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://b13a4v7a0hpxx" path="res://gameplay/player/states/player_fall.gd" id="4_ki8u8"]
 [ext_resource type="Script" uid="uid://bd4tscvehscfo" path="res://gameplay/player/states/player_dash.gd" id="5_tj74x"]
 [ext_resource type="Script" uid="uid://coyt7mve374li" path="res://gameplay/player/states/player_death.gd" id="6_6gmdq"]
+[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/harpoon_placeholder/foxy_harpoon_sheet.png" id="7_r1r5h"]
 [ext_resource type="Script" uid="uid://dhmsjvrmvedhj" path="res://gameplay/player/states/player_run.gd" id="7_rvh5s"]
 [ext_resource type="Script" uid="uid://bn1u27bm1ho6y" path="res://gameplay/player/states/player_attack.gd" id="8_av71s"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="9_r3fl6"]
@@ -51,21 +52,28 @@
 [ext_resource type="Resource" uid="uid://cdmevnqdpo77o" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="collection_dagger"]
+[ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="collection_harpoon"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
+[ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/materials/wooden_arrow.tres" id="Item_wooden_arrow"]
+[ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="Script_ammo_item"]
 [ext_resource type="Script" uid="uid://dh5bqe1t7tido" path="res://gameplay/player/spine_idle_preview.gd" id="Script_spine_idle_preview"]
 [ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
 [ext_resource type="Script" uid="uid://b0u5ln7tkfogr" path="res://data/weapon/weapon_collection_entry.gd" id="weapon_collection_entry"]
 
-[ext_resource type="PackedScene" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
-
 [sub_resource type="AtlasTexture" id="Atlas_bow_0"]
 atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(113, 170, 152, 184)
 margin = Rect2(52, 26, 104, 72)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_8"]
+atlas = ExtResource("7_r1r5h")
+region = Rect2(66, 725, 189, 214)
+margin = Rect2(105, 106, 259, 234)
 filter_clip = true
 
 [sub_resource type="Animation" id="Animation_0rjvg"]
@@ -822,6 +830,12 @@ owned = true
 forge = ExtResource("34_21pkc")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
+[sub_resource type="Resource" id="Collection_harpoon"]
+script = ExtResource("weapon_collection_entry")
+definition = ExtResource("collection_harpoon")
+blueprint_unlocked = true
+owned = true
+
 [sub_resource type="Resource" id="Resource_ieged"]
 script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
@@ -834,7 +848,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vu64a"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_k47i5"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -877,7 +891,9 @@ script = ExtResource("3_nu5xt")
 sprite = NodePath("Sprite3D")
 animation_player = NodePath("AnimationPlayer")
 action_sprite_paths = Dictionary[StringName, NodePath]({
-&"attack_bow": NodePath("BowSprite")
+&"attack_bow": NodePath("BowSprite"),
+&"harpoon/pierce": NodePath("HarpoonSprite"),
+&"harpoon/thrust": NodePath("HarpoonSprite")
 })
 
 [node name="SpineIdlePreview" type="Node3D" parent="Visual" unique_id=1978530799]
@@ -907,8 +923,20 @@ alpha_cut = 1
 texture_filter = 0
 texture = SubResource("Atlas_bow_0")
 
+[node name="HarpoonSprite" type="Sprite3D" parent="Visual" unique_id=1045820721]
+transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, -0.7870444, 0)
+visible = false
+offset = Vector2(0, 96)
+pixel_size = 0.01071923
+billboard = 2
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = SubResource("Frame_8")
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Visual" unique_id=317322072]
 libraries/ = SubResource("AnimationLibrary_7kbwk")
+libraries/harpoon = ExtResource("harpoon_animations")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=953316873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.023983002, 0.4617207, 0.002353549)
@@ -970,7 +998,7 @@ capacity = 30
 script = ExtResource("16_use70")
 default_weapon = SubResource("Resource_jpyye")
 default_forge = SubResource("Resource_orua6")
-collection = Array[ExtResource("weapon_collection_entry")]([SubResource("Resource_o88mx"), SubResource("Resource_34wtv")])
+collection = Array[ExtResource("weapon_collection_entry")]([SubResource("Resource_o88mx"), SubResource("Resource_34wtv"), SubResource("Collection_harpoon")])
 metadata/_custom_type_script = "uid://dvaslfpi4s3pd"
 
 [node name="AmmoComponent" type="Node" parent="." unique_id=1115070351 node_paths=PackedStringArray("inventory")]
@@ -1062,7 +1090,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_vu64a")
+process_material = SubResource("ParticleProcessMaterial_k47i5")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
 player = NodePath("../..")
@@ -1077,7 +1105,7 @@ sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
 
-[node name="PotionQuickSelect" parent="." instance=ExtResource("potion_quick_select")]
+[node name="PotionQuickSelect" parent="." unique_id=622369222 instance=ExtResource("potion_quick_select")]
 
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]

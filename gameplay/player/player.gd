@@ -152,6 +152,8 @@ func take_damage(amount: float) -> float:
 func receive_damage(damage: DamageContext) -> float:
 	if dead or not is_instance_valid(hp):
 		return 0
+	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
+		return 0
 	if damage == null or damage.amount_hp <= 0:
 		return 0
 	if damage.source == self:
@@ -498,6 +500,8 @@ func play_directional_animation(action: String, restart: bool = false) -> void:
 # Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
 func notify_hit(duration: float = -1.0) -> void:
 	if dead:
+		return
+	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
 		return
 	pending_free_dash = false
 	if duration < 0.0:

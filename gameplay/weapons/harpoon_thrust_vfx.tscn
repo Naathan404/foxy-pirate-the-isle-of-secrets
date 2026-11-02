@@ -1,0 +1,93 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/weapons/harpoon_thrust_vfx.gd" id="1_script"]
+[ext_resource type="Shader" path="res://gameplay/weapons/harpoon_lane.gdshader" id="2_lane"]
+[ext_resource type="Shader" path="res://gameplay/weapons/bow_energy.gdshader" id="3_energy"]
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/Dust Particle.png" id="4_spark"]
+
+[sub_resource type="ShaderMaterial" id="GuideMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_lane")
+shader_parameter/telegraph = true
+shader_parameter/opacity = 0.7
+
+[sub_resource type="ShaderMaterial" id="LanceMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_lane")
+shader_parameter/opacity = 1.0
+
+[sub_resource type="ShaderMaterial" id="TipMaterial"]
+shader = ExtResource("3_energy")
+shader_parameter/shape = 1
+shader_parameter/glow_color = Color(1, 0.65, 0.08, 0.8)
+shader_parameter/core_color = Color(1, 1, 0.7, 1)
+shader_parameter/brightness = 1.8
+
+[sub_resource type="QuadMesh" id="LaneMesh"]
+size = Vector2(0.6, 3)
+
+[sub_resource type="QuadMesh" id="TipMesh"]
+size = Vector2(0.65, 0.65)
+
+[sub_resource type="Gradient" id="Gradient"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(1, 1, 0.75, 1, 1, 0.72, 0.08, 0.8, 1, 0.3, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="Ramp"]
+gradient = SubResource("Gradient")
+
+[sub_resource type="ParticleProcessMaterial" id="Process"]
+emission_shape = 1
+emission_sphere_radius = 0.08
+direction = Vector3(0, 0.2, 1)
+spread = 100.0
+initial_velocity_min = 0.6
+initial_velocity_max = 2.2
+gravity = Vector3(0, -1, 0)
+damping_min = 2.0
+damping_max = 4.0
+scale_min = 0.2
+scale_max = 0.6
+color_ramp = SubResource("Ramp")
+
+[sub_resource type="StandardMaterial3D" id="SparkMaterial"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("4_spark")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="SparkMesh"]
+material = SubResource("SparkMaterial")
+size = Vector2(0.08, 0.18)
+
+[node name="HarpoonThrustVFX" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Guide" type="MeshInstance3D" parent="."]
+rotation_degrees = Vector3(-90, 0, 0)
+cast_shadow = 0
+mesh = SubResource("LaneMesh")
+material_override = SubResource("GuideMaterial")
+
+[node name="Lance" type="MeshInstance3D" parent="."]
+rotation_degrees = Vector3(-90, 0, 0)
+cast_shadow = 0
+mesh = SubResource("LaneMesh")
+material_override = SubResource("LanceMaterial")
+
+[node name="Tip" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("TipMesh")
+material_override = SubResource("TipMaterial")
+
+[node name="Sparks" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+emitting = false
+amount = 20
+lifetime = 0.2
+local_coords = false
+visibility_aabb = AABB(-6, -3, -6, 12, 6, 12)
+process_material = SubResource("Process")
+draw_pass_1 = SubResource("SparkMesh")

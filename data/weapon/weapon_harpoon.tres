@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://7d2l7h8n02vv"]
+
+[ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="2_attack"]
+[ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="3_fyix7"]
+[ext_resource type="PackedScene" path="res://gameplay/weapons/attack scenes/harpoon_thrust.tscn" id="3_thrust"]
+[ext_resource type="PackedScene" uid="uid://cv4ixl8bin2s3" path="res://gameplay/weapons/attack scenes/harpoon_pierce.tscn" id="4_pierce"]
+[ext_resource type="Texture2D" uid="uid://bvkk0bgeb5uh3" path="res://assets/sprites/items/equipment/harpoon_placeholder/harpoon.png" id="5_icon"]
+
+[sub_resource type="Resource" id="Thrust"]
+script = ExtResource("2_attack")
+animation_prefix = "harpoon/thrust"
+attack_scene = ExtResource("3_thrust")
+phase_driven_animation = true
+damage_hp = 1.25
+windup_seconds = 0.09
+active_seconds = 0.075
+recovery_seconds = 0.165
+cooldown_seconds = 0.1
+range_units = 2.6
+
+[sub_resource type="Resource" id="Pierce"]
+script = ExtResource("2_attack")
+animation_prefix = "harpoon/pierce"
+skill_icon = ExtResource("5_icon")
+display_name = "Lightning Pierce"
+description = "Brace, then dash through every enemy in a straight line. Invulnerable only during the dash; walls and ledges stop the lunge."
+attack_scene = ExtResource("4_pierce")
+phase_driven_animation = true
+damage_hp = 4.0
+stagger_multiplier = 2.0
+windup_seconds = 0.18
+active_seconds = 0.22
+recovery_seconds = 0.28
+cooldown_seconds = 0.8
+range_units = 5.5
+
+[resource]
+script = ExtResource("1_weapon")
+weapon_id = &"harpoon"
+display_name = "Harpoon"
+icon = ExtResource("5_icon")
+description = "A slender golden harpoon. Fast, precise thrusts reward lining enemies up for a piercing Chaos dash. Temporary prototype artwork."
+stagger_damage = 24.0
+chaos_per_hit = 50.0
+normal_attack = SubResource("Thrust")
+secondary_attack = SubResource("Pierce")

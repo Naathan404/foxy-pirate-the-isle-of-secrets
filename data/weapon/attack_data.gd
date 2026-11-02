@@ -17,6 +17,8 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var delivery_type: DeliveryType = DeliveryType.MELEE
 ## Holding prepares projectile startup; early release completes the remaining startup.
 @export var release_to_fire: bool = true
+## Fit anticipation/strike/recovery poses to their actual forged phase durations.
+@export var phase_driven_animation: bool = false
 @export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
 @export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 ### Cấu hình mốc thời gain của đòn đánh

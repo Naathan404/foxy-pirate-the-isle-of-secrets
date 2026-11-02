@@ -175,6 +175,8 @@ func _on_attack_finished(_attack_id: int = 0, _interrupted: bool = false) -> voi
 func _on_attack_started(context: AttackContext) -> void:
 	finished = false
 	_uses_aim_pose = controller.is_aiming()
+	var attack: AttackData = context.weapon.get_attack(context.action)
+	_uses_aim_pose = _uses_aim_pose or attack.phase_driven_animation
 	_held_action = context.action
 	_combo_step = context.combo_step
 	_step_time_scale = 1.0
@@ -189,7 +191,7 @@ func _on_attack_started(context: AttackContext) -> void:
 	player.last_facing_direction = context.direction
 	animation_prefix = controller.get_attack_animation_prefix()
 	player.play_directional_animation(animation_prefix, true)
-	if controller.is_aiming():
+	if _uses_aim_pose:
 		_sync_aim_pose()
 		return
 	if not player.visual.fit_animation_duration(controller.get_attack_duration()):

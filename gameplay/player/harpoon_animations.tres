@@ -1,0 +1,199 @@
+[gd_resource type="AnimationLibrary" format=3 uid="uid://cxepldwk3cva0"]
+
+[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/harpoon_placeholder/foxy_harpoon_sheet.png" id="1_sheet"]
+
+[sub_resource type="AtlasTexture" id="Frame_0"]
+atlas = ExtResource("1_sheet")
+region = Rect2(73, 142, 192, 214)
+margin = Rect2(112, 112, 256, 234)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_1"]
+atlas = ExtResource("1_sheet")
+region = Rect2(405, 177, 149, 231)
+margin = Rect2(151, 147, 299, 217)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_2"]
+atlas = ExtResource("1_sheet")
+region = Rect2(705, 178, 151, 244)
+margin = Rect2(149, 148, 297, 204)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_3"]
+atlas = ExtResource("1_sheet")
+region = Rect2(995, 141, 184, 215)
+margin = Rect2(145, 111, 264, 233)
+filter_clip = true
+
+[sub_resource type="Animation" id="Anim_pierce_down"]
+resource_name = "pierce_down"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HarpoonSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.625, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [SubResource("Frame_0"), SubResource("Frame_1"), SubResource("Frame_2"), SubResource("Frame_3")]
+}
+
+[sub_resource type="AtlasTexture" id="Frame_12"]
+atlas = ExtResource("1_sheet")
+region = Rect2(60, 1023, 244, 155)
+margin = Rect2(60, 165, 204, 293)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_13"]
+atlas = ExtResource("1_sheet")
+region = Rect2(334, 1005, 316, 171)
+margin = Rect2(48, 147, 132, 277)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_14"]
+atlas = ExtResource("1_sheet")
+region = Rect2(650, 1018, 345, 160)
+margin = Rect2(69, 160, 103, 288)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_15"]
+atlas = ExtResource("1_sheet")
+region = Rect2(995, 1013, 215, 165)
+margin = Rect2(99, 155, 233, 283)
+filter_clip = true
+
+[sub_resource type="Animation" id="Anim_pierce_side"]
+resource_name = "pierce_side"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HarpoonSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.625, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [SubResource("Frame_12"), SubResource("Frame_13"), SubResource("Frame_14"), SubResource("Frame_15")]
+}
+
+[sub_resource type="AtlasTexture" id="Frame_8"]
+atlas = ExtResource("1_sheet")
+region = Rect2(66, 725, 189, 214)
+margin = Rect2(105, 106, 259, 234)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_9"]
+atlas = ExtResource("1_sheet")
+region = Rect2(402, 699, 138, 240)
+margin = Rect2(148, 80, 310, 208)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_10"]
+atlas = ExtResource("1_sheet")
+region = Rect2(713, 653, 141, 286)
+margin = Rect2(154, 34, 307, 162)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_11"]
+atlas = ExtResource("1_sheet")
+region = Rect2(1002, 725, 186, 214)
+margin = Rect2(152, 106, 262, 234)
+filter_clip = true
+
+[sub_resource type="Animation" id="Anim_pierce_up"]
+resource_name = "pierce_up"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HarpoonSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.625, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [SubResource("Frame_8"), SubResource("Frame_9"), SubResource("Frame_10"), SubResource("Frame_11")]
+}
+
+[sub_resource type="Animation" id="Anim_thrust_down"]
+resource_name = "thrust_down"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HarpoonSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.625, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [SubResource("Frame_0"), SubResource("Frame_1"), SubResource("Frame_2"), SubResource("Frame_3")]
+}
+
+[sub_resource type="AtlasTexture" id="Frame_4"]
+atlas = ExtResource("1_sheet")
+region = Rect2(50, 458, 219, 169)
+margin = Rect2(89, 151, 229, 279)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_5"]
+atlas = ExtResource("1_sheet")
+region = Rect2(388, 458, 246, 169)
+margin = Rect2(134, 151, 202, 279)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_6"]
+atlas = ExtResource("1_sheet")
+region = Rect2(677, 458, 307, 169)
+margin = Rect2(121, 151, 141, 279)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Frame_7"]
+atlas = ExtResource("1_sheet")
+region = Rect2(1009, 458, 189, 169)
+margin = Rect2(159, 151, 259, 279)
+filter_clip = true
+
+[sub_resource type="Animation" id="Anim_thrust_side"]
+resource_name = "thrust_side"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HarpoonSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.625, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [SubResource("Frame_4"), SubResource("Frame_5"), SubResource("Frame_6"), SubResource("Frame_7")]
+}
+
+[sub_resource type="Animation" id="Anim_thrust_up"]
+resource_name = "thrust_up"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HarpoonSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.625, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [SubResource("Frame_8"), SubResource("Frame_9"), SubResource("Frame_10"), SubResource("Frame_11")]
+}
+
+[resource]
+_data = {
+&"pierce_down": SubResource("Anim_pierce_down"),
+&"pierce_side": SubResource("Anim_pierce_side"),
+&"pierce_up": SubResource("Anim_pierce_up"),
+&"thrust_down": SubResource("Anim_thrust_down"),
+&"thrust_side": SubResource("Anim_thrust_side"),
+&"thrust_up": SubResource("Anim_thrust_up")
+}
