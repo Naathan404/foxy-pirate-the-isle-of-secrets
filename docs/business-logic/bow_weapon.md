@@ -257,9 +257,9 @@ script kiểm tra nằm trong thư mục tạm ngoài dự án. Môi trường v
 certificate như trước; chưa chạy lại render vì hành vi hình ảnh được giữ nguyên.
 
 Giữ **chuột phải** khi CP đầy để bắt đầu (giữ điều kiện kích hoạt secondary hiện có).
-Foxy khóa di chuyển, giữ pose kéo dây, vẫn đổi hướng theo con trỏ. Thả phím bắn;
-hết CP hoặc đủ 1.8 giây sẽ tự bắn dù vẫn giữ phím. Giữ tiếp sau tự bắn không tự
-kích hoạt lượt mới: cần nhấn lại. Màn thử bắt đầu đầy CP; **C** nạp CP để thử tiếp,
+Foxy đứng yên, giữ pose kéo dây và đổi hướng theo con trỏ. Mũi tên
+trên mặt đất xoay quanh chân và sáng/dày dần theo charge. Thả phím mới bắn;
+đầy charge hoặc hết CP vẫn giữ ngắm đến lúc thả. Màn thử bắt đầu đầy CP; **C** nạp CP để thử tiếp,
 chỉ có tác dụng trong `world/tests/bow_test.tscn`.
 
 Đặt `p = clamp(thời gian giữ / charge_seconds, 0, 1)`:
@@ -267,14 +267,18 @@ chỉ có tác dụng trong `world/tests/bow_test.tscn`.
 - CP tích lũy đã tiêu: `maximum_CP * p²`; tốc độ hao tăng tuyến tính theo thời gian.
 - Số tên: `1 + floor(p * (max_projectiles - 1))`, tối đa số tên trong inventory.
 - Mốc mặc định: 1 / 2 / 3 / 4 / 5 / 6 tên ở 0 / 0.36 / 0.72 / 1.08 / 1.44 / 1.8 giây.
-- Mỗi tên tốn 1 Wooden Arrow, không tốn SP. Chỉ trừ ammo khi thả/tự bắn.
+- Mỗi tên tốn 1 Wooden Arrow, không tốn SP. Chỉ trừ ammo khi thả phím.
 - Mỗi tên giữ damage sau forge/Charm của đòn; tối đa 6 lần damage nếu cả 6 trúng,
   mỗi projectile có dedup riêng. Tường chặn tên và các cung cong không tự tìm địch.
-- Nhấn/thả tức thì có 1 tên, damage và windup như bắn thường, không mất CP ngay khi nhấn.
-  Giữ dưới `tap_seconds = 0.12` vẫn dùng windup thường; đã kéo lâu hơn thì nhả ngay,
+- Nhấn/thả tức thì có 1 tên, không mất CP ngay khi nhấn. Khi thả, phóng ngay,
   sau đó giữ active/recovery theo forge. Cooldown secondary tính từ lúc nhả.
 - Hit, chết, rơi khỏi nền hoặc khóa gameplay/mở inventory ngắt kéo cung. CP đã tiêu
   không hoàn lại, chưa nhả thì không mất tên. Tên đã bay có vòng đời độc lập.
+
+Bắn thường và các đòn `PROJECTILE` khác có `release_to_fire = true` cũng giữ để
+ngắm, thả để phóng; không có thời gian chờ tối thiểu khi bấm/thả nhanh. Chi phí
+và cooldown bắt đầu lúc nhả. Dash hủy ngắm. `ranged_aim_indicator.tscn` chứa dấu
+ngắm. Nhân vật đứng yên trong lúc giữ ngắm; dash hủy ngắm để né.
 
 Các tên có cung Bézier khác nhau trên XZ, hơi nâng cao nhưng vẫn nằm trong độ cao
 HurtBox của quái nhỏ. VFX sinh bằng mesh: vòng tụ lực và hạt quay tăng theo charge,

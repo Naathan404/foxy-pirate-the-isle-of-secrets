@@ -13,6 +13,7 @@ var _step_direction: Vector3 = Vector3.ZERO
 var _step_elapsed: float = 0.0
 var _combo_step: MeleeComboStep
 var _step_time_scale: float = 1.0
+var _held_action: StringName = &"normal"
 
 
 # Controller nhận đòn rồi mới phát animation
@@ -61,6 +62,13 @@ func _enter() -> void:
 
 	player.last_facing_direction = context.direction
 
+	if controller is WeaponController and controller.is_aiming():
+		var held := (
+			player.attack_held if _held_action == &"normal" else player.secondary_attack_held
+		)
+		if not held:
+			controller.release_aim()
+
 	if not controller is WeaponController:
 		player.play_directional_animation(animation_prefix, true)
 	if (
@@ -83,15 +91,8 @@ func _update(delta: float) -> void:
 			controller.cancel()
 			return_to_locomotion()
 			return
-		if controller.is_charging():
-			var aim := player.build_attack_context()
-			controller.aim_charge(aim)
-			player.last_facing_direction = aim.direction
-			player.play_directional_animation(animation_prefix)
-			player.visual.hold_animation_pose(0.25)
-			player._consume_attack_input()
-			if not player.secondary_attack_held:
-				controller.release_charge()
+		if controller.is_aiming():
+			_update_aiming()
 			return
 		if player.dash_buffer_remaining > 0.0 and controller.can_dash_cancel():
 			if (
@@ -142,12 +143,34 @@ func _exit() -> void:
 	controller = null
 
 
+func _update_aiming() -> void:
+	if (
+		player.dash_buffer_remaining > 0.0
+		and is_instance_valid(player.stamina)
+		and player.stamina.can_consume(player.data.dash_cost)
+	):
+		request_state("dash", 10)
+		return
+	var aim := player.build_attack_context()
+	aim.action = _held_action
+	controller.aim_charge(aim)
+	player.last_facing_direction = aim.direction
+	player.play_directional_animation(animation_prefix)
+	player.visual.hold_animation_pose(0.25)
+	player._consume_attack_input()
+	var held := player.attack_held if _held_action == &"normal" else player.secondary_attack_held
+	if not held:
+		player.set_horizontal_velocity(Vector3.ZERO)
+		controller.release_aim()
+
+
 func _on_attack_finished(_attack_id: int = 0, _interrupted: bool = false) -> void:
 	finished = true
 
 
 func _on_attack_started(context: AttackContext) -> void:
 	finished = false
+	_held_action = context.action
 	_combo_step = context.combo_step
 	_step_time_scale = 1.0
 	if _combo_step != null:
@@ -161,7 +184,7 @@ func _on_attack_started(context: AttackContext) -> void:
 	player.last_facing_direction = context.direction
 	animation_prefix = controller.get_attack_animation_prefix()
 	player.play_directional_animation(animation_prefix, true)
-	if controller.is_charging():
+	if controller.is_aiming():
 		player.visual.hold_animation_pose(0.25)
 		return
 	if not player.visual.fit_animation_duration(controller.get_attack_duration()):

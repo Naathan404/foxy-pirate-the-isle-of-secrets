@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://eq38tlvi8kjx"]
+
+[ext_resource type="Script" uid="uid://bbwq682xujutd" path="res://gameplay/weapons/ranged_aim_indicator.gd" id="1_indicator"]
+[ext_resource type="Shader" uid="uid://c3lspcfccl8pa" path="res://gameplay/weapons/ranged_aim_indicator.gdshader" id="2_arrow"]
+
+[sub_resource type="ShaderMaterial" id="Material_arrow"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("2_arrow")
+shader_parameter/charge = 0.0
+shader_parameter/glow_color = Color(1, 0.15, 0.12, 1)
+shader_parameter/charged_color = Color(1, 0.64, 0.15, 1)
+
+[sub_resource type="QuadMesh" id="Mesh_arrow"]
+size = Vector2(1.15, 3)
+
+[node name="RangedAimIndicator" type="Node3D" unique_id=1440644150]
+script = ExtResource("1_indicator")
+
+[node name="Arrow" type="MeshInstance3D" parent="." unique_id=715268692]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, -1.8)
+material_override = SubResource("Material_arrow")
+cast_shadow = 0
+mesh = SubResource("Mesh_arrow")

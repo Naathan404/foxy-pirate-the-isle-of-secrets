@@ -15,6 +15,8 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var aim_mode: AimMode = AimMode.FACING
 ## Describes this attack, independently of the owning weapon's category.
 @export var delivery_type: DeliveryType = DeliveryType.MELEE
+## Projectile attacks aim while held and launch on release.
+@export var release_to_fire: bool = true
 @export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
 @export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 ### Cấu hình mốc thời gain của đòn đánh
