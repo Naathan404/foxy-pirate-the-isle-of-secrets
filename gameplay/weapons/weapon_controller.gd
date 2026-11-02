@@ -200,6 +200,14 @@ func set_weapon_owned(weapon_id: StringName, owned: bool) -> bool:
 	return true
 
 
+## Grants an owned weapon without equipping it. Merchants and rewards must not
+## reach into the collection or _owned list directly.
+func grant_weapon(weapon_id: StringName) -> bool:
+	if weapon_id.is_empty() or is_weapon_owned(weapon_id):
+		return false
+	return set_weapon_owned(weapon_id, true) and is_weapon_owned(weapon_id)
+
+
 func _validate_collection() -> bool:
 	var ids: Dictionary[StringName, bool] = {}
 	for entry: WeaponCollectionEntry in collection:

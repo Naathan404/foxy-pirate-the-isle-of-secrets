@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="MerchantCatalog" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://gameplay/merchant/merchant_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" path="res://gameplay/merchant/merchant_offer.gd" id="2_offer"]
+[ext_resource type="Resource" path="res://data/weapon/weapon_bow.tres" id="3_bow"]
+[ext_resource type="Resource" path="res://data/items/materials/wooden_arrow.tres" id="4_arrow"]
+[ext_resource type="Resource" path="res://data/items/consumables/small_healing_potion.tres" id="5_healing"]
+[ext_resource type="Resource" path="res://data/items/consumables/small_stamina_potion.tres" id="6_stamina"]
+[ext_resource type="Resource" path="res://data/items/materials/starfish_core.tres" id="7_starfish"]
+[ext_resource type="Resource" path="res://data/items/materials/crab_claw.tres" id="8_crab"]
+[ext_resource type="Resource" path="res://data/items/materials/gunpowder_bag.tres" id="9_gunpowder"]
+
+[sub_resource type="Resource" id="Offer_bow"]
+script = ExtResource("2_offer")
+offer_id = &"bow"
+kind = 1
+weapon = ExtResource("3_bow")
+buy_price = 100
+
+[sub_resource type="Resource" id="Offer_arrow"]
+script = ExtResource("2_offer")
+offer_id = &"wooden_arrow"
+item = ExtResource("4_arrow")
+buy_price = 2
+sell_price = 1
+
+[sub_resource type="Resource" id="Offer_healing"]
+script = ExtResource("2_offer")
+offer_id = &"small_healing_potion"
+item = ExtResource("5_healing")
+buy_price = 20
+sell_price = 10
+
+[sub_resource type="Resource" id="Offer_stamina"]
+script = ExtResource("2_offer")
+offer_id = &"small_stamina_potion"
+item = ExtResource("6_stamina")
+buy_price = 20
+sell_price = 10
+
+[sub_resource type="Resource" id="Offer_starfish"]
+script = ExtResource("2_offer")
+offer_id = &"starfish_core"
+item = ExtResource("7_starfish")
+sell_price = 5
+
+[sub_resource type="Resource" id="Offer_crab"]
+script = ExtResource("2_offer")
+offer_id = &"crab_claw"
+item = ExtResource("8_crab")
+sell_price = 8
+
+[sub_resource type="Resource" id="Offer_gunpowder"]
+script = ExtResource("2_offer")
+offer_id = &"gunpowder_bag"
+item = ExtResource("9_gunpowder")
+sell_price = 10
+
+[resource]
+script = ExtResource("1_catalog")
+offers = Array[ExtResource("2_offer")]([SubResource("Offer_bow"), SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_starfish"), SubResource("Offer_crab"), SubResource("Offer_gunpowder")])

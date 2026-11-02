@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 HitstopController="*res://core/autoload/hitstop_controller.gd"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
 GameManager="*res://core/autoload/game_manager.gd"
+SilasProgress="*res://gameplay/merchant/silas_progress_store.gd"
 Dialogic="*uid://ds2q0uclmolvu"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 AudioManager="*res://core/autoload/audio_manager.gd"
@@ -27,9 +28,11 @@ AudioManager="*res://core/autoload/audio_manager.gd"
 [dialogic]
 
 directories/dch_directory={
-"mushroom": "res://dialog/npcs/mushroom/mushroom.dch"
+"mushroom": "res://dialog/npcs/mushroom/mushroom.dch",
+"silas": "res://dialog/npcs/silas/silas.dch"
 }
 directories/dtl_directory={
+"first_meeting": "res://dialog/npcs/silas/timelines/first_meeting.dtl",
 "greeting": "res://dialog/npcs/mushroom/timelines/greeting.dtl"
 }
 layout/style_directory={}
