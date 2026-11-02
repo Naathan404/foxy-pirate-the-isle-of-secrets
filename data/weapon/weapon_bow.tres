@@ -49,6 +49,5 @@ icon = ExtResource("1_tb5i0")
 description = "A steady bow for precise shots and charged arrow volleys."
 category = 1
 stagger_damage = 40.0
-chaos_per_hit = 50.0
 normal_attack = SubResource("Attack_bow")
 secondary_attack = SubResource("Attack_volley")

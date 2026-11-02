@@ -58,4 +58,22 @@ same gameplay-input gate as drinking, so inventory/dialogue/death block it.
 Both HUD sockets refresh counts on inventory changes. A depleted assigned potion
 keeps its icon with a grey tint and count 0. No automatic reassignment or cycling
 through unassigned inventory potions occurs. Empty slots can also be swapped;
-when both slots are empty, swapping returns false. Quick selection is deferred.
+when both slots are empty, swapping returns false.
+
+## Quick selection wheel
+
+Tap R to swap assigned potions; hold R for 0.22 seconds to open the wheel at
+18% game speed. Hover a stocked potion and release R to assign MAIN. Right-click
+the hovered potion to assign BACKUP and close the wheel immediately. Releasing
+R afterward does not also replace MAIN. Assigning a potion from the opposite
+slot still swaps the two assignments through `PotionComponent`.
+
+Empty slots cannot be equipped. Right-clicking an empty slot or the center leaves
+the wheel open; release R at the center or press Esc to keep current equipment.
+The right-click used for BACKUP is blocked from weapon input until the mouse
+button is released, including the frame where the wheel closes.
+
+Inventory/dialogue/death/scene changes and focus loss cancel selection and
+restore mouse state and time scale. `HitstopController` coordinates the held
+slow-motion source with combat hitstop. The wheel uses separate scenes and
+keeps the inventory layout unchanged.

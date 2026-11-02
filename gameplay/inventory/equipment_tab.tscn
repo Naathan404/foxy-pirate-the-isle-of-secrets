@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="3_c1a6h"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_h6sw2"]
 [ext_resource type="Texture2D" uid="uid://7ipah0ym4wc8" path="res://assets/ui/player_hud/inventory/slot_ui.png" id="5_0k2h7"]
+[ext_resource type="Texture2D" uid="uid://bvkk0bgeb5uh3" path="res://assets/sprites/items/equipment/harpoon_placeholder/harpoon.png" id="7_1e8a6"]
 [ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="7_rxrhe"]
 [ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="8_1e8a6"]
 [ext_resource type="Texture2D" uid="uid://bt4fkmaxsc7ee" path="res://assets/ui/player_hud/inventory/equip_button.png" id="inventory_button"]
@@ -359,6 +360,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 64)
 layout_mode = 2
 mouse_filter = 2
+texture = ExtResource("7_1e8a6")
 expand_mode = 1
 stretch_mode = 5
 
@@ -644,6 +646,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 mouse_filter = 2
+expand_mode = 1
 stretch_mode = 5
 
 [node name="SkillText" type="VBoxContainer" parent="Content/Right/Skill/Content/SkillBody" unique_id=449763366]

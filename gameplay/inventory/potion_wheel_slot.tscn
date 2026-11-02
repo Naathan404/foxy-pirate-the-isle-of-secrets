@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://w67yum5hi3nk"]
+
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="1_1kc8n"]
+[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="2_1kc8n"]
+
+[node name="PotionWheelSlot" type="Control" unique_id=1149675308]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 72.0
+offset_bottom = 84.0
+mouse_filter = 2
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1082695507]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 64.0
+offset_bottom = 60.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="." unique_id=1574482348]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 37.0
+offset_right = 72.0
+offset_bottom = 65.0
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_1kc8n")
+theme_override_font_sizes/font_size = 35
+text = "0"
+horizontal_alignment = 1
+
+[node name="Assignment" type="Label" parent="." unique_id=1861096123]
+layout_mode = 0
+offset_top = 66.0
+offset_right = 72.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(1, 0.82, 0.46, 1)
+theme_override_fonts/font = ExtResource("2_1kc8n")
+theme_override_font_sizes/font_size = 20
+text = "MAIN"
+horizontal_alignment = 1

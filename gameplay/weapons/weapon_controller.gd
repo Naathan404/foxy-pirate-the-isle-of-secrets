@@ -590,6 +590,8 @@ func try_attack(request: AttackContext) -> bool:
 	if is_aiming() and _context == snapshot:
 		_show_aim_indicator()
 	if busy and _context == snapshot:
+		if not is_aiming():
+			_execution.begin_windup()
 		attack_started.emit(snapshot)
 	if is_charging() and _context == snapshot:
 		_execution.update_charge(0.0)
@@ -716,11 +718,15 @@ func _physics_process(delta: float) -> void:
 		var current := _context
 		if _phase == Phase.ACTIVE:
 			_execution.tick_active(step)
+		elif _phase == Phase.WINDUP:
+			_execution.tick_windup(step)
 		# Gây damage có thể hủy đòn, không update tiếp context cũ
 		if not busy or _context != current:
 			return
 		_remaining -= step
 		budget -= step
+		if _phase == Phase.ACTIVE and _execution.has_finished_active():
+			_remaining = 0.0
 		if _remaining <= 0.000001:
 			_advance_phase()
 		if not is_physics_processing() or get_node("/root/HitstopController").is_frozen(actor):
@@ -788,6 +794,15 @@ func modify_incoming_damage(amount_hp: float, damage: DamageContext) -> float:
 	if is_instance_valid(_effect):
 		return maxf(0.0, _effect.modify_incoming_damage(amount_hp, damage))
 	return amount_hp
+
+
+func is_attack_invulnerable() -> bool:
+	return (
+		busy
+		and _phase == Phase.ACTIVE
+		and is_instance_valid(_execution)
+		and _execution.is_invulnerable()
+	)
 
 
 func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
