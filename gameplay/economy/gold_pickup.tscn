@@ -41,7 +41,7 @@ trail_color = Color(1, 0.68, 0.22, 1)
 trail_width = 0.14
 tumble_strength = 0.65
 
-[node name="Attraction" parent="." node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("4_attraction")]
+[node name="Attraction" parent="." unique_id=488274804 node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("4_attraction")]
 detector = NodePath("..")
 moving_root = NodePath("..")
 anchor = NodePath("../Sprite3D")

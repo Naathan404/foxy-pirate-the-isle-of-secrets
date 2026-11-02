@@ -16,11 +16,10 @@
 [ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
 [ext_resource type="Script" uid="uid://diqqixidr2eyy" path="res://gameplay/player/hud/hud_portrait.gd" id="14_portrait"]
 [ext_resource type="Texture2D" uid="uid://h30qe12s3t4q" path="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png" id="15_gpu53"]
-[ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="15_khbku"]
 [ext_resource type="Script" uid="uid://welfjuqw50gd" path="res://gameplay/player/hud/hud_tooltip.gd" id="15_tooltip"]
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="16_khbku"]
 [ext_resource type="Texture2D" uid="uid://c2ply0h057nlq" path="res://assets/ui/player_hud/charrm_ui/charm_socket.png" id="19_01apl"]
-[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="23_1wee6"]
 [ext_resource type="PackedScene" uid="uid://bulcvbok8qvje" path="res://gameplay/economy/gold_display.tscn" id="24_gold"]
 [ext_resource type="Script" uid="uid://l383y3sp6xa1" path="res://gameplay/player/hud/chaos_indicator_feedback.gd" id="chaos_indicator"]
 
@@ -89,10 +88,10 @@ transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
 
 [node name="GoldDisplay" parent="." unique_id=1585419187 instance=ExtResource("24_gold")]
-offset_left = 101.6
-offset_top = 516.0
-offset_right = 241.6
-offset_bottom = 556.0
+offset_left = -3.2
+offset_top = 356.0
+offset_right = 136.8
+offset_bottom = 396.0
 
 [node name="Effects" type="Node" parent="." unique_id=1082976363]
 
@@ -372,7 +371,7 @@ offset_top = -138.4
 offset_right = 91.20007
 offset_bottom = -118.399994
 theme_override_colors/font_color = Color(1, 0, 0, 1)
-theme_override_fonts/font = ExtResource("15_khbku")
+theme_override_fonts/font = ExtResource("16_khbku")
 theme_override_font_sizes/font_size = 12
 text = "CP: 0 / 100"
 horizontal_alignment = 2
@@ -477,13 +476,13 @@ script = ExtResource("chaos_indicator")
 [node name="AmmoLabel" type="Label" parent="ChaosControl" unique_id=847852458]
 texture_filter = 1
 layout_mode = 0
-offset_left = 37.76008
-offset_top = 31.999998
-offset_right = 79.76008
-offset_bottom = 58.0
+offset_left = 32.64
+offset_top = 24.960037
+offset_right = 74.64
+offset_bottom = 60.960037
 theme_override_constants/outline_size = 5
-theme_override_fonts/font = ExtResource("15_khbku")
-theme_override_font_sizes/font_size = 25
+theme_override_fonts/font = ExtResource("16_khbku")
+theme_override_font_sizes/font_size = 36
 text = "999"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -537,7 +536,8 @@ offset_bottom = 64.0
 theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 18
+theme_override_fonts/font = ExtResource("16_khbku")
+theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -579,7 +579,8 @@ offset_bottom = 64.0
 theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 18
+theme_override_fonts/font = ExtResource("16_khbku")
+theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -621,9 +622,31 @@ offset_bottom = 64.0
 theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 18
+theme_override_fonts/font = ExtResource("16_khbku")
+theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Second_Potion_socket" type="TextureRect" parent="EquipmentControl" unique_id=239207495]
+self_modulate = Color(0.39458284, 0.5549917, 0.61074257, 1)
+texture_filter = 1
+layout_mode = 0
+offset_left = 96.0
+offset_top = 128.80002
+offset_right = 144.0
+offset_bottom = 176.80002
+mouse_filter = 2
+texture = ExtResource("19_01apl")
+
+[node name="Potion_icon" type="TextureRect" parent="EquipmentControl/Second_Potion_socket" unique_id=1273336174]
+texture_filter = 1
+layout_mode = 0
+offset_left = 6.4545445
+offset_top = 7.2
+offset_right = 56.454544
+offset_bottom = 57.2
+pivot_offset = Vector2(0.5, 0.5)
+mouse_filter = 2
 
 [node name="Potion_socket" type="TextureRect" parent="EquipmentControl" unique_id=1503944081]
 self_modulate = Color(0.21573097, 0.6000273, 0.5232855, 1)
@@ -648,13 +671,12 @@ mouse_filter = 2
 
 [node name="Potion_count" type="Label" parent="EquipmentControl/Potion_socket" unique_id=575894119]
 layout_mode = 0
-offset_left = 18.818182
-offset_top = 37.6
-offset_right = 58.818184
-offset_bottom = 68.6
+offset_left = 39.181816
+offset_top = 25.599998
+offset_right = 79.181816
+offset_bottom = 76.600006
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("23_1wee6")
-theme_override_font_sizes/font_size = 30
+theme_override_fonts/font = ExtResource("16_khbku")
+theme_override_font_sizes/font_size = 50
 text = "99"
-horizontal_alignment = 2
 vertical_alignment = 2

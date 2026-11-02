@@ -7,16 +7,24 @@ implementation covers enemy drops, collection, the runtime wallet and HUD.
 
 | Enemy | Drop chance | Gold per successful drop |
 | --- | --- | --- |
-| Regular enemy | 40% | 5 |
-| Elite crab, starfish and barrel | 100% | 20 |
+| Regular enemy | 50% | 2–5 |
+| Elite crab, starfish and barrel | 100% | 9–12 |
 
-`EnemyData` exposes `Gold Drop / Gold Amount` and `Gold Drop Chance`. The elite
-data resources override the regular defaults. War Lord Turtle has Gold Amount
-set to zero until a separate boss reward is specified.
+These starting rates use the supplied potion price benchmarks: 25G for a small
+health potion and 45G for a large one. Expected direct Gold per kill is 1.75G
+for regular enemies and 10.5G for elites. Roughly 15 regular kills fund a small
+potion and 26–27 fund a large one; 3 elite kills guarantee a small potion and
+4–5 fund a large one. These estimates exclude selling materials and chest rewards.
+
+`EnemyData` exposes `Gold Drop / Min Gold Amount`, `Max Gold Amount` and
+`Gold Drop Chance`. A successful drop samples a uniform integer including both
+endpoints. Invalid ranges are rejected; max zero disables Gold. Elite data
+resources override the regular defaults. War Lord Turtle has min/max set to zero
+until a separate boss reward is specified.
 
 Gold and the existing material drop roll independently. Gold rolls once per death:
-a successful roll requests exactly `gold_amount` separate coins, each worth 1G.
-A regular reward scatters 5 coins; an elite scatters 20. The scene-local
+a successful roll requests exactly the sampled amount of separate coins, each
+worth 1G. A regular reward scatters 2–5 coins; an elite scatters 9–12. The scene-local
 `GoldPickupPool` supplies these coins and assigns separated radial directions.
 The guarded `EnemyBase.die()` schedules the reward once. Hiding an enemy during
 a tide change does not count as a death.
@@ -89,7 +97,7 @@ visual lifetime.
 Enemy setup schedules scene-local coin and trail pool warmup before the first
 kill. `GoldPickupPool` prewarms 64 coins, caps total allocation at 256, creates
 at most 4 per frame and activates at most 8 per frame. These exports can be
-tuned on a `GoldPickupPool` node. A fully warm 20G reward appears over 3 frames.
+tuned on a `GoldPickupPool` node. A fully warm 12G reward appears over 2 frames.
 
 Each death queues one request containing the original reward, position and
 direction, so the enemy may be destroyed before all coins activate. If the pool

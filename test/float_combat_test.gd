@@ -136,6 +136,8 @@ func _test_player_and_charms(world: Node3D) -> void:
 	player.data = player.data.duplicate()
 	player.data.max_hp = 8.0
 	player.get_node("WeaponController").default_forge = null
+	# Keep the healing fixture independent of the scene's full starting potion loadout.
+	player.get_node("Inventory").starting_items.clear()
 	world.add_child(player)
 	player.set_physics_process(false)
 	await process_frame

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DualEssencePotion" format=3 uid="uid://v35jilyjifwa"]
+
+[ext_resource type="Script" uid="uid://bugemquvrnd0d" path="res://data/items/consumables/dual_essence_potion.gd" id="1_ep8bb"]
+[ext_resource type="Texture2D" uid="uid://cm1evtlkpt88m" path="res://assets/sprites/items/potions/Small_Dual_Essence_Potion.png" id="1_fb1ew"]
+
+[resource]
+script = ExtResource("1_ep8bb")
+heal_amount = 2.0
+stamina_amount = 200.0
+potion_kind = 2
+potion_size = 0
+item_id = "small_dual_essence_potion"
+display_name = "Small Dual Essence Potion"
+icon = ExtResource("1_fb1ew")
+description = "Heals 2 HP and restores 200SP."
+max_stack = 10
+type = 1
+metadata/_custom_type_script = "uid://bugemquvrnd0d"

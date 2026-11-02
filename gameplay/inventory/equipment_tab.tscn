@@ -4,7 +4,10 @@
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2"]
 [ext_resource type="PackedScene" uid="uid://cf04lpri8k1o3" path="res://gameplay/inventory/equipment_slot.tscn" id="3"]
 [ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="3_c1a6h"]
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_h6sw2"]
 [ext_resource type="Texture2D" uid="uid://7ipah0ym4wc8" path="res://assets/ui/player_hud/inventory/slot_ui.png" id="5_0k2h7"]
+[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="7_rxrhe"]
+[ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="8_1e8a6"]
 [ext_resource type="Texture2D" uid="uid://bt4fkmaxsc7ee" path="res://assets/ui/player_hud/inventory/equip_button.png" id="inventory_button"]
 
 [sub_resource type="StyleBoxFlat" id="disabled"]
@@ -151,8 +154,11 @@ custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 2
+theme_override_constants/h_separation = 4
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 30
 toggle_mode = true
 text = "Weapons"
 
@@ -162,8 +168,11 @@ custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 2
+theme_override_constants/h_separation = 4
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 30
 toggle_mode = true
 text = "Charms"
 
@@ -194,7 +203,10 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(28, 24)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_h6sw2")
 theme_override_font_sizes/font_size = 20
 text = "<"
 
@@ -202,7 +214,10 @@ text = "<"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_h6sw2")
 theme_override_font_sizes/font_size = 20
 text = "1 / 1"
 horizontal_alignment = 1
@@ -211,7 +226,10 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(28, 24)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_h6sw2")
 theme_override_font_sizes/font_size = 20
 text = ">"
 
@@ -225,8 +243,9 @@ theme_override_constants/separation = 5
 
 [node name="Heading" type="Label" parent="Content/Left/EquippedFrame/Content" unique_id=1444385426]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 18
+theme_override_constants/outline_size = 1
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 17
 text = "Currently Equipped"
 horizontal_alignment = 1
 
@@ -326,7 +345,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
 [node name="Header" type="HBoxContainer" parent="Content/Right" unique_id=1656690673]
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
 theme_override_constants/separation = 6
 
@@ -351,8 +370,12 @@ theme_override_constants/separation = 3
 [node name="ItemTitle" type="Label" parent="Content/Right/Header/Identity" unique_id=1313786875]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/line_spacing = 3
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 25
 text = "Select a weapon"
 autowrap_mode = 3
 max_lines_visible = 2
@@ -361,15 +384,15 @@ max_lines_visible = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.17, 0.15, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 16
 text = "WEAPON"
 
 [node name="ItemDescription" type="Label" parent="Content/Right/Header/Identity" unique_id=1260477796]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 16
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 14
 autowrap_mode = 3
 max_lines_visible = 2
 
@@ -384,8 +407,9 @@ theme_override_constants/separation = 6
 [node name="StatsHeading" type="Label" parent="Content/Right/Stats/Content" unique_id=528364376]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 16
+theme_override_constants/outline_size = 1
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 18
 text = "Base Stats"
 
 [node name="StatsGrid" type="GridContainer" parent="Content/Right/Stats/Content" unique_id=1351891084]
@@ -398,96 +422,96 @@ columns = 4
 [node name="StatName0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=370606054]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Attack"
 
 [node name="StatValue0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=420715474]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1347206265]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Crit Damage"
 
 [node name="StatValue1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1417144512]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1743882071]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Attack Speed"
 
 [node name="StatValue2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1415244511]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=714609625]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Knockback"
 
 [node name="StatValue3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1146056389]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=137875389]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Crit Rate"
 
 [node name="StatValue4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=647589635]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=162944977]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Range"
 
 [node name="StatValue5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1776814730]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
@@ -495,16 +519,16 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "Stagger"
 
 [node name="StaggerValue" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1722476126]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 14
+theme_override_fonts/font = ExtResource("8_1e8a6")
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
@@ -519,7 +543,8 @@ theme_override_constants/separation = 6
 [node name="ForgeHeading" type="Label" parent="Content/Right/Forge/Content" unique_id=660420672]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_constants/outline_size = 1
+theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 16
 text = "Forge Attributes"
 clip_text = true
@@ -548,7 +573,8 @@ theme_override_constants/separation = 6
 [node name="SkillHeading" type="Label" parent="Content/Right/Skill/Content" unique_id=806944078]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_constants/outline_size = 1
+theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 16
 text = "Weapon Skill"
 
@@ -571,21 +597,21 @@ theme_override_constants/separation = 3
 [node name="SkillTitle" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=627158131]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 16
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 max_lines_visible = 2
 
 [node name="SkillMeta" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=967433307]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 14
 
 [node name="SkillDescription" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=1161621398]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_c1a6h")
+theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 max_lines_visible = 3
@@ -614,7 +640,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 10.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2

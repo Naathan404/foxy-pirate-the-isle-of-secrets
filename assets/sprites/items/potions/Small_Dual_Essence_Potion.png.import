@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c2rh3hd8li1c5"
-path="res://.godot/imported/small_stamina_potion.png-cddd0852ec0fd159317db56c903959b1.ctex"
+uid="uid://cm1evtlkpt88m"
+path="res://.godot/imported/Small_Dual_Essence_Potion.png-ba8aa1aa3d05870b06dae96d357a23af.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/small_stamina_potion.png"
-dest_files=["res://.godot/imported/small_stamina_potion.png-cddd0852ec0fd159317db56c903959b1.ctex"]
+source_file="res://assets/sprites/items/potions/Small_Dual_Essence_Potion.png"
+dest_files=["res://.godot/imported/Small_Dual_Essence_Potion.png-ba8aa1aa3d05870b06dae96d357a23af.ctex"]
 
 [params]
 

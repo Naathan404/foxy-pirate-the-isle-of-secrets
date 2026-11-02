@@ -678,7 +678,13 @@ func _on_charm_grapple_finished() -> void:
 
 
 func _drop_gold() -> void:
-	if data == null or data.gold_amount <= 0 or data.gold_drop_chance <= 0.0:
+	if (
+		data == null
+		or data.min_gold_amount < 0
+		or data.max_gold_amount <= 0
+		or data.max_gold_amount < data.min_gold_amount
+		or data.gold_drop_chance <= 0.0
+	):
 		return
 	if not is_inside_tree():
 		return
@@ -689,14 +695,21 @@ func _drop_gold() -> void:
 		return
 	var pool := GoldPickupPool.for_scene(self)
 	if pool != null:
-		pool.spawn_gold(global_position, data.gold_amount, _next_loot_direction())
+		var amount: int = randi_range(data.min_gold_amount, data.max_gold_amount)
+		pool.spawn_gold(global_position, amount, _next_loot_direction())
 
 
 func _prepare_loot_pools() -> void:
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
 	LootTrailPool.for_scene(self)
-	if data != null and data.gold_amount > 0:
+	if (
+		data != null
+		and data.min_gold_amount >= 0
+		and data.max_gold_amount > 0
+		and data.max_gold_amount >= data.min_gold_amount
+		and data.gold_drop_chance > 0.0
+	):
 		GoldPickupPool.for_scene(self)
 
 

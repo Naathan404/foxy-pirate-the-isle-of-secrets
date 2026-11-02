@@ -19,6 +19,8 @@ func equip_potion(potion: Potion) -> bool:
 		return false
 	if potion is StaminaPotion and stamina == null:
 		return false
+	if potion is DualEssencePotion and (health == null or stamina == null):
+		return false
 
 	if not inventory.has_item(potion.item_id):
 		return false
@@ -70,9 +72,21 @@ func use_equipped_potion() -> bool:
 		var used_potion := equipped_potion as StaminaPotion
 		if stamina.restore(used_potion.restore_amount) <= 0.0:
 			return false
+	elif equipped_potion is DualEssencePotion:
+		if not _use_dual_essence(equipped_potion as DualEssencePotion):
+			return false
 	else:
 		return false
 
 	inventory.remove_item(equipped_potion.item_id, 1)
 	potion_used.emit()
 	return true
+
+
+func _use_dual_essence(potion: DualEssencePotion) -> bool:
+	if health == null or stamina == null or not health.is_alive():
+		return false
+	# Always attempt both effects; a full bar must not prevent restoring the other.
+	var healed: float = health.heal(potion.heal_amount)
+	var restored: float = stamina.restore(potion.stamina_amount)
+	return healed > 0.0 or restored > 0.0

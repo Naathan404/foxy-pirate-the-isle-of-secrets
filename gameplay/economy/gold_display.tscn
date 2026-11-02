@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b33hl5mw8xdvg" path="res://gameplay/economy/gold_display.gd" id="1_display"]
 [ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_gcxsi"]
-[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="3_font"]
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_gcxsi"]
 
 [node name="GoldDisplay" type="Control" unique_id=1723458651]
 custom_minimum_size = Vector2(140, 40)
@@ -39,21 +39,21 @@ offset_transform_position_ratio = Vector2(0, 0.1)
 theme_override_colors/font_color = Color(1, 0.86, 0.45, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.045, 0.015, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 28
+theme_override_fonts/font = ExtResource("3_gcxsi")
+theme_override_font_sizes/font_size = 42
 text = "0"
 vertical_alignment = 1
 
 [node name="Gain" type="Label" parent="." unique_id=1310774866]
 visible = false
 layout_mode = 0
-offset_left = 42.0
+offset_left = 54.0
 offset_top = -6.0
-offset_right = 160.0
-offset_bottom = 18.0
-theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+offset_right = 172.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(0.9506008, 0.90322334, 0.7311294, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.045, 0.015, 1)
 theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 17
+theme_override_fonts/font = ExtResource("3_gcxsi")
+theme_override_font_sizes/font_size = 25
 text = "+5 G"

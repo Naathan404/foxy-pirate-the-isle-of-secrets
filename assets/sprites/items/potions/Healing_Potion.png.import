@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ds5hqcelblf8e"
-path="res://.godot/imported/wooden_arrow.png-72a396f4ffd6db065654f173c9073438.ctex"
+uid="uid://wb2w4yllmpjh"
+path="res://.godot/imported/Healing_Potion.png-50849e425e62bf93ae0678c6ebd948e1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/wooden_arrow.png"
-dest_files=["res://.godot/imported/wooden_arrow.png-72a396f4ffd6db065654f173c9073438.ctex"]
+source_file="res://assets/sprites/items/potions/Healing_Potion.png"
+dest_files=["res://.godot/imported/Healing_Potion.png-50849e425e62bf93ae0678c6ebd948e1.ctex"]
 
 [params]
 

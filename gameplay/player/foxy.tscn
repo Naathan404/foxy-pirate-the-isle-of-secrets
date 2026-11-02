@@ -32,6 +32,8 @@
 [ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="21_86838"]
 [ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
+[ext_resource type="Resource" uid="uid://b0c2kxsb7y24n" path="res://data/items/consumables/dual_essence_potion.tres" id="25_21pkc"]
+[ext_resource type="Resource" uid="uid://v35jilyjifwa" path="res://data/items/consumables/small_dual_essence_potion.tres" id="26_vu64a"]
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="26_y6gb4"]
 [ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="27_86838"]
 [ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="27_k8ytl"]
@@ -756,31 +758,43 @@ metadata/_custom_type_script = "uid://0vpaeibrfouv"
 [sub_resource type="Resource" id="Resource_tst5e"]
 script = ExtResource("16_n85vt")
 item = ExtResource("18_7war0")
-quantity = 3
+quantity = 1
 metadata/_custom_type_script = "uid://0vpaeibrfouv"
 
 [sub_resource type="Resource" id="Resource_8yxsm"]
 script = ExtResource("16_n85vt")
 item = ExtResource("19_ycog6")
-quantity = 3
+quantity = 2
 metadata/_custom_type_script = "uid://0vpaeibrfouv"
 
 [sub_resource type="Resource" id="Resource_itkg2"]
 script = ExtResource("16_n85vt")
 item = ExtResource("20_a64i1")
-quantity = 3
+quantity = 2
 metadata/_custom_type_script = "uid://0vpaeibrfouv"
 
 [sub_resource type="Resource" id="Resource_le4ue"]
 script = ExtResource("16_n85vt")
 item = ExtResource("21_86838")
-quantity = 3
+quantity = 1
 metadata/_custom_type_script = "uid://0vpaeibrfouv"
 
 [sub_resource type="Resource" id="Slot_wooden_arrow"]
 script = ExtResource("16_n85vt")
 item = ExtResource("Item_wooden_arrow")
 quantity = 99
+
+[sub_resource type="Resource" id="Resource_khbku"]
+script = ExtResource("16_n85vt")
+item = ExtResource("25_21pkc")
+quantity = 4
+metadata/_custom_type_script = "uid://0vpaeibrfouv"
+
+[sub_resource type="Resource" id="Resource_1wee6"]
+script = ExtResource("16_n85vt")
+item = ExtResource("26_vu64a")
+quantity = 5
+metadata/_custom_type_script = "uid://0vpaeibrfouv"
 
 [sub_resource type="Resource" id="Resource_jpyye"]
 script = ExtResource("26_y6gb4")
@@ -818,7 +832,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wxm0y"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_lxb11"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -946,7 +960,7 @@ shape = SubResource("BoxShape3D_jpyye")
 
 [node name="Inventory" type="Node" parent="." unique_id=1718891682]
 script = ExtResource("15_lycwo")
-starting_items = Array[ExtResource("16_n85vt")]([SubResource("Resource_vt6mg"), SubResource("Resource_tst5e"), SubResource("Resource_8yxsm"), SubResource("Resource_itkg2"), SubResource("Resource_le4ue"), SubResource("Slot_wooden_arrow")])
+starting_items = Array[ExtResource("16_n85vt")]([SubResource("Resource_vt6mg"), SubResource("Resource_tst5e"), SubResource("Resource_8yxsm"), SubResource("Resource_itkg2"), SubResource("Resource_le4ue"), SubResource("Slot_wooden_arrow"), SubResource("Resource_khbku"), SubResource("Resource_1wee6")])
 capacity = 30
 
 [node name="WeaponController" type="Node" parent="." unique_id=1607748033]
@@ -1045,7 +1059,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_wxm0y")
+process_material = SubResource("ParticleProcessMaterial_lxb11")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
 player = NodePath("../..")

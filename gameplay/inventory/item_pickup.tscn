@@ -16,9 +16,8 @@ script = ExtResource("1_wcvja")
 item = ExtResource("2_y770h")
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1888093459]
-transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
 pixel_size = 0.0012
-billboard = 2
+billboard = 1
 shaded = true
 alpha_cut = 1
 texture_filter = 0
@@ -30,7 +29,7 @@ shape = SubResource("SphereShape3D_wcvja")
 [node name="Scatter" parent="." unique_id=2129724032 node_paths=PackedStringArray("visual") instance=ExtResource("4_scatter")]
 visual = NodePath("../Sprite3D")
 
-[node name="Attraction" parent="." node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("5_attraction")]
+[node name="Attraction" parent="." unique_id=1389841254 node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("5_attraction")]
 detector = NodePath("..")
 moving_root = NodePath("..")
 anchor = NodePath("../Sprite3D")

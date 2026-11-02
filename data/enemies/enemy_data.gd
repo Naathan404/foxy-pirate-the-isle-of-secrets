@@ -34,6 +34,6 @@ extends Resource
 @export_range(0.0, 1.0, 0.01) var drop_chance: float = 0.5
 
 @export_group("Gold Drop")
-@export_range(0, 100000, 1) var min_gold_amount: int = 5
+@export_range(0, 100000, 1) var min_gold_amount: int = 2
 @export_range(0, 100000, 1) var max_gold_amount: int = 5
-@export_range(0.0, 1.0, 0.01) var gold_drop_chance: float = 0.25
+@export_range(0.0, 1.0, 0.01) var gold_drop_chance: float = 0.5
