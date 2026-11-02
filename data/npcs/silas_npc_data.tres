@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NpcData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/npcs/npc_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+display_name = "Silas"
+description = "A shrewd island merchant who values gold above all else."
+move_speed = 0.0
+acceleration = 20.0
+deceleration = 20.0
+dialogue_timeline = "res://dialog/npcs/silas/timelines/first_meeting.dtl"
