@@ -9,6 +9,6 @@ display_name = "Relentless"
 description = "Recovery -25%, Damage -10%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 5.0
+drop_weight = 4.0
 recovery_multiplier = 0.75
 damage_multiplier = 0.9

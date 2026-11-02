@@ -6,10 +6,10 @@
 script = ExtResource("1_forge")
 forge_id = &"pristine"
 display_name = "Pristine"
-description = "Damage +8%, Attack Speed +8%, Knockback +8%"
+description = "Damage +5%, Attack Speed +5%, Knockback +10%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 4.0
-damage_multiplier = 1.08
-attack_speed_multiplier = 1.08
-knockback_multiplier = 1.08
+drop_weight = 3.0
+damage_multiplier = 1.05
+attack_speed_multiplier = 1.05
+knockback_multiplier = 1.1

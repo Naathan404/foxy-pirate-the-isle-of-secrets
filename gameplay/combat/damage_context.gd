@@ -20,6 +20,8 @@ var critical_rate: float = 0.0
 var critical_damage_multiplier: float = 1.5
 var is_critical: bool = false
 var stagger_damage: float = 0.0
+## Confirmed weapon hit reward; assigned by WeaponController from its attack snapshot.
+var chaos_gain: float = 0.0
 
 # đánh dấu tag loại tấn công, đánh thường != mất máu theo thời gian
 var tag: StringName = &"normal"
@@ -46,6 +48,7 @@ func create_hit_copy(hit_target: Node = null) -> DamageContext:
 	result.critical_rate = critical_rate
 	result.critical_damage_multiplier = critical_damage_multiplier
 	result.stagger_damage = stagger_damage
+	result.chaos_gain = chaos_gain
 	result.tag = tag
 	result.weapon_category = weapon_category
 	result.origin = origin

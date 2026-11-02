@@ -422,96 +422,126 @@ columns = 4
 [node name="StatName0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=370606054]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Attack"
 
 [node name="StatValue0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=420715474]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1347206265]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Crit Damage"
 
 [node name="StatValue1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1417144512]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1743882071]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Attack Speed"
 
 [node name="StatValue2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1415244511]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=714609625]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Knockback"
 
 [node name="StatValue3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1146056389]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=137875389]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Crit Rate"
 
 [node name="StatValue4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=647589635]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 
 [node name="StatName5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=162944977]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Range"
 
 [node name="StatValue5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1776814730]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 
@@ -519,16 +549,43 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "Stagger"
 
 [node name="StaggerValue" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1722476126]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.48, 0.23, 1)
-theme_override_fonts/font = ExtResource("8_1e8a6")
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
+text = "--"
+horizontal_alignment = 2
+
+[node name="ChaosGainName" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1020481797]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
+text = "Chaos Gain"
+
+[node name="ChaosGainValue" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=2000010112]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 13
 text = "--"
 horizontal_alignment = 2
 

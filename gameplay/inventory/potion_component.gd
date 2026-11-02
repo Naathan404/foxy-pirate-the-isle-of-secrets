@@ -2,6 +2,7 @@ class_name PotionComponent
 extends Node
 
 signal equipped_potion_changed(potion: Potion)
+signal secondary_potion_changed(potion: Potion)
 signal potion_used
 
 @export var inventory: Inventory
@@ -10,9 +11,30 @@ signal potion_used
 
 # loai binh dang duoc su dung vao socket
 var equipped_potion: Potion
+var secondary_potion: Potion
 
 
 func equip_potion(potion: Potion) -> bool:
+	if not _can_equip(potion):
+		return false
+	if is_secondary_equipped(potion):
+		return swap_potions()
+	equipped_potion = potion
+	equipped_potion_changed.emit(potion)
+	return true
+
+
+func equip_secondary_potion(potion: Potion) -> bool:
+	if not _can_equip(potion):
+		return false
+	if is_equipped(potion):
+		return swap_potions()
+	secondary_potion = potion
+	secondary_potion_changed.emit(potion)
+	return true
+
+
+func _can_equip(potion: Potion) -> bool:
 	if potion == null or inventory == null:
 		return false
 	if potion is HealingPotion and health == null:
@@ -25,11 +47,40 @@ func equip_potion(potion: Potion) -> bool:
 	if not inventory.has_item(potion.item_id):
 		return false
 
-	equipped_potion = potion
-
-	equipped_potion_changed.emit(potion)
-
 	return true
+
+
+func is_secondary_equipped(potion: Potion) -> bool:
+	return (
+		potion != null and secondary_potion != null and secondary_potion.item_id == potion.item_id
+	)
+
+
+func unequip_secondary_potion() -> bool:
+	if secondary_potion == null:
+		return false
+	secondary_potion = null
+	secondary_potion_changed.emit(null)
+	return true
+
+
+## Swap only the two assigned resources, including empty/depleted slots.
+func swap_potions() -> bool:
+	if equipped_potion == null and secondary_potion == null:
+		return false
+	var previous: Potion = equipped_potion
+	equipped_potion = secondary_potion
+	secondary_potion = previous
+	# Commit both slots before notifying consumers.
+	equipped_potion_changed.emit(equipped_potion)
+	secondary_potion_changed.emit(secondary_potion)
+	return true
+
+
+func get_secondary_quantity() -> int:
+	if secondary_potion == null or inventory == null:
+		return 0
+	return inventory.count_item(secondary_potion.item_id)
 
 
 func is_equipped(potion: Potion) -> bool:

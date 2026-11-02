@@ -9,6 +9,6 @@ display_name = "Keen Edge"
 description = "Critical Rate +10 pp, Damage -5%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 6.0
+drop_weight = 5.0
 critical_rate_bonus = 0.1
 damage_multiplier = 0.95

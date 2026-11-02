@@ -117,7 +117,7 @@ func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: fl
 	if dead or not is_instance_valid(chaos) or applied_hp <= 0:
 		return
 	if damage.source == self and target is EnemyBase:
-		chaos.gain(data.chaos_per_hit)
+		chaos.gain(damage.chaos_gain)
 
 
 func _on_stamina_changed(amount: float, maximum: float) -> void:
@@ -238,6 +238,8 @@ func _read_input() -> void:
 		return
 	attack_held = Input.is_action_pressed(attack_action)
 	secondary_attack_held = Input.is_action_pressed(secondary_attack_action)
+	if Input.is_action_just_pressed("swap_potion") and is_instance_valid(potion):
+		potion.swap_potions()
 	if Input.is_action_just_pressed("potion") and is_instance_valid(potion):
 		potion.use_equipped_potion()
 	var input_vector := Input.get_vector("left", "right", "up", "down")

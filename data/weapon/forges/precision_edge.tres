@@ -9,6 +9,6 @@ display_name = "Precision Edge"
 description = "Critical Rate +12 pp, Critical Damage -20 pp"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 5.0
+drop_weight = 4.0
 critical_rate_bonus = 0.12
 critical_damage_bonus = -0.2

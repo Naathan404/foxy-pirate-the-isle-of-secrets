@@ -30,7 +30,8 @@ const ANIM = {
 
 @export_group("Chaos - CP")
 @export_range(0.0, 100.0) var max_chaos: float = 100.0
-@export_range(0.0, 100.0) var chaos_per_hit: float = 20.0
+## Legacy serialized value; CP gain now belongs to WeaponData.
+@export_storage var chaos_per_hit: float = 5.0
 
 @export_group("Movement")
 @export_range(0.0, 100.0) var move_speed: float = 7.0

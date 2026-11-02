@@ -47,15 +47,19 @@ func _ready() -> void:
 
 	if is_instance_valid(potion_component):
 		potion_component.equipped_potion_changed.connect(_on_equipped_potion_changed)
+		potion_component.secondary_potion_changed.connect(_on_secondary_potion_changed)
 		potion_component.potion_used.connect(equipment.feedback_potion_used)
 
 		if is_instance_valid(potion_component.inventory):
 			potion_component.inventory.changed.connect(_refresh_potion_quantity)
 
 		_on_equipped_potion_changed(potion_component.equipped_potion)
+		_on_secondary_potion_changed(potion_component.secondary_potion)
 	else:
 		equipment.set_potion_icon(null)
 		equipment.set_potion_quantity(0)
+		equipment.set_secondary_potion_icon(null)
+		equipment.set_secondary_potion_quantity(0)
 
 
 func _sync_weapon() -> void:
@@ -94,10 +98,18 @@ func _on_equipped_potion_changed(potion: Potion) -> void:
 
 func _refresh_potion_quantity() -> void:
 	var amount: int = 0
+	var secondary_amount: int = 0
 	if is_instance_valid(potion_component):
 		amount = potion_component.get_equipped_quantity()
+		secondary_amount = potion_component.get_secondary_quantity()
 
 	equipment.set_potion_quantity(amount)
+	equipment.set_secondary_potion_quantity(secondary_amount)
+
+
+func _on_secondary_potion_changed(potion: Potion) -> void:
+	equipment.set_secondary_potion_icon(potion)
+	_refresh_potion_quantity()
 
 
 func _sync_stats() -> void:

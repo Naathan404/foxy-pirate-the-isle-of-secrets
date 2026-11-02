@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"chaos_resonance"
+display_name = "Chaos Resonance"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 4.0
+chaos_gain_multiplier = 1.4
+damage_multiplier = 0.85
+description = "Chaos Gain +40%, Damage -15%"

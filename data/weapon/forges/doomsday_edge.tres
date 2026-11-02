@@ -13,3 +13,4 @@ stagger_multiplier = 1.4
 attack_speed_multiplier = 0.6
 windup_multiplier = 1.2
 knockback_multiplier = 1.4
+drop_weight = 1.0

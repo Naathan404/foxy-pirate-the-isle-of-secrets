@@ -88,9 +88,9 @@ transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
 
 [node name="GoldDisplay" parent="." unique_id=1585419187 instance=ExtResource("24_gold")]
-offset_left = -3.2
+offset_left = 17.599998
 offset_top = 356.0
-offset_right = 136.8
+offset_right = 157.6
 offset_bottom = 396.0
 
 [node name="Effects" type="Node" parent="." unique_id=1082976363]
@@ -641,12 +641,36 @@ texture = ExtResource("19_01apl")
 [node name="Potion_icon" type="TextureRect" parent="EquipmentControl/Second_Potion_socket" unique_id=1273336174]
 texture_filter = 1
 layout_mode = 0
-offset_left = 6.4545445
-offset_top = 7.2
-offset_right = 56.454544
-offset_bottom = 57.2
+offset_left = 6.545449
+offset_top = 5.5999994
+offset_right = 42.54545
+offset_bottom = 41.6
 pivot_offset = Vector2(0.5, 0.5)
 mouse_filter = 2
+
+[node name="Potion_count" type="Label" parent="EquipmentControl/Second_Potion_socket" unique_id=1470411894]
+layout_mode = 0
+offset_left = 29.818182
+offset_top = 16.800001
+offset_right = 61.818184
+offset_bottom = 54.800003
+theme_override_colors/font_color = Color(0.731311, 0.82951605, 0.8604246, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("16_khbku")
+theme_override_font_sizes/font_size = 32
+text = "99"
+vertical_alignment = 2
+
+[node name="SwapHint" type="Label" parent="EquipmentControl/Second_Potion_socket" unique_id=1899394517]
+visible = false
+layout_mode = 0
+offset_top = 54.0
+offset_right = 48.0
+offset_bottom = 76.0
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 14
+text = "R"
+horizontal_alignment = 1
 
 [node name="Potion_socket" type="TextureRect" parent="EquipmentControl" unique_id=1503944081]
 self_modulate = Color(0.21573097, 0.6000273, 0.5232855, 1)

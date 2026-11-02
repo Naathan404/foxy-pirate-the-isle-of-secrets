@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WeaponForge" format=3]
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://e3eg2gjqtnjw"]
 
 [ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
 
@@ -10,6 +10,6 @@ description = "Projectile Range +25%, Projectile Speed +15%, Damage -10%"
 forge_group = 1
 acquisition_source = &"blacksmith"
 drop_weight = 3.0
-projectile_range_multiplier = 1.25
-projectile_speed_multiplier = 1.15
 damage_multiplier = 0.9
+projectile_speed_multiplier = 1.15
+projectile_range_multiplier = 1.25

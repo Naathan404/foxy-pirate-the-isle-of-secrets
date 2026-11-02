@@ -22,6 +22,7 @@ const FORGE_FIELDS := {
 	"critical_damage_multiplier": "Crit Damage",
 	"critical_damage_bonus": "Crit Damage",
 	"stagger_multiplier": "Stagger",
+	"chaos_gain_multiplier": "Chaos Gain",
 	"skill_damage_multiplier": "Skill Damage",
 	"knockback_multiplier": "Knockback",
 	"projectile_knockback_multiplier": "Projectile Knockback",
@@ -200,6 +201,8 @@ func _refresh_details() -> void:
 	_action_hint = ""
 	%StaggerName.hide()
 	%StaggerValue.hide()
+	%ChaosGainName.hide()
+	%ChaosGainValue.hide()
 	%Portrait.texture = _icon(_selection)
 	%ItemTitle.text = _name(_selection) if _selection != null else "No equipment"
 	%ItemDescription.text = ""
@@ -293,9 +296,16 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 	%StaggerValue.show()
 	%StaggerValue.text = _number(stagger)
 	%StaggerValue.tooltip_text = "Base stagger with forge applied; combo steps can scale it."
+	%ChaosGainName.show()
+	%ChaosGainValue.show()
+	%ChaosGainValue.text = _number(weapon.get_chaos_gain()) + " CP/hit"
+	%ChaosGainValue.tooltip_text = "Weapon Chaos Gain with forge applied, per confirmed enemy hit."
 	%StatsHeading.tooltip_text = (
 		"Base attack with forge applied. "
 		+ "Combo steps and situational Charm effects are calculated on hit."
+		+ " Chaos Gain: "
+		+ _number(weapon.get_chaos_gain())
+		+ " CP per hit."
 	)
 	if forge == null:
 		_add_forge_row("No forge applied")
@@ -330,10 +340,8 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 			skill.display_name if not skill.display_name.is_empty() else "Weapon Skill"
 		)
 		%SkillMeta.text = (
-				_number(skill.charge_seconds) + "s charge"
-				if skill.hold_to_charge
-				else ""
-			)
+			_number(skill.charge_seconds) + "s charge" if skill.hold_to_charge else ""
+		)
 		%SkillDescription.text = skill.description
 		%SkillDescription.tooltip_text = skill.description
 	%EquipButton.text = "Equipped" if _is_equipped(weapon) else "Equip Weapon"

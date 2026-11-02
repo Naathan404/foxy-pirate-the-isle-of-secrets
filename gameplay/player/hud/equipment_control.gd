@@ -19,6 +19,8 @@ var _potion_rest_scale: Vector2
 @onready var space_icon: TextureRect = $SPACE_socket/SPACE_icon
 @onready var potion_icon: TextureRect = $Potion_socket/Potion_icon
 @onready var potion_quantity: Label = $Potion_socket/Potion_count
+@onready var secondary_potion_icon: TextureRect = $Second_Potion_socket/Potion_icon
+@onready var secondary_potion_quantity: Label = $Second_Potion_socket/Potion_count
 
 
 func _ready() -> void:
@@ -122,6 +124,20 @@ func set_potion_quantity(amount: int) -> void:
 	potion_quantity.text = str(amount)
 	potion_quantity.visible = potion_icon.visible
 	potion_icon.modulate = Color.WHITE if amount > 0 else Color.GRAY
+
+
+func set_secondary_potion_icon(potion: Potion) -> void:
+	secondary_potion_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	secondary_potion_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	secondary_potion_icon.texture = potion.icon if potion != null else null
+	secondary_potion_icon.visible = potion != null
+	secondary_potion_quantity.visible = potion != null
+
+
+func set_secondary_potion_quantity(amount: int) -> void:
+	secondary_potion_quantity.text = str(amount)
+	secondary_potion_quantity.visible = secondary_potion_icon.visible
+	secondary_potion_icon.modulate = Color.WHITE if amount > 0 else Color.GRAY
 
 
 func feedback_potion_used() -> void:
