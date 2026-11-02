@@ -221,6 +221,15 @@ texture_normal = ExtResource("6_bba17")
 texture_pressed = ExtResource("7_21gur")
 stretch_mode = 5
 
+[node name="EquipSecondaryPotionButton" type="Button" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_0s057")
+theme_override_font_sizes/font_size = 16
+text = "Equip secondary"
+tooltip_text = "Assign the backup potion. Press R to swap with the main potion."
+
 [node name="Equipment" parent="PanelContainer/MarginContainer/Tabs" unique_id=218277719 instance=ExtResource("equipment_tab")]
 visible = false
 layout_mode = 2
@@ -295,6 +304,7 @@ texture = ExtResource("9_h7xhg")
 stretch_mode = 5
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/EquipPotionButton" to="." method="_on_equip_potion_button_pressed"]
+[connection signal="pressed" from="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/EquipSecondaryPotionButton" to="." method="_on_equip_secondary_potion_button_pressed"]
 [connection signal="pressed" from="TabButtons/MaterialButton" to="." method="_on_material_button_pressed"]
 [connection signal="pressed" from="TabButtons/EquipmentButton" to="." method="_on_equipment_button_pressed"]
 [connection signal="pressed" from="TabButtons/NotesButton" to="." method="_on_notes_button_pressed"]

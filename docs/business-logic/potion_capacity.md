@@ -39,3 +39,23 @@ Capacity belongs to the inventory instance. Saving progression across player
 recreation/game restarts and charging an NPC upgrade price are future integrations.
 Restore capacities before adding saved items. These methods do not spend Gold.
 Do not modify `slots` directly when adding items; use the inventory API.
+
+## Main and secondary potion
+
+`PotionComponent` owns two assigned resources: `equipped_potion` (the active/main
+slot consumed by F) and `secondary_potion` (backup). Inventory's existing equip
+button assigns/removes the main potion; `Equip secondary` assigns/removes backup.
+Assigning a potion already in the opposite slot swaps the slots instead of
+duplicating the assignment. Assignments do not reserve or remove inventory items.
+
+`swap_potions()` exchanges the two references and emits both
+`equipped_potion_changed` and `secondary_potion_changed` after committing the swap.
+The `swap_potion` InputMap action defaults to R. Player handles it through the
+same gameplay-input gate as drinking, so inventory/dialogue/death block it.
+
+`equip_secondary_potion()`, `unequip_secondary_potion()`,
+`is_secondary_equipped()`, and `get_secondary_quantity()` expose the backup API.
+Both HUD sockets refresh counts on inventory changes. A depleted assigned potion
+keeps its icon with a grey tint and count 0. No automatic reassignment or cycling
+through unassigned inventory potions occurs. Empty slots can also be swapped;
+when both slots are empty, swapping returns false. Quick selection is deferred.

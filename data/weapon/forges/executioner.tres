@@ -6,10 +6,10 @@
 script = ExtResource("1_forge")
 forge_id = &"executioner"
 display_name = "Executioner"
-description = "Critical Rate +5 pp, Critical Damage +40%, Attack Speed -5%"
+description = "Critical Rate +5 pp, Critical Damage +40 pp, Attack Speed -5%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 5.0
+drop_weight = 4.0
 critical_rate_bonus = 0.05
-critical_damage_multiplier = 1.4
 attack_speed_multiplier = 0.95
+critical_damage_bonus = 0.4

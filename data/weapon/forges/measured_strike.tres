@@ -9,6 +9,6 @@ display_name = "Measured Strike"
 description = "Startup +15%, Recovery -25%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 6.0
+drop_weight = 5.0
 windup_multiplier = 1.15
 recovery_multiplier = 0.75

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"chaotic_core"
+display_name = "Chaotic Core"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 2.0
+chaos_gain_multiplier = 2.0
+attack_speed_multiplier = 0.75
+damage_multiplier = 0.9
+description = "Chaos Gain +100%, Attack Speed -25%, Damage -10%"

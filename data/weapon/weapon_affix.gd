@@ -19,6 +19,7 @@ enum ForgeGroup { UNIVERSAL, WILDCARD }
 ## Percentage points on the critical multiplier, after its relative modifier.
 @export_range(-4.0, 4.0, 0.01) var critical_damage_bonus: float = 0.0
 @export_range(0.0, 5.0, 0.01) var stagger_multiplier: float = 1.0
+@export_range(0.0, 5.0, 0.01) var chaos_gain_multiplier: float = 1.0
 ## Applies to secondary weapon skills regardless of SP, CP, ammo or other payment.
 @export_range(0.01, 5.0, 0.01) var skill_damage_multiplier: float = 1.0
 @export_range(0.01, 5.0, 0.01) var projectile_speed_multiplier: float = 1.0
@@ -55,7 +56,10 @@ func is_valid() -> bool:
 	if not is_finite(stamina_cost_multiplier) or stamina_cost_multiplier < 0.0:
 		return false
 	for multiplier: float in [
-		knockback_multiplier, projectile_knockback_multiplier, stagger_multiplier
+		knockback_multiplier,
+		projectile_knockback_multiplier,
+		stagger_multiplier,
+		chaos_gain_multiplier
 	]:
 		if not is_finite(multiplier) or multiplier < 0.0:
 			return false

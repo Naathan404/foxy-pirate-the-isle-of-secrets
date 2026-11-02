@@ -1,27 +1,27 @@
 # Weapon Forges
 
-Shared pool: 19 Universal + 6 Wildcard. All weapon categories can roll any entry. The supplied weights sum to 111; chance = weight / 111.
+Shared pool: 22 Universal + 6 Wildcard. All weapon categories can roll any entry. Weights sum to 100; each weight is its roll percentage.
 
 | Group | Forge | Effect | Weight |
 | --- | --- | --- | --- |
-| Universal | Pristine | Damage +8%, Attack Speed +8%, Knockback +8% | 4.0 |
-| Universal | Heavy Edge | Damage +25%, Attack Speed -18%, Knockback +20%, Stagger +15% | 8.0 |
-| Universal | Swift Flow | Attack Speed +30%, Damage -20%, Knockback -20% | 8.0 |
-| Universal | Brittle Force | Damage +45%, Attack Speed -30%, Startup +10% | 4.0 |
-| Universal | Long Reach | Attack Range +25%, Damage -10% | 7.0 |
-| Universal | Close Quarters | Damage +20%, Attack Range -20%, Stagger +15% | 6.0 |
-| Universal | Quickdraw | Startup -25%, Recovery +15% | 6.0 |
-| Universal | Measured Strike | Startup +15%, Recovery -25% | 6.0 |
-| Universal | Keen Edge | Critical Rate +10 pp, Damage -5% | 6.0 |
-| Universal | Precision Edge | Critical Rate +12 pp, Critical Damage -20 pp | 5.0 |
-| Universal | Executioner | Critical Rate +5 pp, Critical Damage +40%, Attack Speed -5% | 5.0 |
-| Universal | Blunt Impact | Damage +15%, Critical Rate -5 pp, Knockback +20%, Stagger +20% | 6.0 |
-| Universal | Concussive Edge | Stagger +45%, Damage -10% | 5.0 |
-| Universal | Anchor Breaker | Knockback +45%, Stagger +20%, Attack Speed -15% | 4.0 |
-| Universal | Shattering Blow | Critical Damage +35%, Stagger +25%, Damage -5% | 4.0 |
-| Universal | Relentless | Recovery -25%, Damage -10% | 5.0 |
-| Universal | Crippling Weight | Damage +45%, Attack Speed -30%, Recovery +15%, Stagger +40% | 3.0 |
-| Universal | Frenzied Steel | Attack Speed +50%, Damage -30%, Stagger -40% | 3.0 |
+| Universal | Pristine | Damage +5%, Attack Speed +5%, Knockback +10% | 3.0 |
+| Universal | Heavy Edge | Damage +25%, Attack Speed -18%, Knockback +20%, Stagger +15%, Chaos Gain +20% | 6.0 |
+| Universal | Swift Flow | Attack Speed +30%, Damage -20%, Knockback -20%, Chaos Gain -20% | 6.0 |
+| Universal | Brittle Force | Damage +45%, Attack Speed -30%, Startup +10% | 3.0 |
+| Universal | Long Reach | Attack Range +25%, Damage -10% | 5.0 |
+| Universal | Close Quarters | Damage +20%, Attack Range -20%, Stagger +15% | 5.0 |
+| Universal | Quickdraw | Startup -25%, Recovery +15% | 5.0 |
+| Universal | Measured Strike | Startup +15%, Recovery -25% | 5.0 |
+| Universal | Keen Edge | Critical Rate +10 pp, Damage -5% | 5.0 |
+| Universal | Precision Edge | Critical Rate +12 pp, Critical Damage -20 pp | 4.0 |
+| Universal | Executioner | Critical Rate +5 pp, Critical Damage +40 pp, Attack Speed -5% | 4.0 |
+| Universal | Blunt Impact | Damage +15%, Critical Rate -5 pp, Knockback +20%, Stagger +20% | 5.0 |
+| Universal | Concussive Edge | Stagger +45%, Damage -10% | 4.0 |
+| Universal | Anchor Breaker | Knockback +45%, Stagger +20%, Attack Speed -15% | 3.0 |
+| Universal | Shattering Blow | Critical Damage +35 pp, Stagger +25%, Damage -5% | 3.0 |
+| Universal | Relentless | Recovery -25%, Damage -10% | 4.0 |
+| Universal | Crippling Weight | Damage +45%, Attack Speed -30%, Recovery +15%, Stagger +40% | 2.0 |
+| Universal | Frenzied Steel | Attack Speed +50%, Damage -30%, Stagger -40%, Chaos Gain -30% | 2.0 |
 | Universal | Doomsday Edge | Damage +75%, Attack Speed -40%, Startup +20%, Knockback +40%, Stagger +40% | 1.0 |
 | Wildcard | Titan Sweep | Melee Hitbox +25%, Attack Speed -10% | 3.0 |
 | Wildcard | Crusher Arc | Melee Hitbox +15%, Stagger +30%, Damage -12% | 3.0 |
@@ -29,12 +29,17 @@ Shared pool: 19 Universal + 6 Wildcard. All weapon categories can roll any entry
 | Wildcard | Sniper Sight | Projectile Range +25%, Critical Rate +7 pp, Attack Speed -15% | 2.0 |
 | Wildcard | Overcharge | Skill Damage +25%, SP Cost +30% | 2.0 |
 | Wildcard | Arcane Efficiency | SP Cost -25%, Skill Damage -10% | 2.0 |
+| Universal | Chaos Resonance | Chaos Gain +40%, Damage -15% | 4.0 |
+| Universal | Sealed Steel | Damage +25%, Chaos Gain -40% | 4.0 |
+| Universal | Chaotic Core | Chaos Gain +100%, Attack Speed -25%, Damage -10% | 2.0 |
 
 ## Resolution rules
 
 - HP damage = max(0, attack damage * combo damage * forge damage multiplier + flat damage). Secondary weapon skills additionally multiply by `skill_damage_multiplier`, regardless of SP, CP or ammo cost. Existing charm modifiers apply afterward.
 - Overcharge grants +25% skill damage and +30% SP cost. Arcane Efficiency grants -25% SP cost and -10% skill damage. Neither skill modifier affects normal attacks; CP and ammo costs stay unchanged.
-- Critical rate bonuses add percentage points, clamped to 0-100%. Critical damage = max(1, weapon critical multiplier * forge critical multiplier + forge critical bonus). At base x1.5: Precision Edge gives x1.3, Executioner x2.1, Shattering Blow x2.025. Critical hits do not increase stagger.
+- Critical rate bonuses add percentage points, clamped to 0-100%. Critical damage = max(1, weapon critical multiplier * forge critical multiplier + forge critical bonus). At base x1.5: Precision Edge gives x1.3, Executioner x1.9, Shattering Blow x1.85. Critical hits do not increase stagger.
+- CP per confirmed enemy hit = `WeaponData.chaos_per_hit` (default 5) * `WeaponForge.chaos_gain_multiplier` (default 1). Each weapon can tune its own base gain. CP does not scale with damage/critical hits. The gain is snapshotted when the attack starts.
+- Successful changes of weapon instance (including unequipping) reset CP to zero. Re-equipping the same instance or rejecting an equip does not reset CP. Projectiles from an earlier equip revision still deal damage but award no CP, even if the player switches back before impact.
 - Stagger per hit = WeaponData.stagger_damage * AttackData.stagger_multiplier * combo stagger multiplier * forge stagger multiplier. The combo factor applies only to normal combo attacks. HP damage, knockback, critical damage and stagger are independent.
 - Attack Speed divides startup, active, recovery and cooldown durations. Startup and Recovery modifiers affect their own durations before speed division.
 - For held projectiles, holding pays down the forged startup. Releasing early completes only
@@ -53,13 +58,13 @@ Shared pool: 19 Universal + 6 Wildcard. All weapon categories can roll any entry
 
 ## Inspector tuning
 
-- WeaponData: `stagger_damage` (Dagger 20, Bow 35).
+- WeaponData: `chaos_per_hit` (default 5 for both existing weapons), `stagger_damage` (Dagger 20, Bow 35).
 - AttackData and MeleeComboStep: `stagger_multiplier`. Dagger finisher is x1.75, returning dagger x1.25, volley arrows x0.5 each.
 - EnemyData: `stagger_threshold` (normal 60, elite 120, War Lord Turtle 240), `stagger_decay_delay` (1.25s), `stagger_decay_per_second` (30), `stagger_immunity_duration` (1s after recovery).
-- WeaponForge: `stagger_multiplier`, `critical_damage_multiplier`, `critical_damage_bonus`, `skill_damage_multiplier`, plus the existing rate, timing, range and knockback fields.
+- WeaponForge: `chaos_gain_multiplier`, `stagger_multiplier`, `critical_damage_multiplier`, `critical_damage_bonus`, `skill_damage_multiplier`, plus the existing rate, timing, range and knockback fields.
 
 ## Integration
 
 Assign `WeaponController.default_forge` for a fixed initial forge. `WeaponInstance.reforge(pool, rng)` replaces its forge using the weighted shared pool; it never mutates shared WeaponData. Equipment displays the forged base stagger and critical multiplier.
 
-CI membership stays fixed in `.github/godot-tests.txt`; existing forge, enemy, combo and equipment tests were updated for these rules.
+CI membership stays fixed in `.github/godot-tests.txt`; no new test cases are added for this change.

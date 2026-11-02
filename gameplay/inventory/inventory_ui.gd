@@ -54,6 +54,8 @@ var _tab_tweens: Dictionary[TextureButton, Tween] = {}
 	"Material/Content/ItemInfo/MarginContainer/VBoxContainer"
 )
 @onready var equip_potion_button: TextureButton = info_layout.get_node("EquipPotionButton")
+@onready
+var equip_secondary_potion_button: Button = info_layout.get_node("EquipSecondaryPotionButton")
 @onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
 @onready var item_name: Label = info_layout.get_node("ItemName")
 @onready var item_type: Label = info_layout.get_node("ItemType")
@@ -88,6 +90,7 @@ func _ready() -> void:
 	inventory.changed.connect(refresh)
 	if is_instance_valid(potion_component):
 		potion_component.equipped_potion_changed.connect(_on_equipped_potion_changed)
+		potion_component.secondary_potion_changed.connect(_on_equipped_potion_changed)
 	_select_tab(0)
 	_refresh_item_info()
 
@@ -140,6 +143,7 @@ func _on_item_dropped(from_index: int, to_index: int) -> void:
 
 
 func _refresh_item_info() -> void:
+	equip_secondary_potion_button.hide()
 	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
 	if slot == null or slot.is_empty():
 		selected_slot_index = -1
@@ -161,13 +165,18 @@ func _refresh_item_info() -> void:
 	if not equip_potion_button.visible:
 		return
 	var equipped = potion_component.is_equipped(slot.item as Potion)
+	equip_secondary_potion_button.show()
+	var secondary_equipped: bool = potion_component.is_secondary_equipped(slot.item as Potion)
+	equip_secondary_potion_button.text = (
+		"Remove secondary" if secondary_equipped else "Equip secondary"
+	)
 	equip_potion_button.texture_normal = (
 		unequip_button_texture if equipped else equip_button_texture
 	)
 	equip_potion_button.texture_pressed = (
 		unequip_button_pressed_texture if equipped else equip_button_pressed_texture
 	)
-	equip_potion_button.tooltip_text = "Tháo bình thuốc" if equipped else "Trang bị bình thuốc"
+	equip_potion_button.tooltip_text = "Tháo bình chính" if equipped else "Trang bị bình chính"
 
 
 func _on_equipped_potion_changed(_potion: Potion) -> void:
@@ -354,3 +363,16 @@ func _on_equip_potion_button_pressed() -> void:
 		potion_component.unequip_potion()
 	else:
 		potion_component.equip_potion(potion)
+
+
+func _on_equip_secondary_potion_button_pressed() -> void:
+	if potion_component == null:
+		return
+	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
+	if slot == null or slot.is_empty() or slot.item is not Potion:
+		return
+	var potion := slot.item as Potion
+	if potion_component.is_secondary_equipped(potion):
+		potion_component.unequip_secondary_potion()
+	else:
+		potion_component.equip_secondary_potion(potion)

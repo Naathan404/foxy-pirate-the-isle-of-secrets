@@ -60,6 +60,7 @@ var _combo_index: int = 0
 var _combo_remaining: float = 0.0
 var _queued_attack: AttackContext
 var _buffer_remaining: float = 0.0
+var _equip_revision: int = 0
 
 
 # Setup nhân vật, SP, đạn và vũ khí khởi đầu
@@ -109,6 +110,8 @@ func equip(weapon: WeaponInstance) -> bool:
 	var definition := weapon.definition
 	if not is_finite(definition.stagger_damage) or definition.stagger_damage < 0.0:
 		return false
+	if not is_finite(definition.chaos_per_hit) or definition.chaos_per_hit < 0.0:
+		return false
 	if definition.normal_attack == null or not definition.normal_attack.is_valid():
 		return false
 	if not _has_animation(definition.normal_attack.animation_prefix):
@@ -130,7 +133,10 @@ func equip(weapon: WeaponInstance) -> bool:
 		_effect.on_unequip()
 		_effect.queue_free()
 	_effect = next_effect
+	var weapon_changed_now: bool = equipped != weapon
 	equipped = weapon
+	if weapon_changed_now:
+		_reset_weapon_chaos()
 	reset_combo()
 	if not _owned.has(weapon):
 		_owned.append(weapon)
@@ -143,6 +149,13 @@ func equip(weapon: WeaponInstance) -> bool:
 	weapon_changed.emit(weapon)
 	collection_changed.emit()
 	return true
+
+
+func _reset_weapon_chaos() -> void:
+	_equip_revision += 1
+	if is_instance_valid(chaos):
+		chaos.consume(chaos.current)
+		chaos.notify_combat_activity()
 
 
 func _has_animation(prefix: String) -> bool:
@@ -270,6 +283,7 @@ func _sync_entry_ownership(entry: WeaponCollectionEntry) -> void:
 			_effect.queue_free()
 		_effect = null
 		equipped = null
+		_reset_weapon_chaos()
 		reset_combo()
 		weapon_changed.emit(null)
 
@@ -536,7 +550,9 @@ func try_attack(request: AttackContext) -> bool:
 	snapshot.attack_id = _next_attack_id
 	# Chỉ bind vũ khí, bind context sẽ tạo vòng tham chiếu
 	snapshot.damage_prepared.connect(_on_damage_prepared)
-	snapshot.damage_applied.connect(_on_damage_applied.bind(snapshot.weapon))
+	snapshot.damage_applied.connect(
+		_on_damage_applied.bind(snapshot.weapon, snapshot.weapon.get_chaos_gain(), _equip_revision)
+	)
 	_context = snapshot
 	_execution = execution
 	execution.context = snapshot
@@ -785,11 +801,20 @@ func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
 
 
 func _on_damage_applied(
-	damage: DamageContext, target: Node, applied_hp: float, source_weapon: WeaponInstance
+	damage: DamageContext,
+	target: Node,
+	applied_hp: float,
+	source_weapon: WeaponInstance,
+	chaos_gain: float = 0.0,
+	equip_revision: int = -1
 ) -> void:
 	if damage == null or applied_hp <= 0:
 		return
 	damage.target = target
+	# Old projectiles cannot refill a new weapon, even after switching back to the old one.
+	damage.chaos_gain = (
+		chaos_gain if source_weapon == equipped and equip_revision == _equip_revision else 0.0
+	)
 	damage.target_defeated = _is_target_defeated(target)
 	# Chỉ kích hoạt hiệu ứng nếu vũ khí gây damage vẫn đang được trang bị
 	if source_weapon == equipped and is_instance_valid(_effect):

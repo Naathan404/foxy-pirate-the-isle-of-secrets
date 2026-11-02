@@ -6,11 +6,12 @@
 script = ExtResource("1_forge")
 forge_id = &"heavy_edge"
 display_name = "Heavy Edge"
-description = "Damage +25%, Attack Speed -18%, Knockback +20%, Stagger +15%"
+description = "Damage +25%, Attack Speed -18%, Knockback +20%, Stagger +15%, Chaos Gain +20%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 8.0
+drop_weight = 6.0
 damage_multiplier = 1.25
 attack_speed_multiplier = 0.82
 knockback_multiplier = 1.2
 stagger_multiplier = 1.15
+chaos_gain_multiplier = 1.2

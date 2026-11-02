@@ -9,6 +9,6 @@ display_name = "Quickdraw"
 description = "Startup -25%, Recovery +15%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 6.0
+drop_weight = 5.0
 windup_multiplier = 0.75
 recovery_multiplier = 1.15

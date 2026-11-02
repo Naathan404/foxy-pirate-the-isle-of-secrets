@@ -146,8 +146,8 @@ controller và nối `damage_dealt` trước khi gọi setup vũ khí.
 
 Luật tích và dùng CP:
 
-- `PlayerData.max_chaos` mặc định 100, `chaos_per_hit` mặc định 20. Resource
-  `foxy_data.tres` hiện override thành 100 CP/hit.
+- `PlayerData.max_chaos` m?c ??nh 100. CP/hit l?y t? `WeaponData.chaos_per_hit` (m?c ??nh 5), nh?n `WeaponForge.chaos_gain_multiplier`; tr??ng c? tr?n PlayerData kh?ng c?n ???c d?ng.
+- ??i sang m?t WeaponInstance kh?c ho?c b? v? kh? ??t CP v? 0. ??n c?a l?n trang b? tr??c kh?ng c?ng CP, k? c? ?? ??i l?i v? kh? c?.
 - Player chỉ cộng khi còn sống, có chaos, `applied_hp > 0`, nguồn damage là chính
   Player và target là `EnemyBase`. Lượng cộng cố định theo hit, không nhân damage.
 - Đánh hụt hoặc không gây mất HP không tăng CP. Normal và secondary đều có thể

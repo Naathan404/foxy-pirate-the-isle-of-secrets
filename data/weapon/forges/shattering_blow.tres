@@ -6,10 +6,10 @@
 script = ExtResource("1_forge")
 forge_id = &"shattering_blow"
 display_name = "Shattering Blow"
-description = "Critical Damage +35%, Stagger +25%, Damage -5%"
+description = "Critical Damage +35 pp, Stagger +25%, Damage -5%"
 forge_group = 0
 acquisition_source = &"blacksmith"
-drop_weight = 4.0
-critical_damage_multiplier = 1.35
+drop_weight = 3.0
 stagger_multiplier = 1.25
 damage_multiplier = 0.95
+critical_damage_bonus = 0.35
