@@ -16,6 +16,7 @@ var _hovered: bool = false
 var _pressed: bool = false
 var _dragging: bool = false
 var _drop_target: bool = false
+var _drag_enabled := true
 var _visual_tween: Tween
 var _background_scale: Vector2
 var _content_scale: Vector2
@@ -130,7 +131,7 @@ func _animate_visual() -> void:
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	if not is_instance_valid(inventory):
+	if not _drag_enabled or not is_instance_valid(inventory):
 		return null
 	var slot: InventorySlot = inventory.get_slot(slot_index)
 	if slot == null or slot.is_empty():
@@ -178,7 +179,7 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 
 
 func _is_valid_drop(data: Variant) -> bool:
-	if not is_visible_in_tree() or not is_instance_valid(inventory) or not data is Dictionary:
+	if not _drag_enabled or not is_visible_in_tree() or not is_instance_valid(inventory) or not data is Dictionary:
 		return false
 	if data.get("inventory") != inventory or not data.get("slot_index") is int:
 		return false
@@ -206,3 +207,19 @@ func refresh(slot: InventorySlot) -> void:
 	quantity_label.text = str(slot.quantity)
 
 	quantity_label.visible = slot.quantity >= 1
+
+
+## Lets read-only menus render a catalog item with the same slot visual as the inventory.
+func set_preview(icon_texture: Texture2D, quantity: int = 1) -> void:
+	_drag_enabled = false
+	icon.texture = icon_texture
+	quantity_label.text = str(maxi(quantity, 1))
+	quantity_label.show()
+
+
+func set_drag_enabled(enabled: bool) -> void:
+	_drag_enabled = enabled
+	if not enabled:
+		_dragging = false
+		_drop_target = false
+		_animate_visual()

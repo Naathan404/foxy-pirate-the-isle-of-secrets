@@ -4,6 +4,7 @@ const CATALOG: MerchantCatalog = preload("res://data/merchants/silas_catalog.tre
 const BOW: WeaponData = preload("res://data/weapon/weapon_bow.tres")
 const ARROW: BaseItem = preload("res://data/items/materials/wooden_arrow.tres")
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
+const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
 const NPC_TEST_SCENE: PackedScene = preload("res://world/tests/npc_test_scene.tscn")
 
@@ -13,6 +14,8 @@ var _failures := 0
 func _initialize() -> void:
 	_test_purchase_rejections()
 	_test_successful_item_trade()
+	_test_configured_trade_amount()
+	_test_catalog_prices_and_disabled_sales()
 	_test_weapon_is_one_time_purchase()
 	_test_persistence()
 	await _test_npc_scene_smoke()
@@ -48,13 +51,13 @@ func _test_purchase_rejections() -> void:
 		"potion test begins with insufficient gold"
 	)
 	var potion_wallet := GoldWallet.new()
-	potion_wallet.add_gold(20)
+	potion_wallet.add_gold(25)
 	_assert_equal(
 		service.purchase(&"small_healing_potion", potion_inventory, potion_wallet, null),
 		MerchantTransactionService.Result.INVENTORY_FULL,
 		"potion capacity rejects purchase"
 	)
-	_assert_equal(potion_wallet.get_balance(), 20, "potion capacity keeps gold")
+	_assert_equal(potion_wallet.get_balance(), 25, "potion capacity keeps gold")
 
 
 func _test_successful_item_trade() -> void:
@@ -82,6 +85,59 @@ func _test_successful_item_trade() -> void:
 	)
 	_assert_equal(inventory.count_item(STARFISH_CORE.item_id), 0, "sold item is removed")
 	_assert_equal(wallet.get_balance(), 15, "sale adds configured gold")
+
+
+func _test_configured_trade_amount() -> void:
+	var bundled_offer := MerchantOffer.new()
+	bundled_offer.offer_id = &"arrow_bundle"
+	bundled_offer.item = ARROW
+	bundled_offer.trade_amount = 3
+	bundled_offer.buy_price = 6
+	bundled_offer.sell_price = 3
+	var bundled_catalog := MerchantCatalog.new()
+	bundled_catalog.offers = [bundled_offer]
+	var service := MerchantTransactionService.new(bundled_catalog)
+	var inventory := _make_inventory(2)
+	var wallet := GoldWallet.new()
+	wallet.add_gold(6)
+	_assert_equal(
+		service.purchase(&"arrow_bundle", inventory, wallet, null),
+		MerchantTransactionService.Result.SUCCESS,
+		"configured trade amount purchases the whole bundle"
+	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 3, "purchase adds configured trade amount")
+	_assert_equal(wallet.get_balance(), 0, "bundle purchase spends configured price once")
+	_assert_equal(
+		service.sell(&"arrow_bundle", inventory, wallet),
+		MerchantTransactionService.Result.SUCCESS,
+		"configured trade amount sells the whole bundle"
+	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 0, "sale removes configured trade amount")
+	_assert_equal(wallet.get_balance(), 3, "bundle sale uses configured price once")
+
+
+func _test_catalog_prices_and_disabled_sales() -> void:
+	_assert_equal(CATALOG.get_offer(&"starfish_core").buy_price, 50, "starfish buy price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"starfish_core").sell_price, 5, "starfish sell price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"crab_claw").sell_price, 5, "crab sale price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"gunpowder_bag").sell_price, 5, "gunpowder sale price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"small_healing_potion").buy_price, 25, "small healing price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"healing_potion").buy_price, 45, "large healing price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"small_stamina_potion").buy_price, 15, "small stamina price comes from catalog")
+	_assert_equal(CATALOG.get_offer(&"stamina_potion").buy_price, 30, "large stamina price comes from catalog")
+	_assert_true(CATALOG.get_sell_offer_for_item(HEALING.item_id) == null, "small potion cannot be sold")
+	_assert_true(CATALOG.get_sell_offer_for_item(LARGE_HEALING.item_id) == null, "large potion cannot be sold")
+	var service := MerchantTransactionService.new(CATALOG)
+	var inventory := _make_inventory(2)
+	var wallet := GoldWallet.new()
+	inventory.add_item(HEALING, 1)
+	_assert_equal(
+		service.sell(&"small_healing_potion", inventory, wallet),
+		MerchantTransactionService.Result.INVALID_OFFER,
+		"catalog prevents selling a potion without a sell price"
+	)
+	_assert_equal(inventory.count_item(HEALING.item_id), 1, "rejected potion sale keeps the item")
+	_assert_equal(wallet.get_balance(), 0, "rejected potion sale keeps gold")
 
 
 func _test_weapon_is_one_time_purchase() -> void:
@@ -139,6 +195,21 @@ func _test_npc_scene_smoke() -> void:
 	if silas != null and panel != null:
 		_assert_true(panel.open_for(GameManager.player, silas.catalog), "shop panel opens for the player")
 		_assert_true(panel.visible, "shop panel becomes visible")
+		_assert_equal(
+			panel.grid.get_child_count(),
+			silas.catalog.get_buy_offers().size(),
+			"buy tab renders the configured catalog"
+		)
+		panel._set_tab(SilasShopPanel.Tab.SELL)
+		var inventory := GameManager.player.get_node_or_null("Inventory") as Inventory
+		if inventory != null:
+			_assert_equal(
+				panel.grid.get_child_count(), inventory.slots.size(), "sell tab renders the real inventory"
+			)
+			panel._set_tab(SilasShopPanel.Tab.BAG)
+			_assert_equal(
+				panel.grid.get_child_count(), inventory.slots.size(), "bag tab renders the real inventory"
+			)
 		panel.close_shop()
 		_assert_false(panel.visible, "shop panel closes")
 	scene.queue_free()

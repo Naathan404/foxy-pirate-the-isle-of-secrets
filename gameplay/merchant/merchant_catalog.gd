@@ -28,6 +28,13 @@ func get_sell_offers() -> Array[MerchantOffer]:
 	return result
 
 
+func get_sell_offer_for_item(item_id: StringName) -> MerchantOffer:
+	for offer: MerchantOffer in get_sell_offers():
+		if offer.item != null and offer.item.item_id == item_id:
+			return offer
+	return null
+
+
 func validate() -> PackedStringArray:
 	var errors := PackedStringArray()
 	var ids: Dictionary[StringName, bool] = {}
@@ -35,6 +42,8 @@ func validate() -> PackedStringArray:
 		if offer == null or not offer.is_valid():
 			errors.append("Merchant catalog has an invalid offer")
 			continue
+		if offer.trade_amount < 1:
+			errors.append("Merchant offer must trade at least one item: %s" % offer.offer_id)
 		if ids.has(offer.offer_id):
 			errors.append("Duplicate merchant offer: %s" % offer.offer_id)
 		ids[offer.offer_id] = true

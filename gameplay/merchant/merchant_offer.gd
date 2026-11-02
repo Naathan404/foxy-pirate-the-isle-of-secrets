@@ -8,6 +8,9 @@ enum Kind { ITEM, WEAPON }
 @export var kind: Kind = Kind.ITEM
 @export var item: BaseItem
 @export var weapon: WeaponData
+@export_group("Trade configuration")
+## Number of items transferred by one click. Prices below apply to this whole bundle.
+@export_range(1, 100000, 1) var trade_amount := 1
 @export_range(0, 1000000, 1) var buy_price := 0
 @export_range(0, 1000000, 1) var sell_price := 0
 
@@ -27,6 +30,8 @@ func get_icon() -> Texture2D:
 func is_valid() -> bool:
 	if offer_id.is_empty():
 		return false
+	if trade_amount < 1:
+		return false
 	if kind == Kind.WEAPON:
-		return weapon != null and not weapon.weapon_id.is_empty()
+		return weapon != null and not weapon.weapon_id.is_empty() and trade_amount == 1
 	return item != null and not item.item_id.is_empty()

@@ -45,11 +45,11 @@ func purchase(
 		return Result.INVALID_OFFER
 	if not wallet.can_afford(offer.buy_price):
 		return Result.INSUFFICIENT_GOLD
-	if not inventory.can_add_item(offer.item):
+	if not inventory.can_add_item(offer.item, offer.trade_amount):
 		return Result.INVENTORY_FULL
 	if not wallet.try_spend(offer.buy_price):
 		return Result.INSUFFICIENT_GOLD
-	if inventory.add_item(offer.item, 1) != 0:
+	if inventory.add_item(offer.item, offer.trade_amount) != 0:
 		wallet.add_gold(offer.buy_price)
 		return Result.INVENTORY_FULL
 	return Result.SUCCESS
@@ -59,14 +59,14 @@ func sell(offer_id: StringName, inventory: Inventory, wallet: GoldWallet) -> Res
 	var offer := _get_sell_offer(offer_id)
 	if offer == null or inventory == null or wallet == null or offer.item == null:
 		return Result.INVALID_OFFER
-	if not inventory.has_item(offer.item.item_id):
+	if not inventory.has_item(offer.item.item_id, offer.trade_amount):
 		return Result.NOT_OWNED
 	if wallet.get_balance() > GoldWallet.MAX_GOLD - offer.sell_price:
 		return Result.GOLD_CAP_REACHED
-	if inventory.remove_item(offer.item.item_id, 1) != 1:
+	if inventory.remove_item(offer.item.item_id, offer.trade_amount) != offer.trade_amount:
 		return Result.NOT_OWNED
 	if not wallet.add_gold(offer.sell_price):
-		inventory.add_item(offer.item, 1)
+		inventory.add_item(offer.item, offer.trade_amount)
 		return Result.GOLD_CAP_REACHED
 	return Result.SUCCESS
 

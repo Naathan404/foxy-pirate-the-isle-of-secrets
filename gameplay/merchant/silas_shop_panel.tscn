@@ -4,144 +4,237 @@
 [ext_resource type="Texture2D" path="res://assets/ui/player_hud/inventory/inventory_background.png" id="2_background"]
 [ext_resource type="Texture2D" path="res://assets/ui/player_hud/inventory/inventory_slot.png" id="3_slot"]
 [ext_resource type="FontFile" path="res://assets/fonts/Minecraft.ttf" id="4_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="5_display_font"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_panel"]
-texture = ExtResource("2_background")
-texture_margin_left = 24.0
-texture_margin_top = 24.0
-texture_margin_right = 24.0
-texture_margin_bottom = 24.0
+[sub_resource type="StyleBoxEmpty" id="StyleEmpty"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBox_icon"]
+[sub_resource type="StyleBoxTexture" id="StyleIcon"]
 texture = ExtResource("3_slot")
 expand_margin_left = 8.0
 expand_margin_top = 8.0
 expand_margin_right = 8.0
 expand_margin_bottom = 8.0
 
+[sub_resource type="StyleBoxFlat" id="StyleAction"]
+bg_color = Color(0.2, 0.12, 0.055, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92, 0.69, 0.29, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleActionHover"]
+bg_color = Color(0.39, 0.23, 0.08, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.86, 0.48, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [node name="SilasShopPanel" type="CanvasLayer"]
 layer = 20
 script = ExtResource("1_script")
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -430.0
-offset_top = -290.0
-offset_right = 430.0
-offset_bottom = 290.0
+offset_left = -400.0
+offset_top = -250.0
+offset_right = 400.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBox_panel")
+theme_override_styles/panel = SubResource("StyleEmpty")
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Background" type="TextureRect" parent="PanelContainer"]
+texture_filter = 1
 layout_mode = 2
-theme_override_constants/margin_left = 42
-theme_override_constants/margin_top = 34
-theme_override_constants/margin_right = 42
-theme_override_constants/margin_bottom = 34
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 10)
+texture = ExtResource("2_background")
+stretch_mode = 5
 
-[node name="Layout" type="VBoxContainer" parent="Panel/Margin"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
 
-[node name="Title" type="Label" parent="Panel/Margin/Layout"]
+[node name="Layout" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 30
+theme_override_constants/separation = 7
+
+[node name="Header" type="HBoxContainer" parent="PanelContainer/MarginContainer/Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("5_display_font")
+theme_override_font_sizes/font_size = 28
 text = "SILAS' BLACK MARKET"
-horizontal_alignment = 1
 
-[node name="Gold" type="Label" parent="Panel/Margin/Layout"]
+[node name="Gold" type="Label" parent="PanelContainer/MarginContainer/Layout/Header"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.83, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
 theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 22
-text = "Gold: 0"
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+text = "GOLD: 0"
+horizontal_alignment = 2
 
-[node name="Tabs" type="HBoxContainer" parent="Panel/Margin/Layout"]
+[node name="Tabs" type="HBoxContainer" parent="PanelContainer/MarginContainer/Layout"]
 layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
-[node name="Buy" type="Button" parent="Panel/Margin/Layout/Tabs"]
-custom_minimum_size = Vector2(130, 38)
+[node name="Buy" type="Button" parent="PanelContainer/MarginContainer/Layout/Tabs"]
+custom_minimum_size = Vector2(0, 31)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("4_font")
-text = "Buy"
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleAction")
+theme_override_styles/hover = SubResource("StyleActionHover")
+text = "BUY"
 
-[node name="Sell" type="Button" parent="Panel/Margin/Layout/Tabs"]
-custom_minimum_size = Vector2(130, 38)
+[node name="Sell" type="Button" parent="PanelContainer/MarginContainer/Layout/Tabs"]
+custom_minimum_size = Vector2(0, 31)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("4_font")
-text = "Sell"
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleAction")
+theme_override_styles/hover = SubResource("StyleActionHover")
+text = "SELL"
 
-[node name="Content" type="HBoxContainer" parent="Panel/Margin/Layout"]
+[node name="Bag" type="Button" parent="PanelContainer/MarginContainer/Layout/Tabs"]
+custom_minimum_size = Vector2(0, 31)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleAction")
+theme_override_styles/hover = SubResource("StyleActionHover")
+text = "BAG"
+
+[node name="Content" type="HBoxContainer" parent="PanelContainer/MarginContainer/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 22
+theme_override_constants/separation = 14
 
-[node name="Entries" type="ScrollContainer" parent="Panel/Margin/Layout/Content"]
-custom_minimum_size = Vector2(340, 0)
+[node name="ItemScroll" type="ScrollContainer" parent="PanelContainer/MarginContainer/Layout/Content"]
+custom_minimum_size = Vector2(415, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_scroll_mode = 0
 
-[node name="Rows" type="VBoxContainer" parent="Panel/Margin/Layout/Content/Entries"]
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/Layout/Content/ItemScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
+columns = 5
+
+[node name="ItemInfo" type="PanelContainer" parent="PanelContainer/MarginContainer/Layout/Content"]
+custom_minimum_size = Vector2(290, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleEmpty")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer"]
+layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Info" type="VBoxContainer" parent="Panel/Margin/Layout/Content"]
-custom_minimum_size = Vector2(350, 0)
+[node name="IconCenter" type="CenterContainer" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 10
 
-[node name="IconFrame" type="PanelContainer" parent="Panel/Margin/Layout/Content/Info"]
-custom_minimum_size = Vector2(90, 90)
+[node name="IconFrame" type="PanelContainer" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/IconCenter"]
+texture_filter = 1
+custom_minimum_size = Vector2(70, 70)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBox_icon")
+theme_override_styles/panel = SubResource("StyleIcon")
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/Layout/Content/Info/IconFrame"]
+[node name="Icon" type="TextureRect" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/IconCenter/IconFrame"]
 layout_mode = 2
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Name" type="Label" parent="Panel/Margin/Layout/Content/Info"]
+[node name="ItemName" type="Label" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("4_font")
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("5_display_font")
 theme_override_font_sizes/font_size = 24
-autowrap_mode = 2
+autowrap_mode = 3
 
-[node name="Count" type="Label" parent="Panel/Margin/Layout/Content/Info"]
+[node name="Count" type="Label" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox"]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 15
 
-[node name="Description" type="Label" parent="Panel/Margin/Layout/Content/Info"]
+[node name="Description" type="Label" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 16
-autowrap_mode = 2
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
 
-[node name="Action" type="Button" parent="Panel/Margin/Layout/Content/Info"]
-custom_minimum_size = Vector2(0, 42)
+[node name="Trade" type="Label" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.31, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("4_font")
-
-[node name="Feedback" type="Label" parent="Panel/Margin/Layout"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
 
-[node name="Close" type="Button" parent="Panel/Margin/Layout"]
-custom_minimum_size = Vector2(0, 36)
+[node name="Action" type="Button" parent="PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_font")
-text = "Leave"
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleAction")
+theme_override_styles/hover = SubResource("StyleActionHover")
+
+[node name="Feedback" type="Label" parent="PanelContainer/MarginContainer/Layout"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+
+[node name="Close" type="Button" parent="PanelContainer/MarginContainer/Layout"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleAction")
+theme_override_styles/hover = SubResource("StyleActionHover")
+text = "LEAVE"
