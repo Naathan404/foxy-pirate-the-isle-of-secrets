@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/Dust Particle.png" id="1_spark"]
+[ext_resource type="Shader" path="res://gameplay/weapons/bow_energy.gdshader" id="2_energy"]
+
+[sub_resource type="Gradient" id="Gradient"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(0.7, 1, 1, 1, 0.1, 0.65, 1, 0.65, 0.05, 0.2, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="Ramp"]
+gradient = SubResource("Gradient")
+
+[sub_resource type="ParticleProcessMaterial" id="Process"]
+emission_shape = 1
+emission_sphere_radius = 0.035
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 0.15
+initial_velocity_max = 1.1
+gravity = Vector3(0, 0, 0)
+damping_min = 1.5
+damping_max = 3.0
+scale_min = 0.2
+scale_max = 0.55
+color_ramp = SubResource("Ramp")
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_spark")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="Mesh"]
+material = SubResource("Material")
+size = Vector2(0.08, 0.14)
+
+[sub_resource type="ShaderMaterial" id="HeadMaterial"]
+shader = ExtResource("2_energy")
+shader_parameter/shape = 1
+shader_parameter/glow_color = Color(0.08, 0.6, 1, 0.85)
+shader_parameter/core_color = Color(0.9, 1, 1, 1)
+shader_parameter/brightness = 1.7
+
+[sub_resource type="QuadMesh" id="HeadMesh"]
+size = Vector2(0.55, 0.55)
+
+[node name="StormstringFlightParticles" type="GPUParticles3D"]
+cast_shadow = 0
+emitting = false
+amount = 18
+lifetime = 0.24
+randomness = 0.5
+local_coords = false
+visibility_aabb = AABB(-6, -6, -6, 12, 12, 12)
+process_material = SubResource("Process")
+draw_pass_1 = SubResource("Mesh")
+
+[node name="HeadGlint" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("HeadMaterial")
+mesh = SubResource("HeadMesh")

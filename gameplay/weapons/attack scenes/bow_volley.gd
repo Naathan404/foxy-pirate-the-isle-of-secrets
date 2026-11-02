@@ -2,11 +2,12 @@ extends WeaponAttack
 ## Charge presentation and release of independently simulated, snapshotted arrows.
 
 const ARROW: PackedScene = preload("res://gameplay/weapons/attack scenes/bow_arrow.tscn")
+const RELEASE_BURST: PackedScene = preload("res://gameplay/weapons/stormstring_burst.tscn")
 
 @export_group("Arrow Fan")
 ## Maximum sideways Bezier control offset at full charge. Retains existing scene overrides.
 @export_range(0.0, 10.0, 0.1) var spread_factor: float = 3.0
-## Maximum deviation from aim for an outer arrow, in radians.
+## Adds distance-scaled width to the fan controls without splitting the destination.
 @export_range(0.0, 0.5, 0.001) var spread_angle_radians: float = 0.08
 @export_range(0.0, 1.0, 0.01) var curve_base_height: float = 0.1
 @export_range(0.0, 1.0, 0.01) var curve_outer_height_bonus: float = 0.15
@@ -51,6 +52,7 @@ func activate() -> void:
 	_released = true
 	var strength := context.charge_progress
 	var count := context.projectile_count
+	var storm_burst_state: Dictionary = {}
 	for index in count:
 		var arrow := ARROW.instantiate() as WeaponAttack
 		var snapshot := AttackContext.new()
@@ -71,13 +73,34 @@ func activate() -> void:
 		snapshot.knockback_multiplier = context.knockback_multiplier
 		# Normalized fan coordinate: left edge -1, right edge +1, single arrow at 0.
 		var spread := lerpf(-1.0, 1.0, float(index) / (count - 1)) if count > 1 else 0.0
-		snapshot.direction = context.direction.rotated(
-			Vector3.UP, spread * strength * spread_angle_radians
-		)
+		snapshot.direction = context.direction
+		if count > 1:
+			snapshot.has_target = true
+			var offset := context.target_position - snapshot.origin
+			offset.y = 0.0
+			if not context.has_target or offset.is_zero_approx():
+				offset = context.direction * context.range_units
+			snapshot.target_position = snapshot.origin + offset.limit_length(context.range_units)
+			arrow.set("converge_on_target", true)
+			# Synchronize arrival despite the outer lanes covering a longer curved path.
+			arrow.set(
+				"arrival_seconds",
+				maxf(
+					0.12,
+					(
+						offset.limit_length(context.range_units).length()
+						/ (float(arrow.get("speed")) * context.projectile_speed_multiplier)
+					)
+				)
+			)
 		snapshot.damage_prepared.connect(context.damage_prepared.emit)
 		snapshot.damage_applied.connect(context.damage_applied.emit)
 		arrow.context = snapshot
-		arrow.set("curve_offset", spread * strength * spread_factor)
+		arrow.set("storm_burst_state", storm_burst_state)
+		arrow.set(
+			"curve_offset",
+			spread * strength * (spread_factor + context.range_units * tan(spread_angle_radians))
+		)
 		# Keep the arc within existing enemy hurtbox height; the fan curves mostly on XZ.
 		arrow.set(
 			"curve_height",
@@ -96,6 +119,15 @@ func activate() -> void:
 		else:
 			_vfx.queue_free()
 	if count > 1:
+		var burst := RELEASE_BURST.instantiate() as Node3D
+		get_parent().add_child(burst)
+		burst.global_position = (
+			context.actor.global_position
+			+ Vector3.UP * charge_vfx_height
+			+ context.direction * 0.35
+		)
+		burst.scale = Vector3.ONE * 0.65
+		burst.call("burst", strength)
 		get_node("/root/ScreenShakeController").request(
 			release_shake_base_pixels + strength * release_shake_charge_bonus_pixels,
 			release_shake_seconds

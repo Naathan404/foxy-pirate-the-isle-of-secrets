@@ -1,5 +1,29 @@
 # Cung: vũ khí tầm xa thứ hai
 
+
+## Stormstring convergence update
+
+- Charged volleys (2+ arrows) lock one destination from the release aim, clamped
+  to the forged range and kept at projectile height. Without a target, use the
+  end of aim range. Arrows expire there; they never cross it and fan out again.
+- Separate cubic departure/convergence controls keep lanes on their own side of
+  aim. Width is capped for nearby targets. A 32-segment arc-length lookup keeps
+  motion steady; each lane adjusts speed to share one arrival time. Forge
+  projectile speed still controls that time. Single-arrow taps retain full range.
+- Swept enemy/wall collision still stops arrows before the destination. Damage,
+  crit, stagger, ammo, CP and per-arrow hit confirmation use the existing flow.
+  The new explosion is visual feedback and adds no area damage.
+- Flight adds a bright cyan/white ribbon, head glint and 18 short-lived GPU motes
+  per arrow. Emitters stop at impact and let existing particles fade independently.
+- `stormstring_burst.tscn` / `.gd` provide a finite release/impact flash, two
+  expanding shockwave rings and 28-52 GPU sparks. Arrows from the same volley
+  share a burst gate: impacts within 0.8 units / 120 ms reuse one large burst.
+  Existing individual hit feedback remains. All new effects clean themselves up.
+- Tune the fan in `bow_volley.tscn` through `spread_factor`,
+  `spread_angle_radians`, `curve_base_height`, and `curve_outer_height_bonus`;
+  tune trail and particle appearance in their dedicated scenes.
+
+
 ## AmmoLabel trên Player HUD
 
 `gameplay/player/hud/player_hud.gd` đọc ammo ID từ đòn thường của vũ khí đang

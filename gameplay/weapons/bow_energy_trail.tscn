@@ -4,3 +4,10 @@
 
 [node name="BowEnergyTrail" type="Node3D"]
 script = ExtResource("1_vfx")
+max_points = 32
+charge_width_bonus = 0.115
+fade_seconds = 0.24
+sample_spacing = 0.13
+smoothing_segments = 2
+core_sharpness = 70.0
+brightness = 1.7
