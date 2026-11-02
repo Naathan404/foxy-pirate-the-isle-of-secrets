@@ -10,15 +10,21 @@ shader = ExtResource("2_arrow")
 shader_parameter/charge = 0.0
 shader_parameter/glow_color = Color(1, 0.15, 0.12, 1)
 shader_parameter/charged_color = Color(1, 0.64, 0.15, 1)
+shader_parameter/canvas_size = Vector2(1.65, 2.15)
+shader_parameter/arrow_scale = 1.0
+shader_parameter/shaft_width = 0.085
+shader_parameter/head_half_width = 0.38
+shader_parameter/glow_radius = 0.13
 
 [sub_resource type="QuadMesh" id="Mesh_arrow"]
-size = Vector2(1.15, 3)
+size = Vector2(1.65, 2.15)
 
 [node name="RangedAimIndicator" type="Node3D" unique_id=1440644150]
 script = ExtResource("1_indicator")
+ground_height = -0.09999999999999998
 
 [node name="Arrow" type="MeshInstance3D" parent="." unique_id=715268692]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, -1.8)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, -1.35)
 material_override = SubResource("Material_arrow")
 cast_shadow = 0
 mesh = SubResource("Mesh_arrow")
