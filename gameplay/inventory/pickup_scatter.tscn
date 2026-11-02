@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cedobrx1ymh47"]
+
+[ext_resource type="Script" uid="uid://dnv4poij7dnna" path="res://gameplay/inventory/pickup_scatter.gd" id="1_scatter"]
+
+[node name="Scatter" type="Node" unique_id=636703190]
+script = ExtResource("1_scatter")
+trail_width = 0.12

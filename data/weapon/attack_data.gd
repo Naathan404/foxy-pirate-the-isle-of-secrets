@@ -15,7 +15,7 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var aim_mode: AimMode = AimMode.FACING
 ## Describes this attack, independently of the owning weapon's category.
 @export var delivery_type: DeliveryType = DeliveryType.MELEE
-## Projectile attacks aim while held and launch on release.
+## Holding prepares projectile startup; early release completes the remaining startup.
 @export var release_to_fire: bool = true
 @export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
 @export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
@@ -38,7 +38,8 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var hold_to_charge: bool = false
 @export_range(0.1, 5.0, 0.05) var charge_seconds: float = 1.8
 @export_range(1, 12, 1) var max_projectiles: int = 6
-@export_range(0.0, 0.3, 0.01) var tap_seconds: float = 0.12
+## Legacy serialized field. Forged windup_seconds now determines held startup.
+@export_storage var tap_seconds: float = 0.12
 
 @export_group("Melee Combo")
 @export var combo_steps: Array[MeleeComboStep] = []

@@ -14,6 +14,7 @@ var _step_elapsed: float = 0.0
 var _combo_step: MeleeComboStep
 var _step_time_scale: float = 1.0
 var _held_action: StringName = &"normal"
+var _uses_aim_pose: bool = false
 
 
 # Controller nhận đòn rồi mới phát animation
@@ -94,6 +95,8 @@ func _update(delta: float) -> void:
 		if controller.is_aiming():
 			_update_aiming()
 			return
+		if _uses_aim_pose:
+			_sync_aim_pose()
 		if player.dash_buffer_remaining > 0.0 and controller.can_dash_cancel():
 			if (
 				is_instance_valid(player.stamina)
@@ -118,6 +121,7 @@ func _exit() -> void:
 	_step_direction = Vector3.ZERO
 	_step_elapsed = 0.0
 	_combo_step = null
+	_uses_aim_pose = false
 	player.set_horizontal_velocity(Vector3.ZERO)
 	if is_instance_valid(player.visual):
 		player.visual.reset_animation_speed()
@@ -156,7 +160,7 @@ func _update_aiming() -> void:
 	controller.aim_charge(aim)
 	player.last_facing_direction = aim.direction
 	player.play_directional_animation(animation_prefix)
-	player.visual.hold_animation_pose(0.25)
+	_sync_aim_pose()
 	player._consume_attack_input()
 	var held := player.attack_held if _held_action == &"normal" else player.secondary_attack_held
 	if not held:
@@ -170,6 +174,7 @@ func _on_attack_finished(_attack_id: int = 0, _interrupted: bool = false) -> voi
 
 func _on_attack_started(context: AttackContext) -> void:
 	finished = false
+	_uses_aim_pose = controller.is_aiming()
 	_held_action = context.action
 	_combo_step = context.combo_step
 	_step_time_scale = 1.0
@@ -185,7 +190,7 @@ func _on_attack_started(context: AttackContext) -> void:
 	animation_prefix = controller.get_attack_animation_prefix()
 	player.play_directional_animation(animation_prefix, true)
 	if controller.is_aiming():
-		player.visual.hold_animation_pose(0.25)
+		_sync_aim_pose()
 		return
 	if not player.visual.fit_animation_duration(controller.get_attack_duration()):
 		controller.cancel()
@@ -195,10 +200,13 @@ func _on_charge_released(context: AttackContext) -> void:
 	player.last_facing_direction = context.direction
 	player.visual.reset_animation_speed()
 	player.play_directional_animation(animation_prefix, true)
-	if controller.get_attack_windup_duration() <= 0.0:
-		player.visual.play_animation_from(0.5, controller.get_attack_duration())
-	else:
-		player.visual.fit_animation_duration(controller.get_attack_duration())
+	_sync_aim_pose()
+
+
+func _sync_aim_pose() -> void:
+	player.visual.pose_attack_phase(
+		controller.get_attack_phase_name(), controller.get_attack_phase_progress()
+	)
 
 
 func _apply_forward_step(delta: float) -> void:

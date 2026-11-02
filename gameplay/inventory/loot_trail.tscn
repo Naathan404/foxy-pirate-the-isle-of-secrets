@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/loot_trail.gd" id="1_trail"]
+[ext_resource type="Shader" path="res://gameplay/inventory/loot_trail.gdshader" id="2_glow"]
+
+[sub_resource type="ImmediateMesh" id="Mesh_trail"]
+resource_local_to_scene = true
+
+[sub_resource type="ShaderMaterial" id="Material_trail"]
+resource_local_to_scene = true
+shader = ExtResource("2_glow")
+
+[sub_resource type="ShaderMaterial" id="Material_glint"]
+resource_local_to_scene = true
+shader = ExtResource("2_glow")
+shader_parameter/landing_glint = true
+
+[sub_resource type="QuadMesh" id="Mesh_glint"]
+size = Vector2(0.65, 0.65)
+
+[node name="LootTrail" type="Node3D"]
+process_priority = 10
+visible = false
+script = ExtResource("1_trail")
+
+[node name="Ribbon" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("Mesh_trail")
+material_override = SubResource("Material_trail")
+
+[node name="LandingGlint" type="MeshInstance3D" parent="."]
+visible = false
+cast_shadow = 0
+mesh = SubResource("Mesh_glint")
+material_override = SubResource("Material_glint")

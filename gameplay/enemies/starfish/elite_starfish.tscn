@@ -26,7 +26,6 @@ use_random_axis_patrol = true
 axis_change_duration_min = 1.5
 axis_change_duration_max = 4.0
 player_detection_radius = 10.1
-unreachable_target_ignore_duration = 2.0
 data = ExtResource("2_data")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]

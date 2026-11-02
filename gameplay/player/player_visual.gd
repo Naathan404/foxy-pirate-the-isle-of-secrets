@@ -3,6 +3,9 @@ extends Node3D
 
 signal animation_finished(animation_name: StringName)
 
+const ATTACK_RELEASE_POSE: float = 0.5
+const ATTACK_RECOVERY_POSE: float = 0.75
+
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
 ## Optional sprites for actions that use another sheet/layout, keyed by animation prefix.
@@ -112,6 +115,25 @@ func hold_animation_pose(progress: float) -> void:
 	var animation := animation_player.get_animation(animation_player.assigned_animation)
 	animation_player.seek(animation.length * _held_progress, true)
 	animation_player.pause()
+
+
+## Phase-driven projectile animation keeps release/recovery aligned with forged timings.
+func pose_attack_phase(phase: StringName, progress: float) -> void:
+	var fraction := clampf(progress, 0.0, 1.0)
+	var pose: float
+	match phase:
+		&"aim":
+			# Stop just before the release frame while the input is still held.
+			pose = lerpf(0.0, ATTACK_RELEASE_POSE - 0.0001, fraction)
+		&"windup":
+			pose = lerpf(0.0, ATTACK_RELEASE_POSE, fraction)
+		&"active":
+			pose = lerpf(ATTACK_RELEASE_POSE, ATTACK_RECOVERY_POSE, fraction)
+		&"recovery":
+			pose = lerpf(ATTACK_RECOVERY_POSE, 0.9999, fraction)
+		_:
+			return
+	hold_animation_pose(pose)
 
 
 ## Play just the release/recovery portion without changing shared animation resources.

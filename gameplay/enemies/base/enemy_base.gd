@@ -22,6 +22,7 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
 const CRITICAL_POPUP: PackedScene = preload("res://gameplay/combat/critical_damage_popup.tscn")
 const NORMAL_POPUP: PackedScene = preload("res://gameplay/combat/normal_damage_popup.tscn")
+const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive drops.
 
 @export var data: EnemyData
 @export var initial_state_name: StringName = &"Idle"
@@ -59,6 +60,8 @@ var _stagger_decay_remaining: float = 0.0
 var _stagger_immunity_remaining: float = 0.0
 var _charm_grapple_tween: Tween
 var _external_push_velocity: Vector3 = Vector3.ZERO
+var _loot_direction_angle: float = 0.0
+var _loot_drop_index: int = 0
 
 @onready var hp: HealthComponent = $HealthComponent
 @onready var hurtbox: HurtBox = $Direction/HurtBox
@@ -82,6 +85,7 @@ func _ready() -> void:
 	if not _validate_components():
 		set_physics_process(false)
 		return
+	_prepare_loot_pools.call_deferred()
 	_setup_stats()
 	_setup_combat()
 	_setup_direction_checks()
@@ -412,7 +416,10 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	_loot_direction_angle = randf() * TAU
+	_loot_drop_index = 0
 	_drop_loot.call_deferred()
+	_drop_gold.call_deferred()
 	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
 		_charm_grapple_tween.kill()
 	_charm_grapple_tween = null
@@ -602,7 +609,12 @@ func _refresh_direction_checks() -> void:
 
 func _refresh_target() -> void:
 	# Disabling the detector during death can still deliver a queued body_exited callback.
-	if dead or submerged or not is_instance_valid(target_detector) or not target_detector.monitoring:
+	if (
+		dead
+		or submerged
+		or not is_instance_valid(target_detector)
+		or not target_detector.monitoring
+	):
 		return
 	var nearest_target: Node3D = null
 	var nearest_distance := INF
@@ -665,6 +677,42 @@ func _on_charm_grapple_finished() -> void:
 	_charm_grapple_tween = null
 
 
+func _drop_gold() -> void:
+	if (
+		data == null
+		or data.min_gold_amount < 0
+		or data.max_gold_amount <= 0
+		or data.max_gold_amount < data.min_gold_amount
+		or data.gold_drop_chance <= 0.0
+	):
+		return
+	if not is_inside_tree():
+		return
+	var loot_parent := get_parent()
+	if loot_parent == null or loot_parent.is_queued_for_deletion():
+		return
+	if data.gold_drop_chance < 1.0 and randf() >= data.gold_drop_chance:
+		return
+	var pool := GoldPickupPool.for_scene(self)
+	if pool != null:
+		var amount: int = randi_range(data.min_gold_amount, data.max_gold_amount)
+		pool.spawn_gold(global_position, amount, _next_loot_direction())
+
+
+func _prepare_loot_pools() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	LootTrailPool.for_scene(self)
+	if (
+		data != null
+		and data.min_gold_amount >= 0
+		and data.max_gold_amount > 0
+		and data.max_gold_amount >= data.min_gold_amount
+		and data.gold_drop_chance > 0.0
+	):
+		GoldPickupPool.for_scene(self)
+
+
 # drop itemmm =========
 func _drop_loot() -> void:
 	if data == null or data.drop_item == null or data.drop_quantity <= 0:
@@ -686,4 +734,10 @@ func _drop_loot() -> void:
 	pickup.quantity = data.drop_quantity
 	loot_parent.add_child(pickup)
 	pickup.global_position = global_position
-	pickup.play_drop_animation()
+	pickup.play_drop_animation(_next_loot_direction())
+
+
+func _next_loot_direction() -> Vector3:
+	var angle := _loot_direction_angle + _loot_drop_index * LOOT_SPREAD_ANGLE
+	_loot_drop_index += 1
+	return Vector3(cos(angle), 0.0, sin(angle))

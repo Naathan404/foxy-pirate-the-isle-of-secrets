@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://b6fbyvpknujg8"]
 
 [ext_resource type="Script" uid="uid://b1oqs4ywtxj0o" path="res://gameplay/weapons/attack scenes/bow_arrow.gd" id="1_arrow"]
+[ext_resource type="Texture2D" uid="uid://dmgxhje3wfyk5" path="res://assets/sprites/weapons/Arrow.png" id="2_7c756"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="2_hitbox"]
-[ext_resource type="Texture2D" uid="uid://bvrowyscvweua" path="res://assets/sprites/items/Arrow.png" id="4_tpjyy"]
 
 [sub_resource type="BoxShape3D" id="Shape_arrow"]
 size = Vector3(0.14, 0.14, 0.65)
@@ -15,11 +15,10 @@ persist_after_release = true
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=543516061]
 transform = Transform3D(-8.7422775e-10, 0, 0.02, 0, 0.02, 0, -0.02, 0, -8.7422775e-10, 0.10992683, 0, 0)
 pixel_size = 0.0625
-billboard = 0
 shaded = true
 alpha_cut = 1
 texture_filter = 0
-texture = ExtResource("4_tpjyy")
+texture = ExtResource("2_7c756")
 
 [node name="HitBox" type="Area3D" parent="." unique_id=1742313661]
 collision_layer = 32
