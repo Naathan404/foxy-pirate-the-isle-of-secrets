@@ -89,10 +89,10 @@ transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
 
 [node name="GoldDisplay" parent="." unique_id=1585419187 instance=ExtResource("24_gold")]
-offset_left = 118.4
-offset_top = 3.2
-offset_right = 258.4
-offset_bottom = 43.2
+offset_left = 101.6
+offset_top = 516.0
+offset_right = 241.6
+offset_bottom = 556.0
 
 [node name="Effects" type="Node" parent="." unique_id=1082976363]
 

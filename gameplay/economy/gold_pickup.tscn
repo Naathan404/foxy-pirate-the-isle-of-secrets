@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b757h2mooxufd" path="res://gameplay/economy/gold_pickup.gd" id="1_pickup"]
 [ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_4jcvl"]
-[ext_resource type="PackedScene" path="res://gameplay/inventory/pickup_scatter.tscn" id="3_scatter"]
+[ext_resource type="PackedScene" uid="uid://cedobrx1ymh47" path="res://gameplay/inventory/pickup_scatter.tscn" id="3_scatter"]
 
 [sub_resource type="SphereShape3D" id="Shape_pickup"]
 radius = 0.8
@@ -14,7 +14,7 @@ script = ExtResource("1_pickup")
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=231233658]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78836787, 0)
-pixel_size = 0.0015
+pixel_size = 0.0012
 billboard = 1
 texture_filter = 0
 texture = ExtResource("2_4jcvl")
