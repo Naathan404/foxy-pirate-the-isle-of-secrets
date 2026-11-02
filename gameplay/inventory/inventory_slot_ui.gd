@@ -210,11 +210,11 @@ func refresh(slot: InventorySlot) -> void:
 
 
 ## Lets read-only menus render a catalog item with the same slot visual as the inventory.
-func set_preview(icon_texture: Texture2D, quantity: int = 1) -> void:
+func set_preview(icon_texture: Texture2D, quantity: int = 1, show_quantity: bool = true) -> void:
 	_drag_enabled = false
 	icon.texture = icon_texture
 	quantity_label.text = str(maxi(quantity, 1))
-	quantity_label.show()
+	quantity_label.visible = show_quantity
 
 
 func set_drag_enabled(enabled: bool) -> void:

@@ -63,4 +63,3 @@ show_debug_health = false
 
 [node name="Starfish" parent="Enemies" unique_id=1294052233 instance=ExtResource("5_onlpw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.686169, 3.1849365, -6.272339)
-unreachable_target_ignore_duration = 2.0

@@ -1,16 +1,16 @@
-[gd_resource type="Resource" script_class="MerchantCatalog" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="MerchantCatalog" format=3 uid="uid://l07gfc1sabb7"]
 
-[ext_resource type="Script" path="res://gameplay/merchant/merchant_catalog.gd" id="1_catalog"]
-[ext_resource type="Script" path="res://gameplay/merchant/merchant_offer.gd" id="2_offer"]
-[ext_resource type="Resource" path="res://data/weapon/weapon_bow.tres" id="3_bow"]
-[ext_resource type="Resource" path="res://data/items/materials/wooden_arrow.tres" id="4_arrow"]
-[ext_resource type="Resource" path="res://data/items/consumables/small_healing_potion.tres" id="5_healing"]
-[ext_resource type="Resource" path="res://data/items/consumables/small_stamina_potion.tres" id="6_stamina"]
-[ext_resource type="Resource" path="res://data/items/materials/starfish_core.tres" id="7_starfish"]
-[ext_resource type="Resource" path="res://data/items/materials/crab_claw.tres" id="8_crab"]
-[ext_resource type="Resource" path="res://data/items/materials/gunpowder_bag.tres" id="9_gunpowder"]
-[ext_resource type="Resource" path="res://data/items/consumables/healing_potion.tres" id="10_large_healing"]
-[ext_resource type="Resource" path="res://data/items/consumables/stamina_potion.tres" id="11_large_stamina"]
+[ext_resource type="Script" uid="uid://dypxn50pvmmax" path="res://gameplay/merchant/merchant_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" uid="uid://buhrolk03pgyv" path="res://gameplay/merchant/merchant_offer.gd" id="2_offer"]
+[ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="3_bow"]
+[ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/materials/wooden_arrow.tres" id="4_arrow"]
+[ext_resource type="Resource" uid="uid://ch2ttumamq7po" path="res://data/items/consumables/small_healing_potion.tres" id="5_healing"]
+[ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="6_stamina"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="7_starfish"]
+[ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="8_crab"]
+[ext_resource type="Resource" uid="uid://c8qmnr7cm6o2u" path="res://data/items/materials/gunpowder_bag.tres" id="9_gunpowder"]
+[ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="10_large_healing"]
+[ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="11_large_stamina"]
 
 [sub_resource type="Resource" id="Offer_bow"]
 script = ExtResource("2_offer")
@@ -23,7 +23,6 @@ buy_price = 100
 script = ExtResource("2_offer")
 offer_id = &"wooden_arrow"
 item = ExtResource("4_arrow")
-trade_amount = 1
 buy_price = 2
 sell_price = 1
 

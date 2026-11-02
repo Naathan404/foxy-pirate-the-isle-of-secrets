@@ -46,11 +46,10 @@ func load_progress() -> bool:
 	if file == null:
 		push_warning("SilasProgressStore: unable to read progress save")
 		return false
-	var saved: Variant = file.get_var(false)
-	if not (saved is Dictionary):
+	var values: Dictionary = file.get_var(false)
+	if values.is_empty():
 		push_warning("SilasProgressStore: invalid progress save")
 		return false
-	var values: Dictionary = saved as Dictionary
 	_met_silas = bool(values.get(&"met_silas", false))
 	_bow_purchased = bool(values.get(&"bow_purchased", false))
 	return true

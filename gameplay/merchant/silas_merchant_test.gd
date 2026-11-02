@@ -7,6 +7,8 @@ const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_po
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
 const NPC_TEST_SCENE: PackedScene = preload("res://world/tests/npc_test_scene.tscn")
+const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
+const GOLD_DISPLAY_SCENE: PackedScene = preload("res://gameplay/economy/gold_display.tscn")
 
 var _failures := 0
 
@@ -18,6 +20,8 @@ func _initialize() -> void:
 	_test_catalog_prices_and_disabled_sales()
 	_test_weapon_is_one_time_purchase()
 	_test_persistence()
+	await _test_toast_queue()
+	await _test_gold_display_feedback()
 	await _test_npc_scene_smoke()
 	print("Silas merchant tests: %s" % ("passed" if _failures == 0 else "failed"))
 	quit(0 if _failures == 0 else 1)
@@ -183,6 +187,44 @@ func _test_persistence() -> void:
 	DirAccess.remove_absolute(absolute_path)
 
 
+func _test_toast_queue() -> void:
+	var queue := TOAST_QUEUE_SCENE.instantiate() as TradeToastQueue
+	root.add_child(queue)
+	await process_frame
+	_assert_equal(queue.process_mode, Node.PROCESS_MODE_ALWAYS, "toast queue processes while paused")
+	queue.enqueue_success("First trade")
+	queue.enqueue_success("Second trade")
+	_assert_equal(queue.pending_count(), 2, "toast queue keeps both trade messages")
+	_assert_equal(queue.message.text, "First trade", "toast queue shows the first message")
+	queue._kill_tween()
+	queue._finish_current()
+	_assert_equal(queue.message.text, "Second trade", "toast queue advances in FIFO order")
+	queue._kill_tween()
+	queue._finish_current()
+	_assert_equal(queue.pending_count(), 0, "toast queue drains after the final message")
+	queue.queue_free()
+	await process_frame
+
+
+func _test_gold_display_feedback() -> void:
+	var display := GOLD_DISPLAY_SCENE.instantiate()
+	root.add_child(display)
+	await process_frame
+	_assert_equal(display.process_mode, Node.PROCESS_MODE_ALWAYS, "gold display processes while paused")
+	display._on_balance_changed(10, 5)
+	_assert_true(display._gain.visible, "gold gain feedback becomes visible")
+	_assert_equal(display._gain.text, "+5 G", "gold gain feedback uses a positive sign")
+	paused = true
+	display._on_balance_changed(8, -2)
+	_assert_true(display._gain.visible, "gold spend feedback becomes visible")
+	_assert_equal(display._gain.text, "-2 G", "gold spend feedback uses a negative sign")
+	await create_timer(0.9, true).timeout
+	_assert_false(display._gain.visible, "gold feedback cleans itself after its tween")
+	paused = false
+	display.queue_free()
+	await process_frame
+
+
 func _test_npc_scene_smoke() -> void:
 	var scene := NPC_TEST_SCENE.instantiate()
 	root.add_child(scene)
@@ -200,6 +242,10 @@ func _test_npc_scene_smoke() -> void:
 			silas.catalog.get_buy_offers().size(),
 			"buy tab renders the configured catalog"
 		)
+		_assert_equal(panel.grid.columns, 5, "shop grid keeps inventory's five-column layout")
+		var first_buy_slot := panel.grid.get_child(0) as InventorySlotUI
+		_assert_false(first_buy_slot.quantity_label.visible, "buy previews do not show redundant quantities")
+		_assert_true(panel.buy_tab is TextureButton, "buy tab uses an inventory-style bookmark")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
 		var inventory := GameManager.player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
@@ -211,6 +257,7 @@ func _test_npc_scene_smoke() -> void:
 				panel.grid.get_child_count(), inventory.slots.size(), "bag tab renders the real inventory"
 			)
 		panel.close_shop()
+		await create_timer(panel.close_duration + 0.05, true).timeout
 		_assert_false(panel.visible, "shop panel closes")
 	scene.queue_free()
 	await process_frame
