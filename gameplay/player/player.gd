@@ -31,6 +31,7 @@ var last_facing_direction: Vector3 = Vector3.BACK
 # nuffer nút dash
 var dash_buffer_remaining: float = 0.0
 var attack_requested: bool = false
+var attack_held: bool = false
 var secondary_attack_held: bool = false
 var attack_buffer_remaining: float = 0.0
 var pending_attack_action: StringName = &"normal"
@@ -185,7 +186,7 @@ func _physics_process(delta: float) -> void:
 		and is_instance_valid(chaos)
 		and not is_gameplay_input_blocked()
 		and game_manager.state == game_manager.State.PLAYING
-		and (not is_instance_valid(weapon_controller) or not weapon_controller.is_charging())
+		and (not is_instance_valid(weapon_controller) or not weapon_controller.holds_chaos())
 	):
 		chaos.advance(delta)
 
@@ -228,12 +229,14 @@ func _push_collided_crates() -> void:
 
 func _read_input() -> void:
 	move_direction = Vector3.ZERO
+	attack_held = false
 	secondary_attack_held = false
 	if is_gameplay_input_blocked():
 		clear_gameplay_input()
 		return
 	if dead:
 		return
+	attack_held = Input.is_action_pressed(attack_action)
 	secondary_attack_held = Input.is_action_pressed(secondary_attack_action)
 	if Input.is_action_just_pressed("potion") and is_instance_valid(potion):
 		potion.use_equipped_potion()
@@ -265,12 +268,13 @@ func _read_input() -> void:
 
 func clear_gameplay_input() -> void:
 	move_direction = Vector3.ZERO
+	attack_held = false
 	secondary_attack_held = false
 	attack_requested = false
 	attack_buffer_remaining = 0.0
 	if is_instance_valid(weapon_controller):
 		weapon_controller.clear_attack_buffer()
-		if weapon_controller.is_charging():
+		if weapon_controller.is_aiming():
 			weapon_controller.cancel()
 	dash_buffer_remaining = 0.0
 

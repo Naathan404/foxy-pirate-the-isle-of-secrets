@@ -83,7 +83,7 @@ func _on_decay_started() -> void:
 
 
 func _on_attack_started(context: AttackContext) -> void:
-	if context.action == &"secondary" and not _weapons.is_charging():
+	if context.action == &"secondary" and not _weapons.is_aiming():
 		_flash(spent_tint, 0.88, 0.30)
 
 

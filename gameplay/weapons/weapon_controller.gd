@@ -12,9 +12,10 @@ signal collection_changed
 signal damage_dealt(damage: DamageContext, target: Node, applied_hp: float)
 
 # Các giai đoạn của 1 đòn đánh
-enum Phase { WINDUP, ACTIVE, RECOVERY, CHARGING }
+enum Phase { WINDUP, ACTIVE, RECOVERY, CHARGING, AIMING }
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
+const AIM_INDICATOR: PackedScene = preload("res://gameplay/weapons/ranged_aim_indicator.tscn")
 
 @export var default_weapon: WeaponData
 ## Optional initial forge; null preserves the unmodified starting weapon.
@@ -53,6 +54,7 @@ var _charging_attack: AttackData
 var _charge_elapsed: float = 0.0
 var _charge_spent: float = 0.0
 var _charge_budget: float = 0.0
+var _aim_indicator: RangedAimIndicator
 var _combo_index: int = 0
 var _combo_remaining: float = 0.0
 var _queued_attack: AttackContext
@@ -284,12 +286,20 @@ func is_charging() -> bool:
 	return busy and _phase == Phase.CHARGING
 
 
+func is_aiming() -> bool:
+	return busy and _phase in [Phase.AIMING, Phase.CHARGING]
+
+
+func holds_chaos() -> bool:
+	return is_aiming() and _context.action == &"secondary"
+
+
 func get_attack_windup_duration() -> float:
 	return _windup
 
 
 func aim_charge(request: AttackContext) -> void:
-	if not is_charging() or request == null:
+	if not is_aiming() or request == null:
 		return
 	var direction := Vector3(request.direction.x, 0.0, request.direction.z)
 	if direction.is_zero_approx():
@@ -297,6 +307,72 @@ func aim_charge(request: AttackContext) -> void:
 	_context.direction = direction.normalized()
 	_context.target_position = request.target_position
 	_context.has_target = request.has_target
+	if is_instance_valid(_aim_indicator):
+		_aim_indicator.set_aim(_context.direction, _context.charge_progress)
+
+
+func release_aim() -> bool:
+	if is_charging():
+		return release_charge()
+	if not is_aiming():
+		return false
+	var current := _context
+	var attack := _charging_attack
+	var cost := attack.stamina_cost
+	var speed := 1.0
+	if equipped.forge != null:
+		cost *= maxf(0.0, equipped.forge.stamina_cost_multiplier)
+		speed = maxf(0.01, equipped.forge.attack_speed_multiplier)
+	if not _can_pay_attack_cost(attack, cost):
+		cancel()
+		return false
+	if current.action == &"secondary" and (not is_instance_valid(chaos) or not chaos.is_full()):
+		cancel()
+		return false
+	var paid := true
+	if cost > 0.0:
+		paid = stamina.try_consume(cost)
+	elif attack.ammo_cost > 0:
+		paid = ammo.try_consume(attack.ammo_id, attack.ammo_cost)
+	if not is_aiming() or _context != current:
+		return false
+	if not paid or (current.action == &"secondary" and not chaos.try_consume_full()):
+		cancel()
+		return false
+	if not is_aiming() or _context != current:
+		return false
+	equipped.cooldowns[current.action] = attack.cooldown_seconds / speed
+	_begin_aimed_release()
+	return true
+
+
+func _begin_aimed_release() -> void:
+	_hide_aim_indicator()
+	_context.origin = actor.global_position
+	_execution.global_position = _context.origin
+	_execution.process_mode = Node.PROCESS_MODE_INHERIT
+	_execution.show()
+	_windup = 0.0
+	_phase = Phase.WINDUP
+	_remaining = 0.0
+	var released := _context
+	charge_released.emit(released)
+	if busy and _context == released:
+		_advance_phase()
+
+
+func _show_aim_indicator() -> void:
+	_hide_aim_indicator()
+	_aim_indicator = AIM_INDICATOR.instantiate() as RangedAimIndicator
+	add_child(_aim_indicator)
+	_aim_indicator.setup(actor, _context.direction)
+
+
+func _hide_aim_indicator() -> void:
+	if is_instance_valid(_aim_indicator):
+		_aim_indicator.hide()
+		_aim_indicator.queue_free()
+	_aim_indicator = null
 
 
 func release_charge() -> bool:
@@ -314,17 +390,9 @@ func release_charge() -> bool:
 	if not is_charging() or _context != charging_context:
 		return false
 	_context.projectile_count = count
-	_context.origin = actor.global_position
-	if _charge_elapsed >= attack.tap_seconds:
-		_windup = 0.0
-	_phase = Phase.WINDUP
-	_remaining = _windup
 	var speed := equipped.forge.attack_speed_multiplier if equipped.forge != null else 1.0
-	equipped.cooldowns[&"secondary"] = attack.cooldown_seconds / maxf(0.01, speed)
-	var released := _context
-	charge_released.emit(released)
-	if busy and _context == released and _remaining <= 0.0:
-		_advance_phase()
+	equipped.cooldowns[_context.action] = attack.cooldown_seconds / maxf(0.01, speed)
+	_begin_aimed_release()
 	return true
 
 
@@ -341,8 +409,8 @@ func _tick_charge(delta: float) -> void:
 	_execution.update_charge(progress)
 	if not is_charging() or _context != current:
 		return
-	if chaos.current <= 0.0 or progress >= 1.0:
-		release_charge()
+	if is_instance_valid(_aim_indicator):
+		_aim_indicator.set_aim(_context.direction, progress)
 
 
 func queue_attack(request: AttackContext) -> bool:
@@ -410,6 +478,10 @@ func try_attack(request: AttackContext) -> bool:
 	var cost := attack.stamina_cost
 	var speed := 1.0
 	var cooldown := attack.cooldown_seconds
+	var aiming := (
+		attack.hold_to_charge
+		or (attack.release_to_fire and attack.delivery_type == AttackData.DeliveryType.PROJECTILE)
+	)
 	if equipped.forge != null:
 		cost *= maxf(0.0, equipped.forge.stamina_cost_multiplier)
 		speed = maxf(0.01, equipped.forge.attack_speed_multiplier)
@@ -446,40 +518,43 @@ func try_attack(request: AttackContext) -> bool:
 	_execution = execution
 	execution.context = snapshot
 	_phase = Phase.CHARGING if attack.hold_to_charge else Phase.WINDUP
+	if aiming and not attack.hold_to_charge:
+		_phase = Phase.AIMING
 	_remaining = _windup
-	_charging_attack = attack if attack.hold_to_charge else null
+	_charging_attack = attack if aiming else null
 	_charge_elapsed = 0.0
 	_charge_spent = 0.0
 	_charge_budget = chaos.maximum if attack.hold_to_charge else 0.0
 	# Khóa nhận đòn trước khi signal SP hoặc đạn được phát
 	busy = true
 	# Gắn đòn vào thế giới để đạn, phép không chạy theo nhân vật
+	if aiming and not attack.hold_to_charge:
+		execution.hide()
+		execution.process_mode = Node.PROCESS_MODE_DISABLED
 	actor.get_parent().add_child(execution)
 	execution.global_position = snapshot.origin
 	var paid := true
-	if cost > 0.0 and not attack.hold_to_charge:
+	if cost > 0.0 and not aiming:
 		paid = stamina.try_consume(cost)
-	elif attack.ammo_cost > 0 and not attack.hold_to_charge:
+	elif attack.ammo_cost > 0 and not aiming:
 		paid = ammo.try_consume(attack.ammo_id, attack.ammo_cost)
 	if not paid:
 		cancel()
 		return false
-	if (
-		snapshot.action == &"secondary"
-		and not attack.hold_to_charge
-		and not chaos.try_consume_full()
-	):
+	if snapshot.action == &"secondary" and not aiming and not chaos.try_consume_full():
 		cancel()
 		return false
-	if not attack.hold_to_charge:
+	if not aiming:
 		snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed
 	clear_attack_buffer()
+	if is_aiming() and _context == snapshot:
+		_show_aim_indicator()
 	if busy and _context == snapshot:
 		attack_started.emit(snapshot)
 	if is_charging() and _context == snapshot:
 		_execution.update_charge(0.0)
 	# Signal trừ tài nguyên có thể hủy đòn, kiểm tra lại trước khi chạy tiếp
-	if busy and not is_charging() and _context == snapshot and _remaining <= 0.0:
+	if busy and not is_aiming() and _context == snapshot and _remaining <= 0.0:
 		_advance_phase()
 	return true
 
@@ -589,6 +664,8 @@ func _physics_process(delta: float) -> void:
 	if is_charging():
 		_tick_charge(delta)
 		return
+	if is_aiming():
+		return
 	var budget := delta
 	# Chia delta cho từng giai đoạn để frame chậm không làm mất nhịp đánh
 	while busy and budget > 0.0:
@@ -639,6 +716,7 @@ func cancel() -> void:
 func _finish(interrupted: bool) -> void:
 	if not busy:
 		return
+	_hide_aim_indicator()
 	var execution := _execution
 	var completed_context := _context
 	var queued := _queued_attack if not interrupted else null
