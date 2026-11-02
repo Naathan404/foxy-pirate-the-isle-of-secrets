@@ -7,6 +7,7 @@ var _active: bool = false
 var _previous_scale: float = 1.0
 var _end_at_msec: int = 0
 var _local_stops: Dictionary = {}
+var _slow_motion_sources: Dictionary[int, Dictionary] = {}
 
 
 func _ready() -> void:
@@ -19,26 +20,63 @@ func request(duration: float = 0.06) -> void:
 		return
 
 	if not _active:
-		_previous_scale = Engine.time_scale
+		if _slow_motion_sources.is_empty():
+			_previous_scale = Engine.time_scale
 		_active = true
 
 	var milisec = int(clampf(duration, 0.0, maximum_duration) * 1000.0)
 
 	_end_at_msec = maxi(_end_at_msec, Time.get_ticks_msec() + milisec)
 
-	Engine.time_scale = minf(_previous_scale, stop_scale)
+	_apply_time_scale()
 	set_process(true)
 
 
 func _process(_delta: float) -> void:
 	var now := Time.get_ticks_msec()
+	var had_global_modifier: bool = _active or not _slow_motion_sources.is_empty()
 	for id: int in _local_stops.keys():
 		if now >= int(_local_stops[id].end_at) or get_tree().paused:
 			_restore_local(id)
 	if _active and now >= _end_at_msec:
-		Engine.time_scale = _previous_scale
 		_active = false
-	set_process(_active or not _local_stops.is_empty())
+	for id: int in _slow_motion_sources.keys():
+		var source: WeakRef = _slow_motion_sources[id].source
+		if not is_instance_valid(source.get_ref()):
+			_slow_motion_sources.erase(id)
+	if had_global_modifier:
+		_apply_time_scale()
+	set_process(_active or not _local_stops.is_empty() or not _slow_motion_sources.is_empty())
+
+
+## Coordinates held UI slow motion with brief combat hitstop; sources release independently.
+func begin_slow_motion(source: Node, time_scale: float) -> void:
+	if not is_instance_valid(source) or not is_finite(time_scale) or time_scale <= 0.0:
+		return
+	if not _active and _slow_motion_sources.is_empty():
+		_previous_scale = Engine.time_scale
+	_slow_motion_sources[source.get_instance_id()] = {
+		"source": weakref(source), "scale": minf(time_scale, 1.0)
+	}
+	_apply_time_scale()
+	set_process(true)
+
+
+func end_slow_motion(source: Node) -> void:
+	if not is_instance_valid(source):
+		return
+	if _slow_motion_sources.erase(source.get_instance_id()):
+		_apply_time_scale()
+	set_process(_active or not _local_stops.is_empty() or not _slow_motion_sources.is_empty())
+
+
+func _apply_time_scale() -> void:
+	var scale_value: float = _previous_scale
+	for settings: Dictionary in _slow_motion_sources.values():
+		scale_value = minf(scale_value, float(settings.scale))
+	if _active:
+		scale_value = minf(scale_value, stop_scale)
+	Engine.time_scale = scale_value
 
 
 ## Melee freezes only combat actors/animations; UI, audio and other actors keep running.
@@ -79,9 +117,10 @@ func _restore_local(id: int) -> void:
 
 
 func cancel() -> void:
-	if _active:
+	if _active or not _slow_motion_sources.is_empty():
 		Engine.time_scale = _previous_scale
 	_active = false
+	_slow_motion_sources.clear()
 	for id: int in _local_stops.keys():
 		_restore_local(id)
 	set_process(false)

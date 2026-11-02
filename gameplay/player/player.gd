@@ -18,6 +18,7 @@ signal combat_activity
 @export var charm_socket_manager: CharmSocketManager
 @export var chaos: ChaosComponent
 @export var potion: PotionComponent
+@export var potion_selector: PotionQuickSelect
 @export var inventory_ui: InventoryUI
 @export var attack_animation_prefix: String = "attack_dagger"
 @export var camera: Camera3D
@@ -41,6 +42,7 @@ var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
+var potion_selection_active: bool = false
 var _charm_grapple_tween: Tween
 
 @onready var visual: PlayerVisual = $Visual
@@ -64,6 +66,8 @@ func _ready() -> void:
 	_setup_stats()
 	_setup_combat()
 	_setup_charm_system()
+	if is_instance_valid(potion_selector):
+		potion_selector.configure(self, potion)
 	get_node("/root/GameManager").register_player(self)
 
 
@@ -232,13 +236,23 @@ func _read_input() -> void:
 	attack_held = false
 	secondary_attack_held = false
 	if is_gameplay_input_blocked():
-		clear_gameplay_input()
+		if not potion_selection_active:
+			clear_gameplay_input()
 		return
 	if dead:
 		return
 	attack_held = Input.is_action_pressed(attack_action)
-	secondary_attack_held = Input.is_action_pressed(secondary_attack_action)
-	if Input.is_action_just_pressed("swap_potion") and is_instance_valid(potion):
+	var secondary_blocked: bool = (
+		is_instance_valid(potion_selector) and potion_selector.blocks_secondary_attack()
+	)
+	secondary_attack_held = (
+		not secondary_blocked and Input.is_action_pressed(secondary_attack_action)
+	)
+	if (
+		not is_instance_valid(potion_selector)
+		and Input.is_action_just_pressed("swap_potion")
+		and is_instance_valid(potion)
+	):
 		potion.swap_potions()
 	if Input.is_action_just_pressed("potion") and is_instance_valid(potion):
 		potion.use_equipped_potion()
@@ -262,13 +276,16 @@ func _read_input() -> void:
 	if InputMap.has_action(attack_action) and Input.is_action_just_pressed(attack_action):
 		request_attack()
 	elif (
-		InputMap.has_action(secondary_attack_action)
+		not secondary_blocked
+		and InputMap.has_action(secondary_attack_action)
 		and Input.is_action_just_pressed(secondary_attack_action)
 	):
 		request_attack(&"secondary")
 
 
 func clear_gameplay_input() -> void:
+	if is_instance_valid(potion_selector):
+		potion_selector.cancel_selection()
 	move_direction = Vector3.ZERO
 	attack_held = false
 	secondary_attack_held = false
@@ -282,7 +299,11 @@ func clear_gameplay_input() -> void:
 
 
 func is_gameplay_input_blocked() -> bool:
-	return blocked or (is_instance_valid(inventory_ui) and inventory_ui.is_open())
+	return (
+		blocked
+		or potion_selection_active
+		or (is_instance_valid(inventory_ui) and inventory_ui.is_open())
+	)
 
 
 func _get_active_camera() -> Camera3D:
@@ -496,6 +517,8 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	if is_instance_valid(potion_selector):
+		potion_selector.cancel_selection()
 	if is_instance_valid(inventory_ui):
 		inventory_ui.close_inventory(true)
 	if is_instance_valid(hurtbox):

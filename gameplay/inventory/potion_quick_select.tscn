@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://dlalbyjl0ra0y"]
+
+[ext_resource type="Script" uid="uid://veyxp0g102l0" path="res://gameplay/inventory/potion_quick_select.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://h45w34mqe332" path="res://data/items/consumables/potion.gd" id="3_potion"]
+[ext_resource type="Resource" uid="uid://ch2ttumamq7po" path="res://data/items/consumables/small_healing_potion.tres" id="4_hp_small"]
+[ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="5_hp_large"]
+[ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="6_sp_small"]
+[ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="7_sp_large"]
+[ext_resource type="Resource" uid="uid://v35jilyjifwa" path="res://data/items/consumables/small_dual_essence_potion.tres" id="8_dual_small"]
+[ext_resource type="Resource" uid="uid://b0c2kxsb7y24n" path="res://data/items/consumables/dual_essence_potion.tres" id="9_dual_large"]
+[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="9_xevfv"]
+
+[node name="PotionQuickSelect" type="CanvasLayer" unique_id=488661125]
+process_mode = 3
+layer = 20
+
+[node name="Wheel" type="Control" parent="." unique_id=865977224]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+catalog = Array[ExtResource("3_potion")]([ExtResource("4_hp_small"), ExtResource("5_hp_large"), ExtResource("6_sp_small"), ExtResource("7_sp_large"), ExtResource("8_dual_small"), ExtResource("9_dual_large")])
+
+[node name="CenterName" type="Label" parent="Wheel" unique_id=1608542701]
+layout_mode = 0
+offset_right = 152.0
+offset_bottom = 62.0
+theme_override_fonts/font = ExtResource("9_xevfv")
+theme_override_font_sizes/font_size = 24
+text = "Select potion"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CenterCount" type="Label" parent="Wheel" unique_id=1434107777]
+layout_mode = 0
+offset_right = 156.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(0.65, 0.8, 0.83, 1)
+theme_override_fonts/font = ExtResource("9_xevfv")
+theme_override_font_sizes/font_size = 18
+text = "Keep current"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Title" type="Label" parent="Wheel" unique_id=1121685074]
+layout_mode = 0
+offset_right = 360.0
+offset_bottom = 30.0
+theme_override_colors/font_color = Color(1, 0.85, 0.53, 1)
+theme_override_fonts/font = ExtResource("9_xevfv")
+theme_override_font_sizes/font_size = 40
+text = "QUICK POTIONS"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Wheel" unique_id=1284634527]
+layout_mode = 0
+offset_right = 520.0
+offset_bottom = 30.0
+theme_override_fonts/font = ExtResource("9_xevfv")
+theme_override_font_sizes/font_size = 18
+text = "Release R: MAIN  /  RMB: BACKUP\nEsc: cancel"
+horizontal_alignment = 1

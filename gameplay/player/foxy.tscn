@@ -60,6 +60,8 @@
 [ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
 [ext_resource type="Script" uid="uid://b0u5ln7tkfogr" path="res://data/weapon/weapon_collection_entry.gd" id="weapon_collection_entry"]
 
+[ext_resource type="PackedScene" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
+
 [sub_resource type="AtlasTexture" id="Atlas_bow_0"]
 atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(113, 170, 152, 184)
@@ -847,7 +849,7 @@ scale_min = 0.79999995
 scale_max = 1.5999999
 color_ramp = SubResource("GradientTexture1D_fi5gb")
 
-[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "ammo", "charm_socket_manager", "chaos", "potion", "inventory_ui", "camera") groups=["player"]]
+[node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "ammo", "charm_socket_manager", "chaos", "potion", "potion_selector", "inventory_ui", "camera") groups=["player"]]
 collision_layer = 2
 collision_mask = 5
 floor_constant_speed = true
@@ -863,6 +865,7 @@ ammo = NodePath("AmmoComponent")
 charm_socket_manager = NodePath("CharmSocketManager")
 chaos = NodePath("ChaosComponent")
 potion = NodePath("PotionComponent")
+potion_selector = NodePath("PotionQuickSelect/Wheel")
 inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
 
@@ -1073,6 +1076,8 @@ player = NodePath("../..")
 sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
+
+[node name="PotionQuickSelect" parent="." instance=ExtResource("potion_quick_select")]
 
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]
