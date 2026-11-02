@@ -1,10 +1,10 @@
 # Potion carrying capacity
 
-`Inventory` owns the limit: by default, 3 health bottles, 3 stamina bottles,
-and 3 dual essence bottles (an independent `Potion.Kind.DUAL_ESSENCE` group).
-Small and large bottles count together within their `Potion.Kind`. Each distinct
-kind/size uses its own item ID and stacks separately (up to `max_stack = 99`).
-`Potion.potion_size` describes size; it does not multiply carrying cost.
+`Inventory` owns one carrying limit per `Potion.Kind`, defaulting to 3 each for
+HP, SP, and Dual Essence. Small and large bottles count together: 2 small HP +
+1 large HP fills the HP limit, without affecting SP or Dual Essence capacity.
+Each kind/size combination keeps its own item ID and separate stack, up to its
+resource's `max_stack`. Carrying limits do not merge stacks.
 
 All additions use `Inventory.add_item()`, which returns unaccepted quantities.
 `get_available_space()` and `can_add_item()` include both inventory space and the
@@ -23,14 +23,14 @@ with the resource's configured `max_stack` (currently 10).
 Progression API on `Inventory`:
 
 ```gdscript
-inventory.count_potions(Potion.Kind.HEALTH)
+inventory.count_potions(Potion.Kind.HEALTH) # total small + large HP
 inventory.get_potion_capacity(Potion.Kind.HEALTH)
-inventory.upgrade_potion_capacity(Potion.Kind.HEALTH) # +1, returns success
+inventory.upgrade_potion_capacity(Potion.Kind.HEALTH) # shared HP limit +1
 inventory.upgrade_potion_capacity(Potion.Kind.STAMINA, 2)
 inventory.set_potion_capacity(Potion.Kind.HEALTH, 5) # restore progression
 ```
 
-Upgrades are independent per kind. Invalid kinds, nonpositive upgrades, limits
+Upgrades are independent per kind and apply to both sizes. Invalid kinds, nonpositive upgrades, limits
 above 100000, and reductions below currently carried quantities are rejected.
 Successful capacity changes emit `potion_capacity_changed(kind, new_capacity)`
 and `changed`. `clear()` removes items but keeps upgraded capacities.

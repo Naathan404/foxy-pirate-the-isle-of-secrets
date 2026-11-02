@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://bk3yobpmcd77a" path="res://assets/ui/player_hud/inventory/equip_button_press.png" id="7_21gur"]
 [ext_resource type="Texture2D" uid="uid://b5ttbxlcdv1uc" path="res://assets/ui/player_hud/inventory/notes_icon.png" id="9_h7xhg"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="9_ntv6s"]
+[ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="9_tbeqg"]
 [ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="10_bixt0"]
 [ext_resource type="PackedScene" uid="uid://c6lni27p5k43v" path="res://gameplay/inventory/equipment_tab.tscn" id="equipment_tab"]
 
@@ -167,12 +168,11 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Quantity" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=1129607073]
-visible = false
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("9_ntv6s")
-theme_override_font_sizes/font_size = 30
+theme_override_fonts/font = ExtResource("9_tbeqg")
+theme_override_font_sizes/font_size = 25
 text = "999"
 horizontal_alignment = 2
 vertical_alignment = 1

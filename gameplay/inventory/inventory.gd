@@ -143,17 +143,20 @@ func get_available_space(item: BaseItem) -> int:
 		elif slot.item.item_id == item.item_id:
 			total += maxi(0, slot.item.max_stack - slot.quantity)
 	if item is Potion:
-		var kind: Potion.Kind = (item as Potion).potion_kind
-		return mini(total, maxi(0, get_potion_capacity(kind) - count_potions(kind)))
+		var potion := item as Potion
+		var limit: int = get_potion_capacity(potion.potion_kind)
+		var carried: int = count_potions(potion.potion_kind)
+		return mini(total, maxi(0, limit - carried))
 	return total
 
 
-## Small and large bottles share one carrying limit for their effect kind.
+## Small and large bottles share a carrying limit; their item stacks remain separate.
 func count_potions(kind: Potion.Kind) -> int:
 	var total: int = 0
 	for slot in slots:
 		if not slot.is_empty() and slot.item is Potion:
-			if (slot.item as Potion).potion_kind == kind:
+			var potion := slot.item as Potion
+			if potion.potion_kind == kind:
 				total += slot.quantity
 	return total
 
