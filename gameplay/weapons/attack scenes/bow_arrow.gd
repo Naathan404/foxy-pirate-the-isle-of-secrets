@@ -2,6 +2,7 @@ extends WeaponAttack
 ## One snapshotted arrow; swept collision prevents tunnelling through thin targets/walls.
 
 const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
+const IMPACT_SOUND: AudioStream = preload("res://assets/audio/combat/bow_impact.wav")
 
 @export var hitbox: HitBox
 @export_range(1.0, 60.0, 0.1) var speed: float = 18.0
@@ -10,20 +11,26 @@ const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_fe
 
 @export_group("Hit Feedback")
 @export var impact_scene: PackedScene = preload("res://gameplay/weapons/bow_impact_vfx.tscn")
-@export_range(0.0, 0.1, 0.001) var hitstop_seconds: float = 0.035
-@export_range(0.0, 8.0, 0.1) var hit_shake_pixels: float = 1.5
-@export_range(0.0, 0.2, 0.005) var hit_kick_distance: float = 0.04
-@export_range(0.1, 1.0, 0.05) var impact_scale: float = 0.4
+@export_range(0.0, 0.1, 0.001) var hitstop_seconds: float = 0.045
+@export_range(0.0, 8.0, 0.1) var hit_shake_pixels: float = 2.0
+@export_range(0.0, 0.2, 0.005) var hit_kick_distance: float = 0.075
+@export_range(0.1, 1.0, 0.05) var impact_scale: float = 0.5
 @export var impact_charge_scale_bonus: float = 0.5
-@export_range(0.0, 1.0, 0.01) var impact_base_strength: float = 0.2
+@export_range(0.0, 1.0, 0.01) var impact_base_strength: float = 0.35
 @export_range(0.0, 1.0, 0.01) var impact_charge_strength_bonus: float = 0.4
 @export var hit_charge_kick_bonus: float = 0.5
 @export var hit_charge_hitstop_bonus: float = 0.5
 @export var hit_charge_shake_bonus: float = 1.0
 @export_range(0.0, 1.0, 0.01) var hit_shake_seconds: float = 0.12
 
+@export_group("Hit Particles")
+@export
+var hit_particles_scene: PackedScene = preload("res://gameplay/weapons/bow_hit_particles.tscn")
+@export_range(1, 64, 1) var hit_particle_count: int = 28
+@export_range(0, 32, 1) var hit_charge_particle_bonus: int = 12
+
 @export_group("Hit Audio")
-@export var hit_sound: AudioStream = preload("res://assets/audio/combat/bow_impact.wav")
+@export var hit_sound: AudioStream = IMPACT_SOUND
 @export_range(-80.0, 6.0, 1.0) var hit_volume_db: float = -12.0
 @export var hit_charge_volume_bonus_db: float = 2.0
 @export var hit_pitch_base: float = 1.15
@@ -31,6 +38,20 @@ const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_fe
 
 @export_group("Trail")
 @export var trail_scene: PackedScene = preload("res://gameplay/weapons/bow_energy_trail.tscn")
+
+@export_group("Range Expiry")
+@export_range(0.05, 0.5, 0.01) var expiry_fade_seconds: float = 0.18
+@export_range(0.05, 0.5, 0.01) var expiry_effect_scale: float = 0.18
+
+@export_group("Wall Hit")
+@export_range(0.0, 2.0, 0.05) var wall_hold_seconds: float = 0.6
+@export_range(0.05, 0.5, 0.01) var wall_fade_seconds: float = 0.22
+@export_range(0.0, 2.0, 0.01) var wall_tip_distance: float = 0.55
+@export var wall_hit_sound: AudioStream = IMPACT_SOUND
+@export_range(-80.0, 6.0, 1.0) var wall_hit_volume_db: float = -20.0
+@export var wall_particles_scene: PackedScene = preload(
+	"res://gameplay/weapons/bow_wall_hit_particles.tscn"
+)
 
 var curve_offset: float = 0.0
 var curve_height: float = 0.0
@@ -44,8 +65,10 @@ var _travelled: float = 0.0
 var _age: float = 0.0
 var _finished: bool = false
 var _previous_position: Vector3
+var _sprite_offset: Vector3
 
-@onready var _model: MeshInstance3D = $ArrowModel
+@onready var _sprite: Sprite3D = $Sprite3D
+@onready var _sprite_scale: Vector3 = _sprite.scale
 
 
 func _ready() -> void:
@@ -73,9 +96,10 @@ func activate() -> void:
 	show()
 	global_position = context.actor.global_position + Vector3.UP * release_height
 	look_at(global_position + context.direction, Vector3.UP)
+	_sprite_offset = _sprite.position
+	_update_sprite_angle(context.direction)
 	_start = global_position
 	_previous_position = global_position
-	_model.position = Vector3.ZERO
 	_end = _start + context.direction * context.range_units
 	_control = (_start + _end) * 0.5
 	_control += context.direction.cross(Vector3.UP) * curve_offset + Vector3.UP * curve_height
@@ -114,12 +138,15 @@ func _physics_process(delta: float) -> void:
 			query.exclude = [(context.actor as CollisionObject3D).get_rid()]
 		var collision := get_world_3d().direct_space_state.intersect_ray(query)
 		if not collision.is_empty():
+			var impact_direction := (destination - global_position).normalized()
 			global_position = collision.position
 			if is_instance_valid(_trail):
 				_trail.call("push_point", global_position)
 			if collision.collider is HurtBox:
 				hitbox.try_hit(collision.collider as HurtBox)
-			_finish_projectile()
+				_finish_projectile()
+			else:
+				_stick_in_wall(collision.normal, impact_direction)
 			return
 	global_position = destination
 	var tangent := _start.bezier_derivative(_control, _control, _end, progress)
@@ -129,14 +156,16 @@ func _physics_process(delta: float) -> void:
 		_trail.call("push_point", global_position)
 	_travelled += distance
 	if _travelled >= context.range_units or _age >= lifetime:
-		_finish_projectile()
+		_expire_projectile()
 
 
 func _process(_delta: float) -> void:
 	if launched and not _finished:
-		_model.global_position = _previous_position.lerp(
-			global_position, Engine.get_physics_interpolation_fraction()
+		_sprite.global_position = (
+			_previous_position.lerp(global_position, Engine.get_physics_interpolation_fraction())
+			+ global_basis * _sprite_offset
 		)
+		_update_sprite_angle(-global_basis.z)
 
 
 func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
@@ -168,6 +197,7 @@ func _play_hit_feedback(target: Node, knockback_scale: float) -> void:
 			true,
 			knockback_scale
 		)
+
 	var impact := impact_scene.instantiate() as Node3D
 	get_parent().add_child(impact)
 	impact.global_position = global_position
@@ -176,6 +206,7 @@ func _play_hit_feedback(target: Node, knockback_scale: float) -> void:
 		Vector3.ONE * impact_scale * (1.0 + strength * impact_charge_scale_bonus) * knockback_scale
 	)
 	impact.call("burst", impact_base_strength + strength * impact_charge_strength_bonus)
+	_spawn_hit_particles(strength, knockback_scale)
 	get_node("/root/AudioManager").play_sfx_3d(
 		hit_sound,
 		global_position,
@@ -192,6 +223,127 @@ func _play_hit_feedback(target: Node, knockback_scale: float) -> void:
 		hit_shake_pixels * (1.0 + strength * hit_charge_shake_bonus) * knockback_scale,
 		hit_shake_seconds
 	)
+
+
+func _spawn_hit_particles(strength: float, impact_multiplier: float) -> void:
+	if hit_particles_scene == null:
+		return
+	var particles := hit_particles_scene.instantiate() as GPUParticles3D
+	particles.amount = hit_particle_count + roundi(strength * hit_charge_particle_bonus)
+	var material := particles.process_material as ParticleProcessMaterial
+	# Each burst owns its material so simultaneous hits can have different directions.
+	material = material.duplicate() as ParticleProcessMaterial
+	particles.process_material = material
+	material.direction = (context.direction + Vector3.UP * 0.45).normalized()
+	var power := (1.0 + strength * 0.4) * clampf(impact_multiplier, 0.75, 1.5)
+	material.initial_velocity_min *= power
+	material.initial_velocity_max *= power
+	material.scale_min *= power
+	material.scale_max *= power
+	# Parent the emitter beside the projectile so its particles survive arrow cleanup.
+	particles.finished.connect(particles.queue_free)
+	get_parent().add_child(particles)
+	particles.global_transform = Transform3D(Basis.IDENTITY, global_position)
+	var camera := get_viewport().get_camera_3d()
+	if is_instance_valid(camera):
+		particles.global_position += camera.global_basis.z * 0.04
+	particles.restart()
+	particles.emitting = true
+
+
+func _update_sprite_angle(direction: Vector3) -> void:
+	var camera := get_viewport().get_camera_3d()
+	if not is_instance_valid(camera):
+		return
+	var screen_x := direction.dot(camera.global_basis.x)
+	var screen_y := direction.dot(camera.global_basis.y)
+	if is_zero_approx(screen_x) and is_zero_approx(screen_y):
+		return
+	# Arrow.png points left in its source image, so flip its axis by PI.
+	var angle := atan2(screen_y, screen_x) + PI
+	# Set the world basis explicitly so the parent's heading cannot override the roll.
+	_sprite.global_basis = (
+		camera.global_basis.orthonormalized()
+		* Basis(Vector3.BACK, angle)
+		* Basis.from_scale(_sprite_scale)
+	)
+
+
+func _stick_in_wall(normal: Vector3, direction: Vector3) -> void:
+	if _finished:
+		return
+	_finished = true
+	hitbox.end_attack()
+	set_physics_process(false)
+	set_process(false)
+	_update_sprite_angle(direction)
+	# The source image's tip is left of its center; keep that tip at the contact.
+	var tip_direction := -_sprite.global_basis.x.normalized()
+	_sprite.global_position = global_position - tip_direction * wall_tip_distance + normal * 0.015
+	if is_instance_valid(_trail):
+		_trail.call("finish")
+		_trail = null
+
+	_spawn_wall_particles(normal)
+	if wall_hit_sound != null:
+		get_node("/root/AudioManager").play_sfx_3d(
+			wall_hit_sound, global_position, wall_hit_volume_db, 1.35
+		)
+
+	_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
+	var fade := create_tween()
+	fade.tween_interval(wall_hold_seconds)
+	fade.tween_property(_sprite, "modulate:a", 0.0, wall_fade_seconds)
+	fade.tween_callback(queue_free)
+
+
+func _spawn_wall_particles(normal: Vector3) -> void:
+	if wall_particles_scene == null:
+		return
+	var particles := wall_particles_scene.instantiate() as GPUParticles3D
+	particles.emitting = false
+	get_parent().add_child(particles)
+	particles.global_position = global_position + normal * 0.04
+	# Aim the emission cone away from the wall, including horizontal surfaces.
+	var up := Vector3.FORWARD if absf(normal.dot(Vector3.UP)) > 0.98 else Vector3.UP
+	particles.look_at(particles.global_position + normal, up)
+	particles.restart()
+	particles.emitting = true
+
+
+func _expire_projectile() -> void:
+	if _finished:
+		return
+	_finished = true
+	hitbox.end_attack()
+	set_physics_process(false)
+	set_process(false)
+	_sprite.global_position = global_position + global_basis * _sprite_offset
+	_update_sprite_angle(-global_basis.z)
+	if is_instance_valid(_trail):
+		_trail.call("finish")
+		_trail = null
+
+	# Reuse the impact visuals as a small, quiet puff at the end of the flight.
+	var puff := impact_scene.instantiate() as Node3D
+	puff.set("ring_count", 0)
+	puff.set("spark_count", 6)
+	puff.set("burst_duration", expiry_fade_seconds + 0.06)
+	puff.set("effect_brightness", 0.8)
+	puff.set("light_base_energy", 0.0)
+	puff.set("light_charge_energy_bonus", 0.0)
+	get_parent().add_child(puff)
+	puff.global_position = _sprite.global_position
+	puff.scale = Vector3.ONE * expiry_effect_scale
+	puff.call("set_aim", -global_basis.z)
+	puff.call("burst", 0.05 + clampf(energy_strength, 0.0, 1.0) * 0.15)
+
+	# Alpha scissor would clip the sprite abruptly instead of allowing a soft fade.
+	_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
+	var fade := create_tween().set_parallel(true)
+	fade.tween_property(_sprite, "modulate:a", 0.0, expiry_fade_seconds)
+	fade.tween_property(_sprite, "scale", _sprite.scale * 0.65, expiry_fade_seconds)
+	fade.chain().tween_callback(queue_free)
 
 
 func _finish_projectile() -> void:
