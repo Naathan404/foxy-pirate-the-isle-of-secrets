@@ -3,6 +3,11 @@ extends WeaponAttack
 
 const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
 const IMPACT_SOUND: AudioStream = preload("res://assets/audio/combat/bow_impact.wav")
+const CURVE_SAMPLES: int = 32
+const STORM_BURST: PackedScene = preload("res://gameplay/weapons/stormstring_burst.tscn")
+const STORM_PARTICLES: PackedScene = preload(
+	"res://gameplay/weapons/stormstring_flight_particles.tscn"
+)
 
 @export var hitbox: HitBox
 @export_range(1.0, 60.0, 0.1) var speed: float = 18.0
@@ -56,10 +61,17 @@ var hit_particles_scene: PackedScene = preload("res://gameplay/weapons/bow_hit_p
 var curve_offset: float = 0.0
 var curve_height: float = 0.0
 var energy_strength: float = 0.0
+var converge_on_target: bool = false
+var arrival_seconds: float = 0.0
+var storm_burst_state: Dictionary = {}
 var _start: Vector3
 var _control: Vector3
+var _control_end: Vector3
 var _end: Vector3
 var _trail: Node3D
+var _flight_particles: GPUParticles3D
+var _curve_lengths: PackedFloat32Array = []
+var _path_length: float = 0.0
 
 var _travelled: float = 0.0
 var _age: float = 0.0
@@ -101,13 +113,22 @@ func activate() -> void:
 	_start = global_position
 	_previous_position = global_position
 	_end = _start + context.direction * context.range_units
-	_control = (_start + _end) * 0.5
-	_control += context.direction.cross(Vector3.UP) * curve_offset + Vector3.UP * curve_height
+	if converge_on_target and context.has_target:
+		var offset := context.target_position - _start
+		offset.y = 0.0
+		_end = _start + offset.limit_length(context.range_units)
+	_build_flight_path()
+	if arrival_seconds > 0.0:
+		speed = _path_length / arrival_seconds
 	if energy_strength > 0.0:
 		_trail = trail_scene.instantiate() as Node3D
 		_trail.set("strength", energy_strength)
 		get_parent().add_child(_trail)
 		_trail.call("push_point", global_position)
+		_flight_particles = STORM_PARTICLES.instantiate() as GPUParticles3D
+		get_parent().add_child(_flight_particles)
+		_flight_particles.global_position = global_position
+		_flight_particles.emitting = true
 	_travelled = 0.0
 	_age = 0.0
 	_finished = false
@@ -124,11 +145,9 @@ func _physics_process(delta: float) -> void:
 		return
 	_age += maxf(0.0, delta)
 	_previous_position = global_position
-	var distance := minf(speed * maxf(0.0, delta), context.range_units - _travelled)
-	var progress := clampf((_travelled + distance) / context.range_units, 0.0, 1.0)
-	var destination := _start.bezier_interpolate(_control, _control, _end, progress)
-	if curve_offset == 0.0 and curve_height == 0.0:
-		destination = _start.lerp(_end, progress)
+	var distance := minf(speed * maxf(0.0, delta), _path_length - _travelled)
+	var progress := _progress_at_distance(_travelled + distance)
+	var destination := _start.bezier_interpolate(_control, _control_end, _end, progress)
 	if distance > 0.0:
 		var query := PhysicsRayQueryParameters3D.create(
 			global_position, destination, CombatLayers.WORLD | CombatLayers.ENEMY_HURTBOX
@@ -149,14 +168,52 @@ func _physics_process(delta: float) -> void:
 				_stick_in_wall(collision.normal, impact_direction)
 			return
 	global_position = destination
-	var tangent := _start.bezier_derivative(_control, _control, _end, progress)
+	var tangent := _start.bezier_derivative(_control, _control_end, _end, progress)
 	if not tangent.is_zero_approx():
 		look_at(global_position + tangent, Vector3.UP)
 	if is_instance_valid(_trail):
 		_trail.call("push_point", global_position)
+	if is_instance_valid(_flight_particles):
+		_flight_particles.global_position = global_position
 	_travelled += distance
-	if _travelled >= context.range_units or _age >= lifetime:
+	if _travelled >= _path_length - 0.0001 or _age >= lifetime:
 		_expire_projectile()
+
+
+func _build_flight_path() -> void:
+	var forward := (_end - _start).normalized()
+	var span := _start.distance_to(_end)
+	var side := forward.cross(Vector3.UP)
+	var width := clampf(curve_offset, -span * 0.45, span * 0.45)
+	# Separate departure/convergence controls keep each lane on its own side of aim.
+	_control = _start.lerp(_end, 0.24) + side * width + Vector3.UP * curve_height
+	_control_end = _start.lerp(_end, 0.76) + side * width * 0.3
+	_curve_lengths.clear()
+	_curve_lengths.append(0.0)
+	_path_length = 0.0
+	var previous := _start
+	for index in range(1, CURVE_SAMPLES + 1):
+		var point := _start.bezier_interpolate(
+			_control, _control_end, _end, float(index) / CURVE_SAMPLES
+		)
+		_path_length += previous.distance_to(point)
+		_curve_lengths.append(_path_length)
+		previous = point
+
+
+## Arc-length lookup avoids slowing at the bend and accelerating out of it.
+func _progress_at_distance(distance: float) -> float:
+	var low: int = 0
+	var high: int = CURVE_SAMPLES
+	while high - low > 1:
+		var middle: int = (low + high) / 2
+		if _curve_lengths[middle] < distance:
+			low = middle
+		else:
+			high = middle
+	var segment: float = _curve_lengths[high] - _curve_lengths[low]
+	var fraction := clampf((distance - _curve_lengths[low]) / maxf(segment, 0.0001), 0.0, 1.0)
+	return (low + fraction) / CURVE_SAMPLES
 
 
 func _process(_delta: float) -> void:
@@ -207,6 +264,7 @@ func _play_hit_feedback(target: Node, knockback_scale: float) -> void:
 	)
 	impact.call("burst", impact_base_strength + strength * impact_charge_strength_bonus)
 	_spawn_hit_particles(strength, knockback_scale)
+	_spawn_storm_burst()
 	get_node("/root/AudioManager").play_sfx_3d(
 		hit_sound,
 		global_position,
@@ -273,6 +331,7 @@ func _stick_in_wall(normal: Vector3, direction: Vector3) -> void:
 	if _finished:
 		return
 	_finished = true
+	_finish_flight_particles()
 	hitbox.end_attack()
 	set_physics_process(false)
 	set_process(false)
@@ -285,6 +344,7 @@ func _stick_in_wall(normal: Vector3, direction: Vector3) -> void:
 		_trail = null
 
 	_spawn_wall_particles(normal)
+	_spawn_storm_burst()
 	if wall_hit_sound != null:
 		get_node("/root/AudioManager").play_sfx_3d(
 			wall_hit_sound, global_position, wall_hit_volume_db, 1.35
@@ -315,11 +375,14 @@ func _expire_projectile() -> void:
 	if _finished:
 		return
 	_finished = true
+	_finish_flight_particles()
 	hitbox.end_attack()
 	set_physics_process(false)
 	set_process(false)
 	_sprite.global_position = global_position + global_basis * _sprite_offset
 	_update_sprite_angle(-global_basis.z)
+	if converge_on_target:
+		_spawn_storm_burst(true)
 	if is_instance_valid(_trail):
 		_trail.call("finish")
 		_trail = null
@@ -350,13 +413,48 @@ func _finish_projectile() -> void:
 	if _finished:
 		return
 	_finished = true
+	_finish_flight_particles()
 	hitbox.end_attack()
 	set_physics_process(false)
 	queue_free()
 
 
 func _exit_tree() -> void:
+	_finish_flight_particles()
 	if is_instance_valid(_trail):
 		_trail.call("finish")
 	if is_instance_valid(hitbox):
 		hitbox.end_attack()
+
+
+func _spawn_storm_burst(terminal_sound: bool = false) -> void:
+	if energy_strength <= 0.0:
+		return
+	var now: int = Time.get_ticks_msec()
+	if storm_burst_state.has("position"):
+		var previous: Vector3 = storm_burst_state["position"]
+		var previous_time: int = storm_burst_state["time"]
+		# Six converging arrows share one large flash; individual hit feedback still plays.
+		if now - previous_time < 120 and previous.distance_squared_to(global_position) < 0.64:
+			return
+	storm_burst_state["position"] = global_position
+	storm_burst_state["time"] = now
+	var burst := STORM_BURST.instantiate() as Node3D
+	get_parent().add_child(burst)
+	burst.global_position = global_position
+	burst.call("burst", energy_strength)
+	if terminal_sound:
+		get_node("/root/AudioManager").play_sfx_3d(
+			hit_sound, global_position, hit_volume_db - 2.0, 0.8
+		)
+
+
+func _finish_flight_particles() -> void:
+	if not is_instance_valid(_flight_particles):
+		return
+	_flight_particles.emitting = false
+	_flight_particles.get_node("HeadGlint").hide()
+	var fade := _flight_particles.create_tween()
+	fade.tween_interval(_flight_particles.lifetime)
+	fade.tween_callback(_flight_particles.queue_free)
+	_flight_particles = null
