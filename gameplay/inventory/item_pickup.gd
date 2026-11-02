@@ -23,9 +23,11 @@ var _drop_tween: Tween
 var _rest_scale: Vector3
 var _rest_position: Vector3
 var _can_be_picked_up: bool = true
+var _collecting: bool = false
 
 @onready var sprite: Sprite3D = $Sprite3D
 @onready var _scatter: PickupScatter = $Scatter
+@onready var _attraction: PlayerAttraction = $Attraction
 
 
 func _ready() -> void:
@@ -42,12 +44,17 @@ func _ready() -> void:
 	if idle_animation_enabled:
 		_rest_position.y += float_height
 	_scatter.landed.connect(_on_scatter_landed)
+	_attraction.configure(_can_attract)
+	_attraction.attraction_started.connect(_on_attraction_started)
+	_attraction.attraction_cancelled.connect(_on_attraction_cancelled)
+	_attraction.arrived.connect(_collect)
+	_attraction.completed.connect(queue_free)
 	_start_idle_animation()
+	_attraction.set_enabled(true)
 
 
 func _start_idle_animation() -> void:
 	sprite.scale = _rest_scale
-	sprite.position = _rest_position
 	sprite.position = _rest_position
 	if not idle_animation_enabled:
 		return
@@ -69,15 +76,14 @@ func _start_idle_animation() -> void:
 
 ## Called after placement; the shared scatter component moves both visual and pickup area.
 func play_drop_animation(direction: Vector3 = Vector3.ZERO) -> void:
+	_attraction.reset()
 	if _idle_tween != null and _idle_tween.is_valid():
 		_idle_tween.kill()
 	if _drop_tween != null and _drop_tween.is_valid():
 		_drop_tween.kill()
 	_can_be_picked_up = false
 	sprite.position = _rest_position
-	sprite.scale = _rest_scale * Vector3(0.9, 1.15, 1.0)
-	_drop_tween = create_tween()
-	_drop_tween.tween_property(sprite, "scale", _rest_scale, rise_duration)
+	sprite.scale = _rest_scale
 	_scatter.launch(drop_height, rise_duration + fall_duration, direction)
 
 
@@ -95,28 +101,50 @@ func _finish_drop_animation() -> void:
 	_drop_tween = null
 	_start_idle_animation()
 	_can_be_picked_up = true
-	# Player đứng sẵn trong vùng nhặt vẫn nhận được đồ sau khi item đáp xuống.
-	for body: Node3D in get_overlapping_bodies():
-		_on_body_entered(body)
-		if is_queued_for_deletion():
-			break
+	_attraction.set_enabled(true)
 
 
 func _on_body_entered(body: Node3D) -> void:
-	if not _can_be_picked_up or is_queued_for_deletion():
-		return
-	if body is not Player:
-		return
+	_attraction.try_attract(body)
 
-	if item == null or quantity <= 0:
+
+func _can_attract(target: Node3D) -> bool:
+	if not _can_be_picked_up or _collecting or is_queued_for_deletion():
+		return false
+	if item == null or quantity <= 0 or not target is Player:
+		return false
+	var player := target as Player
+	if player.dead or player.is_gameplay_input_blocked():
+		return false
+	var inventory := player.get_node_or_null("Inventory") as Inventory
+	return inventory != null and inventory.get_available_space(item) > 0
+
+
+func _on_attraction_started(_target: Node3D) -> void:
+	if _idle_tween != null and _idle_tween.is_valid():
+		_idle_tween.kill()
+	if _drop_tween != null and _drop_tween.is_valid():
+		_drop_tween.kill()
+	sprite.position = _rest_position
+	sprite.scale = _rest_scale
+
+
+func _on_attraction_cancelled() -> void:
+	_collecting = false
+	_start_idle_animation()
+
+
+func _collect(target: Node3D) -> void:
+	if not _can_attract(target):
+		_attraction.retry()
 		return
-
-	var inventory = body.get_node_or_null("Inventory") as Inventory
-
-	if inventory == null:
-		return
-
+	var inventory := target.get_node_or_null("Inventory") as Inventory
+	# Inventory signals may re-enter pickup code; reserve the transaction first.
+	_collecting = true
 	quantity = inventory.add_item(item, quantity)
-
-	if quantity == 0:
-		queue_free()
+	if quantity > 0:
+		_collecting = false
+		_attraction.retry()
+		return
+	_can_be_picked_up = false
+	_attraction.complete()

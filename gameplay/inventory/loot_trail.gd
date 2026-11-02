@@ -6,7 +6,8 @@ signal finished(trail: LootTrail)
 
 const MAX_POINTS: int = 32
 
-@export_range(0.05, 0.5, 0.01) var point_lifetime: float = 0.22
+@export_range(0.05, 0.5, 0.01) var point_lifetime: float = 0.28
+@export_range(0.05, 0.3, 0.01) var landing_flash_seconds: float = 0.12
 
 var _source: Node3D
 var _positions := PackedVector3Array()
@@ -16,10 +17,13 @@ var _count: int = 0
 var _width: float = 0.08
 var _active: bool = false
 var _lease: int = 0
+var _flash_age: float = 0.0
 
 @onready var _ribbon: MeshInstance3D = $Ribbon
 @onready var _mesh: ImmediateMesh = _ribbon.mesh
 @onready var _material: ShaderMaterial = _ribbon.material_override
+@onready var _flash: MeshInstance3D = $LandingGlint
+@onready var _flash_material: ShaderMaterial = _flash.material_override
 
 
 func _ready() -> void:
@@ -34,6 +38,7 @@ func start(source: Node3D, color: Color, width: float) -> void:
 	_source = source
 	_width = maxf(0.01, width)
 	_material.set_shader_parameter("tint", color)
+	_flash_material.set_shader_parameter("tint", color)
 	global_transform = Transform3D.IDENTITY
 	_active = true
 	_append(source.global_position)
@@ -45,11 +50,17 @@ func get_lease() -> int:
 	return _lease
 
 
-func finish(lease: int) -> void:
+func finish(lease: int, show_impact: bool = false) -> void:
 	if not _active or lease != _lease:
 		return
 	if is_instance_valid(_source):
 		_append(_source.global_position)
+		if show_impact:
+			_flash.global_position = _source.global_position
+			_flash.scale = Vector3.ONE
+			_flash_material.set_shader_parameter("opacity", 1.0)
+			_flash_age = 0.0
+			_flash.show()
 	_source = null
 
 
@@ -59,11 +70,14 @@ func reset() -> void:
 	_first = 0
 	_count = 0
 	_mesh.clear_surfaces()
+	_flash.hide()
+	_flash_age = 0.0
 	hide()
 	set_process(false)
 
 
 func _process(delta: float) -> void:
+	_update_flash(delta)
 	for offset in _count:
 		var index := (_first + offset) % MAX_POINTS
 		_ages[index] += maxf(0.0, delta)
@@ -75,12 +89,23 @@ func _process(delta: float) -> void:
 	else:
 		_source = null
 	_mesh.clear_surfaces()
-	if _source == null and _count < 2 and _active:
+	if _source == null and _count < 2 and _active and not _flash.visible:
 		_active = false
 		finished.emit(self)
 		return
 	if _count >= 2:
 		_draw_ribbon()
+
+
+func _update_flash(delta: float) -> void:
+	if not _flash.visible:
+		return
+	_flash_age += maxf(0.0, delta)
+	var progress := clampf(_flash_age / landing_flash_seconds, 0.0, 1.0)
+	_flash.scale = Vector3.ONE * lerpf(1.0, 1.6, progress)
+	_flash_material.set_shader_parameter("opacity", (1.0 - progress) * (1.0 - progress))
+	if progress >= 1.0:
+		_flash.hide()
 
 
 func _append(point: Vector3) -> void:

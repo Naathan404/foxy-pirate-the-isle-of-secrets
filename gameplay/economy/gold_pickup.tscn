@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b757h2mooxufd" path="res://gameplay/economy/gold_pickup.gd" id="1_pickup"]
 [ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_4jcvl"]
 [ext_resource type="PackedScene" uid="uid://cedobrx1ymh47" path="res://gameplay/inventory/pickup_scatter.tscn" id="3_scatter"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/player_attraction.tscn" id="4_attraction"]
 
 [sub_resource type="SphereShape3D" id="Shape_pickup"]
 radius = 0.8
@@ -37,4 +38,11 @@ shape = SubResource("Shape_pickup")
 [node name="Scatter" parent="." unique_id=2061619765 node_paths=PackedStringArray("visual") instance=ExtResource("3_scatter")]
 visual = NodePath("../Sprite3D")
 trail_color = Color(1, 0.68, 0.22, 1)
-trail_width = 0.095
+trail_width = 0.14
+tumble_strength = 0.65
+
+[node name="Attraction" parent="." node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("4_attraction")]
+detector = NodePath("..")
+moving_root = NodePath("..")
+anchor = NodePath("../Sprite3D")
+detection_shape = NodePath("../CollisionShape3D")

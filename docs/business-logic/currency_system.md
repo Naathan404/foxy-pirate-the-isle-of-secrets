@@ -23,9 +23,11 @@ a tide change does not count as a death.
 
 ## Collection and wallet
 
-The coin scatters along a short arc, then becomes collectible when the player walks within its
-pickup area. Dead players and blocked gameplay cannot collect it. Collection
-credits Gold once, shows a HUD gain and animates the coin toward the player.
+The coin scatters along a short arc, then enables the shared PlayerAttraction
+component. Within its default 2.4-unit radius it accelerates toward the live
+player position. Dead players and blocked gameplay cannot collect it. Gold is
+credited once on arrival, the HUD shows the gain, and the coin shrinks before
+returning to its pool. See `player_attraction.md` for the shared item/Gold contract.
 
 `GameManager.gold_wallet` owns the sole balance. `GoldWallet` exposes
 `get_balance()`, `add_gold()`, `can_afford()` and `try_spend()`, with
@@ -55,12 +57,23 @@ walls and floor height before choosing a destination, shortening the throw or
 staying at the origin if no nearby landing is safe.
 
 `Scatter` exposes distance min/max, trail color/width and an optional trail pool.
-Item flight height and duration still use its existing drop animation exports.
-Gold uses its `drop_height` and a 0.46-second flight. Item trails are cyan-white;
-Gold trails are golden-white. Trails fade for up to 0.22 seconds after landing.
+Default scatter range is 1.0–2.2 units. Flight starts 0.35 units above the ground,
+with a fast outward launch, an early apex and a quick fall. Item height/duration
+still use the pickup's existing exports; Gold has a 0.46-second base flight.
+The base height is multiplied by 1.35, then varied by 20% per flight; duration
+varies by 12%. `Flight Feel` exposes these settings and the visual tumble strength.
+Coins have a stronger flip than items. Flight and landing are the sole owners
+of visual scale until the pickup returns to idle.
+
+On first ground contact, the trail emits a short pooled glint and stops following.
+The pickup performs a 0.16-unit, 0.16-second settling hop before enabling
+collection. Gold trails are golden-white and item trails are cyan-white, with
+a white inner filament and broader glow. Trails fade for up to 0.28 seconds.
+Ribbon processing runs after scatter movement so the line reaches its visual
+source in the same rendered frame.
 
 `LootTrailPool` is local to the world scene and reuses ribbon objects, their
-meshes, materials and fixed 32-point buffers. It prewarms 64 trails and grows to
+meshes, materials, landing glints and fixed 32-point buffers. It prewarms 64 trails and grows to
 128, creating at most 4 per frame; acquisition never creates a new trail in the
 drop path. Saturation skips additional trails without changing rewards. Idle entries
 are hidden, have empty meshes and do not process. Each activation has a lease

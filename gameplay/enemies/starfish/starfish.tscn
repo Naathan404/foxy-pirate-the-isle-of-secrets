@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_hitbox"]
 [ext_resource type="Script" uid="uid://bflhjgi4bjv7d" path="res://gameplay/enemies/starfish/states/starfish_attack.gd" id="7_attack"]
 [ext_resource type="Script" uid="uid://dgev8bsxueeb6" path="res://gameplay/enemies/starfish/states/starfish_patrol.gd" id="7_patrol"]
-[ext_resource type="Script" path="res://gameplay/enemies/starfish/starfish.gd" id="8_starfish"]
+[ext_resource type="Script" uid="uid://b7h73fhqmpwws" path="res://gameplay/enemies/starfish/starfish.gd" id="8_starfish"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(1.5, 2, 1.5)
@@ -24,8 +24,9 @@ height = 1.1
 
 [node name="Starfish" unique_id=1294052233 instance=ExtResource("1_base")]
 script = ExtResource("8_starfish")
-data = ExtResource("2_data")
 player_detection_radius = 6.7
+unreachable_target_ignore_duration = 2.0
+data = ExtResource("2_data")
 initial_state_name = &"Patrol"
 destroy_on_death = true
 show_debug_health = true

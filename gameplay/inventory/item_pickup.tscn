@@ -4,6 +4,7 @@
 [ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="2_y770h"]
 [ext_resource type="Texture2D" uid="uid://c6rri8ebn60w7" path="res://assets/sprites/items/Crab_Claw.png" id="3_itqw8"]
 [ext_resource type="PackedScene" uid="uid://cedobrx1ymh47" path="res://gameplay/inventory/pickup_scatter.tscn" id="4_scatter"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/player_attraction.tscn" id="5_attraction"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_wcvja"]
 radius = 0.6419367
@@ -29,4 +30,8 @@ shape = SubResource("SphereShape3D_wcvja")
 [node name="Scatter" parent="." unique_id=2129724032 node_paths=PackedStringArray("visual") instance=ExtResource("4_scatter")]
 visual = NodePath("../Sprite3D")
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[node name="Attraction" parent="." node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("5_attraction")]
+detector = NodePath("..")
+moving_root = NodePath("..")
+anchor = NodePath("../Sprite3D")
+detection_shape = NodePath("../CollisionShape3D")
