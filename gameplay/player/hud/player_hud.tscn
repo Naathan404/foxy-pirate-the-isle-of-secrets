@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://xdoo8a6qp5po"]
 
-[ext_resource type="Script" uid="uid://l383y3sp6xa1" path="res://gameplay/player/hud/chaos_indicator_feedback.gd" id="chaos_indicator"]
 [ext_resource type="Script" uid="uid://boe5rxmapxpg1" path="res://gameplay/player/hud/player_hud.gd" id="1_1qgx4"]
 [ext_resource type="Texture2D" uid="uid://dfmeq6capw5cv" path="res://assets/ui/player_hud/hp_bar_progress.png" id="2_qfbhl"]
 [ext_resource type="Texture2D" uid="uid://bxvt628ftu3ij" path="res://assets/ui/player_hud/stamina_bar_progress.png" id="3_nc5hm"]
@@ -22,7 +21,8 @@
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
 [ext_resource type="Texture2D" uid="uid://c2ply0h057nlq" path="res://assets/ui/player_hud/charrm_ui/charm_socket.png" id="19_01apl"]
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="23_1wee6"]
-[ext_resource type="PackedScene" path="res://gameplay/economy/gold_display.tscn" id="24_gold"]
+[ext_resource type="PackedScene" uid="uid://bulcvbok8qvje" path="res://gameplay/economy/gold_display.tscn" id="24_gold"]
+[ext_resource type="Script" uid="uid://l383y3sp6xa1" path="res://gameplay/player/hud/chaos_indicator_feedback.gd" id="chaos_indicator"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
 shader = ExtResource("5_depth")
@@ -88,11 +88,11 @@ scale = Vector2(1.25, 1.25)
 transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
 
-[node name="GoldDisplay" parent="." instance=ExtResource("24_gold")]
-offset_left = 152.0
-offset_top = 16.0
-offset_right = 292.0
-offset_bottom = 56.0
+[node name="GoldDisplay" parent="." unique_id=1585419187 instance=ExtResource("24_gold")]
+offset_left = 118.4
+offset_top = 3.2
+offset_right = 258.4
+offset_bottom = 43.2
 
 [node name="Effects" type="Node" parent="." unique_id=1082976363]
 

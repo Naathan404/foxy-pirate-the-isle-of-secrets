@@ -270,15 +270,20 @@ chỉ có tác dụng trong `world/tests/bow_test.tscn`.
 - Mỗi tên tốn 1 Wooden Arrow, không tốn SP. Chỉ trừ ammo khi thả phím.
 - Mỗi tên giữ damage sau forge/Charm của đòn; tối đa 6 lần damage nếu cả 6 trúng,
   mỗi projectile có dedup riêng. Tường chặn tên và các cung cong không tự tìm địch.
-- Nhấn/thả tức thì có 1 tên, không mất CP ngay khi nhấn. Khi thả, phóng ngay,
-  sau đó giữ active/recovery theo forge. Cooldown secondary tính từ lúc nhả.
+- Nhấn/thả tức thì có 1 tên, không mất CP ngay khi nhấn. Thời gian giữ tính vào
+  windup sau forge; thả sớm chạy nốt phần windup còn thiếu, giữ đủ thì nhả là phóng.
+  Active/recovery và cooldown tiếp tục theo forge. Cooldown tính từ lúc nhả.
 - Hit, chết, rơi khỏi nền hoặc khóa gameplay/mở inventory ngắt kéo cung. CP đã tiêu
   không hoàn lại, chưa nhả thì không mất tên. Tên đã bay có vòng đời độc lập.
 
 Bắn thường và các đòn `PROJECTILE` khác có `release_to_fire = true` cũng giữ để
-ngắm, thả để phóng; không có thời gian chờ tối thiểu khi bấm/thả nhanh. Chi phí
+ngắm, thả để phóng sau khi hoàn thành windup đã rèn. Chi phí
 và cooldown bắt đầu lúc nhả. Dash hủy ngắm. `ranged_aim_indicator.tscn` chứa dấu
 ngắm. Nhân vật đứng yên trong lúc giữ ngắm; dash hủy ngắm để né.
+
+Animation kéo/nạp, nhả và hồi phục được đồng bộ theo từng pha của controller,
+không giữ pose kéo cố định hoặc cắt bỏ startup khi thả. `charge_seconds` vẫn là
+thời gian tăng sức mạnh riêng; Attack Speed chỉ chia windup, active, recovery và cooldown.
 
 Các tên có cung Bézier khác nhau trên XZ, hơi nâng cao nhưng vẫn nằm trong độ cao
 HurtBox của quái nhỏ. VFX sinh bằng mesh: vòng tụ lực và hạt quay tăng theo charge,

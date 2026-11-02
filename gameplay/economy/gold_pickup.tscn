@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://eewwkdmv48hy"]
 
 [ext_resource type="Script" uid="uid://b757h2mooxufd" path="res://gameplay/economy/gold_pickup.gd" id="1_pickup"]
-[ext_resource type="Texture2D" path="res://gameplay/economy/coin_icon.tres" id="2_coin"]
+[ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_4jcvl"]
 [ext_resource type="PackedScene" path="res://gameplay/inventory/pickup_scatter.tscn" id="3_scatter"]
 
 [sub_resource type="SphereShape3D" id="Shape_pickup"]
@@ -17,7 +17,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78836787, 0)
 pixel_size = 0.0015
 billboard = 1
 texture_filter = 0
-texture = ExtResource("2_coin")
+texture = ExtResource("2_4jcvl")
 
 [node name="Value" type="Label3D" parent="." unique_id=923848023]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)

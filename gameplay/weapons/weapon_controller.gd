@@ -52,6 +52,7 @@ var _animation_prefix: String = ""
 var _next_attack_id: int = 0
 var _charging_attack: AttackData
 var _charge_elapsed: float = 0.0
+var _aim_elapsed: float = 0.0
 var _charge_spent: float = 0.0
 var _charge_budget: float = 0.0
 var _aim_indicator: RangedAimIndicator
@@ -298,6 +299,30 @@ func get_attack_windup_duration() -> float:
 	return _windup
 
 
+func get_attack_phase_name() -> StringName:
+	if is_aiming():
+		return &"aim"
+	match _phase:
+		Phase.WINDUP:
+			return &"windup"
+		Phase.ACTIVE:
+			return &"active"
+		Phase.RECOVERY:
+			return &"recovery"
+	return &""
+
+
+func get_attack_phase_progress() -> float:
+	if is_aiming():
+		return clampf(_aim_elapsed / _windup, 0.0, 1.0) if _windup > 0.0 else 1.0
+	var duration := _windup
+	if _phase == Phase.ACTIVE:
+		duration = _active
+	elif _phase == Phase.RECOVERY:
+		duration = _recovery
+	return clampf(1.0 - _remaining / duration, 0.0, 1.0) if duration > 0.0 else 1.0
+
+
 func aim_charge(request: AttackContext) -> void:
 	if not is_aiming() or request == null:
 		return
@@ -350,14 +375,12 @@ func _begin_aimed_release() -> void:
 	_hide_aim_indicator()
 	_context.origin = actor.global_position
 	_execution.global_position = _context.origin
-	_execution.process_mode = Node.PROCESS_MODE_INHERIT
-	_execution.show()
-	_windup = 0.0
 	_phase = Phase.WINDUP
-	_remaining = 0.0
+	# Holding prepares the forged startup; an early release must finish what remains.
+	_remaining = maxf(0.0, _windup - _aim_elapsed)
 	var released := _context
 	charge_released.emit(released)
-	if busy and _context == released:
+	if busy and _context == released and _remaining <= 0.0:
 		_advance_phase()
 
 
@@ -523,6 +546,7 @@ func try_attack(request: AttackContext) -> bool:
 	_remaining = _windup
 	_charging_attack = attack if aiming else null
 	_charge_elapsed = 0.0
+	_aim_elapsed = 0.0
 	_charge_spent = 0.0
 	_charge_budget = chaos.maximum if attack.hold_to_charge else 0.0
 	# Khóa nhận đòn trước khi signal SP hoặc đạn được phát
@@ -661,10 +685,10 @@ func _physics_process(delta: float) -> void:
 	):
 		cancel()
 		return
-	if is_charging():
-		_tick_charge(delta)
-		return
 	if is_aiming():
+		_aim_elapsed = minf(_windup, _aim_elapsed + maxf(0.0, delta))
+		if is_charging():
+			_tick_charge(delta)
 		return
 	var budget := delta
 	# Chia delta cho từng giai đoạn để frame chậm không làm mất nhịp đánh
@@ -695,6 +719,10 @@ func _advance_phase() -> void:
 		Phase.WINDUP:
 			_phase = Phase.ACTIVE
 			_remaining = _active
+			if _charging_attack != null and not _charging_attack.hold_to_charge:
+				# Keep an unlaunched projectile hidden and suspended throughout startup.
+				_execution.process_mode = Node.PROCESS_MODE_INHERIT
+				_execution.show()
 			_execution.activate()
 		Phase.ACTIVE:
 			_phase = Phase.RECOVERY

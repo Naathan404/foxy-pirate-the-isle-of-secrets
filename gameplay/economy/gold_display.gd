@@ -5,7 +5,7 @@ var _wallet: GoldWallet
 var _gain_tween: Tween
 var _gain_total: int = 0
 
-@onready var _value: Label = $Panel/Row/Amount
+@onready var _value: Label = $Row/Amount
 @onready var _gain: Label = $Gain
 @onready var _gain_rest_position: Vector2 = _gain.position
 

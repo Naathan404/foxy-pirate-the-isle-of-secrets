@@ -37,6 +37,14 @@ Shared pool: 19 Universal + 6 Wildcard. All weapon categories can roll any entry
 - Critical rate bonuses add percentage points, clamped to 0-100%. Critical damage = max(1, weapon critical multiplier * forge critical multiplier + forge critical bonus). At base x1.5: Precision Edge gives x1.3, Executioner x2.1, Shattering Blow x2.025. Critical hits do not increase stagger.
 - Stagger per hit = WeaponData.stagger_damage * AttackData.stagger_multiplier * combo stagger multiplier * forge stagger multiplier. The combo factor applies only to normal combo attacks. HP damage, knockback, critical damage and stagger are independent.
 - Attack Speed divides startup, active, recovery and cooldown durations. Startup and Recovery modifiers affect their own durations before speed division.
+- For held projectiles, holding pays down the forged startup. Releasing early completes only
+  the remaining startup; releasing after preparation launches immediately. Holding never
+  zeroes the authored startup. Ranged animation follows the controller's aim/windup,
+  active and recovery clocks, so separate phase modifiers remain visible.
+- `charge_seconds` is the separate power-charge duration and is not divided by Attack Speed.
+  Charge strength and CP expenditure keep their authored progression. The old `tap_seconds`
+  field remains loadable for compatibility but is hidden from the Inspector; startup is
+  controlled by `windup_seconds`, `windup_multiplier` and `attack_speed_multiplier`.
 - Melee Hitbox affects MELEE delivery only; Projectile Range affects PROJECTILE delivery only. Projectile Speed affects arrows and both outward/return travel of thrown daggers.
 - The controller snapshots damage, critical and stagger stats when an attack starts. Target copies and every volley arrow retain that snapshot; later forge changes cannot alter an attack in flight.
 - Enemy HP loss gives visual feedback and damage numbers. Only reaching the stagger threshold enters Hit; full knockback applies on stagger or death. Boss knockback immunity remains unchanged.
