@@ -22,10 +22,10 @@ var _idle_tween: Tween
 var _drop_tween: Tween
 var _rest_scale: Vector3
 var _rest_position: Vector3
-var _base_rest_y: float
 var _can_be_picked_up: bool = true
 
 @onready var sprite: Sprite3D = $Sprite3D
+@onready var _scatter: PickupScatter = $Scatter
 
 
 func _ready() -> void:
@@ -41,12 +41,13 @@ func _ready() -> void:
 	_rest_position.y += ground_clearance
 	if idle_animation_enabled:
 		_rest_position.y += float_height
-	_base_rest_y = _rest_position.y
+	_scatter.landed.connect(_on_scatter_landed)
 	_start_idle_animation()
 
 
 func _start_idle_animation() -> void:
 	sprite.scale = _rest_scale
+	sprite.position = _rest_position
 	sprite.position = _rest_position
 	if not idle_animation_enabled:
 		return
@@ -66,49 +67,28 @@ func _start_idle_animation() -> void:
 	_idle_tween.parallel().tween_property(sprite, "position:y", _rest_position.y, half_cycle)
 
 
-## Gọi sau khi đặt pickup vào world. Chỉ hình ảnh bật lên, vùng nhặt giữ cố định.
-func play_drop_animation() -> void:
+## Called after placement; the shared scatter component moves both visual and pickup area.
+func play_drop_animation(direction: Vector3 = Vector3.ZERO) -> void:
 	if _idle_tween != null and _idle_tween.is_valid():
 		_idle_tween.kill()
 	if _drop_tween != null and _drop_tween.is_valid():
 		_drop_tween.kill()
-	_update_drop_ground_height()
 	_can_be_picked_up = false
 	sprite.position = _rest_position
 	sprite.scale = _rest_scale * Vector3(0.9, 1.15, 1.0)
 	_drop_tween = create_tween()
-	(
-		_drop_tween
-		. tween_property(sprite, "position:y", _rest_position.y + drop_height, rise_duration)
-		. set_trans(Tween.TRANS_QUAD)
-		. set_ease(Tween.EASE_OUT)
-	)
-	_drop_tween.parallel().tween_property(sprite, "scale", _rest_scale, rise_duration)
-	(
-		_drop_tween
-		. tween_property(sprite, "position:y", _rest_position.y, fall_duration)
-		. set_trans(Tween.TRANS_QUAD)
-		. set_ease(Tween.EASE_IN)
-	)
-	_drop_tween.parallel().tween_property(
-		sprite, "scale", _rest_scale * Vector3(0.9, 1.12, 1.0), fall_duration
-	)
+	_drop_tween.tween_property(sprite, "scale", _rest_scale, rise_duration)
+	_scatter.launch(drop_height, rise_duration + fall_duration, direction)
+
+
+func _on_scatter_landed() -> void:
+	if _drop_tween != null and _drop_tween.is_valid():
+		_drop_tween.kill()
+	_drop_tween = create_tween()
 	# Ép nhẹ khi chạm đất, rồi trả lại hình dáng trước khi lơ lửng.
 	_drop_tween.tween_property(sprite, "scale", _rest_scale * Vector3(1.16, 0.78, 1.0), 0.06)
 	_drop_tween.tween_property(sprite, "scale", _rest_scale, 0.12)
 	_drop_tween.tween_callback(_finish_drop_animation)
-
-
-func _update_drop_ground_height() -> void:
-	_rest_position.y = _base_rest_y
-	var query := PhysicsRayQueryParameters3D.create(
-		global_position + Vector3.UP * 0.5, global_position + Vector3.DOWN * 4.0, CombatLayers.WORLD
-	)
-	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
-	if not hit.is_empty():
-		var floor_position: Vector3 = hit["position"]
-		var local_offset: Vector3 = global_basis.inverse() * (floor_position - global_position)
-		_rest_position.y += local_offset.y
 
 
 func _finish_drop_animation() -> void:

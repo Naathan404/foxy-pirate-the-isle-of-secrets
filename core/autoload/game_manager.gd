@@ -14,6 +14,7 @@ const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
 
 var player: Player
 var inventory: Inventory
+var gold_wallet: GoldWallet = GoldWallet.new()
 var state: State = State.PLAYING
 var _transition_pending: bool = false
 var _transition_overlay: CanvasLayer

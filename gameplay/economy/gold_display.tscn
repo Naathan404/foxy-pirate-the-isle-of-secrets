@@ -1,0 +1,80 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/economy/gold_display.gd" id="1_display"]
+[ext_resource type="Texture2D" path="res://gameplay/economy/coin_icon.tres" id="2_coin"]
+[ext_resource type="FontFile" path="res://assets/fonts/Minecraft.ttf" id="3_font"]
+
+[sub_resource type="StyleBoxFlat" id="Panel_gold"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 5.0
+bg_color = Color(0.1, 0.065, 0.035, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.65, 0.4, 0.12, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[node name="GoldDisplay" type="Control"]
+custom_minimum_size = Vector2(140, 40)
+offset_right = 140.0
+offset_bottom = 40.0
+mouse_filter = 2
+tooltip_text = "Gold"
+script = ExtResource("1_display")
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel_gold")
+
+[node name="Row" type="HBoxContainer" parent="Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Panel/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+mouse_filter = 2
+texture_filter = 1
+texture = ExtResource("2_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="Panel/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.45, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.045, 0.015, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Gain" type="Label" parent="."]
+visible = false
+offset_left = 42.0
+offset_top = 43.0
+offset_right = 160.0
+offset_bottom = 67.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.045, 0.015, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 17
+text = "+5 G"

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0gikxempkii2"
-path="res://.godot/imported/starfish_core.png-fba79b96a906bfc95ac54489e2d6d00a.ctex"
+uid="uid://dm4310xw1jwcf"
+path="res://.godot/imported/Starfish_Core.png-aed968b8ad973b52e33629fa5c4f2852.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/starfish_core.png"
-dest_files=["res://.godot/imported/starfish_core.png-fba79b96a906bfc95ac54489e2d6d00a.ctex"]
+source_file="res://assets/sprites/items/Starfish_Core.png"
+dest_files=["res://.godot/imported/Starfish_Core.png-aed968b8ad973b52e33629fa5c4f2852.ctex"]
 
 [params]
 

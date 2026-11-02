@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
 [ext_resource type="Texture2D" uid="uid://c2ply0h057nlq" path="res://assets/ui/player_hud/charrm_ui/charm_socket.png" id="19_01apl"]
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="23_1wee6"]
+[ext_resource type="PackedScene" path="res://gameplay/economy/gold_display.tscn" id="24_gold"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_depth"]
 shader = ExtResource("5_depth")
@@ -86,6 +87,12 @@ shader_parameter/bevel_strength = 0.22000001045
 scale = Vector2(1.25, 1.25)
 transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
+
+[node name="GoldDisplay" parent="." instance=ExtResource("24_gold")]
+offset_left = 152.0
+offset_top = 16.0
+offset_right = 292.0
+offset_bottom = 56.0
 
 [node name="Effects" type="Node" parent="." unique_id=1082976363]
 

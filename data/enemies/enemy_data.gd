@@ -32,3 +32,7 @@ extends Resource
 @export var drop_item: BaseItem
 @export_range(1, 99, 1) var drop_quantity: int = 1
 @export_range(0.0, 1.0, 0.01) var drop_chance: float = 1.0
+
+@export_group("Gold Drop")
+@export_range(0, 100000, 1) var gold_amount: int = 5
+@export_range(0.0, 1.0, 0.01) var gold_drop_chance: float = 0.4

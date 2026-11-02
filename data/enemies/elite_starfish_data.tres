@@ -16,3 +16,5 @@ hit_deceleration = 24.0
 stagger_threshold = 120.0
 drop_item = ExtResource("2_drop")
 drop_quantity = 3
+gold_amount = 10
+gold_drop_chance = 1.0

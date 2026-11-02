@@ -28,10 +28,10 @@ stretch_mode = 5
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1928762802]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
 
 [node name="Icon" type="TextureRect" parent="MarginContainer" unique_id=2131402762]
 texture_filter = 1
