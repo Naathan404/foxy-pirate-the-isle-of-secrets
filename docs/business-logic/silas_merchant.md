@@ -1,67 +1,46 @@
 # Business logic: Silas merchant
 
-Silas là merchant NPC riêng trên Hub. Anh ta đứng yên tại điểm xuất hiện và
-các điểm ẩn an toàn, không phải một NPC quest tổng quát: script của Silas sở hữu luồng hội thoại,
-mở shop, lặn và dịch chuyển. `BaseNpc` chỉ sở hữu tương tác,
-physics/FSM chung và vòng đời Dialogic.
+Silas is a merchant NPC fixed at the position authored in each map. His script handles
+dialogue, the shop, and opening and closing animations. `BaseNpc` handles shared
+interaction, physics/FSM, and Dialogic lifecycle.
 
-## 1. Ownership và dữ liệu
+## 1. Ownership and data
 
-| Thành phần | Trách nhiệm |
+| Component | Responsibility |
 | --- | --- |
-| `gameplay/npcs/silas/silas_npc.tscn` | Scene, collider, animation và các state `Idle`/`Hidden`. |
-| `gameplay/npcs/silas/silas_npc.gd` | Luồng merchant, chọn hideout, tween lặn/nổi và khóa tương tác. |
-| `data/npcs/silas_npc_data.tres` | Timeline và tốc độ di chuyển bằng 0 của Silas. |
-| `gameplay/npcs/silas/states/silas_hidden.gd` | Giữ Silas ẩn sau khi teleport cho đến khi Player ở đủ xa. |
-| `data/merchants/silas_catalog.tres` | Danh sách offer, giá mua/bán và item/weapon được giao dịch. |
-| `gameplay/merchant/silas_progress_store.gd` | Persistence tạm thời, chỉ cho tiến độ gặp Silas và mua cung. |
+| `gameplay/npcs/silas/silas_npc.tscn` | Scene, colliders, and sprite animations. |
+| `gameplay/npcs/silas/silas_npc.gd` | Merchant flow, animation, and interaction gating. |
+| `data/npcs/silas_npc_data.tres` | Dialogue timelines and zero movement speed. |
+| `data/merchants/silas_catalog.tres` | Offers, prices, and traded items/weapons. |
+| `gameplay/merchant/silas_progress_store.gd` | First meeting and bow purchase progress. |
 
-`SilasNpcData` có `move_speed = 0.0`. Silas không tự đi lại giữa các điểm ẩn;
-vị trí của các điểm này được đặt trực tiếp trong scene.
+`SilasNpcData` sets `move_speed = 0.0`. Silas does not move or change locations
+when the player interacts with him.
 
-## 2. Luồng gặp Silas
+## 2. Interaction flow
 
 ```text
-Player tương tác
-  ├─ met_silas = false: first_meeting -> ghi met_silas -> mở shop
-  └─ met_silas = true : greeting      -> mở shop
+Idle_close -> interaction -> Open (finish animation) -> Idle_Open
+  |-- first meeting -> mark met_silas -> open shop
+  `-- returning greeting          -> open shop
 
-Đóng shop -> farewell -> lặn 0.35 giây -> teleport hideout an toàn
-          -> Hidden -> Player cách hideout >= 12m -> nổi 0.35 giây -> Idle
+Close shop -> farewell -> Close (finish animation) -> Idle_close
 ```
 
-Trong `Hidden`, body collider và interaction collider bị tắt; prompt cũng bị
-ẩn. Silas tắt gravity trong thời gian này để không rơi xuyên qua nền khi body
-collider không hoạt động. Khi nổi lên, collider và interaction được bật lại
-rồi state trở về `Idle`; Silas đứng yên tại marker.
+The player is blocked during `Open`; dialogue begins when that animation finishes.
+`Idle_Open` runs during dialogue and while the shop is open. After farewell,
+`Close` finishes, then Silas returns to `Idle_close` at the same position and
+can be interacted with again.
 
-Nếu không có marker nào cách Player tối thiểu 12m, Silas không teleport: log
-warning, bật lại interaction và đứng tại chỗ. Không được thay fallback này bằng
-một tọa độ ngẫu nhiên không kiểm tra nền.
+## 3. Placing Silas on a map
 
-Vị trí hideout và state hidden chỉ tồn tại trong scene hiện tại.
-Reload map sẽ dùng spawn/hideout đã author trong scene; chúng không được lưu.
+1. Instance `SilasShopPanel` and `Silas` as siblings. Update `shop_panel_path`
+   (default `../SilasShopPanel`) if their hierarchy changes.
+2. Place Silas so his capsule touches the ground. This is his fixed map position.
+3. Check that Silas stays there during and after shop interactions.
 
-## 3. Đặt Silas trên một map
-
-1. Instance `SilasShopPanel` và `Silas` là sibling của nhau. Export
-   `shop_panel_path` trên Silas mặc định là `../SilasShopPanel`; đổi cấu trúc
-   node thì phải cập nhật path này.
-2. Đặt Silas sao cho capsule chạm nền. Đây là vị trí đứng yên ban đầu của NPC.
-3. Thêm các `Marker3D` vào group `silas_hideouts`. Marker phải ở đúng cao độ
-   mặt nền dành cho **body của Silas**, không lấy trực tiếp transform Y của
-   enemy spawn hay art node.
-4. Đặt ít nhất hai marker để khi Player đứng gần một marker vẫn còn đích cách
-   12m. Kiểm tra từng marker bằng cách chạy map, gọi shop rồi đóng shop nhiều
-   lần; xác nhận Silas không xuất hiện trong tường, dưới nền hoặc ngoài vùng đi
-   được.
-5. Hub nguồn là `world/hub/scenes/hub.tscn`; map chạy hiện tại là
-   `world/tests/test_scene.tscn`. Cả hai phải giữ bộ marker tương ứng.
-   Không thêm marker vào `hub-reversed`.
-
-`test/silas_test_scene.tscn` instance Hub thật để thử collision và terrain,
-không phải sân phẳng. Foxy được spawn ở `y = 10` trong Hub/test map để rơi
-xuống collision nền trước khi gameplay bắt đầu.
+`test/silas_test_scene.tscn` instances the Hub to test collision and terrain.
+Foxy spawns at `y = 10` in the Hub/test map and falls to the ground.
 
 ## 4. Thêm hoặc sửa hàng của Silas
 
@@ -95,7 +74,7 @@ binary Godot tại `user://silas_progress.save`:
 
 Mặc định cả hai là `false`. Sau first meeting, `mark_met_silas()` ghi file; sau
 khi mua Bow, `mark_bow_purchased()` ghi file. Lưu không bao gồm vàng, inventory,
-vị trí Player, map state, NPC khác, world drop hoặc hideout hiện thời.
+vị trí Player, map state, NPC khác hoặc world drop.
 
 Để gặp lại Silas như lần đầu trong bản hiện tại, đóng game rồi xóa file
 `user://silas_progress.save`, sau đó mở game lại. Trên Windows, đường dẫn thường
@@ -119,26 +98,22 @@ nên gọi API reset rõ ràng của SaveManager, không truy cập field privat
    và đọc file cũ một lần để tương thích save hiện tại.
 2. **Stock và economy:** catalog hiện tĩnh; chưa có stock, restock theo ngày,
    price modifier, buyback hoặc state riêng cho từng offer.
-3. **World persistence:** item đã nhặt, enemy đã hạ, vị trí Silas/hideout và
-   trạng thái map không tồn tại qua restart. Chỉ lưu vị trí Silas nếu thiết kế
-   world persistence yêu cầu; nếu không, tiếp tục coi marker authored là nguồn
-   chân lý khi load map.
+3. **World persistence:** collected items, defeated enemies, and map state do not survive restart.
+   Silas uses his authored scene position whenever the map loads.
 4. **Nhiều merchant:** chưa có abstraction cho stock/profile chung. Chỉ tách
    component khi merchant thứ hai có nhu cầu thực sự; không đưa luật riêng của
    Silas vào `BaseNpc`.
-5. **Marker audit khi đổi địa hình:** mọi thay đổi GridMap/collision của Hub
-   phải kiểm tra lại marker bằng Godot Editor/runtime. Marker hợp lệ là marker
-   có body Silas đứng được sau tween, không chỉ là một Vector3 nằm gần mesh.
+5. **Silas placement:** after Hub terrain changes, check his position and collision.
 6. **UI reset và QA tools:** khi có menu debug/save slots, thêm action reset
    được xác nhận rõ và test migration/reset. Không buộc tester phải tìm thư mục
    `user://`.
 
-## 7. Kiểm thử cần giữ
+## 7. Tests to keep
 
-- `gameplay/merchant/silas_merchant_test.gd`: giao dịch, catalog UI, timeline
-  farewell, đứng yên tại spawn/hideout, marker đủ xa, lặn/ẩn/nổi và khóa interaction.
-- `test/item_data_test.gd`: contract item, potion, catalog, bow ammo và quan hệ
-  enemy-drop/Silas sell offer.
-- Smoke trực quan trong `test/silas_test_scene.tscn`: player chạm nền, Silas
-  không đi qua tường/vực, từng hideout hợp lệ, dialogue đúng thứ tự và tween
-  không để lộ teleport trước mặt Player.
+- `gameplay/merchant/silas_merchant_test.gd`: trading, catalog UI, farewell,
+  stationary placement, and interaction after closing.
+- `test/silas_animation_test.gd`: Open/Idle_Open/Close/Idle_close sequence,
+  visible sprite and unchanged position after closing.
+- `test/item_data_test.gd`: item, potion, catalog, bow ammo, and enemy drop data.
+- Visual smoke in `test/silas_test_scene.tscn`: Silas placement, dialogue,
+  and shop flow.

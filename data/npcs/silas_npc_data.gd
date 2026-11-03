@@ -1,8 +1,7 @@
 class_name SilasNpcData
 extends NpcData
 
-## Merchant-specific dialogue configuration. Hideout positions belong
-## to the Hub scene because they are world coordinates, not reusable NPC data.
+## Merchant-specific dialogue configuration. Silas stays at the scene's spawn position.
 
 @export_group("Silas Dialogue")
 @export_file("*.dtl") var greeting_timeline: String
