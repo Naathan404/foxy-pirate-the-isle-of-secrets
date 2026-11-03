@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://d255p1ch6pm45"]
+
+[ext_resource type="Texture2D" uid="uid://c0hpmidu42byx" path="res://assets/textures/bridge/bridge.png" id="1_fa4ld"]
+[ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://db5lhn6q8e826" path="res://assets/models/kenney_platformer_kit/lever.glb" id="3_lever"]
+[ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="4_hurtbox"]
+[ext_resource type="PackedScene" path="res://world/objects/platform_call_dock.tscn" id="5_dock"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kouyd"]
+albedo_texture = ExtResource("1_fa4ld")
+uv1_scale = Vector3(0.25, 4, 2)
+uv1_offset = Vector3(0.5, 0, 0)
+uv1_triplanar = true
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_373mi"]
+material = SubResource("StandardMaterial3D_kouyd")
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ot41l"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="LeverHitShape"]
+size = Vector3(1, 1.6, 1)
+
+[node name="MovingPlatform" type="Node3D" unique_id=304837597]
+script = ExtResource("1_script")
+
+[node name="Platform" type="AnimatableBody3D" parent="." unique_id=1191972229]
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Platform" unique_id=207054832]
+mesh = SubResource("BoxMesh_373mi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform" unique_id=395830429]
+shape = SubResource("BoxShape3D_ot41l")
+
+[node name="Lever" type="Node3D" parent="Platform" unique_id=981979026]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.003140211, 0.25, 0)
+
+[node name="Visual" parent="Platform/Lever" unique_id=1529306580 instance=ExtResource("3_lever")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="HurtBox" type="Area3D" parent="Platform/Lever" unique_id=1614850832]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("4_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform/Lever/HurtBox" unique_id=1884615216]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("LeverHitShape")
+
+[node name="Start" type="Marker3D" parent="." unique_id=1064890171]
+
+[node name="End" type="Marker3D" parent="." unique_id=1910727390]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16.033314)
+
+[node name="StartDock" parent="." instance=ExtResource("5_dock")]
+position = Vector3(0, 0, -4.05)
+
+[node name="EndDock" parent="." instance=ExtResource("5_dock")]
+position = Vector3(0, 0, 20.083313)
+call_end = true

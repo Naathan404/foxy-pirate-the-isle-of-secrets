@@ -1,25 +1,23 @@
 # Business logic: Silas merchant
 
-Silas là merchant NPC riêng trên Hub. Anh ta không dùng `MushroomWander` và
-không phải một NPC quest tổng quát: script của Silas sở hữu luồng hội thoại,
-mở shop, lặn, dịch chuyển và quay lại wander. `BaseNpc` chỉ sở hữu tương tác,
+Silas là merchant NPC riêng trên Hub. Anh ta đứng yên tại điểm xuất hiện và
+các điểm ẩn an toàn, không phải một NPC quest tổng quát: script của Silas sở hữu luồng hội thoại,
+mở shop, lặn và dịch chuyển. `BaseNpc` chỉ sở hữu tương tác,
 physics/FSM chung và vòng đời Dialogic.
 
 ## 1. Ownership và dữ liệu
 
 | Thành phần | Trách nhiệm |
 | --- | --- |
-| `gameplay/npcs/silas/silas_npc.tscn` | Scene, collider, raycast, animation và các state `Wander`/`Hidden`. |
+| `gameplay/npcs/silas/silas_npc.tscn` | Scene, collider, animation và các state `Idle`/`Hidden`. |
 | `gameplay/npcs/silas/silas_npc.gd` | Luồng merchant, chọn hideout, tween lặn/nổi và khóa tương tác. |
-| `data/npcs/silas_npc_data.tres` | Tốc độ, timeline và các thông số wander của Silas. |
-| `gameplay/npcs/silas/states/silas_wander.gd` | Chọn mục tiêu ngẫu nhiên quanh hideout hiện tại; tránh tường và vực. |
+| `data/npcs/silas_npc_data.tres` | Timeline và tốc độ di chuyển bằng 0 của Silas. |
 | `gameplay/npcs/silas/states/silas_hidden.gd` | Giữ Silas ẩn sau khi teleport cho đến khi Player ở đủ xa. |
 | `data/merchants/silas_catalog.tres` | Danh sách offer, giá mua/bán và item/weapon được giao dịch. |
 | `gameplay/merchant/silas_progress_store.gd` | Persistence tạm thời, chỉ cho tiến độ gặp Silas và mua cung. |
 
-`SilasNpcData` có `move_speed = 1.0`, `wander_radius = 4.0`, thời gian đi và
-nghỉ đều từ 1 đến 3 giây. Đây là dữ liệu thiết kế; không ghi runtime state vào
-resource chung này.
+`SilasNpcData` có `move_speed = 0.0`. Silas không tự đi lại giữa các điểm ẩn;
+vị trí của các điểm này được đặt trực tiếp trong scene.
 
 ## 2. Luồng gặp Silas
 
@@ -29,19 +27,19 @@ Player tương tác
   └─ met_silas = true : greeting      -> mở shop
 
 Đóng shop -> farewell -> lặn 0.35 giây -> teleport hideout an toàn
-          -> Hidden -> Player cách hideout >= 12m -> nổi 0.35 giây -> Wander
+          -> Hidden -> Player cách hideout >= 12m -> nổi 0.35 giây -> Idle
 ```
 
 Trong `Hidden`, body collider và interaction collider bị tắt; prompt cũng bị
 ẩn. Silas tắt gravity trong thời gian này để không rơi xuyên qua nền khi body
 collider không hoạt động. Khi nổi lên, collider và interaction được bật lại
-rồi state trở về `Wander`.
+rồi state trở về `Idle`; Silas đứng yên tại marker.
 
 Nếu không có marker nào cách Player tối thiểu 12m, Silas không teleport: log
 warning, bật lại interaction và đứng tại chỗ. Không được thay fallback này bằng
 một tọa độ ngẫu nhiên không kiểm tra nền.
 
-Vị trí hideout, đích wander và state hidden chỉ tồn tại trong scene hiện tại.
+Vị trí hideout và state hidden chỉ tồn tại trong scene hiện tại.
 Reload map sẽ dùng spawn/hideout đã author trong scene; chúng không được lưu.
 
 ## 3. Đặt Silas trên một map
@@ -49,9 +47,7 @@ Reload map sẽ dùng spawn/hideout đã author trong scene; chúng không đư�
 1. Instance `SilasShopPanel` và `Silas` là sibling của nhau. Export
    `shop_panel_path` trên Silas mặc định là `../SilasShopPanel`; đổi cấu trúc
    node thì phải cập nhật path này.
-2. Đặt Silas sao cho capsule chạm nền. Bật `FrontRayCast3D` và
-   `GroundRayCast3D`; hai ray này là điều kiện để wander đổi hướng trước tường
-   hoặc vực.
+2. Đặt Silas sao cho capsule chạm nền. Đây là vị trí đứng yên ban đầu của NPC.
 3. Thêm các `Marker3D` vào group `silas_hideouts`. Marker phải ở đúng cao độ
    mặt nền dành cho **body của Silas**, không lấy trực tiếp transform Y của
    enemy spawn hay art node.
@@ -140,7 +136,7 @@ nên gọi API reset rõ ràng của SaveManager, không truy cập field privat
 ## 7. Kiểm thử cần giữ
 
 - `gameplay/merchant/silas_merchant_test.gd`: giao dịch, catalog UI, timeline
-  farewell, bounded wander, marker đủ xa, lặn/ẩn/nổi và khóa interaction.
+  farewell, đứng yên tại spawn/hideout, marker đủ xa, lặn/ẩn/nổi và khóa interaction.
 - `test/item_data_test.gd`: contract item, potion, catalog, bow ammo và quan hệ
   enemy-drop/Silas sell offer.
 - Smoke trực quan trong `test/silas_test_scene.tscn`: player chạm nền, Silas

@@ -19,7 +19,6 @@ enum DialogueIntent { NONE, OPEN_FIRST_SHOP, OPEN_RETURNING_SHOP, DEPART }
 var _shop_panel: SilasShopPanel
 var _dialogue_intent := DialogueIntent.NONE
 var _active_interactor: Player
-var _wander_anchor := Vector3.ZERO
 var _hidden_player: Player
 var _hidden_destination := Vector3.ZERO
 var _burrow_finished := false
@@ -29,7 +28,7 @@ var _is_hidden := false
 
 @onready var body_collision: CollisionShape3D = $CollisionShape3D
 @onready var interaction_collision: CollisionShape3D = $InteractionArea/CollisionShape3D
-@onready var sprite: Sprite3D = $Visual/Sprite3D
+@onready var sprite: AnimatedSprite3D = $Visual/AnimatedSprite3D
 
 
 func _ready() -> void:
@@ -42,7 +41,6 @@ func _ready() -> void:
 	if _shop_panel == null:
 		push_error("SilasNpc: shop panel is missing")
 		return
-	_wander_anchor = global_position
 	_sprite_rest_position = sprite.position
 	_shop_panel.shop_closed.connect(_on_shop_closed)
 	dialogue_finished.connect(_on_dialogue_finished)
@@ -54,10 +52,6 @@ func get_npc_data() -> NpcData:
 
 func get_silas_data() -> SilasNpcData:
 	return data
-
-
-func get_wander_anchor() -> Vector3:
-	return _wander_anchor
 
 
 func should_apply_gravity() -> bool:
@@ -146,7 +140,6 @@ func begin_departure(interactor: Player) -> void:
 		return
 	_hidden_player = interactor
 	_hidden_destination = destination.global_position
-	_wander_anchor = _hidden_destination
 	var hidden_state := fsm.states.get("hidden") as FsmState
 	if hidden_state == null:
 		push_error("SilasNpc: hidden state is missing")
@@ -212,9 +205,9 @@ func _finish_emerge() -> void:
 	interaction_area.set_interaction_enabled(true)
 	_hidden_player = null
 	_is_hidden = false
-	var wander_state := fsm.states.get("wander") as FsmState
-	if wander_state != null:
-		fsm.change_state(wander_state)
+	var idle_state := fsm.states.get("idle") as FsmState
+	if idle_state != null:
+		fsm.change_state(idle_state)
 
 
 func _choose_hideout(interactor: Player) -> Marker3D:
