@@ -273,8 +273,13 @@ func _test_npc_scene_smoke() -> void:
 		_assert_equal(npc.initial_state_name, &"Idle", "Silas starts idle")
 		_assert_equal(npc.data.move_speed, 0.0, "Silas cannot walk")
 		_assert_true(npc.get_node_or_null("States/Wander") == null, "Silas has no wander state")
-		_assert_true(npc.get_node("Visual/AnimatedSprite3D") is AnimatedSprite3D, "Silas art is animated")
-		_assert_false((npc.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden")
+		_assert_true(npc.get_node_or_null("States/Hidden") == null, "Silas has no hidden state")
+		_assert_true(
+			npc.get_node("Visual/AnimatedSprite3D") is AnimatedSprite3D, "Silas art is animated"
+		)
+		_assert_false(
+			(npc.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden"
+		)
 		npc.free()
 	if DisplayServer.get_name() == "headless":
 		_assert_true(
@@ -300,6 +305,7 @@ func _test_npc_scene_smoke() -> void:
 	_assert_true(panel != null, "npc test scene contains shop panel")
 	_assert_true(player != null, "Hub fixture registers a player")
 	if silas != null and panel != null and player != null:
+		var spawn_position := silas.global_position
 		await _test_stationary(silas, "spawn")
 		_assert_true(panel.open_for(player, silas.catalog), "shop panel opens for the player")
 		_assert_true(panel.visible, "shop panel becomes visible")
@@ -342,60 +348,17 @@ func _test_npc_scene_smoke() -> void:
 		)
 		await create_timer(0.1, true).timeout
 		_assert_false(panel.visible, "farewell never reopens the shop")
-		await _test_hidden_departure(scene, silas)
+		await create_timer(1.0, true).timeout
+		_assert_true(silas.sprite.visible, "Silas remains visible after farewell")
+		var offset := silas.global_position - spawn_position
+		offset.y = 0.0
+		_assert_true(offset.length() <= 0.05, "Silas stays at spawn after shop closes")
+		await _test_stationary(silas, "spawn after farewell")
 	# This test owns a complete Hub fixture. Free it before SceneTree.quit() so
 	# GridMap physics/render resources are released while the engine is alive.
 	scene.free()
 	fixture = null
 	await process_frame
-
-
-func _test_hidden_departure(scene: Node, silas: SilasNpc) -> void:
-	var player := _get_game_manager_player()
-	_assert_true(player != null, "Hub fixture registers a player")
-	var hideouts := scene.get_tree().get_nodes_in_group(&"silas_hideouts")
-	_assert_true(not hideouts.is_empty(), "Hub fixture contains Silas hideouts")
-	if player == null or hideouts.is_empty():
-		return
-	player.global_position = Vector3.ZERO
-	var chosen_hideout := silas._choose_hideout(player)
-	_assert_true(chosen_hideout != null, "Silas finds a safe hideout")
-	if chosen_hideout != null:
-		_assert_true(
-			(
-				chosen_hideout.global_position.distance_to(player.global_position)
-				>= silas.minimum_hideout_distance
-			),
-			"chosen hideout is far enough from the player"
-		)
-	silas.begin_departure(player)
-	var destination := silas._hidden_destination
-	player.global_position = destination
-	await create_timer(silas.burrow_duration + 0.08, true).timeout
-	_assert_true(silas._is_hidden, "Silas stays hidden while the player is near the new hideout")
-	_assert_false(silas.sprite.visible, "Silas art is hidden after burrowing")
-	_assert_false((silas.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden")
-	_assert_true(
-		silas.global_position.distance_to(destination) <= 0.01,
-		"Silas teleports exactly to the selected hideout"
-	)
-	_assert_false(silas.interaction_area._enabled, "hidden Silas cannot interact")
-	player.global_position = (
-		silas.global_position + Vector3(silas.minimum_hideout_distance + 1.0, 0.0, 0.0)
-	)
-	await process_frame
-	await create_timer(silas.burrow_duration + 0.08, true).timeout
-	_assert_false(silas._is_hidden, "Silas emerges after the player moves away")
-	_assert_true(silas.sprite.visible, "Silas art reappears")
-	_assert_false((silas.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden")
-	await process_frame
-	_assert_true(silas.is_on_floor(), "Silas emerges on the Hub floor")
-	var emerged_offset := silas.global_position - destination
-	emerged_offset.y = 0.0
-	_assert_true(
-		emerged_offset.length() <= 0.75, "Silas remains at the selected hideout after emerging"
-	)
-	await _test_stationary(silas, "hideout")
 
 
 func _test_stationary(silas: SilasNpc, location: String) -> void:
@@ -404,9 +367,7 @@ func _test_stationary(silas: SilasNpc, location: String) -> void:
 		await process_frame
 		var offset := silas.global_position - start
 		offset.y = 0.0
-		_assert_true(
-			offset.length() <= 0.05, "Silas remains stationary at %s" % location
-		)
+		_assert_true(offset.length() <= 0.05, "Silas remains stationary at %s" % location)
 
 
 func _get_game_manager_player() -> Player:

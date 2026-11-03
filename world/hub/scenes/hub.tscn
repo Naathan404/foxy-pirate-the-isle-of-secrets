@@ -200,19 +200,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
 [node name="Silas" parent="." instance=ExtResource("15_silas_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
 
-[node name="SilasHideoutA" type="Marker3D" parent="." groups=["silas_hideouts"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
-
-[node name="SilasHideoutB" type="Marker3D" parent="." groups=["silas_hideouts"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.964006, 0, 5.036312)
-
-[node name="SilasHideoutC" type="Marker3D" parent="." groups=["silas_hideouts"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.650712, 4, 29.794418)
-
-[node name="SilasHideoutD" type="Marker3D" parent="." groups=["silas_hideouts"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8243723, -2, -21.086876)
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7261753, 3.875, -1.1673746)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
 light_energy = 0.35
