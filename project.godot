@@ -38,6 +38,8 @@ directories/dtl_directory={
 "timelines/greeting": "res://dialog/npcs/silas/timelines/greeting.dtl"
 }
 layout/style_directory={}
+layout/style_list=[]
+layout/default_style="Default"
 
 [display]
 

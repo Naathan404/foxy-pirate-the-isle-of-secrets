@@ -17,6 +17,7 @@ shader = ExtResource("2_lane")
 shader_parameter/opacity = 1.0
 
 [sub_resource type="ShaderMaterial" id="TipMaterial"]
+resource_local_to_scene = true
 shader = ExtResource("3_energy")
 shader_parameter/shape = 1
 shader_parameter/glow_color = Color(1, 0.65, 0.08, 0.8)
