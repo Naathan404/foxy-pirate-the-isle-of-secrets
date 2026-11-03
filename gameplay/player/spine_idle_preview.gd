@@ -45,8 +45,11 @@ func configure_reference(source: Sprite3D, animator: AnimationPlayer) -> void:
 	if texture == null:
 		return
 	var image := texture.get_image()
-	var frame_size := Vector2i(image.get_size()) / Vector2i(source.hframes, source.vframes)
-	var coords := Vector2i(frame % source.hframes, frame / source.hframes)
+	var frame_size := Vector2i(
+		floori(float(image.get_width()) / source.hframes),
+		floori(float(image.get_height()) / source.vframes)
+	)
+	var coords := Vector2i(frame % source.hframes, floori(float(frame) / source.hframes))
 	var used := image.get_region(Rect2i(coords * frame_size, frame_size)).get_used_rect()
 	if not used.has_area():
 		used = Rect2i(Vector2i.ZERO, frame_size)

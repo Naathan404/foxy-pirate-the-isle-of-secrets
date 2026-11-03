@@ -206,7 +206,7 @@ func _progress_at_distance(distance: float) -> float:
 	var low: int = 0
 	var high: int = CURVE_SAMPLES
 	while high - low > 1:
-		var middle: int = (low + high) / 2
+		var middle: int = floori(float(low + high) / 2.0)
 		if _curve_lengths[middle] < distance:
 			low = middle
 		else:

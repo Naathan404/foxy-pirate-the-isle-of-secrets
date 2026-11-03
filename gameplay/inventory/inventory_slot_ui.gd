@@ -26,6 +26,7 @@ var _highlight: Panel
 @onready var content: MarginContainer = $MarginContainer
 @onready var icon: TextureRect = $MarginContainer/Icon
 @onready var quantity_label: Label = $MarginContainer/QuantityLabel
+@onready var potion_assignment_label: Label = $Background/PotionAssignmentLabel
 
 
 func _ready() -> void:
@@ -206,6 +207,7 @@ func refresh(slot: InventorySlot) -> void:
 	if slot == null or slot.is_empty():
 		icon.texture = null
 		quantity_label.hide()
+		set_potion_assignment("")
 		return
 
 	icon.texture = slot.item.icon
@@ -214,9 +216,18 @@ func refresh(slot: InventorySlot) -> void:
 	quantity_label.visible = slot.quantity >= 1
 
 
+func set_potion_assignment(assignment: String) -> void:
+	potion_assignment_label.text = assignment
+	potion_assignment_label.visible = not assignment.is_empty()
+	potion_assignment_label.modulate = (
+		Color(1.0, 0.85, 0.42) if assignment == "MAIN" else Color(0.62, 0.83, 1.0)
+	)
+
+
 ## Lets read-only menus render a catalog item with the same slot visual as the inventory.
 func set_preview(icon_texture: Texture2D, quantity: int = 1, show_quantity: bool = true) -> void:
 	_drag_enabled = false
+	set_potion_assignment("")
 	icon.texture = icon_texture
 	quantity_label.text = str(maxi(quantity, 1))
 	quantity_label.visible = show_quantity

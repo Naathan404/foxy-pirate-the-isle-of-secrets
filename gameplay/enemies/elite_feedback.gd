@@ -203,7 +203,7 @@ func _sync_elite_sprite_glow_parameters() -> void:
 	var frame_count := hframes * vframes
 	var frame := clampi(_source_sprite.frame, 0, frame_count - 1)
 	var frame_column := frame % hframes
-	var frame_row := frame / hframes
+	var frame_row := floori(float(frame) / hframes)
 	_elite_sprite_glow_material.set_shader_parameter(
 		"frame_uv_offset", Vector2(float(frame_column) / hframes, float(frame_row) / vframes)
 	)

@@ -253,13 +253,13 @@ func _update_rings(focus: Vector3) -> void:
 
 func _update_sparks(focus: Vector3, right: Vector3, up: Vector3) -> void:
 	for index in _sparks.size():
-		var seed := fposmod(index * GOLDEN_RATIO, 1.0)
+		var phase := fposmod(index * GOLDEN_RATIO, 1.0)
 		var angle := index * TAU / _sparks.size()
 		var radius: float
 		var alpha: float
 		var stretch := 1.0
 		if _released:
-			var life := lerpf(spark_shortest_life_ratio, 1.0, seed) * burst_duration
+			var life := lerpf(spark_shortest_life_ratio, 1.0, phase) * burst_duration
 			var time := clampf(_age / life, 0.0, 1.0)
 			radius = (
 				(1.0 - pow(1.0 - time, 3.0))
@@ -270,7 +270,7 @@ func _update_sparks(focus: Vector3, right: Vector3, up: Vector3) -> void:
 			radius *= spark_burst_distance_multiplier
 			stretch = spark_streak_length
 		else:
-			var time := fposmod(_charge_age / spark_inflow_seconds + seed, 1.0)
+			var time := fposmod(_charge_age / spark_inflow_seconds + phase, 1.0)
 			angle += time * (spark_orbit_base_speed + _progress * spark_orbit_charge_speed_bonus)
 			radius = lerpf(
 				spark_orbit_base_radius + _progress * spark_orbit_charge_radius_bonus,
@@ -286,7 +286,7 @@ func _update_sparks(focus: Vector3, right: Vector3, up: Vector3) -> void:
 		)
 		var size := (
 			(spark_base_scale + _progress * spark_charge_scale_bonus)
-			* lerpf(spark_size_variation.x, spark_size_variation.y, seed)
+			* lerpf(spark_size_variation.x, spark_size_variation.y, phase)
 		)
 		_sparks[index].scale = Vector3(size * stretch, size, size)
 		var material := _sparks[index].material_override as ShaderMaterial
