@@ -231,6 +231,7 @@ func _test_toast_queue() -> void:
 	_assert_equal(queue.pending_count(), 0, "toast queue drains after the final message")
 	queue.queue_free()
 	await process_frame
+	await process_frame
 
 
 func _test_gold_display_feedback() -> void:
@@ -251,6 +252,7 @@ func _test_gold_display_feedback() -> void:
 	_assert_false(display._gain.visible, "gold feedback cleans itself after its tween")
 	paused = false
 	display.queue_free()
+	await process_frame
 	await process_frame
 
 
@@ -310,6 +312,7 @@ func _test_npc_scene_smoke() -> void:
 		_assert_false(panel.visible, "farewell never reopens the shop")
 		await _test_hidden_departure(scene, silas)
 	scene.queue_free()
+	await process_frame
 	await process_frame
 
 
