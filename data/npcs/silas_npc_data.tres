@@ -6,14 +6,9 @@
 script = ExtResource("1_data")
 greeting_timeline = "res://dialog/npcs/silas/timelines/greeting.dtl"
 farewell_timeline = "res://dialog/npcs/silas/timelines/farewell.dtl"
-wander_radius = 4.0
-wander_move_duration_min = 1.0
-wander_move_duration_max = 3.0
-wander_rest_duration_min = 1.0
-wander_rest_duration_max = 3.0
 display_name = "Silas"
 description = "A shrewd island merchant who values gold above all else."
-move_speed = 1.0
+move_speed = 0.0
 acceleration = 20.0
 deceleration = 20.0
 dialogue_timeline = "res://dialog/npcs/silas/timelines/first_meeting.dtl"

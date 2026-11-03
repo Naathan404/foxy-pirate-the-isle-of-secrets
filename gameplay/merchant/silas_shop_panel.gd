@@ -4,16 +4,9 @@ extends CanvasLayer
 ## Merchant interaction uses the same book, bookmarks and motion language as InventoryUI.
 signal shop_closed
 
-const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot_ui.tscn")
-
 enum Tab { BUY, SELL, BAG }
 
-@export_group("Interaction Feedback")
-@export_range(0.05, 0.5, 0.01) var open_duration := 0.18
-@export_range(0.05, 0.5, 0.01) var close_duration := 0.12
-@export var selected_tab_scale := Vector2(1.12, 1.05)
-@export_range(0.05, 0.3, 0.01) var tab_feedback_duration := 0.12
-
+const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot_ui.tscn")
 const BLUE_BUTTON: Texture2D = preload("res://assets/ui/player_hud/inventory/blue_button.png")
 const DISABLED_BLUE_BUTTON: Texture2D = preload(
 	"res://assets/ui/player_hud/inventory/disable_blue_button.png"
@@ -26,6 +19,12 @@ const ORANGE_BUTTON: Texture2D = preload("res://assets/ui/player_hud/inventory/o
 const DISABLED_ORANGE_BUTTON: Texture2D = preload(
 	"res://assets/ui/player_hud/inventory/disable_orange_button.png"
 )
+
+@export_group("Interaction Feedback")
+@export_range(0.05, 0.5, 0.01) var open_duration := 0.18
+@export_range(0.05, 0.5, 0.01) var close_duration := 0.12
+@export var selected_tab_scale := Vector2(1.12, 1.05)
+@export_range(0.05, 0.3, 0.01) var tab_feedback_duration := 0.12
 
 var _catalog: MerchantCatalog
 var _service: MerchantTransactionService
@@ -52,15 +51,18 @@ var _error_message := ""
 @onready var buy_tab: TextureButton = $TabButtons/Buy
 @onready var sell_tab: TextureButton = $TabButtons/Sell
 @onready var bag_tab: TextureButton = $TabButtons/Bag
-@onready var item_scroll: ScrollContainer = $PanelContainer/MarginContainer/Layout/Content/ItemScroll
-@onready var grid: GridContainer = $PanelContainer/MarginContainer/Layout/Content/ItemScroll/GridContainer
-@onready var item_icon: TextureRect = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/IconCenter/IconFrame/Icon
-@onready var item_name: Label = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/ItemName
-@onready var item_count: Label = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/Count
-@onready var item_description: Label = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/Description
-@onready var trade_label: Label = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/Trade
-@onready var feedback: Label = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/Feedback
-@onready var action_button: Button = $PanelContainer/MarginContainer/Layout/Content/ItemInfo/MarginContainer/VBox/Action
+@onready var content: Control = $PanelContainer/MarginContainer/Layout/Content
+@onready var item_scroll: ScrollContainer = content.get_node("ItemScroll") as ScrollContainer
+@onready var grid: GridContainer = item_scroll.get_node("GridContainer") as GridContainer
+@onready
+var info_box: VBoxContainer = content.get_node("ItemInfo/MarginContainer/VBox") as VBoxContainer
+@onready var item_icon: TextureRect = info_box.get_node("IconCenter/IconFrame/Icon") as TextureRect
+@onready var item_name: Label = info_box.get_node("ItemName") as Label
+@onready var item_count: Label = info_box.get_node("Count") as Label
+@onready var item_description: Label = info_box.get_node("Description") as Label
+@onready var trade_label: Label = info_box.get_node("Trade") as Label
+@onready var feedback: Label = info_box.get_node("Feedback") as Label
+@onready var action_button: Button = info_box.get_node("Action") as Button
 @onready var close_button: Button = $PanelContainer/MarginContainer/Layout/Close
 @onready var toast_queue: TradeToastQueue = $TradeToastQueue
 
@@ -211,7 +213,9 @@ func _update_slot_selection() -> void:
 	for index in range(_slot_uis.size()):
 		if _current_tab == Tab.BUY:
 			var offers := _catalog.get_buy_offers()
-			_slot_uis[index].set_selected(index < offers.size() and offers[index] == _selected_offer)
+			_slot_uis[index].set_selected(
+				index < offers.size() and offers[index] == _selected_offer
+			)
 		else:
 			_slot_uis[index].set_selected(index == _selected_inventory_index)
 
@@ -242,7 +246,11 @@ func _set_offer_info(offer: MerchantOffer) -> void:
 	item_icon.texture = offer.get_icon()
 	item_name.text = offer.get_display_name()
 	item_count.text = "OWNED: %d" % _get_owned_amount(offer)
-	item_description.text = offer.weapon.description if offer.kind == MerchantOffer.Kind.WEAPON else offer.item.description
+	item_description.text = (
+		offer.weapon.description
+		if offer.kind == MerchantOffer.Kind.WEAPON
+		else offer.item.description
+	)
 	trade_label.text = "BUY %d | %d GOLD" % [offer.trade_amount, offer.buy_price]
 	action_button.text = "BUY x%d" % offer.trade_amount
 	action_button.disabled = false
@@ -427,7 +435,9 @@ func _set_tab_feedback(button: TextureButton, selected: bool, animate: bool) -> 
 	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(button, "modulate", target_color, tab_feedback_duration)
 	if selected:
-		tween.tween_property(button, "scale", target_scale * Vector2(1.04, 1.0), tab_feedback_duration * 0.6)
+		tween.tween_property(
+			button, "scale", target_scale * Vector2(1.04, 1.0), tab_feedback_duration * 0.6
+		)
 		tween.chain().tween_property(button, "scale", target_scale, tab_feedback_duration)
 	else:
 		tween.tween_property(button, "scale", target_scale, tab_feedback_duration)

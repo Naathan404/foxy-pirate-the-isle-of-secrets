@@ -28,19 +28,28 @@ func purchase(
 		return Result.INVALID_OFFER
 
 	if offer.kind == MerchantOffer.Kind.WEAPON:
-		if weapons == null or offer.weapon == null:
-			return Result.INVALID_OFFER
-		if weapons.is_weapon_owned(offer.weapon.weapon_id):
-			return Result.ALREADY_OWNED
-		if not wallet.can_afford(offer.buy_price):
-			return Result.INSUFFICIENT_GOLD
-		if not wallet.try_spend(offer.buy_price):
-			return Result.INSUFFICIENT_GOLD
-		if not weapons.grant_weapon(offer.weapon.weapon_id):
-			wallet.add_gold(offer.buy_price)
-			return Result.GRANT_FAILED
-		return Result.SUCCESS
+		return _purchase_weapon(offer, wallet, weapons)
+	return _purchase_item(offer, inventory, wallet)
 
+
+func _purchase_weapon(
+	offer: MerchantOffer, wallet: GoldWallet, weapons: WeaponController
+) -> Result:
+	if weapons == null or offer.weapon == null:
+		return Result.INVALID_OFFER
+	if weapons.is_weapon_owned(offer.weapon.weapon_id):
+		return Result.ALREADY_OWNED
+	if not wallet.can_afford(offer.buy_price):
+		return Result.INSUFFICIENT_GOLD
+	if not wallet.try_spend(offer.buy_price):
+		return Result.INSUFFICIENT_GOLD
+	if not weapons.grant_weapon(offer.weapon.weapon_id):
+		wallet.add_gold(offer.buy_price)
+		return Result.GRANT_FAILED
+	return Result.SUCCESS
+
+
+func _purchase_item(offer: MerchantOffer, inventory: Inventory, wallet: GoldWallet) -> Result:
 	if inventory == null or offer.item == null:
 		return Result.INVALID_OFFER
 	if not wallet.can_afford(offer.buy_price):

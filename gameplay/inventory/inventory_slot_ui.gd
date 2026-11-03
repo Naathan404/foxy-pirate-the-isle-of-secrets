@@ -179,7 +179,12 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 
 
 func _is_valid_drop(data: Variant) -> bool:
-	if not _drag_enabled or not is_visible_in_tree() or not is_instance_valid(inventory) or not data is Dictionary:
+	if (
+		not _drag_enabled
+		or not is_visible_in_tree()
+		or not is_instance_valid(inventory)
+		or not data is Dictionary
+	):
 		return false
 	if data.get("inventory") != inventory or not data.get("slot_index") is int:
 		return false

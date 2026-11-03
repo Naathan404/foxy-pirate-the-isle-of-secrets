@@ -1,16 +1,15 @@
 [remap]
 
-importer="spine.atlas"
+importer="curvature.spine.atlas"
 type="SpineAtlasResource"
 uid="uid://dxf2vivfvosdy"
-path="res://.godot/imported/Foxy_animated.atlas-4db5607aaf65b876eb720508a916d9dd.spatlas"
+path="res://.godot/imported/Foxy_animated.atlas-4db5607aaf65b876eb720508a916d9dd.tres"
 
 [deps]
 
 source_file="res://assets/spine/foxy/Foxy_animated.atlas"
-dest_files=["res://.godot/imported/Foxy_animated.atlas-4db5607aaf65b876eb720508a916d9dd.spatlas"]
+dest_files=["res://.godot/imported/Foxy_animated.atlas-4db5607aaf65b876eb720508a916d9dd.tres"]
 
 [params]
 
 normal_map_prefix="n"
-specular_map_prefix="s"

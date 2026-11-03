@@ -7,6 +7,7 @@ const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_po
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
 const NPC_TEST_SCENE_PATH := "res://test/silas_test_scene.tscn"
+const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
 const GOLD_DISPLAY_SCENE: PackedScene = preload("res://gameplay/economy/gold_display.tscn")
 
@@ -266,6 +267,15 @@ func _test_gold_display_feedback() -> void:
 
 
 func _test_npc_scene_smoke() -> void:
+	var npc := SILAS_SCENE.instantiate() as SilasNpc
+	_assert_true(npc != null, "Silas scene loads")
+	if npc != null:
+		_assert_equal(npc.initial_state_name, &"Idle", "Silas starts idle")
+		_assert_equal(npc.data.move_speed, 0.0, "Silas cannot walk")
+		_assert_true(npc.get_node_or_null("States/Wander") == null, "Silas has no wander state")
+		_assert_true(npc.get_node("Visual/AnimatedSprite3D") is AnimatedSprite3D, "Silas art is animated")
+		_assert_false((npc.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden")
+		npc.free()
 	if DisplayServer.get_name() == "headless":
 		_assert_true(
 			ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"),
@@ -290,7 +300,7 @@ func _test_npc_scene_smoke() -> void:
 	_assert_true(panel != null, "npc test scene contains shop panel")
 	_assert_true(player != null, "Hub fixture registers a player")
 	if silas != null and panel != null and player != null:
-		await _test_wander_bounds(silas)
+		await _test_stationary(silas, "spawn")
 		_assert_true(panel.open_for(player, silas.catalog), "shop panel opens for the player")
 		_assert_true(panel.visible, "shop panel becomes visible")
 		_assert_equal(
@@ -363,6 +373,8 @@ func _test_hidden_departure(scene: Node, silas: SilasNpc) -> void:
 	player.global_position = destination
 	await create_timer(silas.burrow_duration + 0.08, true).timeout
 	_assert_true(silas._is_hidden, "Silas stays hidden while the player is near the new hideout")
+	_assert_false(silas.sprite.visible, "Silas art is hidden after burrowing")
+	_assert_false((silas.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden")
 	_assert_true(
 		silas.global_position.distance_to(destination) <= 0.01,
 		"Silas teleports exactly to the selected hideout"
@@ -374,6 +386,8 @@ func _test_hidden_departure(scene: Node, silas: SilasNpc) -> void:
 	await process_frame
 	await create_timer(silas.burrow_duration + 0.08, true).timeout
 	_assert_false(silas._is_hidden, "Silas emerges after the player moves away")
+	_assert_true(silas.sprite.visible, "Silas art reappears")
+	_assert_false((silas.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden")
 	await process_frame
 	_assert_true(silas.is_on_floor(), "Silas emerges on the Hub floor")
 	var emerged_offset := silas.global_position - destination
@@ -381,16 +395,17 @@ func _test_hidden_departure(scene: Node, silas: SilasNpc) -> void:
 	_assert_true(
 		emerged_offset.length() <= 0.75, "Silas remains at the selected hideout after emerging"
 	)
+	await _test_stationary(silas, "hideout")
 
 
-func _test_wander_bounds(silas: SilasNpc) -> void:
-	var maximum_distance := silas.get_silas_data().wander_radius + 0.3
+func _test_stationary(silas: SilasNpc, location: String) -> void:
+	var start := silas.global_position
 	for _frame in 60:
 		await process_frame
-		var offset := silas.global_position - silas.get_wander_anchor()
+		var offset := silas.global_position - start
 		offset.y = 0.0
 		_assert_true(
-			offset.length() <= maximum_distance, "Silas wander remains within the hideout radius"
+			offset.length() <= 0.05, "Silas remains stationary at %s" % location
 		)
 
 
