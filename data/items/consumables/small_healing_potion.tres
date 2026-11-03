@@ -12,4 +12,4 @@ display_name = "Small Healing Potion"
 icon = ExtResource("1_kdfoy")
 description = "Heals 3 HP."
 max_stack = 10
-type = 1
+type = 2

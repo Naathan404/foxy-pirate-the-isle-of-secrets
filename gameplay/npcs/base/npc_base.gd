@@ -66,9 +66,12 @@ func _physics_process(delta: float) -> void:
 	if get_node("/root/HitstopController").is_frozen(self):
 		return
 	fsm._update(delta)
-	if not is_on_floor():
-		velocity += get_gravity() * delta
-	elif velocity.y < 0.0:
+	if should_apply_gravity():
+		if not is_on_floor():
+			velocity += get_gravity() * delta
+		elif velocity.y < 0.0:
+			velocity.y = 0.0
+	else:
 		velocity.y = 0.0
 	move_and_slide()
 
@@ -135,6 +138,10 @@ func can_be_picked_up() -> bool:
 	# current Player has no carry controller, so a base NPC must not pretend it
 	# can be picked up.
 	return false
+
+
+func should_apply_gravity() -> bool:
+	return true
 
 
 func get_npc_data() -> NpcData:
@@ -237,18 +244,23 @@ func _on_interaction_requested(interactor: Player) -> void:
 	_start_dialogue(interactor)
 
 
-func _start_dialogue(interactor: Player) -> void:
+func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 	var npc_data := get_npc_data()
+	var dialogic := _get_dialogic()
+	var resolved_timeline := timeline_path
+	if resolved_timeline.is_empty() and npc_data != null:
+		resolved_timeline = npc_data.dialogue_timeline
 	if (
 		is_talking
 		or npc_data == null
-		or npc_data.dialogue_timeline.is_empty()
-		or Dialogic.current_timeline != null
+		or resolved_timeline.is_empty()
+		or dialogic == null
+		or dialogic.get("current_timeline") != null
 	):
-		return
-	if not ResourceLoader.exists(npc_data.dialogue_timeline):
-		push_warning("BaseNpc: dialogue timeline not found: %s" % npc_data.dialogue_timeline)
-		return
+		return false
+	if not ResourceLoader.exists(resolved_timeline):
+		push_warning("BaseNpc: dialogue timeline not found: %s" % resolved_timeline)
+		return false
 
 	is_talking = true
 	_conversation_player = interactor
@@ -261,21 +273,30 @@ func _start_dialogue(interactor: Player) -> void:
 	var talk_state := fsm.states.get("talk") as FsmState
 	if is_instance_valid(talk_state):
 		fsm.change_state(talk_state)
-	Dialogic.timeline_ended.connect(_on_dialogue_ended, CONNECT_ONE_SHOT)
-	Dialogic.start(npc_data.dialogue_timeline)
+	dialogic.connect(&"timeline_ended", _on_dialogue_ended, CONNECT_ONE_SHOT)
+	dialogic.call(&"start", resolved_timeline)
 	dialogue_started.emit(interactor)
+	return true
+
+
+func _get_dialogic() -> Node:
+	# Resolve at runtime so NPC scenes and their headless tests do not require
+	# Dialogic's autoload identifier to exist during script compilation.
+	return get_node_or_null("/root/Dialogic")
 
 
 func _on_dialogue_ended() -> void:
 	is_talking = false
 	_restore_dialogue_camera()
+	var finished_interactor := _conversation_player
 	if is_instance_valid(_conversation_player):
 		_conversation_player.blocked = _conversation_player_was_blocked
-		dialogue_finished.emit(_conversation_player)
 	_conversation_player = null
 	interaction_area.set_interaction_enabled(true)
-	var resume_state := fsm.states.get("wander") as FsmState
+	var resume_state := fsm.states.get(initial_state_name.to_lower()) as FsmState
 	if not is_instance_valid(resume_state):
 		resume_state = fsm.states.get("idle") as FsmState
 	if is_instance_valid(resume_state):
 		fsm.change_state(resume_state)
+	if is_instance_valid(finished_interactor):
+		dialogue_finished.emit(finished_interactor)
