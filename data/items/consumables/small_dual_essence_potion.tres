@@ -14,5 +14,5 @@ display_name = "Small Dual Essence Potion"
 icon = ExtResource("1_fb1ew")
 description = "Heals 2 HP and restores 200SP."
 max_stack = 10
-type = 1
+type = 2
 metadata/_custom_type_script = "uid://bugemquvrnd0d"

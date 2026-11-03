@@ -12,4 +12,4 @@ display_name = "Stamina Potion"
 icon = ExtResource("1_c7dyq")
 description = "Restores 600 SP."
 max_stack = 10
-type = 1
+type = 2
