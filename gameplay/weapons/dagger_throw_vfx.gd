@@ -44,6 +44,7 @@ var _glint: MeshInstance3D
 var _cuts: Array[MeshInstance3D] = []
 var _cut_ages: Array[float] = []
 var _cut_directions: Array[Vector3] = []
+var _cut_strengths: Array[float] = []
 
 
 func _ready() -> void:
@@ -85,6 +86,7 @@ func _ready() -> void:
 		_cuts.append(cut)
 		_cut_ages.append(1.0)
 		_cut_directions.append(Vector3.RIGHT)
+		_cut_strengths.append(1.0)
 	set_process(false)
 
 
@@ -110,19 +112,20 @@ func turn() -> void:
 	burst(_last_position, 1.3)
 
 
-func impact(at: Vector3, direction: Vector3 = Vector3.RIGHT) -> void:
-	burst(at, 1.9)
+func impact(at: Vector3, direction: Vector3 = Vector3.RIGHT, strength: float = 1.0) -> void:
+	burst(at, 1.9 * strength)
 	var index := _next_cut
 	_next_cut = (_next_cut + 1) % _cuts.size()
 	_cut_ages[index] = 0.0
 	_cut_directions[index] = direction
+	_cut_strengths[index] = strength
 	_cuts[index].global_position = at
 	_cuts[index].show()
 	var material := _cuts[index].material_override as ShaderMaterial
 	material.set_shader_parameter("tint", Color(1.0, 0.93, 0.75))
 	material.set_shader_parameter("progress", 0.0)
-	material.set_shader_parameter("energy", 1.5)
-	_play_sound(HIT_SOUND, at, hit_volume_db)
+	material.set_shader_parameter("energy", 1.5 * strength)
+	_play_sound(HIT_SOUND, at, hit_volume_db + linear_to_db(strength))
 
 
 func finish(caught: bool = false) -> void:
@@ -313,7 +316,7 @@ func _update_cuts(delta: float) -> void:
 		cut.visible = progress < 1.0
 		if not cut.visible:
 			continue
-		_face_camera(cut, 1.0)
+		_face_camera(cut, _cut_strengths[index])
 		var direction := _cut_directions[index]
 		var projected := Vector2(
 			direction.dot(cut.global_basis.x), direction.dot(cut.global_basis.y)

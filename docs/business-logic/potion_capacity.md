@@ -1,0 +1,79 @@
+# Potion carrying capacity
+
+`Inventory` owns one carrying limit per `Potion.Kind`, defaulting to 3 each for
+HP, SP, and Dual Essence. Small and large bottles count together: 2 small HP +
+1 large HP fills the HP limit, without affecting SP or Dual Essence capacity.
+Each kind/size combination keeps its own item ID and separate stack, up to its
+resource's `max_stack`. Carrying limits do not merge stacks.
+
+All additions use `Inventory.add_item()`, which returns unaccepted quantities.
+`get_available_space()` and `can_add_item()` include both inventory space and the
+potion limit. The existing pickup attraction therefore leaves full-kind potions
+on the ground, retries after space becomes available, and supports partial pickup.
+Starting items also respect the limit. Moving stacks does not change carried totals.
+The player scene starts with 2 small + 1 large bottle for health and stamina.
+
+Dual Essence restores both HP and SP in one use. Small restores 2 HP / 200 SP;
+large restores 5 HP / 500 SP, as configured in their resources. Both components
+are required. A living player can consume it if either bar gains anything; when
+both bars are full, no bottle is consumed. Each bar clamps to its own maximum.
+Dual Essence uses the same capacity/upgrade API; its two sizes stack separately
+with the resource's configured `max_stack` (currently 10).
+
+Progression API on `Inventory`:
+
+```gdscript
+inventory.count_potions(Potion.Kind.HEALTH) # total small + large HP
+inventory.get_potion_capacity(Potion.Kind.HEALTH)
+inventory.upgrade_potion_capacity(Potion.Kind.HEALTH) # shared HP limit +1
+inventory.upgrade_potion_capacity(Potion.Kind.STAMINA, 2)
+inventory.set_potion_capacity(Potion.Kind.HEALTH, 5) # restore progression
+```
+
+Upgrades are independent per kind and apply to both sizes. Invalid kinds, nonpositive upgrades, limits
+above 100000, and reductions below currently carried quantities are rejected.
+Successful capacity changes emit `potion_capacity_changed(kind, new_capacity)`
+and `changed`. `clear()` removes items but keeps upgraded capacities.
+
+Capacity belongs to the inventory instance. Saving progression across player
+recreation/game restarts and charging an NPC upgrade price are future integrations.
+Restore capacities before adding saved items. These methods do not spend Gold.
+Do not modify `slots` directly when adding items; use the inventory API.
+
+## Main and secondary potion
+
+`PotionComponent` owns two assigned resources: `equipped_potion` (the active/main
+slot consumed by F) and `secondary_potion` (backup). Inventory's existing equip
+button assigns/removes the main potion; `Equip secondary` assigns/removes backup.
+Assigning a potion already in the opposite slot swaps the slots instead of
+duplicating the assignment. Assignments do not reserve or remove inventory items.
+
+`swap_potions()` exchanges the two references and emits both
+`equipped_potion_changed` and `secondary_potion_changed` after committing the swap.
+The `swap_potion` InputMap action defaults to R. Player handles it through the
+same gameplay-input gate as drinking, so inventory/dialogue/death block it.
+
+`equip_secondary_potion()`, `unequip_secondary_potion()`,
+`is_secondary_equipped()`, and `get_secondary_quantity()` expose the backup API.
+Both HUD sockets refresh counts on inventory changes. A depleted assigned potion
+keeps its icon with a grey tint and count 0. No automatic reassignment or cycling
+through unassigned inventory potions occurs. Empty slots can also be swapped;
+when both slots are empty, swapping returns false.
+
+## Quick selection wheel
+
+Tap R to swap assigned potions; hold R for 0.22 seconds to open the wheel at
+18% game speed. Hover a stocked potion and release R to assign MAIN. Right-click
+the hovered potion to assign BACKUP and close the wheel immediately. Releasing
+R afterward does not also replace MAIN. Assigning a potion from the opposite
+slot still swaps the two assignments through `PotionComponent`.
+
+Empty slots cannot be equipped. Right-clicking an empty slot or the center leaves
+the wheel open; release R at the center or press Esc to keep current equipment.
+The right-click used for BACKUP is blocked from weapon input until the mouse
+button is released, including the frame where the wheel closes.
+
+Inventory/dialogue/death/scene changes and focus loss cancel selection and
+restore mouse state and time scale. `HitstopController` coordinates the held
+slow-motion source with combat hitstop. The wheel uses separate scenes and
+keeps the inventory layout unchanged.

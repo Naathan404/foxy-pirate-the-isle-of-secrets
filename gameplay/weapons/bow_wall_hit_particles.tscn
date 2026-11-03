@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/Dust Particle.png" id="1_dust"]
+
+[sub_resource type="Gradient" id="Gradient_dust"]
+offsets = PackedFloat32Array(0, 0.15, 0.6, 1)
+colors = PackedColorArray(1, 0.95, 0.75, 1, 1, 0.72, 0.3, 1, 0.85, 0.46, 0.16, 0.7, 0.65, 0.4, 0.2, 0)
+
+[sub_resource type="GradientTexture1D" id="Ramp_dust"]
+gradient = SubResource("Gradient_dust")
+
+[sub_resource type="Curve" id="Curve_size"]
+_data = [Vector2(0, 0.7), 0.0, 0.0, 0, 0, Vector2(0.12, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.08), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="Size_dust"]
+curve = SubResource("Curve_size")
+
+[sub_resource type="ParticleProcessMaterial" id="Process_dust"]
+resource_local_to_scene = true
+lifetime_randomness = 0.2
+emission_shape = 1
+emission_sphere_radius = 0.05
+direction = Vector3(0, 0, -1)
+spread = 75.0
+initial_velocity_min = 2.0
+initial_velocity_max = 4.0
+angle_min = -180.0
+angle_max = 180.0
+angular_velocity_min = -150.0
+angular_velocity_max = 150.0
+gravity = Vector3(0, -3, 0)
+damping_min = 2.0
+damping_max = 3.0
+scale_min = 0.7
+scale_max = 1.6
+scale_curve = SubResource("Size_dust")
+color_ramp = SubResource("Ramp_dust")
+
+[sub_resource type="StandardMaterial3D" id="Material_dust"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_dust")
+texture_filter = 0
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="Mesh_dust"]
+material = SubResource("Material_dust")
+size = Vector2(0.18, 0.18)
+
+[node name="BowWallHitParticles" type="GPUParticles3D"]
+cast_shadow = 0
+emitting = false
+amount = 18
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+randomness = 0.3
+local_coords = false
+fixed_fps = 60
+visibility_aabb = AABB(-3, -3, -3, 6, 6, 6)
+process_material = SubResource("Process_dust")
+draw_pass_1 = SubResource("Mesh_dust")
+
+[connection signal="finished" from="." to="." method="queue_free"]

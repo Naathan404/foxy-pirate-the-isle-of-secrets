@@ -3,7 +3,7 @@ extends CharmEffect
 ## Bắn tám projectile theo hướng con trỏ trong khoảng thời gian cấu hình.
 
 signal projectile_launched(
-	projectile_index: int, projectile_count: int, direction: Vector3, damage_hp: int
+	projectile_index: int, projectile_count: int, direction: Vector3, damage_hp: float
 )
 
 const CHARM_ATTACK_SCENE = preload("res://gameplay/charms/active/charm_active_attack.tscn")
@@ -114,8 +114,8 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 	execution.context.direction = (
 		context.direction.normalized() if not context.direction.is_zero_approx() else Vector3.BACK
 	)
-	execution.context.damage_hp = maxi(
-		1, roundi(_get_base_damage() * definition.get_param_float(&"damage_percent", 0.35))
+	execution.context.damage_hp = maxf(
+		0.0, _get_base_damage() * definition.get_param_float(&"damage_percent", 0.35)
 	)
 	execution.global_position = actor.global_position
 	var projectile_width := definition.get_param_float(&"projectile_width_units", 0.25)
@@ -141,7 +141,7 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 	)
 
 
-func _get_base_damage() -> int:
+func _get_base_damage() -> float:
 	var weapon_controller := actor.get("weapon_controller") as WeaponController
 	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
 		var attack := weapon_controller.equipped.get_attack(&"normal")

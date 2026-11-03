@@ -2,7 +2,7 @@ class_name CharmActiveAttack
 extends WeaponAttack
 ## Base execution cho Active Charm dùng hitbox vật lý của combat system.
 
-signal attack_started(damage_hp: int, direction: Vector3)
+signal attack_started(damage_hp: float, direction: Vector3)
 
 @export var hitbox: HitBox
 @export var hitbox_scale: Vector3 = Vector3.ONE

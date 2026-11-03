@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DualEssencePotion" format=3 uid="uid://b0c2kxsb7y24n"]
+
+[ext_resource type="Script" uid="uid://bugemquvrnd0d" path="res://data/items/consumables/dual_essence_potion.gd" id="1_js0j4"]
+[ext_resource type="Texture2D" uid="uid://mtgqy4ie1agk" path="res://assets/sprites/items/potions/Dual_Essence_Potion.png" id="1_uotih"]
+
+[resource]
+script = ExtResource("1_js0j4")
+potion_kind = 2
+item_id = "dual_essence_potion"
+display_name = "Dual Essence Potion"
+icon = ExtResource("1_uotih")
+description = "Heals 5 HP and restores 500 SP."
+max_stack = 10
+type = 2
+metadata/_custom_type_script = "uid://bugemquvrnd0d"

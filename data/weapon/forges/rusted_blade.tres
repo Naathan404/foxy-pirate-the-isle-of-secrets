@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"rusted_blade"
+display_name = "Rusted Blade"
+description = "Damage -20%, Attack Speed -15%, Knockback -15%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 0.0
+damage_multiplier = 0.8
+attack_speed_multiplier = 0.85
+knockback_multiplier = 0.85

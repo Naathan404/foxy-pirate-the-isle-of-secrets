@@ -7,7 +7,7 @@ extends CharacterBody3D
 ## animations and behavior states.
 
 signal target_changed(target: Node3D)
-signal damaged(applied_hp: int)
+signal damaged(applied_hp: float)
 signal died
 
 enum InitialFacing {
@@ -20,6 +20,9 @@ enum InitialFacing {
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
+const CRITICAL_POPUP: PackedScene = preload("res://gameplay/combat/critical_damage_popup.tscn")
+const NORMAL_POPUP: PackedScene = preload("res://gameplay/combat/normal_damage_popup.tscn")
+const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive drops.
 
 @export var data: EnemyData
 @export var initial_state_name: StringName = &"Idle"
@@ -43,10 +46,22 @@ var target: Node3D
 var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
+var submerged: bool = false
 var pending_hit_direction: Vector3 = Vector3.ZERO
+var pending_knockback_multiplier: float = 1.0
 var pending_charm_stun_seconds: float = 0.0
+var stagger_amount: float = 0.0
+var _surface_collision: Dictionary = {}
+var _surface_process_mode: ProcessMode = Node.PROCESS_MODE_INHERIT
+var _surface_visible: bool = true
+var _surface_hurtbox_enabled: bool = true
+var _surface_detection_frames: int = 0
+var _stagger_decay_remaining: float = 0.0
+var _stagger_immunity_remaining: float = 0.0
 var _charm_grapple_tween: Tween
 var _external_push_velocity: Vector3 = Vector3.ZERO
+var _loot_direction_angle: float = 0.0
+var _loot_drop_index: int = 0
 
 @onready var hp: HealthComponent = $HealthComponent
 @onready var hurtbox: HurtBox = $Direction/HurtBox
@@ -65,9 +80,12 @@ var _external_push_velocity: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if not _validate_components():
 		set_physics_process(false)
 		return
+	_prepare_loot_pools.call_deferred()
 	_setup_stats()
 	_setup_combat()
 	_setup_direction_checks()
@@ -80,6 +98,20 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint() or submerged:
+		return
+	var hitstop_controller := get_node_or_null("/root/HitstopController")
+	if (
+		hitstop_controller != null
+		and hitstop_controller.has_method("is_frozen")
+		and bool(hitstop_controller.call("is_frozen", self))
+	):
+		return
+	_update_stagger(delta)
+	if _surface_detection_frames > 0:
+		_surface_detection_frames -= 1
+		if _surface_detection_frames == 0:
+			_refresh_target()
 	fsm._update(delta)
 	if dead:
 		return
@@ -96,7 +128,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _apply_external_push(push_velocity: Vector3) -> void:
-	if dead:
+	if dead or submerged:
 		return
 	_external_push_velocity += Vector3(push_velocity.x, 0.0, push_velocity.z)
 
@@ -197,7 +229,7 @@ func play_directional_animation(action: StringName, restart: bool = false) -> bo
 
 
 func has_target() -> bool:
-	return is_instance_valid(target) and not dead
+	return is_instance_valid(target) and not dead and not submerged
 
 
 func _distance_to_target() -> float:
@@ -223,9 +255,9 @@ func begin_active_attack(attack_id: int = 0, tag: StringName = &"normal") -> boo
 
 
 func _begin_active_attack_with_damage(
-	amount_hp: int, attack_id: int = 0, tag: StringName = &"normal"
+	amount_hp: float, attack_id: int = 0, tag: StringName = &"normal"
 ) -> bool:
-	if dead or amount_hp <= 0 or not is_instance_valid(active_hitbox):
+	if dead or submerged or amount_hp <= 0 or not is_instance_valid(active_hitbox):
 		return false
 	return active_hitbox.begin_attack(amount_hp, attack_id, tag)
 
@@ -236,7 +268,7 @@ func end_active_attack() -> void:
 
 
 func _start_contact_damage() -> bool:
-	if dead or data == null or not is_instance_valid(contact_hitbox):
+	if dead or submerged or data == null or not is_instance_valid(contact_hitbox):
 		return false
 	contact_hitbox.actor = self
 	contact_hitbox.team = team
@@ -250,27 +282,57 @@ func _stop_contact_damage() -> void:
 		contact_hitbox.end_attack()
 
 
-func take_damage(amount: int) -> int:
+func take_damage(amount: float) -> float:
 	var damage := DamageContext.new()
 	damage.amount_hp = amount
 	return receive_damage(damage)
 
 
-func receive_damage(damage: DamageContext) -> int:
-	if dead or not is_instance_valid(hp):
+func receive_damage(damage: DamageContext) -> float:
+	if dead or submerged or not is_instance_valid(hp):
 		return 0
 	if damage == null or damage.amount_hp <= 0:
 		return 0
 	if damage.source == self or damage.source_team == team:
 		return 0
 	pending_hit_direction = _get_hit_direction(damage.source)
-	return hp.take_damage(damage.amount_hp)
+	if damage.is_melee_normal_attack():
+		var direction := Vector3(damage.direction.x, 0.0, damage.direction.z)
+		if not direction.is_zero_approx():
+			pending_hit_direction = direction.normalized()
+	pending_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
+	var applied_hp := hp.take_damage(damage.amount_hp)
+	if applied_hp > 0.0:
+		if is_instance_valid(damage.source) and damage.source.has_signal("combat_activity"):
+			damage.source.emit_signal("combat_activity")
+		if not dead and hp.is_alive():
+			_accumulate_stagger(damage.stagger_damage)
+		var popup_scene := CRITICAL_POPUP if damage.is_critical else NORMAL_POPUP
+		var popup := popup_scene.instantiate() as Label3D
+		get_parent().add_child(popup)
+		popup.global_position = global_position + Vector3.UP * 1.4
+		popup.call("show_damage", applied_hp)
+	return applied_hp
+
+
+## Hit and fatal recoil share forge scaling, resistance and boss immunity.
+func consume_hit_knockback_velocity() -> Vector3:
+	var multiplier := pending_knockback_multiplier
+	pending_knockback_multiplier = 1.0
+	if data == null or is_in_group("boss"):
+		return Vector3.ZERO
+	var direction := pending_hit_direction
+	if direction.is_zero_approx():
+		direction = -last_facing_direction
+	var speed := data.hit_knockback_speed * maxf(0.0, multiplier)
+	speed *= 1.0 - data.knockback_resistance
+	return direction.normalized() * speed
 
 
 func apply_charm_grapple(
 	source: Node3D, stop_distance: float, pull_speed_units_per_second: float, stun_seconds: float
 ) -> StringName:
-	if dead or not is_instance_valid(source):
+	if dead or submerged or not is_instance_valid(source):
 		return &"miss"
 	if charm_grapple_large or is_in_group("boss"):
 		if not source.has_method("apply_charm_grapple_pull"):
@@ -313,14 +375,51 @@ func apply_charm_grapple(
 func _notify_hit() -> void:
 	if dead:
 		return
+	if is_instance_valid(fsm.current_state) and fsm.current_state.name == &"Hit":
+		return
 	request_state(&"hit", 50)
+
+
+func _accumulate_stagger(amount: float) -> void:
+	if data == null or not is_finite(amount) or amount <= 0.0:
+		return
+	if _stagger_immunity_remaining > 0.0:
+		return
+	for state: FsmState in [fsm.current_state, fsm.next_state]:
+		if is_instance_valid(state) and state.name == &"Hit":
+			return
+	stagger_amount += amount
+	_stagger_decay_remaining = data.stagger_decay_delay
+	if stagger_amount >= data.stagger_threshold:
+		stagger_amount = 0.0
+		_notify_hit()
+
+
+func _update_stagger(delta: float) -> void:
+	if dead or data == null:
+		return
+	var elapsed := maxf(0.0, delta)
+	_stagger_immunity_remaining = maxf(0.0, _stagger_immunity_remaining - elapsed)
+	var decay_time := maxf(0.0, elapsed - _stagger_decay_remaining)
+	_stagger_decay_remaining = maxf(0.0, _stagger_decay_remaining - elapsed)
+	stagger_amount = maxf(0.0, stagger_amount - data.stagger_decay_per_second * decay_time)
+
+
+func _on_hit_recovery_finished() -> void:
+	stagger_amount = 0.0
+	pending_charm_stun_seconds = 0.0
+	if data != null:
+		_stagger_immunity_remaining = data.stagger_immunity_duration
 
 
 func die() -> void:
 	if dead:
 		return
 	dead = true
+	_loot_direction_angle = randf() * TAU
+	_loot_drop_index = 0
 	_drop_loot.call_deferred()
+	_drop_gold.call_deferred()
 	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
 		_charm_grapple_tween.kill()
 	_charm_grapple_tween = null
@@ -336,10 +435,64 @@ func request_state(state_name: StringName, priority: int = 0) -> bool:
 
 
 func set_target(next_target: Node3D) -> void:
+	if submerged and next_target != null:
+		return
 	if target == next_target:
 		return
 	target = next_target
 	target_changed.emit(target)
+
+
+## Water hides an enemy without killing it or resetting its HP.
+## TidalEnemy keeps processing independently while this subtree is suspended.
+func _set_submerged(value: bool) -> void:
+	if dead or submerged == value:
+		return
+	submerged = value
+	if submerged:
+		_surface_process_mode = process_mode
+		_surface_visible = visible
+		_surface_hurtbox_enabled = hurtbox.enabled
+		end_active_attack()
+		_stop_contact_damage()
+		set_target(null)
+		velocity = Vector3.ZERO
+		move_direction = Vector3.ZERO
+		_external_push_velocity = Vector3.ZERO
+		if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+			_charm_grapple_tween.kill()
+		_charm_grapple_tween = null
+		# Cancel a half-finished attack; resurface in the configured initial state.
+		if is_instance_valid(fsm.current_state):
+			fsm.current_state._exit()
+			fsm.current_state = null
+		fsm.change_state(initial_state, 99)
+		_surface_collision.clear()
+		var colliders: Array[Node] = find_children("*", "CollisionObject3D", true, false)
+		colliders.append(self)
+		for node: Node in colliders:
+			var collider := node as CollisionObject3D
+			_surface_collision[collider] = [collider.collision_layer, collider.collision_mask]
+			collider.collision_layer = 0
+			collider.collision_mask = 0
+		hurtbox.enabled = false
+		hide()
+		process_mode = Node.PROCESS_MODE_DISABLED
+	else:
+		for node: Node in _surface_collision:
+			if not is_instance_valid(node):
+				continue
+			var collider := node as CollisionObject3D
+			var saved: Array = _surface_collision[node]
+			collider.collision_layer = saved[0]
+			collider.collision_mask = saved[1]
+		_surface_collision.clear()
+		hurtbox.enabled = _surface_hurtbox_enabled
+		visible = _surface_visible
+		process_mode = _surface_process_mode
+		# Area overlap lists need a physics tick after collision masks are restored.
+		_surface_detection_frames = 2
+		_refresh_direction_checks()
 
 
 func _validate_components() -> bool:
@@ -442,9 +595,10 @@ func _setup_target_detector() -> void:
 
 
 func _setup_direction_checks() -> void:
-	for ray: RayCast3D in [front_ray, ground_ray]:
-		if is_instance_valid(ray):
-			ray.collision_mask = CombatLayers.WORLD
+	if is_instance_valid(front_ray):
+		front_ray.collision_mask = CombatLayers.ENEMY_FRONT_OBSTACLE_MASK
+	if is_instance_valid(ground_ray):
+		ground_ray.collision_mask = CombatLayers.WORLD
 
 
 func _refresh_direction_checks() -> void:
@@ -454,7 +608,13 @@ func _refresh_direction_checks() -> void:
 
 
 func _refresh_target() -> void:
-	if not is_instance_valid(target_detector):
+	# Disabling the detector during death can still deliver a queued body_exited callback.
+	if (
+		dead
+		or submerged
+		or not is_instance_valid(target_detector)
+		or not target_detector.monitoring
+	):
 		return
 	var nearest_target: Node3D = null
 	var nearest_distance := INF
@@ -482,13 +642,13 @@ func _on_target_body_exited(body: Node3D) -> void:
 		_refresh_target()
 
 
-func _on_damaged(applied_hp: int) -> void:
+func _on_damaged(applied_hp: float) -> void:
 	damaged.emit(applied_hp)
-	if hp.is_alive():
-		_notify_hit()
+	if hp.is_alive() and is_instance_valid(visual):
+		visual.play_hit_feedback()
 
 
-func _on_hp_changed(_current_hp: int, _maximum_hp: int) -> void:
+func _on_hp_changed(_current_hp: float, _maximum_hp: float) -> void:
 	_update_debug_health()
 
 
@@ -498,7 +658,9 @@ func _update_debug_health() -> void:
 	debug_health_label.visible = show_debug_health
 	if not is_instance_valid(hp):
 		return
-	debug_health_label.text = "HP: %d / %d" % [hp.current_hp, hp.get_max_hp()]
+	debug_health_label.text = (
+		"HP: %s / %s" % [String.num(hp.current_hp, 2), String.num(hp.get_max_hp(), 2)]
+	)
 
 
 func _get_hit_direction(source: Node) -> Vector3:
@@ -513,6 +675,42 @@ func _get_hit_direction(source: Node) -> Vector3:
 
 func _on_charm_grapple_finished() -> void:
 	_charm_grapple_tween = null
+
+
+func _drop_gold() -> void:
+	if (
+		data == null
+		or data.min_gold_amount < 0
+		or data.max_gold_amount <= 0
+		or data.max_gold_amount < data.min_gold_amount
+		or data.gold_drop_chance <= 0.0
+	):
+		return
+	if not is_inside_tree():
+		return
+	var loot_parent := get_parent()
+	if loot_parent == null or loot_parent.is_queued_for_deletion():
+		return
+	if data.gold_drop_chance < 1.0 and randf() >= data.gold_drop_chance:
+		return
+	var pool := GoldPickupPool.for_scene(self)
+	if pool != null:
+		var amount: int = randi_range(data.min_gold_amount, data.max_gold_amount)
+		pool.spawn_gold(global_position, amount, _next_loot_direction())
+
+
+func _prepare_loot_pools() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	LootTrailPool.for_scene(self)
+	if (
+		data != null
+		and data.min_gold_amount >= 0
+		and data.max_gold_amount > 0
+		and data.max_gold_amount >= data.min_gold_amount
+		and data.gold_drop_chance > 0.0
+	):
+		GoldPickupPool.for_scene(self)
 
 
 # drop itemmm =========
@@ -536,4 +734,10 @@ func _drop_loot() -> void:
 	pickup.quantity = data.drop_quantity
 	loot_parent.add_child(pickup)
 	pickup.global_position = global_position
-	pickup.play_drop_animation()
+	pickup.play_drop_animation(_next_loot_direction())
+
+
+func _next_loot_direction() -> Vector3:
+	var angle := _loot_direction_angle + _loot_drop_index * LOOT_SPREAD_ANGLE
+	_loot_drop_index += 1
+	return Vector3(cos(angle), 0.0, sin(angle))

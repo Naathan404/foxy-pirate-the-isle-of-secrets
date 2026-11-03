@@ -32,13 +32,16 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 
 ## Kiểm thử Godot
 
-- `addons/dialogic/` được commit cùng dự án, gồm cả file `.uid`, asset và cấu hình import. Dialogic được bật trong `project.godot`, autoload trỏ tới đường dẫn file để bản clone mới không phụ thuộc cache UID.
+Migration HP/damage/healing sang float và danh sách consumer được cập nhật:
+[float_combat.md](business-logic/float_combat.md).
+
+- `addons/dialogic/` được commit cùng dự án, gồm cả file `.uid`, asset và cấu hình import. Dialogic được bật trong `project.godot`, autoload hiện trỏ tới UID; chạy import trước khi kiểm thử để Godot dựng lại ánh xạ UID.
 - Các addon khác (ví dụ `godot_ai`) là công cụ cục bộ và vẫn bị Git bỏ qua. Không commit cấu hình bật plugin hay autoload của các công cụ này; CI phải chạy được khi không có chúng.
-- Plugin Godot AI tự thêm lại `_mcp_game_helper` trỏ tới `res://addons/godot_ai/runtime/game_helper.gd` khi bật plugin. Trước khi commit, nên bỏ dòng công cụ cục bộ này khỏi diff. CI cũng loại đúng dòng đó sau checkout, trước khi chạy Godot, để việc plugin ghi lại cấu hình không tiếp tục làm fail import.
-- Bước chuẩn bị trên chỉ bỏ autoload Godot AI có đúng tên và đường dẫn đã biết. Không bỏ các autoload khác, không tắt Dialogic và không lọc lỗi engine khỏi log. Thiếu script/resource gameplay vẫn làm CI fail như trước.
+- Plugin Godot AI tự thêm lại `_mcp_game_helper` trỏ tới `res://addons/godot_ai/runtime/game_helper.gd` khi bật plugin. Trước khi commit, nên bỏ autoload này và mục `res://addons/godot_ai/plugin.cfg` khỏi diff. CI cũng loại đúng hai mục đó sau checkout, trước khi chạy Godot, để cấu hình cục bộ không làm fail import hoặc báo thiếu plugin.
+- Bước chuẩn bị trên chỉ bỏ autoload và mục bật plugin Godot AI có đúng tên và đường dẫn đã biết. Không bỏ các autoload hay plugin khác, không tắt Dialogic và không lọc lỗi engine khỏi log. Thiếu script/resource gameplay vẫn làm CI fail như trước.
 - Chạy game hoặc scene liên quan đến thay đổi.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
-- Test độc lập đặt tại `test/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.
+- Test độc lập đặt tại `test/**/*_test.gd` hoặc cạnh module trong `gameplay/charms/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại. CI tìm test ở cả hai thư mục.
 - Mỗi test có giới hạn 60 giây. CI báo thất bại khi Godot trả mã lỗi hoặc log có lỗi script/engine.
 - CI có hai job: lint và kiểm tra Godot. Job Godot import project một lần rồi chạy các test độc lập; không có smoke test riêng.
 - Ghi cách chạy và kết quả trong PR; thêm ảnh hoặc video nếu thay đổi UI/gameplay.
@@ -50,38 +53,34 @@ Chạy ở máy cá nhân bằng PowerShell:
 
 ~~~powershell
 & 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --editor --import --quit
-foreach ($testScript in Get-ChildItem test -Recurse -Filter '*_test.gd' -File) {
+foreach ($testScript in Get-ChildItem test, gameplay/charms -Recurse -Filter '*_test.gd' -File) {
     & 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script $testScript.FullName
     if ($LASTEXITCODE -ne 0) { throw "Test failed: $($testScript.Name)" }
 }
 ~~~
 
-### Chaos và dagger boomerang
+### Các bộ test hiện có
 
-[test/chaos_test.gd](../test/chaos_test.gd) kiểm tra contract của
-[Player/ChaosComponent](player_business_logic.md#contract-chaos-point-cp) và
-[dagger boomerang](weapon_business_logic.md#contract-của-dagger-boomerang).
+| Test | Phạm vi |
+| --- | --- |
+| [attack_step_test.gd](../test/attack_step_test.gd) | Bước tiến, pause inventory, va chạm tường, đòn bị từ chối và ngắt bởi hit |
+| [dagger_combo_test.gd](../test/dagger_combo_test.gd) | Combo, quét tám hướng, chống trùng hit, input buffer, dash và hitstop |
+| [mouse_attack_test.gd](../test/mouse_attack_test.gd) | Ngắm chuột, khóa hướng từng đòn, combo và giữ phím chạy ngược hướng chém |
+| [enemy_death_test.gd](../test/enemy_death_test.gd) | Luồng chết của enemy |
+| [scene_transition_test.gd](../test/scene_transition_test.gd) | Fade, pause, reload và trigger đến map đích |
+| [player_state_test.gd](../test/player_state_test.gd) | API thời lượng animation, timer Hit và thời gian chờ Death |
+| [weapon_forge_test.gd](../test/weapon_forge_test.gd) | Pool 17 forge, roll theo seed, mọi category, timing combo/non-combo, SP, hitbox và projectile range |
+| [float_combat_test.gd](../test/float_combat_test.gd) | HP/damage/heal lẻ, signal, HitBox/HurtBox, potion, Charm, HUD và breakpoint HP của bốn enemy |
+| [bow_attack_test.gd](../test/bow_attack_test.gd) | Inventory ammo, bắn khi SP 0, hết tên/refill, animation, đổi dao/cung, projectile qua recovery, tường mỏng, range và forge |
+| [bow_charge_test.gd](../test/bow_charge_test.gd) | Tụ lực cung: tap, hao CP tăng dần, khóa chạy/đổi aim, 6 tên tự bắn, ammo, ngắt và collision Bézier |
+| [charm_active_test.gd](../gameplay/charms/active/charm_active_test.gd) | Arrow Rain, Crescent Cleave và Tide Grapple |
+| [charm_passive_test.gd](../gameplay/charms/passive/charm_passive_test.gd) | Passive Charm thay đổi chỉ số |
+| [charm_event_passive_test.gd](../gameplay/charms/passive/charm_event_passive_test.gd) | Passive Charm theo sự kiện và điều kiện |
+| [charm_progression_test.gd](../gameplay/charms/progression/charm_progression_test.gd) | Safe location, socket economy, acquisition và snapshot |
 
-Chạy từ thư mục gốc với Godot 4.7; thay đường dẫn executable theo máy:
-
-~~~powershell
-& 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script res://test/chaos_test.gd
-~~~
-
-Test thành công in `Chaos integration checks: PASS` và trả mã 0. Test dùng scene
-Foxy, Barrel và vật cản vật lý thật để kiểm tra:
-
-- Clamp CP, reset, tiêu toàn bộ khi đầy và vô hiệu hóa khi sức chứa bằng 0.
-- Input chuột phải, đánh hụt không tăng CP, năm hit normal làm đầy thanh và hiện `[RMB]`.
-- Từ chối secondary khi thiếu CP hoặc không có kỹ năng; tiêu CP khi nhận kỹ năng.
-- Chờ windup mới bay, sống sau khi controller kết thúc hoặc hủy đòn đã phóng.
-- Mỗi enemy nhận một hit mỗi lượt đi/về, có báo damage và cộng CP cho cả hai lượt.
-- Quay về khi gặp tường, không gây damage lên enemy phía sau tường ở tình huống test.
-- Bắt dao khi người ném di chuyển, tự hủy khi hết lifetime và hủy dao chưa phóng.
-
-Test tạo bản sao PlayerData riêng và chốt 20 CP/hit cho fixture (20 lượt đi,
-40 sau cả hai lượt). Vì vậy thay đổi CP/hit trong resource Foxy không làm sai
-assertion của test và test không sửa resource cân bằng gameplay dùng chung.
+`test/chaos_test.gd` không có trong repository hiện tại. Các test ở trên không
+thay thế kiểm thử đầy đủ contract CP và vòng đời dagger boomerang; cần bổ sung
+test riêng khi sửa các hành vi đó.
 
 Test headless kiểm tra logic và va chạm, không xác nhận hình ảnh sprite, animation
 hay bố cục HUD. Các phần này vẫn cần xem trực tiếp trong game.

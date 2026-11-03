@@ -179,7 +179,7 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 
 | Charm | Acquisition | SP | Cooldown | Business effect |
 | --- | --- | ---: | ---: | --- |
-| Arrow Rain | Merchant/enemy drop | 100 | 6 giây | Bắn 8 mũi về phía con trỏ trong 1,4 giây. Mỗi mũi gây 35% base weapon damage, tối thiểu 1 HP; range 8 units. |
+| Arrow Rain | Merchant/enemy drop | 300 | 6 giây | Bắn 8 mũi về phía con trỏ trong 1,4 giây. Mỗi mũi gây 35% base weapon damage dạng `float`, không ép tối thiểu 1 HP; range 8 units. |
 | Crescent Cleave | Merchant/enemy drop | 100 | 4 giây | Gây 200% base weapon damage trong bán nguyệt 180 độ phía trước, bán kính 2,8 units. Mỗi target chỉ bị hit một lần mỗi activation. |
 | Tide Grapple | Fixed boss reward | 150 | 5 giây | Gây 250% base weapon damage trong range 4 units. Target nhỏ bị kéo và stun 1 giây; target lớn/Boss/địa hình kéo Player tới điểm dừng cách mục tiêu 1 unit. Miss không tạo effect. |
 

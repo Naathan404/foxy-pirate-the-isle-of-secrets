@@ -9,13 +9,13 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 var enabled: bool = true
 
 
-func take_damage(damage: DamageContext) -> int:
+func take_damage(damage: DamageContext) -> float:
 	if not enabled or damage == null or not is_instance_valid(actor):
 		return 0
 	if actor == damage.source or team == damage.source_team or damage.amount_hp <= 0:
 		return 0
 	if actor.has_method("receive_damage"):
-		return int(actor.call("receive_damage", damage))
+		return float(actor.call("receive_damage", damage))
 	if actor.has_method("take_damage"):
-		return int(actor.call("take_damage", damage.amount_hp))
+		return float(actor.call("take_damage", damage.amount_hp))
 	return 0

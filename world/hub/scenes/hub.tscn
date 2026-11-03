@@ -13,6 +13,8 @@
 [ext_resource type="MeshLibrary" uid="uid://bb7wxqh2ru0di" path="res://assets/meshes/objects/objects.meshlib" id="7_l3xad"]
 [ext_resource type="PackedScene" uid="uid://bonqvqqvistj6" path="res://world/components/decoration/mullti_mesh_decorator.tscn" id="8_omo6j"]
 [ext_resource type="ArrayMesh" uid="uid://jci2vipujt47" path="res://assets/models/kenney_mini_forest/plant.glb" id="13_24f13"]
+[ext_resource type="PackedScene" path="res://gameplay/merchant/silas_shop_panel.tscn" id="14_silas_panel"]
+[ext_resource type="PackedScene" path="res://gameplay/npcs/silas/silas_npc.tscn" id="15_silas_npc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -191,7 +193,25 @@ buffer = PackedFloat32Array(-1.7479966, 0, 3.2839248, 6.026083, 0, 2.4484549, 0,
 script = ExtResource("1_m32iv")
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("2_l3xad")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -2.7261753, 3.875, -1.1673746)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+
+[node name="SilasShopPanel" parent="." instance=ExtResource("14_silas_panel")]
+
+[node name="Silas" parent="." instance=ExtResource("15_silas_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
+
+[node name="SilasHideoutA" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
+
+[node name="SilasHideoutB" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.964006, 0, 5.036312)
+
+[node name="SilasHideoutC" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.650712, 4, 29.794418)
+
+[node name="SilasHideoutD" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8243723, -2, -21.086876)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7261753, 3.875, -1.1673746)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)

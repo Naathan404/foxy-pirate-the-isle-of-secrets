@@ -1,9 +1,9 @@
 class_name HitBox
 extends Area3D
 
-signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
 signal damage_prepared(damage: DamageContext, target: Node)
-signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: int)
+signal hit_confirmed(damage: DamageContext, target: Node, applied_hp: float)
 
 enum RehitPolicy {
 	ONCE_PER_ATTACK,
@@ -32,7 +32,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func begin_attack(
-	amount_hp: int,
+	amount_hp: float,
 	attack_id: int = 0,
 	tag: StringName = &"normal",
 	rehit_policy: RehitPolicy = RehitPolicy.ONCE_PER_ATTACK
@@ -75,10 +75,34 @@ func is_active() -> bool:
 	return _active
 
 
-func _on_area_entered(area: Area3D) -> void:
-	if not _active or not area is HurtBox:
+## Immediate sample for swept melee, sharing the same per-swing target reservation.
+func sample_shape() -> void:
+	if not _active or not is_inside_tree():
 		return
-	var hurtbox := area as HurtBox
+	for child in get_children():
+		var collider := child as CollisionShape3D
+		if collider == null or collider.disabled or collider.shape == null:
+			continue
+		var query := PhysicsShapeQueryParameters3D.new()
+		query.shape = collider.shape
+		query.transform = collider.global_transform
+		query.collision_mask = collision_mask
+		query.collide_with_areas = true
+		query.collide_with_bodies = false
+		for result in get_world_3d().direct_space_state.intersect_shape(query, 64):
+			_on_area_entered(result.collider as Area3D)
+			if not _active:
+				return
+
+
+func _on_area_entered(area: Area3D) -> void:
+	try_hit(area as HurtBox)
+
+
+## Swept projectiles can submit a sampled target through the same deduplication policy.
+func try_hit(hurtbox: HurtBox) -> void:
+	if not _active or not is_instance_valid(hurtbox):
+		return
 	if not is_instance_valid(hurtbox.actor):
 		return
 	var target_id := hurtbox.actor.get_instance_id()

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"anchor_breaker"
+display_name = "Anchor Breaker"
+description = "Knockback +45%, Stagger +20%, Attack Speed -15%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 3.0
+knockback_multiplier = 1.45
+stagger_multiplier = 1.2
+attack_speed_multiplier = 0.85

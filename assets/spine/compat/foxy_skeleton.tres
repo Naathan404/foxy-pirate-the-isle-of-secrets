@@ -1,0 +1,8 @@
+[gd_resource type="SpineSkeletonDataResource" format=3 uid="uid://de68au0hxyqo6"]
+
+[ext_resource type="SpineAtlasResource" uid="uid://nmco250xjljx" path="res://assets/spine/compat/Foxy_animated.atlas" id="1_3pb2e"]
+[ext_resource type="SpineSkeletonFileResource" uid="uid://cjyen8sk8fdyb" path="res://assets/spine/compat/Foxy_animated.skel" id="2_oi1h0"]
+
+[resource]
+atlas_res = ExtResource("1_3pb2e")
+skeleton_file_res = ExtResource("2_oi1h0")

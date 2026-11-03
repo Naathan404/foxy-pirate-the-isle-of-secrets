@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"sealed_steel"
+display_name = "Sealed Steel"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 4.0
+damage_multiplier = 1.25
+chaos_gain_multiplier = 0.6
+description = "Damage +25%, Chaos Gain -40%"

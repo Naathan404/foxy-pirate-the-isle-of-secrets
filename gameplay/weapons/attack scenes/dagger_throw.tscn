@@ -71,5 +71,6 @@ shape = SubResource("SphereShape3D_jpyye")
 [node name="CombatFeedback" type="Node" parent="HitBox" unique_id=1433124923 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("7_ogmxt")
 hitbox = NodePath("..")
-hitstop_duration = 0.065
-shake_pixels = 5.5
+hitstop_duration = 0.3
+shake_pixels = 12.0
+shake_duration = 0.4

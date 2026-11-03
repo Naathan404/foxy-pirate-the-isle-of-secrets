@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://bqt066tkjp3c1"]
 
-[ext_resource type="Texture2D" uid="uid://cnpjgqqnym7p4" path="res://assets/sprites/items/healing_potion.png" id="1_q7m61"]
 [ext_resource type="Script" uid="uid://24w7wd4t1fs3" path="res://gameplay/inventory/item_pickup.gd" id="1_wcvja"]
 [ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="2_y770h"]
+[ext_resource type="Texture2D" uid="uid://c6rri8ebn60w7" path="res://assets/sprites/items/Crab_Claw.png" id="3_itqw8"]
+[ext_resource type="PackedScene" uid="uid://cedobrx1ymh47" path="res://gameplay/inventory/pickup_scatter.tscn" id="4_scatter"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/player_attraction.tscn" id="5_attraction"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_wcvja"]
 radius = 0.6419367
@@ -14,15 +16,21 @@ script = ExtResource("1_wcvja")
 item = ExtResource("2_y770h")
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1888093459]
-transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
-pixel_size = 0.036
-billboard = 2
+pixel_size = 0.0012
+billboard = 1
 shaded = true
 alpha_cut = 1
 texture_filter = 0
-texture = ExtResource("1_q7m61")
+texture = ExtResource("3_itqw8")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=478981975]
 shape = SubResource("SphereShape3D_wcvja")
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[node name="Scatter" parent="." unique_id=2129724032 node_paths=PackedStringArray("visual") instance=ExtResource("4_scatter")]
+visual = NodePath("../Sprite3D")
+
+[node name="Attraction" parent="." unique_id=1389841254 node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("5_attraction")]
+detector = NodePath("..")
+moving_root = NodePath("..")
+anchor = NodePath("../Sprite3D")
+detection_shape = NodePath("../CollisionShape3D")

@@ -27,6 +27,8 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_m4i1l"]
+length = 0.8
+loop_mode = 1
 step = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -35,10 +37,10 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [15, 18, 21, 24, 27]
+"values": [15, 18, 21, 24]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -54,6 +56,8 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_7b4fy"]
+length = 0.8
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -61,10 +65,10 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [15, 18, 21, 24, 27]
+"values": [15, 18, 21, 24]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -80,6 +84,8 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_g2tde"]
+length = 0.8
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -87,10 +93,10 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [15, 18, 21, 24, 27]
+"values": [15, 18, 21, 24]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -106,6 +112,8 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_yrmf2"]
+length = 0.8
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -113,10 +121,10 @@ tracks/0/path = NodePath("Sprite3D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [17, 20, 23, 26, 29]
+"values": [17, 20, 23, 26]
 }
 tracks/1/type = "value"
 tracks/1/imported = false

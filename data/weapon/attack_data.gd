@@ -2,13 +2,25 @@ class_name AttackData
 extends Resource
 
 enum AimMode { FACING, CURSOR_DIRECTION, CURSON_POSITION }
+enum DeliveryType { MELEE, PROJECTILE, AREA }
 
 # Phần prefix của tên animation
 @export var animation_prefix: String = "attack_dagger"
+## HUD artwork for this skill; secondary attacks supply the player's weapon skill icon.
+@export var skill_icon: Texture2D
+@export var display_name: String = ""
+@export_multiline var description: String = ""
 # scene thực hiện đòn đnahs
 @export var attack_scene: PackedScene
 @export var aim_mode: AimMode = AimMode.FACING
-@export_range(1, 1000, 1) var damage_hp: int = 1
+## Describes this attack, independently of the owning weapon's category.
+@export var delivery_type: DeliveryType = DeliveryType.MELEE
+## Holding prepares projectile startup; early release completes the remaining startup.
+@export var release_to_fire: bool = true
+## Fit anticipation/strike/recovery poses to their actual forged phase durations.
+@export var phase_driven_animation: bool = false
+@export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
+@export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 ### Cấu hình mốc thời gain của đòn đánh
 # Chuẩn bị ra đòn -> không dmg
 @export_range(0.0, 10.0, 0.001) var windup_seconds: float = 0.125
@@ -24,12 +36,31 @@ enum AimMode { FACING, CURSOR_DIRECTION, CURSON_POSITION }
 @export var ammo_id: StringName = &""
 @export_range(0, 100, 1) var ammo_cost: int = 0
 
+@export_group("Hold Charge")
+@export var hold_to_charge: bool = false
+@export_range(0.1, 5.0, 0.05) var charge_seconds: float = 1.8
+@export_range(1, 12, 1) var max_projectiles: int = 6
+## Legacy serialized field. Forged windup_seconds now determines held startup.
+@export_storage var tap_seconds: float = 0.12
+
+@export_group("Melee Combo")
+@export var combo_steps: Array[MeleeComboStep] = []
+@export_range(0.0, 1.0, 0.01) var combo_reset_seconds: float = 0.22
+@export_range(0.01, 1.0, 0.01) var input_buffer_seconds: float = 0.32
+
 
 func is_valid() -> bool:
+	for step in combo_steps:
+		if step == null or not step.is_valid():
+			return false
 	return (
 		attack_scene != null
+		and delivery_type in DeliveryType.values()
 		and not animation_prefix.is_empty()
-		and damage_hp > 0
+		and is_finite(damage_hp)
+		and damage_hp > 0.0
+		and is_finite(stagger_multiplier)
+		and stagger_multiplier >= 0.0
 		and windup_seconds >= 0.0
 		and active_seconds > 0.0
 		and recovery_seconds >= 0.0
@@ -39,4 +70,8 @@ func is_valid() -> bool:
 		and ammo_cost >= 0
 		and (ammo_cost == 0 or not ammo_id.is_empty())
 		and not (stamina_cost > 0.0 and ammo_cost > 0)
+		and (
+			not hold_to_charge
+			or (charge_seconds > 0.0 and max_projectiles > 0 and stamina_cost == 0.0)
+		)
 	)

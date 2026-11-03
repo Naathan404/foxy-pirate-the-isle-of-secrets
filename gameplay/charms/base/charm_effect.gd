@@ -32,11 +32,11 @@ func cancel_active() -> void:
 	pass
 
 
-func on_damage_dealt(_damage: DamageContext, _target: Node, _applied_hp: int) -> void:
+func on_damage_dealt(_damage: DamageContext, _target: Node, _applied_hp: float) -> void:
 	pass
 
 
-func on_damage_received(_damage: DamageContext, _applied_hp: int) -> void:
+func on_damage_received(_damage: DamageContext, _applied_hp: float) -> void:
 	pass
 
 
@@ -52,15 +52,15 @@ func on_dash_finished(_interrupted: bool) -> void:
 	pass
 
 
-func modify_outgoing_damage(amount_hp: int, _damage: DamageContext) -> int:
+func modify_outgoing_damage(amount_hp: float, _damage: DamageContext) -> float:
 	return amount_hp
 
 
-func modify_attack_damage(amount_hp: int, _attack: AttackContext) -> int:
+func modify_attack_damage(amount_hp: float, _attack: AttackContext) -> float:
 	return amount_hp
 
 
-func modify_incoming_damage(amount_hp: int, _damage: DamageContext) -> int:
+func modify_incoming_damage(amount_hp: float, _damage: DamageContext) -> float:
 	return amount_hp
 
 

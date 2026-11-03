@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://cmpdo81fwpbrg"]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"doomsday_edge"
+display_name = "Doomsday Edge"
+description = "Damage +75%, Attack Speed -40%, Startup +20%, Knockback +40%, Stagger +40%"
+acquisition_source = &"blacksmith"
+damage_multiplier = 1.75
+stagger_multiplier = 1.4
+attack_speed_multiplier = 0.6
+windup_multiplier = 1.2
+knockback_multiplier = 1.4
+drop_weight = 1.0

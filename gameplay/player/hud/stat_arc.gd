@@ -16,7 +16,6 @@ extends Node
 @export_group("Optional Indicators")
 @export var value_label: Label
 @export var readiness_icon: TextureRect
-@export var readiness_icon_2: TextureRect
 @export var unavailable_tint: Color = Color(0.55, 0.55, 0.55)
 
 var _was_full: bool = false
@@ -35,31 +34,27 @@ func _ready() -> void:
 func set_stat(current: float, maximum: float) -> void:
 	var degrees := maximum_arc * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
 	for bar: TextureProgressBar in [capacity, fill, shadow]:
+		if stat_name == "HP":
+			bar.step = 0.0
 		bar.radial_initial_angle = initial_angle
 		bar.radial_fill_degrees = degrees
-		bar.max_value = maxf(maximum, 1.0)
+		bar.max_value = maxf(maximum, 0.01)
 	capacity.value = maxf(maximum, 0.0)
 	shadow.value = maxf(maximum, 0.0)
 	fill_effect.set_target(current)
 	var text := "%s: %d / %d" % [stat_name, floori(current), floori(maximum)]
+	if stat_name == "HP":
+		text = "%s: %s / %s" % [stat_name, String.num(current, 2), String.num(maximum, 2)]
 	capacity.set_stat_tooltip(text)
 	if is_instance_valid(value_label):
 		value_label.text = text
 	if is_instance_valid(readiness_icon):
 		var full := maximum > 0.0 and current >= maximum
 		readiness_icon.modulate = Color.WHITE if full else unavailable_tint
-
-		if is_instance_valid(readiness_icon_2):
-			readiness_icon_2.modulate = Color.WHITE
-
 		if full and not _was_full:
 			_shake_readiness_shake()
-			if is_instance_valid(readiness_icon_2):
-				readiness_icon_2.modulate = Color.RED
 		elif not full:
 			_stop_readiness_shake()
-			if is_instance_valid(readiness_icon_2):
-				readiness_icon_2.modulate = Color.WHITE
 
 		_was_full = full
 

@@ -84,6 +84,22 @@ func get_water_height() -> float:
 	return water.global_position.y if is_instance_valid(water) else low_height
 
 
+## Negative infinity means this position lies outside the water mesh footprint.
+func get_depth_at(world_position: Vector3) -> float:
+	var surface := water as MeshInstance3D
+	if is_instance_valid(surface) and surface.mesh != null:
+		var point := surface.to_local(world_position)
+		var bounds := surface.get_aabb()
+		if (
+			point.x < bounds.position.x
+			or point.x > bounds.end.x
+			or point.z < bounds.position.z
+			or point.z > bounds.end.z
+		):
+			return -INF
+	return get_water_height() - world_position.y
+
+
 func get_phase_time_remaining() -> float:
 	return maxf(0.0, _phase_duration() - _elapsed)
 

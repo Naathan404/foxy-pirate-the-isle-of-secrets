@@ -14,6 +14,26 @@ var unavailable_seconds: float = 0.0
 var cooldowns: Dictionary[StringName, float] = {}
 
 
+func get_chaos_gain() -> float:
+	if definition == null:
+		return 0.0
+	var multiplier: float = forge.chaos_gain_multiplier if forge != null else 1.0
+	var amount: float = definition.chaos_per_hit * multiplier
+	return amount if is_finite(amount) and amount >= 0.0 else 0.0
+
+
+## Replaces the single forge without stacking or mutating shared WeaponData.
+## The caller owns when reforging is allowed and any blacksmith payment/UI.
+func reforge(pool: WeaponForgePool, random: RandomNumberGenerator) -> bool:
+	if definition == null or pool == null:
+		return false
+	var rolled := pool.roll(random)
+	if rolled == null:
+		return false
+	forge = rolled
+	return true
+
+
 # Gọi advance cho tất cả vũ khí, vũ khí không được trang bị thời gian vẫn được giảm
 func advance(delta: float) -> void:
 	unavailable_seconds = maxf(0.0, unavailable_seconds - delta)

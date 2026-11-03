@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3 uid="uid://cgq8e3x122qh2"]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"cursed_scrap"
+display_name = "Cursed Scrap"
+description = "Damage -15%, Attack Speed -15%, Critical Rate -5 điểm %"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 0.0
+damage_multiplier = 0.85
+attack_speed_multiplier = 0.85
+critical_rate_bonus = -0.05

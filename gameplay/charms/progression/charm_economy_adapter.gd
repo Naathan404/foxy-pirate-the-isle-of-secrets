@@ -1,6 +1,6 @@
 class_name CharmEconomyAdapter
 extends RefCounted
-## Interface tối thiểu cho economy thật; project hiện chưa có wallet/save service.
+## Purchase interface; a concrete adapter must delegate to the shared GoldWallet.
 
 
 func can_afford(_amount: int) -> bool:

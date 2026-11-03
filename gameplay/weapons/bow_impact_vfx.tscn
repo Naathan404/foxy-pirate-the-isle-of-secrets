@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bi8syvayco804"]
+
+[ext_resource type="Script" uid="uid://c0ns3d164sepu" path="res://gameplay/weapons/bow_charge_vfx.gd" id="1_vfx"]
+
+[node name="BowImpactVFX" type="Node3D" unique_id=549478905]
+script = ExtResource("1_vfx")
+effect_color = Color(0.2, 0.75, 1, 0.85)
+core_color = Color(1, 0.88, 0.58, 1)
+burst_duration = 0.32
+presentation = 1
+effect_brightness = 2.0
+ring_count = 5
+ring_radius = 0.5
+ring_base_scale = 0.3
+ring_release_stagger = 0.018
+spark_streak_length = 3.5
+core_burst_size = 2.2

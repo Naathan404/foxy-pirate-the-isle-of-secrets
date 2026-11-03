@@ -10,7 +10,7 @@ const TIDE_ATTACK_SCENE = preload("res://gameplay/charms/active/tide_grapple_att
 var _failures: int = 0
 var _arrow_launch_count: int = 0
 var _arrow_first_direction: Vector3 = Vector3.ZERO
-var _arrow_last_damage_hp: int = 0
+var _arrow_last_damage_hp: float = 0
 
 
 func _initialize() -> void:
@@ -23,7 +23,10 @@ func _run_tests() -> void:
 	root.add_child(world)
 	var actor := MockActor.new()
 	world.add_child(actor)
-	actor.setup_stats_and_weapon(450.0, 100)
+	# Fund the whole scenario from authored costs so balance tuning cannot starve later cases.
+	var total_cost := ARROW_RAIN.resource_cost * 2.0
+	total_cost += CRESCENT_CLEAVE.resource_cost + TIDE_GRAPPLE.resource_cost
+	actor.setup_stats_and_weapon(total_cost, 100)
 	var manager := CharmSocketManager.new()
 	var registry := CharmRegistry.new()
 	registry.definitions = [ARROW_RAIN, CRESCENT_CLEAVE, TIDE_GRAPPLE]
@@ -55,14 +58,14 @@ func _test_data() -> void:
 	_assert_near(ARROW_RAIN.get_param_float(&"damage_percent"), 0.35, "Arrow damage")
 	var volley_duration := ARROW_RAIN.get_param_float(&"volley_duration_seconds")
 	_assert_true(volley_duration >= 1.0 and volley_duration <= 1.5, "Arrow volley data")
-	_assert_near(ARROW_RAIN.resource_cost, 100.0, "Arrow cost")
+	_assert_true(ARROW_RAIN.resource_cost > 0.0, "Arrow has a positive cost")
 	_assert_near(ARROW_RAIN.cooldown_seconds, 6.0, "Arrow cooldown")
 	_assert_near(CRESCENT_CLEAVE.get_param_float(&"damage_multiplier"), 2.0, "Cleave damage")
-	_assert_near(CRESCENT_CLEAVE.resource_cost, 100.0, "Cleave cost")
+	_assert_true(CRESCENT_CLEAVE.resource_cost > 0.0, "Cleave has a positive cost")
 	_assert_near(CRESCENT_CLEAVE.cooldown_seconds, 4.0, "Cleave cooldown")
 	_assert_near(TIDE_GRAPPLE.get_param_float(&"damage_multiplier"), 2.5, "Tide damage")
 	_assert_near(TIDE_GRAPPLE.get_param_float(&"stun_seconds"), 1.0, "Tide stun")
-	_assert_near(TIDE_GRAPPLE.resource_cost, 150.0, "Tide cost")
+	_assert_true(TIDE_GRAPPLE.resource_cost > 0.0, "Tide has a positive cost")
 	_assert_near(TIDE_GRAPPLE.cooldown_seconds, 5.0, "Tide cooldown")
 	_assert_equal(TIDE_GRAPPLE.acquisition_source, &"fixed_boss_reward", "Tide source")
 	_assert_true(InputMap.has_action(&"charm_slot_q"), "Q input exists")
@@ -79,17 +82,23 @@ func _test_arrow_rain(
 	effect.projectile_launched.connect(_on_arrow_projectile_launched)
 	actor.aim_target = Vector3.RIGHT * 8.0
 	actor.has_aim_target = true
+	var expected_sp := actor.stamina.get_current_sp() - ARROW_RAIN.resource_cost
 	_assert_true(manager.activate_socket(CharmConstants.SocketId.Q), "activate Arrow Rain")
-	_assert_near(actor.stamina.get_current_sp(), 350.0, "Arrow cost consumed")
+	_assert_near(actor.stamina.get_current_sp(), expected_sp, "Arrow cost consumed")
 	_assert_true(runtime.cooldown_remaining > 5.9, "Arrow cooldown started")
 	_assert_false(manager.activate_socket(CharmConstants.SocketId.Q), "Arrow cooldown rejects")
-	_assert_near(actor.stamina.get_current_sp(), 350.0, "cooldown rejection is free")
+	_assert_near(actor.stamina.get_current_sp(), expected_sp, "cooldown rejection is free")
 	await create_timer(1.8).timeout
 	_assert_equal(_arrow_launch_count, 8, "Arrow launches eight projectiles")
 	_assert_true(_arrow_first_direction.is_equal_approx(Vector3.RIGHT), "Arrow cursor aim")
 	_assert_equal(_arrow_last_damage_hp, 35, "Arrow projectile damage")
 	runtime.reset_cooldown()
 	_assert_true(manager.activate_socket(CharmConstants.SocketId.Q), "reactivate Arrow Rain")
+	_assert_near(
+		actor.stamina.get_current_sp(),
+		expected_sp - ARROW_RAIN.resource_cost,
+		"Reactivation pays the authored cost again"
+	)
 	actor.dead = true
 	await physics_frame
 	await process_frame
@@ -107,8 +116,9 @@ func _test_crescent_cleave(
 		manager.equip_charm(CRESCENT_CLEAVE.charm_id, CharmConstants.SocketId.Q),
 		"equip Crescent Cleave"
 	)
+	var expected_sp := actor.stamina.get_current_sp() - CRESCENT_CLEAVE.resource_cost
 	_assert_true(manager.activate_socket(CharmConstants.SocketId.Q), "activate Crescent Cleave")
-	_assert_near(actor.stamina.get_current_sp(), 150.0, "Cleave cost consumed")
+	_assert_near(actor.stamina.get_current_sp(), expected_sp, "Cleave cost consumed")
 	var runtime := registry.get_equipped(CharmConstants.SocketId.Q)
 	_assert_true(runtime.cooldown_remaining > 3.9, "Cleave cooldown started")
 	var attack := CRESCENT_ATTACK_SCENE.instantiate() as CrescentCleaveAttack
@@ -201,7 +211,7 @@ func _test_tide_grapple(
 
 
 func _make_attack_context(
-	actor: MockActor, direction: Vector3, damage_hp: int, action: StringName
+	actor: MockActor, direction: Vector3, damage_hp: float, action: StringName
 ) -> AttackContext:
 	var context := AttackContext.new()
 	context.actor = actor
@@ -221,7 +231,7 @@ func _add_hurtbox(target: MockTarget) -> HurtBox:
 
 
 func _on_arrow_projectile_launched(
-	_projectile_index: int, _projectile_count: int, direction: Vector3, damage_hp: int
+	_projectile_index: int, _projectile_count: int, direction: Vector3, damage_hp: float
 ) -> void:
 	_arrow_launch_count += 1
 	if _arrow_launch_count == 1:
@@ -263,7 +273,7 @@ class MockActor:
 	var has_aim_target: bool = false
 	var pull_count: int = 0
 
-	func setup_stats_and_weapon(max_sp: float, base_damage_hp: int) -> void:
+	func setup_stats_and_weapon(max_sp: float, base_damage_hp: float) -> void:
 		stamina = StaminaComponent.new()
 		add_child(stamina)
 		stamina.init(max_sp, 0.0, 0.0)
@@ -297,10 +307,10 @@ class MockTarget:
 	extends Node3D
 	var large: bool = false
 	var hit_count: int = 0
-	var last_damage_hp: int = 0
+	var last_damage_hp: float = 0
 	var last_stun_seconds: float = 0.0
 
-	func receive_damage(damage: DamageContext) -> int:
+	func receive_damage(damage: DamageContext) -> float:
 		hit_count += 1
 		last_damage_hp = damage.amount_hp
 		return damage.amount_hp

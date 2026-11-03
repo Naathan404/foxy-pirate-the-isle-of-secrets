@@ -21,6 +21,6 @@ func _exit() -> void:
 	super()
 
 
-func _on_enemy_damaged(_applied_hp: int) -> void:
+func _on_enemy_damaged(_applied_hp: float) -> void:
 	if enemy.hp.is_alive():
 		_change_axis_after_hit = true

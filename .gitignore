@@ -5,3 +5,4 @@ addons/*
 !addons/dialogic/
 .cache_local/
 __pycache__/
+/bin/windows/~*

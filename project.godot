@@ -23,11 +23,20 @@ GameManager="*res://core/autoload/game_manager.gd"
 Dialogic="*uid://ds2q0uclmolvu"
 AudioManager="*res://core/autoload/audio_manager.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+<<<<<<<HEAD_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [dialogic]
 
-directories/dch_directory={}
-directories/dtl_directory={}
+directories/dch_directory={
+"mushroom": "res://dialog/npcs/mushroom/mushroom.dch",
+"silas": "res://dialog/npcs/silas/silas.dch"
+}
+directories/dtl_directory={
+"farewell": "res://dialog/npcs/silas/timelines/farewell.dtl",
+"first_meeting": "res://dialog/npcs/silas/timelines/first_meeting.dtl",
+"greeting": "res://dialog/npcs/mushroom/timelines/greeting.dtl",
+"timelines/greeting": "res://dialog/npcs/silas/timelines/greeting.dtl"
+}
 layout/style_directory={}
 
 [display]

@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dxdng1vnsft1d"]
+
+[ext_resource type="Script" uid="uid://mfsoihamj8bg" path="res://addons/spine_bridge/scripts/spine_sprite_3d.gd" id="1_lysge"]
+[ext_resource type="Script" uid="uid://nw7n8s8enevc" path="res://assets/spine/compat/test.gd" id="1_uqc7g"]
+[ext_resource type="SpineSkeletonDataResource" uid="uid://de68au0hxyqo6" path="res://assets/spine/compat/foxy_skeleton.tres" id="2_uqc7g"]
+
+[node name="Node3D" type="Node3D" unique_id=1314171285]
+script = ExtResource("1_uqc7g")
+
+[node name="Foxy" type="Node3D" parent="." unique_id=903761622]
+script = ExtResource("1_lysge")
+skeleton_data_res = ExtResource("2_uqc7g")
+preview_skin = "Default"
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1177234666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -7, 20)
+projection = 1
+current = true
+size = 11.0

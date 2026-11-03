@@ -1,9 +1,18 @@
 [gd_scene format=3 uid="uid://bc7ep6qb7uugy"]
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_k7kha"]
-[ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="2_q7t1m"]
+[ext_resource type="PackedScene" uid="uid://bo7ce6vvl81jr" path="res://world/hub/objects/sea_water.tscn" id="2_q7t1m"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="3_m4gbr"]
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="4_tide"]
+[ext_resource type="Script" uid="uid://y21pp04evlll" path="res://world/gimmick/coral_valley/drowning_area.gd" id="5_drowning"]
+[ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="6_itkpp"]
+[ext_resource type="PackedScene" uid="uid://djxjvu6e00r3h" path="res://world/gimmick/coral_valley/crate_reset_lever.tscn" id="7_reset"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="8_4g5uf"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="9_numxk"]
+[ext_resource type="PackedScene" path="res://world/gimmick/coral_valley/tidal_spawner.tscn" id="12_cg0uc"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_water_volume"]
+size = Vector3(200, 128, 200)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_q7t1m"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -31,7 +40,19 @@ data = {
 metadata/_editor_floor_ = Vector3(0, 2, 0)
 
 [node name="SeaWater" parent="." unique_id=1691806370 instance=ExtResource("2_q7t1m")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.462, 7.5, 5.61)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.47139, 1.8067789, 5.609998)
+
+[node name="DrowningArea2" type="Area3D" parent="SeaWater" unique_id=1230921898 node_paths=PackedStringArray("water", "volume")]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("5_drowning")
+water = NodePath("..")
+volume = NodePath("CollisionShape3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeaWater/DrowningArea2" unique_id=699375717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -64, 0)
+shape = SubResource("BoxShape3D_water_volume")
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("3_m4gbr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.520647, 10.954132, 0)
@@ -40,10 +61,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.520647, 10.954132, 0)
 script = ExtResource("4_tide")
 water = NodePath("../SeaWater")
 low_height = 1.5
-high_height = 7.5
-low_duration = 5.0
-rise_duration = 3.0
-fall_duration = 3.0
+high_height = 6.5
+low_duration = 15.0
+rise_duration = 6.0
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=1554009451]
 transform = Transform3D(0.26306993, 0.78078187, 0.56672233, 0.3144715, -0.624727, 0.71471953, 0.9120867, -0.009803204, -0.40988043, 10.266136, 23.039204, -39.183483)
@@ -51,3 +71,50 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1858254158]
 environment = SubResource("Environment_m4gbr")
+
+[node name="Crate" parent="." unique_id=70792245 node_paths=PackedStringArray("tide_controller") instance=ExtResource("6_itkpp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.122001, -2.5003834)
+tide_controller = NodePath("../TideController")
+float_draft = 0.4
+
+[node name="CrateResetLever" parent="." unique_id=1308475802 node_paths=PackedStringArray("crates") instance=ExtResource("7_reset")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 8, 0)
+crates = [NodePath("../Crate")]
+
+[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("8_4g5uf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.313423, 8.981615, 13.534039)
+trigger_id = &"coral_valley_gate_b"
+destination_scene = "uid://yyr7vg0mg0q4"
+destination_trigger_id = &"hub_gate_a"
+
+[node name="Starfish" parent="." unique_id=1294052233 instance=ExtResource("9_numxk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.481876, 8.773853, 14.49264)
+unreachable_target_ignore_duration = 2.0
+
+[node name="TidalSpawner" parent="." unique_id=349427638 node_paths=PackedStringArray("tide_controller", "spawn_points") instance=ExtResource("12_cg0uc")]
+tide_controller = NodePath("../TideController")
+spawn_points = [NodePath("Marker3D"), NodePath("Marker3D2"), NodePath("Marker3D3"), NodePath("Marker3D4")]
+
+[node name="Marker3D" type="Marker3D" parent="TidalSpawner" unique_id=342776012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9929533, 3.4354277, -13.644463)
+
+[node name="Marker3D2" type="Marker3D" parent="TidalSpawner" unique_id=201636323]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.041696, 3.4354277, -13.644463)
+
+[node name="Marker3D5" type="Marker3D" parent="TidalSpawner" unique_id=1503510531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9929533, 3.4354277, -4.6167126)
+
+[node name="Marker3D6" type="Marker3D" parent="TidalSpawner" unique_id=1761649167]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.041696, 3.4354277, -4.6167126)
+
+[node name="Marker3D3" type="Marker3D" parent="TidalSpawner" unique_id=333161112]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.59105, 3.4354277, 2.1030045)
+
+[node name="Marker3D4" type="Marker3D" parent="TidalSpawner" unique_id=1372412165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.041696, 3.4354277, 2.2566528)
+
+[node name="Marker3D7" type="Marker3D" parent="TidalSpawner" unique_id=218230322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.59105, 3.4354277, 9.797603)
+
+[node name="Marker3D8" type="Marker3D" parent="TidalSpawner" unique_id=1280355078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.041696, 3.4354277, 9.951251)

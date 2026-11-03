@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://c5gbfpj2scc84"]
+
+[ext_resource type="PackedScene" uid="uid://du6rjries5kjq" path="res://gameplay/combat/critical_damage_popup.tscn" id="1"]
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="2_nyt4n"]
+
+[node name="NormalDamagePopup" unique_id=1648140330 instance=ExtResource("1")]
+texture_filter = 0
+modulate = Color(1, 0.93, 0.78, 1)
+outline_modulate = Color(0.18, 0.11, 0.08, 1)
+font = ExtResource("2_nyt4n")
+font_size = 100
+outline_size = 12
+rise_units = 0.55
+lifetime = 0.5
+initial_scale = 0.8
+peak_scale = 1.05
+spawn_jitter = 0.12

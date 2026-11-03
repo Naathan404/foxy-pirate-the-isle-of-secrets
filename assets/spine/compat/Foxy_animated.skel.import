@@ -1,0 +1,13 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://cjyen8sk8fdyb"
+valid=false
+
+[deps]
+
+source_file="res://assets/spine/compat/Foxy_animated.skel"
+
+[params]
+

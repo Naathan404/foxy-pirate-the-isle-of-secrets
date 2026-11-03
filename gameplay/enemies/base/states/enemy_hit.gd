@@ -9,15 +9,19 @@ var _recovery_remaining: float = 0.0
 func _enter() -> void:
 	timer = enemy.data.hit_duration if enemy.data != null else 0.0
 	timer = maxf(timer, enemy.pending_charm_stun_seconds)
+	if enemy.pending_charm_stun_seconds > 0.0 and is_instance_valid(enemy.visual):
+		enemy.visual.play_hit_feedback()
 	enemy.pending_charm_stun_seconds = 0.0
 	_is_recovering = false
 	_recovery_remaining = enemy.data.hit_recovery_duration if enemy.data != null else 0.0
 	enemy.end_active_attack()
 	enemy._stop_contact_damage()
 	enemy.play_directional_animation(&"hit", true)
-	if is_instance_valid(enemy.visual):
-		enemy.visual.play_hit_feedback()
 	_apply_recoil()
+
+
+func _exit() -> void:
+	enemy._on_hit_recovery_finished()
 
 
 func _update(delta: float) -> void:
@@ -41,9 +45,4 @@ func _begin_recovery() -> void:
 
 
 func _apply_recoil() -> void:
-	if enemy.data == null:
-		return
-	var direction := enemy.pending_hit_direction
-	if direction.is_zero_approx():
-		direction = -enemy.last_facing_direction
-	enemy._set_horizontal_velocity(direction.normalized() * enemy.data.hit_knockback_speed)
+	enemy._set_horizontal_velocity(enemy.consume_hit_knockback_velocity())

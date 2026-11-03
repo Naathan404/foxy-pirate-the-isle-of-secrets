@@ -1,0 +1,17 @@
+# Fixed CI suite. Change this list only when the user explicitly requests it.
+gameplay/charms/active/charm_active_test.gd
+gameplay/charms/passive/charm_event_passive_test.gd
+gameplay/charms/passive/charm_passive_test.gd
+gameplay/charms/progression/charm_progression_test.gd
+test/attack_step_test.gd
+test/combat_screen_flash_test.gd
+test/elite_enemy_test.gd
+test/equipment_slot_feedback_test.gd
+test/float_combat_test.gd
+test/item_data_test.gd
+test/mouse_attack_test.gd
+test/normal_damage_popup_test.gd
+test/player_state_test.gd
+test/scene_transition_test.gd
+test/spine_idle_preview_test.gd
+gameplay/merchant/silas_merchant_test.gd

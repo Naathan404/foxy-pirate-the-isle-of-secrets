@@ -3,6 +3,10 @@ extends Node
 
 const FLASH_SHADER: Shader = preload("res://gameplay/weapons/dagger_hit_flash.gdshader")
 
+@export_group("Hit Flash")
+@export_range(0.0, 0.3, 0.005) var flash_hold_seconds: float = 0.035
+@export_range(0.01, 0.3, 0.005) var flash_fade_seconds: float = 0.09
+
 var _sprite: Sprite3D
 var _rest_position: Vector3
 var _pose_tween: Tween
@@ -17,7 +21,7 @@ func _ready() -> void:
 	set_process(false)
 
 
-func kick(direction: Vector3, distance: float, flash: bool = false) -> void:
+func kick(direction: Vector3, distance: float, flash: bool = false, strength: float = 1.0) -> void:
 	if _pose_tween != null and _pose_tween.is_valid():
 		_pose_tween.kill()
 	var parent := _sprite.get_parent() as Node3D
@@ -27,10 +31,10 @@ func kick(direction: Vector3, distance: float, flash: bool = false) -> void:
 	_pose_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_pose_tween.tween_property(_sprite, "position", _rest_position, 0.18)
 	if flash:
-		_play_flash()
+		_play_flash(strength)
 
 
-func _play_flash() -> void:
+func _play_flash(strength: float) -> void:
 	if _flash_tween != null and _flash_tween.is_valid():
 		_flash_tween.kill()
 	if _flash_material == null:
@@ -41,11 +45,13 @@ func _play_flash() -> void:
 		_previous_overlay = _sprite.material_overlay
 	_sprite.material_overlay = _flash_material
 	_flash_material.set_shader_parameter("sprite_texture", _sprite.texture)
-	_flash_material.set_shader_parameter("strength", 1.0)
+	_flash_material.set_shader_parameter("strength", clampf(strength, 0.0, 1.0))
 	set_process(true)
 	_flash_tween = create_tween().set_ignore_time_scale(true)
-	_flash_tween.tween_interval(0.035)
-	_flash_tween.tween_property(_flash_material, "shader_parameter/strength", 0.0, 0.09)
+	_flash_tween.tween_interval(flash_hold_seconds * strength)
+	_flash_tween.tween_property(
+		_flash_material, "shader_parameter/strength", 0.0, flash_fade_seconds * strength
+	)
 	_flash_tween.tween_callback(_restore_overlay)
 
 

@@ -101,8 +101,9 @@ Xem thêm [hướng dẫn kiểm tra](docs/testing.md). Không commit thư mục
 | --- | --- |
 | Hướng dẫn chung | [Development guideline](docs/development_guideline.md) |
 | Tổ chức code và scene | [Kiến trúc](docs/architecture.md) |
-| Luồng Player và state machine hiện tại | [Player business logic](docs/player_business_logic.md) |
-| Trang bị và luồng chiến đấu của vũ khí | [Weapon business logic](docs/weapon_business_logic.md) |
+| Luồng Player và state machine hiện tại | [Player business logic](docs/business-logic/player_business_logic.md) |
+| NPC, hội thoại và state tuần tra | [NPC business logic](docs/business-logic/npc_business_logic.md) |
+| Trang bị và luồng chiến đấu của vũ khí | [Weapon business logic](docs/business-logic/weapon_business_logic.md) |
 | Quy tắc đặt tên và định dạng | [Convention](docs/conventions.md) |
 | Nhánh, commit và PR | [Git workflow](docs/git_workflow.md) |
 | Lint và test | [Testing](docs/testing.md) |

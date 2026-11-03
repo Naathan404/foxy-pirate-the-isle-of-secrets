@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://eewwkdmv48hy"]
+
+[ext_resource type="Script" uid="uid://b757h2mooxufd" path="res://gameplay/economy/gold_pickup.gd" id="1_pickup"]
+[ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_4jcvl"]
+[ext_resource type="PackedScene" uid="uid://cedobrx1ymh47" path="res://gameplay/inventory/pickup_scatter.tscn" id="3_scatter"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/player_attraction.tscn" id="4_attraction"]
+
+[sub_resource type="SphereShape3D" id="Shape_pickup"]
+radius = 0.8
+
+[node name="GoldPickup" type="Area3D" unique_id=1699573106]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_pickup")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=231233658]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78836787, 0)
+pixel_size = 0.0012
+billboard = 1
+texture_filter = 0
+texture = ExtResource("2_4jcvl")
+
+[node name="Value" type="Label3D" parent="." unique_id=923848023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+visible = false
+pixel_size = 0.008
+billboard = 1
+modulate = Color(1, 0.86, 0.4, 1)
+outline_modulate = Color(0.15, 0.07, 0.025, 1)
+text = "1 G"
+font_size = 24
+outline_size = 5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1513063423]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("Shape_pickup")
+
+[node name="Scatter" parent="." unique_id=2061619765 node_paths=PackedStringArray("visual") instance=ExtResource("3_scatter")]
+visual = NodePath("../Sprite3D")
+trail_color = Color(1, 0.68, 0.22, 1)
+trail_width = 0.14
+tumble_strength = 0.65
+
+[node name="Attraction" parent="." unique_id=488274804 node_paths=PackedStringArray("detector", "moving_root", "anchor", "detection_shape") instance=ExtResource("4_attraction")]
+detector = NodePath("..")
+moving_root = NodePath("..")
+anchor = NodePath("../Sprite3D")
+detection_shape = NodePath("../CollisionShape3D")

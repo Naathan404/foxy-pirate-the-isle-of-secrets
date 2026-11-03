@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dxf2vivfvosdy"
+path="res://.godot/imported/Foxy_animated.atlas-4db5607aaf65b876eb720508a916d9dd.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/foxy/Foxy_animated.atlas"
+dest_files=["res://.godot/imported/Foxy_animated.atlas-4db5607aaf65b876eb720508a916d9dd.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

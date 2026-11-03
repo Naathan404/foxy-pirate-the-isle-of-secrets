@@ -1,0 +1,90 @@
+
+Foxy_animated.png
+size: 769,1035
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Body
+  rotate: true
+  xy: 612, 12
+  size: 219, 155
+  orig: 219, 155
+  offset: 0, 0
+  index: -1
+Head
+  rotate: false
+  xy: 2, 605
+  size: 553, 428
+  orig: 553, 428
+  offset: 0, 0
+  index: -1
+Layer 34
+  rotate: true
+  xy: 376, 233
+  size: 370, 167
+  orig: 374, 170
+  offset: 3, 1
+  index: -1
+Layer 5
+  rotate: true
+  xy: 557, 334
+  size: 344, 209
+  orig: 347, 211
+  offset: 1, 1
+  index: -1
+Layer 5 copy
+  rotate: true
+  xy: 557, 680
+  size: 353, 209
+  orig: 356, 211
+  offset: 1, 1
+  index: -1
+Left Ear
+  rotate: false
+  xy: 2, 357
+  size: 194, 246
+  orig: 194, 246
+  offset: 0, 0
+  index: -1
+LeftHand
+  rotate: false
+  xy: 191, 86
+  size: 183, 246
+  orig: 183, 246
+  offset: 0, 0
+  index: -1
+Leg
+  rotate: true
+  xy: 376, 2
+  size: 229, 234
+  orig: 229, 234
+  offset: 0, 0
+  index: -1
+P-ring
+  rotate: false
+  xy: 2, 52
+  size: 218, 29
+  orig: 222, 33
+  offset: 3, 2
+  index: -1
+Right Ear
+  rotate: false
+  xy: 2, 83
+  size: 187, 249
+  orig: 187, 249
+  offset: 0, 0
+  index: -1
+RightHand
+  rotate: false
+  xy: 198, 364
+  size: 167, 239
+  orig: 167, 239
+  offset: 0, 0
+  index: -1
+ring
+  rotate: false
+  xy: 545, 233
+  size: 105, 99
+  orig: 108, 103
+  offset: 1, 1
+  index: -1

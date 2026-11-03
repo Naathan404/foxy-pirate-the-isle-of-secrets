@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StaminaPotion" format=3 uid="uid://dnigjwvge146m"]
+
+[ext_resource type="Texture2D" uid="uid://dbtc4nydo0n4" path="res://assets/sprites/items/potions/Stamina_Potion.png" id="1_c7dyq"]
+[ext_resource type="Script" uid="uid://doeun5epnj8ch" path="res://data/items/consumables/stamina_potion.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+restore_amount = 600.0
+potion_kind = 1
+item_id = "stamina_potion"
+display_name = "Stamina Potion"
+icon = ExtResource("1_c7dyq")
+description = "Restores 600 SP."
+max_stack = 10
+type = 2

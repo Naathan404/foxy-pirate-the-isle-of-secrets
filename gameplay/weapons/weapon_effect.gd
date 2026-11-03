@@ -17,12 +17,12 @@ func on_unequip() -> void:
 
 
 # xử lý trước khi trừ máu
-func modify_incoming_damage(amount_hp: int, _damage: DamageContext) -> int:
+func modify_incoming_damage(amount_hp: float, _damage: DamageContext) -> float:
 	return amount_hp
 
 
 # lượng máu target thật sự mất
-func on_damage_dealt(_damage: DamageContext, _target: Node, _applied_hp: int) -> void:
+func on_damage_dealt(_damage: DamageContext, _target: Node, _applied_hp: float) -> void:
 	pass
 
 

@@ -8,7 +8,7 @@ var _applied: bool = false
 func setup(owner_actor: Node3D, charm_definition: CharmData, charm_runtime: CharmRuntime) -> bool:
 	if not super.setup(owner_actor, charm_definition, charm_runtime):
 		return false
-	var max_hp_flat := definition.get_param_int(&"max_hp_flat")
+	var max_hp_flat := definition.get_param_float(&"max_hp_flat")
 	var max_sp_flat := definition.get_param_float(&"max_sp_flat")
 	var move_speed_flat := definition.get_param_float(&"move_speed_flat")
 	var move_speed_multiplier := definition.get_param_float(&"move_speed_multiplier", 1.0)
@@ -30,7 +30,7 @@ func on_equipped() -> void:
 	var source := definition.charm_id
 	var health := _get_health_component()
 	var stamina := _get_stamina_component()
-	var max_hp_flat := definition.get_param_int(&"max_hp_flat")
+	var max_hp_flat := definition.get_param_float(&"max_hp_flat")
 	var max_sp_flat := definition.get_param_float(&"max_sp_flat")
 	if max_hp_flat != 0:
 		health.set_max_hp_modifier(source, max_hp_flat)

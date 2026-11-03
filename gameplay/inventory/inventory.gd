@@ -3,11 +3,14 @@ extends Node
 
 ## UI có thể lắng nghe signal này để cập nhật sau khi túi thay đổi
 signal changed
+signal potion_capacity_changed(kind: Potion.Kind, new_capacity: int)
 
 @export var starting_items: Array[InventorySlot] = []
 
 @export_range(20, 40, 1) var capacity: int = 20
+@export_range(0, 100000, 1) var default_potion_capacity: int = 3
 var slots: Array[InventorySlot] = []
+var _potion_capacities: Dictionary[Potion.Kind, int] = {}
 
 
 func _ready() -> void:
@@ -32,7 +35,10 @@ func add_item(item: BaseItem, amount: int) -> int:
 	if item == null or item.max_stack < 1:
 		return amount
 
-	var remaining: int = amount
+	var accepted: int = mini(amount, get_available_space(item))
+	if accepted == 0:
+		return amount
+	var remaining: int = accepted
 
 	# tìm slot đã chứa cùng item
 	for slot in slots:
@@ -46,7 +52,7 @@ func add_item(item: BaseItem, amount: int) -> int:
 
 			if remaining == 0:
 				changed.emit()
-				return 0
+				return amount - accepted
 
 	# tìm slot trống để thêm
 	for slot in slots:
@@ -60,11 +66,11 @@ func add_item(item: BaseItem, amount: int) -> int:
 
 		if remaining == 0:
 			changed.emit()
-			return 0
+			return amount - accepted
 
-	if remaining < amount:
+	if remaining < accepted:
 		changed.emit()
-	return remaining
+	return amount - accepted + remaining
 
 
 # Xóa item
@@ -136,7 +142,48 @@ func get_available_space(item: BaseItem) -> int:
 			total += item.max_stack
 		elif slot.item.item_id == item.item_id:
 			total += maxi(0, slot.item.max_stack - slot.quantity)
+	if item is Potion:
+		var potion := item as Potion
+		var limit: int = get_potion_capacity(potion.potion_kind)
+		var carried: int = count_potions(potion.potion_kind)
+		return mini(total, maxi(0, limit - carried))
 	return total
+
+
+## Small and large bottles share a carrying limit; their item stacks remain separate.
+func count_potions(kind: Potion.Kind) -> int:
+	var total: int = 0
+	for slot in slots:
+		if not slot.is_empty() and slot.item is Potion:
+			var potion := slot.item as Potion
+			if potion.potion_kind == kind:
+				total += slot.quantity
+	return total
+
+
+func get_potion_capacity(kind: Potion.Kind) -> int:
+	return _potion_capacities.get(kind, default_potion_capacity)
+
+
+## Used by upgrades or restoring saved progression. Never discards carried bottles.
+func set_potion_capacity(kind: Potion.Kind, new_capacity: int) -> bool:
+	if not Potion.Kind.values().has(kind) or new_capacity < 0 or new_capacity > 100000:
+		return false
+	if new_capacity < count_potions(kind):
+		return false
+	if new_capacity == get_potion_capacity(kind):
+		return true
+	_potion_capacities[kind] = new_capacity
+	potion_capacity_changed.emit(kind, new_capacity)
+	changed.emit()
+	return true
+
+
+## Returns false for invalid/overflowing upgrades; does not charge currency.
+func upgrade_potion_capacity(kind: Potion.Kind, extra: int = 1) -> bool:
+	if extra <= 0 or extra > 100000 - get_potion_capacity(kind):
+		return false
+	return set_potion_capacity(kind, get_potion_capacity(kind) + extra)
 
 
 ## Chỉ kiểm tra, không thêm item; true khi chứa được toàn bộ amount

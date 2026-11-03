@@ -14,6 +14,24 @@ func validate() -> bool:
 	return true
 
 
+## Optional execution-owned telegraph during the controller's startup phase.
+func begin_windup() -> void:
+	pass
+
+
+func tick_windup(_delta: float) -> void:
+	pass
+
+
+func is_invulnerable() -> bool:
+	return false
+
+
+## Movement attacks can end early at a wall and enter their normal recovery.
+func has_finished_active() -> bool:
+	return false
+
+
 # hàm được gọi khi vừa bắt đầu tấn công
 func activate() -> void:
 	active = true
@@ -22,6 +40,11 @@ func activate() -> void:
 
 # xử lí liên tục trong lúc ra đòn đánh, cận chiến thì chắc hông cần
 func tick_active(_delta: float) -> void:
+	pass
+
+
+## Optional presentation hook for an attack held before its windup/release.
+func update_charge(_progress: float) -> void:
 	pass
 
 

@@ -11,6 +11,8 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot
 @export_group("Interaction Feedback")
 @export_range(0.05, 0.5, 0.01) var open_duration: float = 0.18
 @export_range(0.05, 0.5, 0.01) var close_duration: float = 0.12
+@export var selected_tab_scale: Vector2 = Vector2(1.12, 1.05)
+@export_range(0.05, 0.3, 0.01) var tab_feedback_duration: float = 0.12
 
 @export_group("Button textures")
 @export var equip_button_texture: Texture
@@ -37,6 +39,8 @@ var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 var _transition_tween: Tween
 var _info_tween: Tween
 var _book_scale: Vector2
+var _tab_base_scales: Dictionary[TextureButton, Vector2] = {}
+var _tab_tweens: Dictionary[TextureButton, Tween] = {}
 
 @onready var panel: PanelContainer = $PanelContainer
 @onready var book_background: TextureRect = $PanelContainer/Background
@@ -50,16 +54,24 @@ var _book_scale: Vector2
 	"Material/Content/ItemInfo/MarginContainer/VBoxContainer"
 )
 @onready var equip_potion_button: TextureButton = info_layout.get_node("EquipPotionButton")
+@onready
+var equip_secondary_potion_button: Button = info_layout.get_node("EquipSecondaryPotionButton")
 @onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
 @onready var item_name: Label = info_layout.get_node("ItemName")
 @onready var item_type: Label = info_layout.get_node("ItemType")
 @onready var item_description: Label = info_layout.get_node("Description")
 @onready var item_quantity: Label = info_layout.get_node("Quantity")
+@onready var equipment_tab: Control = tabs.get_node("Equipment")
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_book_scale = book_background.scale
+	for button: TextureButton in [material_button, equipment_button, notes_button]:
+		_tab_base_scales[button] = button.scale
+		button.resized.connect(_update_tab_pivot.bind(button))
+	_restore_tab_feedback.call_deferred()
+	_bind_equipment.call_deferred()
 	hide()
 	if inventory == null:
 		push_error("Chưa gán inventory cho ui")
@@ -78,6 +90,7 @@ func _ready() -> void:
 	inventory.changed.connect(refresh)
 	if is_instance_valid(potion_component):
 		potion_component.equipped_potion_changed.connect(_on_equipped_potion_changed)
+		potion_component.secondary_potion_changed.connect(_on_equipped_potion_changed)
 	_select_tab(0)
 	_refresh_item_info()
 
@@ -97,6 +110,13 @@ func refresh() -> void:
 		slot_uis[index].refresh(inventory.slots[index])
 	_refresh_item_info()
 	_update_slot_selection()
+	equipment_tab.refresh()
+
+
+func _bind_equipment() -> void:
+	var player := get_parent() as Player
+	if player != null:
+		equipment_tab.bind_components(player.weapon_controller, player.charm_socket_manager)
 
 
 func _on_slot_clicked(index: int) -> void:
@@ -123,6 +143,7 @@ func _on_item_dropped(from_index: int, to_index: int) -> void:
 
 
 func _refresh_item_info() -> void:
+	equip_secondary_potion_button.hide()
 	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
 	if slot == null or slot.is_empty():
 		selected_slot_index = -1
@@ -144,13 +165,18 @@ func _refresh_item_info() -> void:
 	if not equip_potion_button.visible:
 		return
 	var equipped = potion_component.is_equipped(slot.item as Potion)
+	equip_secondary_potion_button.show()
+	var secondary_equipped: bool = potion_component.is_secondary_equipped(slot.item as Potion)
+	equip_secondary_potion_button.text = (
+		"Remove secondary" if secondary_equipped else "Equip secondary"
+	)
 	equip_potion_button.texture_normal = (
 		unequip_button_texture if equipped else equip_button_texture
 	)
 	equip_potion_button.texture_pressed = (
 		unequip_button_pressed_texture if equipped else equip_button_pressed_texture
 	)
-	equip_potion_button.tooltip_text = "Tháo bình thuốc" if equipped else "Trang bị bình thuốc"
+	equip_potion_button.tooltip_text = "Tháo bình chính" if equipped else "Trang bị bình chính"
 
 
 func _on_equipped_potion_changed(_potion: Potion) -> void:
@@ -181,12 +207,51 @@ func _select_tab(index: int) -> void:
 
 	_cancel_inventory_drag()
 	tabs.current_tab = index
+	if index == 1:
+		equipment_tab.refresh()
 
 	for i in range(buttons.size()):
 		var selected: bool = i == index
 		buttons[i].set_pressed_no_signal(selected)
 		buttons[i].texture_normal = (active_textures[i] if selected else inactive_textures[i])
-		buttons[i].modulate = Color.WHITE if selected else Color.GRAY
+		_set_tab_feedback(buttons[i], selected, _is_open and not _is_closing)
+
+
+func _update_tab_pivot(button: TextureButton) -> void:
+	# Grow outward from the book edge without moving the VBox or its hit-area layout.
+	button.pivot_offset = Vector2(0.0, button.size.y * 0.5)
+
+
+func _set_tab_feedback(button: TextureButton, selected: bool, animate: bool) -> void:
+	var previous := _tab_tweens.get(button) as Tween
+	if previous != null and previous.is_valid():
+		previous.kill()
+	_update_tab_pivot(button)
+	var base_scale := _tab_base_scales[button]
+	var target_scale := base_scale * (selected_tab_scale if selected else Vector2.ONE)
+	var target_color := Color.WHITE if selected else Color.GRAY
+	button.z_index = 1 if selected else 0
+	if not animate:
+		button.scale = target_scale
+		button.modulate = target_color
+		return
+	var tween := create_tween().set_parallel(true)
+	_tab_tweens[button] = tween
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "modulate", target_color, tab_feedback_duration)
+	if selected:
+		# Keep vertical growth small so adjacent tabs remain separated during the punch.
+		var punch_scale := target_scale * Vector2(1.04, 1.0)
+		tween.tween_property(button, "scale", punch_scale, tab_feedback_duration * 0.6)
+		tween.chain().tween_property(button, "scale", target_scale, tab_feedback_duration)
+	else:
+		tween.tween_property(button, "scale", target_scale, tab_feedback_duration)
+
+
+func _restore_tab_feedback() -> void:
+	var buttons: Array[TextureButton] = [material_button, equipment_button, notes_button]
+	for i in buttons.size():
+		_set_tab_feedback(buttons[i], i == tabs.current_tab, false)
 
 
 func open_inventory() -> void:
@@ -206,6 +271,8 @@ func open_inventory() -> void:
 	_is_closing = false
 	refresh()
 	show()
+	# Containers reset child scale when laying out; restore after the opening layout pass.
+	_restore_tab_feedback.call_deferred()
 	book_background.pivot_offset = book_background.size * 0.5
 	if fresh_open:
 		panel.modulate.a = 0.0
@@ -247,6 +314,7 @@ func _finish_close() -> void:
 	_is_open = false
 	_is_closing = false
 	hide()
+	_restore_tab_feedback()
 	panel.modulate.a = 1.0
 	tab_buttons.modulate.a = 1.0
 	book_background.scale = _book_scale
@@ -295,3 +363,16 @@ func _on_equip_potion_button_pressed() -> void:
 		potion_component.unequip_potion()
 	else:
 		potion_component.equip_potion(potion)
+
+
+func _on_equip_secondary_potion_button_pressed() -> void:
+	if potion_component == null:
+		return
+	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
+	if slot == null or slot.is_empty() or slot.item is not Potion:
+		return
+	var potion := slot.item as Potion
+	if potion_component.is_secondary_equipped(potion):
+		potion_component.unequip_secondary_potion()
+	else:
+		potion_component.equip_secondary_potion(potion)

@@ -127,7 +127,7 @@ func _create_vignette() -> void:
 	_vignette_overlay.hide()
 
 
-func _on_damaged(amount: int) -> void:
+func _on_damaged(amount: float) -> void:
 	if not _configured or amount <= 0 or not is_instance_valid(sprite):
 		return
 	_play_flash()

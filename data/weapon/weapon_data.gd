@@ -5,7 +5,15 @@ enum WeaponCategory { MELEE, RANGED, STAFF }
 
 @export var weapon_id: StringName = &"dagger"
 @export var display_name: String = "Dagger"
+@export var icon: Texture2D
+@export_multiline var description: String = ""
 @export var category: WeaponCategory = WeaponCategory.MELEE
+@export_range(0.0, 1.0, 0.01) var critical_rate: float = 0.05
+@export_range(1.0, 5.0, 0.05) var critical_damage_multiplier: float = 1.5
+## Independent of HP damage and critical hits; attacks and combo steps can scale this value.
+@export_range(0.0, 10000.0, 1.0) var stagger_damage: float = 20.0
+## CP per confirmed enemy hit, before the forge's Chaos Gain modifier.
+@export_range(0.0, 1000.0, 0.1) var chaos_per_hit: float = 5.0
 # Đòn chính
 @export var normal_attack: AttackData
 # Đòn phụ, trống nếu vũ khí không có

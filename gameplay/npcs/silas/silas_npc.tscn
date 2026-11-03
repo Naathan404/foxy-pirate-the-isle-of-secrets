@@ -1,0 +1,59 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://gameplay/npcs/base/npc_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://gameplay/npcs/silas/silas_npc.gd" id="2_silas"]
+[ext_resource type="Resource" path="res://data/npcs/silas_npc_data.tres" id="3_data"]
+[ext_resource type="Resource" path="res://data/merchants/silas_catalog.tres" id="4_catalog"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_1.png" id="5_texture"]
+[ext_resource type="AnimationLibrary" path="res://gameplay/npcs/silas/silas_npc_anims.tres" id="6_anims"]
+[ext_resource type="Script" path="res://gameplay/npcs/base/states/npc_talk.gd" id="7_talk"]
+[ext_resource type="Script" path="res://gameplay/npcs/silas/states/silas_wander.gd" id="8_wander"]
+[ext_resource type="Script" path="res://gameplay/npcs/silas/states/silas_hidden.gd" id="9_hidden"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_silas"]
+radius = 0.9
+height = 2.5
+
+[sub_resource type="CylinderShape3D" id="CylinderShape_interaction"]
+height = 3.0
+radius = 3.0
+
+[node name="Silas" instance=ExtResource("1_base")]
+script = ExtResource("2_silas")
+data = ExtResource("3_data")
+catalog = ExtResource("4_catalog")
+shop_panel_path = NodePath("../SilasShopPanel")
+initial_state_name = &"Wander"
+dialogue_camera_focus_ratio = 0.42
+dialogue_camera_transition_duration = 0.28
+
+[node name="Sprite3D" parent="Visual" index="0"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, 0, 0, 0)
+offset = Vector2(0, 34)
+texture = ExtResource("5_texture")
+
+[node name="AnimationPlayer" parent="Visual" index="1"]
+libraries/ = ExtResource("6_anims")
+
+[node name="FrontRayCast3D" parent="Direction" index="0"]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" index="1"]
+enabled = true
+
+[node name="CollisionShape3D" parent="." index="2"]
+position = Vector3(0, 1.25, 0)
+shape = SubResource("CapsuleShape_silas")
+
+[node name="Talk" type="Node" parent="States" index="1"]
+script = ExtResource("7_talk")
+
+[node name="Wander" type="Node" parent="States" index="2"]
+script = ExtResource("8_wander")
+
+[node name="Hidden" type="Node" parent="States" index="3"]
+script = ExtResource("9_hidden")
+
+[node name="CollisionShape3D" parent="InteractionArea" index="0"]
+position = Vector3(0, 1.5, 0)
+shape = SubResource("CylinderShape_interaction")

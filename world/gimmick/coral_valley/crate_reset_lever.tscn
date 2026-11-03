@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://djxjvu6e00r3h"]
+
+[ext_resource type="Script" uid="uid://3sbcm50ojwfx" path="res://world/gimmick/coral_valley/crate_reset_lever.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://db5lhn6q8e826" path="res://assets/models/kenney_platformer_kit/lever.glb" id="2_model"]
+[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="3_font"]
+[ext_resource type="AudioStream" uid="uid://c15xy2p4qusr0" path="res://assets/audio/world/crate_lever.wav" id="4_sound"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_base"]
+size = Vector3(1.8, 1.05, 1.35)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_interact"]
+radius = 3.0
+
+[node name="CrateResetLever" type="Node3D" unique_id=1522511598 node_paths=PackedStringArray("safe_point")]
+process_physics_priority = -30
+script = ExtResource("1_script")
+safe_point = NodePath("SafePoint")
+reset_sound = ExtResource("4_sound")
+
+[node name="Visual" parent="." unique_id=1070096384 instance=ExtResource("2_model")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
+
+[node name="BaseBody" type="StaticBody3D" parent="." unique_id=1938341987]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BaseBody" unique_id=731617525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.525, 0)
+shape = SubResource("BoxShape3D_base")
+
+[node name="InteractionArea" type="Area3D" parent="." unique_id=621481468]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea" unique_id=720649189]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_interact")
+
+[node name="Prompt" type="Label3D" parent="." unique_id=319131062]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+visible = false
+pixel_size = 0.012
+billboard = 1
+text = "[G] Reset crates"
+font = ExtResource("3_font")
+font_size = 40
+outline_size = 8
+
+[node name="SafePoint" type="Marker3D" parent="." unique_id=1409784215]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.4)

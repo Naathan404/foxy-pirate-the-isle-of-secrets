@@ -4,7 +4,7 @@ extends RefCounted
 ### Context chứa ngồn đánh, hướng, mục tiêu, damage
 
 # Lượng máu thật sự mất
-signal damage_applied(damage: DamageContext, target: Node, applied_hp: int)
+signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
 signal damage_prepared(damage: DamageContext, target: Node)
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
@@ -24,9 +24,20 @@ var weapon: WeaponInstance
 var weapon_category: int = -1
 
 # chỉ số sau khi rèn
-var damage_hp: int = 1
+var damage_hp: float = 1
+var critical_rate: float = 0.0
+var critical_damage_multiplier: float = 1.5
+var stagger_damage: float = 0.0
+var projectile_speed_multiplier: float = 1.0
 var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
+## Forge snapshot; the combo step's authored knockback is applied when building damage.
+var knockback_multiplier: float = 1.0
+var combo_index: int = 0
+var combo_step: MeleeComboStep
+var active_seconds: float = 0.125
+var charge_progress: float = 0.0
+var projectile_count: int = 1
 
 
 # Tạo damage context cho 1 lần gây sát thương
@@ -37,8 +48,14 @@ func create_damage_context() -> DamageContext:
 	damage.attack_id = attack_id
 	damage.base_amount_hp = damage_hp
 	damage.amount_hp = damage_hp
+	damage.critical_rate = critical_rate
+	damage.critical_damage_multiplier = critical_damage_multiplier
+	damage.stagger_damage = stagger_damage
 	damage.tag = action
 	damage.weapon_category = weapon_category
 	damage.origin = origin
 	damage.direction = direction
+	damage.knockback_multiplier = knockback_multiplier
+	if combo_step != null:
+		damage.knockback_multiplier *= combo_step.knockback_multiplier
 	return damage

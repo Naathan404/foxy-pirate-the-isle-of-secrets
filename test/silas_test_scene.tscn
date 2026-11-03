@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cwoa8oxjdtbx0"]
+
+[ext_resource type="Script" uid="uid://cn7ji2spf10tk" path="res://test/silas_test_scene.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cj86kg5fm6gue" path="res://world/hub/scenes/hub.tscn" id="2_hub"]
+
+[node name="SilasTestScene" type="Node3D" unique_id=1534516813]
+script = ExtResource("1_script")
+
+[node name="Hub" parent="." unique_id=574803608 instance=ExtResource("2_hub")]

@@ -2,7 +2,7 @@ class_name CrescentCleaveAttack
 extends Node3D
 ## Một lần quét vùng bán nguyệt phía trước và chỉ gây sát thương một lần mỗi mục tiêu.
 
-signal target_hit(target: Node, applied_hp: int)
+signal target_hit(target: Node, applied_hp: float)
 
 @export var hit_area: Area3D
 

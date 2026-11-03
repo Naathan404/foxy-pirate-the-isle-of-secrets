@@ -1,0 +1,109 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/weapons/stormstring_burst.gd" id="1_script"]
+[ext_resource type="Shader" path="res://gameplay/weapons/bow_energy.gdshader" id="2_energy"]
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/Dust Particle.png" id="3_spark"]
+
+[sub_resource type="ShaderMaterial" id="RingMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_energy")
+shader_parameter/shape = 0
+shader_parameter/billboard = false
+shader_parameter/glow_color = Color(0.06, 0.65, 1, 1)
+shader_parameter/core_color = Color(0.8, 1, 1, 1)
+shader_parameter/ring_width = 0.022
+shader_parameter/glow_softness = 0.07
+shader_parameter/arc_breakup = 0.3
+shader_parameter/brightness = 2.0
+
+[sub_resource type="ShaderMaterial" id="EchoMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_energy")
+shader_parameter/shape = 0
+shader_parameter/billboard = false
+shader_parameter/glow_color = Color(0.22, 0.35, 1, 0.7)
+shader_parameter/core_color = Color(0.4, 0.8, 1, 1)
+shader_parameter/ring_width = 0.012
+shader_parameter/glow_softness = 0.045
+shader_parameter/arc_breakup = 0.8
+shader_parameter/phase = 0.6
+shader_parameter/brightness = 1.8
+
+[sub_resource type="ShaderMaterial" id="FlashMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("2_energy")
+shader_parameter/shape = 1
+shader_parameter/glow_color = Color(0.1, 0.65, 1, 1)
+shader_parameter/core_color = Color(1, 0.98, 0.8, 1)
+shader_parameter/brightness = 2.0
+
+[sub_resource type="QuadMesh" id="RingMesh"]
+size = Vector2(3.6, 3.6)
+
+[sub_resource type="QuadMesh" id="FlashMesh"]
+size = Vector2(2.4, 2.4)
+
+[sub_resource type="Gradient" id="SparkGradient"]
+offsets = PackedFloat32Array(0, 0.25, 0.65, 1)
+colors = PackedColorArray(1, 1, 0.85, 1, 0.3, 0.95, 1, 1, 0.08, 0.4, 1, 0.65, 0.05, 0.15, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="SparkRamp"]
+gradient = SubResource("SparkGradient")
+
+[sub_resource type="ParticleProcessMaterial" id="SparkProcess"]
+emission_shape = 1
+emission_sphere_radius = 0.12
+direction = Vector3(0, 0.25, 1)
+spread = 180.0
+initial_velocity_min = 3.0
+initial_velocity_max = 8.0
+gravity = Vector3(0, -3, 0)
+damping_min = 5.0
+damping_max = 9.0
+scale_min = 0.3
+scale_max = 0.8
+color_ramp = SubResource("SparkRamp")
+
+[sub_resource type="StandardMaterial3D" id="SparkMaterial"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("3_spark")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="SparkMesh"]
+material = SubResource("SparkMaterial")
+size = Vector2(0.1, 0.28)
+
+[node name="StormstringBurst" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+rotation_degrees = Vector3(-90, 0, 0)
+cast_shadow = 0
+material_override = SubResource("RingMaterial")
+mesh = SubResource("RingMesh")
+
+[node name="Echo" type="MeshInstance3D" parent="."]
+rotation_degrees = Vector3(-70, 15, 20)
+cast_shadow = 0
+material_override = SubResource("EchoMaterial")
+mesh = SubResource("RingMesh")
+
+[node name="Flash" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("FlashMaterial")
+mesh = SubResource("FlashMesh")
+
+[node name="Particles" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+emitting = false
+amount = 52
+lifetime = 0.48
+one_shot = true
+explosiveness = 1.0
+randomness = 0.35
+visibility_aabb = AABB(-5, -5, -5, 10, 10, 10)
+process_material = SubResource("SparkProcess")
+draw_pass_1 = SubResource("SparkMesh")

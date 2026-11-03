@@ -31,8 +31,15 @@ func _process(_delta: float) -> void:
 		cancel()
 		return
 	_bind_camera(active_camera)
+	_apply_shake(now)
+
+
+func _apply_shake(now: int) -> void:
 	var phase := float(now) / 1000000.0 * frequency
 	var jitter := Vector2(_noise.get_noise_2d(phase, 17.0), _noise.get_noise_2d(53.0, phase))
+	# Noise chooses direction; the envelope sets the requested pixel amplitude.
+	# Raw simplex magnitudes made small melee requests nearly invisible.
+	jitter = jitter.normalized() if not jitter.is_zero_approx() else Vector2.RIGHT
 	var displacement := jitter * _current_strength(now) * _world_units_per_pixel()
 	# Chỉ đổi offset dựng hình; camera vẫn theo cha Foxy, HUD CanvasLayer không bị rung.
 	_camera.h_offset = _base_offset.x + displacement.x
@@ -56,6 +63,8 @@ func request(pixels: float = 3.0, duration: float = 0.14) -> void:
 	_strength = minf(maxf(_current_strength(now), pixels), maximum_pixels)
 	_duration = maxf(remaining, minf(duration, maximum_duration))
 	_end_at_usec = now + int(_duration * 1000000.0)
+	# Apply on impact rather than waiting for the next idle frame.
+	_apply_shake(now)
 	set_process(true)
 
 

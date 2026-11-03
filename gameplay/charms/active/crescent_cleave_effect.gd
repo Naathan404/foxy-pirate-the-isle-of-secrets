@@ -74,13 +74,11 @@ func _build_context(activation: CharmActivationContext) -> AttackContext:
 		if not activation.direction.is_zero_approx()
 		else Vector3.BACK
 	)
-	result.damage_hp = maxi(
-		1, roundi(_get_base_damage() * definition.get_param_float(&"damage_multiplier"))
-	)
+	result.damage_hp = maxf(0.0, _get_base_damage() * definition.get_param_float(&"damage_multiplier"))
 	return result
 
 
-func _get_base_damage() -> int:
+func _get_base_damage() -> float:
 	var weapon_controller := actor.get("weapon_controller") as WeaponController
 	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
 		var attack := weapon_controller.equipped.get_attack(&"normal")

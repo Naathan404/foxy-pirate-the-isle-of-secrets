@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponForge" format=3]
+
+[ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="1_forge"]
+
+[resource]
+script = ExtResource("1_forge")
+forge_id = &"pristine"
+display_name = "Pristine"
+description = "Damage +5%, Attack Speed +5%, Knockback +10%"
+forge_group = 0
+acquisition_source = &"blacksmith"
+drop_weight = 3.0
+damage_multiplier = 1.05
+attack_speed_multiplier = 1.05
+knockback_multiplier = 1.1

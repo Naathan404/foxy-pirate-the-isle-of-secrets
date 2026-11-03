@@ -11,8 +11,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Bấm phím R để test đưa Cáo về Checkpoint (hoặc reload scene đều được)
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
+	# Keep the checkpoint test shortcut separate from gameplay bindings.
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F8:
 		respawn_player()
 
 
