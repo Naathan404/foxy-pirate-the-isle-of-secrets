@@ -6,7 +6,7 @@ const ARROW: BaseItem = preload("res://data/items/materials/wooden_arrow.tres")
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
-const NPC_TEST_SCENE: PackedScene = preload("res://test/silas_test_scene.tscn")
+const NPC_TEST_SCENE_PATH := "res://test/silas_test_scene.tscn"
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
 const GOLD_DISPLAY_SCENE: PackedScene = preload("res://gameplay/economy/gold_display.tscn")
 
@@ -257,7 +257,11 @@ func _test_gold_display_feedback() -> void:
 
 
 func _test_npc_scene_smoke() -> void:
-	var scene := NPC_TEST_SCENE.instantiate()
+	var fixture := ResourceLoader.load(NPC_TEST_SCENE_PATH) as PackedScene
+	_assert_true(fixture != null, "Silas fixture loads")
+	if fixture == null:
+		return
+	var scene := fixture.instantiate()
 	root.add_child(scene)
 	await process_frame
 	await process_frame
@@ -311,8 +315,10 @@ func _test_npc_scene_smoke() -> void:
 		await create_timer(0.1, true).timeout
 		_assert_false(panel.visible, "farewell never reopens the shop")
 		await _test_hidden_departure(scene, silas)
-	scene.queue_free()
-	await process_frame
+	# This test owns a complete Hub fixture. Free it before SceneTree.quit() so
+	# GridMap physics/render resources are released while the engine is alive.
+	scene.free()
+	fixture = null
 	await process_frame
 
 
