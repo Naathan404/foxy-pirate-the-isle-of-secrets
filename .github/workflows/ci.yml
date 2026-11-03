@@ -38,9 +38,13 @@ jobs:
         shell: bash
         run: |
           # The local editor plugin recreates this entry, but its addon is not shipped.
-          sed -i '\|^_mcp_game_helper="\*res://addons/godot_ai/runtime/game_helper\.gd"[[:space:]]*$|d' project.godot
+          sed -i '\|addons/godot_ai/runtime/game_helper\.gd|d' project.godot
           # Remove only this local plugin, preserving Dialogic and other plugins.
-          sed -i '/^enabled=PackedStringArray(/ { s|"res://addons/godot_ai/plugin.cfg", ||g; s|, "res://addons/godot_ai/plugin.cfg"||g; s|"res://addons/godot_ai/plugin.cfg"||g; }' project.godot
+          sed -i 's|"res://addons/godot_ai/plugin.cfg", ||g; s|, "res://addons/godot_ai/plugin.cfg"||g; s|"res://addons/godot_ai/plugin.cfg"||g' project.godot
+          if grep -nE '^(<<<<<<<|=======|>>>>>>>)' project.godot; then
+            echo "::error::project.godot contains merge conflict markers"
+            exit 1
+          fi
       - uses: lihop/setup-godot@v3
         with:
           version: 4.7.2-stable
