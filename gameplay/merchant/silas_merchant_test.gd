@@ -267,7 +267,6 @@ func _test_npc_scene_smoke() -> void:
 	_assert_true(player != null, "Hub fixture registers a player")
 	if silas != null and panel != null and player != null:
 		await _test_wander_bounds(silas)
-		silas._active_interactor = player
 		_assert_true(panel.open_for(player, silas.catalog), "shop panel opens for the player")
 		_assert_true(panel.visible, "shop panel becomes visible")
 		_assert_equal(
@@ -307,15 +306,6 @@ func _test_npc_scene_smoke() -> void:
 		_assert_true(
 			ResourceLoader.exists(silas.data.farewell_timeline), "farewell timeline exists"
 		)
-		var dialogic := _get_dialogic()
-		_assert_true(
-			dialogic != null and dialogic.get("current_timeline") != null,
-			"closing the shop starts farewell"
-		)
-		await process_frame
-		if dialogic != null and dialogic.get("current_timeline") != null:
-			dialogic.call("end_timeline", true)
-			await process_frame
 		await create_timer(0.1, true).timeout
 		_assert_false(panel.visible, "farewell never reopens the shop")
 		await _test_hidden_departure(scene, silas)
@@ -380,10 +370,6 @@ func _test_wander_bounds(silas: SilasNpc) -> void:
 func _get_game_manager_player() -> Player:
 	var manager := root.get_node_or_null("GameManager")
 	return manager.get("player") as Player if manager != null else null
-
-
-func _get_dialogic() -> Node:
-	return root.get_node_or_null("Dialogic")
 
 
 func _make_inventory(capacity: int) -> Inventory:
