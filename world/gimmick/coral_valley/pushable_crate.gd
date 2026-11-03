@@ -10,7 +10,7 @@ extends CharacterBody3D
 @export_group("Floating")
 @export var float_enabled: bool = true
 ## Waterline above the crate's base, measured in world units.
-@export_range(0.0, 2.0, 0.05) var float_draft: float = 0.2
+@export_range(0.0, 3.0, 0.05) var float_draft: float = 0.2
 @export_range(0.1, 20.0, 0.1) var float_speed: float = 6.0
 
 var is_floating: bool = false
