@@ -19,7 +19,7 @@ func activate() -> void:
 	_body = context.actor as CharacterBody3D
 	if not is_instance_valid(_body):
 		return
-		
+
 	_saved_mask = _body.collision_mask
 	_owns_mask = true
 	_body.collision_mask = CombatLayers.WORLD
