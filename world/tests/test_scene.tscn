@@ -23,6 +23,8 @@
 [ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="21_0ifmg"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="22_qtl4h"]
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="23_5fcor"]
+[ext_resource type="PackedScene" path="res://gameplay/merchant/silas_shop_panel.tscn" id="24_silas_panel"]
+[ext_resource type="PackedScene" path="res://gameplay/npcs/silas/silas_npc.tscn" id="25_silas_npc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -201,6 +203,24 @@ buffer = PackedFloat32Array(-1.7479966, 0, 3.2839248, 6.026083, 0, 2.4484549, 0,
 script = ExtResource("1_i6gfe")
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("2_exmxu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+
+[node name="SilasShopPanel" parent="." instance=ExtResource("24_silas_panel")]
+
+[node name="Silas" parent="." instance=ExtResource("25_silas_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
+
+[node name="SilasHideoutA" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
+
+[node name="SilasHideoutB" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.964006, 0, 5.036312)
+
+[node name="SilasHideoutC" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.650712, 4, 29.794418)
+
+[node name="SilasHideoutD" type="Marker3D" parent="." groups=["silas_hideouts"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8243723, -2, -21.086876)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7261753, 3.875, -1.1673746)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]

@@ -3,7 +3,7 @@ extends Node3D
 ## Isolated merchant sandbox. It never changes Foxy's shared starter data.
 @export var starting_gold := 250
 
-@onready var foxy: Player = $Foxy
+@onready var foxy: Player = $Hub/Foxy
 
 
 func _ready() -> void:

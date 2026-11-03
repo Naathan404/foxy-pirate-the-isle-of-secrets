@@ -6,7 +6,7 @@ const ARROW: BaseItem = preload("res://data/items/materials/wooden_arrow.tres")
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
-const NPC_TEST_SCENE: PackedScene = preload("res://world/tests/npc_test_scene.tscn")
+const NPC_TEST_SCENE: PackedScene = preload("res://test/silas_test_scene.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
 const GOLD_DISPLAY_SCENE: PackedScene = preload("res://gameplay/economy/gold_display.tscn")
 
@@ -121,16 +121,41 @@ func _test_configured_trade_amount() -> void:
 
 
 func _test_catalog_prices_and_disabled_sales() -> void:
-	_assert_equal(CATALOG.get_offer(&"starfish_core").buy_price, 50, "starfish buy price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"starfish_core").sell_price, 5, "starfish sell price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"crab_claw").sell_price, 5, "crab sale price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"gunpowder_bag").sell_price, 5, "gunpowder sale price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"small_healing_potion").buy_price, 25, "small healing price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"healing_potion").buy_price, 45, "large healing price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"small_stamina_potion").buy_price, 15, "small stamina price comes from catalog")
-	_assert_equal(CATALOG.get_offer(&"stamina_potion").buy_price, 30, "large stamina price comes from catalog")
-	_assert_true(CATALOG.get_sell_offer_for_item(HEALING.item_id) == null, "small potion cannot be sold")
-	_assert_true(CATALOG.get_sell_offer_for_item(LARGE_HEALING.item_id) == null, "large potion cannot be sold")
+	_assert_equal(
+		CATALOG.get_offer(&"starfish_core").buy_price, 50, "starfish buy price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"starfish_core").sell_price, 5, "starfish sell price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"crab_claw").sell_price, 5, "crab sale price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"gunpowder_bag").sell_price, 5, "gunpowder sale price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"small_healing_potion").buy_price,
+		25,
+		"small healing price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"healing_potion").buy_price, 45, "large healing price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"small_stamina_potion").buy_price,
+		15,
+		"small stamina price comes from catalog"
+	)
+	_assert_equal(
+		CATALOG.get_offer(&"stamina_potion").buy_price, 30, "large stamina price comes from catalog"
+	)
+	_assert_true(
+		CATALOG.get_sell_offer_for_item(HEALING.item_id) == null, "small potion cannot be sold"
+	)
+	_assert_true(
+		CATALOG.get_sell_offer_for_item(LARGE_HEALING.item_id) == null,
+		"large potion cannot be sold"
+	)
 	var service := MerchantTransactionService.new(CATALOG)
 	var inventory := _make_inventory(2)
 	var wallet := GoldWallet.new()
@@ -191,7 +216,9 @@ func _test_toast_queue() -> void:
 	var queue := TOAST_QUEUE_SCENE.instantiate() as TradeToastQueue
 	root.add_child(queue)
 	await process_frame
-	_assert_equal(queue.process_mode, Node.PROCESS_MODE_ALWAYS, "toast queue processes while paused")
+	_assert_equal(
+		queue.process_mode, Node.PROCESS_MODE_ALWAYS, "toast queue processes while paused"
+	)
 	queue.enqueue_success("First trade")
 	queue.enqueue_success("Second trade")
 	_assert_equal(queue.pending_count(), 2, "toast queue keeps both trade messages")
@@ -210,7 +237,9 @@ func _test_gold_display_feedback() -> void:
 	var display := GOLD_DISPLAY_SCENE.instantiate()
 	root.add_child(display)
 	await process_frame
-	_assert_equal(display.process_mode, Node.PROCESS_MODE_ALWAYS, "gold display processes while paused")
+	_assert_equal(
+		display.process_mode, Node.PROCESS_MODE_ALWAYS, "gold display processes while paused"
+	)
 	display._on_balance_changed(10, 5)
 	_assert_true(display._gain.visible, "gold gain feedback becomes visible")
 	_assert_equal(display._gain.text, "+5 G", "gold gain feedback uses a positive sign")
@@ -230,12 +259,16 @@ func _test_npc_scene_smoke() -> void:
 	root.add_child(scene)
 	await process_frame
 	await process_frame
-	var silas := scene.get_node_or_null("Silas") as SilasNpc
-	var panel := scene.get_node_or_null("SilasShopPanel") as SilasShopPanel
+	var silas := scene.get_node_or_null("Hub/Silas") as SilasNpc
+	var panel := scene.get_node_or_null("Hub/SilasShopPanel") as SilasShopPanel
 	_assert_true(silas != null, "npc test scene contains Silas")
 	_assert_true(panel != null, "npc test scene contains shop panel")
 	if silas != null and panel != null:
-		_assert_true(panel.open_for(GameManager.player, silas.catalog), "shop panel opens for the player")
+		await _test_wander_bounds(silas)
+		silas._active_interactor = GameManager.player
+		_assert_true(
+			panel.open_for(GameManager.player, silas.catalog), "shop panel opens for the player"
+		)
 		_assert_true(panel.visible, "shop panel becomes visible")
 		_assert_equal(
 			panel.grid.get_child_count(),
@@ -244,23 +277,100 @@ func _test_npc_scene_smoke() -> void:
 		)
 		_assert_equal(panel.grid.columns, 5, "shop grid keeps inventory's five-column layout")
 		var first_buy_slot := panel.grid.get_child(0) as InventorySlotUI
-		_assert_false(first_buy_slot.quantity_label.visible, "buy previews do not show redundant quantities")
+		_assert_false(
+			first_buy_slot.quantity_label.visible, "buy previews do not show redundant quantities"
+		)
 		_assert_true(panel.buy_tab is TextureButton, "buy tab uses an inventory-style bookmark")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
 		var inventory := GameManager.player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
 			_assert_equal(
-				panel.grid.get_child_count(), inventory.slots.size(), "sell tab renders the real inventory"
+				panel.grid.get_child_count(),
+				inventory.slots.size(),
+				"sell tab renders the real inventory"
 			)
 			panel._set_tab(SilasShopPanel.Tab.BAG)
 			_assert_equal(
-				panel.grid.get_child_count(), inventory.slots.size(), "bag tab renders the real inventory"
+				panel.grid.get_child_count(),
+				inventory.slots.size(),
+				"bag tab renders the real inventory"
 			)
 		panel.close_shop()
 		await create_timer(panel.close_duration + 0.05, true).timeout
 		_assert_false(panel.visible, "shop panel closes")
+		_assert_true(
+			ResourceLoader.exists(silas.data.dialogue_timeline), "first-meeting timeline exists"
+		)
+		_assert_true(
+			ResourceLoader.exists(silas.data.greeting_timeline), "greeting timeline exists"
+		)
+		_assert_true(
+			ResourceLoader.exists(silas.data.farewell_timeline), "farewell timeline exists"
+		)
+		_assert_true(Dialogic.current_timeline != null, "closing the shop starts farewell")
+		await process_frame
+		if Dialogic.current_timeline != null:
+			Dialogic.end_timeline(true)
+			await process_frame
+		await create_timer(0.1, true).timeout
+		_assert_false(panel.visible, "farewell never reopens the shop")
+		await _test_hidden_departure(scene, silas)
 	scene.queue_free()
 	await process_frame
+
+
+func _test_hidden_departure(scene: Node, silas: SilasNpc) -> void:
+	var player := GameManager.player
+	_assert_true(player != null, "Hub fixture registers a player")
+	var hideouts := scene.get_tree().get_nodes_in_group(&"silas_hideouts")
+	_assert_true(not hideouts.is_empty(), "Hub fixture contains Silas hideouts")
+	if player == null or hideouts.is_empty():
+		return
+	player.global_position = Vector3.ZERO
+	var chosen_hideout := silas._choose_hideout(player)
+	_assert_true(chosen_hideout != null, "Silas finds a safe hideout")
+	if chosen_hideout != null:
+		_assert_true(
+			(
+				chosen_hideout.global_position.distance_to(player.global_position)
+				>= silas.minimum_hideout_distance
+			),
+			"chosen hideout is far enough from the player"
+		)
+	silas.begin_departure(player)
+	var destination := silas._hidden_destination
+	player.global_position = destination
+	await create_timer(silas.burrow_duration + 0.08, true).timeout
+	_assert_true(silas._is_hidden, "Silas stays hidden while the player is near the new hideout")
+	_assert_true(
+		silas.global_position.distance_to(destination) <= 0.01,
+		"Silas teleports exactly to the selected hideout"
+	)
+	_assert_false(silas.interaction_area._enabled, "hidden Silas cannot interact")
+	player.global_position = (
+		silas.global_position + Vector3(silas.minimum_hideout_distance + 1.0, 0.0, 0.0)
+	)
+	await process_frame
+	await create_timer(silas.burrow_duration + 0.08, true).timeout
+	_assert_false(silas._is_hidden, "Silas emerges after the player moves away")
+	await process_frame
+	_assert_true(silas.is_on_floor(), "Silas emerges on the Hub floor")
+	var emerged_offset := silas.global_position - destination
+	emerged_offset.y = 0.0
+	_assert_true(
+		emerged_offset.length() <= 0.75, "Silas remains at the selected hideout after emerging"
+	)
+
+
+func _test_wander_bounds(silas: SilasNpc) -> void:
+	var maximum_distance := silas.get_silas_data().wander_radius + 0.3
+	for _frame in 60:
+		await process_frame
+		var offset := silas.global_position - silas.get_wander_anchor()
+		offset.y = 0.0
+		_assert_true(
+			offset.length() <= maximum_distance, "Silas wander remains within the hideout radius"
+		)
 
 
 func _make_inventory(capacity: int) -> Inventory:

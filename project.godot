@@ -32,8 +32,10 @@ directories/dch_directory={
 "silas": "res://dialog/npcs/silas/silas.dch"
 }
 directories/dtl_directory={
+"farewell": "res://dialog/npcs/silas/timelines/farewell.dtl",
 "first_meeting": "res://dialog/npcs/silas/timelines/first_meeting.dtl",
-"greeting": "res://dialog/npcs/mushroom/timelines/greeting.dtl"
+"greeting": "res://dialog/npcs/mushroom/timelines/greeting.dtl",
+"timelines/greeting": "res://dialog/npcs/silas/timelines/greeting.dtl"
 }
 layout/style_directory={}
 

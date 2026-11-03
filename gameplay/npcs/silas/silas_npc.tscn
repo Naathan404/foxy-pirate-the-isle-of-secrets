@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_1.png" id="5_texture"]
 [ext_resource type="AnimationLibrary" path="res://gameplay/npcs/silas/silas_npc_anims.tres" id="6_anims"]
 [ext_resource type="Script" path="res://gameplay/npcs/base/states/npc_talk.gd" id="7_talk"]
+[ext_resource type="Script" path="res://gameplay/npcs/silas/states/silas_wander.gd" id="8_wander"]
+[ext_resource type="Script" path="res://gameplay/npcs/silas/states/silas_hidden.gd" id="9_hidden"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_silas"]
 radius = 0.9
@@ -21,7 +23,7 @@ script = ExtResource("2_silas")
 data = ExtResource("3_data")
 catalog = ExtResource("4_catalog")
 shop_panel_path = NodePath("../SilasShopPanel")
-initial_state_name = &"Idle"
+initial_state_name = &"Wander"
 dialogue_camera_focus_ratio = 0.42
 dialogue_camera_transition_duration = 0.28
 
@@ -33,12 +35,24 @@ texture = ExtResource("5_texture")
 [node name="AnimationPlayer" parent="Visual" index="1"]
 libraries/ = ExtResource("6_anims")
 
+[node name="FrontRayCast3D" parent="Direction" index="0"]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" index="1"]
+enabled = true
+
 [node name="CollisionShape3D" parent="." index="2"]
 position = Vector3(0, 1.25, 0)
 shape = SubResource("CapsuleShape_silas")
 
 [node name="Talk" type="Node" parent="States" index="1"]
 script = ExtResource("7_talk")
+
+[node name="Wander" type="Node" parent="States" index="2"]
+script = ExtResource("8_wander")
+
+[node name="Hidden" type="Node" parent="States" index="3"]
+script = ExtResource("9_hidden")
 
 [node name="CollisionShape3D" parent="InteractionArea" index="0"]
 position = Vector3(0, 1.5, 0)
