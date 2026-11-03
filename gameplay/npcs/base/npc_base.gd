@@ -246,6 +246,7 @@ func _on_interaction_requested(interactor: Player) -> void:
 
 func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 	var npc_data := get_npc_data()
+	var dialogic := _get_dialogic()
 	var resolved_timeline := timeline_path
 	if resolved_timeline.is_empty() and npc_data != null:
 		resolved_timeline = npc_data.dialogue_timeline
@@ -253,7 +254,8 @@ func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 		is_talking
 		or npc_data == null
 		or resolved_timeline.is_empty()
-		or Dialogic.current_timeline != null
+		or dialogic == null
+		or dialogic.get("current_timeline") != null
 	):
 		return false
 	if not ResourceLoader.exists(resolved_timeline):
@@ -271,10 +273,16 @@ func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 	var talk_state := fsm.states.get("talk") as FsmState
 	if is_instance_valid(talk_state):
 		fsm.change_state(talk_state)
-	Dialogic.timeline_ended.connect(_on_dialogue_ended, CONNECT_ONE_SHOT)
-	Dialogic.start(resolved_timeline)
+	dialogic.connect(&"timeline_ended", _on_dialogue_ended, CONNECT_ONE_SHOT)
+	dialogic.call(&"start", resolved_timeline)
 	dialogue_started.emit(interactor)
 	return true
+
+
+func _get_dialogic() -> Node:
+	# Resolve at runtime so NPC scenes and their headless tests do not require
+	# Dialogic's autoload identifier to exist during script compilation.
+	return get_node_or_null("/root/Dialogic")
 
 
 func _on_dialogue_ended() -> void:

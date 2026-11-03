@@ -261,14 +261,14 @@ func _test_npc_scene_smoke() -> void:
 	await process_frame
 	var silas := scene.get_node_or_null("Hub/Silas") as SilasNpc
 	var panel := scene.get_node_or_null("Hub/SilasShopPanel") as SilasShopPanel
+	var player := _get_game_manager_player()
 	_assert_true(silas != null, "npc test scene contains Silas")
 	_assert_true(panel != null, "npc test scene contains shop panel")
-	if silas != null and panel != null:
+	_assert_true(player != null, "Hub fixture registers a player")
+	if silas != null and panel != null and player != null:
 		await _test_wander_bounds(silas)
-		silas._active_interactor = GameManager.player
-		_assert_true(
-			panel.open_for(GameManager.player, silas.catalog), "shop panel opens for the player"
-		)
+		silas._active_interactor = player
+		_assert_true(panel.open_for(player, silas.catalog), "shop panel opens for the player")
 		_assert_true(panel.visible, "shop panel becomes visible")
 		_assert_equal(
 			panel.grid.get_child_count(),
@@ -282,7 +282,7 @@ func _test_npc_scene_smoke() -> void:
 		)
 		_assert_true(panel.buy_tab is TextureButton, "buy tab uses an inventory-style bookmark")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
-		var inventory := GameManager.player.get_node_or_null("Inventory") as Inventory
+		var inventory := player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
 			_assert_equal(
 				panel.grid.get_child_count(),
@@ -307,10 +307,14 @@ func _test_npc_scene_smoke() -> void:
 		_assert_true(
 			ResourceLoader.exists(silas.data.farewell_timeline), "farewell timeline exists"
 		)
-		_assert_true(Dialogic.current_timeline != null, "closing the shop starts farewell")
+		var dialogic := _get_dialogic()
+		_assert_true(
+			dialogic != null and dialogic.get("current_timeline") != null,
+			"closing the shop starts farewell"
+		)
 		await process_frame
-		if Dialogic.current_timeline != null:
-			Dialogic.end_timeline(true)
+		if dialogic != null and dialogic.get("current_timeline") != null:
+			dialogic.call("end_timeline", true)
 			await process_frame
 		await create_timer(0.1, true).timeout
 		_assert_false(panel.visible, "farewell never reopens the shop")
@@ -320,7 +324,7 @@ func _test_npc_scene_smoke() -> void:
 
 
 func _test_hidden_departure(scene: Node, silas: SilasNpc) -> void:
-	var player := GameManager.player
+	var player := _get_game_manager_player()
 	_assert_true(player != null, "Hub fixture registers a player")
 	var hideouts := scene.get_tree().get_nodes_in_group(&"silas_hideouts")
 	_assert_true(not hideouts.is_empty(), "Hub fixture contains Silas hideouts")
@@ -371,6 +375,15 @@ func _test_wander_bounds(silas: SilasNpc) -> void:
 		_assert_true(
 			offset.length() <= maximum_distance, "Silas wander remains within the hideout radius"
 		)
+
+
+func _get_game_manager_player() -> Player:
+	var manager := root.get_node_or_null("GameManager")
+	return manager.get("player") as Player if manager != null else null
+
+
+func _get_dialogic() -> Node:
+	return root.get_node_or_null("Dialogic")
 
 
 func _make_inventory(capacity: int) -> Inventory:
