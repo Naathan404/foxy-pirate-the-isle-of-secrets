@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://ddu3mubhw4y6n"]
 
 [ext_resource type="Script" uid="uid://b03gmcx2kf6go" path="res://gameplay/inventory/inventory_slot_ui.gd" id="1_u5xhv"]
-[ext_resource type="Texture2D" uid="uid://dv40a00uxu68y" path="res://assets/ui/player_hud/inventory/inventory_slot.png" id="2_rjo3g"]
+[ext_resource type="Texture2D" uid="uid://d0ed421hv3cav" path="res://assets/ui/player_hud/inventory/Inventory_Slot_2.png" id="2_rjo3g"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_rjo3g"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbeqg"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qajpg"]
 line_spacing = 0.0
@@ -13,8 +15,9 @@ outline_color = Color(0, 0, 0, 1)
 
 [node name="InventorySlotUI" type="PanelContainer" unique_id=515379981]
 custom_minimum_size = Vector2(64, 64)
-offset_right = 128.0
-offset_bottom = 128.0
+offset_right = 100.0
+offset_bottom = 100.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_tbeqg")
 script = ExtResource("1_u5xhv")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1079686084]
@@ -24,6 +27,19 @@ mouse_filter = 2
 texture = ExtResource("2_rjo3g")
 expand_mode = 1
 stretch_mode = 5
+flip_h = true
+
+[node name="PotionAssignmentLabel" type="Label" parent="Background" unique_id=1341108348]
+layout_mode = 1
+offset_right = 56.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("3_rjo3g")
+theme_override_font_sizes/font_size = 20
+text = "MAIN"
+vertical_alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1928762802]
 layout_mode = 2

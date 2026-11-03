@@ -118,9 +118,9 @@ func _get_bottom_height() -> float:
 	if box == null:
 		return global_position.y
 	var half_size := box.size * 0.5
-	var basis := _body_shape.global_basis
-	var extent := absf(basis.x.y) * half_size.x + absf(basis.y.y) * half_size.y
-	extent += absf(basis.z.y) * half_size.z
+	var shape_basis := _body_shape.global_basis
+	var extent := absf(shape_basis.x.y) * half_size.x + absf(shape_basis.y.y) * half_size.y
+	extent += absf(shape_basis.z.y) * half_size.z
 	return _body_shape.global_position.y - extent
 
 

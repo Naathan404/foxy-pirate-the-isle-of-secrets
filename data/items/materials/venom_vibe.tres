@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://bt21m2gguymn5"]
+
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://b1tu7c86ntqpp" path="res://assets/sprites/items/Venom_Vibe.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_base")
+item_id = "venom_vibe"
+display_name = "Venom Vibe"
+icon = ExtResource("2_icon")
+description = "A thorny tendril dripping with venom."
+max_stack = 10
+metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

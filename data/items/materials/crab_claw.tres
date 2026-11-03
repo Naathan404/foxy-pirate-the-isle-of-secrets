@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://yp4kcso8yfap"]
 
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_e5qyu"]
-[ext_resource type="Texture2D" uid="uid://b7d5lwhywmo6x" path="res://assets/sprites/items/crab_claw.png" id="1_n2n28"]
+[ext_resource type="Texture2D" uid="uid://c6rri8ebn60w7" path="res://assets/sprites/items/Crab_Claw.png" id="1_n2n28"]
 
 [resource]
 script = ExtResource("1_e5qyu")

@@ -60,9 +60,9 @@ func _ready() -> void:
 	_aura.hide()
 	_glint.hide()
 	for index in POOL_SIZE:
-		var burst := _make_quad("Burst%d" % index, index % 2)
-		burst.hide()
-		_bursts.append(burst)
+		var burst_quad := _make_quad("Burst%d" % index, index % 2)
+		burst_quad.hide()
+		_bursts.append(burst_quad)
 		_burst_ages.append(1.0)
 		_burst_sizes.append(1.0)
 		var ghost := Sprite3D.new()

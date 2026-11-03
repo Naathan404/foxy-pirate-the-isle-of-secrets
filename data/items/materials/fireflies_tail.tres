@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://bjm73rcy0l6vt"]
+
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://bh1uvhx6pkhnk" path="res://assets/sprites/items/Fireflies_Tail.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_base")
+item_id = "fireflies_tail"
+display_name = "Fireflies Tail"
+icon = ExtResource("2_icon")
+description = "A firefly tail that keeps its warm glow."
+max_stack = 10
+metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

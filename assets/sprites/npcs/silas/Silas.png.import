@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://8n16ih7xarfv"
-path.s3tc="res://.godot/imported/Silas.png-af6d932b7319ccc0aeb3a35ff8ac247f.s3tc.ctex"
+path="res://.godot/imported/Silas.png-af6d932b7319ccc0aeb3a35ff8ac247f.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/npcs/silas/Silas.png"
-dest_files=["res://.godot/imported/Silas.png-af6d932b7319ccc0aeb3a35ff8ac247f.s3tc.ctex"]
+dest_files=["res://.godot/imported/Silas.png-af6d932b7319ccc0aeb3a35ff8ac247f.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

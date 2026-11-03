@@ -1,8 +1,11 @@
 class_name Player
 extends CharacterBody3D
 
+@warning_ignore("unused_signal") # Emitted by player states.
 signal action_rejected(action: StringName)
+@warning_ignore("unused_signal") # Emitted by player states.
 signal dash_finished(interrupted: bool)
+@warning_ignore("unused_signal") # Emitted by player states.
 signal dash_started
 ## Emitted for confirmed outgoing or incoming damage, including Charm hits.
 signal combat_activity

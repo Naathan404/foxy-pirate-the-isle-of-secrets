@@ -324,10 +324,10 @@ func _on_action_pressed() -> void:
 
 func _queue_success_toast(offer: MerchantOffer, was_purchase: bool) -> void:
 	var verb := "Purchased" if was_purchase else "Sold"
-	var sign := "-" if was_purchase else "+"
+	var price_sign := "-" if was_purchase else "+"
 	var gold := offer.buy_price if was_purchase else offer.sell_price
 	toast_queue.enqueue_success(
-		"%s x%d %s  %s%d G" % [verb, offer.trade_amount, offer.get_display_name(), sign, gold]
+		"%s x%d %s  %s%d G" % [verb, offer.trade_amount, offer.get_display_name(), price_sign, gold]
 	)
 
 

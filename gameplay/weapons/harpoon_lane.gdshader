@@ -6,12 +6,12 @@ uniform float opacity : hint_range(0.0, 1.0) = 1.0;
 
 void fragment() {
 	vec2 p = UV * 2.0 - 1.0;
-	float edges = smoothstep(0.78, 0.95, abs(p.x));
-	float ends = smoothstep(0.92, 0.99, abs(p.y));
 	float mask;
 	if (telegraph) {
-		float dash = step(0.35, fract(UV.y * 9.0 - TIME * 3.0));
-		mask = max(edges * dash, ends) * 0.8 + 0.07;
+		float length_fade = 1.0 - smoothstep(0.62, 1.0, abs(p.y));
+		float pulse = 0.75 + 0.25 * sin(TIME * 13.0);
+		mask = (exp(-p.x * p.x * 130.0) * 0.65
+			+ exp(-p.x * p.x * 18.0) * 0.22) * length_fade * pulse;
 	} else {
 		float core = exp(-p.x * p.x * 120.0);
 		float glow = exp(-p.x * p.x * 9.0) * 0.5;

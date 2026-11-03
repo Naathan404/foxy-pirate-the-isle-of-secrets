@@ -4,7 +4,9 @@ extends RefCounted
 ### Context chứa ngồn đánh, hướng, mục tiêu, damage
 
 # Lượng máu thật sự mất
+@warning_ignore("unused_signal") # Emitted by attack implementations.
 signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
+@warning_ignore("unused_signal") # Emitted by attack implementations.
 signal damage_prepared(damage: DamageContext, target: Node)
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
