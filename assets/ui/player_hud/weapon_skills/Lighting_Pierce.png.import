@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wovfxsw8vnms"
-path="res://.godot/imported/CP_Stormstring.png-bd1bdbd0d4e127d9abae131bd9519092.ctex"
+uid="uid://811606mgtknp"
+path="res://.godot/imported/Lighting_Pierce.png-3000ff0ff09da02a6d1a9179a9983c8d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/weapon_skills/CP_Stormstring.png"
-dest_files=["res://.godot/imported/CP_Stormstring.png-bd1bdbd0d4e127d9abae131bd9519092.ctex"]
+source_file="res://assets/ui/player_hud/weapon_skills/Lighting_Pierce.png"
+dest_files=["res://.godot/imported/Lighting_Pierce.png-3000ff0ff09da02a6d1a9179a9983c8d.ctex"]
 
 [params]
 

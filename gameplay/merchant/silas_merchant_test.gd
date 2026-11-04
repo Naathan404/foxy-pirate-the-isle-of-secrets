@@ -2,13 +2,14 @@ extends SceneTree
 
 const CATALOG: MerchantCatalog = preload("res://data/merchants/silas_catalog.tres")
 const BOW: WeaponData = preload("res://data/weapon/weapon_bow.tres")
-const ARROW: BaseItem = preload("res://data/items/materials/wooden_arrow.tres")
+const ARROW: BaseItem = preload("res://data/items/consumables/wooden_arrow.tres")
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
 const NPC_TEST_SCENE_PATH := "res://test/silas_test_scene.tscn"
 const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
+const SHOP_PANEL_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_panel.tscn")
 const GOLD_DISPLAY_SCENE: PackedScene = preload("res://gameplay/economy/gold_display.tscn")
 
 var _failures := 0
@@ -18,8 +19,11 @@ func _initialize() -> void:
 	_test_purchase_rejections()
 	_test_successful_item_trade()
 	_test_configured_trade_amount()
-	_test_catalog_prices_and_disabled_sales()
+	_test_multiple_trade_quantities()
+	_test_catalog_prices_and_sales()
+	_test_random_buy_stock()
 	_test_weapon_is_one_time_purchase()
+	await _test_shop_scene()
 	_test_persistence()
 	await _test_toast_queue()
 	await _test_gold_display_feedback()
@@ -103,7 +107,12 @@ func _test_configured_trade_amount() -> void:
 	bundled_offer.buy_price = 6
 	bundled_offer.sell_price = 3
 	var bundled_catalog := MerchantCatalog.new()
-	bundled_catalog.offers = [bundled_offer]
+	var single_offer := MerchantOffer.new()
+	single_offer.offer_id = &"single_arrow"
+	single_offer.item = ARROW
+	single_offer.buy_price = 2
+	bundled_catalog.offers = [bundled_offer, single_offer]
+	_assert_true(bundled_catalog.validate().is_empty(), "one item can have multiple buy offers")
 	var service := MerchantTransactionService.new(bundled_catalog)
 	var inventory := _make_inventory(2)
 	var wallet := GoldWallet.new()
@@ -122,61 +131,116 @@ func _test_configured_trade_amount() -> void:
 	)
 	_assert_equal(inventory.count_item(ARROW.item_id), 0, "sale removes configured trade amount")
 	_assert_equal(wallet.get_balance(), 3, "bundle sale uses configured price once")
+	single_offer.sell_price = 1
+	_assert_false(
+		bundled_catalog.validate().is_empty(), "one item cannot have two sell offers"
+	)
 	inventory.free()
 
 
-func _test_catalog_prices_and_disabled_sales() -> void:
+func _test_multiple_trade_quantities() -> void:
+	var service := MerchantTransactionService.new(CATALOG)
+	var inventory := _make_inventory(4)
+	var wallet := GoldWallet.new()
+	wallet.add_gold(10)
 	_assert_equal(
-		CATALOG.get_offer(&"starfish_core").buy_price, 50, "starfish buy price comes from catalog"
+		service.purchase(&"wooden_arrow", inventory, wallet, null, 3),
+		MerchantTransactionService.Result.SUCCESS,
+		"buying three arrows succeeds"
 	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 3, "quantity purchase adds three arrows")
+	_assert_equal(wallet.get_balance(), 4, "quantity purchase spends six gold")
 	_assert_equal(
-		CATALOG.get_offer(&"starfish_core").sell_price, 5, "starfish sell price comes from catalog"
+		service.sell(&"wooden_arrow", inventory, wallet, 2),
+		MerchantTransactionService.Result.SUCCESS,
+		"selling two arrows succeeds"
 	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 1, "quantity sale removes two arrows")
+	_assert_equal(wallet.get_balance(), 6, "quantity sale adds two gold")
 	_assert_equal(
-		CATALOG.get_offer(&"crab_claw").sell_price, 5, "crab sale price comes from catalog"
+		service.sell(&"wooden_arrow", inventory, wallet, 2),
+		MerchantTransactionService.Result.NOT_OWNED,
+		"quantity sale rejects insufficient stock"
 	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 1, "failed sale preserves stock")
+	_assert_equal(wallet.get_balance(), 6, "failed sale preserves gold")
+	inventory.free()
+
+
+func _test_random_buy_stock() -> void:
+	var random := RandomNumberGenerator.new()
+	random.seed = 42
+	var source_count := CATALOG.get_buy_offers().size()
+	var fixed_count := CATALOG.guaranteed_buy_offer_ids.size()
+	var expected_count := fixed_count + mini(
+		CATALOG.random_buy_offer_count, source_count - fixed_count
+	)
+	var stock := CATALOG.roll_buy_stock(random)
+	_assert_equal(stock.get_buy_offers().size(), expected_count, "stock has fixed and drawn offers")
 	_assert_equal(
-		CATALOG.get_offer(&"gunpowder_bag").sell_price, 5, "gunpowder sale price comes from catalog"
+		CATALOG.get_buy_offers().size(), source_count, "rolling leaves the source pool intact"
 	)
-	_assert_equal(
-		CATALOG.get_offer(&"small_healing_potion").buy_price,
-		25,
-		"small healing price comes from catalog"
-	)
-	_assert_equal(
-		CATALOG.get_offer(&"healing_potion").buy_price, 45, "large healing price comes from catalog"
-	)
-	_assert_equal(
-		CATALOG.get_offer(&"small_stamina_potion").buy_price,
-		15,
-		"small stamina price comes from catalog"
-	)
-	_assert_equal(
-		CATALOG.get_offer(&"stamina_potion").buy_price, 30, "large stamina price comes from catalog"
-	)
+	_assert_true(stock.validate().is_empty(), "rolled catalog remains valid")
+	for offer_id: StringName in CATALOG.guaranteed_buy_offer_ids:
+		_assert_true(stock.get_offer(offer_id).buy_price > 0, "guaranteed offer remains available")
+	var hidden_count := 0
+	var service := MerchantTransactionService.new(stock)
+	for offer: MerchantOffer in CATALOG.get_buy_offers():
+		if stock.get_offer(offer.offer_id).buy_price == 0:
+			hidden_count += 1
+			_assert_true(service._get_buy_offer(offer.offer_id) == null, "hidden offer cannot be bought")
+	_assert_equal(hidden_count, source_count - expected_count, "undrawn offers are hidden")
 	_assert_true(
-		CATALOG.get_sell_offer_for_item(HEALING.item_id) == null, "small potion cannot be sold"
+		stock.get_sell_offer_for_item(&"starfish_core") != null,
+		"buy selection does not change what Silas buys from the player"
 	)
+	var store := SilasProgressStore.new()
+	var before := store.get_shop_stock(CATALOG)
 	_assert_true(
-		CATALOG.get_sell_offer_for_item(LARGE_HEALING.item_id) == null,
-		"large potion cannot be sold"
+		before == store.get_shop_stock(CATALOG), "stock stays fixed during a play session"
 	)
+	var after := store.reroll_shop_stock(CATALOG)
+	var changed := false
+	for offer: MerchantOffer in CATALOG.get_buy_offers():
+		if (before.get_offer(offer.offer_id).buy_price > 0) != (
+			after.get_offer(offer.offer_id).buy_price > 0
+		):
+			changed = true
+			break
+	_assert_true(changed, "manual reroll changes the stock")
+	store.free()
+
+
+func _test_catalog_prices_and_sales() -> void:
+	for offer: MerchantOffer in CATALOG.get_buy_offers():
+		_assert_true(offer.buy_price > 0, "buy offer has a price")
+	var potion_sell_offer := CATALOG.get_sell_offer_for_item(HEALING.item_id)
+	_assert_true(potion_sell_offer != null, "Silas buys the configured small potion")
+	if potion_sell_offer == null:
+		return
 	var service := MerchantTransactionService.new(CATALOG)
 	var inventory := _make_inventory(2)
 	var wallet := GoldWallet.new()
 	inventory.add_item(HEALING, 1)
 	_assert_equal(
-		service.sell(&"small_healing_potion", inventory, wallet),
-		MerchantTransactionService.Result.INVALID_OFFER,
-		"catalog prevents selling a potion without a sell price"
+		service.sell(potion_sell_offer.offer_id, inventory, wallet),
+		MerchantTransactionService.Result.SUCCESS,
+		"catalog accepts the configured potion sale"
 	)
-	_assert_equal(inventory.count_item(HEALING.item_id), 1, "rejected potion sale keeps the item")
-	_assert_equal(wallet.get_balance(), 0, "rejected potion sale keeps gold")
+	_assert_equal(inventory.count_item(HEALING.item_id), 0, "potion sale removes the item")
+	_assert_equal(wallet.get_balance(), potion_sell_offer.sell_price, "sale pays catalog price")
 	inventory.free()
 
 
 func _test_weapon_is_one_time_purchase() -> void:
-	var service := MerchantTransactionService.new(CATALOG)
+	var bow_offer := MerchantOffer.new()
+	bow_offer.offer_id = &"bow"
+	bow_offer.kind = MerchantOffer.Kind.WEAPON
+	bow_offer.weapon = BOW
+	bow_offer.buy_price = 100
+	var weapon_catalog := MerchantCatalog.new()
+	weapon_catalog.offers = [bow_offer]
+	var service := MerchantTransactionService.new(weapon_catalog)
 	var weapons := WeaponController.new()
 	var entry := WeaponCollectionEntry.new()
 	entry.definition = BOW
@@ -199,6 +263,21 @@ func _test_weapon_is_one_time_purchase() -> void:
 	)
 	inventory.free()
 	weapons.free()
+
+
+func _test_shop_scene() -> void:
+	var panel := SHOP_PANEL_SCENE.instantiate() as SilasShopPanel
+	_assert_true(panel != null, "Silas shop scene loads")
+	if panel == null:
+		return
+	root.add_child(panel)
+	await process_frame
+	_assert_true(panel.buy_tab != null, "buy tab is connected")
+	_assert_true(panel.sell_tab != null, "sell tab is connected")
+	_assert_true(panel.grid != null, "item grid is connected")
+	_assert_true(panel.action_button != null, "purchase button is connected")
+	panel.queue_free()
+	await process_frame
 
 
 func _test_persistence() -> void:
@@ -314,25 +393,27 @@ func _test_npc_scene_smoke() -> void:
 			silas.catalog.get_buy_offers().size(),
 			"buy tab renders the configured catalog"
 		)
-		_assert_equal(panel.grid.columns, 5, "shop grid keeps inventory's five-column layout")
-		var first_buy_slot := panel.grid.get_child(0) as InventorySlotUI
-		_assert_false(
-			first_buy_slot.quantity_label.visible, "buy previews do not show redundant quantities"
+		_assert_equal(
+			panel.reroll_button.visible, OS.has_feature("debug"), "reroll button is debug-only"
 		)
-		_assert_true(panel.buy_tab is TextureButton, "buy tab uses an inventory-style bookmark")
+		panel.reroll_button.pressed.emit()
+		var session_stock := panel._catalog
+		_assert_equal(
+			panel.grid.get_child_count(), session_stock.get_buy_offers().size(),
+			"debug reroll updates the open shop"
+		)
+		panel.reroll_button.pressed.emit()
+		_assert_true(panel._catalog != session_stock, "debug button creates a new stock catalog")
+		_assert_equal(SilasShopPanel.GRID_COLUMNS, 4, "shop grid uses the mockup's four columns")
+		var first_buy_slot := panel.grid.get_child(0) as SilasShopSlot
+		_assert_true(first_buy_slot != null, "shop uses the Silas slot art")
+		_assert_true(panel.buy_tab is TextureButton, "buy tab uses the supplied texture")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
 		var inventory := player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
-			_assert_equal(
-				panel.grid.get_child_count(),
-				inventory.slots.size(),
-				"sell tab renders the real inventory"
-			)
-			panel._set_tab(SilasShopPanel.Tab.BAG)
-			_assert_equal(
-				panel.grid.get_child_count(),
-				inventory.slots.size(),
-				"bag tab renders the real inventory"
+			_assert_true(
+				panel.grid.get_child_count() <= inventory.slots.size(),
+				"sell tab renders occupied inventory slots"
 			)
 		panel.close_shop()
 		await create_timer(panel.close_duration + 0.05, true).timeout

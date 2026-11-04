@@ -10,11 +10,15 @@ charm_id = &"turtle_shell"
 display_name = "Turtle Shell"
 description = "Increase maximum HP by 2 and reduce movement speed by 15%."
 sprite = ExtResource("3_125md")
+charm_type = null
 effect_scene = ExtResource("2_effect")
+resource_cost = null
+cooldown_seconds = null
+proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
-drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"stat_modifier", &"defense"])
 effect_params = {
 "max_hp_flat": 2,
 "move_speed_multiplier": 0.85
 }
+drop_chance = 0.1

@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://7d2l7h8n02vv"]
 
+[ext_resource type="Texture2D" uid="uid://dc3tu67hi66t2" path="res://assets/sprites/items/equipment/Harpoon.png" id="1_uvv2e"]
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_weapon"]
 [ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="2_attack"]
 [ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="3_fyix7"]
 [ext_resource type="PackedScene" uid="uid://bjpyjqo60nn4o" path="res://gameplay/weapons/attack scenes/harpoon_thrust.tscn" id="3_thrust"]
 [ext_resource type="PackedScene" uid="uid://cv4ixl8bin2s3" path="res://gameplay/weapons/attack scenes/harpoon_pierce.tscn" id="4_pierce"]
-[ext_resource type="Texture2D" uid="uid://bvkk0bgeb5uh3" path="res://assets/sprites/items/equipment/harpoon_placeholder/harpoon.png" id="5_icon"]
+[ext_resource type="Texture2D" uid="uid://811606mgtknp" path="res://assets/ui/player_hud/weapon_skills/Lighting_Pierce.png" id="7_uvv2e"]
 
 [sub_resource type="Resource" id="Thrust"]
 script = ExtResource("2_attack")
@@ -22,7 +23,7 @@ range_units = 2.6
 [sub_resource type="Resource" id="Pierce"]
 script = ExtResource("2_attack")
 animation_prefix = "harpoon/pierce"
-skill_icon = ExtResource("5_icon")
+skill_icon = ExtResource("7_uvv2e")
 display_name = "Lightning Pierce"
 description = "Step back and charge for 0.5 seconds, then pierce every enemy in a straight line. Invulnerable during the dash; walls and ledges stop the lunge."
 attack_scene = ExtResource("4_pierce")
@@ -39,7 +40,7 @@ range_units = 8.0
 script = ExtResource("1_weapon")
 weapon_id = &"harpoon"
 display_name = "Harpoon"
-icon = ExtResource("5_icon")
+icon = ExtResource("1_uvv2e")
 description = "A slender golden harpoon. Fast, precise thrusts reward lining enemies up for a piercing Chaos dash. Temporary prototype artwork."
 stagger_damage = 24.0
 chaos_per_hit = 50.0

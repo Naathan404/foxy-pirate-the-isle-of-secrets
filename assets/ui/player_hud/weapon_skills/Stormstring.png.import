@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://h30qe12s3t4q"
-path="res://.godot/imported/CP_Dagger.png-6f84270cd1f0e4faf90884319a2daeb0.ctex"
+uid="uid://cjiisbfv0nw4u"
+path="res://.godot/imported/Stormstring.png-353c062a37d2897dfe5f8dbf6098d3d0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png"
-dest_files=["res://.godot/imported/CP_Dagger.png-6f84270cd1f0e4faf90884319a2daeb0.ctex"]
+source_file="res://assets/ui/player_hud/weapon_skills/Stormstring.png"
+dest_files=["res://.godot/imported/Stormstring.png-353c062a37d2897dfe5f8dbf6098d3d0.ctex"]
 
 [params]
 

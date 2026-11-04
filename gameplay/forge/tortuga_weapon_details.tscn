@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://dwdpsp5ebl1b1"]
+
+[ext_resource type="Script" uid="uid://du1m6c532c5e3" path="res://gameplay/forge/tortuga_weapon_details.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="2_heading_font"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="3_body_font"]
+[ext_resource type="Texture2D" uid="uid://bokwoc773t64x" path="res://assets/ui/silas_shop/PNG/14_divider_gold.png" id="4_divider"]
+[ext_resource type="Texture2D" uid="uid://dn8xyc2ls77hv" path="res://assets/ui/silas_shop/PNG/15_detail_item_icon_slot.png" id="5_skill_frame"]
+
+[node name="WeaponDetails" type="Control" unique_id=2131289469]
+custom_minimum_size = Vector2(372, 604)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Description" type="Label" parent="." unique_id=1279491059]
+layout_mode = 0
+offset_right = 364.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(0.22, 0.11, 0.07, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
+[node name="StatsHeading" type="Label" parent="." unique_id=1694246620]
+layout_mode = 0
+offset_top = 75.0
+offset_right = 364.0
+offset_bottom = 103.0
+theme_override_colors/font_color = Color(0.41, 0.18, 0.08, 1)
+theme_override_fonts/font = ExtResource("2_heading_font")
+theme_override_font_sizes/font_size = 23
+text = "WEAPON STATS"
+
+[node name="StatsGrid" type="Control" parent="." unique_id=1395777062]
+anchors_preset = 0
+offset_top = 108.0
+offset_right = 330.0
+offset_bottom = 238.0
+mouse_filter = 2
+
+[node name="DividerA" type="TextureRect" parent="." unique_id=932568394]
+layout_mode = 0
+offset_top = 240.0
+offset_right = 364.0
+offset_bottom = 251.0
+mouse_filter = 2
+texture = ExtResource("4_divider")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ForgeHeading" type="Label" parent="." unique_id=452633805]
+layout_mode = 0
+offset_top = 245.0
+offset_right = 364.0
+offset_bottom = 276.0
+theme_override_colors/font_color = Color(0.41, 0.18, 0.08, 1)
+theme_override_fonts/font = ExtResource("2_heading_font")
+theme_override_font_sizes/font_size = 23
+text = "FORGE ATTRIBUTES"
+
+[node name="ForgeScroll" type="ScrollContainer" parent="." unique_id=1302541852]
+layout_mode = 0
+offset_top = 277.0
+offset_right = 350.0
+offset_bottom = 417.0
+horizontal_scroll_mode = 0
+
+[node name="ForgeRows" type="Control" parent="ForgeScroll" unique_id=1144143997]
+custom_minimum_size = Vector2(344, 104)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="DividerB" type="TextureRect" parent="." unique_id=347616833]
+layout_mode = 0
+offset_top = 418.0
+offset_right = 364.0
+offset_bottom = 429.0
+mouse_filter = 2
+texture = ExtResource("4_divider")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkillHeading" type="Label" parent="." unique_id=635659710]
+layout_mode = 0
+offset_top = 423.0
+offset_right = 364.0
+offset_bottom = 452.0
+theme_override_colors/font_color = Color(0.41, 0.18, 0.08, 1)
+theme_override_fonts/font = ExtResource("2_heading_font")
+theme_override_font_sizes/font_size = 23
+text = "WEAPON SKILL"
+
+[node name="SkillFrame" type="TextureRect" parent="." unique_id=45319636]
+layout_mode = 0
+offset_top = 459.0
+offset_right = 68.0
+offset_bottom = 527.0
+mouse_filter = 2
+texture = ExtResource("5_skill_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkillIcon" type="TextureRect" parent="SkillFrame" unique_id=629419928]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 12.0
+offset_right = 55.0
+offset_bottom = 54.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkillName" type="Label" parent="." unique_id=1811806652]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 463.0
+offset_right = 363.0
+offset_bottom = 494.0
+theme_override_colors/font_color = Color(0.29, 0.13, 0.07, 1)
+theme_override_fonts/font = ExtResource("2_heading_font")
+theme_override_font_sizes/font_size = 20
+text_overrun_behavior = 3
+
+[node name="SkillMeta" type="Label" parent="." unique_id=66079988]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 495.0
+offset_right = 363.0
+offset_bottom = 523.0
+theme_override_colors/font_color = Color(0.49, 0.25, 0.12, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 14
+
+[node name="SkillDescription" type="Label" parent="." unique_id=29150897]
+layout_mode = 0
+offset_top = 532.0
+offset_right = 364.0
+offset_bottom = 608.0
+theme_override_colors/font_color = Color(0.22, 0.11, 0.07, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3

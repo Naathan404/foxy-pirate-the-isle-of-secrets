@@ -8,11 +8,15 @@ script = ExtResource("1_data")
 charm_id = &"backstabber"
 display_name = "Backstabber"
 description = "Melee normal attacks from behind deal 50% bonus damage."
+charm_type = null
 effect_scene = ExtResource("2_effect")
+resource_cost = null
+cooldown_seconds = null
+proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
-drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"outgoing_damage", &"normal_attack", &"melee", &"positional"])
 effect_params = {
 "behind_dot_threshold": 0.0,
 "damage_multiplier": 1.5
 }
+drop_chance = 0.1

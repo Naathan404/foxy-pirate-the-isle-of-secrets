@@ -6,7 +6,7 @@ signal balance_changed(balance: int, change: int)
 
 const MAX_GOLD: int = 9223372036854775807
 
-var _balance: int = 0
+var _balance: int = 1000
 
 
 func get_balance() -> int:

@@ -13,10 +13,10 @@ var _locked: bool = false
 var _visual_tween: Tween
 var _background_scale: Vector2
 var _icon_scale: Vector2
-var _highlight: Panel
 
 @onready var background: TextureRect = $TextureRect
 @onready var item_icon: TextureRect = $Icon
+@onready var _highlight: TextureRect = $SelectionHighlight
 
 
 func _ready() -> void:
@@ -25,17 +25,6 @@ func _ready() -> void:
 	# The texture supplies the slot frame; remove Button theme art that would stay still.
 	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled", &"focus"]:
 		add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	var border := StyleBoxFlat.new()
-	border.draw_center = false
-	border.set_border_width_all(2)
-	border.border_color = Color.WHITE
-	_highlight = Panel.new()
-	_highlight.name = "SelectionHighlight"
-	_highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_highlight.add_theme_stylebox_override("panel", border)
-	add_child(_highlight)
-	_highlight.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_highlight.hide()
 	mouse_entered.connect(_set_hovered.bind(true))
 	mouse_exited.connect(_set_hovered.bind(false))
 	button_down.connect(_set_pressed.bind(true))
@@ -102,7 +91,7 @@ func _animate_visual() -> void:
 	var tint := Color(1.08, 1.08, 1.08) if hovered else Color.WHITE
 	var icon_tint := Color(tint, 0.35 if _locked else 1.0)
 	_highlight.visible = _selected or hovered or (has_focus() and not disabled)
-	_highlight.modulate = Color(1.0, 0.8, 0.35) if _selected else Color(1, 1, 1, 0.45)
+	_highlight.modulate = Color.WHITE if _selected else Color(1, 1, 1, 0.6)
 	if not is_visible_in_tree():
 		background.scale = _background_scale
 		item_icon.scale = _icon_scale
