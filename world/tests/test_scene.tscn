@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="23_5fcor"]
 [ext_resource type="PackedScene" uid="uid://dltw4fun83bl4" path="res://gameplay/merchant/silas_shop_panel.tscn" id="24_silas_panel"]
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="25_silas_npc"]
+[ext_resource type="PackedScene" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="tortuga_npc"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="26_or6q7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
@@ -210,6 +211,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
 
 [node name="Silas" parent="." unique_id=1750552988 instance=ExtResource("25_silas_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
+
+[node name="MasterTortuga" parent="." instance=ExtResource("tortuga_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2, 3)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
 transform = Transform3D(-0.43569398, -0.73731464, 0.51627326, 2.6181812e-09, 0.57357645, 0.8191521, -0.90009475, 0.3568996, -0.24990383, 0, 0, 0)

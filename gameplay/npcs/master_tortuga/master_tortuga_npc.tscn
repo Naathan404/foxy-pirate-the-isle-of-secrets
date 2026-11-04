@@ -1,0 +1,227 @@
+[gd_scene format=3 uid="uid://bt18ui53kscd7"]
+
+[ext_resource type="Script" uid="uid://c3xa7fx4nfjx2" path="res://gameplay/npcs/base/npc_visual.gd" id="2_l8274"]
+[ext_resource type="Texture2D" uid="uid://cs78ha0hbmq2w" path="res://assets/sprites/npcs/master_tortuga/Master_Tortuga_Idle.png" id="3_gnmsh"]
+[ext_resource type="Texture2D" uid="uid://boygebnjr0o5t" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_1.png" id="4_kchqp"]
+[ext_resource type="Texture2D" uid="uid://cosmx2jjbfa1y" path="res://assets/sprites/npcs/master_tortuga/Master_Tortuga_Talking.png" id="5_4f57c"]
+[ext_resource type="AnimationLibrary" uid="uid://brpsylflg2vk7" path="res://gameplay/npcs/silas/silas_npc_anims.tres" id="5_gd6i5"]
+[ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="6_4f57c"]
+[ext_resource type="Script" uid="uid://mik1dga3ihuk" path="res://gameplay/npcs/base/states/npc_idle.gd" id="7_2agp7"]
+[ext_resource type="Script" uid="uid://bl01533qto3ma" path="res://gameplay/npcs/base/states/npc_talk.gd" id="8_0ql8l"]
+[ext_resource type="Script" uid="uid://clierd32ld0n" path="res://gameplay/npcs/base/npc_interaction_area.gd" id="9_bm454"]
+[ext_resource type="Resource" uid="uid://dm6urnvsjgkei" path="res://data/forge/tortuga_catalog.tres" id="tortuga_catalog"]
+[ext_resource type="Resource" uid="uid://bbe1ym7lp20dk" path="res://data/npcs/master_tortuga_data.tres" id="tortuga_data"]
+[ext_resource type="PackedScene" uid="uid://b3l8eoptwh2gv" path="res://gameplay/forge/tortuga_panel.tscn" id="tortuga_panel"]
+[ext_resource type="Script" uid="uid://dh2t0kqpty1rg" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.gd" id="tortuga_script"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c3pw6"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(0, 0, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dgwvt"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(443, 0, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u3a7j"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(886, 0, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qkwd6"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(1329, 0, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xapf4"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(0, 443, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fa381"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(443, 443, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_77pcf"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(886, 443, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tryfo"]
+atlas = ExtResource("3_gnmsh")
+region = Rect2(1329, 443, 443, 443)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2agp7"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(0, 0, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ql8l"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(512, 0, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bm454"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(1024, 0, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_je6kt"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(1536, 0, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oxwnl"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(0, 512, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hra5y"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(512, 512, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v4etj"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(1024, 512, 512, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l2wgl"]
+atlas = ExtResource("5_4f57c")
+region = Rect2(1536, 512, 512, 512)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_je6kt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c3pw6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dgwvt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u3a7j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qkwd6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xapf4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fa381")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_77pcf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tryfo")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2agp7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ql8l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bm454")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_je6kt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oxwnl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hra5y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v4etj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l2wgl")
+}],
+"loop": 1,
+"name": &"talking",
+"speed": 12.0
+}]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_oxwnl"]
+radius = 1.1860352
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hra5y"]
+height = 3.0
+radius = 3.0
+
+[node name="MasterTortugaNpc" type="CharacterBody3D" unique_id=122461608]
+script = ExtResource("tortuga_script")
+data = ExtResource("tortuga_data")
+
+[node name="Visual" type="Node3D" parent="." unique_id=1894690924 node_paths=PackedStringArray("sprite", "animation_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6943457, 0)
+script = ExtResource("2_l8274")
+sprite = NodePath("Sprite3D")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Visual" unique_id=1529006159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.286155, 0)
+offset = Vector2(0, 48)
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_je6kt")
+animation = &"talking"
+autoplay = "idle"
+frame = 7
+frame_progress = 1.0
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1933070025]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, 0, 0, 0)
+visible = false
+offset = Vector2(0, 34)
+pixel_size = 0.0625
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("4_kchqp")
+hframes = 4
+vframes = 4
+frame = 10
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Visual" unique_id=1946686998]
+libraries/ = ExtResource("5_gd6i5")
+
+[node name="Direction" type="Node3D" parent="." unique_id=180047644]
+
+[node name="FrontRayCast3D" type="RayCast3D" parent="Direction" unique_id=1285238474]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+enabled = false
+target_position = Vector3(0, 0, 0.8)
+
+[node name="GroundRayCast3D" type="RayCast3D" parent="Direction" unique_id=802129823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0.65)
+enabled = false
+target_position = Vector3(0, -1.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=268602548]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("CylinderShape3D_oxwnl")
+
+[node name="FSM" type="Node" parent="." unique_id=1719082481]
+script = ExtResource("6_4f57c")
+
+[node name="States" type="Node" parent="." unique_id=293147027]
+
+[node name="Idle" type="Node" parent="States" unique_id=934058214]
+script = ExtResource("7_2agp7")
+
+[node name="Talk" type="Node" parent="States" unique_id=400933189]
+script = ExtResource("8_0ql8l")
+
+[node name="InteractionArea" type="Area3D" parent="." unique_id=747229856]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("9_bm454")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea" unique_id=221836232]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("CylinderShape3D_hra5y")
+
+[node name="TortugaPanel" parent="." unique_id=1301583089 instance=ExtResource("tortuga_panel")]
+catalog = ExtResource("tortuga_catalog")

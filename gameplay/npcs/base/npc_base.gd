@@ -165,6 +165,8 @@ func _focus_dialogue_camera(interactor: Player) -> void:
 	_dialogue_camera = active_camera
 	_dialogue_camera_initial_position = active_camera.global_position
 	_dialogue_camera_initial_fov = active_camera.fov
+	if _dialogue_camera is BoundedFollowCamera3D:
+		(_dialogue_camera as BoundedFollowCamera3D).begin_dialogue_override()
 
 	var player_to_npc := global_position - interactor.global_position
 	player_to_npc.y = 0.0
@@ -174,9 +176,7 @@ func _focus_dialogue_camera(interactor: Player) -> void:
 	var target_fov := _dialogue_camera_initial_fov * dialogue_camera_fov_scale
 	_dialogue_camera_tween = create_tween().set_parallel()
 	_dialogue_camera_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_dialogue_camera_tween.tween_property(
-		_dialogue_camera, "global_position", target_position, dialogue_camera_transition_duration
-	)
+	_tween_dialogue_camera_position(target_position)
 	_dialogue_camera_tween.tween_property(
 		_dialogue_camera, "fov", target_fov, dialogue_camera_transition_duration
 	)
@@ -189,24 +189,45 @@ func _restore_dialogue_camera(immediate := false) -> void:
 
 	_stop_dialogue_camera_tween()
 	if immediate:
-		_dialogue_camera.global_position = _dialogue_camera_initial_position
+		if _dialogue_camera is BoundedFollowCamera3D:
+			(_dialogue_camera as BoundedFollowCamera3D).set_bounded_global_position(
+				_dialogue_camera_initial_position
+			)
+			(_dialogue_camera as BoundedFollowCamera3D).end_dialogue_override()
+		else:
+			_dialogue_camera.global_position = _dialogue_camera_initial_position
 		_dialogue_camera.fov = _dialogue_camera_initial_fov
 		_clear_dialogue_camera_state()
 		return
 
 	_dialogue_camera_tween = create_tween().set_parallel()
 	_dialogue_camera_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_dialogue_camera_tween.tween_property(
-		_dialogue_camera,
-		"global_position",
-		_dialogue_camera_initial_position,
-		dialogue_camera_transition_duration
-	)
+	_tween_dialogue_camera_position(_dialogue_camera_initial_position)
 	_dialogue_camera_tween.tween_property(
 		_dialogue_camera, "fov", _dialogue_camera_initial_fov, dialogue_camera_transition_duration
 	)
 	_dialogue_camera_tween.set_parallel(false)
-	_dialogue_camera_tween.tween_callback(_clear_dialogue_camera_state)
+	_dialogue_camera_tween.tween_callback(_finish_dialogue_camera_restore)
+
+
+func _tween_dialogue_camera_position(target_position: Vector3) -> void:
+	if _dialogue_camera is BoundedFollowCamera3D:
+		_dialogue_camera_tween.tween_method(
+			Callable(_dialogue_camera, "set_bounded_global_position"),
+			_dialogue_camera.global_position,
+			target_position,
+			dialogue_camera_transition_duration
+		)
+	else:
+		_dialogue_camera_tween.tween_property(
+			_dialogue_camera, "global_position", target_position, dialogue_camera_transition_duration
+		)
+
+
+func _finish_dialogue_camera_restore() -> void:
+	if _dialogue_camera is BoundedFollowCamera3D:
+		(_dialogue_camera as BoundedFollowCamera3D).end_dialogue_override()
+	_clear_dialogue_camera_state()
 
 
 func _stop_dialogue_camera_tween() -> void:
@@ -273,6 +294,14 @@ func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 	var talk_state := fsm.states.get("talk") as FsmState
 	if is_instance_valid(talk_state):
 		fsm.change_state(talk_state)
+	# Dialogic.start() clears its base style before the first text event. That
+	# event then resolves the default style again, so keep both paths aligned.
+	ProjectSettings.set_setting(
+		"dialogic/layout/default_style", "res://dialog/ui/pirate_dialogue_style.tres"
+	)
+	var styles: Node = dialogic.call(&"get_subsystem", "Styles")
+	if is_instance_valid(styles):
+		styles.call(&"change_style", "res://dialog/ui/pirate_dialogue_style.tres")
 	dialogic.connect(&"timeline_ended", _on_dialogue_ended, CONNECT_ONE_SHOT)
 	dialogic.call(&"start", resolved_timeline)
 	dialogue_started.emit(interactor)

@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://xusr4en2ovo"]
+
+[ext_resource type="Script" uid="uid://drrd50s6dmfco" path="res://gameplay/forge/tortuga_cost_chip.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ekljc06mdpud" path="res://assets/ui/silas_shop/PNG/05_item_slot_empty.png" id="2_frame"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="3_font"]
+
+[node name="CostChip" type="Control" unique_id=179167058]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Frame" type="TextureRect" parent="." unique_id=1093227602]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+texture = ExtResource("2_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1095856724]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 35.0
+offset_bottom = 35.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="." unique_id=563962036]
+layout_mode = 0
+offset_left = 41.0
+offset_top = 3.0
+offset_right = 141.0
+offset_bottom = 19.0
+theme_override_colors/font_color = Color(0.22, 0.11, 0.07, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 15
+text_overrun_behavior = 3
+
+[node name="Amount" type="Label" parent="." unique_id=1310876848]
+layout_mode = 0
+offset_left = 41.0
+offset_top = 19.0
+offset_right = 141.0
+offset_bottom = 39.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16

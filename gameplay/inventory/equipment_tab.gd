@@ -2,6 +2,7 @@ extends Control
 ## A read-only view of combat stats with equipment commands delegated to their owners.
 
 const SLOT := preload("res://gameplay/inventory/equipment_slot.tscn")
+const STAT_FONT: FontFile = preload("res://assets/fonts/unifont-17.0.03.otf")
 const PAGE_SIZE := 15
 const KEYS := ["Q", "SPACE", "E"]
 const FORGE_FIELDS := {
@@ -391,6 +392,7 @@ func _add_forge_row(text: String, benefit: float = 0.0) -> void:
 	label.text = "  " + text
 	label.tooltip_text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_font_override("font", STAT_FONT)
 	label.add_theme_font_size_override("font_size", 12)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.76, 0.69, 0.60, 0.45)

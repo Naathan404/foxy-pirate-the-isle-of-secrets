@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://381t0uh6oy0e"]
 
 [ext_resource type="Script" uid="uid://dlxg0f4p03ka5" path="res://world/hub/scenes/hub.gd" id="1_m32iv"]
+[ext_resource type="Script" uid="uid://cwey86jadengi" path="res://world/components/camera_bounds_3d.gd" id="camera_bounds"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_l3xad"]
 [ext_resource type="MeshLibrary" uid="uid://bscwetg41y4ge" path="res://assets/meshes/world/world.meshlib" id="3_omo6j"]
 [ext_resource type="PackedScene" uid="uid://3v06vwpc6plb" path="res://gameplay/checkpoint/checkpoint.tscn" id="4_3cxqn"]
@@ -479,3 +480,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.072242, 2.81216, -1.592403
 
 [node name="Crate" parent="WorldPivot/GameplayProps" instance=ExtResource("14_crate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.285956, 1.9911819, 5.825096)
+
+[node name="CameraBounds" type="Node3D" parent="."]
+script = ExtResource("camera_bounds")
+
+[node name="CornerA" type="Marker3D" parent="CameraBounds"]
+position = Vector3(-48, 0, -61)
+
+[node name="CornerB" type="Marker3D" parent="CameraBounds"]
+position = Vector3(43, 0, 38)

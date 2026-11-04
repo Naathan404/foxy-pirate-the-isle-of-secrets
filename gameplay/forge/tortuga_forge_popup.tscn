@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://bympsgu0f6rjq"]
+
+[ext_resource type="Script" uid="uid://bosef1yke0olg" path="res://gameplay/forge/tortuga_forge_popup.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="2_book"]
+[ext_resource type="PackedScene" uid="uid://cu7aa2l611pay" path="res://gameplay/forge/tortuga_forge_card.tscn" id="3_card"]
+[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="4_title_font"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="5_body_font"]
+[ext_resource type="Texture2D" uid="uid://c6ykgwy2j6ix1" path="res://assets/ui/Button_Normal.png" id="5_hfhci"]
+
+[node name="ForgePopup" type="Control" unique_id=1255500094]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=239146137]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.025, 0.015, 0.012, 0.77)
+
+[node name="Window" type="Control" parent="." unique_id=48838557]
+anchors_preset = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -462.0
+offset_top = -283.0
+offset_right = 462.0
+offset_bottom = 283.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="TextureRect" parent="Window" unique_id=695613706]
+visible = false
+layout_mode = 0
+offset_right = 924.0
+offset_bottom = 566.0
+mouse_filter = 2
+texture = ExtResource("2_book")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Subtitle" type="Label" parent="Window" unique_id=629228894]
+visible = false
+layout_mode = 0
+offset_left = 104.0
+offset_top = 1.0
+offset_right = 820.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.3, 0.17, 0.11, 1)
+theme_override_fonts/font = ExtResource("5_body_font")
+theme_override_font_sizes/font_size = 16
+text = "Payment complete. Select one result to continue."
+horizontal_alignment = 1
+
+[node name="CardA" parent="Window" unique_id=665111787 instance=ExtResource("3_card")]
+layout_mode = 0
+offset_left = 47.0
+offset_top = 41.0
+offset_right = 457.0
+offset_bottom = 515.0
+
+[node name="CardB" parent="Window" unique_id=729372699 instance=ExtResource("3_card")]
+layout_mode = 0
+offset_left = 467.0
+offset_top = 41.0
+offset_right = 877.0
+offset_bottom = 515.0
+
+[node name="TextureRect" type="TextureRect" parent="Window" unique_id=1997634127]
+layout_mode = 0
+offset_left = 309.0
+offset_top = -14.0
+offset_right = 609.0
+offset_bottom = 66.0
+texture = ExtResource("5_hfhci")
+expand_mode = 1
+
+[node name="Title" type="Label" parent="Window" unique_id=1906686847]
+layout_mode = 0
+offset_left = 355.0
+offset_top = 3.0
+offset_right = 555.0
+offset_bottom = 45.0
+theme_override_colors/font_color = Color(0.37, 0.16, 0.08, 1)
+theme_override_fonts/font = ExtResource("4_title_font")
+theme_override_font_sizes/font_size = 30
+text = "CHOOSE ONE FORGE"
+horizontal_alignment = 1
+vertical_alignment = 1
