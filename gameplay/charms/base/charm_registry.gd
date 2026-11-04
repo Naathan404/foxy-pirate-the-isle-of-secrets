@@ -112,6 +112,8 @@ func _debug_set_owned(charm_id: StringName, owned: bool = true) -> bool:
 	if not OS.is_debug_build() or not _catalog.has(charm_id):
 		return false
 	if owned:
+		if _owned_ids.has(charm_id):
+			return true
 		_owned_ids[charm_id] = true
 		charm_owned.emit(charm_id)
 		return true

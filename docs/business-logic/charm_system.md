@@ -204,7 +204,7 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 | Life Steal | Merchant/enemy drop 10% | Hit normal attack hợp lệ thứ 12 hồi 1 HP; không vượt max HP. |
 | Double Strike | Merchant/enemy drop 10% | Hit normal attack hợp lệ thứ 4 roll 50% để nhân đôi damage. |
 | Chaos Collector | Merchant/enemy drop 25% | Mỗi normal attack gây damage thực tế cộng 2 CP. |
-| Backstabber | Merchant/enemy drop | Melee normal attack từ nửa sau hướng nhìn của target gây 150% damage. Không áp dụng cho ranged hoặc skill. |
+| Backstabber | Merchant/enemy drop 10% | Melee normal attack từ nửa sau hướng nhìn của target gây 150% damage. Không áp dụng cho ranged hoặc skill. |
 
 ## 10. Acquisition
 
@@ -284,6 +284,12 @@ Trong debug build, Remote Inspector của `Player/CharmSocketManager` có nhóm
 2. Chọn `Debug Charm` từ dropdown lấy trực tiếp từ Registry.
 3. Charm được equip ngay; socket cần thiết được mở tạm trong instance đang chạy.
 4. Chọn `<Unequip>` để tháo Charm khỏi socket đang chọn.
+
+Scene Foxy hiện bật thêm hai tiện ích debug: `debug_grant_all_charms` tự sở hữu toàn bộ
+Charm đã đăng ký, còn `debug_auto_equip_first_three` mở các socket cần thiết và gắn ba
+Charm đầu catalog vào Q / Space / E. Hai cờ này mặc định tắt trên `CharmSocketManager`
+được tạo trong test hoặc scene khác; chúng chỉ được serialize bật trên Foxy debug scene.
+Không cờ nào có hiệu lực trong release build.
 
 Debug equip bỏ qua ownership và safe-location restriction, không grant ownership và bị từ chối
 trong release build. Nó chỉ phục vụ gameplay verification, không phải flow sản phẩm.

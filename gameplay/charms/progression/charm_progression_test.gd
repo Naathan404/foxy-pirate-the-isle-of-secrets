@@ -123,14 +123,15 @@ func _test_acquisition(registry: CharmRegistry) -> void:
 	placeholder.display_name = "Placeholder Passive"
 	placeholder.charm_type = CharmConstants.CharmType.PASSIVE
 	placeholder.acquisition_source = &"shop"
+	placeholder.drop_chance = 0.0
 	_assert_true(registry.register_definition(placeholder), "register blocked placeholder")
 	var pool := service.get_shop_pool(registry)
-	_assert_equal(pool.size(), 8, "shop contains eight accepted Passive Charms")
+	_assert_equal(pool.size(), 7, "shop contains seven accepted Passive Charms")
 	for definition: CharmData in pool:
 		_assert_true(definition.is_passive(), "shop excludes Active Charms")
 		_assert_true(definition.effect_scene != null, "shop excludes placeholders")
 	_assert_true(registry.set_owned(GALE_PACE.charm_id, true), "own Gale Pace")
-	_assert_equal(service.get_shop_pool(registry).size(), 7, "shop excludes owned Charm")
+	_assert_equal(service.get_shop_pool(registry).size(), 6, "shop excludes owned Charm")
 	var random := RandomNumberGenerator.new()
 	random.seed = 7007
 	var offer := service.roll_shop_offer(registry, random)

@@ -41,7 +41,6 @@
 [ext_resource type="Resource" uid="uid://cmpdo81fwpbrg" path="res://data/weapon/forges/doomsday_edge.tres" id="32_pnplv"]
 [ext_resource type="Resource" uid="uid://e3eg2gjqtnjw" path="res://data/weapon/forges/true_flight.tres" id="34_21pkc"]
 [ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
-[ext_resource type="Resource" uid="uid://pm7d7bi2h3b" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" uid="uid://btyx2ybnfoih7" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
 [ext_resource type="Resource" uid="uid://c1bl3r46frbfh" path="res://gameplay/charms/charm_data/crescent_cleave.tres" id="charm_crescent"]

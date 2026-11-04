@@ -9,7 +9,11 @@ func grant_fixed_boss_reward(registry: CharmRegistry, charm_id: StringName) -> b
 	if not is_instance_valid(registry):
 		return false
 	var definition := registry.get_definition(charm_id)
-	if not _is_playable(definition) or definition.acquisition_source != &"fixed_boss_reward":
+	if (
+		not _is_playable(definition)
+		or definition.acquisition_source != &"fixed_boss_reward"
+		or definition.drop_chance < 0.0
+	):
 		return false
 	return registry.set_owned(charm_id, true)
 
@@ -87,8 +91,11 @@ func roll_enemy_drop(
 	for definition: CharmData in get_enemy_drop_pool(registry):
 		if definition.acquisition_source != source:
 			continue
-		if random.randf() <= definition.drop_chance:
-			candidates.append(definition)
+		if definition.drop_chance <= 0.0:
+			continue
+		if definition.drop_chance < 1.0 and random.randf() >= definition.drop_chance:
+			continue
+		candidates.append(definition)
 	if candidates.is_empty():
 		return null
 	return candidates[random.randi_range(0, candidates.size() - 1)]

@@ -16,7 +16,7 @@ extends Resource
 @export_enum("Playable:0", "Prototype:1", "Disabled:2")
 var content_status: int = CharmConstants.ContentStatus.PLAYABLE
 ## -1 means that the drop chance is intentionally unset (prototype/pending balance).
-@export_range(-1.0, 1.0, 0.01) var drop_chance: float = 0.0
+@export_range(-1.0, 1.0, 0.01) var drop_chance: float = -1.0
 @export var tags: Array[StringName] = []
 @export var effect_params: Dictionary = {}
 

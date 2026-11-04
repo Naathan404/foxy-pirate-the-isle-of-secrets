@@ -10,6 +10,7 @@ display_name = "Life Steal"
 description = "The 12th confirmed normal-attack hit restores 1 HP."
 effect_scene = ExtResource("2_effect")
 acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"damage_dealt", &"normal_attack", &"healing"])
 effect_params = {
 "heal_hp": 1.0,
