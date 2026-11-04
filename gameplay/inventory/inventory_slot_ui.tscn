@@ -1,22 +1,23 @@
 [gd_scene format=3 uid="uid://ddu3mubhw4y6n"]
 
 [ext_resource type="Script" uid="uid://b03gmcx2kf6go" path="res://gameplay/inventory/inventory_slot_ui.gd" id="1_u5xhv"]
-[ext_resource type="Texture2D" uid="uid://d0ed421hv3cav" path="res://assets/ui/player_hud/inventory/Inventory_Slot_2.png" id="2_rjo3g"]
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/05_item_slot_empty.png" id="2_rjo3g"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_rjo3g"]
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/06_item_selection_highlight.png" id="4_selection"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbeqg"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qajpg"]
 line_spacing = 0.0
 font = ExtResource("3_rjo3g")
-font_size = 40
-outline_size = 10
+font_size = 32
+outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
 [node name="InventorySlotUI" type="PanelContainer" unique_id=515379981]
-custom_minimum_size = Vector2(64, 64)
-offset_right = 100.0
-offset_bottom = 100.0
+custom_minimum_size = Vector2(88, 88)
+offset_right = 88.0
+offset_bottom = 88.0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_tbeqg")
 script = ExtResource("1_u5xhv")
 
@@ -30,14 +31,15 @@ stretch_mode = 5
 flip_h = true
 
 [node name="PotionAssignmentLabel" type="Label" parent="Background" unique_id=1341108348]
+z_index = 2
 layout_mode = 1
-offset_right = 56.0
+offset_right = 80.0
 offset_bottom = 20.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 5
+theme_override_constants/outline_size = 3
 theme_override_fonts/font = ExtResource("3_rjo3g")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 16
 text = "MAIN"
 vertical_alignment = 1
 
@@ -56,12 +58,30 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="QuantityLabel" type="Label" parent="MarginContainer" unique_id=806705806]
-layout_mode = 2
-size_flags_vertical = 8
-offset_transform_enabled = true
-offset_transform_position = Vector2(0, 8)
+[node name="QuantityLabel" type="Label" parent="Background" unique_id=806705806]
+z_index = 2
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -52.0
+offset_top = -29.0
+offset_right = -6.0
+offset_bottom = -4.0
+grow_horizontal = 0
+grow_vertical = 0
 text = "99"
 label_settings = SubResource("LabelSettings_qajpg")
 horizontal_alignment = 2
 vertical_alignment = 2
+
+[node name="Selection" type="TextureRect" parent="."]
+z_index = 1
+visible = false
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_selection")
+expand_mode = 1
+stretch_mode = 5

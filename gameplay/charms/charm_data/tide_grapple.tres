@@ -12,8 +12,8 @@ charm_type = 0
 effect_scene = ExtResource("2_effect")
 resource_cost = 150.0
 cooldown_seconds = 5.0
+proc_chance = null
 acquisition_source = &"fixed_boss_reward"
-drop_chance = 1.0
 tags = Array[StringName]([&"active", &"grapple", &"boss_reward"])
 effect_params = {
 "damage_multiplier": 2.5,
@@ -22,3 +22,4 @@ effect_params = {
 "range_units": 4.0,
 "stun_seconds": 1.0
 }
+drop_chance = 1.0

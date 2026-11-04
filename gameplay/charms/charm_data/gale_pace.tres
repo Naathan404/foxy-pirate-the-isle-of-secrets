@@ -8,11 +8,15 @@ script = ExtResource("1_data")
 charm_id = &"gale_pace"
 display_name = "Gale Pace"
 description = "Increase movement speed by 20% and reduce maximum SP by 100."
+charm_type = null
 effect_scene = ExtResource("2_effect")
+resource_cost = null
+cooldown_seconds = null
+proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
-drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"stat_modifier", &"movement"])
 effect_params = {
 "max_sp_flat": -100.0,
 "move_speed_multiplier": 1.2
 }
+drop_chance = 0.1

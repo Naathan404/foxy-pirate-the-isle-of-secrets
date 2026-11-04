@@ -171,9 +171,9 @@ columns = 5
 [node name="Pagination" type="Control" parent="Content/Left" unique_id=626549173]
 anchors_preset = 0
 offset_left = 65.0
-offset_top = 362.0
+offset_top = 360.0
 offset_right = 335.0
-offset_bottom = 398.0
+offset_bottom = 396.0
 
 [node name="Previous" type="Button" parent="Content/Left/Pagination" unique_id=1129001370]
 unique_name_in_owner = true

@@ -8,11 +8,15 @@ script = ExtResource("1_data")
 charm_id = &"endurance_vessel"
 display_name = "Endurance Vessel"
 description = "Increase maximum SP by 150 and reduce maximum HP by 2."
+charm_type = null
 effect_scene = ExtResource("2_effect")
+resource_cost = null
+cooldown_seconds = null
+proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
-drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"stat_modifier", &"stamina"])
 effect_params = {
 "max_hp_flat": -2,
 "max_sp_flat": 150.0
 }
+drop_chance = 0.1

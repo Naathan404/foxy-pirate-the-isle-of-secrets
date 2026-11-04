@@ -8,11 +8,15 @@ script = ExtResource("1_data")
 charm_id = &"life_steal"
 display_name = "Life Steal"
 description = "The 12th confirmed normal-attack hit restores 1 HP."
+charm_type = null
 effect_scene = ExtResource("2_effect")
+resource_cost = null
+cooldown_seconds = null
+proc_chance = 0.05
 acquisition_source = &"merchant_or_enemy_drop"
-drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"damage_dealt", &"normal_attack", &"healing"])
 effect_params = {
 "heal_hp": 1.0,
 "hit_threshold": 12
 }
+drop_chance = 0.1

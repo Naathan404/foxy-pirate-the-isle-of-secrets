@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c6rri8ebn60w7"
-path.s3tc="res://.godot/imported/crab_claw.png-c79579eeb07b5698d63877c0147419b3.s3tc.ctex"
+path.s3tc="res://.godot/imported/Crab_Claw.png-a049048f5972c3e302610d86fc2f1739.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sprites/items/crab_claw.png"
-dest_files=["res://.godot/imported/crab_claw.png-c79579eeb07b5698d63877c0147419b3.s3tc.ctex"]
+source_file="res://assets/sprites/items/Crab_Claw.png"
+dest_files=["res://.godot/imported/Crab_Claw.png-a049048f5972c3e302610d86fc2f1739.s3tc.ctex"]
 
 [params]
 

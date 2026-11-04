@@ -4,6 +4,7 @@ extends WeaponAttack
 
 const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
 const HIT_VFX: PackedScene = preload("res://gameplay/weapons/bow_impact_vfx.tscn")
+const PIERCE_HIT_VFX: PackedScene = preload("res://gameplay/weapons/harpoon_pierce_impact.tscn")
 const SWING_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_throw.wav")
 const HIT_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_hit.wav")
 const SKILL_HIT_SOUND: AudioStream = preload("res://assets/audio/combat/bow_impact.wav")
@@ -111,29 +112,43 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 			feedback = SPRITE_FEEDBACK.new()
 			feedback.name = "DaggerFeedback"
 			sprite.add_child(feedback)
-		feedback.kick(context.direction, (0.1 if dash_attack else 0.045) * power, true, power)
-	var impact := HIT_VFX.instantiate() as Node3D
-	impact.set("effect_color", Color(1.0, 0.68, 0.1, 0.9))
-	impact.set("core_color", Color(1.0, 0.98, 0.7, 1.0))
-	impact.set("ring_count", 0 if dash_attack else 1)
-	impact.set("spark_count", 16 if dash_attack else 6)
-	impact.set("spark_streak_length", 4.0 if dash_attack else 2.0)
-	get_parent().add_child(impact)
-	impact.global_position = at
-	impact.scale = Vector3(0.85, 0.55, 0.35) * power if dash_attack else Vector3.ONE * 0.32 * power
-	impact.call("set_aim", context.direction)
-	impact.call("burst", 0.8 if dash_attack else 0.35)
+		feedback.kick(context.direction, (0.18 if dash_attack else 0.045) * power, true, power)
+	if dash_attack:
+		var pierce_impact := PIERCE_HIT_VFX.instantiate() as Node3D
+		get_parent().add_child(pierce_impact)
+		var camera := get_viewport().get_camera_3d()
+		var view_offset := Vector3.ZERO
+		if is_instance_valid(camera):
+			view_offset = (camera.global_position - at).normalized() * 0.1
+		pierce_impact.global_position = at + view_offset
+		pierce_impact.call("burst", context.direction, power)
+	else:
+		var impact := HIT_VFX.instantiate() as Node3D
+		impact.set("effect_color", Color(1.0, 0.68, 0.1, 0.9))
+		impact.set("core_color", Color(1.0, 0.98, 0.7, 1.0))
+		impact.set("ring_count", 1)
+		impact.set("spark_count", 6)
+		impact.set("spark_streak_length", 2.0)
+		get_parent().add_child(impact)
+		impact.global_position = at
+		impact.scale = Vector3.ONE * 0.32 * power
+		impact.call("set_aim", context.direction)
+		impact.call("burst", 0.35)
 	if dash_attack or not _impact_played:
+		if dash_attack and not _impact_played:
+			get_node("/root/HitstopController").request(0.045 * power)
 		_impact_played = true
 		get_node("/root/HitstopController").request_local(
 			null if dash_attack else context.actor, target as Node3D,
-			(0.075 if dash_attack else 0.035) * power
+			(0.1 if dash_attack else 0.035) * power
 		)
-		get_node("/root/ScreenShakeController").request((4.0 if dash_attack else 1.8) * power, 0.12)
+		get_node("/root/ScreenShakeController").request((6.0 if dash_attack else 1.8) * power, 0.14)
 		get_node("/root/AudioManager").play_sfx_3d(
 			SKILL_HIT_SOUND if dash_attack else HIT_SOUND,
-			at, -10.0 if dash_attack else -16.0, 0.95 if dash_attack else 1.3
+			at, -6.0 if dash_attack else -16.0, 0.85 if dash_attack else 1.3
 		)
+		if dash_attack:
+			get_node("/root/AudioManager").play_sfx_3d(HIT_SOUND, at, -13.0, 1.15)
 
 
 func _exit_tree() -> void:

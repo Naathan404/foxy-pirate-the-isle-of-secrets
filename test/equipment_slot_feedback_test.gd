@@ -1,6 +1,7 @@
 extends SceneTree
 
 const SLOT: PackedScene = preload("res://gameplay/inventory/equipment_slot.tscn")
+const ITEM_SLOT: PackedScene = preload("res://gameplay/inventory/inventory_slot_ui.tscn")
 
 var _failures: int = 0
 
@@ -57,7 +58,14 @@ func _run() -> void:
 		slot.background.scale.is_equal_approx(base_scale * 1.02),
 		"Selected slot keeps a gentle emphasis"
 	)
-	_check(slot.get_node("SelectionHighlight").modulate.g < 1.0, "Selected border is gold")
+	var highlight := slot.get_node("SelectionHighlight") as TextureRect
+	_check(
+		highlight.texture.resource_path.ends_with("06_item_selection_highlight.png"),
+		"Shop highlight texture is used"
+	)
+	_check(
+		slot.get_node("Badge").z_index > highlight.z_index, "Equipment badge stays above highlight"
+	)
 	slot.present(artwork, "x", true, true)
 	await create_timer(0.15).timeout
 	_check(
@@ -74,10 +82,30 @@ func _run() -> void:
 	await create_timer(0.15).timeout
 	_check(slot.get_global_rect() == hit_area, "Reopening preserves slot geometry")
 	grid.free()
+	var item_slot := ITEM_SLOT.instantiate() as InventorySlotUI
+	root.add_child(item_slot)
+	item_slot.set_potion_assignment("MAIN")
+	item_slot.set_selected(true)
+	var item_highlight := item_slot.get_node("Selection") as TextureRect
+	_check(
+		item_highlight.texture.resource_path.ends_with("06_item_selection_highlight.png"),
+		"Inventory slot uses the same highlight texture"
+	)
+	_check(
+		item_slot.potion_assignment_label.z_index > item_highlight.z_index,
+		"Potion assignment label stays above the highlight"
+	)
+	_check(
+		item_slot.quantity_label.z_index > item_highlight.z_index,
+		"Item quantity stays above the highlight"
+	)
+	item_slot.free()
 	if _failures == 0:
 		print(
-			"Equipment slot feedback: pointer hover, press, selection, locked tint, "
-			+ "confirmation and fixed geometry passed"
+			(
+				"Equipment slot feedback: pointer hover, press, selection, locked tint, "
+				+ "confirmation and fixed geometry passed"
+			)
 		)
 	quit(0 if _failures == 0 else 1)
 

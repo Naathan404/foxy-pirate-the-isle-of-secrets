@@ -21,15 +21,21 @@ func _init(merchant_catalog: MerchantCatalog = null) -> void:
 
 
 func purchase(
-	offer_id: StringName, inventory: Inventory, wallet: GoldWallet, weapons: WeaponController
+	offer_id: StringName,
+	inventory: Inventory,
+	wallet: GoldWallet,
+	weapons: WeaponController,
+	quantity: int = 1
 ) -> Result:
 	var offer := _get_buy_offer(offer_id)
-	if offer == null or wallet == null:
+	if offer == null or wallet == null or quantity < 1 or quantity > 99:
 		return Result.INVALID_OFFER
 
 	if offer.kind == MerchantOffer.Kind.WEAPON:
+		if quantity != 1:
+			return Result.INVALID_OFFER
 		return _purchase_weapon(offer, wallet, weapons)
-	return _purchase_item(offer, inventory, wallet)
+	return _purchase_item(offer, inventory, wallet, quantity)
 
 
 func _purchase_weapon(
@@ -49,33 +55,48 @@ func _purchase_weapon(
 	return Result.SUCCESS
 
 
-func _purchase_item(offer: MerchantOffer, inventory: Inventory, wallet: GoldWallet) -> Result:
+func _purchase_item(
+	offer: MerchantOffer, inventory: Inventory, wallet: GoldWallet, quantity: int
+) -> Result:
 	if inventory == null or offer.item == null:
 		return Result.INVALID_OFFER
-	if not wallet.can_afford(offer.buy_price):
+	var price := offer.buy_price * quantity
+	var amount := offer.trade_amount * quantity
+	if not wallet.can_afford(price):
 		return Result.INSUFFICIENT_GOLD
-	if not inventory.can_add_item(offer.item, offer.trade_amount):
+	if not inventory.can_add_item(offer.item, amount):
 		return Result.INVENTORY_FULL
-	if not wallet.try_spend(offer.buy_price):
+	if not wallet.try_spend(price):
 		return Result.INSUFFICIENT_GOLD
-	if inventory.add_item(offer.item, offer.trade_amount) != 0:
-		wallet.add_gold(offer.buy_price)
+	if inventory.add_item(offer.item, amount) != 0:
+		wallet.add_gold(price)
 		return Result.INVENTORY_FULL
 	return Result.SUCCESS
 
 
-func sell(offer_id: StringName, inventory: Inventory, wallet: GoldWallet) -> Result:
+func sell(
+	offer_id: StringName, inventory: Inventory, wallet: GoldWallet, quantity: int = 1
+) -> Result:
 	var offer := _get_sell_offer(offer_id)
-	if offer == null or inventory == null or wallet == null or offer.item == null:
+	if (
+		offer == null
+		or inventory == null
+		or wallet == null
+		or offer.item == null
+		or quantity < 1
+		or quantity > 99
+	):
 		return Result.INVALID_OFFER
-	if not inventory.has_item(offer.item.item_id, offer.trade_amount):
+	var price := offer.sell_price * quantity
+	var amount := offer.trade_amount * quantity
+	if not inventory.has_item(offer.item.item_id, amount):
 		return Result.NOT_OWNED
-	if wallet.get_balance() > GoldWallet.MAX_GOLD - offer.sell_price:
+	if wallet.get_balance() > GoldWallet.MAX_GOLD - price:
 		return Result.GOLD_CAP_REACHED
-	if inventory.remove_item(offer.item.item_id, offer.trade_amount) != offer.trade_amount:
+	if inventory.remove_item(offer.item.item_id, amount) != amount:
 		return Result.NOT_OWNED
-	if not wallet.add_gold(offer.sell_price):
-		inventory.add_item(offer.item, offer.trade_amount)
+	if not wallet.add_gold(price):
+		inventory.add_item(offer.item, amount)
 		return Result.GOLD_CAP_REACHED
 	return Result.SUCCESS
 

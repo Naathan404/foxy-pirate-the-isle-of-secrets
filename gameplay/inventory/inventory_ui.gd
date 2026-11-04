@@ -43,9 +43,8 @@ var _tab_tweens: Dictionary[TextureButton, Tween] = {}
 @onready var material_button: TextureButton = $TabButtons/MaterialButton
 @onready var equipment_button: TextureButton = $TabButtons/EquipmentButton
 @onready var notes_button: TextureButton = $TabButtons/NotesButton
-@onready var info_layout: Control = tabs.get_node(
-	"Material/Content/ItemInfo/MarginContainer/VBoxContainer"
-)
+@onready
+var info_layout: Control = tabs.get_node("Material/Content/ItemInfo/MarginContainer/VBoxContainer")
 @onready var equip_potion_button: TextureButton = info_layout.get_node("EquipPotionButton")
 @onready var equip_potion_label: Label = equip_potion_button.get_node("Label")
 @onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
@@ -141,9 +140,9 @@ func _refresh_item_info() -> void:
 	if slot == null or slot.is_empty():
 		selected_slot_index = -1
 		item_icon.texture = null
-		item_name.text = ""
+		item_name.text = "Select an item"
 		item_type.text = ""
-		item_description.text = ""
+		item_description.text = "Choose a slot to see its details."
 		item_quantity.text = ""
 		equip_potion_button.hide()
 		return

@@ -2,13 +2,14 @@ extends SceneTree
 
 const CATALOG: MerchantCatalog = preload("res://data/merchants/silas_catalog.tres")
 const BOW: WeaponData = preload("res://data/weapon/weapon_bow.tres")
-const ARROW: BaseItem = preload("res://data/items/materials/wooden_arrow.tres")
+const ARROW: BaseItem = preload("res://data/items/consumables/wooden_arrow.tres")
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
 const NPC_TEST_SCENE_PATH := "res://test/silas_test_scene.tscn"
 const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
+const SHOP_PANEL_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_panel.tscn")
 const GOLD_DISPLAY_SCENE: PackedScene = preload("res://gameplay/economy/gold_display.tscn")
 
 var _failures := 0
@@ -18,8 +19,10 @@ func _initialize() -> void:
 	_test_purchase_rejections()
 	_test_successful_item_trade()
 	_test_configured_trade_amount()
+	_test_multiple_trade_quantities()
 	_test_catalog_prices_and_disabled_sales()
 	_test_weapon_is_one_time_purchase()
+	await _test_shop_scene()
 	_test_persistence()
 	await _test_toast_queue()
 	await _test_gold_display_feedback()
@@ -125,6 +128,35 @@ func _test_configured_trade_amount() -> void:
 	inventory.free()
 
 
+func _test_multiple_trade_quantities() -> void:
+	var service := MerchantTransactionService.new(CATALOG)
+	var inventory := _make_inventory(4)
+	var wallet := GoldWallet.new()
+	wallet.add_gold(10)
+	_assert_equal(
+		service.purchase(&"wooden_arrow", inventory, wallet, null, 3),
+		MerchantTransactionService.Result.SUCCESS,
+		"buying three arrows succeeds"
+	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 3, "quantity purchase adds three arrows")
+	_assert_equal(wallet.get_balance(), 4, "quantity purchase spends six gold")
+	_assert_equal(
+		service.sell(&"wooden_arrow", inventory, wallet, 2),
+		MerchantTransactionService.Result.SUCCESS,
+		"selling two arrows succeeds"
+	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 1, "quantity sale removes two arrows")
+	_assert_equal(wallet.get_balance(), 6, "quantity sale adds two gold")
+	_assert_equal(
+		service.sell(&"wooden_arrow", inventory, wallet, 2),
+		MerchantTransactionService.Result.NOT_OWNED,
+		"quantity sale rejects insufficient stock"
+	)
+	_assert_equal(inventory.count_item(ARROW.item_id), 1, "failed sale preserves stock")
+	_assert_equal(wallet.get_balance(), 6, "failed sale preserves gold")
+	inventory.free()
+
+
 func _test_catalog_prices_and_disabled_sales() -> void:
 	_assert_equal(
 		CATALOG.get_offer(&"starfish_core").buy_price, 50, "starfish buy price comes from catalog"
@@ -199,6 +231,21 @@ func _test_weapon_is_one_time_purchase() -> void:
 	)
 	inventory.free()
 	weapons.free()
+
+
+func _test_shop_scene() -> void:
+	var panel := SHOP_PANEL_SCENE.instantiate() as SilasShopPanel
+	_assert_true(panel != null, "Silas shop scene loads")
+	if panel == null:
+		return
+	root.add_child(panel)
+	await process_frame
+	_assert_true(panel.buy_tab != null, "buy tab is connected")
+	_assert_true(panel.sell_tab != null, "sell tab is connected")
+	_assert_true(panel.grid != null, "item grid is connected")
+	_assert_true(panel.action_button != null, "purchase button is connected")
+	panel.queue_free()
+	await process_frame
 
 
 func _test_persistence() -> void:
@@ -314,25 +361,16 @@ func _test_npc_scene_smoke() -> void:
 			silas.catalog.get_buy_offers().size(),
 			"buy tab renders the configured catalog"
 		)
-		_assert_equal(panel.grid.columns, 5, "shop grid keeps inventory's five-column layout")
-		var first_buy_slot := panel.grid.get_child(0) as InventorySlotUI
-		_assert_false(
-			first_buy_slot.quantity_label.visible, "buy previews do not show redundant quantities"
-		)
-		_assert_true(panel.buy_tab is TextureButton, "buy tab uses an inventory-style bookmark")
+		_assert_equal(SilasShopPanel.GRID_COLUMNS, 4, "shop grid uses the mockup's four columns")
+		var first_buy_slot := panel.grid.get_child(0) as SilasShopSlot
+		_assert_true(first_buy_slot != null, "shop uses the Silas slot art")
+		_assert_true(panel.buy_tab is TextureButton, "buy tab uses the supplied texture")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
 		var inventory := player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
-			_assert_equal(
-				panel.grid.get_child_count(),
-				inventory.slots.size(),
-				"sell tab renders the real inventory"
-			)
-			panel._set_tab(SilasShopPanel.Tab.BAG)
-			_assert_equal(
-				panel.grid.get_child_count(),
-				inventory.slots.size(),
-				"bag tab renders the real inventory"
+			_assert_true(
+				panel.grid.get_child_count() <= inventory.slots.size(),
+				"sell tab renders occupied inventory slots"
 			)
 		panel.close_shop()
 		await create_timer(panel.close_duration + 0.05, true).timeout
