@@ -104,10 +104,11 @@ theme_override_styles/tab_selected = SubResource("StyleBoxEmpty_gv8eq")
 theme_override_styles/tab_disabled = SubResource("StyleBoxEmpty_mgn5m")
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_btrla")
 tab_alignment = 2
-current_tab = 0
+current_tab = 1
 tabs_visible = false
 
 [node name="Material" type="MarginContainer" parent="PanelContainer/MarginContainer/Tabs" unique_id=1098953536]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -141,12 +142,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Bag" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content" unique_id=1342385827]
-modulate = Color(1, 1, 1, 0.45)
 layout_mode = 0
 offset_left = 171.0
-offset_top = 486.0
+offset_top = 471.0
 offset_right = 397.0
-offset_bottom = 615.0
+offset_bottom = 600.0
 mouse_filter = 2
 texture = ExtResource("shop_bag")
 expand_mode = 1
@@ -387,7 +387,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Equipment" parent="PanelContainer/MarginContainer/Tabs" unique_id=218277719 instance=ExtResource("equipment_tab")]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 

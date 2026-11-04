@@ -50,9 +50,10 @@ Không có registry item toàn cục. Resource được tham chiếu trực ti�
    duy nhất, icon, `display_name`, mô tả và `max_stack > 0`.
 2. Potion phải kế thừa đúng lớp Potion, có type `CONSUMABLE` và mọi chỉ số hồi
    phục dương.
-3. Tạo `MerchantOffer` trong `data/merchants/silas_catalog.tres`. Với item,
-   `offer_id` phải đúng bằng `item_id`; với weapon, phải đúng bằng `weapon_id`.
-   Một catalog không được tham chiếu cùng item/weapon hai lần.
+3. Tạo `MerchantOffer` trong `data/merchants/silas_catalog.tres`. Mỗi offer cần
+   `offer_id` duy nhất. Nhiều offer có thể dùng chung một item để bán theo gói,
+   nhưng chỉ một offer của item đó được có `sell_price > 0`. Với weapon,
+   `offer_id` phải đúng bằng `weapon_id`.
 4. Chọn `buy_price` và/hoặc `sell_price`. Giá bằng 0 nghĩa là phía giao dịch đó
    bị tắt. `trade_amount` phải lớn hơn hoặc bằng 1; weapon chỉ bán một lần.
 5. Nếu thêm enemy drop mà người chơi cần bán cho Silas, thêm sell offer tương
@@ -61,6 +62,26 @@ Không có registry item toàn cục. Resource được tham chiếu trực ti�
 6. Chạy `test/item_data_test.gd` và `gameplay/merchant/silas_merchant_test.gd`.
 
 Xem thêm [item_data.md](../item_data.md) cho contract đầy đủ.
+
+### Buy stock pool
+
+`silas_catalog.tres` is the source pool. All offers with `buy_price > 0` are
+eligible for the Buy tab. `guaranteed_buy_offer_ids` lists offers that appear on
+every visit. `random_buy_offer_count` draws that many distinct offers from the
+remaining pool once per play session; a value of `0` keeps the old behavior and
+shows every buy offer. The current setup always shows Wooden Arrow, its five-arrow
+bundle and the two small potions, then draws three of the seven other offers.
+
+The roll creates a temporary catalog. Hidden offers have `buy_price = 0` in that
+catalog, so the transaction service rejects purchases even if their IDs are
+passed directly. Their `sell_price` stays intact: the Sell tab still accepts
+configured items held by the player. Stock is unlimited for visible items; the
+roll changes availability, not quantity. `SilasProgressStore` holds this stock
+in memory for the play session, so closing and reopening the shop keeps the same
+selection. It is not written to `silas_progress.save`; restarting the game rolls
+again. Call `SilasNpc.reroll_shop_stock()` to change it explicitly. The shop's
+`Debug: Reroll Stock` button calls this function in debug builds and updates the
+open Buy tab. The source resource is never modified.
 
 ## 5. Lưu hiện tại và cách reset
 
@@ -96,7 +117,8 @@ nên gọi API reset rõ ràng của SaveManager, không truy cập field privat
    slot save, atomic write và ownership rõ ràng cho Player, inventory, wallet,
    quest và world state. Khi có nó, migrate hai flag của Silas vào payload chung
    và đọc file cũ một lần để tương thích save hiện tại.
-2. **Stock và economy:** catalog hiện tĩnh; chưa có stock, restock theo ngày,
+2. **Stock và economy:** bể hàng được rút một lần mỗi lượt chơi và có thể đổi
+   bằng hàm hoặc nút debug; chưa có giới hạn số lượng, restock theo ngày,
    price modifier, buyback hoặc state riêng cho từng offer.
 3. **World persistence:** collected items, defeated enemies, and map state do not survive restart.
    Silas uses his authored scene position whenever the map loads.

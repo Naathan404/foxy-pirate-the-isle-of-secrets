@@ -9,6 +9,10 @@ const SAVE_VERSION := 1
 
 var _met_silas := false
 var _bow_purchased := false
+var _shop_stock: MerchantCatalog
+var _stock_source: MerchantCatalog
+var _stock_random := RandomNumberGenerator.new()
+var _stock_random_ready := false
 
 
 func _ready() -> void:
@@ -21,6 +25,24 @@ func has_met_silas() -> bool:
 
 func has_bow_purchase() -> bool:
 	return _bow_purchased
+
+
+func get_shop_stock(source: MerchantCatalog) -> MerchantCatalog:
+	if _shop_stock == null or _stock_source != source:
+		return reroll_shop_stock(source)
+	return _shop_stock
+
+
+func reroll_shop_stock(source: MerchantCatalog) -> MerchantCatalog:
+	if source == null or not source.validate().is_empty():
+		return null
+	if not _stock_random_ready:
+		_stock_random.randomize()
+		_stock_random_ready = true
+	var previous := _shop_stock if _stock_source == source else null
+	_shop_stock = source.roll_buy_stock(_stock_random, previous)
+	_stock_source = source
+	return _shop_stock
 
 
 func mark_met_silas() -> bool:

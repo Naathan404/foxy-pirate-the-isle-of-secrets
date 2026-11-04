@@ -3,6 +3,7 @@ extends CanvasLayer
 
 ## Silas's shop follows its own parchment artwork while sharing the inventory book.
 signal shop_closed
+signal stock_reroll_requested
 
 enum Tab { BUY, SELL }
 
@@ -10,7 +11,7 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_slot
 const TAB_ACTIVE: Texture2D = preload("res://assets/ui/silas_shop/PNG/32_tab_active_blank.png")
 const TAB_INACTIVE: Texture2D = preload("res://assets/ui/silas_shop/PNG/33_tab_inactive_blank.png")
 const GRID_COLUMNS: int = 4
-const GRID_STEP := Vector2(86.0, 94.0)
+const GRID_STEP := Vector2(86.0, 98.0)
 
 @export_group("Interaction Feedback")
 @export_range(0.05, 0.5, 0.01) var open_duration := 0.18
@@ -59,6 +60,7 @@ var _error_message := ""
 @onready var action_button: TextureButton = $Book/Info/Action
 @onready var action_label: Label = $Book/Info/Action/Text
 @onready var close_button: Button = $Book/Close
+@onready var reroll_button: Button = $DebugReroll
 @onready var toast_queue: TradeToastQueue = $TradeToastQueue
 
 
@@ -77,6 +79,8 @@ func _ready() -> void:
 	plus_button.pressed.connect(_change_quantity.bind(1))
 	action_button.pressed.connect(_on_action_pressed)
 	close_button.pressed.connect(close_shop)
+	reroll_button.visible = OS.has_feature("debug")
+	reroll_button.pressed.connect(_on_debug_reroll_pressed)
 	_restore_tab_feedback.call_deferred()
 	hide()
 
@@ -123,6 +127,20 @@ func close_shop() -> void:
 	_transition_tween.tween_property(panel, "modulate:a", 0.0, close_duration)
 	_transition_tween.tween_property(panel, "scale", _book_scale * 0.96, close_duration)
 	_transition_tween.chain().tween_callback(_finish_close)
+
+
+func update_stock(stock: MerchantCatalog) -> void:
+	if not visible or stock == null or not stock.validate().is_empty():
+		return
+	_catalog = stock
+	_service = MerchantTransactionService.new(stock)
+	_selected_offer = null
+	_quantity = 1
+	_set_tab(Tab.BUY)
+
+
+func _on_debug_reroll_pressed() -> void:
+	stock_reroll_requested.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
