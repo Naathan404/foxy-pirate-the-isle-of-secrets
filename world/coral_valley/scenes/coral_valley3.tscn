@@ -133,9 +133,10 @@ transform = Transform3D(0.039600004, 0, 0, 0, 1, 0, 0, 0, 0.06, -135, 0, 159)
 
 [node name="SeaWater9" parent="SeaWaters" unique_id=1990497904 instance=ExtResource("7_ywsg1")]
 transform = Transform3D(0.032076, 0, 0, 0, 1, 0, 0, 0, 0.12672001, -11, 0, 36)
+visible = false
 
 [node name="SeaWater6" parent="SeaWaters" unique_id=939832025 instance=ExtResource("7_ywsg1")]
-transform = Transform3D(1.416, 0, 0, 0, 0.964, 0, 0, 0, 0.5933333, -44.4, 0, -182)
+transform = Transform3D(1.416, 0, 0, 0, 0.964, 0, 0, 0, 0.5933333, -44.4, 0, -180.42552)
 
 [node name="SeaWater7" parent="SeaWaters" unique_id=1512991175 instance=ExtResource("7_ywsg1")]
 transform = Transform3D(-7.2e-08, 0, -0.6016666, 0, 0.964, 0, 1.4513333, 0, -2.3e-08, 199.5, 0, 111)
@@ -144,7 +145,7 @@ transform = Transform3D(-7.2e-08, 0, -0.6016666, 0, 0.964, 0, 1.4513333, 0, -2.3
 transform = Transform3D(0.61833334, 0, 0, 0, 1.039, 0, 0, 0, 0.6066667, 29, 0, 366)
 
 [node name="SeaWater3" parent="SeaWaters" unique_id=327661648 instance=ExtResource("7_ywsg1")]
-transform = Transform3D(0.28625, 0, 0, 0, 1.039, 0, 0, 0, 0.49, -108.6517, -9.7122345, 12.153137)
+transform = Transform3D(0.28625, 0, 0, 0, 1.039, 0, 0, 0, 0.49, -98.86499, -9.7122345, 12.153137)
 
 [node name="SeaWater5" parent="SeaWaters" unique_id=1101437747 instance=ExtResource("7_ywsg1")]
 transform = Transform3D(0.363, 0, 0, 0, 1.067, 0, 0, 0, 0.505, 107, 0, 3.5)
