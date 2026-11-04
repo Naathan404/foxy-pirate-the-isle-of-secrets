@@ -1,12 +1,12 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://day6x7bd5e0qu"]
 
-[ext_resource type="Texture2D" uid="uid://1kmehpflwcs4" path="res://assets/sprites/items/equipment/bow.png" id="1_tb5i0"]
+[ext_resource type="Texture2D" uid="uid://nyay5x5j7arv" path="res://assets/sprites/items/equipment/Bow.png" id="1_tb5i0"]
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_weapon"]
 [ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="2_attack"]
 [ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="2_unbbq"]
 [ext_resource type="PackedScene" uid="uid://b6fbyvpknujg8" path="res://gameplay/weapons/attack scenes/bow_arrow.tscn" id="3_arrow"]
 [ext_resource type="PackedScene" uid="uid://bol363uk25tl" path="res://gameplay/weapons/attack scenes/bow_volley.tscn" id="4_volley"]
-[ext_resource type="Texture2D" uid="uid://wovfxsw8vnms" path="res://assets/ui/player_hud/weapon_skills/CP_Stormstring.png" id="5_skill_icon"]
+[ext_resource type="Texture2D" uid="uid://cjiisbfv0nw4u" path="res://assets/ui/player_hud/weapon_skills/Stormstring.png" id="7_y7u25"]
 
 [sub_resource type="Resource" id="Attack_bow"]
 script = ExtResource("2_attack")
@@ -25,7 +25,7 @@ ammo_cost = 1
 [sub_resource type="Resource" id="Attack_volley"]
 script = ExtResource("2_attack")
 animation_prefix = "attack_bow"
-skill_icon = ExtResource("5_skill_icon")
+skill_icon = ExtResource("7_y7u25")
 display_name = "Stormstring"
 description = "Hold to charge a fan of arrows. A full charge releases up to 6 arrows; each hit can critically strike."
 attack_scene = ExtResource("4_volley")

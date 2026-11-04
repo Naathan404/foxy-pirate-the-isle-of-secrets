@@ -15,7 +15,6 @@
 [ext_resource type="Script" uid="uid://bqemuakdoq8ue" path="res://gameplay/player/hud/stat_arc.gd" id="13_arc"]
 [ext_resource type="Texture2D" uid="uid://bc7engerqqfue" path="res://assets/ui/player_hud/weapon_skills/ChaosPoint.png" id="14_01apl"]
 [ext_resource type="Script" uid="uid://diqqixidr2eyy" path="res://gameplay/player/hud/hud_portrait.gd" id="14_portrait"]
-[ext_resource type="Texture2D" uid="uid://h30qe12s3t4q" path="res://assets/ui/player_hud/weapon_skills/CP_Dagger.png" id="15_gpu53"]
 [ext_resource type="Script" uid="uid://welfjuqw50gd" path="res://gameplay/player/hud/hud_tooltip.gd" id="15_tooltip"]
 [ext_resource type="Script" uid="uid://bqywjkp7lu54m" path="res://gameplay/player/hud/equipment_control.gd" id="16_dv5bc"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="16_khbku"]
@@ -454,12 +453,21 @@ texture = ExtResource("14_01apl")
 
 [node name="WeaponIcon" type="TextureRect" parent="ChaosControl/WeaponFrame" unique_id=763200509]
 texture_filter = 1
-layout_mode = 0
-offset_right = 72.0
-offset_bottom = 72.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -43.839924
+offset_top = -36.16
+offset_right = 36.16008
+offset_bottom = 43.839996
+grow_horizontal = 2
+grow_vertical = 2
 pivot_offset_ratio = Vector2(0.5, 0.5)
 mouse_filter = 2
-texture = ExtResource("15_gpu53")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="TextureRect" type="TextureRect" parent="ChaosControl" unique_id=207544922]

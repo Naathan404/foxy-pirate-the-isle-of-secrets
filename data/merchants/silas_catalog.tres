@@ -2,22 +2,19 @@
 
 [ext_resource type="Script" uid="uid://dypxn50pvmmax" path="res://gameplay/merchant/merchant_catalog.gd" id="1_catalog"]
 [ext_resource type="Script" uid="uid://buhrolk03pgyv" path="res://gameplay/merchant/merchant_offer.gd" id="2_offer"]
-[ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="3_bow"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="4_arrow"]
 [ext_resource type="Resource" uid="uid://ch2ttumamq7po" path="res://data/items/consumables/small_healing_potion.tres" id="5_healing"]
 [ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="6_stamina"]
 [ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="7_starfish"]
 [ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="8_crab"]
 [ext_resource type="Resource" uid="uid://c8qmnr7cm6o2u" path="res://data/items/materials/gunpowder_bag.tres" id="9_gunpowder"]
+[ext_resource type="Resource" uid="uid://v35jilyjifwa" path="res://data/items/consumables/small_dual_essence_potion.tres" id="10_fmmac"]
 [ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="10_large_healing"]
 [ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="11_large_stamina"]
-
-[sub_resource type="Resource" id="Offer_bow"]
-script = ExtResource("2_offer")
-offer_id = &"bow"
-kind = 1
-weapon = ExtResource("3_bow")
-buy_price = 100
+[ext_resource type="Resource" uid="uid://b0c2kxsb7y24n" path="res://data/items/consumables/dual_essence_potion.tres" id="11_rlrpf"]
+[ext_resource type="Resource" uid="uid://bh3m6d50c6isl" path="res://data/items/materials/mushroom_cap.tres" id="12_xfqqx"]
+[ext_resource type="Resource" uid="uid://bjm73rcy0l6vt" path="res://data/items/materials/fireflies_tail.tres" id="13_sdt1n"]
+[ext_resource type="Resource" uid="uid://bt21m2gguymn5" path="res://data/items/materials/venom_vibe.tres" id="14_bwia0"]
 
 [sub_resource type="Resource" id="Offer_arrow"]
 script = ExtResource("2_offer")
@@ -31,24 +28,28 @@ script = ExtResource("2_offer")
 offer_id = &"small_healing_potion"
 item = ExtResource("5_healing")
 buy_price = 25
+sell_price = 2
 
 [sub_resource type="Resource" id="Offer_stamina"]
 script = ExtResource("2_offer")
 offer_id = &"small_stamina_potion"
 item = ExtResource("6_stamina")
-buy_price = 15
+buy_price = 20
+sell_price = 2
 
 [sub_resource type="Resource" id="Offer_large_healing"]
 script = ExtResource("2_offer")
 offer_id = &"healing_potion"
 item = ExtResource("10_large_healing")
-buy_price = 45
+buy_price = 50
+sell_price = 5
 
 [sub_resource type="Resource" id="Offer_large_stamina"]
 script = ExtResource("2_offer")
 offer_id = &"stamina_potion"
 item = ExtResource("11_large_stamina")
-buy_price = 30
+buy_price = 35
+sell_price = 5
 
 [sub_resource type="Resource" id="Offer_starfish"]
 script = ExtResource("2_offer")
@@ -71,6 +72,56 @@ item = ExtResource("9_gunpowder")
 buy_price = 50
 sell_price = 5
 
+[sub_resource type="Resource" id="Resource_pgjsf"]
+script = ExtResource("2_offer")
+offer_id = &"small_dual_essence_potion"
+item = ExtResource("10_fmmac")
+buy_price = 30
+sell_price = 4
+metadata/_custom_type_script = "uid://buhrolk03pgyv"
+
+[sub_resource type="Resource" id="Resource_a82x4"]
+script = ExtResource("2_offer")
+offer_id = &"dual_essence_potion"
+item = ExtResource("11_rlrpf")
+buy_price = 60
+sell_price = 8
+metadata/_custom_type_script = "uid://buhrolk03pgyv"
+
+[sub_resource type="Resource" id="Resource_bggsi"]
+script = ExtResource("2_offer")
+offer_id = &"wooden_arrow_group_5"
+item = ExtResource("4_arrow")
+trade_amount = 5
+buy_price = 8
+metadata/_custom_type_script = "uid://buhrolk03pgyv"
+
+[sub_resource type="Resource" id="Resource_yqegw"]
+script = ExtResource("2_offer")
+offer_id = &"mushroom_cap"
+item = ExtResource("12_xfqqx")
+buy_price = 50
+sell_price = 5
+metadata/_custom_type_script = "uid://buhrolk03pgyv"
+
+[sub_resource type="Resource" id="Resource_1q27o"]
+script = ExtResource("2_offer")
+offer_id = &"fireflies_tail"
+item = ExtResource("13_sdt1n")
+buy_price = 50
+sell_price = 5
+metadata/_custom_type_script = "uid://buhrolk03pgyv"
+
+[sub_resource type="Resource" id="Resource_xg348"]
+script = ExtResource("2_offer")
+offer_id = &"venom_vine"
+item = ExtResource("14_bwia0")
+buy_price = 50
+sell_price = 5
+metadata/_custom_type_script = "uid://buhrolk03pgyv"
+
 [resource]
 script = ExtResource("1_catalog")
-offers = Array[ExtResource("2_offer")]([SubResource("Offer_bow"), SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_large_healing"), SubResource("Offer_large_stamina"), SubResource("Offer_starfish"), SubResource("Offer_crab"), SubResource("Offer_gunpowder")])
+offers = Array[ExtResource("2_offer")]([SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_large_healing"), SubResource("Offer_large_stamina"), SubResource("Offer_starfish"), SubResource("Offer_crab"), SubResource("Offer_gunpowder"), SubResource("Resource_pgjsf"), SubResource("Resource_a82x4"), SubResource("Resource_bggsi"), SubResource("Resource_yqegw"), SubResource("Resource_1q27o"), SubResource("Resource_xg348")])
+guaranteed_buy_offer_ids = Array[StringName]([&"wooden_arrow", &"small_healing_potion", &"small_stamina_potion"])
+random_buy_offer_count = 4

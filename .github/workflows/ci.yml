@@ -61,7 +61,10 @@ jobs:
             shift
             # Bash also supports setup-godot's launcher without a shebang.
             timeout "$limit" bash -c 'godot --headless --path . "$@"' _ "$@" 2>&1 | tee "$RUNNER_TEMP/godot.log"
-            if grep -Eq 'SCRIPT ERROR:|ERROR:' "$RUNNER_TEMP/godot.log"; then
+            # Godot's editor debugger can emit this lifecycle error on shutdown:
+            # https://github.com/godotengine/godot/issues/117243
+            # Keep all other Godot errors fatal.
+            if grep -E 'SCRIPT ERROR:|ERROR:' "$RUNNER_TEMP/godot.log" | grep -Ev '^ERROR: Plugin is not attached to debugger\.$'; then
               echo "::error::Godot reported an error; see the log above."
               exit 1
             fi

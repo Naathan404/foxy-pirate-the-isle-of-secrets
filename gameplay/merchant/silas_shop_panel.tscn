@@ -22,6 +22,7 @@
 [ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="21_font"]
 [ext_resource type="PackedScene" path="res://gameplay/merchant/trade_toast_queue.tscn" id="22_toasts"]
 [ext_resource type="Texture2D" uid="uid://djt3xrkck7v2j" path="res://assets/ui/silas_shop/PNG/28_label_plate_blank.png" id="23_leave_plate"]
+[ext_resource type="Script" uid="uid://bsn8narxl3gfb" path="res://gameplay/ui/button_press_feedback.gd" id="24_button_feedback"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xarjo"]
 
@@ -200,9 +201,9 @@ stretch_mode = 5
 layout_mode = 0
 offset_left = -1.0
 offset_top = 3.0
-offset_right = 139.0
+offset_right = 127.0
 offset_bottom = 46.0
-theme_override_colors/font_color = Color(0.26, 0.1, 0.05, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("21_font")
 theme_override_font_sizes/font_size = 30
 text = "0"
@@ -414,6 +415,9 @@ texture_normal = ExtResource("16_minus")
 ignore_texture_size = true
 stretch_mode = 5
 
+[node name="PressFeedback" type="Node" parent="Book/Info/Quantity/Minus" unique_id=939795018]
+script = ExtResource("24_button_feedback")
+
 [node name="Field" type="TextureRect" parent="Book/Info/Quantity" unique_id=139086468]
 layout_mode = 0
 offset_left = 13.0
@@ -446,6 +450,9 @@ texture_normal = ExtResource("17_plus")
 ignore_texture_size = true
 stretch_mode = 5
 
+[node name="PressFeedback" type="Node" parent="Book/Info/Quantity/Plus" unique_id=409415495]
+script = ExtResource("24_button_feedback")
+
 [node name="Action" type="TextureButton" parent="Book/Info" unique_id=875970682]
 layout_mode = 0
 offset_left = 85.0
@@ -456,6 +463,9 @@ mouse_default_cursor_shape = 2
 texture_normal = ExtResource("18_action")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="PressFeedback" type="Node" parent="Book/Info/Action" unique_id=609830071]
+script = ExtResource("24_button_feedback")
 
 [node name="Text" type="Label" parent="Book/Info/Action" unique_id=58075750]
 layout_mode = 1
@@ -511,6 +521,23 @@ theme_override_font_sizes/font_size = 36
 text = "Leave"
 flat = true
 
+[node name="PressFeedback" type="Node" parent="Book/Close" unique_id=1968068662]
+script = ExtResource("24_button_feedback")
+
 [node name="TradeToastQueue" parent="." unique_id=1537738564 instance=ExtResource("22_toasts")]
 visible = false
 layout_mode = 3
+
+[node name="DebugReroll" type="Button" parent="." unique_id=2122193843]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -190.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 46.0
+grow_horizontal = 0
+text = "Debug: Reroll Stock"
+
+[node name="PressFeedback" type="Node" parent="DebugReroll" unique_id=1112941602]
+script = ExtResource("24_button_feedback")

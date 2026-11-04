@@ -5,8 +5,8 @@
 
 [resource]
 script = ExtResource("1_base")
-item_id = "venom_vibe"
-display_name = "Venom Vibe"
+item_id = "venom_vine"
+display_name = "Venom Vine"
 icon = ExtResource("2_icon")
 description = "A thorny tendril dripping with venom."
 max_stack = 10

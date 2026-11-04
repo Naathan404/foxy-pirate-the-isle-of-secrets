@@ -17,14 +17,21 @@ var _presentation_state := PresentationState.CLOSED
 var _active_interactor: Player
 var _opening_player_was_blocked := false
 var _pending_timeline := ""
+var _stock_random := RandomNumberGenerator.new()
 @onready var sprite: AnimatedSprite3D = $Visual/AnimatedSprite3D
 
 
 func _ready() -> void:
-	if data == null or catalog == null or not catalog.validate().is_empty():
-		push_error("SilasNpc: valid data and merchant catalog are required")
+	if data == null or catalog == null:
+		push_error("SilasNpc: NPC data or merchant catalog is missing")
 		set_physics_process(false)
 		return
+	var catalog_errors := catalog.validate()
+	if not catalog_errors.is_empty():
+		push_error("SilasNpc: invalid merchant catalog:\n%s" % "\n".join(catalog_errors))
+		set_physics_process(false)
+		return
+	_stock_random.randomize()
 	super()
 	_shop_panel = get_node_or_null(shop_panel_path) as SilasShopPanel
 	if _shop_panel == null:
@@ -37,6 +44,7 @@ func _ready() -> void:
 	sprite.animation_finished.connect(_on_sprite_animation_finished)
 	sprite.play(&"idle_close")
 	_shop_panel.shop_closed.connect(_on_shop_closed)
+	_shop_panel.stock_reroll_requested.connect(reroll_shop_stock)
 	dialogue_finished.connect(_on_dialogue_finished)
 
 
@@ -150,8 +158,21 @@ func _open_shop(interactor: Player) -> void:
 		return
 	_active_interactor = interactor
 	interaction_area.set_interaction_enabled(false)
-	if not _shop_panel.open_for(interactor, catalog):
+	var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
+	var stock := (
+		progress.get_shop_stock(catalog) if progress != null else catalog.roll_buy_stock(_stock_random)
+	)
+	if not _shop_panel.open_for(interactor, stock):
 		_begin_close()
+
+
+func reroll_shop_stock() -> void:
+	var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
+	if progress == null:
+		return
+	var stock := progress.reroll_shop_stock(catalog)
+	if _shop_panel != null and _shop_panel.visible and stock != null:
+		_shop_panel.update_stock(stock)
 
 
 func _on_shop_closed() -> void:
