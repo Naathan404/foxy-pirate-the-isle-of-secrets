@@ -1,0 +1,59 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/05_item_slot_empty.png" id="1_slot"]
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/06_item_selection_highlight.png" id="2_selected"]
+[ext_resource type="FontFile" path="res://assets/fonts/unifont-17.0.03.otf" id="3_font"]
+
+[node name="TortugaSlot" type="Control"]
+custom_minimum_size = Vector2(94, 104)
+mouse_filter = 2
+
+[node name="Button" type="TextureButton" parent="."]
+offset_right = 88.0
+offset_bottom = 88.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("1_slot")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Darken" type="TextureRect" parent="Button"]
+visible = false
+offset_right = 88.0
+offset_bottom = 88.0
+mouse_filter = 2
+modulate = Color(0.6, 0.55, 0.5, 1)
+texture = ExtResource("1_slot")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Icon" type="TextureRect" parent="Button"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 72.0
+offset_bottom = 68.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Highlight" type="TextureRect" parent="Button"]
+visible = false
+offset_left = -3.0
+offset_top = -3.0
+offset_right = 91.0
+offset_bottom = 91.0
+mouse_filter = 2
+texture = ExtResource("2_selected")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="."]
+offset_left = -3.0
+offset_top = 82.0
+offset_right = 91.0
+offset_bottom = 104.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.23, 0.105, 0.07, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+text_overrun_behavior = 3

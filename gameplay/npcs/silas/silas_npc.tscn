@@ -264,9 +264,8 @@ animations = [{
 "speed": 8.0
 }]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape_silas"]
-radius = 0.9
-height = 2.5
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_6k346"]
+radius = 1.1860352
 
 [sub_resource type="CylinderShape3D" id="CylinderShape_interaction"]
 height = 3.0
@@ -311,7 +310,7 @@ libraries/ = ExtResource("6_anims")
 
 [node name="CollisionShape3D" parent="." index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
-shape = SubResource("CapsuleShape_silas")
+shape = SubResource("CylinderShape3D_6k346")
 
 [node name="Talk" type="Node" parent="States" index="1" unique_id=1989019649]
 script = ExtResource("7_talk")

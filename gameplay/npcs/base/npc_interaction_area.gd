@@ -48,7 +48,7 @@ func _get_interactor() -> Player:
 func _create_prompt() -> Label3D:
 	var prompt := Label3D.new()
 	prompt.name = "Prompt"
-	prompt.text = _get_action_prompt()
+	prompt.text = "Talk"
 	prompt.font_size = 56
 	prompt.outline_size = 12
 	prompt.pixel_size = 0.01

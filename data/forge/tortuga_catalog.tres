@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="TortugaCatalog" format=3 uid="uid://dm6urnvsjgkei"]
+
+[ext_resource type="Script" uid="uid://b4wjo1hao0ebp" path="res://gameplay/forge/tortuga_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" uid="uid://dd0d4dsdkts5i" path="res://gameplay/forge/tortuga_recipe.gd" id="2_recipe"]
+[ext_resource type="Script" uid="uid://cjmeu6301emu1" path="res://gameplay/forge/tortuga_ingredient.gd" id="3_ingredient"]
+[ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="4_bow"]
+[ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="5_harpoon"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="6_starfish"]
+[ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="7_crab"]
+[ext_resource type="Resource" path="res://data/items/materials/coral.tres" id="8_coral"]
+[ext_resource type="Resource" path="res://data/weapon/forges/shared_pool.tres" id="9_pool"]
+[ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="dagger"]
+
+[sub_resource type="Resource" id="ForgeCrab"]
+script = ExtResource("3_ingredient")
+item = ExtResource("7_crab")
+amount = 2
+
+[sub_resource type="Resource" id="ForgeStarfish"]
+script = ExtResource("3_ingredient")
+item = ExtResource("6_starfish")
+
+[sub_resource type="Resource" id="DaggerRecipe"]
+script = ExtResource("2_recipe")
+weapon = ExtResource("dagger")
+
+[sub_resource type="Resource" id="BowStarfish"]
+script = ExtResource("3_ingredient")
+item = ExtResource("6_starfish")
+amount = 5
+
+[sub_resource type="Resource" id="BowCrab"]
+script = ExtResource("3_ingredient")
+item = ExtResource("7_crab")
+amount = 5
+
+[sub_resource type="Resource" id="BowRecipe"]
+script = ExtResource("2_recipe")
+weapon = ExtResource("4_bow")
+gold_cost = 100
+ingredients = Array[ExtResource("3_ingredient")]([SubResource("BowStarfish"), SubResource("BowCrab")])
+
+[sub_resource type="Resource" id="HarpoonCrab"]
+script = ExtResource("3_ingredient")
+item = ExtResource("7_crab")
+amount = 2
+
+[sub_resource type="Resource" id="HarpoonStarfish"]
+script = ExtResource("3_ingredient")
+item = ExtResource("6_starfish")
+
+[sub_resource type="Resource" id="HarpoonCoral"]
+script = ExtResource("3_ingredient")
+item = ExtResource("8_coral")
+amount = 5
+
+[sub_resource type="Resource" id="HarpoonRecipe"]
+script = ExtResource("2_recipe")
+weapon = ExtResource("5_harpoon")
+gold_cost = 250
+ingredients = Array[ExtResource("3_ingredient")]([SubResource("HarpoonCrab"), SubResource("HarpoonStarfish"), SubResource("HarpoonCoral")])
+
+[resource]
+script = ExtResource("1_catalog")
+recipes = Array[ExtResource("2_recipe")]([SubResource("DaggerRecipe"), SubResource("BowRecipe"), SubResource("HarpoonRecipe")])
+forge_ingredients = Array[ExtResource("3_ingredient")]([SubResource("ForgeCrab"), SubResource("ForgeStarfish")])
+forge_pool = ExtResource("9_pool")

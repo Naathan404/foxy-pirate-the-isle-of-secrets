@@ -1,0 +1,349 @@
+[gd_scene format=3 uid="uid://b3l8eoptwh2gv"]
+
+[ext_resource type="Script" uid="uid://1nos00yo7mfw" path="res://gameplay/forge/tortuga_panel.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="2_book"]
+[ext_resource type="Texture2D" uid="uid://1q3c8vtxvd5b" path="res://assets/ui/silas_shop/PNG/01_shop_header_lantern_banner.png" id="3_header"]
+[ext_resource type="Texture2D" uid="uid://eeec67jm4h4y" path="res://assets/ui/silas_shop/PNG/32_tab_active_blank.png" id="4_active"]
+[ext_resource type="Texture2D" uid="uid://7s3ih1xyueqv" path="res://assets/ui/silas_shop/PNG/20_price_pill_blank.png" id="4_y1l2d"]
+[ext_resource type="Texture2D" uid="uid://h8nkhrn66qfw" path="res://assets/ui/silas_shop/PNG/33_tab_inactive_blank.png" id="5_idle"]
+[ext_resource type="Texture2D" uid="uid://bghbjcbfj5hf6" path="res://assets/ui/silas_shop/PNG/27_detail_page_border_only.png" id="6_border"]
+[ext_resource type="Script" uid="uid://bsn8narxl3gfb" path="res://gameplay/ui/button_press_feedback.gd" id="7_5vsl8"]
+[ext_resource type="Texture2D" uid="uid://dn8xyc2ls77hv" path="res://assets/ui/silas_shop/PNG/15_detail_item_icon_slot.png" id="7_icon_frame"]
+[ext_resource type="Texture2D" uid="uid://bbnpp5em43u2o" path="res://assets/ui/silas_shop/PNG/16_item_name_ink_brushstroke.png" id="8_name"]
+[ext_resource type="Texture2D" uid="uid://bootcj1j63ful" path="res://assets/ui/silas_shop/PNG/34_purchase_button_blank.png" id="9_action"]
+[ext_resource type="Texture2D" uid="uid://djt3xrkck7v2j" path="res://assets/ui/silas_shop/PNG/28_label_plate_blank.png" id="10_plate"]
+[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="11_title_font"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="12_body_font"]
+[ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="13_5vsl8"]
+[ext_resource type="PackedScene" uid="uid://bympsgu0f6rjq" path="res://gameplay/forge/tortuga_forge_popup.tscn" id="forge_popup"]
+[ext_resource type="PackedScene" uid="uid://dwdpsp5ebl1b1" path="res://gameplay/forge/tortuga_weapon_details.tscn" id="weapon_details"]
+
+[node name="TortugaPanel" type="CanvasLayer" unique_id=1396822409]
+layer = 20
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=1088827091]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.035, 0.025, 0.023, 0.76)
+
+[node name="Book" type="Control" parent="." unique_id=34064067]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -550.0
+offset_top = -325.0
+offset_right = 550.0
+offset_bottom = 325.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Background" type="TextureRect" parent="Book" unique_id=1161090194]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_book")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Header" type="TextureRect" parent="Book" unique_id=1864422711]
+visible = false
+layout_mode = 0
+offset_left = 66.0
+offset_top = -20.0
+offset_right = 518.0
+offset_bottom = 116.0
+mouse_filter = 2
+texture = ExtResource("3_header")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect" type="TextureRect" parent="Book" unique_id=1931720662]
+layout_mode = 0
+offset_left = 197.0
+offset_top = 5.0
+offset_right = 447.0
+offset_bottom = 85.0
+texture = ExtResource("4_y1l2d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Book" unique_id=554520994]
+layout_mode = 0
+offset_left = 181.0
+offset_top = 16.0
+offset_right = 463.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color(0.46443862, 0.11818587, 0, 1)
+theme_override_fonts/font = ExtResource("11_title_font")
+theme_override_font_sizes/font_size = 30
+text = "MASTER TORTUGA"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Tabs" type="Control" parent="Book" unique_id=1001507423]
+anchors_preset = 0
+offset_left = 164.0
+offset_top = 74.0
+offset_right = 514.0
+offset_bottom = 125.0
+
+[node name="Craft" type="TextureButton" parent="Book/Tabs" unique_id=122359710]
+layout_mode = 0
+offset_right = 160.0
+offset_bottom = 52.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4_active")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Book/Tabs/Craft" unique_id=1764222541]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(1, 0.9, 0.7, 1)
+theme_override_fonts/font = ExtResource("11_title_font")
+theme_override_font_sizes/font_size = 27
+text = "Craft"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonPressFeedback" type="Node" parent="Book/Tabs/Craft" unique_id=660222076]
+script = ExtResource("7_5vsl8")
+metadata/_custom_type_script = "uid://bsn8narxl3gfb"
+
+[node name="Forge" type="TextureButton" parent="Book/Tabs" unique_id=1088413106]
+layout_mode = 0
+offset_left = 166.0
+offset_right = 326.0
+offset_bottom = 52.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("5_idle")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Book/Tabs/Forge" unique_id=2076104890]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(0.29, 0.14, 0.1, 1)
+theme_override_fonts/font = ExtResource("11_title_font")
+theme_override_font_sizes/font_size = 27
+text = "Forge"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonPressFeedback" type="Node" parent="Book/Tabs/Forge" unique_id=1710356251]
+script = ExtResource("7_5vsl8")
+metadata/_custom_type_script = "uid://bsn8narxl3gfb"
+
+[node name="GridScroll" type="ScrollContainer" parent="Book" unique_id=781576712]
+layout_mode = 0
+offset_left = 146.0
+offset_top = 129.0
+offset_right = 522.0
+offset_bottom = 509.0
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="Control" parent="Book/GridScroll" unique_id=280763759]
+custom_minimum_size = Vector2(376, 350)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Empty" type="Label" parent="Book" unique_id=691242103]
+layout_mode = 0
+offset_left = 147.0
+offset_top = 280.0
+offset_right = 517.0
+offset_bottom = 360.0
+theme_override_colors/font_color = Color(0.32, 0.17, 0.12, 1)
+theme_override_fonts/font = ExtResource("12_body_font")
+theme_override_font_sizes/font_size = 19
+text = "Empty."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="DetailBorder" type="TextureRect" parent="Book" unique_id=191573337]
+visible = false
+layout_mode = 0
+offset_left = 561.0
+offset_top = 120.0
+offset_right = 1009.0
+offset_bottom = 568.0
+mouse_filter = 2
+texture = ExtResource("6_border")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="IconFrame" type="TextureRect" parent="Book" unique_id=563381993]
+layout_mode = 0
+offset_left = 583.0
+offset_top = 83.0
+offset_right = 683.0
+offset_bottom = 183.0
+mouse_filter = 2
+texture = ExtResource("7_icon_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Icon" type="TextureRect" parent="Book/IconFrame" unique_id=176491024]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NamePlate" type="TextureRect" parent="Book" unique_id=226430214]
+layout_mode = 0
+offset_left = 679.0
+offset_top = 82.0
+offset_right = 945.0
+offset_bottom = 145.0
+mouse_filter = 2
+texture = ExtResource("8_name")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemName" type="Label" parent="Book" unique_id=335698408]
+layout_mode = 0
+offset_left = 686.0
+offset_top = 90.0
+offset_right = 931.0
+offset_bottom = 134.0
+theme_override_colors/font_color = Color(1, 0.9, 0.72, 1)
+theme_override_fonts/font = ExtResource("11_title_font")
+theme_override_font_sizes/font_size = 25
+text = "Weapon's Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Status" type="Label" parent="Book" unique_id=999308500]
+layout_mode = 0
+offset_left = 696.0
+offset_top = 145.0
+offset_right = 953.0
+offset_bottom = 175.0
+theme_override_colors/font_color = Color(0.36, 0.18, 0.11, 1)
+theme_override_fonts/font = ExtResource("13_5vsl8")
+theme_override_font_sizes/font_size = 20
+text = "Status"
+
+[node name="DetailsScroll" type="ScrollContainer" parent="Book" unique_id=1487831070]
+layout_mode = 0
+offset_left = 580.0
+offset_top = 186.0
+offset_right = 945.0
+offset_bottom = 386.0
+horizontal_scroll_mode = 0
+scroll_hint_mode = 1
+
+[node name="WeaponDetails" parent="Book/DetailsScroll" unique_id=289945837 instance=ExtResource("weapon_details")]
+custom_minimum_size = Vector2(350, 604)
+layout_mode = 2
+
+[node name="CostGrid" type="Control" parent="Book" unique_id=710005252]
+anchors_preset = 0
+offset_left = 589.0
+offset_top = 391.0
+offset_right = 939.0
+offset_bottom = 503.0
+mouse_filter = 2
+
+[node name="Action" type="TextureButton" parent="Book" unique_id=663786749]
+layout_mode = 0
+offset_left = 235.0
+offset_top = 442.0
+offset_right = 434.0
+offset_bottom = 496.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("9_action")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Book/Action" unique_id=1171449696]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(1, 0.91, 0.71, 1)
+theme_override_fonts/font = ExtResource("11_title_font")
+theme_override_font_sizes/font_size = 24
+text = "Craft"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonPressFeedback" type="Node" parent="Book/Action" unique_id=1903112800]
+script = ExtResource("7_5vsl8")
+metadata/_custom_type_script = "uid://bsn8narxl3gfb"
+
+[node name="Feedback" type="Label" parent="Book" unique_id=757995315]
+layout_mode = 0
+offset_left = 183.0
+offset_top = 415.0
+offset_right = 495.0
+offset_bottom = 446.0
+theme_override_colors/font_color = Color(0.85490197, 0.12941177, 0.09019608, 1)
+theme_override_fonts/font = ExtResource("13_5vsl8")
+theme_override_font_sizes/font_size = 20
+text = "Feedback"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="LeavePlate" type="TextureRect" parent="Book" unique_id=687982659]
+layout_mode = 0
+offset_left = 433.0
+offset_top = 566.0
+offset_right = 683.0
+offset_bottom = 626.0
+mouse_filter = 2
+texture = ExtResource("10_plate")
+expand_mode = 1
+
+[node name="Close" type="Button" parent="Book" unique_id=1532582786]
+layout_mode = 0
+offset_left = 475.0
+offset_top = 568.0
+offset_right = 627.0
+offset_bottom = 620.0
+theme_override_colors/font_color = Color(0.29, 0.13, 0.08, 1)
+theme_override_fonts/font = ExtResource("11_title_font")
+theme_override_font_sizes/font_size = 40
+text = "Leave"
+flat = true
+
+[node name="ButtonPressFeedback" type="Node" parent="Book/Close" unique_id=1061902353]
+script = ExtResource("7_5vsl8")
+metadata/_custom_type_script = "uid://bsn8narxl3gfb"
+
+[node name="DebugSupplies" type="Button" parent="Book" unique_id=151026443]
+layout_mode = 0
+offset_left = 144.0
+offset_top = 577.0
+offset_right = 324.0
+offset_bottom = 610.0
+theme_override_colors/font_color = Color(0.34, 0.15, 0.09, 1)
+theme_override_fonts/font = ExtResource("12_body_font")
+theme_override_font_sizes/font_size = 15
+text = "Debug: Supplies"
+flat = true
+
+[node name="ForgePopup" parent="." unique_id=637437155 instance=ExtResource("forge_popup")]
+visible = false

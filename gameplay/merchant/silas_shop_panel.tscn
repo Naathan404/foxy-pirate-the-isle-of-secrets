@@ -171,9 +171,9 @@ stretch_mode = 5
 
 [node name="GoldBadge" type="Control" parent="Book" unique_id=900180299]
 anchors_preset = 0
-offset_left = 567.0
+offset_left = 834.0
 offset_top = 37.0
-offset_right = 747.0
+offset_right = 1014.0
 offset_bottom = 97.0
 mouse_filter = 2
 
@@ -500,20 +500,20 @@ vertical_alignment = 1
 
 [node name="LeavePlate" type="TextureRect" parent="Book" unique_id=2115421042]
 layout_mode = 0
-offset_left = 839.0
-offset_top = 40.0
-offset_right = 989.0
-offset_bottom = 90.0
+offset_left = 473.0
+offset_top = 563.0
+offset_right = 623.0
+offset_bottom = 613.0
 mouse_filter = 2
 texture = ExtResource("23_leave_plate")
 expand_mode = 1
 
 [node name="Close" type="Button" parent="Book" unique_id=1266189592]
 layout_mode = 0
-offset_left = 840.0
-offset_top = 38.0
-offset_right = 990.0
-offset_bottom = 88.0
+offset_left = 474.0
+offset_top = 561.0
+offset_right = 624.0
+offset_bottom = 611.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.35, 0.13, 0.07, 1)
 theme_override_fonts/font = ExtResource("21_font")

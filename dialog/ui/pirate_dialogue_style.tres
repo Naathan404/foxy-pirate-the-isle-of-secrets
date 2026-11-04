@@ -1,0 +1,75 @@
+[gd_resource type="Resource" script_class="DialogicStyle" format=3 uid="uid://dslkux3olbsui"]
+
+[ext_resource type="Resource" uid="uid://8t1mr302tmqs" path="res://addons/dialogic/Modules/DefaultLayoutParts/Style_VN_Default/default_vn_style.tres" id="1_x0x6e"]
+[ext_resource type="Script" uid="uid://bwg6yncmh2cml" path="res://addons/dialogic/Resources/dialogic_style_layer.gd" id="2_bowg6"]
+[ext_resource type="Script" uid="uid://dv08k6ljua6fm" path="res://addons/dialogic/Resources/dialogic_style.gd" id="3_qivog"]
+
+[sub_resource type="Resource" id="Resource_gn14l"]
+script = ExtResource("2_bowg6")
+
+[sub_resource type="Resource" id="Resource_jwm68"]
+script = ExtResource("2_bowg6")
+overrides = {
+"bold_font": "res://assets/fonts/unifont-17.0.03.otf",
+"bold_italics_font": "res://assets/fonts/unifont-17.0.03.otf",
+"box_color_custom": "Color(1, 1, 1, 1)",
+"box_color_use_global": "false",
+"box_margin_bottom": "22",
+"box_panel": "res://dialog/ui/dialogue_paper.tres",
+"box_size": "Vector2(900, 228)",
+"italics_font": "res://assets/fonts/unifont-17.0.03.otf",
+"name_label_box_modulate": "Color(1, 1, 1, 1)",
+"name_label_box_offset": "Vector2(29, -2)",
+"name_label_box_panel": "res://dialog/ui/dialogue_nameplate.tres",
+"name_label_box_use_global_color": "false",
+"name_label_custom_color": "Color(0.31, 0.10, 0.08, 1)",
+"name_label_custom_font_size": "21",
+"name_label_font": "res://assets/fonts/unifont-17.0.03.otf",
+"name_label_use_character_color": "false",
+"name_label_use_global_color": "false",
+"name_label_use_global_font": "false",
+"name_label_use_global_font_size": "false",
+"next_indicator_position_offset": "Vector2(-29, -22)",
+"next_indicator_size": "Vector2(27, 27)",
+"next_indicator_texture": "res://assets/ui/silas_shop/PNG/29_page_corner_ink_ornament.png",
+"normal_font": "res://assets/fonts/unifont-17.0.03.otf",
+"text_custom_color": "Color(0.18, 0.095, 0.065, 1)",
+"text_size": "22",
+"text_use_global_color": "false",
+"text_use_global_font": "false",
+"text_use_global_size": "false"
+}
+
+[sub_resource type="Resource" id="Resource_ndc6p"]
+script = ExtResource("2_bowg6")
+overrides = {
+"boxes_min_size": "Vector2(430, 62)",
+"boxes_offset": "Vector2(0, -94)",
+"boxes_stylebox_disabled": "res://dialog/ui/dialogue_choice_idle.tres",
+"boxes_stylebox_focused": "res://dialog/ui/dialogue_choice_active.tres",
+"boxes_stylebox_hovered": "res://dialog/ui/dialogue_choice_active.tres",
+"boxes_stylebox_normal": "res://dialog/ui/dialogue_choice_idle.tres",
+"boxes_stylebox_pressed": "res://dialog/ui/dialogue_choice_active.tres",
+"boxes_v_separation": "12",
+"font_custom": "res://assets/fonts/unifont-17.0.03.otf",
+"font_size_custom": "21",
+"font_size_use_global": "false",
+"font_use_global": "false",
+"text_color_custom": "Color(0.18, 0.095, 0.065, 1)",
+"text_color_disabled": "Color(0.43, 0.37, 0.32, 1)",
+"text_color_focused": "Color(1, 0.91, 0.73, 1)",
+"text_color_hovered": "Color(1, 0.91, 0.73, 1)",
+"text_color_pressed": "Color(1, 0.91, 0.73, 1)",
+"text_color_use_global": "false"
+}
+
+[resource]
+script = ExtResource("3_qivog")
+name = "Pirate Dialogue"
+inherits = ExtResource("1_x0x6e")
+layer_list = Array[String](["13", "15"])
+layer_info = {
+"": SubResource("Resource_gn14l"),
+"13": SubResource("Resource_jwm68"),
+"15": SubResource("Resource_ndc6p")
+}

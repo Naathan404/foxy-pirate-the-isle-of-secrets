@@ -15,6 +15,8 @@
 [ext_resource type="ArrayMesh" uid="uid://jci2vipujt47" path="res://assets/models/kenney_mini_forest/plant.glb" id="13_24f13"]
 [ext_resource type="PackedScene" uid="uid://dltw4fun83bl4" path="res://gameplay/merchant/silas_shop_panel.tscn" id="14_silas_panel"]
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="15_silas_npc"]
+[ext_resource type="Script" uid="uid://cwey86jadengi" path="res://world/components/camera_bounds_3d.gd" id="camera_bounds"]
+[ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="tortuga_npc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -198,7 +200,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
 [node name="SilasShopPanel" parent="." unique_id=297138611 instance=ExtResource("14_silas_panel")]
 
 [node name="Silas" parent="." unique_id=128334314 instance=ExtResource("15_silas_npc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 29.523533, -0.33695424, 18.533806)
+
+[node name="MasterTortuga" parent="." unique_id=288821948 instance=ExtResource("tortuga_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.70143, 7.819124, -24.165083)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
@@ -422,3 +427,12 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="SeaWater" parent="." unique_id=785709136 instance=ExtResource("5_en8wc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0012025833, -6.014505, -0.00055122375)
+
+[node name="CameraBounds" type="Node3D" parent="." unique_id=145112967]
+script = ExtResource("camera_bounds")
+
+[node name="CornerA" type="Marker3D" parent="CameraBounds" unique_id=1439034911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59.510002, 0, -63.080883)
+
+[node name="CornerB" type="Marker3D" parent="CameraBounds" unique_id=350326552]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.79037, 0, 40.362617)
