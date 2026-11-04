@@ -1,3 +1,4 @@
+# gdlint: disable=max-public-methods
 class_name CharmSocketManager
 extends Node
 ## Quản lý ba socket cố định và quyền đổi Charm tại safe location.
@@ -22,8 +23,6 @@ var _sockets: Dictionary[int, CharmSocket] = {}
 var _debug_socket_id: int = CharmConstants.SocketId.Q
 var _debug_charm_id: StringName = &""
 var _previous_pressed: Dictionary[int, bool] = {}
-var _debug_grant_all_charms: bool = false
-var _debug_auto_equip_first_three: bool = false
 
 
 func _ready() -> void:
@@ -38,8 +37,6 @@ func _ready() -> void:
 	notify_property_list_changed()
 	if not _debug_charm_id.is_empty():
 		_apply_debug_charm_selection.call_deferred()
-	if OS.is_debug_build() and _debug_grant_all_charms:
-		_debug_grant_and_equip_all.call_deferred()
 
 
 func _get_property_list() -> Array[Dictionary]:
@@ -65,16 +62,6 @@ func _get_property_list() -> Array[Dictionary]:
 			"hint_string": ",".join(_get_debug_charm_options()),
 			"usage": PROPERTY_USAGE_EDITOR,
 		},
-		{
-			"name": "debug_grant_all_charms",
-			"type": TYPE_BOOL,
-			"usage": PROPERTY_USAGE_EDITOR,
-		},
-		{
-			"name": "debug_auto_equip_first_three",
-			"type": TYPE_BOOL,
-			"usage": PROPERTY_USAGE_EDITOR,
-		},
 	]
 
 
@@ -84,10 +71,6 @@ func _get(property: StringName) -> Variant:
 			return _debug_socket_id
 		&"debug_charm":
 			return _get_debug_charm_label(_debug_charm_id)
-		&"debug_grant_all_charms":
-			return _debug_grant_all_charms
-		&"debug_auto_equip_first_three":
-			return _debug_auto_equip_first_three
 	return null
 
 
@@ -104,16 +87,6 @@ func _set(property: StringName, value: Variant) -> bool:
 			_debug_charm_id = _get_debug_charm_id(String(value))
 			if is_node_ready():
 				_apply_debug_charm_selection.call_deferred()
-			return true
-		&"debug_grant_all_charms":
-			_debug_grant_all_charms = bool(value)
-			if is_node_ready() and _debug_grant_all_charms:
-				_debug_grant_and_equip_all.call_deferred()
-			return true
-		&"debug_auto_equip_first_three":
-			_debug_auto_equip_first_three = bool(value)
-			if is_node_ready() and _debug_auto_equip_first_three:
-				_debug_grant_and_equip_all.call_deferred()
 			return true
 	return false
 
@@ -329,23 +302,43 @@ func _debug_equip_charm(charm_id: StringName, socket_id: int) -> bool:
 	return equipped
 
 
-func _debug_grant_and_equip_all() -> void:
+func debug_all_charms_owned() -> bool:
 	if not OS.is_debug_build() or not is_node_ready() or not is_instance_valid(registry):
-		return
-	for charm_id: StringName in registry.get_registered_ids():
-		registry._debug_set_owned(charm_id, true)
-	if not _debug_auto_equip_first_three or not is_instance_valid(actor):
-		return
-	var socket_ids := [
-		CharmConstants.SocketId.Q,
-		CharmConstants.SocketId.SPACE,
-		CharmConstants.SocketId.E,
-	]
+		return false
 	var charm_ids := registry.get_registered_ids()
-	for index: int in range(mini(socket_ids.size(), charm_ids.size())):
-		_debug_equip_charm(charm_ids[index], socket_ids[index])
+	if charm_ids.is_empty():
+		return false
+	for charm_id: StringName in charm_ids:
+		if not registry.is_owned(charm_id):
+			return false
+	return true
+
+
+func debug_toggle_all_charms() -> bool:
+	if not OS.is_debug_build() or not is_node_ready() or not is_instance_valid(registry):
+		return false
+	var should_grant := not debug_all_charms_owned()
+	var changed_count := 0
+	var added_debug_safe_source := false
+	if not should_grant:
+		added_debug_safe_source = not can_change_loadout()
+		if added_debug_safe_source:
+			enter_safe_location(self)
+		for socket_id: int in range(CharmConstants.MAX_SOCKET_COUNT):
+			if not get_equipped_charm(socket_id).is_empty():
+				unequip_charm(socket_id)
+	for charm_id: StringName in registry.get_registered_ids():
+		if registry._debug_set_owned(charm_id, should_grant):
+			changed_count += 1
+	_end_debug_loadout_change(added_debug_safe_source)
 	notify_property_list_changed()
-	print("Charm debug: granted all registered Charms and auto-equipped first three sockets")
+	print(
+		(
+			"Charm debug: %s ownership for %d registered Charms"
+			% ["granted" if should_grant else "cleared", changed_count]
+		)
+	)
+	return should_grant
 
 
 func _debug_unequip_charm(socket_id: int) -> bool:

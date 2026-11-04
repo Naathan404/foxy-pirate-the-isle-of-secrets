@@ -1,6 +1,16 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://gameplay/charms/active/tide_grapple_attack.gd" id="1_script"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tide"]
+size = Vector3(0.12, 0.12, 2.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tide"]
+albedo_color = Color(0.1, 0.8, 1, 0.8)
+emission_enabled = true
+emission = Color(0, 0.35, 0.9, 1)
+emission_energy_multiplier = 2.0
+transparency = 1
 
 [node name="TideGrappleAttack" type="Node3D" node_paths=PackedStringArray("raycast")]
 script = ExtResource("1_script")
@@ -11,3 +21,7 @@ enabled = false
 collision_mask = 21
 collide_with_areas = true
 collide_with_bodies = true
+
+[node name="Placeholder" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_tide")
+material_override = SubResource("StandardMaterial3D_tide")
