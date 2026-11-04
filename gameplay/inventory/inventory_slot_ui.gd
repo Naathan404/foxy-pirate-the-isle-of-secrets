@@ -20,27 +20,18 @@ var _drag_enabled := true
 var _visual_tween: Tween
 var _background_scale: Vector2
 var _content_scale: Vector2
-var _highlight: Panel
 
 @onready var background: TextureRect = $Background
 @onready var content: MarginContainer = $MarginContainer
 @onready var icon: TextureRect = $MarginContainer/Icon
-@onready var quantity_label: Label = $MarginContainer/QuantityLabel
+@onready var quantity_label: Label = $Background/QuantityLabel
 @onready var potion_assignment_label: Label = $Background/PotionAssignmentLabel
+@onready var _highlight: TextureRect = $Selection
 
 
 func _ready() -> void:
 	_background_scale = background.scale
 	_content_scale = content.scale
-	var style := StyleBoxFlat.new()
-	style.draw_center = false
-	style.set_border_width_all(2)
-	style.border_color = Color.WHITE
-	_highlight = Panel.new()
-	_highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_highlight.add_theme_stylebox_override("panel", style)
-	_highlight.hide()
-	add_child(_highlight)
 	mouse_entered.connect(_set_hovered.bind(true))
 	mouse_exited.connect(_set_hovered.bind(false))
 	visibility_changed.connect(_on_visibility_changed)
@@ -112,9 +103,7 @@ func _animate_visual() -> void:
 	tint.a = 0.4 if _dragging else 1.0
 	_highlight.visible = _selected or _hovered or _drop_target
 	_highlight.modulate = (
-		Color(0.45, 1.0, 0.65)
-		if _drop_target
-		else (Color(1.0, 0.8, 0.35) if _selected else Color(1, 1, 1, 0.45))
+		Color(0.5, 1.0, 0.6) if _drop_target else Color.WHITE if _selected else Color(1, 1, 1, 0.6)
 	)
 	if not is_visible_in_tree():
 		background.scale = _background_scale

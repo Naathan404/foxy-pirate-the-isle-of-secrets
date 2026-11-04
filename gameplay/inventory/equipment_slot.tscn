@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://cf04lpri8k1o3"]
 
 [ext_resource type="Script" uid="uid://chtw2ww4dajpd" path="res://gameplay/inventory/equipment_slot.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://d0ed421hv3cav" path="res://assets/ui/player_hud/inventory/Inventory_Slot_2.png" id="2_h228d"]
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/05_item_slot_empty.png" id="2_h228d"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_h228d"]
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/06_item_selection_highlight.png" id="4_selection"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_h228d"]
 
@@ -54,6 +55,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Badge" type="Label" parent="." unique_id=1076404912]
+z_index = 2
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -72,3 +74,17 @@ theme_override_font_sizes/font_size = 30
 text = "E"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="SelectionHighlight" type="TextureRect" parent="."]
+z_index = 1
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_selection")
+expand_mode = 1
+stretch_mode = 5
