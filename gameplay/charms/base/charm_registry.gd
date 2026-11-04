@@ -1,3 +1,4 @@
+# gdlint: disable=max-public-methods
 class_name CharmRegistry
 extends Node
 ## Catalog, ownership và runtime lifecycle của Charm.
@@ -63,6 +64,9 @@ func validate_catalog() -> PackedStringArray:
 func set_owned(charm_id: StringName, owned: bool) -> bool:
 	if not _catalog.has(charm_id):
 		return false
+	var definition := get_definition(charm_id)
+	if definition == null or not definition.is_playable():
+		return false
 	if owned:
 		if _owned_ids.has(charm_id):
 			return true
@@ -92,6 +96,9 @@ func get_owned_ids() -> Array[StringName]:
 func equip_charm(charm_id: StringName, socket_id: int, owner_actor: Node3D) -> bool:
 	if not is_owned(charm_id):
 		return false
+	var definition := get_definition(charm_id)
+	if definition == null or not definition.is_playable():
+		return false
 	return _equip_charm_runtime(charm_id, socket_id, owner_actor)
 
 
@@ -99,6 +106,17 @@ func _debug_equip_charm(charm_id: StringName, socket_id: int, owner_actor: Node3
 	if not OS.is_debug_build():
 		return false
 	return _equip_charm_runtime(charm_id, socket_id, owner_actor)
+
+
+func _debug_set_owned(charm_id: StringName, owned: bool = true) -> bool:
+	if not OS.is_debug_build() or not _catalog.has(charm_id):
+		return false
+	if owned:
+		_owned_ids[charm_id] = true
+		charm_owned.emit(charm_id)
+		return true
+	_owned_ids.erase(charm_id)
+	return true
 
 
 func _equip_charm_runtime(charm_id: StringName, socket_id: int, owner_actor: Node3D) -> bool:
@@ -154,26 +172,50 @@ func get_equipped(socket_id: int) -> CharmRuntime:
 
 
 func activate_socket(socket_id: int, context: CharmActivationContext) -> bool:
+	return input_pressed(socket_id, context)
+
+
+func input_pressed(socket_id: int, context: CharmActivationContext) -> bool:
 	var runtime := get_equipped(socket_id)
-	if runtime == null or context == null or not runtime.can_activate():
+	if runtime == null or context == null or not runtime.can_receive_input():
+		return false
+	if runtime.cooldown_remaining > 0.0 and not runtime.effect.can_bypass_cooldown(context):
+		return false
+	if runtime.effect.get_cooldown_policy() == &"on_activate" and not runtime.can_activate():
 		return false
 	if not runtime.effect.can_activate(context):
 		return false
-	if (
-		runtime.definition.resource_cost > 0.0
-		and not _can_consume_resource(context.actor, runtime.definition.resource_cost)
-	):
+	var cost := maxf(0.0, runtime.effect.get_activation_cost(context))
+	if cost > 0.0 and not _can_consume_resource(context.actor, cost):
 		return false
 	if not runtime.effect.activate(context):
 		return false
-	if (
-		runtime.definition.resource_cost > 0.0
-		and not _consume_resource(context.actor, runtime.definition.resource_cost)
-	):
+	if cost > 0.0 and not _consume_resource(context.actor, cost):
 		runtime.effect.cancel_active()
 		return false
-	runtime.start_cooldown()
+	if runtime.effect.get_cooldown_policy() == &"on_activate":
+		runtime.start_cooldown()
 	return true
+
+
+func input_held(socket_id: int, context: CharmActivationContext, delta: float) -> bool:
+	var runtime := get_equipped(socket_id)
+	if runtime == null or context == null or not runtime.can_receive_input():
+		return false
+	return runtime.effect.on_input_held(context, maxf(0.0, delta))
+
+
+func input_released(socket_id: int, context: CharmActivationContext) -> bool:
+	var runtime := get_equipped(socket_id)
+	if runtime == null or context == null or not runtime.can_receive_input():
+		return false
+	return runtime.effect.on_input_released(context)
+
+
+func input_cancelled() -> void:
+	for runtime: CharmRuntime in _get_equipped_runtime_snapshot():
+		if _is_runtime_still_equipped(runtime):
+			runtime.effect.on_input_cancelled()
 
 
 func advance(delta: float) -> void:
@@ -184,10 +226,14 @@ func advance(delta: float) -> void:
 
 func modify_outgoing_damage(amount_hp: float, damage: DamageContext) -> float:
 	var modified_amount := amount_hp
+	if damage != null and damage.has_proc_result(&"__outgoing_pipeline_complete"):
+		return modified_amount
 	# Forge/attack-level modifiers đã được chốt trước; per-hit Charm stack theo Q -> Space -> E.
 	for runtime: CharmRuntime in _get_equipped_runtime_snapshot():
 		if _is_runtime_still_equipped(runtime):
 			modified_amount = runtime.effect.modify_outgoing_damage(modified_amount, damage)
+	if damage != null:
+		damage.record_proc(&"__outgoing_pipeline_complete", true, &"pipeline")
 	return maxf(0.0, modified_amount)
 
 
@@ -233,6 +279,8 @@ func dispatch_event(event_name: StringName, payload: Array) -> void:
 			&"dash_finished":
 				if payload.size() >= 1:
 					runtime.effect.on_dash_finished(payload[0])
+			&"actor_died":
+				runtime.effect.on_actor_died()
 
 
 func reset_active_cooldowns() -> void:

@@ -53,6 +53,42 @@ func _is_shop_eligible(definition: CharmData) -> bool:
 func _is_playable(definition: CharmData) -> bool:
 	return (
 		definition != null
+		and definition.is_playable()
 		and definition.effect_scene != null
 		and CharmValidator.validate_data(definition).is_empty()
 	)
+
+
+func get_enemy_drop_pool(registry: CharmRegistry, include_owned: bool = false) -> Array[CharmData]:
+	var result: Array[CharmData] = []
+	if not is_instance_valid(registry):
+		return result
+	for charm_id: StringName in registry.get_registered_ids():
+		var definition := registry.get_definition(charm_id)
+		if (
+			not _is_playable(definition)
+			or definition.acquisition_source != &"merchant_or_enemy_drop"
+		):
+			continue
+		if definition.drop_chance < 0.0 or (not include_owned and registry.is_owned(charm_id)):
+			continue
+		result.append(definition)
+	return result
+
+
+func roll_enemy_drop(
+	registry: CharmRegistry,
+	random: RandomNumberGenerator,
+	source: StringName = &"merchant_or_enemy_drop"
+) -> CharmData:
+	if random == null or not is_instance_valid(registry):
+		return null
+	var candidates: Array[CharmData] = []
+	for definition: CharmData in get_enemy_drop_pool(registry):
+		if definition.acquisition_source != source:
+			continue
+		if random.randf() <= definition.drop_chance:
+			candidates.append(definition)
+	if candidates.is_empty():
+		return null
+	return candidates[random.randi_range(0, candidates.size() - 1)]

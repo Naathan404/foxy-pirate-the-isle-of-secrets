@@ -174,6 +174,7 @@ func _test_passive_charms(player: Player) -> void:
 		load("res://gameplay/charms/charm_data/double_strike.tres").duplicate(true) as CharmData
 	)
 	definition.proc_chance = 1.0
+	definition.effect_params[&"hit_threshold"] = 1
 	var double_strike := DoubleStrikeEffect.new()
 	player.add_child(double_strike)
 	_check(double_strike.setup(player, definition, CharmRuntime.new()), "Double Strike sets up")
@@ -190,6 +191,7 @@ func _test_passive_charms(player: Player) -> void:
 	definition = load("res://gameplay/charms/charm_data/life_steal.tres").duplicate(true)
 	definition.proc_chance = 1.0
 	definition.effect_params[&"heal_hp"] = 0.125
+	definition.effect_params[&"hit_threshold"] = 1
 	var life_steal := LifeStealEffect.new()
 	player.add_child(life_steal)
 	_check(life_steal.setup(player, definition, CharmRuntime.new()), "Life Steal sets up")

@@ -54,7 +54,7 @@ func _run_tests() -> void:
 		"equip Turtle Shell"
 	)
 	_assert_equal(actor.hp.get_max_hp(), 12, "Turtle max HP")
-	_assert_near(_get_move_speed(actor), 96.0, "stacked speed multipliers")
+	_assert_near(_get_move_speed(actor), 102.0, "stacked speed multipliers")
 	_assert_equal(actor.hp.heal(2), 2, "heal to modified max HP")
 
 	_assert_true(
@@ -63,15 +63,15 @@ func _run_tests() -> void:
 	)
 	_assert_equal(actor.hp.get_max_hp(), 10, "Endurance offsets Turtle HP")
 	_assert_equal(actor.hp.get_current_hp(), 10, "Endurance clamps current HP")
-	_assert_near(actor.stamina.get_max_sp(), 400.0, "Endurance offsets Gale SP")
+	_assert_near(actor.stamina.get_max_sp(), 350.0, "Endurance offsets Gale SP")
 	var turtle_runtime := registry.get_equipped(CharmConstants.SocketId.SPACE)
 	turtle_runtime.effect.on_equipped()
 	_assert_equal(actor.hp.get_max_hp(), 10, "re-equip hook does not stack HP")
-	_assert_near(_get_move_speed(actor), 96.0, "re-equip hook does not stack speed")
+	_assert_near(_get_move_speed(actor), 102.0, "re-equip hook does not stack speed")
 
 	_assert_true(registry.unequip_socket(CharmConstants.SocketId.Q), "unequip Gale Pace")
-	_assert_near(actor.stamina.get_max_sp(), 500.0, "Gale removal preserves Endurance")
-	_assert_near(_get_move_speed(actor), 80.0, "Gale removal preserves Turtle")
+	_assert_near(actor.stamina.get_max_sp(), 450.0, "Gale removal preserves Endurance")
+	_assert_near(_get_move_speed(actor), 85.0, "Gale removal preserves Turtle")
 	_assert_true(registry.unequip_socket(CharmConstants.SocketId.SPACE), "unequip Turtle Shell")
 	_assert_equal(actor.hp.get_max_hp(), 8, "Turtle removal preserves Endurance")
 	_assert_equal(actor.hp.get_current_hp(), 8, "Turtle removal clamps current HP")
@@ -93,8 +93,8 @@ func _test_data() -> void:
 	_assert_near(GALE_PACE.get_param_float(&"move_speed_multiplier"), 1.2, "Gale speed")
 	_assert_near(GALE_PACE.get_param_float(&"max_sp_flat"), -100.0, "Gale SP")
 	_assert_equal(TURTLE_SHELL.get_param_int(&"max_hp_flat"), 2, "Turtle HP")
-	_assert_near(TURTLE_SHELL.get_param_float(&"move_speed_multiplier"), 0.8, "Turtle speed")
-	_assert_near(ENDURANCE_VESSEL.get_param_float(&"max_sp_flat"), 200.0, "Endurance SP")
+	_assert_near(TURTLE_SHELL.get_param_float(&"move_speed_multiplier"), 0.85, "Turtle speed")
+	_assert_near(ENDURANCE_VESSEL.get_param_float(&"max_sp_flat"), 150.0, "Endurance SP")
 	_assert_equal(ENDURANCE_VESSEL.get_param_int(&"max_hp_flat"), -2, "Endurance HP")
 
 

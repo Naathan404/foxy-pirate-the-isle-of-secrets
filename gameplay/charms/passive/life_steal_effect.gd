@@ -1,6 +1,8 @@
 class_name LifeStealEffect
 extends ProcCharmEffect
-## Normal attack proc hồi HP sau khi damage thực sự được áp dụng.
+## Mỗi hit normal attack hợp lệ thứ 12 hồi HP sau khi damage thực sự được áp dụng.
+
+var _hit_count: int = 0
 
 
 func setup(owner_actor: Node3D, charm_definition: CharmData, charm_runtime: CharmRuntime) -> bool:
@@ -14,12 +16,16 @@ func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) ->
 		return
 	if damage.source != actor or not damage.is_normal_attack():
 		return
-	if damage.has_proc_result(definition.charm_id):
+	_hit_count += 1
+	if _hit_count < definition.get_param_int(&"hit_threshold", 12):
 		return
-	var success := _roll_proc()
-	damage.record_proc(definition.charm_id, success, &"normal_attack_damage_dealt")
-	if success:
-		_get_health_component().heal(definition.get_param_float(&"heal_hp"))
+	_hit_count = 0
+	_get_health_component().heal(definition.get_param_float(&"heal_hp"))
+
+
+func cancel_active() -> void:
+	_hit_count = 0
+	super.cancel_active()
 
 
 func _get_health_component() -> HealthComponent:

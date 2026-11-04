@@ -1,6 +1,6 @@
 # Charm System - Business Logic
 
-> Trạng thái: đã triển khai foundation, socket/loadout, 10 Charm playable, progression
+> Trạng thái: foundation, socket/loadout, 12 Charm playable và 3 Charm prototype đã được tích hợp.
 > adapter và test harness. Cập nhật lần cuối: 2026-10-25.
 
 ## 1. Mục đích và phạm vi
@@ -131,6 +131,10 @@ chối đều không được làm mất currency.
 
 ## 7. Active Charm
 
+`CharmData.content_status` phân biệt `PLAYABLE`, `PROTOTYPE` và `DISABLED`. Prototype chỉ được
+equip qua Runtime Charm Debug, không đi qua shop, enemy drop, fixed reward hoặc save production.
+`drop_chance = -1` là giá trị chưa chốt, không phải tỷ lệ 0%.
+
 Khi người chơi nhấn Q, Space hoặc E, activation đi qua transaction sau:
 
 1. Socket phải tồn tại, đã mở và có Charm.
@@ -179,25 +183,27 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 
 | Charm | Acquisition | SP | Cooldown | Business effect |
 | --- | --- | ---: | ---: | --- |
-| Arrow Rain | Merchant/enemy drop | 300 | 6 giây | Bắn 8 mũi về phía con trỏ trong 1,4 giây. Mỗi mũi gây 35% base weapon damage dạng `float`, không ép tối thiểu 1 HP; range 8 units. |
-| Crescent Cleave | Merchant/enemy drop | 100 | 4 giây | Gây 200% base weapon damage trong bán nguyệt 180 độ phía trước, bán kính 2,8 units. Mỗi target chỉ bị hit một lần mỗi activation. |
-| Tide Grapple | Fixed boss reward | 150 | 5 giây | Gây 250% base weapon damage trong range 4 units. Target nhỏ bị kéo và stun 1 giây; target lớn/Boss/địa hình kéo Player tới điểm dừng cách mục tiêu 1 unit. Miss không tạo effect. |
+| Arrow Rain | Merchant/enemy drop 5% | 100 | 6 giây | Mưa 8 mũi trong vùng tròn tại con trỏ trong 1,4 giây; mỗi mũi gây 35% base weapon damage. |
+| Crescent Cleave | Merchant/enemy drop 5% | 100 | 4 giây | Gây 200% base weapon damage trong bán nguyệt 180 độ phía trước, bán kính 2,8 units. Mỗi target chỉ bị hit một lần mỗi activation. |
+| Shadow Lunge | Merchant/enemy drop 5% | 125 | 6 giây | Lướt bằng khoảng Dash và gây 300% base weapon damage phía trước. |
+| Buckshot Salvo | Merchant/enemy drop 5% | 150 | 7 giây | Burst 360 độ; pellet khác nhau có thể cùng trúng một target. |
+| Tide Grapple | Fixed boss reward 100% | 150 | 5 giây | Gây 250% base weapon damage trong range 4 units. Target nhỏ bị kéo và stun 1 giây; target lớn/Boss/địa hình kéo Player tới điểm dừng cách mục tiêu 1 unit. Miss không tạo effect. |
 
 ### 9.2 Passive stat
 
 | Charm | Acquisition | Business effect |
 | --- | --- | --- |
-| Gale Pace | Merchant/enemy drop | Movement speed x1,2; max SP -100. |
-| Turtle Shell | Merchant/enemy drop | Max HP +2; movement speed x0,8. |
-| Endurance Vessel | Merchant/enemy drop | Max SP +200; max HP -2. |
+| Gale Pace | Merchant/enemy drop 10% | Movement speed x1,2; max SP -100. |
+| Turtle Shell | Merchant/enemy drop 10% | Max HP +2; movement speed x0,85. |
+| Endurance Vessel | Merchant/enemy drop 10% | Max SP +150; max HP -2. |
 
 ### 9.3 Passive event/condition
 
 | Charm | Acquisition | Business effect |
 | --- | --- | --- |
-| Life Steal | Merchant/enemy drop | Normal attack gây damage thực tế có 5% cơ hội hồi 1 HP; không vượt max HP. |
-| Double Strike | Merchant/enemy drop | Mỗi hit của normal attack roll đúng một lần; 20% cơ hội nhân đôi damage. |
-| Adrenaline Surge | Merchant/enemy drop | Khi target thực sự chết do Player gây ra, có 20% cơ hội hồi 100 SP và reset cooldown của toàn bộ Active Charm đang equip. |
+| Life Steal | Merchant/enemy drop 10% | Hit normal attack hợp lệ thứ 12 hồi 1 HP; không vượt max HP. |
+| Double Strike | Merchant/enemy drop 10% | Hit normal attack hợp lệ thứ 4 roll 50% để nhân đôi damage. |
+| Chaos Collector | Merchant/enemy drop 25% | Mỗi normal attack gây damage thực tế cộng 2 CP. |
 | Backstabber | Merchant/enemy drop | Melee normal attack từ nửa sau hướng nhìn của target gây 150% damage. Không áp dụng cho ranged hoặc skill. |
 
 ## 10. Acquisition
@@ -206,6 +212,10 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 
 Boss reward chỉ grant Charm có `acquisition_source = fixed_boss_reward`. Trong scope hiện tại,
 Tide Grapple là fixed boss reward. Active khác không được đi nhầm flow này.
+
+Ba prototype vàng hiện có: `Dead Man's Anchor` (300 SP cast đầu, recast trong 5 giây),
+`Abyssal Whirlpool` (400 SP/cast, kéo enemy thường 1,5 giây rồi nổ) và `Dead Man's Salute`
+(100 SP/giây khi giữ phím). Cooldown, drop chance và damage release của chúng vẫn pending.
 
 ### 10.2 Shop pool
 
@@ -252,6 +262,11 @@ Snapshot là adapter cho save system tương lai; module này không tự ghi fi
 - `loadout_change_rejected(reason)`;
 - `charm_activation_rejected(socket_id, reason)`.
 
+Input Active dùng lifecycle chung `just_pressed -> pressed(delta) -> just_released`.
+One-shot Charm chỉ xử lý press; Charm hai giai đoạn/channeling có thể giữ state ở effect và
+nhận release/recast mà không tạo manager riêng. Cost/cooldown là policy của effect; state vẫn
+nằm trong `CharmRuntime` và không mutate `.tres`.
+
 Loadout rejection có thể là `unsafe_location`, `socket_locked`, `charm_not_owned`,
 `duplicate_charm`, `socket_occupied` hoặc `registry_rejected`. Activation rejection có thể là
 `socket_unavailable`, `actor_unavailable`, `actor_context_unavailable`,
@@ -280,7 +295,7 @@ trong release build. Nó chỉ phục vụ gameplay verification, không phải 
 - Chưa có shop UI hoặc merchant flow; service hiện chỉ tạo pool/offer.
 - Chưa nối reward service vào boss cụ thể; metadata fixed reward đã sẵn sàng.
 - Chưa có save manager thật; snapshot capture/restore đã sẵn sàng để nhúng vào payload chung.
-- Placeholder Charm ngoài 10 Charm trên không được đánh dấu playable hoặc đưa vào pool.
+- Placeholder Charm ngoài 12 Charm playable và 3 prototype vàng trên không được đánh dấu playable hoặc đưa vào pool.
 
 ## 15. Acceptance và regression tests
 

@@ -11,6 +11,8 @@ const CHARM_ATTACK_SCENE = preload("res://gameplay/charms/active/charm_active_at
 var _remaining_projectiles: int = 0
 var _projectile_timer: float = 0.0
 var _activation_direction: Vector3 = Vector3.BACK
+var _target_position: Vector3 = Vector3.ZERO
+var _has_target_position: bool = false
 var _socket_id: int = CharmConstants.SocketId.UNASSIGNED
 var _executions: Array[CharmActiveAttack] = []
 var _launched_projectile_count: int = 0
@@ -46,6 +48,16 @@ func activate(context: CharmActivationContext) -> bool:
 	_remaining_projectiles = definition.get_param_int(&"projectile_count")
 	_projectile_timer = 0.0
 	_activation_direction = _get_aim_direction(context)
+	_target_position = (
+		context.target_position
+		if context.has_target
+		else (
+			actor.global_position
+			+ _activation_direction * definition.get_param_float(&"range_units", 8.0)
+		)
+	)
+	_target_position.y = actor.global_position.y
+	_has_target_position = true
 	_socket_id = context.socket_id
 	_launched_projectile_count = 0
 	set_physics_process(true)
@@ -65,6 +77,7 @@ func on_unequipped() -> void:
 func cancel_active() -> void:
 	set_physics_process(false)
 	_remaining_projectiles = 0
+	_has_target_position = false
 	for execution: CharmActiveAttack in _executions:
 		if is_instance_valid(execution):
 			execution.deactivate()
@@ -111,26 +124,30 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 	execution.context.attack_id = Time.get_ticks_usec()
 	execution.context.action = definition.charm_id
 	execution.context.origin = actor.global_position
-	execution.context.direction = (
-		context.direction.normalized() if not context.direction.is_zero_approx() else Vector3.BACK
-	)
+	var index := _launched_projectile_count
+	var count := maxi(1, definition.get_param_int(&"projectile_count", 8))
+	var angle := TAU * float(index) / float(count)
+	var radius := definition.get_param_float(&"impact_radius_units", 2.0)
+	var impact_position := _target_position + Vector3(cos(angle), 0.0, sin(angle)) * radius
+	# The impact is already positioned at the cursor ring; keep a horizontal facing
+	# direction for the shared attack scene so its placeholder mesh has a stable basis.
+	execution.context.direction = Vector3.BACK
 	execution.context.damage_hp = maxf(
 		0.0, _get_base_damage() * definition.get_param_float(&"damage_percent", 0.35)
 	)
-	execution.global_position = actor.global_position
+	execution.global_position = impact_position
 	var projectile_width := definition.get_param_float(&"projectile_width_units", 0.25)
 	var projectile_length := definition.get_param_float(&"projectile_length_units", 0.8)
 	execution.hitbox_scale = Vector3(projectile_width, 1.0, projectile_length)
-	execution.forward_offset = definition.get_param_float(&"spawn_forward_offset", 0.5)
-	execution.travel_speed_units_per_second = definition.get_param_float(&"projectile_speed")
-	execution.max_travel_distance = definition.get_param_float(&"range_units")
+	execution.forward_offset = 0.0
+	execution.travel_speed_units_per_second = 0.0
+	execution.max_travel_distance = 0.0
 	execution.activate()
 	if not execution.active:
 		_remaining_projectiles = 0
 		execution.queue_free()
 		return
-	var lifetime := execution.max_travel_distance / execution.travel_speed_units_per_second
-	execution.release_after(lifetime + 0.1)
+	execution.release_after(definition.get_param_float(&"impact_lifetime_seconds", 0.18))
 	_remaining_projectiles -= 1
 	_launched_projectile_count += 1
 	projectile_launched.emit(

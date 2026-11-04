@@ -29,7 +29,7 @@ func _run_tests() -> void:
 	actor.setup()
 	var manager := CharmSocketManager.new()
 	var registry := CharmRegistry.new()
-	registry.definitions = [LIFE_STEAL, DOUBLE_STRIKE, ADRENALINE_SURGE, BACKSTABBER, ARROW_RAIN]
+	registry.definitions = [LIFE_STEAL, DOUBLE_STRIKE, BACKSTABBER, ARROW_RAIN]
 	manager.actor = actor
 	manager.registry = registry
 	manager.loadout = CharmLoadout.new()
@@ -38,9 +38,10 @@ func _run_tests() -> void:
 	actor.add_child(manager)
 	await process_frame
 	for definition: CharmData in registry.definitions:
-		_assert_true(
-			registry.set_owned(definition.charm_id, true), "own " + definition.display_name
-		)
+		if definition.is_playable():
+			_assert_true(
+				registry.set_owned(definition.charm_id, true), "own " + definition.display_name
+			)
 
 	_test_life_steal(actor, registry)
 	await _test_double_strike_pipeline(actor, world, manager, registry)
@@ -54,14 +55,12 @@ func _run_tests() -> void:
 
 
 func _test_data() -> void:
-	var definitions: Array[CharmData] = [LIFE_STEAL, DOUBLE_STRIKE, ADRENALINE_SURGE, BACKSTABBER]
+	var definitions: Array[CharmData] = [LIFE_STEAL, DOUBLE_STRIKE, BACKSTABBER]
 	_assert_equal(CharmValidator.validate_catalog(definitions).size(), 0, "valid catalog")
-	_assert_near(LIFE_STEAL.proc_chance, 0.05, "Life Steal chance")
+	_assert_equal(LIFE_STEAL.get_param_int(&"hit_threshold"), 12, "Life Steal hit threshold")
 	_assert_equal(LIFE_STEAL.get_param_int(&"heal_hp"), 1, "Life Steal heal")
-	_assert_near(DOUBLE_STRIKE.proc_chance, 0.2, "Double Strike chance")
+	_assert_near(DOUBLE_STRIKE.proc_chance, 0.5, "Double Strike chance")
 	_assert_near(DOUBLE_STRIKE.get_param_float(&"damage_multiplier"), 2.0, "Double Strike")
-	_assert_near(ADRENALINE_SURGE.proc_chance, 0.2, "Adrenaline chance")
-	_assert_near(ADRENALINE_SURGE.get_param_float(&"restore_sp"), 100.0, "Adrenaline SP")
 	_assert_near(BACKSTABBER.get_param_float(&"damage_multiplier"), 1.5, "Backstabber")
 
 
@@ -80,23 +79,23 @@ func _test_life_steal(actor: MockActor, registry: CharmRegistry) -> void:
 		"equip Life Steal"
 	)
 	var effect := registry.get_equipped(CharmConstants.SocketId.Q).effect as LifeStealEffect
-	effect.set_proc_seed(_find_seed(LIFE_STEAL.proc_chance, true))
 	actor.hp.take_damage(2)
 	var damage := _make_damage(actor, &"normal", WeaponData.WeaponCategory.MELEE)
+	effect.definition.effect_params[&"hit_threshold"] = 1
 	registry.dispatch_event(&"damage_dealt", [damage, actor, 1])
 	_assert_equal(actor.hp.get_current_hp(), 9, "Life Steal heals one HP")
-	_assert_proc(damage, LIFE_STEAL.charm_id, true, &"normal_attack_damage_dealt")
+	_assert_false(
+		damage.has_proc_result(LIFE_STEAL.charm_id), "Life Steal uses counter without proc roll"
+	)
 	registry.dispatch_event(&"damage_dealt", [damage, actor, 1])
-	_assert_equal(actor.hp.get_current_hp(), 9, "Life Steal does not repeat one hit")
+	_assert_equal(actor.hp.get_current_hp(), 10, "Life Steal clamps at max HP")
 
 	var failed_damage := _make_damage(actor, &"normal", WeaponData.WeaponCategory.MELEE)
-	effect.set_proc_seed(_find_seed(LIFE_STEAL.proc_chance, false))
 	registry.dispatch_event(&"damage_dealt", [failed_damage, actor, 1])
-	_assert_equal(actor.hp.get_current_hp(), 9, "Life Steal failed roll does not heal")
-	_assert_proc(failed_damage, LIFE_STEAL.charm_id, false, &"normal_attack_damage_dealt")
+	_assert_equal(actor.hp.get_current_hp(), 10, "Life Steal remains clamped")
+	_assert_false(failed_damage.has_proc_result(LIFE_STEAL.charm_id), "Life Steal no proc payload")
 
 	var skill_damage := _make_damage(actor, &"crescent_cleave", WeaponData.WeaponCategory.MELEE)
-	effect.set_proc_seed(_find_seed(LIFE_STEAL.proc_chance, true))
 	registry.dispatch_event(&"damage_dealt", [skill_damage, actor, 1])
 	_assert_false(skill_damage.has_proc_result(LIFE_STEAL.charm_id), "Life Steal ignores skills")
 
@@ -114,6 +113,7 @@ func _test_double_strike_pipeline(
 		"equip Double Strike"
 	)
 	var effect := registry.get_equipped(CharmConstants.SocketId.Q).effect as DoubleStrikeEffect
+	effect.definition.effect_params[&"hit_threshold"] = 1
 	effect.set_proc_seed(_find_seed(DOUBLE_STRIKE.proc_chance, true))
 	var controller := WeaponController.new()
 	controller.actor = actor
@@ -208,6 +208,7 @@ func _test_backstabber(actor: MockActor, world: Node3D, registry: CharmRegistry)
 	var double_effect := (
 		registry.get_equipped(CharmConstants.SocketId.SPACE).effect as DoubleStrikeEffect
 	)
+	double_effect.definition.effect_params[&"hit_threshold"] = 1
 	double_effect.set_proc_seed(_find_seed(DOUBLE_STRIKE.proc_chance, true))
 	var stacked := _make_damage(actor, &"normal", WeaponData.WeaponCategory.MELEE)
 	stacked.target = target
@@ -223,63 +224,12 @@ func _test_backstabber(actor: MockActor, world: Node3D, registry: CharmRegistry)
 
 
 func _test_adrenaline_surge(
-	actor: MockActor, world: Node3D, _manager: CharmSocketManager, registry: CharmRegistry
+	_actor: MockActor, _world: Node3D, _manager: CharmSocketManager, registry: CharmRegistry
 ) -> void:
-	_assert_true(
-		registry.equip_charm(ARROW_RAIN.charm_id, CharmConstants.SocketId.Q, actor),
-		"equip Active for Adrenaline"
-	)
-	_assert_true(
-		registry.equip_charm(ADRENALINE_SURGE.charm_id, CharmConstants.SocketId.SPACE, actor),
-		"equip Adrenaline Surge"
-	)
-	var active_runtime := registry.get_equipped(CharmConstants.SocketId.Q)
-	active_runtime.start_cooldown()
-	var effect := (
-		registry.get_equipped(CharmConstants.SocketId.SPACE).effect as AdrenalineSurgeEffect
-	)
-	effect.set_proc_seed(_find_seed(ADRENALINE_SURGE.proc_chance, true))
-	actor.stamina.try_consume(150.0)
-	var target := MockTarget.new()
-	world.add_child(target)
-	target.setup(1)
-	target.dead = true
-	var kill_damage := _make_damage(actor, &"normal", WeaponData.WeaponCategory.MELEE)
-	kill_damage.target = target
-	kill_damage.target_defeated = true
-	registry.dispatch_event(&"target_defeated", [target, kill_damage])
-	_assert_near(active_runtime.cooldown_remaining, 0.0, "Adrenaline resets Active cooldown")
-	_assert_near(actor.stamina.get_current_sp(), 250.0, "Adrenaline restores 100 SP")
-	_assert_proc(kill_damage, ADRENALINE_SURGE.charm_id, true, &"player_caused_target_defeat")
-	registry.dispatch_event(&"target_defeated", [target, kill_damage])
-	_assert_near(actor.stamina.get_current_sp(), 250.0, "death event cannot proc twice")
-
-	active_runtime.start_cooldown()
-	actor.stamina.try_consume(100.0)
-	effect.set_proc_seed(_find_seed(ADRENALINE_SURGE.proc_chance, false))
-	var failed_damage := _make_damage(actor, &"normal", WeaponData.WeaponCategory.MELEE)
-	failed_damage.target = target
-	failed_damage.target_defeated = true
-	registry.dispatch_event(&"target_defeated", [target, failed_damage])
-	_assert_true(active_runtime.cooldown_remaining > 5.9, "failed Adrenaline keeps cooldown")
-	_assert_near(actor.stamina.get_current_sp(), 150.0, "failed Adrenaline keeps SP")
-
-	var foreign_actor := Node3D.new()
-	world.add_child(foreign_actor)
-	var foreign_damage := _make_damage(actor, &"normal", WeaponData.WeaponCategory.MELEE)
-	foreign_damage.source = foreign_actor
-	foreign_damage.target = target
-	foreign_damage.target_defeated = true
-	effect.set_proc_seed(_find_seed(ADRENALINE_SURGE.proc_chance, true))
-	registry.dispatch_event(&"target_defeated", [target, foreign_damage])
 	_assert_false(
-		foreign_damage.has_proc_result(ADRENALINE_SURGE.charm_id),
-		"Adrenaline ignores non-player death"
+		registry.equip_charm(ADRENALINE_SURGE.charm_id, CharmConstants.SocketId.SPACE, _actor),
+		"disabled Adrenaline Surge cannot be equipped"
 	)
-	_assert_true(registry.unequip_socket(CharmConstants.SocketId.SPACE), "unequip Adrenaline")
-	_assert_true(registry.unequip_socket(CharmConstants.SocketId.Q), "unequip Active")
-	target.queue_free()
-	foreign_actor.queue_free()
 
 
 func _make_damage(actor: MockActor, action: StringName, category: int) -> DamageContext:

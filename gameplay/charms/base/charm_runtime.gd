@@ -38,6 +38,10 @@ func can_activate() -> bool:
 	)
 
 
+func can_receive_input() -> bool:
+	return equipped and definition != null and is_instance_valid(effect)
+
+
 func start_cooldown() -> void:
 	if definition == null:
 		return

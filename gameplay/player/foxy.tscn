@@ -51,6 +51,12 @@
 [ext_resource type="Resource" uid="uid://ckio67a4p70la" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
 [ext_resource type="Resource" uid="uid://cdmevnqdpo77o" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/shadow_lunge.tres" id="charm_shadow_lunge"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/buckshot_salvo.tres" id="charm_buckshot"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/chaos_collector.tres" id="charm_chaos_collector"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/abyssal_whirlpool.tres" id="charm_whirlpool"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/dead_mans_salute.tres" id="charm_salute"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="collection_dagger"]
 [ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="collection_harpoon"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
@@ -1023,10 +1029,12 @@ script = ExtResource("16_charm_manager")
 registry = NodePath("CharmRegistry")
 actor = NodePath("..")
 loadout = SubResource("Resource_ieged")
+debug_grant_all_charms = true
+debug_auto_equip_first_three = true
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")
-definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_adrenaline"), ExtResource("charm_backstabber")])
+definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute")])
 
 [node name="ChaosComponent" type="Node" parent="." unique_id=2085136369]
 script = ExtResource("21_chaos")

@@ -356,11 +356,17 @@ func _show_charm(charm: CharmData) -> void:
 	)
 	%ItemDescription.text = "Choose a socket below to equip this charm."
 	%StatsHeading.text = "Charm Details"
-	_set_stat_labels(["CP Cost", "Cooldown", "Proc Rate", "Type", "Socket", "Owned"])
+	_set_stat_labels(["SP Cost", "Cooldown", "Drop Chance", "Type", "Socket", "Owned"])
+	var cost_text := _number(charm.resource_cost)
+	if charm.charm_id == &"dead_mans_salute":
+		cost_text = _number(charm.get_param_float(&"sp_per_second", 100.0)) + "/s"
+	var drop_text := (
+		"Pending" if charm.drop_chance < 0.0 else _number(charm.drop_chance * 100.0) + "%"
+	)
 	var values := [
-		_number(charm.resource_cost),
+		cost_text,
 		_number(charm.cooldown_seconds) + "s",
-		_number(charm.proc_chance * 100.0) + "%",
+		drop_text,
 		"Active" if charm.is_active() else "Passive",
 		KEYS[_socket],
 		"Yes" if owned else "No"
@@ -373,10 +379,11 @@ func _show_charm(charm: CharmData) -> void:
 	%SkillHeading.text = "Charm Effect"
 	%SkillIcon.texture = charm.sprite
 	%SkillTitle.text = charm.display_name
+	var prototype_suffix := " | Prototype / balance pending" if charm.is_prototype() else ""
 	%SkillMeta.text = (
-		_number(charm.cooldown_seconds) + "s cooldown  |  " + _number(charm.resource_cost) + " CP"
+		_number(charm.cooldown_seconds) + "s cooldown  |  " + cost_text + " SP" + prototype_suffix
 		if charm.is_active()
-		else _number(charm.proc_chance * 100.0) + "% proc chance"
+		else drop_text + " drop chance" + prototype_suffix
 	)
 	%SkillDescription.text = charm.description
 	%SkillDescription.tooltip_text = charm.description
