@@ -2,17 +2,7 @@ extends Control
 ## A read-only view of combat stats with equipment commands delegated to their owners.
 
 const SLOT := preload("res://gameplay/inventory/equipment_slot.tscn")
-const EQUIP_TEXTURE: Texture2D = preload("res://assets/ui/player_hud/inventory/equip_button.png")
-const EQUIP_PRESSED_TEXTURE: Texture2D = preload(
-	"res://assets/ui/player_hud/inventory/equip_button_press.png"
-)
-const UNEQUIP_TEXTURE: Texture2D = preload(
-	"res://assets/ui/player_hud/inventory/unequip_button.png"
-)
-const UNEQUIP_PRESSED_TEXTURE: Texture2D = preload(
-	"res://assets/ui/player_hud/inventory/unequip_button_press.png"
-)
-const PAGE_SIZE := 12
+const PAGE_SIZE := 15
 const KEYS := ["Q", "SPACE", "E"]
 const FORGE_FIELDS := {
 	"damage_multiplier": "Damage",
@@ -49,15 +39,11 @@ var _action_hint: String = ""
 
 
 func _ready() -> void:
-	resized.connect(_layout_content)
-	_layout_content.call_deferred()
 	%WeaponsButton.pressed.connect(_set_category.bind(false))
 	%CharmsButton.pressed.connect(_set_category.bind(true))
 	%Previous.pressed.connect(_turn_page.bind(-1))
 	%Next.pressed.connect(_turn_page.bind(1))
 	%EquipButton.pressed.connect(_equip_selected)
-	%EquipButton.button_down.connect(_refresh_action_art.bind(true))
-	%EquipButton.button_up.connect(_refresh_action_art.bind(false))
 	%EquippedWeapon.pressed.connect(_select_equipped_weapon)
 	for i in 3:
 		_equipped_slot(i).pressed.connect(_select_socket.bind(i))
@@ -66,26 +52,7 @@ func _ready() -> void:
 		%ItemGrid.add_child(slot)
 		slot.pressed.connect(_select_index.bind(i))
 		_slots.append(slot)
-
-
-## Only the equipment contents adapt; the inventory book keeps its original transforms.
-func _layout_content() -> void:
-	var content := $Content as HBoxContainer
-	var left := $Content/Left as VBoxContainer
-	var right := $Content/Right as VBoxContainer
-	left.custom_minimum_size.x = 0.0
-	right.custom_minimum_size.x = 0.0
-	var page_width := maxf(
-		380.0, maxf(left.get_combined_minimum_size().x, right.get_combined_minimum_size().x)
-	)
-	left.custom_minimum_size.x = page_width
-	right.custom_minimum_size.x = page_width
-	content.size = content.get_combined_minimum_size().max(Vector2(808.0, 480.0))
-	# Original artwork extends outside its panel; keep all contents inside the paper borders.
-	var available := size - Vector2(16.0, 52.0)
-	var factor := minf(available.x / content.size.x, available.y / content.size.y)
-	content.scale = Vector2.ONE * factor
-	content.position = Vector2(8.0, 8.0) + (available - content.size * factor) * 0.5
+	refresh()
 
 
 func bind_components(controller: WeaponController, manager: CharmSocketManager) -> void:
@@ -140,7 +107,6 @@ func refresh() -> void:
 		)
 	_refresh_equipped()
 	_refresh_details()
-	_layout_content.call_deferred()
 
 
 func _set_category(show_charms: bool) -> void:
@@ -166,7 +132,7 @@ func _select_equipped_weapon() -> void:
 	_show_charms = false
 	_selection = weapons.equipped if is_instance_valid(weapons) else null
 	_page = (
-		maxi(0, weapons.get_owned_weapons().find(_selection) / PAGE_SIZE)
+		maxi(0, floori(float(weapons.get_owned_weapons().find(_selection)) / PAGE_SIZE))
 		if is_instance_valid(weapons)
 		else 0
 	)
@@ -185,8 +151,8 @@ func _select_socket(index: int) -> void:
 
 func _refresh_equipped() -> void:
 	var weapon := weapons.equipped if is_instance_valid(weapons) else null
-	%EquippedWeapon.present(_icon(weapon), "", not _show_charms)
-	%EquippedWeapon.tooltip_text = _name(weapon)
+	%EquippedWeapon.present(_icon(weapon), "", weapon != null and not _show_charms)
+	%EquippedWeapon.tooltip_text = _name(weapon) if weapon != null else "No weapon equipped"
 	for i in 3:
 		var slot := _equipped_slot(i)
 		var unlocked := is_instance_valid(charms) and charms.is_socket_unlocked(i)
@@ -226,19 +192,12 @@ func _refresh_details() -> void:
 		_show_charm(_selection)
 	else:
 		%ItemDescription.text = "Equipment you acquire will appear here."
-		%EquipButton.text = "No equipment selected"
+		%EquipButton.text = "Equip"
+		_action_hint = "Select a weapon or charm first."
 	_refresh_action_art()
 
 
-## Inventory action artwork includes its own lettering; keep Button.text for semantics/tooltips.
-func _refresh_action_art(held: bool = false) -> void:
-	var unequip: bool = %EquipButton.text.begins_with("Unequip")
-	var artwork: TextureRect = %EquipButton.get_node("Artwork")
-	if unequip:
-		artwork.texture = UNEQUIP_PRESSED_TEXTURE if held else UNEQUIP_TEXTURE
-	else:
-		artwork.texture = EQUIP_PRESSED_TEXTURE if held else EQUIP_TEXTURE
-	artwork.modulate = Color(0.6, 0.6, 0.6, 0.75) if %EquipButton.disabled else Color.WHITE
+func _refresh_action_art() -> void:
 	%EquipButton.tooltip_text = (
 		%EquipButton.text + ("\n" + _action_hint if not _action_hint.is_empty() else "")
 	)
@@ -448,7 +407,9 @@ func _add_forge_row(text: String, benefit: float = 0.0) -> void:
 
 func _set_stat_labels(labels: Array) -> void:
 	for i in 6:
-		get_node("Content/Right/Stats/Content/StatsGrid/StatName" + str(i)).text = labels[i]
+		get_node(
+			"Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid/StatName" + str(i)
+		).text = labels[i]
 
 
 func _is_equipped(entry: Resource) -> bool:

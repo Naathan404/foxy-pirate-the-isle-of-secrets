@@ -73,8 +73,8 @@ func _set_hovered(hovered: bool) -> void:
 	_animate_visual()
 
 
-func _set_pressed(pressed: bool) -> void:
-	_pressed = pressed and not disabled
+func _set_pressed(press_active: bool) -> void:
+	_pressed = press_active and not disabled
 	_animate_visual()
 
 

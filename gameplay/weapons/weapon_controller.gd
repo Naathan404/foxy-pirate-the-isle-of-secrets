@@ -427,7 +427,7 @@ func release_charge() -> bool:
 	var charging_context := _context
 	var count := 1 + floori(_context.charge_progress * (attack.max_projectiles - 1) + 0.00001)
 	if attack.ammo_cost > 0:
-		count = mini(count, ammo.get_amount(attack.ammo_id) / attack.ammo_cost)
+		count = mini(count, floori(float(ammo.get_amount(attack.ammo_id)) / attack.ammo_cost))
 		if count <= 0 or not ammo.try_consume(attack.ammo_id, count * attack.ammo_cost):
 			cancel()
 			return false

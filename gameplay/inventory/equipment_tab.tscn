@@ -3,13 +3,12 @@
 [ext_resource type="Script" uid="uid://cvy4vyj0b7usm" path="res://gameplay/inventory/equipment_tab.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2"]
 [ext_resource type="PackedScene" uid="uid://cf04lpri8k1o3" path="res://gameplay/inventory/equipment_slot.tscn" id="3"]
-[ext_resource type="FontFile" uid="uid://bq3n4x414nthx" path="res://assets/fonts/Super Mindset.ttf" id="3_c1a6h"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_h6sw2"]
-[ext_resource type="Texture2D" uid="uid://7ipah0ym4wc8" path="res://assets/ui/player_hud/inventory/slot_ui.png" id="5_0k2h7"]
-[ext_resource type="Texture2D" uid="uid://bvkk0bgeb5uh3" path="res://assets/sprites/items/equipment/harpoon_placeholder/harpoon.png" id="7_1e8a6"]
+[ext_resource type="Texture2D" uid="uid://d1vl8vesersl" path="res://assets/ui/player_hud/inventory/Inventory_Slot_1.png" id="5_0k2h7"]
 [ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="7_rxrhe"]
 [ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="8_1e8a6"]
-[ext_resource type="Texture2D" uid="uid://bt4fkmaxsc7ee" path="res://assets/ui/player_hud/inventory/equip_button.png" id="inventory_button"]
+[ext_resource type="Texture2D" uid="uid://c6ykgwy2j6ix1" path="res://assets/ui/Button_Normal.png" id="paper_button"]
+[ext_resource type="Texture2D" uid="uid://cy0cpkyt60rlt" path="res://assets/ui/Button_Press.png" id="paper_button_pressed"]
 
 [sub_resource type="StyleBoxFlat" id="disabled"]
 content_margin_left = 8.0
@@ -18,49 +17,31 @@ content_margin_right = 8.0
 content_margin_bottom = 4.0
 bg_color = Color(0.79, 0.65, 0.57, 0.7)
 
-[sub_resource type="StyleBoxFlat" id="gold"]
-content_margin_left = 8.0
+[sub_resource type="StyleBoxTexture" id="paper_pressed"]
+content_margin_left = 12.0
 content_margin_top = 4.0
-content_margin_right = 8.0
+content_margin_right = 12.0
 content_margin_bottom = 4.0
-bg_color = Color(1, 0.77, 0.32, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.68, 0.36, 0.16, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+texture = ExtResource("paper_button_pressed")
 
-[sub_resource type="StyleBoxFlat" id="button"]
-content_margin_left = 8.0
+[sub_resource type="StyleBoxTexture" id="paper_normal"]
+content_margin_left = 12.0
 content_margin_top = 4.0
-content_margin_right = 8.0
+content_margin_right = 12.0
 content_margin_bottom = 4.0
-bg_color = Color(0.76, 0.48, 0.36, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.49, 0.25, 0.21, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+texture = ExtResource("paper_button")
 
 [sub_resource type="StyleBoxFlat" id="frame"]
 content_margin_left = 9.0
 content_margin_top = 6.0
 content_margin_right = 9.0
 content_margin_bottom = 6.0
-bg_color = Color(1, 0.87, 0.75, 0.38)
+bg_color = Color(0, 0, 0, 0)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.71, 0.4, 0.32, 0.7)
+border_color = Color(0.55, 0.27, 0.19, 0.65)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -74,9 +55,9 @@ Button/colors/font_disabled_color = Color(0.41, 0.3, 0.27, 1)
 Button/colors/font_hover_color = Color(0.25, 0.14, 0.13, 1)
 Button/colors/font_pressed_color = Color(0.25, 0.14, 0.13, 1)
 Button/styles/disabled = SubResource("disabled")
-Button/styles/hover = SubResource("gold")
-Button/styles/normal = SubResource("button")
-Button/styles/pressed = SubResource("gold")
+Button/styles/hover = SubResource("paper_pressed")
+Button/styles/normal = SubResource("paper_normal")
+Button/styles/pressed = SubResource("paper_pressed")
 Label/colors/font_color = Color(0.25, 0.14, 0.13, 1)
 PanelContainer/styles/panel = SubResource("frame")
 
@@ -85,7 +66,7 @@ content_margin_left = 12.0
 content_margin_top = 7.0
 content_margin_right = 12.0
 content_margin_bottom = 10.0
-bg_color = Color(1, 0.87, 0.75, 0.3)
+bg_color = Color(1, 0.87, 0.75, 0.12)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -112,19 +93,6 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
-[sub_resource type="StyleBoxTexture" id="portrait_frame"]
-content_margin_left = 9.0
-content_margin_top = 6.0
-content_margin_right = 9.0
-content_margin_bottom = 6.0
-texture = ExtResource("5_0k2h7")
-texture_margin_left = 6.0
-texture_margin_top = 6.0
-texture_margin_right = 6.0
-texture_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxEmpty" id="action_empty"]
-
 [node name="Equipment" type="Control" unique_id=247571998]
 texture_filter = 1
 layout_mode = 3
@@ -132,55 +100,60 @@ anchors_preset = 0
 theme = SubResource("theme")
 script = ExtResource("1")
 
-[node name="Content" type="HBoxContainer" parent="." unique_id=2005222285]
-layout_mode = 0
-offset_top = 10.0
-offset_right = 808.0
-offset_bottom = 490.0
-theme_override_constants/separation = 48
+[node name="Content" type="Control" parent="." unique_id=2005222285]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Left" type="VBoxContainer" parent="Content" unique_id=1498310626]
-custom_minimum_size = Vector2(380, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
+[node name="Left" type="Control" parent="Content" unique_id=1498310626]
+anchors_preset = 0
+offset_left = 100.0
+offset_right = 500.0
+offset_bottom = 626.0
 
-[node name="Categories" type="HBoxContainer" parent="Content/Left" unique_id=139711679]
-layout_mode = 2
-theme_override_constants/separation = 6
+[node name="Categories" type="Control" parent="Content/Left" unique_id=139711679]
+anchors_preset = 0
+offset_top = 51.0
+offset_right = 400.0
+offset_bottom = 95.0
 
 [node name="WeaponsButton" type="Button" parent="Content/Left/Categories" unique_id=725427380]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
+layout_mode = 0
+offset_right = 190.0
+offset_bottom = 44.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 2
 theme_override_constants/h_separation = 4
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 24
 toggle_mode = true
 text = "Weapons"
 
 [node name="CharmsButton" type="Button" parent="Content/Left/Categories" unique_id=54030355]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
+layout_mode = 0
+offset_left = 210.0
+offset_right = 400.0
+offset_bottom = 44.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 2
 theme_override_constants/h_separation = 4
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 24
 toggle_mode = true
 text = "Charms"
 
 [node name="CollectionScroll" type="ScrollContainer" parent="Content/Left" unique_id=1541486687]
-custom_minimum_size = Vector2(0, 240)
-layout_mode = 2
-size_flags_vertical = 3
+layout_mode = 0
+offset_top = 100.0
+offset_right = 400.0
+offset_bottom = 340.0
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 0
 
@@ -191,19 +164,22 @@ size_flags_horizontal = 3
 [node name="ItemGrid" type="GridContainer" parent="Content/Left/CollectionScroll/CollectionCenter" unique_id=1899753152]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 3
-theme_override_constants/v_separation = 3
-columns = 4
+theme_override_constants/h_separation = 7
+theme_override_constants/v_separation = 7
+columns = 5
 
-[node name="Pagination" type="HBoxContainer" parent="Content/Left" unique_id=626549173]
-layout_mode = 2
-theme_override_constants/separation = 6
-alignment = 1
+[node name="Pagination" type="Control" parent="Content/Left" unique_id=626549173]
+anchors_preset = 0
+offset_left = 65.0
+offset_top = 362.0
+offset_right = 335.0
+offset_bottom = 398.0
 
 [node name="Previous" type="Button" parent="Content/Left/Pagination" unique_id=1129001370]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 24)
-layout_mode = 2
+layout_mode = 0
+offset_right = 46.0
+offset_bottom = 36.0
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 4
@@ -213,8 +189,10 @@ text = "<"
 
 [node name="PageLabel" type="Label" parent="Content/Left/Pagination" unique_id=522600171]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
+layout_mode = 0
+offset_left = 56.0
+offset_right = 214.0
+offset_bottom = 36.0
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 4
@@ -225,8 +203,10 @@ horizontal_alignment = 1
 
 [node name="Next" type="Button" parent="Content/Left/Pagination" unique_id=277318681]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 24)
-layout_mode = 2
+layout_mode = 0
+offset_left = 224.0
+offset_right = 270.0
+offset_bottom = 36.0
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 4
@@ -235,44 +215,57 @@ theme_override_font_sizes/font_size = 20
 text = ">"
 
 [node name="EquippedFrame" type="PanelContainer" parent="Content/Left" unique_id=1884600484]
-layout_mode = 2
+layout_mode = 0
+offset_top = 398.0
+offset_right = 400.0
+offset_bottom = 528.0
 theme_override_styles/panel = SubResource("equipped_frame")
 
-[node name="Content" type="VBoxContainer" parent="Content/Left/EquippedFrame" unique_id=2110342671]
+[node name="Content" type="Control" parent="Content/Left/EquippedFrame" unique_id=2110342671]
 layout_mode = 2
-theme_override_constants/separation = 5
+offset_transform_enabled = true
 
 [node name="Heading" type="Label" parent="Content/Left/EquippedFrame/Content" unique_id=1444385426]
-layout_mode = 2
+layout_mode = 0
+offset_left = 1.0
+offset_top = -2.0
+offset_right = 377.0
+offset_bottom = 23.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 17
 text = "Currently Equipped"
 horizontal_alignment = 1
 
-[node name="EquippedRow" type="HBoxContainer" parent="Content/Left/EquippedFrame/Content" unique_id=1830079294]
-layout_mode = 2
-theme_override_constants/separation = 18
-alignment = 1
+[node name="EquippedRow" type="Control" parent="Content/Left/EquippedFrame/Content" unique_id=1830079294]
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 23.0
+offset_right = 356.0
+offset_bottom = 123.0
 
-[node name="Weapon" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=1701504350]
-layout_mode = 2
-theme_override_constants/separation = 3
-alignment = 2
+[node name="Weapon" type="Control" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=1701504350]
+anchors_preset = 0
+offset_right = 72.0
+offset_bottom = 98.0
 
 [node name="EquippedWeapon" parent="Content/Left/EquippedFrame/Content/EquippedRow/Weapon" unique_id=1582759862 instance=ExtResource("3")]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = 20.0
+offset_bottom = 92.0
 
-[node name="Q" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=756994306]
-layout_mode = 2
-theme_override_constants/separation = 3
-alignment = 2
+[node name="Q" type="Control" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=756994306]
+anchors_preset = 0
+offset_left = 88.0
+offset_right = 160.0
+offset_bottom = 98.0
 
 [node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" unique_id=2089369510]
-custom_minimum_size = Vector2(22, 16)
-layout_mode = 2
-size_flags_horizontal = 4
+layout_mode = 0
+offset_left = 12.0
+offset_right = 60.0
+offset_bottom = 18.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("keycap")
 
@@ -287,17 +280,21 @@ vertical_alignment = 1
 
 [node name="EquippedQ" parent="Content/Left/EquippedFrame/Content/EquippedRow/Q" unique_id=1916998293 instance=ExtResource("3")]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = 20.0
+offset_bottom = 92.0
 
-[node name="Space" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=87900540]
-layout_mode = 2
-theme_override_constants/separation = 3
-alignment = 2
+[node name="Space" type="Control" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=87900540]
+anchors_preset = 0
+offset_left = 176.0
+offset_right = 248.0
+offset_bottom = 98.0
 
 [node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" unique_id=290752849]
-custom_minimum_size = Vector2(22, 16)
-layout_mode = 2
-size_flags_horizontal = 4
+layout_mode = 0
+offset_left = 2.0
+offset_right = 70.0
+offset_bottom = 18.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("keycap")
 
@@ -312,17 +309,21 @@ vertical_alignment = 1
 
 [node name="EquippedSpace" parent="Content/Left/EquippedFrame/Content/EquippedRow/Space" unique_id=169478051 instance=ExtResource("3")]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = 20.0
+offset_bottom = 92.0
 
-[node name="E" type="VBoxContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=183300284]
-layout_mode = 2
-theme_override_constants/separation = 3
-alignment = 2
+[node name="E" type="Control" parent="Content/Left/EquippedFrame/Content/EquippedRow" unique_id=183300284]
+anchors_preset = 0
+offset_left = 264.0
+offset_right = 336.0
+offset_bottom = 98.0
 
 [node name="Keycap" type="PanelContainer" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" unique_id=15051985]
-custom_minimum_size = Vector2(22, 16)
-layout_mode = 2
-size_flags_horizontal = 4
+layout_mode = 0
+offset_left = 12.0
+offset_right = 60.0
+offset_bottom = 18.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("keycap")
 
@@ -337,217 +338,275 @@ vertical_alignment = 1
 
 [node name="EquippedE" parent="Content/Left/EquippedFrame/Content/EquippedRow/E" unique_id=462181856 instance=ExtResource("3")]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = 20.0
+offset_bottom = 92.0
 
-[node name="Right" type="VBoxContainer" parent="Content" unique_id=1659653199]
-custom_minimum_size = Vector2(380, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
+[node name="Right" type="Control" parent="Content" unique_id=1659653199]
+anchors_preset = 0
+offset_left = 544.0
+offset_right = 1000.0
+offset_bottom = 626.0
 
-[node name="Header" type="HBoxContainer" parent="Content/Right" unique_id=1656690673]
-custom_minimum_size = Vector2(0, 70)
-layout_mode = 2
-theme_override_constants/separation = 6
+[node name="Header" type="Control" parent="Content/Right" unique_id=1656690673]
+anchors_preset = 0
+offset_right = 456.0
+offset_bottom = 289.0
 
-[node name="PortraitFrame" type="PanelContainer" parent="Content/Right/Header" unique_id=1382000063]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_styles/panel = SubResource("portrait_frame")
+[node name="PortraitFrame" type="Control" parent="Content/Right/Header" unique_id=1382000063]
+anchors_preset = 0
+offset_left = 30.0
+offset_top = 57.0
+offset_right = 130.0
+offset_bottom = 157.0
 
-[node name="Portrait" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=1340957437]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(60, 64)
-layout_mode = 2
+[node name="PortraitBackground" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=187352470]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("7_1e8a6")
+texture = ExtResource("5_0k2h7")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Identity" type="VBoxContainer" parent="Content/Right/Header" unique_id=1167304461]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 3
+[node name="Portrait" type="TextureRect" parent="Content/Right/Header/PortraitFrame" unique_id=1340957437]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Identity" type="Control" parent="Content/Right/Header" unique_id=1167304461]
+anchors_preset = 0
+offset_left = 21.0
+offset_top = 159.0
+offset_right = 449.0
+offset_bottom = 253.0
 
 [node name="ItemTitle" type="Label" parent="Content/Right/Header/Identity" unique_id=1313786875]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 119.0
+offset_top = -105.0
+offset_right = 547.0
+offset_bottom = -69.0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/line_spacing = 3
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 25
+theme_override_font_sizes/font_size = 32
 text = "Select a weapon"
 autowrap_mode = 3
 max_lines_visible = 2
 
 [node name="ItemKind" type="Label" parent="Content/Right/Header/Identity" unique_id=506238120]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 119.0
+offset_top = -68.0
+offset_right = 547.0
+offset_bottom = -43.0
 theme_override_colors/font_color = Color(0.68, 0.17, 0.15, 1)
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 22
 text = "WEAPON"
 
 [node name="ItemDescription" type="Label" parent="Content/Right/Header/Identity" unique_id=1260477796]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 119.0
+offset_top = -40.0
+offset_right = 399.0
+offset_bottom = -8.0
 theme_override_fonts/font = ExtResource("8_1e8a6")
 theme_override_font_sizes/font_size = 14
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="Stats" type="PanelContainer" parent="Content/Right" unique_id=255553697]
-custom_minimum_size = Vector2(0, 106)
+[node name="DetailsScroll" type="ScrollContainer" parent="Content/Right" unique_id=1315256100]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 172.0
+offset_right = 430.0
+offset_bottom = 452.0
+horizontal_scroll_mode = 0
+
+[node name="Details" type="Control" parent="Content/Right/DetailsScroll" unique_id=573664232]
+custom_minimum_size = Vector2(400, 316)
 layout_mode = 2
 
-[node name="Content" type="VBoxContainer" parent="Content/Right/Stats" unique_id=1060444925]
-layout_mode = 2
-theme_override_constants/separation = 6
+[node name="Stats" type="PanelContainer" parent="Content/Right/DetailsScroll/Details" unique_id=255553697]
+layout_mode = 0
+offset_right = 400.0
+offset_bottom = 100.0
 
-[node name="StatsHeading" type="Label" parent="Content/Right/Stats/Content" unique_id=528364376]
+[node name="Content" type="Control" parent="Content/Right/DetailsScroll/Details/Stats" unique_id=1060444925]
+layout_mode = 2
+
+[node name="StatsHeading" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content" unique_id=528364376]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = -6.0
+offset_right = 410.0
+offset_bottom = 15.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 18
 text = "Base Stats"
 
-[node name="StatsGrid" type="GridContainer" parent="Content/Right/Stats/Content" unique_id=1351891084]
+[node name="StatsGrid" type="GridContainer" parent="Content/Right/DetailsScroll/Details/Stats/Content" unique_id=1351891084]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = 22.0
+offset_right = 380.0
+offset_bottom = 85.0
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 5
 columns = 4
 
-[node name="StatName0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=370606054]
+[node name="StatName0" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=370606054]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Attack"
 
-[node name="StatValue0" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=420715474]
+[node name="StatValue0" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=420715474]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="StatName1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1347206265]
+[node name="StatName1" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1347206265]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Crit Damage"
 
-[node name="StatValue1" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1417144512]
+[node name="StatValue1" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1417144512]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="StatName2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1743882071]
+[node name="StatName2" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1743882071]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Attack Speed"
 
-[node name="StatValue2" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1415244511]
+[node name="StatValue2" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1415244511]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="StatName3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=714609625]
+[node name="StatName3" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=714609625]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Knockback"
 
-[node name="StatValue3" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1146056389]
+[node name="StatValue3" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1146056389]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="StatName4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=137875389]
+[node name="StatName4" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=137875389]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Crit Rate"
 
-[node name="StatValue4" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=647589635]
+[node name="StatValue4" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=647589635]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="StatName5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=162944977]
+[node name="StatName5" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=162944977]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Range"
 
-[node name="StatValue5" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1776814730]
+[node name="StatValue5" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1776814730]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="StaggerName" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=828133402]
+[node name="StaggerName" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=828133402]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -555,21 +614,21 @@ theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Stagger"
 
-[node name="StaggerValue" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1722476126]
+[node name="StaggerValue" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1722476126]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="ChaosGainName" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=1020481797]
+[node name="ChaosGainName" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=1020481797]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -577,31 +636,35 @@ theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Chaos Gain"
 
-[node name="ChaosGainValue" type="Label" parent="Content/Right/Stats/Content/StatsGrid" unique_id=2000010112]
+[node name="ChaosGainValue" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid" unique_id=2000010112]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
-[node name="Forge" type="PanelContainer" parent="Content/Right" unique_id=1669688536]
-custom_minimum_size = Vector2(0, 98)
+[node name="Forge" type="PanelContainer" parent="Content/Right/DetailsScroll/Details" unique_id=1669688536]
+layout_mode = 0
+offset_top = 103.0
+offset_right = 400.0
+offset_bottom = 175.0
+
+[node name="Content" type="Control" parent="Content/Right/DetailsScroll/Details/Forge" unique_id=1676430217]
 layout_mode = 2
 
-[node name="Content" type="VBoxContainer" parent="Content/Right/Forge" unique_id=1676430217]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ForgeHeading" type="Label" parent="Content/Right/Forge/Content" unique_id=660420672]
+[node name="ForgeHeading" type="Label" parent="Content/Right/DetailsScroll/Details/Forge/Content" unique_id=660420672]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = -6.0
+offset_right = 486.0
+offset_bottom = 15.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 16
@@ -609,68 +672,88 @@ text = "Forge Attributes"
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="ForgeScroll" type="ScrollContainer" parent="Content/Right/Forge/Content" unique_id=860904370]
-custom_minimum_size = Vector2(0, 62)
-layout_mode = 2
-size_flags_vertical = 3
+[node name="ForgeScroll" type="ScrollContainer" parent="Content/Right/DetailsScroll/Details/Forge/Content" unique_id=860904370]
+layout_mode = 0
+offset_top = 23.0
+offset_right = 380.0
+offset_bottom = 54.0
 horizontal_scroll_mode = 0
 
-[node name="ForgeRows" type="VBoxContainer" parent="Content/Right/Forge/Content/ForgeScroll" unique_id=1681361133]
+[node name="ForgeRows" type="VBoxContainer" parent="Content/Right/DetailsScroll/Details/Forge/Content/ForgeScroll" unique_id=1681361133]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 3
 
-[node name="Skill" type="PanelContainer" parent="Content/Right" unique_id=2035021333]
-custom_minimum_size = Vector2(0, 108)
+[node name="Skill" type="PanelContainer" parent="Content/Right/DetailsScroll/Details" unique_id=2035021333]
+layout_mode = 0
+offset_top = 181.0
+offset_right = 400.0
+offset_bottom = 281.0
+
+[node name="Content" type="Control" parent="Content/Right/DetailsScroll/Details/Skill" unique_id=764757674]
 layout_mode = 2
 
-[node name="Content" type="VBoxContainer" parent="Content/Right/Skill" unique_id=764757674]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="SkillHeading" type="Label" parent="Content/Right/Skill/Content" unique_id=806944078]
+[node name="SkillHeading" type="Label" parent="Content/Right/DetailsScroll/Details/Skill/Content" unique_id=806944078]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = -6.0
+offset_right = 486.0
+offset_bottom = 15.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 16
 text = "Weapon Skill"
 
-[node name="SkillBody" type="HBoxContainer" parent="Content/Right/Skill/Content" unique_id=37286423]
-layout_mode = 2
-theme_override_constants/separation = 6
+[node name="SkillBody" type="Control" parent="Content/Right/DetailsScroll/Details/Skill/Content" unique_id=37286423]
+anchors_preset = 0
+offset_top = 23.0
+offset_right = 380.0
+offset_bottom = 77.0
 
-[node name="SkillIcon" type="TextureRect" parent="Content/Right/Skill/Content/SkillBody" unique_id=1625757164]
+[node name="SkillIcon" type="TextureRect" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody" unique_id=1625757164]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(64, 64)
-layout_mode = 2
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 52.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SkillText" type="VBoxContainer" parent="Content/Right/Skill/Content/SkillBody" unique_id=449763366]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 3
+[node name="SkillText" type="Control" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody" unique_id=449763366]
+anchors_preset = 0
+offset_left = 60.0
+offset_right = 380.0
+offset_bottom = 54.0
 
-[node name="SkillTitle" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=627158131]
+[node name="SkillTitle" type="Label" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody/SkillText" unique_id=627158131]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = -1.0
+offset_top = -8.0
+offset_right = 319.0
+offset_bottom = 10.0
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="SkillMeta" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=967433307]
+[node name="SkillMeta" type="Label" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody/SkillText" unique_id=967433307]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = -1.0
+offset_top = 11.0
+offset_right = 319.0
+offset_bottom = 27.0
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 14
 
-[node name="SkillDescription" type="Label" parent="Content/Right/Skill/Content/SkillBody/SkillText" unique_id=1161621398]
+[node name="SkillDescription" type="Label" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody/SkillText" unique_id=1161621398]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_top = 31.0
+offset_right = 320.0
+offset_bottom = 71.0
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
@@ -678,32 +761,16 @@ max_lines_visible = 3
 
 [node name="EquipButton" type="Button" parent="Content/Right" unique_id=275646008]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
+layout_mode = 0
+offset_left = 132.0
+offset_top = 469.0
+offset_right = 324.0
+offset_bottom = 510.0
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0, 0, 0, 0)
-theme_override_colors/font_focus_color = Color(0, 0, 0, 0)
-theme_override_colors/font_pressed_color = Color(0, 0, 0, 0)
-theme_override_colors/font_hover_color = Color(0, 0, 0, 0)
-theme_override_colors/font_disabled_color = Color(0, 0, 0, 0)
-theme_override_fonts/font = ExtResource("3_c1a6h")
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("action_empty")
-theme_override_styles/pressed = SubResource("action_empty")
-theme_override_styles/hover = SubResource("action_empty")
-theme_override_styles/disabled = SubResource("action_empty")
+theme_override_colors/font_color = Color(0.25, 0.14, 0.13, 1)
+theme_override_colors/font_pressed_color = Color(0.25, 0.14, 0.13, 1)
+theme_override_colors/font_hover_color = Color(0.25, 0.14, 0.13, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.38, 0.35, 1)
+theme_override_fonts/font = ExtResource("7_rxrhe")
+theme_override_font_sizes/font_size = 25
 text = "Equipped"
-
-[node name="Artwork" type="TextureRect" parent="Content/Right/EquipButton" unique_id=243900389]
-texture_filter = 1
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_bottom = -10.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("inventory_button")
-expand_mode = 1
-stretch_mode = 5

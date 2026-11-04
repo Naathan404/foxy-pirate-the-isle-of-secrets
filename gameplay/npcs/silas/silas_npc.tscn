@@ -286,11 +286,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6943457, 0)
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Visual" index="0" unique_id=1854447506]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58351445, 0)
 offset = Vector2(0, 48)
-pixel_size = 0.02
+pixel_size = 0.015
 billboard = 1
 shaded = true
 alpha_cut = 1
-texture_filter = 0
+texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_jpyye")
 animation = &"open"
 autoplay = "idle_close"

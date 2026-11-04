@@ -133,7 +133,7 @@ func _transition_scene(
 
 
 func _place_player_at_trigger(trigger_id: StringName) -> void:
-	var destination: SceneChangeTrigger
+	var destination: SceneChangeTrigger = null
 	var scene := get_tree().current_scene
 	for node: Node in get_tree().get_nodes_in_group("scene_change_triggers"):
 		var trigger := node as SceneChangeTrigger

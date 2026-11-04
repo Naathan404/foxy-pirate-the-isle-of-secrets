@@ -30,7 +30,7 @@ enum SourceUpAxis {
 @export_group("Population")
 @export_range(0, 100000, 1) var instance_count: int = 100
 @export var randomize_on_populate: bool = true
-@export var seed: int = 0
+@export var random_seed: int = 0
 @export_range(0.0, 360.0, 0.1, "suffix:deg") var random_rotation: float = 360.0
 @export_range(0.0, 90.0, 0.1, "suffix:deg") var random_tilt: float = 0.0
 @export var base_scale: Vector3 = Vector3.ONE
@@ -61,7 +61,7 @@ func populate() -> void:
 	if randomize_on_populate != false:
 		_random.randomize()
 	else:
-		_random.seed = seed
+		_random.seed = random_seed
 	var result := MultiMesh.new()
 	result.transform_format = MultiMesh.TRANSFORM_3D
 	result.mesh = source_mesh
@@ -206,12 +206,12 @@ func _pick_spaced_placement(
 	var attempt_count: int = 8 if position_attempts == null else position_attempts
 	for _attempt in maxi(1, attempt_count):
 		placement = _sample_placement(_pick_triangle(triangles, total_weight))
-		var position: Vector3 = placement["position"]
+		var candidate_position: Vector3 = placement["position"]
 		if (
 			minimum_distance <= 0.0
-			or _is_position_available(position, minimum_distance, position_grid)
+			or _is_position_available(candidate_position, minimum_distance, position_grid)
 		):
-			_register_position(position, minimum_distance, position_grid)
+			_register_position(candidate_position, minimum_distance, position_grid)
 			return placement
 	var fallback_position: Vector3 = placement["position"]
 	_register_position(fallback_position, minimum_distance, position_grid)
@@ -231,10 +231,10 @@ func _sample_placement(triangle: Dictionary) -> Dictionary:
 
 
 func _is_position_available(
-	position: Vector3, minimum_distance: float, position_grid: Dictionary
+	candidate_position: Vector3, minimum_distance: float, position_grid: Dictionary
 ) -> bool:
 	var cell_size := maxf(minimum_distance, 0.001)
-	var cell := _position_cell(position, cell_size)
+	var cell := _position_cell(candidate_position, cell_size)
 	var minimum_distance_squared := minimum_distance * minimum_distance
 	for x in range(-1, 2):
 		for y in range(-1, 2):
@@ -243,41 +243,41 @@ func _is_position_available(
 				if not position_grid.has(nearby_cell):
 					continue
 				for nearby_position: Vector3 in position_grid[nearby_cell]:
-					if position.distance_squared_to(nearby_position) < minimum_distance_squared:
+					if candidate_position.distance_squared_to(nearby_position) < minimum_distance_squared:
 						return false
 	return true
 
 
 func _register_position(
-	position: Vector3, minimum_distance: float, position_grid: Dictionary
+	candidate_position: Vector3, minimum_distance: float, position_grid: Dictionary
 ) -> void:
 	if minimum_distance <= 0.0:
 		return
-	var cell := _position_cell(position, maxf(minimum_distance, 0.001))
+	var cell := _position_cell(candidate_position, maxf(minimum_distance, 0.001))
 	var positions: Array = position_grid.get(cell, [])
-	positions.append(position)
+	positions.append(candidate_position)
 	position_grid[cell] = positions
 
 
-func _position_cell(position: Vector3, cell_size: float) -> Vector3i:
+func _position_cell(candidate_position: Vector3, cell_size: float) -> Vector3i:
 	return Vector3i(
-		floori(position.x / cell_size),
-		floori(position.y / cell_size),
-		floori(position.z / cell_size)
+		floori(candidate_position.x / cell_size),
+		floori(candidate_position.y / cell_size),
+		floori(candidate_position.z / cell_size)
 	)
 
 
 func _make_transform(placement: Dictionary) -> Transform3D:
 	var world_position: Vector3 = placement["position"]
 	var normal: Vector3 = placement["normal"]
-	var basis := _basis_aligned_to(normal)
-	basis = _apply_random_rotation(basis, normal)
-	basis = _apply_random_tilt(basis, normal)
+	var instance_basis := _basis_aligned_to(normal)
+	instance_basis = _apply_random_rotation(instance_basis, normal)
+	instance_basis = _apply_random_tilt(instance_basis, normal)
 	var scale_factor := _random.randf_range(
 		minf(random_scale_min, random_scale_max), maxf(random_scale_min, random_scale_max)
 	)
-	basis = basis.scaled(base_scale * scale_factor)
-	return global_transform.affine_inverse() * Transform3D(basis, world_position)
+	instance_basis = instance_basis.scaled(base_scale * scale_factor)
+	return global_transform.affine_inverse() * Transform3D(instance_basis, world_position)
 
 
 func _basis_aligned_to(normal: Vector3) -> Basis:
@@ -293,20 +293,23 @@ func _basis_aligned_to(normal: Vector3) -> Basis:
 	return Basis(Quaternion(source_up, normal))
 
 
-func _apply_random_rotation(basis: Basis, normal: Vector3) -> Basis:
+func _apply_random_rotation(instance_basis: Basis, normal: Vector3) -> Basis:
 	if is_zero_approx(random_rotation):
-		return basis
-	return Basis(normal, deg_to_rad(_random.randf_range(-random_rotation, random_rotation))) * basis
+		return instance_basis
+	return (
+		Basis(normal, deg_to_rad(_random.randf_range(-random_rotation, random_rotation)))
+		* instance_basis
+	)
 
 
-func _apply_random_tilt(basis: Basis, normal: Vector3) -> Basis:
+func _apply_random_tilt(instance_basis: Basis, normal: Vector3) -> Basis:
 	if is_zero_approx(random_tilt):
-		return basis
+		return instance_basis
 	var tangent := normal.cross(Vector3.UP)
 	if tangent.is_zero_approx():
 		tangent = normal.cross(Vector3.RIGHT)
 	tangent = tangent.normalized().rotated(normal, _random.randf_range(0.0, TAU))
-	return Basis(tangent, deg_to_rad(_random.randf_range(0.0, random_tilt))) * basis
+	return Basis(tangent, deg_to_rad(_random.randf_range(0.0, random_tilt))) * instance_basis
 
 
 func _source_up_vector() -> Vector3:

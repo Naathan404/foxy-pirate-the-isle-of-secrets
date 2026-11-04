@@ -17,10 +17,15 @@ var secondary_potion: Potion
 func equip_potion(potion: Potion) -> bool:
 	if not _can_equip(potion):
 		return false
+	if is_equipped(potion):
+		return true
 	if is_secondary_equipped(potion):
 		return swap_potions()
+	var previous: Potion = equipped_potion
 	equipped_potion = potion
+	secondary_potion = previous
 	equipped_potion_changed.emit(potion)
+	secondary_potion_changed.emit(secondary_potion)
 	return true
 
 
@@ -90,8 +95,10 @@ func is_equipped(potion: Potion) -> bool:
 func unequip_potion() -> bool:
 	if equipped_potion == null:
 		return false
-	equipped_potion = null
-	equipped_potion_changed.emit(null)
+	equipped_potion = secondary_potion
+	secondary_potion = null
+	equipped_potion_changed.emit(equipped_potion)
+	secondary_potion_changed.emit(null)
 	return true
 
 

@@ -23,6 +23,7 @@ GameManager="*res://core/autoload/game_manager.gd"
 Dialogic="*uid://ds2q0uclmolvu"
 AudioManager="*res://core/autoload/audio_manager.gd"
 SilasProgress="*res://gameplay/merchant/silas_progress_store.gd"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [dialogic]
 
@@ -37,6 +38,8 @@ directories/dtl_directory={
 "timelines/greeting": "res://dialog/npcs/silas/timelines/greeting.dtl"
 }
 layout/style_directory={}
+layout/style_list=[]
+layout/default_style="Default"
 
 [display]
 
@@ -53,7 +56,8 @@ project/assembly_name="foxy-pirate-the-isle-of-secret"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogic/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/spine_bridge/editor/preview/plugin.cfg", "res://addons/spine_bridge/editor/transform/plugin.cfg", "res://addons/spine_bridge/plugin.cfg")
+<<<<<<<HEADenabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg")
 
 [input]
 
@@ -95,6 +99,11 @@ test_hit={
 secondary_attack={
 "deadzone": 0.2,
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":2,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+<<<<<<<HEADcharm_slot_q={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":81,"key_label":0,"unicode":113,"location":0,"echo":false,"script":null)
 ]
 }
 charm_slot_space={

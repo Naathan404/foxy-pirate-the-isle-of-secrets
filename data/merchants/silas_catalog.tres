@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dypxn50pvmmax" path="res://gameplay/merchant/merchant_catalog.gd" id="1_catalog"]
 [ext_resource type="Script" uid="uid://buhrolk03pgyv" path="res://gameplay/merchant/merchant_offer.gd" id="2_offer"]
 [ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="3_bow"]
-[ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/materials/wooden_arrow.tres" id="4_arrow"]
+[ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="4_arrow"]
 [ext_resource type="Resource" uid="uid://ch2ttumamq7po" path="res://data/items/consumables/small_healing_potion.tres" id="5_healing"]
 [ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="6_stamina"]
 [ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="7_starfish"]

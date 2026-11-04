@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://c8qmnr7cm6o2u"]
 
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_shfvp"]
-[ext_resource type="Texture2D" uid="uid://cli5tbl015kp6" path="res://assets/sprites/items/gunpowder_bag.png" id="1_uwkqt"]
+[ext_resource type="Texture2D" uid="uid://kgtw2kjmyc21" path="res://assets/sprites/items/Gunpowder_Bag.png" id="1_uwkqt"]
 
 [resource]
 script = ExtResource("1_shfvp")
