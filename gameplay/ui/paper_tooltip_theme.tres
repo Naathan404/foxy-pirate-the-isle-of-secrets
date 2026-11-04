@@ -1,0 +1,27 @@
+[gd_resource type="Theme" load_steps=3 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/unifont-17.0.03.otf" id="1_font"]
+
+[sub_resource type="StyleBoxFlat" id="tooltip_paper"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.98, 0.87, 0.69, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.16, 0.1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.12, 0.05, 0.03, 0.35)
+shadow_size = 4
+
+[resource]
+TooltipLabel/colors/font_color = Color(0.2, 0.09, 0.06, 1)
+TooltipLabel/font_sizes/font_size = 16
+TooltipLabel/fonts/font = ExtResource("1_font")
+TooltipPanel/styles/panel = SubResource("tooltip_paper")

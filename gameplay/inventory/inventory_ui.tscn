@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dqmnkxuwherpm"]
 
 [ext_resource type="Script" uid="uid://by2le7hjaf5sv" path="res://gameplay/inventory/inventory_ui.gd" id="1_e0l88"]
+[ext_resource type="Theme" path="res://gameplay/ui/paper_tooltip_theme.tres" id="paper_tooltips"]
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2_0s057"]
 [ext_resource type="Texture2D" uid="uid://cd8adeiyriaix" path="res://assets/ui/player_hud/inventory/material_icon.png" id="5_hmekt"]
 [ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="6_tbeqg"]
@@ -61,6 +62,7 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.7058824)
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=2033281845]
+theme = ExtResource("paper_tooltips")
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
