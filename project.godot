@@ -56,7 +56,7 @@ project/assembly_name="foxy-pirate-the-isle-of-secret"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg", "res://addons/spine_bridge/editor/preview/plugin.cfg", "res://addons/spine_bridge/editor/transform/plugin.cfg", "res://addons/spine_bridge/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg")
 <<<<<<<HEADenabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg")
 
 [input]

@@ -16,9 +16,8 @@ resource_cost = null
 cooldown_seconds = null
 proc_chance = 0.2
 acquisition_source = &"merchant_or_enemy_drop"
+content_status = 2
 tags = Array[StringName]([&"passive", &"target_defeated", &"cooldown_reset", &"stamina"])
 effect_params = {
 "restore_sp": 100.0
 }
-content_status = 2
-drop_chance = -1.0

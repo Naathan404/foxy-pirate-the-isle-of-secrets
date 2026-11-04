@@ -14,9 +14,9 @@ resource_cost = null
 cooldown_seconds = null
 proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.1
 tags = Array[StringName]([&"passive", &"stat_modifier", &"movement"])
 effect_params = {
 "max_sp_flat": -100.0,
 "move_speed_multiplier": 1.2
 }
-drop_chance = 0.1
