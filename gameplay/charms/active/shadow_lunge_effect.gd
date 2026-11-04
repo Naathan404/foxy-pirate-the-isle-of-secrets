@@ -30,16 +30,15 @@ func activate(context: CharmActivationContext) -> bool:
 	var distance := definition.get_param_float(&"dash_distance_units", 5.0)
 	var origin := actor.global_position
 	var motion := direction * distance
-	if (
-		actor is CharacterBody3D
-		and (actor as CharacterBody3D).test_move(actor.global_transform, motion)
-	):
-		var safe_distance := maxf(0.0, distance - definition.get_param_float(&"wall_padding", 0.35))
-		motion = direction * safe_distance
+	var travel_distance := distance
 	if actor is CharacterBody3D:
-		(actor as CharacterBody3D).global_position += motion
+		var collision := (actor as CharacterBody3D).move_and_collide(motion)
+		if collision != null:
+			travel_distance = origin.distance_to(actor.global_position)
 	else:
 		actor.global_position += motion
+	if travel_distance <= 0.001:
+		return true
 	var execution := ATTACK_SCENE.instantiate() as CharmActiveAttack
 	if execution == null:
 		return false
@@ -58,8 +57,8 @@ func activate(context: CharmActivationContext) -> bool:
 	execution.global_position = origin
 	execution.hitbox_scale = Vector3(1.0, 1.0, 1.5)
 	execution.forward_offset = 0.0
-	execution.travel_speed_units_per_second = distance / 0.18
-	execution.max_travel_distance = distance
+	execution.travel_speed_units_per_second = travel_distance / 0.18
+	execution.max_travel_distance = travel_distance
 	execution.activate()
 	execution.release_after(0.28)
 	return true

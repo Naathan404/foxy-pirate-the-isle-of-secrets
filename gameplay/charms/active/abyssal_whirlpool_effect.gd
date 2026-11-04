@@ -53,7 +53,11 @@ func _physics_process(delta: float) -> void:
 		var direction := _zone.global_position - target.global_position
 		direction.y = 0.0
 		if direction.length() > 0.05:
-			target.global_position += direction.normalized() * minf(direction.length(), delta * 3.0)
+			var motion := direction.normalized() * minf(direction.length(), delta * 3.0)
+			if target is CharacterBody3D:
+				(target as CharacterBody3D).move_and_collide(motion)
+			else:
+				target.global_position += motion
 	_remaining -= maxf(0.0, delta)
 	if _remaining <= 0.0 and not _exploded:
 		_explode()

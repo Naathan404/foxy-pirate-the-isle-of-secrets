@@ -11,6 +11,7 @@ description = "Every fourth confirmed normal-attack hit has a 50% chance to deal
 effect_scene = ExtResource("2_effect")
 proc_chance = 0.5
 acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.10
 tags = Array[StringName]([&"passive", &"outgoing_damage", &"normal_attack", &"proc"])
 effect_params = {
 "damage_multiplier": 2.0,
