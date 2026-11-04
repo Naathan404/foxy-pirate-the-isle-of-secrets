@@ -117,7 +117,11 @@ func _debug_set_owned(charm_id: StringName, owned: bool = true) -> bool:
 		_owned_ids[charm_id] = true
 		charm_owned.emit(charm_id)
 		return true
-	_owned_ids.erase(charm_id)
+	if not _owned_ids.erase(charm_id):
+		return true
+	if _is_equipped(charm_id):
+		unequip_charm(charm_id)
+	charm_ownership_removed.emit(charm_id)
 	return true
 
 

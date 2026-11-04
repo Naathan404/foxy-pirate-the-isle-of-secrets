@@ -26,7 +26,13 @@ func activate(_context: CharmActivationContext) -> bool:
 	mesh.bottom_radius = 0.2
 	mesh.height = 0.04
 	_ring.mesh = mesh
-	_ring.modulate = Color(1.0, 0.65, 0.2, 0.6)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(1.0, 0.65, 0.2, 0.7)
+	material.emission_enabled = true
+	material.emission = Color(0.9, 0.25, 0.02, 1.0)
+	material.emission_energy_multiplier = 2.0
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_ring.material_override = material
 	_ring.global_position = actor.global_position + Vector3.UP * 0.05
 	actor.get_parent().add_child(_ring)
 	set_physics_process(true)

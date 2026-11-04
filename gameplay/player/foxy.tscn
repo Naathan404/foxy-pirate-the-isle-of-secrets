@@ -1021,8 +1021,6 @@ script = ExtResource("16_charm_manager")
 registry = NodePath("CharmRegistry")
 actor = NodePath("..")
 loadout = SubResource("Resource_ieged")
-debug_grant_all_charms = true
-debug_auto_equip_first_three = true
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")
@@ -1050,6 +1048,14 @@ offset_top = 6.0
 offset_right = 1186.0
 offset_bottom = 29.0
 text = "DEBUG:"
+
+[node name="DebugGrantAllCharms" type="Button" parent="TestHUD"]
+offset_left = 1018.0
+offset_top = 80.0
+offset_right = 1120.0
+offset_bottom = 103.0
+mouse_default_cursor_shape = 2
+text = "Grant All Charms"
 
 [node name="HP" type="Label" parent="TestHUD" unique_id=700755012]
 offset_left = 1031.0

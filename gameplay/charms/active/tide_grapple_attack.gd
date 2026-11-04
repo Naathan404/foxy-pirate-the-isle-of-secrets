@@ -19,6 +19,8 @@ var pull_stop_distance: float = 1.0
 var pull_speed_units_per_second: float = 16.0
 var stun_seconds: float = 1.0
 
+@onready var placeholder: MeshInstance3D = $Placeholder
+
 
 func validate() -> bool:
 	return is_instance_valid(raycast)
@@ -30,6 +32,8 @@ func activate() -> bool:
 	if context.direction.is_zero_approx() or context.damage_hp <= 0 or range_units <= 0.0:
 		return false
 	look_at(global_position + context.direction, Vector3.UP)
+	if is_instance_valid(placeholder):
+		placeholder.scale = Vector3.ONE * (range_units / 2.5)
 	raycast.target_position = Vector3(0.0, 0.0, -range_units)
 	raycast.enabled = true
 	raycast.force_raycast_update()
@@ -37,7 +41,8 @@ func activate() -> bool:
 		resolve_hit(raycast.get_collider(), raycast.get_collision_point())
 	else:
 		grapple_resolved.emit(RESULT_MISS, null)
-	queue_free()
+	var release_timer := get_tree().create_timer(0.35)
+	release_timer.timeout.connect(queue_free, CONNECT_ONE_SHOT)
 	return true
 
 

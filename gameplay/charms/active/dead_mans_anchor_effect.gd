@@ -29,7 +29,13 @@ func activate(_context: CharmActivationContext) -> bool:
 	mesh.radius = 0.35
 	mesh.height = 1.2
 	_marker.mesh = mesh
-	_marker.modulate = Color(0.2, 0.8, 1.0, 0.55)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.2, 0.8, 1.0, 0.65)
+	material.emission_enabled = true
+	material.emission = Color(0.05, 0.4, 0.9, 1.0)
+	material.emission_energy_multiplier = 2.0
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_marker.material_override = material
 	_marker.global_position = actor.global_position
 	actor.get_parent().add_child(_marker)
 	_window_remaining = definition.get_param_float(&"recast_window_seconds", 5.0)

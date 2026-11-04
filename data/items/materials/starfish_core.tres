@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://cywjrscuemerx"]
 
-[ext_resource type="Texture2D" uid="uid://dm4310xw1jwcf" path="res://assets/sprites/items/Starfish_Core.png" id="1_84cbb"]
+[ext_resource type="Texture2D" uid="uid://dm4310xw1jwcf" path="res://assets/sprites/items/starfish_core.png" id="1_84cbb"]
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_or8jv"]
 
 [resource]
