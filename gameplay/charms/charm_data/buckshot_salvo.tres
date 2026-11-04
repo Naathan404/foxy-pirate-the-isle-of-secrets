@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/active/buckshot_salvo_effect.tscn" id="2_effect"]
+
+[resource]
+script = ExtResource("1_data")
+charm_id = &"buckshot_salvo"
+display_name = "Buckshot Salvo"
+description = "Fire a radial 360-degree burst of pellets."
+charm_type = 0
+effect_scene = ExtResource("2_effect")
+resource_cost = 150.0
+cooldown_seconds = 7.0
+acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.05
+tags = Array[StringName]([&"active", &"projectile", &"radial"])
+effect_params = {
+"damage_percent": 0.5,
+"projectile_count": 8,
+"projectile_speed": 14.0,
+"range_units": 5.0
+}

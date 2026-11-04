@@ -22,7 +22,10 @@ func activate() -> void:
 		return
 
 	super.activate()
-	look_at(global_position + context.direction, Vector3.UP)
+	var facing := context.direction
+	if facing.is_zero_approx() or facing.cross(Vector3.UP).is_zero_approx():
+		facing = Vector3.BACK
+	look_at(global_position + facing, Vector3.UP)
 	hitbox.position.z = -forward_offset
 	hitbox.scale = hitbox_scale * context.hitbox_multiplier
 	hitbox.actor = context.actor

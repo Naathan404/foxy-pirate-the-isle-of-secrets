@@ -82,6 +82,7 @@ var _loot_drop_index: int = 0
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
+	add_to_group("enemy")
 	if not _validate_components():
 		set_physics_process(false)
 		return

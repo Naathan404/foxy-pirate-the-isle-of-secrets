@@ -14,10 +14,16 @@ static func capture(manager: CharmSocketManager, registry: CharmRegistry) -> Dic
 		return {}
 	var owned_ids: Array[String] = []
 	for charm_id: StringName in registry.get_owned_ids():
-		owned_ids.append(String(charm_id))
+		var definition := registry.get_definition(charm_id)
+		if definition != null and definition.is_playable():
+			owned_ids.append(String(charm_id))
 	var equipped_ids: Array[String] = []
 	for socket_id: int in range(CharmConstants.MAX_SOCKET_COUNT):
-		equipped_ids.append(String(manager.get_equipped_charm(socket_id)))
+		var charm_id := manager.get_equipped_charm(socket_id)
+		var definition := registry.get_definition(charm_id)
+		equipped_ids.append(
+			String(charm_id if definition != null and definition.is_playable() else &"")
+		)
 	return {
 		"version": VERSION,
 		"unlocked_socket_count": manager.get_unlocked_socket_count(),
@@ -62,7 +68,8 @@ static func _read_valid_owned_ids(value: Variant, registry: CharmRegistry) -> Ar
 		var charm_id := StringName(String(raw_id))
 		if charm_id.is_empty() or seen.has(charm_id):
 			continue
-		if registry.get_definition(charm_id) == null:
+		var definition := registry.get_definition(charm_id)
+		if definition == null or not definition.is_playable():
 			continue
 		seen[charm_id] = true
 		result.append(charm_id)
@@ -82,7 +89,8 @@ static func _read_valid_equipped_ids(
 		var charm_id := StringName(String(source[socket_id]))
 		if charm_id.is_empty() or seen.has(charm_id):
 			continue
-		if not registry.is_owned(charm_id):
+		var definition := registry.get_definition(charm_id)
+		if definition == null or not definition.is_playable() or not registry.is_owned(charm_id):
 			continue
 		seen[charm_id] = true
 		result[socket_id] = charm_id

@@ -8,11 +8,11 @@
 script = ExtResource("1_data")
 charm_id = &"arrow_rain"
 display_name = "Arrow Rain"
-description = "Fire 8 arrows toward the cursor over 1.4 seconds."
+description = "Call down 8 arrows in a circle at the cursor over 1.4 seconds."
 sprite = ExtResource("3_p1bem")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
-resource_cost = 300.0
+resource_cost = 100.0
 cooldown_seconds = 6.0
 acquisition_source = &"merchant_or_enemy_drop"
 tags = Array[StringName]([&"active", &"projectile"])

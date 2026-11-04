@@ -1,3 +1,4 @@
+# gdlint: disable=max-public-methods
 class_name CharmEffect
 extends Node
 ## Hook contract cho hiệu ứng Active và Passive Charm.
@@ -44,6 +45,10 @@ func on_target_defeated(_target: Node, _damage: DamageContext) -> void:
 	pass
 
 
+func on_actor_died() -> void:
+	cancel_active()
+
+
 func on_dash_started() -> void:
 	pass
 
@@ -73,4 +78,28 @@ func can_activate(_context: CharmActivationContext) -> bool:
 
 
 func activate(_context: CharmActivationContext) -> bool:
+	return false
+
+
+func on_input_held(_context: CharmActivationContext, _delta: float) -> bool:
+	return false
+
+
+func on_input_released(_context: CharmActivationContext) -> bool:
+	return false
+
+
+func on_input_cancelled() -> void:
+	cancel_active()
+
+
+func get_activation_cost(_context: CharmActivationContext) -> float:
+	return definition.resource_cost if definition != null else 0.0
+
+
+func get_cooldown_policy() -> StringName:
+	return &"on_activate"
+
+
+func can_bypass_cooldown(_context: CharmActivationContext) -> bool:
 	return false

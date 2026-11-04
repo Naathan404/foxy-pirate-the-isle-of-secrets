@@ -21,6 +21,9 @@ var _safe_location_sources: Dictionary[int, bool] = {}
 var _sockets: Dictionary[int, CharmSocket] = {}
 var _debug_socket_id: int = CharmConstants.SocketId.Q
 var _debug_charm_id: StringName = &""
+var _previous_pressed: Dictionary[int, bool] = {}
+var _debug_grant_all_charms: bool = false
+var _debug_auto_equip_first_three: bool = false
 
 
 func _ready() -> void:
@@ -35,6 +38,8 @@ func _ready() -> void:
 	notify_property_list_changed()
 	if not _debug_charm_id.is_empty():
 		_apply_debug_charm_selection.call_deferred()
+	if OS.is_debug_build() and _debug_grant_all_charms:
+		_debug_grant_and_equip_all.call_deferred()
 
 
 func _get_property_list() -> Array[Dictionary]:
@@ -60,6 +65,16 @@ func _get_property_list() -> Array[Dictionary]:
 			"hint_string": ",".join(_get_debug_charm_options()),
 			"usage": PROPERTY_USAGE_EDITOR,
 		},
+		{
+			"name": "debug_grant_all_charms",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_EDITOR,
+		},
+		{
+			"name": "debug_auto_equip_first_three",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_EDITOR,
+		},
 	]
 
 
@@ -69,6 +84,10 @@ func _get(property: StringName) -> Variant:
 			return _debug_socket_id
 		&"debug_charm":
 			return _get_debug_charm_label(_debug_charm_id)
+		&"debug_grant_all_charms":
+			return _debug_grant_all_charms
+		&"debug_auto_equip_first_three":
+			return _debug_auto_equip_first_three
 	return null
 
 
@@ -86,11 +105,21 @@ func _set(property: StringName, value: Variant) -> bool:
 			if is_node_ready():
 				_apply_debug_charm_selection.call_deferred()
 			return true
+		&"debug_grant_all_charms":
+			_debug_grant_all_charms = bool(value)
+			if is_node_ready() and _debug_grant_all_charms:
+				_debug_grant_and_equip_all.call_deferred()
+			return true
+		&"debug_auto_equip_first_three":
+			_debug_auto_equip_first_three = bool(value)
+			if is_node_ready() and _debug_auto_equip_first_three:
+				_debug_grant_and_equip_all.call_deferred()
+			return true
 	return false
 
 
-func _physics_process(_delta: float) -> void:
-	_handle_slot_input()
+func _physics_process(delta: float) -> void:
+	_handle_slot_input(delta)
 
 
 func _setup_sockets() -> void:
@@ -300,6 +329,25 @@ func _debug_equip_charm(charm_id: StringName, socket_id: int) -> bool:
 	return equipped
 
 
+func _debug_grant_and_equip_all() -> void:
+	if not OS.is_debug_build() or not is_node_ready() or not is_instance_valid(registry):
+		return
+	for charm_id: StringName in registry.get_registered_ids():
+		registry._debug_set_owned(charm_id, true)
+	if not _debug_auto_equip_first_three or not is_instance_valid(actor):
+		return
+	var socket_ids := [
+		CharmConstants.SocketId.Q,
+		CharmConstants.SocketId.SPACE,
+		CharmConstants.SocketId.E,
+	]
+	var charm_ids := registry.get_registered_ids()
+	for index: int in range(mini(socket_ids.size(), charm_ids.size())):
+		_debug_equip_charm(charm_ids[index], socket_ids[index])
+	notify_property_list_changed()
+	print("Charm debug: granted all registered Charms and auto-equipped first three sockets")
+
+
 func _debug_unequip_charm(socket_id: int) -> bool:
 	if not OS.is_debug_build():
 		return false
@@ -317,6 +365,12 @@ func _debug_unequip_charm(socket_id: int) -> bool:
 
 
 func activate_socket(socket_id: int) -> bool:
+	return _dispatch_input(socket_id, true, false, false, 0.0)
+
+
+func _dispatch_input(
+	socket_id: int, just_pressed: bool, pressed: bool, just_released: bool, delta: float
+) -> bool:
 	var socket := _sockets.get(socket_id) as CharmSocket
 	if socket == null or not socket.unlocked or not socket.has_charm():
 		charm_activation_rejected.emit(socket_id, &"socket_unavailable")
@@ -340,10 +394,16 @@ func activate_socket(socket_id: int) -> bool:
 	if not is_instance_valid(registry):
 		charm_activation_rejected.emit(socket_id, &"registry_unavailable")
 		return false
-	if not registry.activate_socket(socket_id, context):
+	var handled := false
+	if just_pressed:
+		handled = registry.input_pressed(socket_id, context)
+	if pressed:
+		handled = registry.input_held(socket_id, context, delta) or handled
+	if just_released:
+		handled = registry.input_released(socket_id, context) or handled
+	if not handled and just_pressed:
 		charm_activation_rejected.emit(socket_id, &"registry_rejected")
-		return false
-	return true
+	return handled
 
 
 func modify_outgoing_damage(amount_hp: float, damage: DamageContext) -> float:
@@ -379,13 +439,22 @@ func reset_active_cooldowns() -> void:
 		registry.reset_active_cooldowns()
 
 
-func _handle_slot_input() -> void:
+func _handle_slot_input(delta: float) -> void:
 	if actor is Player and (actor as Player).is_gameplay_input_blocked():
+		_previous_pressed.clear()
+		if is_instance_valid(registry):
+			registry.input_cancelled()
 		return
 	for socket_id: int in _sockets:
 		var socket := _sockets[socket_id] as CharmSocket
-		if socket != null and Input.is_action_just_pressed(socket.input_action):
-			activate_socket(socket_id)
+		if socket == null or not socket.unlocked or not socket.has_charm():
+			continue
+		var pressed := Input.is_action_pressed(socket.input_action)
+		var was_pressed := bool(_previous_pressed.get(socket_id, false))
+		_dispatch_input(
+			socket_id, pressed and not was_pressed, pressed, not pressed and was_pressed, delta
+		)
+		_previous_pressed[socket_id] = pressed
 
 
 func _apply_debug_charm_selection() -> void:
@@ -449,6 +518,9 @@ func _connect_actor_events() -> void:
 		and not actor.dash_finished.is_connected(_on_dash_finished)
 	):
 		actor.dash_finished.connect(_on_dash_finished)
+	var health := actor.get("hp") as HealthComponent
+	if is_instance_valid(health) and not health.died.is_connected(_on_actor_died):
+		health.died.connect(_on_actor_died)
 
 
 func _on_dash_started() -> void:
@@ -457,6 +529,11 @@ func _on_dash_started() -> void:
 
 func _on_dash_finished(interrupted: bool) -> void:
 	dispatch_event(&"dash_finished", [interrupted])
+
+
+func _on_actor_died() -> void:
+	_previous_pressed.clear()
+	dispatch_event(&"actor_died", [])
 
 
 func _is_equipped_elsewhere(charm_id: StringName, requested_socket_id: int) -> bool:

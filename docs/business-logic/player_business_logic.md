@@ -128,6 +128,10 @@ ngắt kết nối signal và hủy phần đòn còn lại.
 
 ### Contract chaos point (CP)
 
+Charm `Chaos Collector` dùng cùng `ChaosComponent.gain(2)` sau mỗi confirmed normal-attack hit
+do Player gây damage thực tế; miss, skill và hit không mất HP không cộng CP. Charm không thay đổi
+luật clamp hoặc decay của `ChaosComponent`.
+
 [ChaosComponent](../core/components/chaos_component.gd) là component riêng của Player,
 được gán qua `Player.chaos`, `WeaponController.chaos` và `PlayerHUD.chaos` trong Foxy.
 `_setup_stats()` gọi `chaos.init(data.max_chaos)`; `_setup_combat()` gán chaos cho

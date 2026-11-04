@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/chaos_collector_effect.tscn" id="2_effect"]
+
+[resource]
+script = ExtResource("1_data")
+charm_id = &"chaos_collector"
+display_name = "Chaos Collector"
+description = "Confirmed normal attacks grant 2 Chaos."
+effect_scene = ExtResource("2_effect")
+acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.25
+tags = Array[StringName]([&"passive", &"damage_dealt", &"normal_attack", &"chaos"])
+effect_params = {
+"chaos_per_hit": 2.0
+}

@@ -90,7 +90,9 @@ func _test_arrow_rain(
 	_assert_near(actor.stamina.get_current_sp(), expected_sp, "cooldown rejection is free")
 	await create_timer(1.8).timeout
 	_assert_equal(_arrow_launch_count, 8, "Arrow launches eight projectiles")
-	_assert_true(_arrow_first_direction.is_equal_approx(Vector3.RIGHT), "Arrow cursor aim")
+	_assert_true(
+		_arrow_first_direction.is_equal_approx(Vector3.BACK), "Arrow impact uses stable facing"
+	)
 	_assert_equal(_arrow_last_damage_hp, 35, "Arrow projectile damage")
 	runtime.reset_cooldown()
 	_assert_true(manager.activate_socket(CharmConstants.SocketId.Q), "reactivate Arrow Rain")
