@@ -53,9 +53,6 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland2" index="1" unique_id=1661393056]
 visible = false
 
-[node name="SeaWater" parent="CoralIsland2" index="3" unique_id=116442875]
-visible = false
-
 [node name="CoralIsland3" parent="." unique_id=70048280 instance=ExtResource("3_r5dp7")]
 
 [node name="WorldEnvironment" parent="CoralIsland3" index="0"]
@@ -72,19 +69,21 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland4" index="1"]
 visible = false
 
-[node name="SeaWater" parent="." unique_id=1688637613 instance=ExtResource("6_r5dp7")]
+[node name="SeaWaters" type="Node3D" parent="." unique_id=752669126]
+
+[node name="SeaWater" parent="SeaWaters" unique_id=1688637613 instance=ExtResource("6_r5dp7")]
 transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1, -246, 0, 78)
 
-[node name="SeaWater2" parent="." unique_id=1552811881 instance=ExtResource("6_r5dp7")]
+[node name="SeaWater2" parent="SeaWaters" unique_id=1552811881 instance=ExtResource("6_r5dp7")]
 transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1, -246, 0, 278)
 
-[node name="SeaWater3" parent="." unique_id=2015003361 instance=ExtResource("6_r5dp7")]
+[node name="SeaWater3" parent="SeaWaters" unique_id=2015003361 instance=ExtResource("6_r5dp7")]
 transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.1, 34, 0, 268.1)
 
-[node name="SeaWater4" parent="." unique_id=652098241 instance=ExtResource("6_r5dp7")]
+[node name="SeaWater4" parent="SeaWaters" unique_id=652098241 instance=ExtResource("6_r5dp7")]
 transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 0.8, 34, 0, 54)
 
-[node name="SeaWater5" parent="." unique_id=495989288 instance=ExtResource("6_r5dp7")]
+[node name="SeaWater5" parent="SeaWaters" unique_id=495989288 instance=ExtResource("6_r5dp7")]
 transform = Transform3D(1.232, 0, 0, 0, 1, 0, 0, 0, 0.24000001, 51.247997, 0, 145.20001)
 
 [editable path="CoralIsland8"]

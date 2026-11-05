@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://db5lhn6q8e826" path="res://assets/models/kenney_platformer_kit/lever.glb" id="3_lever"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="4_hurtbox"]
-[ext_resource type="PackedScene" path="res://world/objects/platform_call_dock.tscn" id="5_dock"]
+[ext_resource type="PackedScene" uid="uid://b51d78vnn7fra" path="res://world/objects/platform_call_dock.tscn" id="5_dock"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kouyd"]
 albedo_texture = ExtResource("1_fa4ld")
@@ -53,11 +53,11 @@ shape = SubResource("LeverHitShape")
 [node name="Start" type="Marker3D" parent="." unique_id=1064890171]
 
 [node name="End" type="Marker3D" parent="." unique_id=1910727390]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16.033314)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.033314)
 
-[node name="StartDock" parent="." instance=ExtResource("5_dock")]
-position = Vector3(0, 0, -4.05)
+[node name="StartDock" parent="." unique_id=1539520790 instance=ExtResource("5_dock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.05)
 
-[node name="EndDock" parent="." instance=ExtResource("5_dock")]
-position = Vector3(0, 0, 20.083313)
+[node name="EndDock" parent="." unique_id=1860631709 instance=ExtResource("5_dock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.083313)
 call_end = true

@@ -1,13 +1,9 @@
 [gd_scene format=3 uid="uid://dj81lyqu3ry8v"]
 
-[ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island9.tscn" id="island_9"]
-
+[ext_resource type="PackedScene" uid="uid://bysge4gycen5u" path="res://world/coral_valley/scenes/islands/coral_island9.tscn" id="island_9"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island13.tscn" id="island_13"]
-
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island14.tscn" id="island_14"]
-
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island15.tscn" id="island_15"]
-
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island16.tscn" id="island_16"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
@@ -28,23 +24,23 @@ ambient_light_energy = 0.72
 
 [node name="Stage4" type="Node3D" unique_id=728909387]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1872380418]
 environment = SubResource("Environment_1h7xg")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=442048085]
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
 light_energy = 0.35
 shadow_enabled = true
 
-[node name="CoralIsland9" parent="." instance=ExtResource("island_9")]
+[node name="CoralIsland9" parent="." unique_id=676812550 instance=ExtResource("island_9")]
 
-[node name="WorldEnvironment" parent="CoralIsland9" index="0"]
+[node name="WorldEnvironment" parent="CoralIsland9" index="0" unique_id=1846282655]
 environment = null
 
-[node name="DirectionalLight3D" parent="CoralIsland9" index="1"]
+[node name="DirectionalLight3D" parent="CoralIsland9" index="1" unique_id=1792811233]
 visible = false
 
-[node name="CoralIsland13" parent="." instance=ExtResource("island_13")]
+[node name="CoralIsland13" parent="." unique_id=1888245668 instance=ExtResource("island_13")]
 
 [node name="WorldEnvironment" parent="CoralIsland13" index="0"]
 environment = null
@@ -52,7 +48,7 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland13" index="1"]
 visible = false
 
-[node name="CoralIsland14" parent="." instance=ExtResource("island_14")]
+[node name="CoralIsland14" parent="." unique_id=2085194903 instance=ExtResource("island_14")]
 
 [node name="WorldEnvironment" parent="CoralIsland14" index="0"]
 environment = null
@@ -60,7 +56,7 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland14" index="1"]
 visible = false
 
-[node name="CoralIsland15" parent="." instance=ExtResource("island_15")]
+[node name="CoralIsland15" parent="." unique_id=1138629588 instance=ExtResource("island_15")]
 
 [node name="WorldEnvironment" parent="CoralIsland15" index="0"]
 environment = null
@@ -68,7 +64,7 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland15" index="1"]
 visible = false
 
-[node name="CoralIsland16" parent="." instance=ExtResource("island_16")]
+[node name="CoralIsland16" parent="." unique_id=2080225887 instance=ExtResource("island_16")]
 
 [node name="WorldEnvironment" parent="CoralIsland16" index="0"]
 environment = null
@@ -77,11 +73,7 @@ environment = null
 visible = false
 
 [editable path="CoralIsland9"]
-
 [editable path="CoralIsland13"]
-
 [editable path="CoralIsland14"]
-
 [editable path="CoralIsland15"]
-
 [editable path="CoralIsland16"]
