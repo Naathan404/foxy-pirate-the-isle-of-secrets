@@ -14,9 +14,9 @@ resource_cost = null
 cooldown_seconds = null
 proc_chance = 0.05
 acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.1
 tags = Array[StringName]([&"passive", &"damage_dealt", &"normal_attack", &"healing"])
 effect_params = {
 "heal_hp": 1.0,
 "hit_threshold": 12
 }
-drop_chance = 0.1

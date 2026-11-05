@@ -14,6 +14,7 @@ resource_cost = 100.0
 cooldown_seconds = 4.0
 proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.05
 tags = Array[StringName]([&"active", &"melee"])
 effect_params = {
 "damage_multiplier": 2.0,
@@ -21,4 +22,3 @@ effect_params = {
 "hit_duration_seconds": 0.12,
 "radius_units": 2.8
 }
-drop_chance = 0.05
