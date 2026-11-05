@@ -8,11 +8,11 @@ const TALKING_SHEET: Texture2D = preload(
 @export var data: NpcData
 @export_file("*.dtl") var farewell_timeline: String
 
-@onready var sprite: AnimatedSprite3D = $Visual/AnimatedSprite3D
-@onready var forge_panel: TortugaPanel = $TortugaPanel
-
 var _active_interactor: Player
 var _is_farewell_dialogue := false
+
+@onready var sprite: AnimatedSprite3D = $Visual/AnimatedSprite3D
+@onready var forge_panel: TortugaPanel = $TortugaPanel
 
 
 func _ready() -> void:

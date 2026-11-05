@@ -28,6 +28,8 @@ signal combat_activity
 @export var dash_action: StringName = &"dash"
 @export var attack_action: StringName = &"normal_attack"
 @export var secondary_attack_action: StringName = &"secondary_attack"
+@export_group("Crate Interaction")
+@export_range(0.0, 3.0, 0.05) var dash_crate_knockback_distance: float = 0.9
 @export_group("Damage")
 @export_range(0.0, 3.0, 0.05, "suffix:s") var post_hit_invulnerability_duration: float = 0.8
 
@@ -49,6 +51,7 @@ var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
 var potion_selection_active: bool = false
 var _charm_grapple_tween: Tween
+var _dash_pushed_crates: Dictionary[int, bool] = {}
 var _post_hit_invulnerability_remaining: float = 0.0
 
 @onready var visual: PlayerVisual = $Visual
@@ -72,6 +75,7 @@ func _ready() -> void:
 	pending_hit_duration = data.hit_duration
 	_setup_stats()
 	_setup_combat()
+	dash_started.connect(_on_dash_started_for_crates)
 	_setup_charm_system()
 	_setup_debug_charm_button()
 	if is_instance_valid(potion_selector):
@@ -252,12 +256,19 @@ func _physics_process(delta: float) -> void:
 
 
 func _push_collided_crates() -> void:
-	if dead or move_direction.is_zero_approx() or not is_on_floor():
+	if dead or not is_on_floor():
 		return
-	# Only deliberate walking pushes; attack lunges, recoil and dash do not.
-	for state: FsmState in [fsm.current_state, fsm.next_state]:
-		if state != null and state.name.to_lower() not in ["idle", "run"]:
-			return
+	var dashing := fsm.current_state != null and fsm.current_state.name.to_lower() == "dash"
+	if dashing and not bool(fsm.current_state.get("active")):
+		return
+	var push_direction := last_facing_direction if dashing else move_direction
+	if push_direction.is_zero_approx():
+		return
+	if not dashing:
+		# Only deliberate walking pushes; attack lunges and recoil do not.
+		for state: FsmState in [fsm.current_state, fsm.next_state]:
+			if state != null and state.name.to_lower() not in ["idle", "run"]:
+				return
 	for index in get_slide_collision_count():
 		var collision := get_slide_collision(index)
 		var crate := collision.get_collider() as PushableCrate
@@ -265,13 +276,24 @@ func _push_collided_crates() -> void:
 			continue
 		var normal := collision.get_normal()
 		# Standing on top and grazing a side are not pushes.
-		if absf(normal.y) > 0.4 or -move_direction.dot(normal) < 0.35:
+		if absf(normal.y) > 0.4 or -push_direction.dot(normal) < 0.35:
+			continue
+		if dashing:
+			var crate_id := crate.get_instance_id()
+			if not _dash_pushed_crates.has(crate_id) and crate.request_knockback(
+				push_direction, dash_crate_knockback_distance
+			):
+				_dash_pushed_crates[crate_id] = true
 			continue
 		var push_speed := minf(crate.push_speed, _get_move_speed())
-		if crate.request_push(move_direction, push_speed):
+		if crate.request_push(push_direction, push_speed):
 			# move_and_slide clears velocity against the crate. Keep the following speed
 			# for the next tick so walking acceleration does not produce a stop/start push.
-			set_horizontal_velocity(move_direction * push_speed)
+			set_horizontal_velocity(push_direction * push_speed)
+
+
+func _on_dash_started_for_crates() -> void:
+	_dash_pushed_crates.clear()
 
 
 func _read_input() -> void:

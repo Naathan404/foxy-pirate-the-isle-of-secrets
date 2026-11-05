@@ -16,6 +16,7 @@ enum RehitPolicy {
 var _active: bool = false
 var _damage: DamageContext
 var _hit_actors: Dictionary = {}
+var _hit_crates: Dictionary[int, bool] = {}
 var _contact_areas_by_actor: Dictionary = {}
 var _rehit_policy: RehitPolicy = RehitPolicy.ONCE_PER_ATTACK
 
@@ -66,6 +67,7 @@ func end_attack() -> void:
 	_active = false
 	_damage = null
 	_hit_actors.clear()
+	_hit_crates.clear()
 	_contact_areas_by_actor.clear()
 	_rehit_policy = RehitPolicy.ONCE_PER_ATTACK
 	set_physics_process(false)
@@ -93,6 +95,39 @@ func sample_shape() -> void:
 			_on_area_entered(result.collider as Area3D)
 			if not _active:
 				return
+		if _damage.crate_knockback_distance > 0.0:
+			_sample_crates(collider)
+
+
+func _sample_crates(collider: CollisionShape3D) -> void:
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = collider.shape
+	query.transform = collider.global_transform
+	query.collision_mask = CombatLayers.WORLD
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	for result in get_world_3d().direct_space_state.intersect_shape(query, 64):
+		var crate := result.collider as PushableCrate
+		if crate == null or _hit_crates.has(crate.get_instance_id()):
+			continue
+		if not _can_reach_crate(crate):
+			continue
+		var distance := _damage.crate_knockback_distance * maxf(
+			0.0, _damage.knockback_multiplier
+		)
+		if crate.request_knockback(_damage.direction, distance):
+			_hit_crates[crate.get_instance_id()] = true
+			crate.play_weapon_impact_feedback(_damage.direction)
+
+
+func _can_reach_crate(crate: PushableCrate) -> bool:
+	if not _damage.source is Node3D:
+		return false
+	var origin: Vector3 = (_damage.source as Node3D).global_position + Vector3.UP * 0.75
+	var destination: Vector3 = crate.global_position + Vector3.UP * 0.75
+	var ray := PhysicsRayQueryParameters3D.create(origin, destination, CombatLayers.WORLD)
+	var hit := get_world_3d().direct_space_state.intersect_ray(ray)
+	return not hit.is_empty() and hit.collider == crate
 
 
 func _on_area_entered(area: Area3D) -> void:

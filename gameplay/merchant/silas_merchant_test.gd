@@ -404,7 +404,7 @@ func _test_npc_scene_smoke() -> void:
 		)
 		panel.reroll_button.pressed.emit()
 		_assert_true(panel._catalog != session_stock, "debug button creates a new stock catalog")
-		_assert_equal(SilasShopPanel.GRID_COLUMNS, 4, "shop grid uses the mockup's four columns")
+		_assert_equal(panel.grid_columns, 4, "shop grid uses the mockup's four columns")
 		var first_buy_slot := panel.grid.get_child(0) as SilasShopSlot
 		_assert_true(first_buy_slot != null, "shop uses the Silas slot art")
 		_assert_true(panel.buy_tab is TextureButton, "buy tab uses the supplied texture")
