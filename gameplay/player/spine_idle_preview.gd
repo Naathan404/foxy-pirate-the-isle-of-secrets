@@ -5,6 +5,8 @@ extends Node3D
 @export_file("*.tres")
 var skeleton_data_path: String = "res://assets/spine/compat/foxy_skeleton.tres"
 @export var spine_animation: String = "animation"
+## Scale the fitted Spine artwork without moving its feet from the sprite baseline.
+@export_range(0.25, 3.0, 0.05, "or_greater") var size_multiplier: float = 1.0
 
 var _spine: Node3D
 var _load_attempted: bool = false
@@ -109,7 +111,11 @@ func sync_animation(
 	if not is_instance_valid(active_camera):
 		active_camera = get_viewport().get_camera_3d()
 	if is_instance_valid(active_camera):
-		var direction: Vector3 = get_parent().to_local(active_camera.global_position) - position
+		# Face the camera's view direction. Its position slides sideways at map
+		# bounds, which must not yaw the flat Spine artwork.
+		var direction: Vector3 = (
+			get_parent().global_basis.inverse() * active_camera.global_basis.z
+		)
 		rotation.y = atan2(direction.x, direction.z)
 
 
@@ -146,7 +152,7 @@ func _fit_to_sprite() -> void:
 	var bounds: AABB = _spine.get_aabb()
 	if bounds.size.y <= 0.0 or _reference_height <= 0.0:
 		return
-	var factor := _reference_height / bounds.size.y
+	var factor := _reference_height / bounds.size.y * size_multiplier
 	_spine.scale = Vector3.ONE * factor
 	_spine.position = (
 		Vector3(-bounds.get_center().x * factor, -bounds.position.y * factor, 0.0)

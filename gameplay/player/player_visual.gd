@@ -43,11 +43,27 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	_face_sprites_to_camera()
 	if get_node("/root/HitstopController").is_frozen(get_parent()):
 		return
 	# Camera đổi góc thì sprite cũng đổi hướng theo
 	if not _action.is_empty():
 		_update_directional_animation()
+
+
+func _face_sprites_to_camera() -> void:
+	var active_camera := _camera
+	if not is_instance_valid(active_camera):
+		active_camera = get_viewport().get_camera_3d()
+	if not is_instance_valid(active_camera):
+		return
+	var direction: Vector3 = global_basis.inverse() * active_camera.global_basis.z
+	var yaw := atan2(direction.x, direction.z)
+	if is_instance_valid(sprite):
+		sprite.rotation.y = yaw
+	for action_sprite: Sprite3D in _action_sprites.values():
+		if is_instance_valid(action_sprite):
+			action_sprite.rotation.y = yaw
 
 
 # Mỗi hành động cần đủ 3 animation: down, up và side

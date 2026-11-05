@@ -30,6 +30,9 @@ ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_sky_contribution = 0.53
 ambient_light_energy = 0.72
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_wq86g"]
+size = Vector3(2, 2, 6)
+
 [node name="CoralValley" type="Node3D" unique_id=1021252524]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
 
@@ -180,7 +183,22 @@ destination_trigger_id = &"Coral_2"
 script = ExtResource("camera_bounds")
 
 [node name="CornerA" type="Marker3D" parent="CameraBounds" unique_id=585291780]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -280, 0, -72)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -306.5986, 0, -72)
 
 [node name="CornerB" type="Marker3D" parent="CameraBounds" unique_id=585331915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 242)
+
+[node name="SceneChangeTrigger2" parent="." unique_id=588801232 instance=ExtResource("12_wm6vx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -289.97922, 3.9818935, 144.155)
+trigger_id = &"cv_1"
+destination_scene = "uid://cj86kg5fm6gue"
+destination_trigger_id = &"hub_right"
+
+[node name="CollisionShape3D" parent="SceneChangeTrigger2" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.97683716)
+shape = SubResource("BoxShape3D_wq86g")
+
+[node name="ExitPosition" parent="SceneChangeTrigger2" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.487, 1, -0.213)
+
+[editable path="SceneChangeTrigger2"]
