@@ -11,6 +11,7 @@ const DASH_SOUND: AudioStream = preload("res://assets/audio/combat/bow_release.w
 @export_range(0.0, 1.0, 0.01) var recoil_distance: float = 0.38
 @export_range(0.1, 1.0, 0.01) var recoil_phase: float = 0.4
 @export_range(0.1, 1.0, 0.01) var afterimage_spacing: float = 0.42
+@export_range(0.0, 3.0, 0.05) var crate_knockback_distance: float = 1.1
 
 var _body: CharacterBody3D
 var _saved_mask: int = 0
@@ -100,6 +101,7 @@ func activate() -> void:
 	_trail.set("fade_seconds", 0.38)
 	get_parent().add_child(_trail)
 	_trail.call("push_point", _body.global_position + Vector3.UP * 0.8 + context.direction)
+	context.crate_knockback_distance = crate_knockback_distance
 	super.activate()
 	get_node("/root/AudioManager").play_sfx_3d(DASH_SOUND, _body.global_position, -9.0, 0.9)
 	get_node("/root/ScreenShakeController").request(3.5, 0.13)

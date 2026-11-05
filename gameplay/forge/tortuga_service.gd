@@ -41,7 +41,7 @@ func craft(weapon_id: StringName) -> String:
 		return "Not enough gold or materials."
 	if not _pay(recipe.gold_cost, recipe.ingredients):
 		return "Payment failed."
-	if not weapons.grant_weapon(weapon_id):
+	if not weapons.grant_unforged_weapon(weapon_id):
 		_refund(recipe.gold_cost, recipe.ingredients)
 		return "Unable to grant weapon."
 	return ""

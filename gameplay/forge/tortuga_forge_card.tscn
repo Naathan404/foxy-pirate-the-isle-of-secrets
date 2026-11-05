@@ -80,7 +80,7 @@ horizontal_scroll_mode = 0
 scroll_hint_mode = 1
 
 [node name="Rows" type="Control" parent="StatsScroll" unique_id=546786024]
-custom_minimum_size = Vector2(350, 250)
+custom_minimum_size = Vector2(330, 250)
 layout_mode = 2
 mouse_filter = 2
 

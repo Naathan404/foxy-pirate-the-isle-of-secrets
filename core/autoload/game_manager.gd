@@ -119,6 +119,10 @@ func _transition_scene(
 		await get_tree().scene_changed
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
+		# Camera processing is paused during the fade. Position it at the arrival
+		# point now, then render a fully black frame before revealing the scene.
+		_settle_arrival_camera()
+		await get_tree().process_frame
 	await _fade_to(0.0, fade_in_seconds)
 	_transition_overlay.hide()
 	if is_instance_valid(player):
@@ -154,6 +158,16 @@ func _place_player_at_trigger(trigger_id: StringName) -> void:
 	player.global_position = destination.get_exit_position()
 	player.velocity = Vector3.ZERO
 	player.reset_physics_interpolation()
+
+
+func _settle_arrival_camera() -> void:
+	if not is_instance_valid(player) or not is_instance_valid(player.camera):
+		return
+	var follow_camera := player.camera as BoundedFollowCamera3D
+	if follow_camera != null:
+		follow_camera.snap_to_follow()
+	else:
+		player.camera.reset_physics_interpolation()
 
 
 func _fade_to(alpha: float, duration: float) -> void:

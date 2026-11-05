@@ -3,10 +3,10 @@
 [ext_resource type="Texture2D" uid="uid://df3exqonch8fi" path="res://assets/ui/silas_shop/PNG/35_detail_panel_blank_optional.png" id="1_amf7s"]
 
 [resource]
-content_margin_left = 32.0
-content_margin_top = 29.0
-content_margin_right = 32.0
-content_margin_bottom = 25.0
+content_margin_left = 44.0
+content_margin_top = 38.0
+content_margin_right = 44.0
+content_margin_bottom = 38.0
 texture = ExtResource("1_amf7s")
 texture_margin_left = 38.0
 texture_margin_top = 38.0

@@ -111,6 +111,15 @@ func _check_trigger(manager: Node) -> void:
 	)
 	_check(arrival_player.velocity.is_zero_approx(), "Arrival clears Player velocity")
 	_check(paused, "Player placed before gameplay resumes")
+	var arrival_camera := arrival_player.camera as BoundedFollowCamera3D
+	_check(arrival_camera != null, "Arrival Player has a bounded follow camera")
+	if arrival_camera != null:
+		_check(
+			arrival_camera.global_position.is_equal_approx(
+				arrival_player.global_position + Vector3(0.0, 24.0, 24.0)
+			),
+			"Camera follows destination marker before fade-in"
+		)
 	await manager.scene_transition_finished
 	_check(previous_world.get_ref() == null, "Player overlap replaces source scene")
 	_check(current_scene.scene_file_path == ARRIVAL_MAP, "Trigger reaches destination")

@@ -35,6 +35,8 @@ var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
 ## Forge snapshot; the combo step's authored knockback is applied when building damage.
 var knockback_multiplier: float = 1.0
+## Physical push for crates; zero leaves scenery unaffected.
+var crate_knockback_distance: float = 0.0
 var combo_index: int = 0
 var combo_step: MeleeComboStep
 var active_seconds: float = 0.125
@@ -58,6 +60,7 @@ func create_damage_context() -> DamageContext:
 	damage.origin = origin
 	damage.direction = direction
 	damage.knockback_multiplier = knockback_multiplier
+	damage.crate_knockback_distance = crate_knockback_distance
 	if combo_step != null:
 		damage.knockback_multiplier *= combo_step.knockback_multiplier
 	return damage

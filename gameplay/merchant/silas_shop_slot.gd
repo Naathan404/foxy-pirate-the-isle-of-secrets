@@ -3,6 +3,10 @@ extends Control
 
 signal clicked
 
+@export_group("Slot Colors")
+@export var unavailable_tint := Color(0.58, 0.56, 0.52)
+@export var hover_tint := Color(1.15, 1.12, 1.05)
+
 @onready var frame: TextureRect = $Frame
 @onready var icon: TextureRect = $Icon
 @onready var quantity_label: Label = $Quantity
@@ -40,8 +44,8 @@ func set_selected(selected: bool) -> void:
 
 
 func set_unavailable(unavailable: bool) -> void:
-	modulate = Color(0.58, 0.56, 0.52) if unavailable else Color.WHITE
+	modulate = unavailable_tint if unavailable else Color.WHITE
 
 
 func _set_hovered(hovered: bool) -> void:
-	frame.modulate = Color(1.15, 1.12, 1.05) if hovered else Color.WHITE
+	frame.modulate = hover_tint if hovered else Color.WHITE

@@ -22,6 +22,13 @@ func _process(_delta: float) -> void:
 	set_bounded_global_position(global_position)
 
 
+func snap_to_follow() -> void:
+	_dialogue_override = false
+	position = _follow_offset
+	set_bounded_global_position(global_position)
+	reset_physics_interpolation()
+
+
 func begin_dialogue_override() -> void:
 	_dialogue_override = true
 

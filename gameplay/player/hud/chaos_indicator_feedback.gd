@@ -10,6 +10,19 @@ extends TextureRect
 @export var decay_tint: Color = Color(0.80, 0.65, 1.25)
 @export var rejected_tint: Color = Color(1.25, 0.30, 0.25)
 @export_range(0.4, 3.0, 0.1, "suffix:s") var ready_pulse_seconds: float = 1.2
+@export_group("Flash Strength")
+@export_range(1.0, 1.5, 0.01) var ready_flash_scale := 1.18
+@export_range(0.01, 1.0, 0.01) var ready_flash_duration := 0.35
+@export_range(1.0, 1.5, 0.01) var gain_flash_scale := 1.10
+@export_range(0.01, 1.0, 0.01) var gain_flash_duration := 0.25
+@export_range(0.5, 1.2, 0.01) var spent_flash_scale := 0.88
+@export_range(0.01, 1.0, 0.01) var spent_flash_duration := 0.30
+@export_range(1.0, 1.2, 0.01) var decay_flash_scale := 1.04
+@export_range(0.01, 1.0, 0.01) var decay_flash_duration := 0.35
+@export_range(1.0, 1.5, 0.01) var rejected_flash_scale := 1.08
+@export_range(0.01, 1.0, 0.01) var rejected_flash_duration := 0.25
+@export_range(1.0, 1.2, 0.01) var ready_pulse_scale := 1.05
+@export_range(0.0, 0.5, 0.01) var ready_tint_lighten := 0.25
 
 var _chaos: ChaosComponent
 var _weapons: WeaponController
@@ -67,9 +80,9 @@ func set_stat(current: float, maximum: float) -> void:
 		_initialized = true
 		_settle()
 	elif _is_full() and not was_full:
-		_flash(ready_tint, 1.18, 0.35)
+		_flash(ready_tint, ready_flash_scale, ready_flash_duration)
 	elif gained:
-		_flash(gain_tint, 1.10, 0.25)
+		_flash(gain_tint, gain_flash_scale, gain_flash_duration)
 	elif not _is_full():
 		if _pulse_tween != null and _pulse_tween.is_valid():
 			_pulse_tween.kill()
@@ -79,17 +92,17 @@ func set_stat(current: float, maximum: float) -> void:
 
 
 func _on_decay_started() -> void:
-	_flash(decay_tint, 1.04, 0.35)
+	_flash(decay_tint, decay_flash_scale, decay_flash_duration)
 
 
 func _on_attack_started(context: AttackContext) -> void:
 	if context.action == &"secondary" and not _weapons.is_aiming():
-		_flash(spent_tint, 0.88, 0.30)
+		_flash(spent_tint, spent_flash_scale, spent_flash_duration)
 
 
 func _on_charge_released(context: AttackContext) -> void:
 	if context.action == &"secondary":
-		_flash(spent_tint, 0.88, 0.30)
+		_flash(spent_tint, spent_flash_scale, spent_flash_duration)
 
 
 func _on_action_rejected(action: StringName) -> void:
@@ -105,7 +118,7 @@ func _on_action_rejected(action: StringName) -> void:
 		or _weapons.equipped.get_attack(&"secondary") == null
 	):
 		return
-	_flash(rejected_tint, 1.08, 0.25)
+	_flash(rejected_tint, rejected_flash_scale, rejected_flash_duration)
 
 
 func _flash(tint: Color, size_factor: float, seconds: float) -> void:
@@ -138,9 +151,9 @@ func _settle() -> void:
 	_pulse_tween = create_tween().set_loops().set_parallel(true)
 	_pulse_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_pulse_tween.tween_property(
-		self, "modulate", _base_tint * ready_tint.lightened(0.25), half_cycle
+		self, "modulate", _base_tint * ready_tint.lightened(ready_tint_lighten), half_cycle
 	)
-	_pulse_tween.tween_property(self, "_size_factor", 1.05, half_cycle)
+	_pulse_tween.tween_property(self, "_size_factor", ready_pulse_scale, half_cycle)
 	_pulse_tween.chain().tween_property(self, "modulate", _rest_color(), half_cycle)
 	_pulse_tween.parallel().tween_property(self, "_size_factor", 1.0, half_cycle)
 

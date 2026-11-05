@@ -6,6 +6,7 @@ extends PanelContainer
 @export var hud_layer: CanvasLayer
 @export var bars: Array[ArcTooltipBar] = []
 @export_range(0.0, 1.0, 0.05) var tooltip_delay: float = 0.2
+@export var cursor_offset := Vector2(14.0, 18.0)
 
 var _hovered_bar: ArcTooltipBar
 var _hover_time: float = 0.0
@@ -49,7 +50,7 @@ func _process(delta: float) -> void:
 	# Chuyển từ tọa độ viewport sang CanvasLayer để giữ đúng vị trí khi scale HUD.
 	var to_local := hud_layer.get_final_transform().affine_inverse()
 	var visible_rect := to_local * get_viewport().get_visible_rect()
-	var desired := to_local * (_mouse_position + Vector2(14.0, 18.0))
+	var desired := to_local * (_mouse_position + cursor_offset)
 	position = (
 		desired
 		. clamp(visible_rect.position, (visible_rect.end - size).max(visible_rect.position))

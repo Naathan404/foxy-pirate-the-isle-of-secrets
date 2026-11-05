@@ -30,6 +30,7 @@ var origin: Vector3 = Vector3.ZERO
 var direction: Vector3 = Vector3.BACK
 var target_defeated: bool = false
 var knockback_multiplier: float = 1.0
+var crate_knockback_distance: float = 0.0
 
 # Mỗi Charm ghi kết quả theo ID để event lặp không roll hoặc áp dụng lần hai.
 var proc_results: Dictionary[StringName, Dictionary] = {}
@@ -54,6 +55,7 @@ func create_hit_copy(hit_target: Node = null) -> DamageContext:
 	result.origin = origin
 	result.direction = direction
 	result.knockback_multiplier = knockback_multiplier
+	result.crate_knockback_distance = crate_knockback_distance
 	return result
 
 

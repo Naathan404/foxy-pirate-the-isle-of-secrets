@@ -4,7 +4,15 @@ extends Control
 signal option_chosen(index: int)
 
 const ROW_SCENE: PackedScene = preload("res://gameplay/forge/tortuga_stat_row.tscn")
-const ROW_HEIGHT := 32.0
+const OPTION_COUNT := 2
+const BASE_MULTIPLIER := 1.0
+const PERCENT_SCALE := 100.0
+const MAX_WINDOW_SCALE := 1.0
+
+@export_group("Comparison Layout")
+@export_range(16.0, 64.0, 1.0) var row_height := 32.0
+@export_range(80.0, 500.0, 1.0) var minimum_rows_height := 250.0
+@export var reference_viewport_size := Vector2(950.0, 590.0)
 
 @onready var window: Control = $Window
 @onready var cards: Array[Control] = [$Window/CardA, $Window/CardB]
@@ -20,10 +28,10 @@ func _ready() -> void:
 
 
 func show_choices(weapon: WeaponInstance, choices: Array[WeaponForge]) -> void:
-	if weapon == null or choices.size() != 2:
+	if weapon == null or choices.size() != OPTION_COUNT:
 		return
 	$Window/Subtitle.text = "Payment complete. Select one result to continue."
-	for index in 2:
+	for index in OPTION_COUNT:
 		_fill_card(cards[index], weapon, choices[index])
 	show()
 	_fit_window()
@@ -37,12 +45,12 @@ func _fill_card(card: Control, weapon: WeaponInstance, forge: WeaponForge) -> vo
 		rows.remove_child(child)
 		child.queue_free()
 	var values := _comparison_rows(weapon, forge)
-	rows.custom_minimum_size.y = maxf(250.0, values.size() * ROW_HEIGHT)
+	rows.custom_minimum_size.y = maxf(minimum_rows_height, values.size() * row_height)
 	for index in values.size():
 		var value: Dictionary = values[index]
 		var row := ROW_SCENE.instantiate() as Control
 		rows.add_child(row)
-		row.position = Vector2(0, index * ROW_HEIGHT)
+		row.position = Vector2(0, index * row_height)
 		row.call(&"set_comparison", value.title, value.before, value.after, value.trend)
 
 
@@ -68,8 +76,8 @@ func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dict
 	_add_metric(
 		result,
 		"Crit chance",
-		clampf(data.critical_rate + _bonus(old, "critical_rate_bonus"), 0.0, 1.0) * 100.0,
-		clampf(data.critical_rate + chosen.critical_rate_bonus, 0.0, 1.0) * 100.0,
+		clampf(data.critical_rate + _bonus(old, "critical_rate_bonus"), 0.0, 1.0) * PERCENT_SCALE,
+		clampf(data.critical_rate + chosen.critical_rate_bonus, 0.0, 1.0) * PERCENT_SCALE,
 		"%.0f%%"
 	)
 	_add_metric(
@@ -140,7 +148,7 @@ func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dict
 			chosen.skill_damage_multiplier,
 			"%.2fx"
 		)
-	elif chosen.skill_damage_multiplier != 1.0:
+	elif chosen.skill_damage_multiplier != BASE_MULTIPLIER:
 		_add_na(result, "Skill damage")
 	_add_metric(
 		result, "Windup", _value(old, "windup_multiplier"), chosen.windup_multiplier, "%.2fx", true
@@ -164,7 +172,7 @@ func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dict
 			chosen.melee_hitbox_multiplier,
 			"%.2fx"
 		)
-	elif chosen.melee_hitbox_multiplier != 1.0:
+	elif chosen.melee_hitbox_multiplier != BASE_MULTIPLIER:
 		_add_na(result, "Melee hitbox")
 	if attack.delivery_type == AttackData.DeliveryType.PROJECTILE:
 		_add_metric(
@@ -181,7 +189,7 @@ func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dict
 			chosen.projectile_knockback_multiplier,
 			"%.2fx"
 		)
-	elif chosen.projectile_speed_multiplier != 1.0:
+	elif chosen.projectile_speed_multiplier != BASE_MULTIPLIER:
 		_add_na(result, "Projectile speed")
 	if attack.stamina_cost > 0.0:
 		_add_metric(
@@ -199,7 +207,7 @@ func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dict
 			chosen.stamina_damage_multiplier,
 			"%.2fx"
 		)
-	elif chosen.stamina_damage_multiplier != 1.0:
+	elif chosen.stamina_damage_multiplier != BASE_MULTIPLIER:
 		_add_na(result, "Stamina damage")
 	return result
 
@@ -234,7 +242,7 @@ func _add_na(rows: Array[Dictionary], title: String) -> void:
 
 
 func _value(forge: WeaponForge, property: String) -> float:
-	return float(forge.get(property)) if forge != null else 1.0
+	return float(forge.get(property)) if forge != null else BASE_MULTIPLIER
 
 
 func _bonus(forge: WeaponForge, property: String) -> float:
@@ -251,4 +259,10 @@ func _on_choose(index: int) -> void:
 
 func _fit_window() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	window.scale = Vector2.ONE * minf(1.0, minf(viewport_size.x / 950.0, viewport_size.y / 590.0))
+	window.scale = Vector2.ONE * minf(
+		MAX_WINDOW_SCALE,
+		minf(
+			viewport_size.x / reference_viewport_size.x,
+			viewport_size.y / reference_viewport_size.y
+		)
+	)
