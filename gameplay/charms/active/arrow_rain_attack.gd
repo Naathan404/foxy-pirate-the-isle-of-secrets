@@ -86,7 +86,9 @@ func _quadratic_bezier(progress: float) -> Vector3:
 
 
 func _quadratic_bezier_derivative(progress: float) -> Vector3:
-	return 2.0 * ((1.0 - progress) * (flight_control - flight_start) + progress * (flight_end - flight_control))
+	var first_tangent := (1.0 - progress) * (flight_control - flight_start)
+	var second_tangent := progress * (flight_end - flight_control)
+	return 2.0 * (first_tangent + second_tangent)
 
 
 func _sweep_hit(from: Vector3, to: Vector3) -> void:

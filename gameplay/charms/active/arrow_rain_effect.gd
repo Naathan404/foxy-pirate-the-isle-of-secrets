@@ -137,7 +137,8 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 	# on the outer rim, while remaining deterministic for replays and tests.
 	var angle := float(index) * 2.39996323
 	var radial_fraction := sqrt((float(index) + 0.5) / float(count))
-	var impact_position := _target_position + Vector3(cos(angle), 0.0, sin(angle)) * radius * radial_fraction
+	var radial_offset := Vector3(cos(angle), 0.0, sin(angle)) * radius * radial_fraction
+	var impact_position := _target_position + radial_offset
 	# Keep the impact/damage facing stable for downstream knockback and callbacks;
 	# the arrow sprite itself follows the parabolic tangent independently.
 	execution.context.direction = Vector3.BACK
