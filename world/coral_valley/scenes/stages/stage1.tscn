@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island3.tscn" id="3_r5dp7"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island4.tscn" id="4_2g3gq"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="6_r5dp7"]
+[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="7_2g3gq"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -27,6 +28,9 @@ ambient_light_energy = 0.72
 
 [node name="Bridge" parent="." unique_id=334634608 instance=ExtResource("1_u7cb7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, -2, 123)
+
+[node name="Bridge2" parent="." unique_id=2121986817 instance=ExtResource("1_u7cb7")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -51.000004, -2, 198)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=370744154]
 environment = SubResource("Environment_1h7xg")
@@ -62,6 +66,7 @@ environment = null
 visible = false
 
 [node name="CoralIsland4" parent="." unique_id=1550301546 instance=ExtResource("4_2g3gq")]
+transform = Transform3D(-1.5893256e-08, 0, 1, 0, 1, 0, -1, 0, -1.5893256e-08, -363.99997, 0, 88)
 
 [node name="WorldEnvironment" parent="CoralIsland4" index="0"]
 environment = null
@@ -85,6 +90,9 @@ transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 0.8, 34, 0, 54)
 
 [node name="SeaWater5" parent="SeaWaters" unique_id=495989288 instance=ExtResource("6_r5dp7")]
 transform = Transform3D(1.232, 0, 0, 0, 1, 0, 0, 0, 0.24000001, 51.247997, 0, 145.20001)
+
+[node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("7_2g3gq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -257, 0, 156)
 
 [editable path="CoralIsland8"]
 [editable path="CoralIsland2"]
