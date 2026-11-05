@@ -164,6 +164,21 @@ func _test_runtime_debug_inspector(manager: CharmSocketManager, registry: CharmR
 		&"",
 		"runtime inspector clears selected socket",
 	)
+	manager.set_safe_location(false)
+	_assert_true(manager.debug_set_all_charms(true), "debug grant applies to current registry")
+	_assert_true(registry.is_owned(ARROW_RAIN.charm_id), "debug grant owns Arrow Rain")
+	_assert_true(
+		manager.debug_equip_charm(ARROW_RAIN.charm_id, CharmConstants.SocketId.Q),
+		"debug equip works outside safe location",
+	)
+	_assert_equal(
+		manager.get_equipped_charm(CharmConstants.SocketId.Q),
+		ARROW_RAIN.charm_id,
+		"debug equip selects Arrow Rain outside safe location",
+	)
+	_assert_true(manager.debug_set_all_charms(false), "debug clear removes current ownership")
+	_assert_false(registry.is_owned(ARROW_RAIN.charm_id), "debug clear removes Arrow Rain ownership")
+	manager.set_safe_location(true)
 
 
 func _test_snapshot(world: Node3D, manager: CharmSocketManager, registry: CharmRegistry) -> void:

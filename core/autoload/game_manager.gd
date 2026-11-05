@@ -16,6 +16,9 @@ var player: Player
 var inventory: Inventory
 var gold_wallet: GoldWallet = GoldWallet.new()
 var state: State = State.PLAYING
+# Debug-only progression flag. Each map owns a fresh Player scene, so keep the
+# HUD grant state on the autoload instead of on the scene-local CharmRegistry.
+var debug_all_charms_granted: bool = false
 var _transition_pending: bool = false
 var _transition_overlay: CanvasLayer
 var _fade_rect: ColorRect
@@ -35,7 +38,19 @@ func register_player(active_player: Player) -> void:
 		player.inventory_ui.close_inventory(true)
 	player = active_player
 	inventory = player.get_node_or_null("Inventory") as Inventory
+	if (
+		OS.is_debug_build()
+		and debug_all_charms_granted
+		and is_instance_valid(player.charm_socket_manager)
+	):
+		player.charm_socket_manager.debug_set_all_charms(true)
 	player_changed.emit(player)
+
+
+func set_debug_all_charms_granted(granted: bool) -> void:
+	if not OS.is_debug_build():
+		return
+	debug_all_charms_granted = granted
 
 
 func unregister_player(departing_player: Player) -> void:

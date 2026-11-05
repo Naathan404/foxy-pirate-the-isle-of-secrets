@@ -318,9 +318,18 @@ func debug_toggle_all_charms() -> bool:
 	if not OS.is_debug_build() or not is_node_ready() or not is_instance_valid(registry):
 		return false
 	var should_grant := not debug_all_charms_owned()
+	debug_set_all_charms(should_grant)
+	return should_grant
+
+
+## Applies the HUD debug grant to this scene-local Registry.
+## Ownership is intentionally separate from loadout/equip state.
+func debug_set_all_charms(granted: bool) -> bool:
+	if not OS.is_debug_build() or not is_node_ready() or not is_instance_valid(registry):
+		return false
 	var changed_count := 0
 	var added_debug_safe_source := false
-	if not should_grant:
+	if not granted:
 		added_debug_safe_source = not can_change_loadout()
 		if added_debug_safe_source:
 			enter_safe_location(self)
@@ -328,17 +337,33 @@ func debug_toggle_all_charms() -> bool:
 			if not get_equipped_charm(socket_id).is_empty():
 				unequip_charm(socket_id)
 	for charm_id: StringName in registry.get_registered_ids():
-		if registry._debug_set_owned(charm_id, should_grant):
+		if registry._debug_set_owned(charm_id, granted):
 			changed_count += 1
 	_end_debug_loadout_change(added_debug_safe_source)
 	notify_property_list_changed()
 	print(
 		(
 			"Charm debug: %s ownership for %d registered Charms"
-			% ["granted" if should_grant else "cleared", changed_count]
+			% ["granted" if granted else "cleared", changed_count]
 		)
 	)
-	return should_grant
+	return true
+
+
+## Debug-only UI path. It keeps normal equip rules unchanged in release builds,
+## while allowing the inventory to equip an owned Charm on any test map.
+func can_debug_change_loadout(charm_id: StringName = &"") -> bool:
+	if not OS.is_debug_build() or not is_node_ready() or not is_instance_valid(registry):
+		return false
+	return charm_id.is_empty() or registry.is_owned(charm_id)
+
+
+func debug_equip_charm(charm_id: StringName, socket_id: int) -> bool:
+	return _debug_equip_charm(charm_id, socket_id)
+
+
+func debug_unequip_charm(socket_id: int) -> bool:
+	return _debug_unequip_charm(socket_id)
 
 
 func _debug_unequip_charm(socket_id: int) -> bool:

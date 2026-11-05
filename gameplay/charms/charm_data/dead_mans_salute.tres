@@ -2,12 +2,14 @@
 
 [ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/dead_mans_salute_effect.tscn" id="2_effect"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/dead_mans_salute.png" id="3_icon"]
 
 [resource]
 script = ExtResource("1_data")
 charm_id = &"dead_mans_salute"
 display_name = "Dead Man's Salute"
 description = "Prototype: hold to charge, spending 100 SP per second, then release a blast."
+sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
 resource_cost = 0.0
