@@ -98,22 +98,22 @@ data = {
 }
 metadata/_editor_floor_ = Vector3(0, -3, 0)
 
-[node name="SeaWater" parent="CoralIsland7" index="3" unique_id=116442875]
-visible = true
-
 [node name="SeaWaters" type="Node3D" parent="." unique_id=635377205]
 
 [node name="SeaWater" parent="SeaWaters" unique_id=2022102145 instance=ExtResource("6_oxqnf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -107.93846, 0, -101.25624)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -153.93848, 0, -223.25624)
 
 [node name="SeaWater3" parent="SeaWaters" unique_id=1359795926 instance=ExtResource("6_oxqnf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.6500001, -107.49665, 0, 161.36629)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.6500001, 46.50335, 0, 42.566284)
 
 [node name="SeaWater4" parent="SeaWaters" unique_id=181283929 instance=ExtResource("6_oxqnf")]
-transform = Transform3D(0.9, 0, 0, 0, 1, 0, 0, 0, 1.6199999, 99.643486, 0, 158.03627)
+transform = Transform3D(0.9, 0, 0, 0, 1, 0, 0, 0, 1.6199999, -163.15651, 0, 38.156277)
+
+[node name="SeaWater5" parent="SeaWaters" unique_id=116442875 instance=ExtResource("6_oxqnf")]
+transform = Transform3D(0.17999998, 0, 0, 0, 1, 0, 0, 0, 1.2830399, -66.676544, 0, 82.168434)
 
 [node name="SeaWater2" parent="SeaWaters" unique_id=1390153836 instance=ExtResource("6_oxqnf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 91.166306, 0, -102.58908)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.166306, 0, -221.58908)
 
 [editable path="CoralIsland1"]
 [editable path="CoralIsland5"]
