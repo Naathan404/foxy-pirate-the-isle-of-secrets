@@ -12,7 +12,8 @@ func _update(delta: float) -> void:
 	var barrel := enemy as Barrel
 	if barrel == null or not barrel.update_attack_cooldown(delta):
 		return
-	if not enemy.has_target():
+	if not barrel.can_trigger_attack():
 		return
-	barrel.aim_at_target()
+	if barrel.should_aim_at_target() and enemy.has_target():
+		barrel.aim_at_target()
 	request_state(&"shoot")
