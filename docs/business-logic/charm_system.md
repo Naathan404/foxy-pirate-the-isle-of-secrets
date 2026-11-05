@@ -285,13 +285,16 @@ Trong debug build, Remote Inspector của `Player/CharmSocketManager` có nhóm
 3. Charm được equip ngay; socket cần thiết được mở tạm trong instance đang chạy.
 4. Chọn `<Unequip>` để tháo Charm khỏi socket đang chọn.
 
-Scene Foxy luôn khởi động với ownership/loadout Charm sạch. Trong debug build có nút
-`Grant All Charms` ở HUD; lần bấm đầu grant ownership cho toàn bộ Charm đã đăng ký (15
-Charm hiện tại), lần bấm tiếp theo đổi thành `Clear All Charms` và xoá ownership/equip hiện
-tại. Nút không tự equip Charm sau khi grant và không có hiệu lực trong release build.
+Scene Foxy khởi động với loadout Charm sạch. Trong debug build có nút `Grant All Charms` ở HUD;
+lần bấm đầu grant ownership cho toàn bộ Charm đã đăng ký (15 Charm hiện tại), lần bấm tiếp theo
+đổi thành `Clear All Charms` và xoá ownership/equip hiện tại. Trạng thái grant được giữ qua
+scene transition để Player mới ở map tiếp theo vẫn sở hữu các Charm đó. Nút không tự equip
+Charm sau khi grant và không có hiệu lực trong release build.
 
-Debug equip bỏ qua ownership và safe-location restriction, không grant ownership và bị từ chối
-trong release build. Nó chỉ phục vụ gameplay verification, không phải flow sản phẩm.
+Debug equip qua Remote Inspector bỏ qua ownership và safe-location restriction, không grant
+ownership và bị từ chối trong release build. Trong debug build, Equipment UI dùng đường debug
+này cho Charm đã owned, cho phép test equip/unequip và mở socket trên map không có Checkpoint.
+Nó chỉ phục vụ gameplay verification, không phải flow sản phẩm.
 
 ## 14. Dependency và giới hạn hiện tại
 

@@ -14,17 +14,22 @@ charm_type = 0
 effect_scene = ExtResource("2_effect")
 resource_cost = 100.0
 cooldown_seconds = 6.0
-proc_chance = null
 acquisition_source = &"merchant_or_enemy_drop"
 drop_chance = 0.05
 tags = Array[StringName]([&"active", &"projectile"])
 effect_params = {
 "damage_percent": 0.35,
+"flight_duration_seconds": 0.8,
+"flight_height_units": 5.0,
+"impact_activation_progress": 0.52,
+"impact_lifetime_seconds": 0.18,
+"impact_radius_units": 2.0,
 "projectile_count": 8,
 "projectile_length_units": 0.6,
 "projectile_speed": 12.0,
 "projectile_width_units": 0.18,
 "range_units": 8.0,
 "spawn_forward_offset": 0.6,
+"spawn_height_units": 0.8,
 "volley_duration_seconds": 1.4
 }

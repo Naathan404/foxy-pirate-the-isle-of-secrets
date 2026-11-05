@@ -2,12 +2,14 @@
 
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/passive/life_steal_effect.tscn" id="2_effect"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/life_steal.png" id="3_icon"]
 
 [resource]
 script = ExtResource("1_data")
 charm_id = &"life_steal"
 display_name = "Life Steal"
 description = "The 12th confirmed normal-attack hit restores 1 HP."
+sprite = ExtResource("3_icon")
 charm_type = null
 effect_scene = ExtResource("2_effect")
 resource_cost = null

@@ -77,10 +77,12 @@ func _ready() -> void:
 	_setup_combat()
 	dash_started.connect(_on_dash_started_for_crates)
 	_setup_charm_system()
-	_setup_debug_charm_button()
 	if is_instance_valid(potion_selector):
 		potion_selector.configure(self, potion)
 	get_node("/root/GameManager").register_player(self)
+	# GameManager applies the debug grant before the button reads its state. This
+	# keeps the label correct after entering a new map.
+	_setup_debug_charm_button()
 
 
 func _setup_debug_charm_button() -> void:
@@ -103,6 +105,9 @@ func _on_debug_grant_all_charms_pressed() -> void:
 	if not is_instance_valid(charm_socket_manager):
 		return
 	var granted := charm_socket_manager.debug_toggle_all_charms()
+	var game_manager := get_node_or_null("/root/GameManager")
+	if game_manager != null and game_manager.has_method("set_debug_all_charms_granted"):
+		game_manager.set_debug_all_charms_granted(granted)
 	if is_instance_valid(debug_grant_charms_button):
 		debug_grant_charms_button.text = "Clear All Charms" if granted else "Grant All Charms"
 

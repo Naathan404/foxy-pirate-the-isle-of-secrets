@@ -364,16 +364,23 @@ func _show_charm(charm: CharmData) -> void:
 	%SkillDescription.text = charm.description
 	%SkillDescription.tooltip_text = charm.description
 	var current := charms.get_equipped_charm(_socket)
+	var debug_loadout := charms.can_debug_change_loadout(charm.charm_id)
+	var can_edit_loadout := charms.can_change_loadout() or debug_loadout
+	var socket_available := charms.is_socket_unlocked(_socket) or debug_loadout
 	%EquipButton.text = (
 		"Unequip " + KEYS[_socket] if current == charm.charm_id else "Equip to " + KEYS[_socket]
 	)
 	%EquipButton.disabled = (
 		not owned
-		or not charms.can_change_loadout()
-		or not charms.is_socket_unlocked(_socket)
+		or not can_edit_loadout
+		or not socket_available
 		or (not current.is_empty() and current != charm.charm_id)
 	)
-	_set_action_hint("Change charms at a safe location.")
+	_set_action_hint(
+		"Change charms at a safe location."
+		if not debug_loadout
+		else "Debug equip is available on any map."
+	)
 	if charms.can_change_loadout():
 		_set_action_hint("Select Q, SPACE or E below Currently Equipped.")
 		if not charms.is_socket_unlocked(_socket):
@@ -391,10 +398,19 @@ func _equip_selected() -> void:
 		changed = true
 	elif _selection is CharmData:
 		var current := charms.get_equipped_charm(_socket)
+		var use_debug_loadout := charms.can_debug_change_loadout(_selection.charm_id)
 		if current == _selection.charm_id:
-			changed = charms.unequip_charm(_socket)
+			changed = (
+				charms.debug_unequip_charm(_socket)
+				if use_debug_loadout
+				else charms.unequip_charm(_socket)
+			)
 		else:
-			changed = charms.equip_charm(_selection.charm_id, _socket)
+			changed = (
+				charms.debug_equip_charm(_selection.charm_id, _socket)
+				if use_debug_loadout
+				else charms.equip_charm(_selection.charm_id, _socket)
+			)
 	refresh()
 	if changed:
 		if _selection is WeaponInstance:
