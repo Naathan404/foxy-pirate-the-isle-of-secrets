@@ -1,9 +1,11 @@
 [gd_scene format=3 uid="uid://c1xcg6aaua0r0"]
 
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island8.tscn" id="1_jsq15"]
-[ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island2.tscn" id="2_u7cb7"]
+[ext_resource type="PackedScene" uid="uid://d0fte67sn6yi0" path="res://world/hub/objects/bridge.tscn" id="1_u7cb7"]
+[ext_resource type="PackedScene" uid="uid://d1em755mvcub4" path="res://world/coral_valley/scenes/islands/coral_island2.tscn" id="2_u7cb7"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island3.tscn" id="3_r5dp7"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island4.tscn" id="4_2g3gq"]
+[ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="6_r5dp7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -23,6 +25,9 @@ ambient_light_energy = 0.72
 
 [node name="Stage 1" type="Node3D" unique_id=1275578970]
 
+[node name="Bridge" parent="." unique_id=334634608 instance=ExtResource("1_u7cb7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, -2, 123)
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=370744154]
 environment = SubResource("Environment_1h7xg")
 
@@ -32,6 +37,7 @@ light_energy = 0.35
 shadow_enabled = true
 
 [node name="CoralIsland8" parent="." unique_id=794729246 instance=ExtResource("1_jsq15")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 10)
 
 [node name="WorldEnvironment" parent="CoralIsland8" index="0"]
 environment = null
@@ -41,10 +47,13 @@ visible = false
 
 [node name="CoralIsland2" parent="." unique_id=225693629 instance=ExtResource("2_u7cb7")]
 
-[node name="WorldEnvironment" parent="CoralIsland2" index="0"]
+[node name="WorldEnvironment" parent="CoralIsland2" index="0" unique_id=1992690317]
 environment = null
 
-[node name="DirectionalLight3D" parent="CoralIsland2" index="1"]
+[node name="DirectionalLight3D" parent="CoralIsland2" index="1" unique_id=1661393056]
+visible = false
+
+[node name="SeaWater" parent="CoralIsland2" index="3" unique_id=116442875]
 visible = false
 
 [node name="CoralIsland3" parent="." unique_id=70048280 instance=ExtResource("3_r5dp7")]
@@ -62,6 +71,21 @@ environment = null
 
 [node name="DirectionalLight3D" parent="CoralIsland4" index="1"]
 visible = false
+
+[node name="SeaWater" parent="." unique_id=1688637613 instance=ExtResource("6_r5dp7")]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1, -246, 0, 78)
+
+[node name="SeaWater2" parent="." unique_id=1552811881 instance=ExtResource("6_r5dp7")]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1, -246, 0, 278)
+
+[node name="SeaWater3" parent="." unique_id=2015003361 instance=ExtResource("6_r5dp7")]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.1, 34, 0, 268.1)
+
+[node name="SeaWater4" parent="." unique_id=652098241 instance=ExtResource("6_r5dp7")]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 0.8, 34, 0, 54)
+
+[node name="SeaWater5" parent="." unique_id=495989288 instance=ExtResource("6_r5dp7")]
+transform = Transform3D(1.232, 0, 0, 0, 1, 0, 0, 0, 0.24000001, 51.247997, 0, 145.20001)
 
 [editable path="CoralIsland8"]
 [editable path="CoralIsland2"]
