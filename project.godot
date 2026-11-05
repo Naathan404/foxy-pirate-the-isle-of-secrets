@@ -36,6 +36,7 @@ directories/dtl_directory={
 "farewell": "res://dialog/npcs/silas/timelines/farewell.dtl",
 "first_meeting": "res://dialog/npcs/silas/timelines/first_meeting.dtl",
 "greeting": "res://dialog/npcs/mushroom/timelines/greeting.dtl",
+"master_tortuga/farewell": "res://dialog/npcs/master_tortuga/farewell.dtl",
 "master_tortuga/greeting": "res://dialog/npcs/master_tortuga/greeting.dtl",
 "timelines/greeting": "res://dialog/npcs/silas/timelines/greeting.dtl"
 }

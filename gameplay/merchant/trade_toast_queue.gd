@@ -3,6 +3,11 @@ extends Control
 
 ## A pause-safe FIFO queue used for successful merchant transactions.
 @export_range(0.2, 5.0, 0.1) var hold_duration := 1.0
+@export_group("Animation")
+@export_range(0.0, 40.0, 1.0) var enter_offset := 10.0
+@export_range(0.0, 40.0, 1.0) var exit_offset := 8.0
+@export_range(0.01, 1.0, 0.01) var enter_duration := 0.14
+@export_range(0.01, 1.0, 0.01) var exit_duration := 0.24
 
 var _pending: Array[String] = []
 var _showing := false
@@ -46,18 +51,20 @@ func _show_next() -> void:
 		return
 	_showing = true
 	message.text = _pending.pop_front()
-	panel.position = _rest_position + Vector2(0.0, -10.0)
+	panel.position = _rest_position + Vector2(0.0, -enter_offset)
 	panel.modulate.a = 0.0
 	panel.show()
 	_kill_tween()
 	_tween = create_tween().set_parallel(true)
 	_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	_tween.set_ignore_time_scale(true)
-	_tween.tween_property(panel, "position:y", _rest_position.y, 0.14)
-	_tween.tween_property(panel, "modulate:a", 1.0, 0.14)
-	_tween.tween_property(panel, "position:y", _rest_position.y - 8.0, 0.24).set_delay(hold_duration)
-	_tween.tween_property(panel, "modulate:a", 0.0, 0.24).set_delay(hold_duration)
-	_tween.tween_callback(_finish_current).set_delay(hold_duration + 0.24)
+	_tween.tween_property(panel, "position:y", _rest_position.y, enter_duration)
+	_tween.tween_property(panel, "modulate:a", 1.0, enter_duration)
+	_tween.tween_property(
+		panel, "position:y", _rest_position.y - exit_offset, exit_duration
+	).set_delay(hold_duration)
+	_tween.tween_property(panel, "modulate:a", 0.0, exit_duration).set_delay(hold_duration)
+	_tween.tween_callback(_finish_current).set_delay(hold_duration + exit_duration)
 
 
 func _finish_current() -> void:

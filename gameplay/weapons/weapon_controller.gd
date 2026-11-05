@@ -208,6 +208,17 @@ func grant_weapon(weapon_id: StringName) -> bool:
 	return set_weapon_owned(weapon_id, true) and is_weapon_owned(weapon_id)
 
 
+## Grants a freshly crafted weapon without inheriting a configured Forge.
+func grant_unforged_weapon(weapon_id: StringName) -> bool:
+	if weapon_id.is_empty() or is_weapon_owned(weapon_id):
+		return false
+	var entry := _find_collection_entry(weapon_id)
+	if entry == null:
+		return false
+	entry.forge = null
+	return set_weapon_owned(weapon_id, true) and is_weapon_owned(weapon_id)
+
+
 ## Replace the sole forge on an owned instance. Combat reads it on the next attack.
 func set_weapon_forge(weapon_id: StringName, new_forge: WeaponForge) -> bool:
 	var weapon := _find_owned_weapon(weapon_id)
@@ -289,8 +300,6 @@ func _sync_entry_ownership(entry: WeaponCollectionEntry) -> void:
 			var weapon := WeaponInstance.new()
 			weapon.definition = entry.definition
 			weapon.forge = entry.forge
-			if weapon.forge == null and default_weapon != null and default_weapon.weapon_id == id:
-				weapon.forge = default_forge
 			_owned.append(weapon)
 		return
 	var removing_equipped := equipped != null and equipped.definition.weapon_id == id

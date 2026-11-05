@@ -13,6 +13,13 @@ const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot
 @export_range(0.05, 0.5, 0.01) var close_duration: float = 0.12
 @export var selected_tab_scale: Vector2 = Vector2(1.12, 1.05)
 @export_range(0.05, 0.3, 0.01) var tab_feedback_duration: float = 0.12
+@export_range(0.0, 1.0, 0.01) var deselected_info_alpha := 0.55
+@export_range(0.01, 0.5, 0.01) var info_fade_duration := 0.12
+@export_range(1.0, 1.2, 0.01) var tab_click_punch_scale := 1.04
+@export_range(0.1, 1.0, 0.05) var tab_click_punch_duration_ratio := 0.6
+@export_range(0.5, 1.0, 0.01) var closed_background_scale := 0.96
+@export var selected_tab_tint := Color.WHITE
+@export var idle_tab_tint := Color.GRAY
 
 @export_group("Button labels")
 @export var equip_text: String = "Equip"
@@ -119,9 +126,9 @@ func _on_slot_clicked(index: int) -> void:
 	if selected_slot_index >= 0:
 		if _info_tween != null and _info_tween.is_valid():
 			_info_tween.kill()
-		info_layout.modulate.a = 0.55
+		info_layout.modulate.a = deselected_info_alpha
 		_info_tween = create_tween()
-		_info_tween.tween_property(info_layout, "modulate:a", 1.0, 0.12)
+		_info_tween.tween_property(info_layout, "modulate:a", 1.0, info_fade_duration)
 
 
 func _update_slot_selection() -> void:
@@ -226,7 +233,7 @@ func _set_tab_feedback(button: TextureButton, selected: bool, animate: bool) -> 
 	_update_tab_pivot(button)
 	var base_scale := _tab_base_scales[button]
 	var target_scale := base_scale * (selected_tab_scale if selected else Vector2.ONE)
-	var target_color := Color.WHITE if selected else Color.GRAY
+	var target_color := selected_tab_tint if selected else idle_tab_tint
 	button.z_index = 1 if selected else 0
 	if not animate:
 		button.scale = target_scale
@@ -238,8 +245,10 @@ func _set_tab_feedback(button: TextureButton, selected: bool, animate: bool) -> 
 	tween.tween_property(button, "modulate", target_color, tab_feedback_duration)
 	if selected:
 		# Keep vertical growth small so adjacent tabs remain separated during the punch.
-		var punch_scale := target_scale * Vector2(1.04, 1.0)
-		tween.tween_property(button, "scale", punch_scale, tab_feedback_duration * 0.6)
+		var punch_scale := target_scale * Vector2(tab_click_punch_scale, 1.0)
+		tween.tween_property(
+			button, "scale", punch_scale, tab_feedback_duration * tab_click_punch_duration_ratio
+		)
 		tween.chain().tween_property(button, "scale", target_scale, tab_feedback_duration)
 	else:
 		tween.tween_property(button, "scale", target_scale, tab_feedback_duration)
@@ -274,7 +283,7 @@ func open_inventory() -> void:
 	if fresh_open:
 		panel.modulate.a = 0.0
 		tab_buttons.modulate.a = 0.0
-		book_background.scale = _book_scale * 0.96
+		book_background.scale = _book_scale * closed_background_scale
 	_transition_tween = create_tween().set_parallel()
 	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_transition_tween.tween_property(panel, "modulate:a", 1.0, open_duration)
@@ -297,7 +306,9 @@ func close_inventory(immediate: bool = false) -> void:
 	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_transition_tween.tween_property(panel, "modulate:a", 0.0, close_duration)
 	_transition_tween.tween_property(tab_buttons, "modulate:a", 0.0, close_duration)
-	_transition_tween.tween_property(book_background, "scale", _book_scale * 0.96, close_duration)
+	_transition_tween.tween_property(
+		book_background, "scale", _book_scale * closed_background_scale, close_duration
+	)
 	_transition_tween.chain().tween_callback(_finish_close)
 
 

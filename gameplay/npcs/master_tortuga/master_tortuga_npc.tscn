@@ -149,6 +149,7 @@ radius = 3.0
 [node name="MasterTortugaNpc" type="CharacterBody3D" unique_id=122461608]
 script = ExtResource("tortuga_script")
 data = ExtResource("tortuga_data")
+farewell_timeline = "res://dialog/npcs/master_tortuga/farewell.dtl"
 
 [node name="Visual" type="Node3D" parent="." unique_id=1894690924 node_paths=PackedStringArray("sprite", "animation_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6943457, 0)

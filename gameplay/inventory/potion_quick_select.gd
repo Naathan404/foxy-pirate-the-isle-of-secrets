@@ -3,7 +3,9 @@ extends Control
 ## Owns tap/hold selection and its overlay; PotionComponent remains the equipment authority.
 
 const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/potion_wheel_slot.tscn")
-const SECTOR_STEPS: int = 24
+const SECTOR_START_ANGLE := -PI * 0.5
+const MILLIS_PER_SECOND := 1000.0
+const FULL_TURN := TAU
 
 @export var catalog: Array[Potion] = []
 @export var swap_action: StringName = &"swap_potion"
@@ -11,6 +13,26 @@ const SECTOR_STEPS: int = 24
 @export_range(0.05, 1.0, 0.01) var slow_motion_scale: float = 0.18
 @export_range(100.0, 240.0, 1.0) var outer_radius: float = 172.0
 @export_range(40.0, 100.0, 1.0) var inner_radius: float = 80.0
+@export_group("Wheel Layout")
+@export var slot_half_size := Vector2(36.0, 42.0)
+@export var center_name_offset := Vector2(-76.0, -42.0)
+@export var center_count_offset := Vector2(-78.0, 24.0)
+@export var title_offset := Vector2(-180.0, -50.0)
+@export var hint_offset := Vector2(-260.0, 28.0)
+@export_range(0.0, 100.0, 1.0) var outer_hit_padding := 60.0
+@export_range(0.0, 0.2, 0.005) var sector_gap_radians := 0.025
+@export_range(0.0, 20.0, 1.0) var inner_circle_inset := 5.0
+@export_range(8, 48, 1) var sector_segment_count := 24
+@export_group("Wheel Colors")
+@export var overlay_color := Color(0.01, 0.025, 0.045, 0.5)
+@export var center_color := Color(0.035, 0.06, 0.085, 0.96)
+@export var selected_sector_color := Color(0.15, 0.24, 0.27, 0.98)
+@export var idle_sector_color := Color(0.04, 0.08, 0.12, 0.96)
+@export var selected_rim_color := Color(1.0, 0.8, 0.4)
+@export var idle_rim_color := Color(0.25, 0.43, 0.48, 0.7)
+@export var unavailable_icon_tint := Color(0.4, 0.45, 0.5, 0.6)
+@export_range(0.5, 8.0, 0.5) var selected_rim_width := 2.0
+@export_range(0.5, 8.0, 0.5) var idle_rim_width := 1.0
 
 var _player: Player
 var _potions: PotionComponent
@@ -110,7 +132,7 @@ func _process(_delta: float) -> void:
 
 
 func _elapsed_hold() -> float:
-	return (Time.get_ticks_msec() - _pressed_at) / 1000.0
+	return (Time.get_ticks_msec() - _pressed_at) / MILLIS_PER_SECOND
 
 
 func _can_interact() -> bool:
@@ -177,7 +199,11 @@ func _update_hover() -> void:
 	var offset := get_local_mouse_position() - size * 0.5
 	var distance := offset.length()
 	var next: int = -1
-	if distance >= inner_radius and distance <= outer_radius + 60.0 and not _slots.is_empty():
+	if (
+		distance >= inner_radius
+		and distance <= outer_radius + outer_hit_padding
+		and not _slots.is_empty()
+	):
 		var step := TAU / _slots.size()
 		next = posmod(floori((offset.angle() + PI * 0.5 + step * 0.5) / step), _slots.size())
 	if next == _hovered:
@@ -201,7 +227,7 @@ func _refresh_slots() -> void:
 		var quantity: int = _potions.inventory.count_item(potion.item_id)
 		var slot: Control = _slots[index]
 		var icon := slot.get_node("Icon") as TextureRect
-		icon.modulate = Color.WHITE if quantity > 0 else Color(0.4, 0.45, 0.5, 0.6)
+		icon.modulate = Color.WHITE if quantity > 0 else unavailable_icon_tint
 		(slot.get_node("Count") as Label).text = str(quantity)
 		var assignment := slot.get_node("Assignment") as Label
 		assignment.text = "MAIN" if _potions.is_equipped(potion) else ""
@@ -220,36 +246,42 @@ func _refresh_slots() -> void:
 func _layout_slots() -> void:
 	var center := size * 0.5
 	for index in _slots.size():
-		var angle := -PI * 0.5 + index * TAU / _slots.size()
+		var angle := SECTOR_START_ANGLE + index * FULL_TURN / _slots.size()
 		var radius := (outer_radius + inner_radius) * 0.5
-		_slots[index].position = center + Vector2.from_angle(angle) * radius - Vector2(36, 42)
-	_center_name.position = center + Vector2(-76, -42)
-	_center_count.position = center + Vector2(-78, 24)
-	_title.position = center + Vector2(-180, -outer_radius - 50)
-	_hint.position = center + Vector2(-260, outer_radius + 28)
+		_slots[index].position = center + Vector2.from_angle(angle) * radius - slot_half_size
+	_center_name.position = center + center_name_offset
+	_center_count.position = center + center_count_offset
+	_title.position = center + title_offset + Vector2(0.0, -outer_radius)
+	_hint.position = center + hint_offset + Vector2(0.0, outer_radius)
 	queue_redraw()
 
 
 func _draw() -> void:
 	var center := size * 0.5
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.01, 0.025, 0.045, 0.5))
-	draw_circle(center, inner_radius - 5.0, Color(0.035, 0.06, 0.085, 0.96))
+	draw_rect(Rect2(Vector2.ZERO, size), overlay_color)
+	draw_circle(center, inner_radius - inner_circle_inset, center_color)
 	for index in _slots.size():
-		var angle := -PI * 0.5 + index * TAU / _slots.size()
-		var half_angle := PI / _slots.size() - 0.025
+		var angle := SECTOR_START_ANGLE + index * FULL_TURN / _slots.size()
+		var half_angle := PI / _slots.size() - sector_gap_radians
 		var polygon: PackedVector2Array = []
-		for step in range(SECTOR_STEPS + 1):
-			var phase := lerpf(angle - half_angle, angle + half_angle, float(step) / SECTOR_STEPS)
+		for step in range(sector_segment_count + 1):
+			var phase := lerpf(
+				angle - half_angle, angle + half_angle, float(step) / sector_segment_count
+			)
 			polygon.append(center + Vector2.from_angle(phase) * outer_radius)
-		for step in range(SECTOR_STEPS, -1, -1):
-			var phase := lerpf(angle - half_angle, angle + half_angle, float(step) / SECTOR_STEPS)
+		for step in range(sector_segment_count, -1, -1):
+			var phase := lerpf(
+				angle - half_angle, angle + half_angle, float(step) / sector_segment_count
+			)
 			polygon.append(center + Vector2.from_angle(phase) * inner_radius)
 		var selected: bool = index == _hovered
-		var fill := Color(0.15, 0.24, 0.27, 0.98) if selected else Color(0.04, 0.08, 0.12, 0.96)
+		var fill := selected_sector_color if selected else idle_sector_color
 		draw_colored_polygon(polygon, fill)
 		polygon.append(polygon[0])
-		var rim := Color(1.0, 0.8, 0.4) if selected else Color(0.25, 0.43, 0.48, 0.7)
-		draw_polyline(polygon, rim, 2.0 if selected else 1.0, true)
+		var rim := selected_rim_color if selected else idle_rim_color
+		draw_polyline(
+			polygon, rim, selected_rim_width if selected else idle_rim_width, true
+		)
 
 
 func _swap_key_name() -> String:

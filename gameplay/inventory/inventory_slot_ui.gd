@@ -8,6 +8,15 @@ signal item_dropped(from_index: int, to_index: int)
 @export_range(1.0, 1.2, 0.01) var hover_scale: float = 1.05
 @export_range(0.8, 1.0, 0.01) var pressed_scale: float = 0.94
 @export_range(0.05, 0.3, 0.01) var feedback_duration: float = 0.1
+@export_range(1.0, 1.3, 0.01) var drop_feedback_scale := 1.12
+@export_range(1.0, 1.1, 0.01) var selected_scale := 1.02
+@export var hover_tint := Color(1.08, 1.08, 1.08)
+@export_range(0.0, 1.0, 0.01) var dragging_alpha := 0.4
+@export_range(0.0, 1.0, 0.01) var inactive_highlight_alpha := 0.6
+@export_range(0.0, 1.0, 0.01) var drag_preview_alpha := 0.7
+@export var main_assignment_tint := Color(1.0, 0.85, 0.42)
+@export var backup_assignment_tint := Color(0.62, 0.83, 1.0)
+@export var drop_target_tint := Color(0.5, 1.0, 0.6)
 
 var inventory: Inventory
 var slot_index: int = -1
@@ -64,8 +73,8 @@ func set_selected(selected: bool) -> void:
 
 
 func play_drop_feedback() -> void:
-	background.scale = _background_scale * 1.12
-	content.scale = _content_scale * 1.12
+	background.scale = _background_scale * drop_feedback_scale
+	content.scale = _content_scale * drop_feedback_scale
 	_animate_visual()
 
 
@@ -96,14 +105,18 @@ func _animate_visual() -> void:
 		return
 	if _visual_tween != null and _visual_tween.is_valid():
 		_visual_tween.kill()
-	var factor: float = hover_scale if _hovered else (1.02 if _selected else 1.0)
+	var factor: float = hover_scale if _hovered else (selected_scale if _selected else 1.0)
 	if _pressed:
 		factor = pressed_scale
-	var tint := Color(1.08, 1.08, 1.08) if _hovered else Color.WHITE
-	tint.a = 0.4 if _dragging else 1.0
+	var tint := hover_tint if _hovered else Color.WHITE
+	tint.a = dragging_alpha if _dragging else 1.0
 	_highlight.visible = _selected or _hovered or _drop_target
 	_highlight.modulate = (
-		Color(0.5, 1.0, 0.6) if _drop_target else Color.WHITE if _selected else Color(1, 1, 1, 0.6)
+		drop_target_tint
+		if _drop_target
+		else Color.WHITE
+		if _selected
+		else Color(1, 1, 1, inactive_highlight_alpha)
 	)
 	if not is_visible_in_tree():
 		background.scale = _background_scale
@@ -141,7 +154,7 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview_icon.position = -size / 2.0
 	preview_icon.size = size
 	preview_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	preview_icon.modulate.a = 0.7
+	preview_icon.modulate.a = drag_preview_alpha
 	preview.add_child(preview_icon)
 	var label := Label.new()
 	label.label_settings = quantity_label.label_settings
@@ -209,7 +222,7 @@ func set_potion_assignment(assignment: String) -> void:
 	potion_assignment_label.text = assignment
 	potion_assignment_label.visible = not assignment.is_empty()
 	potion_assignment_label.modulate = (
-		Color(1.0, 0.85, 0.42) if assignment == "MAIN" else Color(0.62, 0.83, 1.0)
+		main_assignment_tint if assignment == "MAIN" else backup_assignment_tint
 	)
 
 

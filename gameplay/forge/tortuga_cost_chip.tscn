@@ -8,6 +8,8 @@
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 3
 anchors_preset = 0
+offset_right = 170.0
+offset_bottom = 40.0
 mouse_filter = 2
 script = ExtResource("1_script")
 
@@ -34,7 +36,7 @@ stretch_mode = 5
 layout_mode = 0
 offset_left = 41.0
 offset_top = 3.0
-offset_right = 141.0
+offset_right = 161.0
 offset_bottom = 19.0
 theme_override_colors/font_color = Color(0.22, 0.11, 0.07, 1)
 theme_override_fonts/font = ExtResource("3_font")
@@ -45,7 +47,7 @@ text_overrun_behavior = 3
 layout_mode = 0
 offset_left = 41.0
 offset_top = 19.0
-offset_right = 141.0
+offset_right = 161.0
 offset_bottom = 39.0
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 16

@@ -10,6 +10,7 @@ extends Node
 @export_range(0.0, 1.0, 0.01) var follow_delay: float = 0.2
 @export_range(0.01, 2.0, 0.01) var follow_duration: float = 0.35
 @export_range(0.01, 1.0, 0.01) var fade_duration: float = 0.12
+@export_range(0.01, 0.5, 0.01) var fade_in_duration := 0.06
 
 var _initialized: bool = false
 var _active: bool = false
@@ -58,7 +59,7 @@ func set_target(amount: float) -> void:
 	white_fill.show()
 	_stop(_fade_tween)
 	_fade_tween = create_tween()
-	_fade_tween.tween_property(white_fill, "modulate:a", 1.0, 0.06)
+	_fade_tween.tween_property(white_fill, "modulate:a", 1.0, fade_in_duration)
 
 	# Retarget từ vị trí đang chạy, không quay về giá trị của đòn trước.
 	_stop(_lead_tween)

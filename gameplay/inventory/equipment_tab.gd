@@ -4,7 +4,13 @@ extends Control
 const SLOT := preload("res://gameplay/inventory/equipment_slot.tscn")
 const STAT_FONT: FontFile = preload("res://assets/fonts/unifont-17.0.03.otf")
 const PAGE_SIZE := 15
+const SOCKET_COUNT := 3
+const STAT_VALUE_COUNT := 6
+const PERCENT_SCALE := 100.0
+const BASE_MULTIPLIER := 1.0
+const DEFAULT_SP_PER_SECOND := 100.0
 const KEYS := ["Q", "SPACE", "E"]
+
 const FORGE_FIELDS := {
 	"damage_multiplier": "Damage",
 	"flat_damage": "Flat Damage",
@@ -28,6 +34,14 @@ const FORGE_FIELDS := {
 	"hitbox_multiplier": "Hitbox",
 }
 
+@export_group("Forge Attribute Rows")
+@export_range(8, 24, 1) var forge_row_font_size := 12
+@export var neutral_forge_row_color := Color(0.76, 0.69, 0.60, 0.45)
+@export var positive_forge_row_color := Color(0.60, 0.77, 0.55, 0.70)
+@export var negative_forge_row_color := Color(0.88, 0.56, 0.50, 0.70)
+@export_range(0, 16, 1) var forge_row_corner_radius := 3
+@export_range(0.0, 16.0, 1.0) var forge_row_vertical_padding := 2.0
+
 var weapons: WeaponController
 var charms: CharmSocketManager
 var _show_charms: bool = false
@@ -46,7 +60,7 @@ func _ready() -> void:
 	%Next.pressed.connect(_turn_page.bind(1))
 	%EquipButton.pressed.connect(_equip_selected)
 	%EquippedWeapon.pressed.connect(_select_equipped_weapon)
-	for i in 3:
+	for i in SOCKET_COUNT:
 		_equipped_slot(i).pressed.connect(_select_socket.bind(i))
 	for i in PAGE_SIZE:
 		var slot := SLOT.instantiate() as Button
@@ -154,7 +168,7 @@ func _refresh_equipped() -> void:
 	var weapon := weapons.equipped if is_instance_valid(weapons) else null
 	%EquippedWeapon.present(_icon(weapon), "", weapon != null and not _show_charms)
 	%EquippedWeapon.tooltip_text = _name(weapon) if weapon != null else "No weapon equipped"
-	for i in 3:
+	for i in SOCKET_COUNT:
 		var slot := _equipped_slot(i)
 		var unlocked := is_instance_valid(charms) and charms.is_socket_unlocked(i)
 		var definition: CharmData
@@ -179,7 +193,7 @@ func _refresh_details() -> void:
 	%SkillMeta.text = ""
 	%SkillDescription.text = ""
 	%EquipButton.disabled = true
-	for i in 6:
+	for i in STAT_VALUE_COUNT:
 		get_node("%" + "StatValue" + str(i)).text = "--"
 	for child in %ForgeRows.get_children():
 		%ForgeRows.remove_child(child)
@@ -245,12 +259,12 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 	var values := [
 		_number(damage),
 		"x" + _number(crit_damage),
-		_signed((speed - 1.0) * 100.0) + "%",
+		_signed((speed - BASE_MULTIPLIER) * PERCENT_SCALE) + "%",
 		"x" + _number(knockback),
-		_number(crit * 100.0) + "%",
+		_number(crit * PERCENT_SCALE) + "%",
 		_number(reach)
 	]
-	for i in 6:
+	for i in STAT_VALUE_COUNT:
 		get_node("%" + "StatValue" + str(i)).text = values[i]
 	%StaggerName.show()
 	%StaggerValue.show()
@@ -282,7 +296,7 @@ func _show_weapon(weapon: WeaponInstance) -> void:
 				_signed(value)
 				if field == "flat_damage"
 				else (
-					_signed((value if additive else value - 1.0) * 100.0)
+					_signed((value if additive else value - BASE_MULTIPLIER) * PERCENT_SCALE)
 					+ (" pp" if additive else "%")
 				)
 			)
@@ -319,7 +333,9 @@ func _show_charm(charm: CharmData) -> void:
 	_set_stat_labels(["SP Cost", "Cooldown", "Drop Chance", "Type", "Socket", "Owned"])
 	var cost_text := _number(charm.resource_cost)
 	if charm.charm_id == &"dead_mans_salute":
-		cost_text = _number(charm.get_param_float(&"sp_per_second", 100.0)) + "/s"
+		cost_text = _number(
+			charm.get_param_float(&"sp_per_second", DEFAULT_SP_PER_SECOND)
+		) + "/s"
 	var drop_text := (
 		"Pending" if charm.drop_chance < 0.0 else _number(charm.drop_chance * 100.0) + "%"
 	)
@@ -331,7 +347,7 @@ func _show_charm(charm: CharmData) -> void:
 		KEYS[_socket],
 		"Yes" if owned else "No"
 	]
-	for i in 6:
+	for i in STAT_VALUE_COUNT:
 		get_node("%" + "StatValue" + str(i)).text = values[i]
 	%ForgeHeading.text = "Availability"
 	_add_forge_row("Owned" if owned else "Not acquired yet")
@@ -393,22 +409,22 @@ func _add_forge_row(text: String, benefit: float = 0.0) -> void:
 	label.tooltip_text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_font_override("font", STAT_FONT)
-	label.add_theme_font_size_override("font_size", 12)
+	label.add_theme_font_size_override("font_size", forge_row_font_size)
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.76, 0.69, 0.60, 0.45)
+	style.bg_color = neutral_forge_row_color
 	if benefit > 0.0:
-		style.bg_color = Color(0.60, 0.77, 0.55, 0.70)
+		style.bg_color = positive_forge_row_color
 	elif benefit < 0.0:
-		style.bg_color = Color(0.88, 0.56, 0.50, 0.70)
-	style.set_corner_radius_all(3)
-	style.content_margin_top = 2.0
-	style.content_margin_bottom = 2.0
+		style.bg_color = negative_forge_row_color
+	style.set_corner_radius_all(forge_row_corner_radius)
+	style.content_margin_top = forge_row_vertical_padding
+	style.content_margin_bottom = forge_row_vertical_padding
 	label.add_theme_stylebox_override("normal", style)
 	%ForgeRows.add_child(label)
 
 
 func _set_stat_labels(labels: Array) -> void:
-	for i in 6:
+	for i in STAT_VALUE_COUNT:
 		get_node(
 			"Content/Right/DetailsScroll/Details/Stats/Content/StatsGrid/StatName" + str(i)
 		).text = labels[i]
@@ -418,7 +434,7 @@ func _is_equipped(entry: Resource) -> bool:
 	if entry is WeaponInstance:
 		return is_instance_valid(weapons) and weapons.equipped == entry
 	if entry is CharmData and is_instance_valid(charms):
-		for i in 3:
+		for i in SOCKET_COUNT:
 			if charms.get_equipped_charm(i) == entry.charm_id:
 				return true
 	return false

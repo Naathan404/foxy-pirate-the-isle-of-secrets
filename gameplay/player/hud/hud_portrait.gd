@@ -6,6 +6,11 @@ const LOW_HP_ANIMATION: StringName = &"low_hp"
 
 @export_range(0.0, 1.0) var low_health_ratio: float = 0.3
 @export_range(0.05, 2.0) var hit_duration: float = 0.25
+@export_group("Hit Feedback")
+@export_range(0.0, 20.0, 0.5) var hit_shake_distance := 2.0
+@export_range(1.0, 120.0, 1.0) var hit_shake_frequency := 40.0
+@export var dead_tint := Color(0.45, 0.45, 0.45)
+@export var hit_tint := Color(1.0, 0.35, 0.35)
 @export var healthy_texture: Texture2D
 @export var low_health_texture: Texture2D
 @export var hit_texture: Texture2D
@@ -28,7 +33,11 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_hit_remaining = maxf(0.0, _hit_remaining - delta)
-	var shake := 2.0 if int(_hit_remaining * 40.0) % 2 == 0 else -2.0
+	var shake := (
+		hit_shake_distance
+		if int(_hit_remaining * hit_shake_frequency) % 2 == 0
+		else -hit_shake_distance
+	)
 	position = _rest_position + Vector2(shake, 0.0)
 	if _hit_remaining == 0.0:
 		position = _rest_position
@@ -68,10 +77,10 @@ func _update_portrait() -> void:
 	modulate = Color.WHITE
 	if _dead:
 		texture = dead_texture if dead_texture != null else healthy_texture
-		modulate = Color(0.45, 0.45, 0.45)
+		modulate = dead_tint
 	elif _hit_remaining > 0.0:
 		texture = hit_texture if hit_texture != null else healthy_texture
-		modulate = Color(1.0, 0.35, 0.35)
+		modulate = hit_tint
 	elif _health_ratio <= low_health_ratio:
 		texture = low_health_texture if low_health_texture != null else healthy_texture
 	_update_low_health_animation()
@@ -89,5 +98,5 @@ func _update_low_health_animation() -> void:
 		_animation_player.pause()
 	elif not _animation_player.is_playing():
 		_animation_player.play(LOW_HP_ANIMATION)
-		modulate = Color(1.0, 0.35, 0.35)
+		modulate = hit_tint
 		_animation_player.advance(0.0)

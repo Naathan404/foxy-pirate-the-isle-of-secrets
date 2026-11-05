@@ -4,7 +4,7 @@ extends CharacterBody3D
 
 @export_range(0.1, 10.0, 0.1) var push_speed: float = 2.0
 @export var push_enabled: bool = true
-## Optional: assigned crates can only be pushed during LOW tide.
+## Optional water source; a grounded crate remains pushable while its base is dry.
 @export var tide_controller: TideController
 
 @export_group("Floating")
@@ -145,6 +145,8 @@ func _can_be_pushed() -> bool:
 		and is_on_floor()
 		and (
 			not is_instance_valid(tide_controller)
-			or tide_controller.state == TideController.State.LOW
+			or tide_controller.get_depth_at(
+				Vector3(global_position.x, _get_bottom_height(), global_position.z)
+			) <= 0.0
 		)
 	)

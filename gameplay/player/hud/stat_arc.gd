@@ -2,6 +2,8 @@ class_name HudStatArc
 extends Node
 ## Hiển thị một chỉ số bằng cung nền, bóng và fill; dùng chung cho HP, SP và CP.
 
+const MINIMUM_STAT_VALUE := 0.01
+
 @export var capacity: ArcTooltipBar
 @export var fill: TextureProgressBar
 @export var shadow: TextureProgressBar
@@ -17,6 +19,12 @@ extends Node
 @export var value_label: Label
 @export var readiness_icon: TextureRect
 @export var unavailable_tint: Color = Color(0.55, 0.55, 0.55)
+@export_group("Ready Feedback")
+@export_range(1.0, 1.5, 0.01) var ready_punch_scale := 1.2
+@export_range(0.01, 1.0, 0.01) var ready_punch_in_duration := 0.1
+@export_range(0.01, 1.0, 0.01) var ready_punch_out_duration := 0.18
+@export var ready_shake_angles: Array[float] = [-8.0, 8.0, -5.0, 5.0, 0.0]
+@export_range(0.01, 1.0, 0.01) var ready_shake_step_duration := 0.1
 
 var _was_full: bool = false
 var _icon_rotation: float = 0.0
@@ -38,7 +46,7 @@ func set_stat(current: float, maximum: float) -> void:
 			bar.step = 0.0
 		bar.radial_initial_angle = initial_angle
 		bar.radial_fill_degrees = degrees
-		bar.max_value = maxf(maximum, 0.01)
+		bar.max_value = maxf(maximum, MINIMUM_STAT_VALUE)
 	capacity.value = maxf(maximum, 0.0)
 	shadow.value = maxf(maximum, 0.0)
 	fill_effect.set_target(current)
@@ -74,14 +82,16 @@ func _shake_readiness_shake() -> void:
 	# Phóng lên 20%, rồi thu về scale gốc
 	(
 		_punch_tween
-		. tween_property(readiness_icon, "scale", _icon_scale * 1.2, 0.1)
+		. tween_property(
+			readiness_icon, "scale", _icon_scale * ready_punch_scale, ready_punch_in_duration
+		)
 		. set_trans(Tween.TRANS_BACK)
 		. set_ease(Tween.EASE_OUT)
 	)
 
 	(
 		_punch_tween
-		. tween_property(readiness_icon, "scale", _icon_scale, 0.18)
+		. tween_property(readiness_icon, "scale", _icon_scale, ready_punch_out_duration)
 		. set_trans(Tween.TRANS_SINE)
 		. set_ease(Tween.EASE_OUT)
 	)
@@ -89,9 +99,12 @@ func _shake_readiness_shake() -> void:
 	_readiness_tween = create_tween()
 	_readiness_tween.set_trans(Tween.TRANS_SINE)
 
-	for angle: float in [-8.0, 8.0, -5.0, 5.0, 0.0]:
+	for angle: float in ready_shake_angles:
 		_readiness_tween.tween_property(
-			readiness_icon, "rotation", _icon_rotation + deg_to_rad(angle), 0.1
+			readiness_icon,
+			"rotation",
+			_icon_rotation + deg_to_rad(angle),
+			ready_shake_step_duration
 		)
 
 

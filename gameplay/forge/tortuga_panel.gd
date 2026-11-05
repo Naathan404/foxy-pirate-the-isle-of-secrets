@@ -12,8 +12,25 @@ const GOLD_ICON: Texture2D = preload(
 )
 const TAB_ACTIVE: Texture2D = preload("res://assets/ui/silas_shop/PNG/32_tab_active_blank.png")
 const TAB_IDLE: Texture2D = preload("res://assets/ui/silas_shop/PNG/33_tab_inactive_blank.png")
-const COLUMNS := 4
-const STEP := Vector2(94, 105)
+const FORGE_OPTION_COUNT := 2
+const MAX_BOOK_SCALE := 1.0
+@export_group("Blueprint Grid")
+@export_range(1, 8, 1) var grid_columns := 4
+@export var grid_step := Vector2(94.0, 105.0)
+@export_range(0.0, 1000.0, 1.0) var grid_minimum_height := 350.0
+@export_group("Cost Grid")
+@export_range(1, 4, 1) var cost_grid_columns := 2
+@export var cost_grid_step := Vector2(154.0, 44.0)
+@export_group("Panel Animation")
+@export_range(0.05, 1.0, 0.01) var panel_open_duration := 0.16
+@export_range(0.5, 1.0, 0.01) var panel_start_scale := 0.96
+@export var selected_tab_text_color := Color(1.0, 0.9, 0.7)
+@export var idle_tab_text_color := Color(0.29, 0.14, 0.1)
+@export_group("Responsive Layout")
+@export var reference_viewport_size := Vector2(1130.0, 690.0)
+@export_group("Debug Supplies")
+@export_range(1, 99, 1) var debug_ingredient_amount := 10
+@export_range(1, 9999, 1) var debug_gold_amount := 500
 
 @export var catalog: TortugaCatalog
 
@@ -87,10 +104,10 @@ func open_for(player: Player) -> bool:
 	show()
 	_set_tab(Tab.CRAFT)
 	book.modulate.a = 0.0
-	book.scale = _base_book_scale * 0.96
+	book.scale = _base_book_scale * panel_start_scale
 	var tween := create_tween().set_parallel().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property(book, "modulate:a", 1.0, 0.16)
-	tween.tween_property(book, "scale", _base_book_scale, 0.16)
+	tween.tween_property(book, "modulate:a", 1.0, panel_open_duration)
+	tween.tween_property(book, "scale", _base_book_scale, panel_open_duration)
 	return true
 
 
@@ -138,10 +155,10 @@ func _set_tab(next_tab: Tab) -> void:
 	craft_tab.texture_normal = TAB_ACTIVE if _tab == Tab.CRAFT else TAB_IDLE
 	forge_tab.texture_normal = TAB_ACTIVE if _tab == Tab.FORGE else TAB_IDLE
 	craft_tab.get_node("Text").add_theme_color_override(
-		"font_color", Color(1, 0.9, 0.7) if _tab == Tab.CRAFT else Color(0.29, 0.14, 0.1)
+		"font_color", selected_tab_text_color if _tab == Tab.CRAFT else idle_tab_text_color
 	)
 	forge_tab.get_node("Text").add_theme_color_override(
-		"font_color", Color(1, 0.9, 0.7) if _tab == Tab.FORGE else Color(0.29, 0.14, 0.1)
+		"font_color", selected_tab_text_color if _tab == Tab.FORGE else idle_tab_text_color
 	)
 	_refresh()
 
@@ -174,12 +191,14 @@ func _rebuild_grid() -> void:
 	empty_label.text = (
 		"No blueprints unlocked yet." if _tab == Tab.CRAFT else "No weapons owned yet."
 	)
-	grid.custom_minimum_size.y = maxf(350.0, ceilf(float(entries.size()) / COLUMNS) * STEP.y)
+	grid.custom_minimum_size.y = maxf(
+		grid_minimum_height, ceilf(float(entries.size()) / grid_columns) * grid_step.y
+	)
 	for index in entries.size():
 		var data := entries[index]
 		var slot := SLOT_SCENE.instantiate() as Control
 		grid.add_child(slot)
-		slot.position = Vector2(index % COLUMNS, floori(float(index) / COLUMNS)) * STEP
+		slot.position = Vector2(index % grid_columns, floori(float(index) / grid_columns)) * grid_step
 		slot.get_node("Button/Icon").texture = data.icon
 		slot.get_node("Button/Darken").visible = (
 			_tab == Tab.CRAFT and _weapons.is_weapon_owned(data.weapon_id)
@@ -267,7 +286,10 @@ func _add_cost_chip(
 ) -> void:
 	var chip := COST_SCENE.instantiate() as Control
 	cost_grid.add_child(chip)
-	chip.position = Vector2(index % 2 * 154, floori(float(index) / 2.0) * 44)
+	chip.position = (
+		Vector2(index % cost_grid_columns, floori(float(index) / cost_grid_columns))
+		* cost_grid_step
+	)
 	chip.call(&"set_cost", texture, title, current, required)
 
 
@@ -290,10 +312,10 @@ func _on_action() -> void:
 	_pending_options = _service.roll_forges(_selected_id)
 	feedback.text = (
 		"Choose one of the two new forges."
-		if _pending_options.size() == 2
+		if _pending_options.size() == FORGE_OPTION_COUNT
 		else "Not enough gold or materials."
 	)
-	if _pending_options.size() == 2:
+	if _pending_options.size() == FORGE_OPTION_COUNT:
 		book.process_mode = Node.PROCESS_MODE_DISABLED
 		forge_popup.call(&"show_choices", _selected_weapon(), _pending_options)
 		book.hide()
@@ -330,14 +352,17 @@ func _on_debug_supplies() -> void:
 	for ingredient in catalog.forge_ingredients:
 		items[ingredient.item.item_id] = ingredient.item
 	for item in items.values():
-		_inventory.add_item(item, 10)
-	_wallet.add_gold(500)
+		_inventory.add_item(item, debug_ingredient_amount)
+	_wallet.add_gold(debug_gold_amount)
 	feedback.text = "Debug supplies added."
 	_refresh()
 
 
 func _fit_book() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	var factor := minf(viewport_size.x / 1130.0, viewport_size.y / 690.0)
-	_base_book_scale = Vector2.ONE * minf(1.0, factor)
+	var factor := minf(
+		viewport_size.x / reference_viewport_size.x,
+		viewport_size.y / reference_viewport_size.y
+	)
+	_base_book_scale = Vector2.ONE * minf(MAX_BOOK_SCALE, factor)
 	book.scale = _base_book_scale

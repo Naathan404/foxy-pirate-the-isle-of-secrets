@@ -6,9 +6,13 @@ const TALKING_SHEET: Texture2D = preload(
 )
 
 @export var data: NpcData
+@export_file("*.dtl") var farewell_timeline: String
 
 @onready var sprite: AnimatedSprite3D = $Visual/AnimatedSprite3D
 @onready var forge_panel: TortugaPanel = $TortugaPanel
+
+var _active_interactor: Player
+var _is_farewell_dialogue := false
 
 
 func _ready() -> void:
@@ -28,6 +32,13 @@ func get_npc_data() -> NpcData:
 	return data
 
 
+func _focus_dialogue_camera(interactor: Player) -> void:
+	# The greeting already focused the camera; keep its original restore target.
+	if _is_farewell_dialogue:
+		return
+	super(interactor)
+
+
 func play_directional_animation(action: StringName, _restart: bool = false) -> bool:
 	return action == &"idle" or action == &"walk"
 
@@ -38,6 +49,12 @@ func _on_dialogue_started(_interactor: Player) -> void:
 
 func _on_dialogue_finished(interactor: Player) -> void:
 	sprite.play(&"idle")
+	if _is_farewell_dialogue:
+		_is_farewell_dialogue = false
+		_active_interactor = null
+		interaction_area.set_interaction_enabled(true)
+		return
+	_active_interactor = interactor
 	interaction_area.set_interaction_enabled(false)
 	_open_panel.call_deferred(interactor)
 
@@ -48,7 +65,16 @@ func _open_panel(interactor: Player) -> void:
 
 
 func _on_panel_closed() -> void:
-	interaction_area.set_interaction_enabled(true)
+	if not is_instance_valid(_active_interactor) or _active_interactor.dead:
+		_active_interactor = null
+		interaction_area.set_interaction_enabled(true)
+		return
+	interaction_area.set_interaction_enabled(false)
+	_is_farewell_dialogue = true
+	if not _start_dialogue(_active_interactor, farewell_timeline):
+		_is_farewell_dialogue = false
+		_active_interactor = null
+		interaction_area.set_interaction_enabled(true)
 
 
 func _install_talking_animation() -> void:

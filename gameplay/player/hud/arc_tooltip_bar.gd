@@ -1,6 +1,8 @@
 class_name ArcTooltipBar
 extends TextureProgressBar
 
+@export_range(0.0, 1.0, 0.01) var clickable_alpha_threshold := 0.1
+
 var _mask_texture: Texture2D
 var _alpha_mask: BitMap
 var _stat_text: String = ""
@@ -18,7 +20,7 @@ func _has_point(point: Vector2) -> bool:
 		if image.is_compressed():
 			image.decompress()
 		_alpha_mask = BitMap.new()
-		_alpha_mask.create_from_image_alpha(image, 0.1)
+		_alpha_mask.create_from_image_alpha(image, clickable_alpha_threshold)
 	if _alpha_mask == null:
 		return false
 

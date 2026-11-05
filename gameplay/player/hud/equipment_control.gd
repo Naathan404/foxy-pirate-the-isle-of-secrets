@@ -2,6 +2,11 @@ class_name EquipmentControl
 extends Control
 ## Hiển thị ô Charm và cooldown thật từ runtime; không quản lý trang bị hay tài nguyên
 
+@export_group("Potion Feedback")
+@export_range(1.0, 1.5, 0.01) var potion_use_scale := 1.2
+@export_range(0.01, 0.5, 0.01) var potion_use_in_duration := 0.08
+@export_range(0.01, 0.5, 0.01) var potion_use_out_duration := 0.16
+
 var _manager: CharmSocketManager
 var _slots: Dictionary[int, TextureRect] = {}
 var _icons: Dictionary[int, TextureRect] = {}
@@ -153,14 +158,16 @@ func feedback_potion_used() -> void:
 	_potion_tween = create_tween()
 	(
 		_potion_tween
-		. tween_property(potion_icon, "scale", _potion_rest_scale * 1.2, 0.08)
+		. tween_property(
+			potion_icon, "scale", _potion_rest_scale * potion_use_scale, potion_use_in_duration
+		)
 		. set_trans(Tween.TRANS_BACK)
 		. set_ease(Tween.EASE_OUT)
 	)
 
 	(
 		_potion_tween
-		. tween_property(potion_icon, "scale", _potion_rest_scale, 0.16)
+		. tween_property(potion_icon, "scale", _potion_rest_scale, potion_use_out_duration)
 		. set_trans(Tween.TRANS_SINE)
 		. set_ease(Tween.EASE_OUT)
 	)

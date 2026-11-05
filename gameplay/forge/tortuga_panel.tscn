@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://b3l8eoptwh2gv"]
 
 [ext_resource type="Script" uid="uid://1nos00yo7mfw" path="res://gameplay/forge/tortuga_panel.gd" id="1_script"]
-[ext_resource type="Theme" path="res://gameplay/ui/paper_tooltip_theme.tres" id="paper_tooltips"]
 [ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="2_book"]
 [ext_resource type="Texture2D" uid="uid://1q3c8vtxvd5b" path="res://assets/ui/silas_shop/PNG/01_shop_header_lantern_banner.png" id="3_header"]
 [ext_resource type="Texture2D" uid="uid://eeec67jm4h4y" path="res://assets/ui/silas_shop/PNG/32_tab_active_blank.png" id="4_active"]
@@ -17,6 +16,7 @@
 [ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="12_body_font"]
 [ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="13_5vsl8"]
 [ext_resource type="PackedScene" uid="uid://bympsgu0f6rjq" path="res://gameplay/forge/tortuga_forge_popup.tscn" id="forge_popup"]
+[ext_resource type="Theme" uid="uid://cks1ueubqpl0a" path="res://gameplay/ui/paper_tooltip_theme.tres" id="paper_tooltips"]
 [ext_resource type="PackedScene" uid="uid://dwdpsp5ebl1b1" path="res://gameplay/forge/tortuga_weapon_details.tscn" id="weapon_details"]
 
 [node name="TortugaPanel" type="CanvasLayer" unique_id=1396822409]
@@ -31,7 +31,6 @@ mouse_filter = 2
 color = Color(0.035, 0.025, 0.023, 0.76)
 
 [node name="Book" type="Control" parent="." unique_id=34064067]
-theme = ExtResource("paper_tooltips")
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -45,6 +44,7 @@ offset_bottom = 325.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
+theme = ExtResource("paper_tooltips")
 
 [node name="Background" type="TextureRect" parent="Book" unique_id=1161090194]
 layout_mode = 0
@@ -254,7 +254,7 @@ layout_mode = 0
 offset_left = 580.0
 offset_top = 186.0
 offset_right = 945.0
-offset_bottom = 386.0
+offset_bottom = 406.0
 horizontal_scroll_mode = 0
 scroll_hint_mode = 1
 
@@ -265,9 +265,9 @@ layout_mode = 2
 [node name="CostGrid" type="Control" parent="Book" unique_id=710005252]
 anchors_preset = 0
 offset_left = 589.0
-offset_top = 391.0
+offset_top = 407.0
 offset_right = 939.0
-offset_bottom = 503.0
+offset_bottom = 519.0
 mouse_filter = 2
 
 [node name="Action" type="TextureButton" parent="Book" unique_id=663786749]

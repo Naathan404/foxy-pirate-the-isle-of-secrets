@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://dgkurc4mhqwu7"]
-
-[ext_resource type="PackedScene" uid="uid://df5suj6du08w4" path="res://world/coral_valley/scenes/coral_valley.tscn" id="1_cgbv1"]
-
-[node name="CoralValley" unique_id=1021252524 instance=ExtResource("1_cgbv1")]
-
-[node name="Foxy" parent="." index="0" unique_id=1350175917]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -129, 6, 149)

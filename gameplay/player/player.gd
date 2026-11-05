@@ -28,6 +28,8 @@ signal combat_activity
 @export var dash_action: StringName = &"dash"
 @export var attack_action: StringName = &"normal_attack"
 @export var secondary_attack_action: StringName = &"secondary_attack"
+@export_group("Damage")
+@export_range(0.0, 3.0, 0.05, "suffix:s") var post_hit_invulnerability_duration: float = 0.8
 
 var move_direction: Vector3 = Vector3.ZERO
 # Đứng yên vẫn nhớ hướng để đánh và dash
@@ -47,6 +49,7 @@ var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
 var potion_selection_active: bool = false
 var _charm_grapple_tween: Tween
+var _post_hit_invulnerability_remaining: float = 0.0
 
 @onready var visual: PlayerVisual = $Visual
 @onready var fsm: Fsm = $FSM
@@ -181,6 +184,8 @@ func take_damage(amount: float) -> float:
 func receive_damage(damage: DamageContext) -> float:
 	if dead or not is_instance_valid(hp):
 		return 0
+	if _post_hit_invulnerability_remaining > 0.0:
+		return 0
 	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
 		return 0
 	if damage == null or damage.amount_hp <= 0:
@@ -196,13 +201,20 @@ func receive_damage(damage: DamageContext) -> float:
 			amount = float(weapon_controller.call("modify_incoming_damage", amount, damage))
 	if is_instance_valid(charm_socket_manager):
 		amount = charm_socket_manager.modify_incoming_damage(amount, damage)
+	if not is_finite(amount) or amount <= 0.0 or not hp.is_alive():
+		return 0
+	# Set this before take_damage emits signals, which may trigger another hit.
+	_post_hit_invulnerability_remaining = post_hit_invulnerability_duration
 	var applied_hp := hp.take_damage(amount)
+	if applied_hp <= 0.0:
+		_post_hit_invulnerability_remaining = 0.0
 	if applied_hp > 0 and is_instance_valid(charm_socket_manager):
 		charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
 	return applied_hp
 
 
 func _physics_process(delta: float) -> void:
+	_post_hit_invulnerability_remaining = maxf(0.0, _post_hit_invulnerability_remaining - delta)
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	attack_buffer_remaining = maxf(0.0, attack_buffer_remaining - delta)
 	if attack_buffer_remaining <= 0.0:
