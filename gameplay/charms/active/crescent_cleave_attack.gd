@@ -15,6 +15,8 @@ var _active: bool = false
 var _remaining_seconds: float = 0.0
 var _hit_actor_ids: Dictionary[int, bool] = {}
 
+@onready var placeholder: MeshInstance3D = $Placeholder
+
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -58,6 +60,8 @@ func activate() -> bool:
 	if sphere == null:
 		return false
 	sphere.radius = radius_units
+	if is_instance_valid(placeholder):
+		placeholder.scale = Vector3(radius_units, 1.0, radius_units)
 	_hit_actor_ids.clear()
 	_remaining_seconds = maxf(0.01, active_seconds)
 	_active = true

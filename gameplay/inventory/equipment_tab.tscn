@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://bsn8narxl3gfb" path="res://gameplay/ui/button_press_feedback.gd" id="6_1e8a6"]
 [ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="7_rxrhe"]
 [ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="8_1e8a6"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="11_xeyqw"]
 [ext_resource type="Texture2D" uid="uid://c6ykgwy2j6ix1" path="res://assets/ui/Button_Normal.png" id="paper_button"]
 [ext_resource type="Texture2D" uid="uid://cy0cpkyt60rlt" path="res://assets/ui/Button_Press.png" id="paper_button_pressed"]
 
@@ -359,7 +360,7 @@ offset_bottom = 92.0
 anchors_preset = 0
 offset_left = 544.0
 offset_right = 1000.0
-offset_bottom = 626.0
+offset_bottom = 580.0
 
 [node name="Header" type="Control" parent="Content/Right" unique_id=1656690673]
 anchors_preset = 0
@@ -457,17 +458,18 @@ layout_mode = 0
 offset_left = 22.0
 offset_top = 172.0
 offset_right = 430.0
-offset_bottom = 452.0
+offset_bottom = 472.0
 horizontal_scroll_mode = 0
+scroll_hint_mode = 1
 
 [node name="Details" type="Control" parent="Content/Right/DetailsScroll" unique_id=573664232]
-custom_minimum_size = Vector2(400, 316)
+custom_minimum_size = Vector2(400, 520)
 layout_mode = 2
 
 [node name="Stats" type="PanelContainer" parent="Content/Right/DetailsScroll/Details" unique_id=255553697]
 layout_mode = 0
 offset_right = 400.0
-offset_bottom = 100.0
+offset_bottom = 112.0
 
 [node name="Content" type="Control" parent="Content/Right/DetailsScroll/Details/Stats" unique_id=1060444925]
 layout_mode = 2
@@ -475,20 +477,22 @@ layout_mode = 2
 [node name="StatsHeading" type="Label" parent="Content/Right/DetailsScroll/Details/Stats/Content" unique_id=528364376]
 unique_name_in_owner = true
 layout_mode = 0
-offset_top = -6.0
-offset_right = 410.0
-offset_bottom = 15.0
+offset_left = -1.0
+offset_top = -3.0
+offset_right = 409.0
+offset_bottom = 25.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 25
 text = "Base Stats"
 
 [node name="StatsGrid" type="GridContainer" parent="Content/Right/DetailsScroll/Details/Stats/Content" unique_id=1351891084]
 unique_name_in_owner = true
 layout_mode = 0
-offset_top = 22.0
-offset_right = 380.0
-offset_bottom = 85.0
+offset_left = 4.0
+offset_top = 31.0
+offset_right = 384.0
+offset_bottom = 98.0
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 5
 columns = 4
@@ -499,7 +503,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Attack"
 
@@ -509,7 +513,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -520,7 +524,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Crit Damage"
 
@@ -530,7 +534,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -541,7 +545,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Attack Speed"
 
@@ -551,7 +555,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -562,7 +566,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Knockback"
 
@@ -572,7 +576,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -583,7 +587,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Crit Rate"
 
@@ -593,7 +597,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -604,7 +608,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Range"
 
@@ -614,7 +618,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -626,7 +630,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Stagger"
 
@@ -636,7 +640,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
@@ -648,7 +652,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_colors/font_outline_color = Color(0.2509804, 0.14117648, 0.12941177, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "Chaos Gain"
 
@@ -658,16 +662,16 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_colors/font_outline_color = Color(0.14901961, 0.47843137, 0.23137255, 1)
 theme_override_constants/outline_size = 0
-theme_override_fonts/font = ExtResource("2")
+theme_override_fonts/font = ExtResource("11_xeyqw")
 theme_override_font_sizes/font_size = 12
 text = "--"
 horizontal_alignment = 2
 
 [node name="Forge" type="PanelContainer" parent="Content/Right/DetailsScroll/Details" unique_id=1669688536]
 layout_mode = 0
-offset_top = 103.0
+offset_top = 115.0
 offset_right = 400.0
-offset_bottom = 175.0
+offset_bottom = 251.0
 
 [node name="Content" type="Control" parent="Content/Right/DetailsScroll/Details/Forge" unique_id=1676430217]
 layout_mode = 2
@@ -675,22 +679,23 @@ layout_mode = 2
 [node name="ForgeHeading" type="Label" parent="Content/Right/DetailsScroll/Details/Forge/Content" unique_id=660420672]
 unique_name_in_owner = true
 layout_mode = 0
-offset_top = -6.0
+offset_top = -3.0
 offset_right = 486.0
-offset_bottom = 15.0
+offset_bottom = 25.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 25
 text = "Forge Attributes"
 clip_text = true
 text_overrun_behavior = 3
 
 [node name="ForgeScroll" type="ScrollContainer" parent="Content/Right/DetailsScroll/Details/Forge/Content" unique_id=860904370]
 layout_mode = 0
-offset_top = 23.0
+offset_top = 29.0
 offset_right = 380.0
-offset_bottom = 54.0
+offset_bottom = 129.0
 horizontal_scroll_mode = 0
+scroll_hint_mode = 1
 
 [node name="ForgeRows" type="VBoxContainer" parent="Content/Right/DetailsScroll/Details/Forge/Content/ForgeScroll" unique_id=1681361133]
 unique_name_in_owner = true
@@ -700,9 +705,9 @@ theme_override_constants/separation = 3
 
 [node name="Skill" type="PanelContainer" parent="Content/Right/DetailsScroll/Details" unique_id=2035021333]
 layout_mode = 0
-offset_top = 181.0
+offset_top = 255.0
 offset_right = 400.0
-offset_bottom = 281.0
+offset_bottom = 405.0
 
 [node name="Content" type="Control" parent="Content/Right/DetailsScroll/Details/Skill" unique_id=764757674]
 layout_mode = 2
@@ -710,19 +715,19 @@ layout_mode = 2
 [node name="SkillHeading" type="Label" parent="Content/Right/DetailsScroll/Details/Skill/Content" unique_id=806944078]
 unique_name_in_owner = true
 layout_mode = 0
-offset_top = -6.0
+offset_top = -3.0
 offset_right = 486.0
-offset_bottom = 15.0
+offset_bottom = 25.0
 theme_override_constants/outline_size = 1
 theme_override_fonts/font = ExtResource("7_rxrhe")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 25
 text = "Weapon Skill"
 
 [node name="SkillBody" type="Control" parent="Content/Right/DetailsScroll/Details/Skill/Content" unique_id=37286423]
 anchors_preset = 0
-offset_top = 23.0
+offset_top = 31.0
 offset_right = 380.0
-offset_bottom = 77.0
+offset_bottom = 143.0
 
 [node name="SkillIcon" type="TextureRect" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody" unique_id=1625757164]
 unique_name_in_owner = true
@@ -737,7 +742,7 @@ stretch_mode = 5
 anchors_preset = 0
 offset_left = 60.0
 offset_right = 380.0
-offset_bottom = 54.0
+offset_bottom = 244.0
 
 [node name="SkillTitle" type="Label" parent="Content/Right/DetailsScroll/Details/Skill/Content/SkillBody/SkillText" unique_id=627158131]
 unique_name_in_owner = true
@@ -766,19 +771,18 @@ unique_name_in_owner = true
 layout_mode = 0
 offset_top = 31.0
 offset_right = 320.0
-offset_bottom = 71.0
+offset_bottom = 131.0
 theme_override_fonts/font = ExtResource("7_rxrhe")
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
-max_lines_visible = 3
 
 [node name="EquipButton" type="Button" parent="Content/Right" unique_id=275646008]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 132.0
-offset_top = 469.0
+offset_top = 478.0
 offset_right = 324.0
-offset_bottom = 510.0
+offset_bottom = 519.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.25, 0.14, 0.13, 1)
 theme_override_colors/font_pressed_color = Color(0.25, 0.14, 0.13, 1)

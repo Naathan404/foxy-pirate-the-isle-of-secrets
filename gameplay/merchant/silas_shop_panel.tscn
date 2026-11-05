@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dltw4fun83bl4"]
 
 [ext_resource type="Script" uid="uid://bld5tt2iup86q" path="res://gameplay/merchant/silas_shop_panel.gd" id="1_script"]
+[ext_resource type="Theme" path="res://gameplay/ui/paper_tooltip_theme.tres" id="paper_tooltips"]
 [ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="2_book"]
 [ext_resource type="Texture2D" uid="uid://1q3c8vtxvd5b" path="res://assets/ui/silas_shop/PNG/01_shop_header_lantern_banner.png" id="3_header"]
 [ext_resource type="Texture2D" uid="uid://eeec67jm4h4y" path="res://assets/ui/silas_shop/PNG/32_tab_active_blank.png" id="4_tab_active"]
@@ -42,6 +43,7 @@ mouse_filter = 2
 color = Color(0.035, 0.025, 0.023, 0.76)
 
 [node name="Book" type="Control" parent="." unique_id=261697898]
+theme = ExtResource("paper_tooltips")
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -171,9 +173,9 @@ stretch_mode = 5
 
 [node name="GoldBadge" type="Control" parent="Book" unique_id=900180299]
 anchors_preset = 0
-offset_left = 567.0
+offset_left = 834.0
 offset_top = 37.0
-offset_right = 747.0
+offset_right = 1014.0
 offset_bottom = 97.0
 mouse_filter = 2
 
@@ -500,20 +502,20 @@ vertical_alignment = 1
 
 [node name="LeavePlate" type="TextureRect" parent="Book" unique_id=2115421042]
 layout_mode = 0
-offset_left = 839.0
-offset_top = 40.0
-offset_right = 989.0
-offset_bottom = 90.0
+offset_left = 473.0
+offset_top = 563.0
+offset_right = 623.0
+offset_bottom = 613.0
 mouse_filter = 2
 texture = ExtResource("23_leave_plate")
 expand_mode = 1
 
 [node name="Close" type="Button" parent="Book" unique_id=1266189592]
 layout_mode = 0
-offset_left = 840.0
-offset_top = 38.0
-offset_right = 990.0
-offset_bottom = 88.0
+offset_left = 474.0
+offset_top = 561.0
+offset_right = 624.0
+offset_bottom = 611.0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.35, 0.13, 0.07, 1)
 theme_override_fonts/font = ExtResource("21_font")

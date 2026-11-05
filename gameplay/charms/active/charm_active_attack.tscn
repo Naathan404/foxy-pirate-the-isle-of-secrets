@@ -9,6 +9,13 @@ size = Vector3(2, 1, 2)
 [sub_resource type="BoxMesh" id="BoxMesh_charm"]
 size = Vector3(0.22, 0.22, 0.9)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_charm"]
+albedo_color = Color(0.15, 0.85, 1, 0.9)
+emission_enabled = true
+emission = Color(0.05, 0.35, 0.8, 1)
+emission_energy_multiplier = 2.0
+transparency = 1
+
 [node name="CharmActiveAttack" type="Node3D" node_paths=PackedStringArray("hitbox")]
 script = ExtResource("1_script")
 hitbox = NodePath("HitBox")
@@ -23,3 +30,4 @@ shape = SubResource("BoxShape3D_charm")
 
 [node name="Placeholder" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_charm")
+material_override = SubResource("StandardMaterial3D_charm")

@@ -208,6 +208,20 @@ func grant_weapon(weapon_id: StringName) -> bool:
 	return set_weapon_owned(weapon_id, true) and is_weapon_owned(weapon_id)
 
 
+## Replace the sole forge on an owned instance. Combat reads it on the next attack.
+func set_weapon_forge(weapon_id: StringName, new_forge: WeaponForge) -> bool:
+	var weapon := _find_owned_weapon(weapon_id)
+	var entry := _find_collection_entry(weapon_id)
+	if weapon == null or entry == null or (new_forge != null and not new_forge.is_valid()):
+		return false
+	weapon.forge = new_forge
+	entry.forge = new_forge
+	collection_changed.emit()
+	if equipped == weapon:
+		weapon_changed.emit(weapon)
+	return true
+
+
 func _validate_collection() -> bool:
 	var ids: Dictionary[StringName, bool] = {}
 	for entry: WeaponCollectionEntry in collection:

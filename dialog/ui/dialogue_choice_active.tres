@@ -1,0 +1,14 @@
+[gd_resource type="StyleBoxTexture" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/silas_shop/PNG/23_button_active_blank.png" id="1_imju5"]
+
+[resource]
+content_margin_left = 56.0
+content_margin_top = 11.0
+content_margin_right = 56.0
+content_margin_bottom = 11.0
+texture = ExtResource("1_imju5")
+texture_margin_left = 52.0
+texture_margin_top = 30.0
+texture_margin_right = 52.0
+texture_margin_bottom = 30.0

@@ -27,7 +27,13 @@ func activate(context: CharmActivationContext) -> bool:
 	mesh.bottom_radius = radius
 	mesh.height = 0.05
 	visual.mesh = mesh
-	visual.modulate = Color(0.15, 0.4, 0.9, 0.5)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.15, 0.4, 0.9, 0.55)
+	material.emission_enabled = true
+	material.emission = Color(0.05, 0.2, 0.8, 1.0)
+	material.emission_energy_multiplier = 1.5
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	visual.material_override = material
 	_zone.add_child(visual)
 	_remaining = definition.get_param_float(&"duration_seconds", 1.5)
 	_exploded = false

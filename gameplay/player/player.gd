@@ -1,11 +1,11 @@
 class_name Player
 extends CharacterBody3D
 
-@warning_ignore("unused_signal") # Emitted by player states.
+@warning_ignore("unused_signal")  # Emitted by player states.
 signal action_rejected(action: StringName)
-@warning_ignore("unused_signal") # Emitted by player states.
+@warning_ignore("unused_signal")  # Emitted by player states.
 signal dash_finished(interrupted: bool)
-@warning_ignore("unused_signal") # Emitted by player states.
+@warning_ignore("unused_signal")  # Emitted by player states.
 signal dash_started
 ## Emitted for confirmed outgoing or incoming damage, including Charm hits.
 signal combat_activity
@@ -54,6 +54,7 @@ var _charm_grapple_tween: Tween
 
 @onready var stamina_label: Label = get_node_or_null("TestHUD/SP")
 @onready var hp_label: Label = get_node_or_null("TestHUD/HP")
+@onready var debug_grant_charms_button: Button = get_node_or_null("TestHUD/DebugGrantAllCharms")
 
 
 func _ready() -> void:
@@ -69,9 +70,34 @@ func _ready() -> void:
 	_setup_stats()
 	_setup_combat()
 	_setup_charm_system()
+	_setup_debug_charm_button()
 	if is_instance_valid(potion_selector):
 		potion_selector.configure(self, potion)
 	get_node("/root/GameManager").register_player(self)
+
+
+func _setup_debug_charm_button() -> void:
+	if not is_instance_valid(debug_grant_charms_button):
+		return
+	debug_grant_charms_button.visible = OS.is_debug_build()
+	debug_grant_charms_button.text = (
+		"Clear All Charms"
+		if is_instance_valid(charm_socket_manager) and charm_socket_manager.debug_all_charms_owned()
+		else "Grant All Charms"
+	)
+	if (
+		OS.is_debug_build()
+		and not debug_grant_charms_button.pressed.is_connected(_on_debug_grant_all_charms_pressed)
+	):
+		debug_grant_charms_button.pressed.connect(_on_debug_grant_all_charms_pressed)
+
+
+func _on_debug_grant_all_charms_pressed() -> void:
+	if not is_instance_valid(charm_socket_manager):
+		return
+	var granted := charm_socket_manager.debug_toggle_all_charms()
+	if is_instance_valid(debug_grant_charms_button):
+		debug_grant_charms_button.text = "Clear All Charms" if granted else "Grant All Charms"
 
 
 func _exit_tree() -> void:

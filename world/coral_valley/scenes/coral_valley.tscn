@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="9_57dpo"]
 [ext_resource type="PackedScene" uid="uid://djxjvu6e00r3h" path="res://world/gimmick/coral_valley/crate_reset_lever.tscn" id="9_wm6vx"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="12_wm6vx"]
+[ext_resource type="Script" uid="uid://cwey86jadengi" path="res://world/components/camera_bounds_3d.gd" id="camera_bounds"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -174,3 +175,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 5, 133)
 trigger_id = &"Coral_1"
 destination_scene = "uid://c7v4k2mrs8awh"
 destination_trigger_id = &"Coral_2"
+
+[node name="CameraBounds" type="Node3D" parent="." unique_id=193537478]
+script = ExtResource("camera_bounds")
+
+[node name="CornerA" type="Marker3D" parent="CameraBounds" unique_id=585291780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -280, 0, -72)
+
+[node name="CornerB" type="Marker3D" parent="CameraBounds" unique_id=585331915]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 242)

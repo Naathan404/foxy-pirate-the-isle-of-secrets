@@ -37,9 +37,11 @@
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="26_y6gb4"]
 [ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="27_86838"]
 [ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="27_k8ytl"]
+[ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="28_xsuyu"]
 [ext_resource type="Resource" uid="uid://cmpdo81fwpbrg" path="res://data/weapon/forges/doomsday_edge.tres" id="32_pnplv"]
 [ext_resource type="Resource" uid="uid://e3eg2gjqtnjw" path="res://data/weapon/forges/true_flight.tres" id="34_21pkc"]
 [ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
+[ext_resource type="Script" uid="uid://cl78s3j6pfbde" path="res://gameplay/player/bounded_follow_camera_3d.gd" id="camera_bounds_follow"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" uid="uid://btyx2ybnfoih7" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
@@ -804,6 +806,12 @@ item = ExtResource("25_21pkc")
 quantity = 2
 metadata/_custom_type_script = "uid://0vpaeibrfouv"
 
+[sub_resource type="Resource" id="Resource_84vxo"]
+script = ExtResource("16_n85vt")
+item = ExtResource("28_xsuyu")
+quantity = 21
+metadata/_custom_type_script = "uid://0vpaeibrfouv"
+
 [sub_resource type="Resource" id="Resource_jpyye"]
 script = ExtResource("26_y6gb4")
 metadata/_custom_type_script = "uid://dnv8otqkgp6v5"
@@ -824,7 +832,6 @@ metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("27_86838")
 blueprint_unlocked = true
-owned = true
 forge = ExtResource("34_21pkc")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
@@ -989,7 +996,7 @@ shape = SubResource("BoxShape3D_jpyye")
 
 [node name="Inventory" type="Node" parent="." unique_id=1718891682]
 script = ExtResource("15_lycwo")
-starting_items = Array[ExtResource("16_n85vt")]([SubResource("Resource_vt6mg"), SubResource("Resource_tst5e"), SubResource("Resource_8yxsm"), SubResource("Resource_itkg2"), SubResource("Resource_le4ue"), SubResource("Slot_wooden_arrow"), SubResource("Resource_khbku")])
+starting_items = Array[ExtResource("16_n85vt")]([SubResource("Resource_vt6mg"), SubResource("Resource_tst5e"), SubResource("Resource_8yxsm"), SubResource("Resource_itkg2"), SubResource("Resource_le4ue"), SubResource("Slot_wooden_arrow"), SubResource("Resource_khbku"), SubResource("Resource_84vxo")])
 capacity = 30
 
 [node name="WeaponController" type="Node" parent="." unique_id=1607748033]
@@ -1039,6 +1046,7 @@ metadata/_custom_type_script = "uid://b4jjfhk68ly5q"
 [node name="Camera3D" type="Camera3D" parent="." unique_id=342202680]
 transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 24, 24)
 fov = 30.0
+script = ExtResource("camera_bounds_follow")
 
 [node name="TestHUD" type="CanvasLayer" parent="." unique_id=404690851]
 
@@ -1048,6 +1056,14 @@ offset_top = 6.0
 offset_right = 1186.0
 offset_bottom = 29.0
 text = "DEBUG:"
+
+[node name="DebugGrantAllCharms" type="Button" parent="TestHUD"]
+offset_left = 1018.0
+offset_top = 80.0
+offset_right = 1120.0
+offset_bottom = 103.0
+mouse_default_cursor_shape = 2
+text = "Grant All Charms"
 
 [node name="HP" type="Label" parent="TestHUD" unique_id=700755012]
 offset_left = 1031.0
