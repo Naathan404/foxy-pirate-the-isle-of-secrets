@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island13.tscn" id="2_id0yi"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="2_lqu66"]
+[ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="3_okguq"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -47,5 +48,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 7.8399997, -110, 2, 106)
 trigger_id = &"stage5_A"
 destination_scene = "uid://dj81lyqu3ry8v"
 destination_trigger_id = &"stage4_B"
+
+[node name="SeaWater" parent="." unique_id=116442875 instance=ExtResource("3_okguq")]
+transform = Transform3D(2.1, 0, 0, 0, 1, 0, 0, 0, 1.9000001, -42, 0, 102)
 
 [editable path="CoralIsland13"]
