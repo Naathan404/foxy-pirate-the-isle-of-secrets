@@ -1,0 +1,82 @@
+{
+	"schema_version": 2,
+	"default_provider": "spine-4.3",
+	"providers": [
+		{
+			"id": "spine-4.3",
+			"spine_version": "4.3",
+			"supported_versions": ["4.3"],
+			"source_commit": "042612eee854389957e21f2c445436f11266dcfb",
+			"integration_ref_commit": "f182572b6360e6875d10a7c2b92dffed8c46c7d1",
+			"abi": { "major": 1, "minor": 16 },
+			"entry_symbol": "spine_provider_43_get_api",
+			"capabilities": ["SB_CAP_PROBE_VERSION", "SB_CAP_TRACK_ENTRY_OBJECT", "SB_CAP_ANIMATION_STATE_CONTROL", "SB_CAP_ANIMATION_OBJECT", "SB_CAP_EVENT_DATA_OBJECT", "SB_CAP_ANIMATION_TIMELINE_OBJECT", "SB_CAP_BONE_DATA_INFO", "SB_CAP_BONE_CONVERSIONS", "SB_CAP_SKIN_OBJECT_OPS", "SB_CAP_CONSTRAINT_OBJECTS", "SB_CAP_TWO_COLOR_TINT", "SB_CAP_NORMAL_PAGES", "SB_CAP_SETUP_POSE_OPS", "SB_CAP_CURRENT_SKIN", "SB_CAP_DEBUG_GEOMETRY"],
+			"library": {
+				"windows.editor.x86_64": "windows/spine_provider_43.windows.editor.x86_64.dll",
+				"windows.template_debug.x86_64": "windows/spine_provider_43.windows.template_debug.x86_64.dll",
+				"windows.template_release.x86_64": "windows/spine_provider_43.windows.template_release.x86_64.dll"
+			},
+			"notes": "SB-04 起为独立动态库 provider：spine-cpp 4.3（来源锁定见 source_commit）与纯 C ABI 适配层编入 addons/spine_bridge/<platform>/，仅导出入口 entry_symbol；Bridge 动态库不链接任何 spine-cpp。SB-05 起 manifest v2：supported_versions 为该 provider 声明可解析的骨架 major.minor 集合，运行时装载状态以实际 LoadLibrary 结果为准（不在清单中声明）；capabilities 为构建时声明，宿主仍按 ABI 函数表双重校验。SB-24B 起区分当前/目标基线：source_commit 为 runtime 锁定提交（当前实现与历史验收基线，保持不变）；integration_ref_commit 为 Godot 集成参考目标基线（spine-godot 4.3 分支 HEAD，含双色着色/SpineSprite3D/AnimationTrack GDExtension 化）。SB-24A 已核实两提交的 spine-cpp 逐文件 0 差异，故本批不升级 spine-cpp，仅登记集成参考；双色/3D 能力待 SB-25/26 实现，不因此字段视为已支持。2026-09-24 上游复核：042612ee 后官方 4.3 分支新增提交均不涉及 spine-cpp，锁定不变；官方 libgdx f83b75ea linked-mesh slider 修复以本地补丁移植（tools/apply_spine43_slider_fix.py，SConstruct 构建前自动应用，见 providers/spine_4_3/README.md）。"
+		},
+		{
+			"id": "spine-4.2",
+			"spine_version": "4.2",
+			"supported_versions": ["4.2"],
+			"source_commit": "e7dc1435fa4a0083ab431f1b28e083c14a1f5c68",
+			"abi": { "major": 1, "minor": 16 },
+			"entry_symbol": "spine_provider_42_get_api",
+			"capabilities": ["SB_CAP_PROBE_VERSION", "SB_CAP_TRACK_ENTRY_OBJECT", "SB_CAP_ANIMATION_STATE_CONTROL", "SB_CAP_ANIMATION_OBJECT", "SB_CAP_EVENT_DATA_OBJECT", "SB_CAP_ANIMATION_TIMELINE_OBJECT", "SB_CAP_BONE_DATA_INFO", "SB_CAP_BONE_CONVERSIONS", "SB_CAP_SKIN_OBJECT_OPS", "SB_CAP_CONSTRAINT_OBJECTS", "SB_CAP_TWO_COLOR_TINT", "SB_CAP_NORMAL_PAGES", "SB_CAP_SETUP_POSE_OPS", "SB_CAP_CURRENT_SKIN", "SB_CAP_DEBUG_GEOMETRY"],
+			"library": {
+				"windows.editor.x86_64": "windows/spine_provider_42.windows.editor.x86_64.dll",
+				"windows.template_debug.x86_64": "windows/spine_provider_42.windows.template_debug.x86_64.dll",
+				"windows.template_release.x86_64": "windows/spine_provider_42.windows.template_release.x86_64.dll"
+			},
+			"notes": "SB-06 起为独立动态库 provider：spine-cpp 4.2（官方 spine-runtimes 4.2 分支，提交见 source_commit，Version.h 为 4.2）与纯 C ABI 适配层编入独立 DLL，仅导出入口 entry_symbol；与 spine-4.3 provider 完全隔离，可同进程同场景共存。已实测验证的导出版本：4.2.43（黑小焱）。4.2 API 差异按真实接口适配（Vector 容器、getTracks 取轨道、空动画为 runtime 单例，按对象身份区分普通同名动画、世界变换分解移植 BonePose 算法），非机械改名。"
+		},
+			{
+				"id": "spine-4.1",
+			"spine_version": "4.1",
+			"supported_versions": ["4.1"],
+			"source_commit": "77a5db0ec6d16331f5efbaa7662bba9355bd3424",
+			"abi": { "major": 1, "minor": 1 },
+			"entry_symbol": "spine_provider_41_get_api",
+			"capabilities": ["SB_CAP_PROBE_VERSION"],
+			"library": {
+				"windows.editor.x86_64": "windows/spine_provider_41.windows.editor.x86_64.dll",
+				"windows.template_debug.x86_64": "windows/spine_provider_41.windows.template_debug.x86_64.dll",
+				"windows.template_release.x86_64": "windows/spine_provider_41.windows.template_release.x86_64.dll"
+			},
+				"notes": "SB-16：独立 spine-cpp 4.1 provider，来源锁定为 77a5db0ec6d16331f5efbaa7662bba9355bd3424，唯一入口 spine_provider_41_get_api。已实现冻结 ABI v1.1 的加载、实例、动画状态、基础属性、插槽附件、渲染帧、事件快照与 setup 数据；相对 4.3 的 TrackEntry/AnimationState 控制、Animation/Timeline、EventData、Skin/Attachment 对象、约束、双色帧、setup pose 扩展、当前 Skin 和调试几何等可选族暂不声明，宿主按 capability 回退或报告不支持。"
+			},
+			{
+				"id": "spine-4.0",
+				"spine_version": "4.0",
+				"supported_versions": ["4.0"],
+				"source_commit": "425ce416bb218b28caeec47b317aa57cd7140375",
+				"abi": { "major": 1, "minor": 1 },
+				"entry_symbol": "spine_provider_40_get_api",
+				"capabilities": ["SB_CAP_PROBE_VERSION"],
+				"library": {
+					"windows.editor.x86_64": "windows/spine_provider_40.windows.editor.x86_64.dll",
+					"windows.template_debug.x86_64": "windows/spine_provider_40.windows.template_debug.x86_64.dll",
+					"windows.template_release.x86_64": "windows/spine_provider_40.windows.template_release.x86_64.dll"
+				},
+				"notes": "SB-17：独立 spine-cpp 4.0 provider，来源锁定为 425ce416bb218b28caeec47b317aa57cd7140375（4.0 分支 HEAD），唯一入口 spine_provider_40_get_api。已实现冻结 ABI v1.1 的 JSON/二进制加载、版本探测、实例/动画状态、基础属性、插槽附件、Region/Mesh 渲染帧、包围盒、事件快照和 setup 数据；4.0 的约束算法由官方 runtime 驱动，但本 provider 不声明未冻结的约束对象族、TrackEntry/Animation/Timeline/EventData/Skin 对象、双色帧、setup pose 扩展、当前 Skin 和调试几何能力，宿主按 capability 回退或报告不支持。"
+			},
+			{
+				"id": "spine-3.8",
+				"spine_version": "3.8",
+				"supported_versions": ["3.8"],
+				"source_commit": "8b4844bd4b193ba9e54487ed397a777993cbad56",
+				"abi": { "major": 1, "minor": 1 },
+				"entry_symbol": "spine_provider_38_get_api",
+				"capabilities": ["SB_CAP_PROBE_VERSION"],
+				"library": {
+					"windows.editor.x86_64": "windows/spine_provider_38.windows.editor.x86_64.dll",
+					"windows.template_debug.x86_64": "windows/spine_provider_38.windows.template_debug.x86_64.dll",
+					"windows.template_release.x86_64": "windows/spine_provider_38.windows.template_release.x86_64.dll"
+				},
+				"notes": "SB-18：独立 spine-cpp 3.8 provider，来源锁定为 8b4844bd4b193ba9e54487ed397a777993cbad56（3.8 分支 HEAD），唯一入口 spine_provider_38_get_api。已实现冻结 ABI v1.1 的 JSON/二进制加载、版本探测、实例/动画状态、基础属性、插槽附件、皮肤、Region/Mesh 渲染帧、包围盒、事件快照和 setup 数据；3.8 无 physics/sequence 等新版本能力，AtlasPage 不提供 PMA 字段，未声明的对象 API、双色帧、当前 Skin 和调试几何按 capability 明确保持不支持或未测。"
+			}
+		]
+}

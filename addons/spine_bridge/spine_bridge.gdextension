@@ -1,0 +1,35 @@
+[configuration]
+
+entry_symbol = "spine_bridge_library_init"
+compatibility_minimum = "4.7"
+
+[libraries]
+
+; 首版仅面向 Windows（Q01）；其他平台条目随平台接入再补充。
+; DLL 尚未构建时，编辑器会在启动时记录一次库文件缺失错误，属预期现象。
+windows.editor.x86_64 = "windows/libspine_bridge.windows.editor.x86_64.dll"
+windows.debug.x86_64 = "windows/libspine_bridge.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "windows/libspine_bridge.windows.template_release.x86_64.dll"
+
+[dependencies]
+
+; SB-04：4.3 provider 独立动态库（运行时由 Bridge 的 ProviderManager 装载）。
+; SB-06：4.2 provider 同规则登记，与 4.3 各自独立成库。
+; SB-17：4.0 provider 同规则登记，与其他 runtime 各自独立成库。
+; SB-18：3.8 provider 同规则登记，与其他 runtime 各自独立成库。
+; 导出时随包携带；仅登记 template_release 目标变体
+;（2026-09-24 瘦身：editor 变体不随包导出——导出包内不存在编辑器宿主，运行时
+; current_target() 不会选中该变体；template_debug 的 provider 变体亦不随包导出
+;——debug 导出由 load_entry_library() 的同平台回退装载 release 变体（当前冻结
+; ABI 与装载协商支持该混载方向，Windows x86_64 已实测；开发机项目目录保留全部
+; 变体，编辑器内运行按 providers.json 直取）。Bridge 主库不在此列，由
+; [libraries] 按导出目标选取）。
+; 依赖收集按“源路径 → 目标目录”字典读取（数组条目不会被登记）；目标目录相对导出包根，
+; 取 addons/spine_bridge/windows 与装载路径 res://addons/spine_bridge/windows/（globalize 后为 exe 所在目录）一致。
+windows = {
+	"windows/spine_provider_43.windows.template_release.x86_64.dll": "addons/spine_bridge/windows",
+	"windows/spine_provider_42.windows.template_release.x86_64.dll": "addons/spine_bridge/windows",
+	"windows/spine_provider_41.windows.template_release.x86_64.dll": "addons/spine_bridge/windows",
+	"windows/spine_provider_40.windows.template_release.x86_64.dll": "addons/spine_bridge/windows",
+	"windows/spine_provider_38.windows.template_release.x86_64.dll": "addons/spine_bridge/windows"
+}
