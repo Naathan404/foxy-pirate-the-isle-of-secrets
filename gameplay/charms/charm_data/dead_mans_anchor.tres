@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CharmData" format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://c1gtfqtbeobfm"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/dead_mans_anchor_effect.tscn" id="2_effect"]
-[ext_resource type="Texture2D" path="res://assets/sprites/charms/dead_mans_anchor.png" id="3_icon"]
+[ext_resource type="Texture2D" uid="uid://d17dvlhunohkf" path="res://assets/sprites/charms/dead_mans_anchor.png" id="3_icon"]
 
 [resource]
 script = ExtResource("1_data")
@@ -13,10 +13,8 @@ sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
 resource_cost = 300.0
-cooldown_seconds = 0.0
 acquisition_source = &"prototype_debug"
 content_status = 1
-drop_chance = -1.0
 tags = Array[StringName]([&"active", &"prototype", &"recast"])
 effect_params = {
 "recast_window_seconds": 5.0

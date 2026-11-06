@@ -1,0 +1,14 @@
+[remap]
+
+importer="curvature.spine.binary"
+type="SpineSkeletonFileResource"
+uid="uid://bjslohiu2vvcs"
+path="res://.godot/imported/Foxy_full_skin_Roll.skel-081dd0b0b364625e647d44c5d04c409b.tres"
+
+[deps]
+
+source_file="res://assets/spine/animation/Foxy_full_skin_Roll.skel"
+dest_files=["res://.godot/imported/Foxy_full_skin_Roll.skel-081dd0b0b364625e647d44c5d04c409b.tres"]
+
+[params]
+

@@ -25,8 +25,8 @@
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="23_5fcor"]
 [ext_resource type="PackedScene" uid="uid://dltw4fun83bl4" path="res://gameplay/merchant/silas_shop_panel.tscn" id="24_silas_panel"]
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="25_silas_npc"]
-[ext_resource type="PackedScene" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="tortuga_npc"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="26_or6q7"]
+[ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="tortuga_npc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kouyd"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -212,7 +212,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
 [node name="Silas" parent="." unique_id=1750552988 instance=ExtResource("25_silas_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 3)
 
-[node name="MasterTortuga" parent="." instance=ExtResource("tortuga_npc")]
+[node name="MasterTortuga" parent="." unique_id=1890482098 instance=ExtResource("tortuga_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2, 3)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1887658636]
@@ -459,15 +459,40 @@ initial_facing = 0
 
 [node name="Barrel" parent="World" unique_id=1050350307 instance=ExtResource("16_dxx27")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62284946, 5.042698, 23.770195)
+trigger_mode = 1
+auto_aim_at_player = true
+direction_mode = 0
+shot_interval = 0.2
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
+initial_facing = 0
 
 [node name="Barrel2" parent="World" unique_id=893582788 instance=ExtResource("16_dxx27")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.157921, 3.8701534, -19.61535)
+trigger_mode = 0
+auto_aim_at_player = false
+direction_mode = 0
+shot_interval = 0.2
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
 
 [node name="Barrel3" parent="World" unique_id=984723923 instance=ExtResource("16_dxx27")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.519032, 0.48890686, 7.6230145)
+trigger_mode = 0
+auto_aim_at_player = false
+direction_mode = 0
+shot_interval = 0.2
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
 
 [node name="Barrel4" parent="World" unique_id=1103253354 instance=ExtResource("16_dxx27")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.156448, -1.6086941, -27.062931)
+trigger_mode = 0
+auto_aim_at_player = false
+direction_mode = 0
+shot_interval = 0.2
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
 
 [node name="Starfish4" parent="World" unique_id=2105442354 instance=ExtResource("14_fkh54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.04325, -1.09375, -31.622093)
@@ -503,6 +528,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.650712, -0.8267536, 29.794
 
 [node name="EliteBarrel" parent="." unique_id=763433729 instance=ExtResource("23_5fcor")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8243723, 4.4990196, -21.086876)
+trigger_mode = 0
+auto_aim_at_player = false
+shot_interval = 0.2
 
 [node name="MovingPlatform" parent="." unique_id=304837597 instance=ExtResource("26_or6q7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.589443, 1.7562828, 12)

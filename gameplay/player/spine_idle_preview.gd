@@ -1,10 +1,13 @@
 extends Node3D
-## Optional idle-down experiment; gameplay continues to use PlayerVisual's animation clock.
+## Spine visual overlay; PlayerVisual's AnimationPlayer keeps gameplay timing.
 
 @export var enabled: bool = true
 @export_file("*.tres")
 var skeleton_data_path: String = "res://assets/spine/compat/foxy_skeleton.tres"
 @export var spine_animation: String = "animation"
+@export var spine_skin: String = ""
+@export var animation_mapping: Dictionary = {}
+@export var artwork_faces_left: bool = true
 ## Scale the fitted Spine artwork without moving its feet from the sprite baseline.
 @export_range(0.25, 3.0, 0.05, "or_greater") var size_multiplier: float = 1.0
 
@@ -15,6 +18,9 @@ var _fitted_transform: Transform3D = Transform3D.IDENTITY
 var _reference_height: float = 0.0
 var _reference_bottom: Vector3 = Vector3.ZERO
 var _fit_ready: bool = false
+var _current_spine_animation: String = ""
+var _current_spine_skin: String = ""
+var _dagger_combo_index: int = 0
 
 
 func _ready() -> void:
@@ -79,20 +85,94 @@ func _process(_delta: float) -> void:
 		_spine.resume()
 
 
+func set_dagger_combo_index(index: int) -> void:
+	_dagger_combo_index = clampi(index, -1, 2)
+
+
+## The dash effect snapshots the meshes currently drawn by Spine.
+func get_afterimage_source() -> Node3D:
+	return _spine if _active and visible and is_instance_valid(_spine) else null
+
+
 func sync_animation(
 	animation_name: StringName,
 	source: Sprite3D,
 	active_sprite: Sprite3D,
 	camera: Camera3D,
-	facing_left: bool
+	facing_left: bool,
+	screen_facing: Vector3,
+	restart: bool = false
 ) -> void:
-	var show_preview := enabled and animation_name == &"idle_down"
+	var target_animation := ""
+	var target_skin := spine_skin
+	var mapping_key := String(animation_name)
+	if animation_name == &"idle_side":
+		mapping_key = "idle_down"
+	elif (
+		(mapping_key.begins_with("run_") or mapping_key.begins_with("dash_"))
+		and absf(screen_facing.x) > 0.01
+		and absf(screen_facing.z) > 0.01
+	):
+		mapping_key = mapping_key.get_slice("_", 0) + "_side"
+	var mapping: Array = animation_mapping.get(mapping_key, [])
+	if mapping.size() == 2:
+		target_animation = str(mapping[0])
+		target_skin = str(mapping[1])
+		if String(animation_name).begins_with("attack_dagger_"):
+			target_animation = (
+				"Attack_%d" % (_dagger_combo_index + 1)
+				if _dagger_combo_index >= 0 else ""
+			)
+	elif animation_mapping.is_empty() and animation_name == &"idle_down":
+		target_animation = spine_animation
+	var show_preview := enabled and not target_animation.is_empty()
+	if show_preview and is_instance_valid(_spine) and (
+		restart
+		or _current_spine_animation != target_animation
+		or _current_spine_skin != target_skin
+	):
+		# Spine 3.8 cannot restore setup pose after a skin/clip change.
+		# A fresh instance prevents leftover bone and attachment state.
+		_spine.visible = false
+		_spine.set_process(false)
+		_spine.set_physics_process(false)
+		_spine.queue_free()
+		_spine = null
+		_load_attempted = false
 	if show_preview:
 		show_preview = _ensure_spine()
-	if show_preview and not _active:
-		if not _fit_ready:
+	if show_preview and not _fit_ready:
+		var calibration_core = _spine.get_node("_SpineSpriteCore3D")
+		if not spine_skin.is_empty():
+			show_preview = calibration_core.set_skin(spine_skin)
+		if show_preview:
+			show_preview = bool(_spine.set_animation(spine_animation, true, 0))
+		if show_preview:
 			_fit_to_sprite()
-		show_preview = _fit_ready and bool(_spine.set_animation(spine_animation, true, 0))
+			show_preview = _fit_ready
+		if show_preview:
+			_spine.visible = false
+			_spine.set_process(false)
+			_spine.set_physics_process(false)
+			_spine.queue_free()
+			_spine = null
+			_load_attempted = false
+			show_preview = _ensure_spine()
+	if show_preview and (
+		not _active
+		or restart
+		or _current_spine_animation != target_animation
+		or _current_spine_skin != target_skin
+	):
+		if not target_skin.is_empty():
+			var core = _spine.get_node("_SpineSpriteCore3D")
+			show_preview = core.set_skin(target_skin)
+		if show_preview:
+			var loop := not String(animation_name).begins_with("attack_dagger_")
+			show_preview = bool(_spine.set_animation(target_animation, loop, 0))
+		if show_preview:
+			_current_spine_animation = target_animation
+			_current_spine_skin = target_skin
 	_active = show_preview
 	visible = _active
 	source.visible = source == active_sprite and not _active
@@ -101,9 +181,9 @@ func sync_animation(
 	if not _active:
 		_spine.pause()
 		return
-	# This artwork faces left. Mirror its fitted offset along with its geometry.
+	# Mirror the artwork and its fitted offset together.
 	var facing_transform := _fitted_transform
-	if not facing_left:
+	if facing_left != artwork_faces_left:
 		facing_transform.basis.x *= -1.0
 		facing_transform.origin.x = 2.0 * _reference_bottom.x - _fitted_transform.origin.x
 	_spine.transform = facing_transform
@@ -140,13 +220,14 @@ func _ensure_spine() -> bool:
 		return false
 	add_child(_spine)
 	_spine.set("shadow_casting", 2)  # Double Sided
-	_spine.set("skeleton_data_res", load(skeleton_data_path))
+	var skeleton_data = load(skeleton_data_path)
+	_spine.set("skeleton_data_res", skeleton_data)
 	_spine.pause()
 	return _spine.is_loaded()
 
 
 func _fit_to_sprite() -> void:
-	# Calibrate once against the initial skeleton bounds, never against a paused animated pose.
+	# Calibrate once against the authored idle pose. Action clips can start compressed.
 	_spine.transform = Transform3D.IDENTITY
 	_spine.update_skeleton(0.0)
 	var bounds: AABB = _spine.get_aabb()

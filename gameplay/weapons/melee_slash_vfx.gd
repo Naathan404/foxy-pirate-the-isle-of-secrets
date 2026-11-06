@@ -2,7 +2,7 @@ class_name MeleeSlashVFX
 extends Node3D
 ## Visual only: the execution supplies swing progress; no damage queries live here.
 
-const ENERGY_SHADER: Shader = preload("res://gameplay/weapons/dagger_energy.gdshader")
+const ENERGY_SHADER: Shader = preload("res://gameplay/weapons/dagger_slash_overlay.gdshader")
 const SEGMENTS: int = 40
 
 var _step: MeleeComboStep

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1_data"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/passive/life_steal_effect.tscn" id="2_effect"]
-[ext_resource type="Texture2D" path="res://assets/sprites/charms/life_steal.png" id="3_icon"]
+[ext_resource type="Texture2D" uid="uid://dh8y7q51mj44p" path="res://assets/sprites/charms/life_steal.png" id="3_icon"]
 
 [resource]
 script = ExtResource("1_data")

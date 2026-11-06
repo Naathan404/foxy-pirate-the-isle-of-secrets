@@ -1,7 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://608osx3u4s1k"]
 
-[ext_resource type="Script" path="res://gameplay/charms/active/arrow_rain_telegraph.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://ceypthm451g0n" path="res://gameplay/charms/active/arrow_rain_telegraph.gd" id="1_script"]
 
-[node name="ArrowRainTelegraph" type="MeshInstance3D"]
+[node name="ArrowRainTelegraph" type="MeshInstance3D" unique_id=1742755747]
 script = ExtResource("1_script")
-

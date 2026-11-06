@@ -1,0 +1,15 @@
+[remap]
+
+importer="curvature.spine.atlas"
+type="SpineAtlasResource"
+uid="uid://df12lodtka2js"
+path="res://.godot/imported/Foxy_full_skin_Roll.atlas-608e680f125cc078e95d8f6322148085.tres"
+
+[deps]
+
+source_file="res://assets/spine/animation/Foxy_full_skin_Roll.atlas"
+dest_files=["res://.godot/imported/Foxy_full_skin_Roll.atlas-608e680f125cc078e95d8f6322148085.tres"]
+
+[params]
+
+normal_map_prefix="n"
