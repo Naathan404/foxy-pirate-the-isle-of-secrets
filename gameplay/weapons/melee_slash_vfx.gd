@@ -16,30 +16,34 @@ var _fade_seconds: float = 0.16
 var _released: bool = false
 var _age: float = 0.0
 var _impact_count: int = 0
+var _show_trail: bool = true
 
 
-func setup(step: MeleeComboStep, radius: float) -> void:
+func setup(step: MeleeComboStep, radius: float, show_trail: bool = true) -> void:
 	_step = step
+	_show_trail = show_trail
 	_radius = radius * (1.15 if step.heavy_impact else 1.1)
 	_fade_seconds = 0.22 if step.heavy_impact else 0.16
 	_material.shader = ENERGY_SHADER
 	_material.set_shader_parameter("shape", 4)
 	_material.set_shader_parameter("tint", step.slash_color)
 	_material.set_shader_parameter("energy", 2.0 if step.heavy_impact else 1.65)
-	var ribbon := MeshInstance3D.new()
-	ribbon.mesh = _mesh
-	ribbon.material_override = _material
-	ribbon.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(ribbon)
+	if _show_trail:
+		var ribbon := MeshInstance3D.new()
+		ribbon.mesh = _mesh
+		ribbon.material_override = _material
+		ribbon.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(ribbon)
 	_echo_material.shader = ENERGY_SHADER
 	_echo_material.set_shader_parameter("shape", 4)
 	_echo_material.set_shader_parameter("tint", Color(step.slash_color, step.slash_color.a * 0.4))
 	_echo_material.set_shader_parameter("energy", 1.25)
-	var echo := MeshInstance3D.new()
-	echo.mesh = _echo_mesh
-	echo.material_override = _echo_material
-	echo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(echo)
+	if _show_trail:
+		var echo := MeshInstance3D.new()
+		echo.mesh = _echo_mesh
+		echo.material_override = _echo_material
+		echo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(echo)
 	set_progress(0.0)
 
 
@@ -61,7 +65,7 @@ func impact(at: Vector3, direction: Vector3, heavy: bool, strength: float = 1.0)
 	var camera := get_viewport().get_camera_3d()
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.albedo_color = Color(1.0, 0.95, 0.75)
+	material.albedo_color = Color(0.92, 0.98, 1.0)
 	material.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	for index in 7 if heavy else 4:
 		var spark := MeshInstance3D.new()
@@ -93,6 +97,8 @@ func _process(delta: float) -> void:
 
 
 func _draw_arc() -> void:
+	if not _show_trail:
+		return
 	var head := lerpf(_step.swing_start_degrees, _step.swing_end_degrees, _progress)
 	var tail := lerpf(
 		_step.swing_start_degrees, _step.swing_end_degrees, maxf(0.0, _progress - 0.95)

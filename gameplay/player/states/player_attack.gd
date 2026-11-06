@@ -216,6 +216,12 @@ func _sync_aim_pose() -> void:
 
 
 func _apply_forward_step(delta: float) -> void:
+	if (
+		_combo_step != null and _combo_step.straight_thrust
+		and controller is WeaponController
+		and controller.get_attack_phase_name() != &"active"
+	):
+		return
 	var distance := _combo_step.step_distance if _combo_step != null else step_distance
 	var duration := (
 		_combo_step.step_duration * _step_time_scale if _combo_step != null else step_duration
