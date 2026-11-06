@@ -190,6 +190,10 @@ func _on_attack_started(context: AttackContext) -> void:
 		_step_direction = context.direction
 	player.last_facing_direction = context.direction
 	animation_prefix = controller.get_attack_animation_prefix()
+	if animation_prefix == "attack_dagger":
+		player.visual.set_dagger_combo_index(
+			context.combo_index if context.action == &"normal" else -1
+		)
 	player.play_directional_animation(animation_prefix, true)
 	if _uses_aim_pose:
 		_sync_aim_pose()

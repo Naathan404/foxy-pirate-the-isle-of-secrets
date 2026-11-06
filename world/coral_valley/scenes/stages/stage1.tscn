@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://d1em755mvcub4" path="res://world/coral_valley/scenes/islands/coral_island2.tscn" id="2_u7cb7"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island3.tscn" id="3_r5dp7"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island4.tscn" id="4_2g3gq"]
-[ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="6_r5dp7"]
+[ext_resource type="PackedScene" uid="uid://bo7ce6vvl81jr" path="res://world/hub/objects/sea_water.tscn" id="6_r5dp7"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="7_2g3gq"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="8_kgb05"]
 
@@ -58,6 +58,9 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland2" index="1" unique_id=1661393056]
 visible = false
 
+[node name="SeaWater" parent="CoralIsland2" index="3" unique_id=116442875]
+visible = true
+
 [node name="CoralIsland3" parent="." unique_id=70048280 instance=ExtResource("3_r5dp7")]
 
 [node name="WorldEnvironment" parent="CoralIsland3" index="0"]
@@ -71,9 +74,6 @@ transform = Transform3D(-1.5893256e-08, 0, 1, 0, 1, 0, -1, 0, -1.5893256e-08, -3
 
 [node name="WorldEnvironment" parent="CoralIsland4" index="0"]
 environment = null
-
-[node name="DirectionalLight3D" parent="CoralIsland4" index="1"]
-visible = false
 
 [node name="SeaWaters" type="Node3D" parent="." unique_id=752669126]
 
@@ -93,7 +93,7 @@ transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 0.8, 34, 0, 54)
 transform = Transform3D(1.232, 0, 0, 0, 1, 0, 0, 0, 0.24000001, 51.247997, 0, 145.20001)
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("7_2g3gq")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -257, 0, 156)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -266.21976, 5.88918, 144.76683)
 
 [node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("8_kgb05")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 5.4449997, -66, 2, 134.66954)

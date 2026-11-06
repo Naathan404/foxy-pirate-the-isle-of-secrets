@@ -1,6 +1,6 @@
 [gd_resource type="AnimationLibrary" format=3 uid="uid://cxepldwk3cva0"]
 
-[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/harpoon_placeholder/foxy_harpoon_sheet.png" id="1_sheet"]
+[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/_placeholder/foxy_harpoon_sheet.png" id="1_sheet"]
 
 [sub_resource type="AtlasTexture" id="Frame_0"]
 atlas = ExtResource("1_sheet")

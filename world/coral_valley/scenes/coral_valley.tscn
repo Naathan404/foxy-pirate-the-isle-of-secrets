@@ -118,7 +118,7 @@ crates = [NodePath("../Crate"), NodePath("../Crate2"), NodePath("../Crate3"), No
 [node name="SeaWaters" type="Node3D" parent="." unique_id=581786872]
 
 [node name="SeaWater" parent="SeaWaters" unique_id=116442875 instance=ExtResource("7_ywsg1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -419, 0, 85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -418.40356, -0.8651581, 85.316986)
 
 [node name="SeaWater8" parent="SeaWaters" unique_id=2047882677 instance=ExtResource("7_ywsg1")]
 transform = Transform3D(0.039600004, 0, 0, 0, 1, 0, 0, 0, 0.06, -107, 0, 141)
