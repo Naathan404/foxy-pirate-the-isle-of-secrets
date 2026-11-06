@@ -115,6 +115,7 @@ transform = Transform3D(0.17999998, 0, 0, 0, 1, 0, 0, 0, 1.2830399, -66.676544, 
 [node name="SeaWater2" parent="SeaWaters" unique_id=1390153836 instance=ExtResource("6_oxqnf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.166306, 0, -221.58908)
 
+[editable path="MovingPlatform"]
 [editable path="CoralIsland1"]
 [editable path="CoralIsland5"]
 [editable path="CoralIsland6"]
