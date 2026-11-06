@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_qfblp"]
 [ext_resource type="PackedScene" uid="uid://d0fte67sn6yi0" path="res://world/hub/objects/bridge.tscn" id="7_3nbuy"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="8_805np"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="9_87ubc"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island10.tscn" id="island_10"]
 [ext_resource type="PackedScene" uid="uid://pmlwlksjm4fa" path="res://world/coral_valley/scenes/islands/coral_island11.tscn" id="island_11"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island12.tscn" id="island_12"]
@@ -109,7 +110,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 10.083313)
 transform = Transform3D(1.275, 0, 0, 0, 1, 0, 0, 0, 1, -112.68065, -2, 215)
 
 [node name="SeaWaters" type="Node3D" parent="." unique_id=1212102177]
-visible = false
 
 [node name="SeaWater" parent="SeaWaters" unique_id=116442875 instance=ExtResource("8_805np")]
 transform = Transform3D(1.8762269, 0, 0, 0, 1, 0, 0, 0, 2.0087566, 13.497223, 0, 229.31001)
@@ -122,6 +122,18 @@ transform = Transform3D(0.21666306, 0, 0, 0, 1, 0, 0, 0, 0.98017335, -184.53625,
 
 [node name="SeaWater4" parent="SeaWaters" unique_id=1649179745 instance=ExtResource("8_805np")]
 transform = Transform3D(0.21666306, 0, 0, 0, 1, 0, 0, 0, 0.87163156, -184.53625, 0, 342.57803)
+
+[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("9_87ubc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 6.7518, -363.90524, 2, 214.29843)
+trigger_id = &"stage3_A"
+destination_scene = "uid://8bajt0wsi25i"
+destination_trigger_id = &"stage2_B"
+
+[node name="SceneChangeTrigger2" parent="." unique_id=2011635440 instance=ExtResource("9_87ubc")]
+transform = Transform3D(-4.371139e-08, 0, -3.4029076, 0, 1, 0, 1, 0, -1.4874581e-07, -205.49767, 2, 188.29123)
+trigger_id = &"stage3_B"
+destination_scene = "uid://dj81lyqu3ry8v"
+destination_trigger_id = &"stage4_A"
 
 [editable path="CoralIsland10"]
 [editable path="CoralIsland11"]

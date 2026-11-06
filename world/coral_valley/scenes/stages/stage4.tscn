@@ -2,7 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="5_ww385"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_jdacn"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="7_efo3i"]
 [ext_resource type="PackedScene" uid="uid://d0fte67sn6yi0" path="res://world/hub/objects/bridge.tscn" id="7_ghh4f"]
+[ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="8_efo3i"]
 [ext_resource type="PackedScene" uid="uid://bysge4gycen5u" path="res://world/coral_valley/scenes/islands/coral_island9.tscn" id="island_9"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island15.tscn" id="island_15"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island16.tscn" id="island_16"]
@@ -96,6 +98,47 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -184, -2, -46)
 
 [node name="Bridge2" parent="." unique_id=116366302 instance=ExtResource("7_ghh4f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -192, -2, -46)
+
+[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("7_efo3i")]
+transform = Transform3D(-4.371139e-08, 0, -4.9979997, 0, 1, 0, 1, 0, -2.1846951e-07, -175.78622, 2, 166)
+trigger_id = &"stage4_A"
+destination_scene = "uid://c4ev6rtupcfe4"
+destination_trigger_id = &"stage3_B"
+
+[node name="SceneChangeTrigger2" parent="." unique_id=1782827298 instance=ExtResource("7_efo3i")]
+transform = Transform3D(-1, 0, 4.3693902e-07, 0, 1, 0, -8.742278e-08, 0, -4.9979997, -100.81823, 2, 119.95258)
+trigger_id = &"stage4_B"
+destination_scene = "uid://b4qt2tgtd8lpy"
+destination_trigger_id = &"stage5_A"
+
+[node name="SceneChangeTrigger3" parent="." unique_id=368205892 instance=ExtResource("7_efo3i")]
+transform = Transform3D(-1, 0, 4.3693902e-07, 0, 1, 0, -8.742278e-08, 0, -4.9979997, -105.38128, 2, -17.018219)
+trigger_id = &"stage4_C"
+destination_scene = "uid://cc6e6g5fqidwv"
+destination_trigger_id = &"stage6_A"
+
+[node name="SeaWaters" type="Node3D" parent="." unique_id=1545627304]
+
+[node name="SeaWater" parent="SeaWaters" unique_id=1220898610 instance=ExtResource("8_efo3i")]
+transform = Transform3D(1.3572246, 0, 0, 0, 1, 0, 0, 0, 2.9575863, -437.11865, 0, 27.884085)
+
+[node name="SeaWater2" parent="SeaWaters" unique_id=1897914126 instance=ExtResource("8_efo3i")]
+transform = Transform3D(2.1884882, 0, 0, 0, 1, 0, 0, 0, 1.4787469, -84.41499, 0, -119.9785)
+
+[node name="SeaWater3" parent="SeaWaters" unique_id=2142768301 instance=ExtResource("8_efo3i")]
+transform = Transform3D(2.1884882, 0, 0, 0, 1, 0, 0, 0, 0.9179081, -84.41499, 0, 232.36725)
+
+[node name="SeaWater4" parent="SeaWaters" unique_id=1108977938 instance=ExtResource("8_efo3i")]
+transform = Transform3D(0.3685378, 0, 0, 0, 1, 0, 0, 0, 0.9179081, -254.86548, 0, 114.84358)
+
+[node name="SeaWater5" parent="SeaWaters" unique_id=1831918756 instance=ExtResource("8_efo3i")]
+transform = Transform3D(0.11279868, 0, 0, 0, 1, 0, 0, 0, 0.1611231, -302.1887, 0, 130.17215)
+
+[node name="SeaWater6" parent="SeaWaters" unique_id=1579373063 instance=ExtResource("8_efo3i")]
+transform = Transform3D(2.1045427, 0, 0, 0, 1, 0, 0, 0, 0.35538745, -76.81495, 0, 54.934418)
+
+[node name="SeaWater7" parent="SeaWaters" unique_id=2002557118 instance=ExtResource("8_efo3i")]
+transform = Transform3D(1.3982699, 0, 0, 0, 1, 0, 0, 0, 0.35538745, -5.8264704, 0, 105.229774)
 
 [editable path="CoralIsland9"]
 [editable path="CoralIsland15"]

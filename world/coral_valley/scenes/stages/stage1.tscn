@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island4.tscn" id="4_2g3gq"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="6_r5dp7"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="7_2g3gq"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="8_kgb05"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -93,6 +94,12 @@ transform = Transform3D(1.232, 0, 0, 0, 1, 0, 0, 0, 0.24000001, 51.247997, 0, 14
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("7_2g3gq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -257, 0, 156)
+
+[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("8_kgb05")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 5.4449997, -66, 2, 134.66954)
+trigger_id = &"stage1"
+destination_scene = "uid://8bajt0wsi25i"
+destination_trigger_id = &"stage2_A"
 
 [editable path="CoralIsland8"]
 [editable path="CoralIsland2"]
