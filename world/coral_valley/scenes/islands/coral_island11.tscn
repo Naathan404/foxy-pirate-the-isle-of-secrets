@@ -42,7 +42,6 @@ metadata/_editor_floor_ = Vector3(0, -3, 0)
 
 [node name="SeaWater" parent="." unique_id=116442875 instance=ExtResource("2_oyjpp")]
 transform = Transform3D(0.11699998, 0, 0, 0, 1, 0, 0, 0, 0.123199984, -170.23001, 0, 221.788)
-visible = false
 
 [node name="TideController" type="Node" parent="." unique_id=1248645761 node_paths=PackedStringArray("water")]
 script = ExtResource("3_ow4x7")

@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://b4qt2tgtd8lpy"]
+
+[ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island13.tscn" id="2_id0yi"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
+sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
+ground_bottom_color = Color(0.694361, 0.82665706, 0.9260749, 1)
+ground_horizon_color = Color(0.7735731, 0.8808251, 0.9452769, 1)
+
+[sub_resource type="Sky" id="Sky_1remn"]
+sky_material = SubResource("ProceduralSkyMaterial_ocap6")
+
+[sub_resource type="Environment" id="Environment_1h7xg"]
+background_mode = 2
+sky = SubResource("Sky_1remn")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_sky_contribution = 0.53
+ambient_light_energy = 0.72
+
+[node name="Stage4" type="Node3D" unique_id=728909387]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1872380418]
+environment = SubResource("Environment_1h7xg")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=442048085]
+transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
+light_energy = 0.35
+shadow_enabled = true
+
+[node name="CoralIsland13" parent="." unique_id=1888245668 instance=ExtResource("2_id0yi")]
+
+[node name="WorldEnvironment" parent="CoralIsland13" index="0"]
+environment = null
+
+[node name="DirectionalLight3D" parent="CoralIsland13" index="1"]
+visible = false
+
+[editable path="CoralIsland13"]
