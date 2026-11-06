@@ -6,6 +6,7 @@ const ATTACK_PLAYBACK_WINDOWS := {
 	"Attack_2": 0.5,
 	"Attack_3": 1.2,
 }
+const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
 
 @export var enabled: bool = true
 @export_file("*.tres")
@@ -142,7 +143,7 @@ func _update_slash_overlay() -> void:
 
 
 func set_dagger_combo_index(index: int) -> void:
-	_dagger_combo_index = clampi(index, -1, 2)
+	_dagger_combo_index = clampi(index, -1, 3)
 
 
 func fit_attack_duration(duration: float) -> void:
@@ -196,7 +197,7 @@ func sync_animation(
 		target_skin = str(mapping[1])
 		if String(animation_name).begins_with("attack_dagger_"):
 			target_animation = (
-				"Attack_%d" % (_dagger_combo_index + 1)
+				DAGGER_COMBO_ANIMATIONS[_dagger_combo_index]
 				if _dagger_combo_index >= 0 else ""
 			)
 	elif animation_mapping.is_empty() and animation_name == &"idle_down":

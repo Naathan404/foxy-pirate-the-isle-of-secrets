@@ -3,7 +3,7 @@
 /android/
 addons/*
 !addons/dialogic/
-!addons/spine_bridge
+!addons/spine_bridge/
 .cache_local/
 __pycache__/
 /bin/windows/~*

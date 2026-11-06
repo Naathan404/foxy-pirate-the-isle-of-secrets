@@ -38,8 +38,6 @@
 [ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="27_86838"]
 [ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="27_k8ytl"]
 [ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="28_xsuyu"]
-[ext_resource type="Resource" uid="uid://cmpdo81fwpbrg" path="res://data/weapon/forges/doomsday_edge.tres" id="32_pnplv"]
-[ext_resource type="Resource" uid="uid://e3eg2gjqtnjw" path="res://data/weapon/forges/true_flight.tres" id="34_21pkc"]
 [ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
 [ext_resource type="Script" uid="uid://cl78s3j6pfbde" path="res://gameplay/player/bounded_follow_camera_3d.gd" id="camera_bounds_follow"]
 [ext_resource type="Resource" uid="uid://c1gtfqtbeobfm" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
@@ -65,6 +63,7 @@
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="Script_ammo_item"]
 [ext_resource type="Script" uid="uid://dh5bqe1t7tido" path="res://gameplay/player/spine_idle_preview.gd" id="Script_spine_idle_preview"]
 [ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/_placeholder/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
@@ -847,14 +846,12 @@ script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_dagger")
 blueprint_unlocked = true
 owned = true
-forge = ExtResource("32_pnplv")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
 [sub_resource type="Resource" id="Resource_34wtv"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("27_86838")
 blueprint_unlocked = true
-forge = ExtResource("34_21pkc")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
 [sub_resource type="Resource" id="Collection_harpoon"]
@@ -1016,7 +1013,7 @@ script = ExtResource("7_rvh5s")
 
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
-step_distance = 0.2
+step_distance = 0.4
 step_duration = 0.1
 
 [node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component", "weapon_controller", "ammo") instance=ExtResource("20_pt1je")]
@@ -1054,6 +1051,9 @@ metadata/_custom_type_script = "uid://dvaslfpi4s3pd"
 
 [node name="AmmoComponent" type="Node" parent="." unique_id=1115070351 node_paths=PackedStringArray("inventory")]
 script = ExtResource("Script_ammo_inventory")
+inventory = NodePath("../Inventory")
+
+[node name="ItemPickupPopup" parent="." node_paths=PackedStringArray("inventory") instance=ExtResource("pickup_popup")]
 inventory = NodePath("../Inventory")
 ammo_items = Array[ExtResource("Script_ammo_item")]([ExtResource("Item_wooden_arrow")])
 
