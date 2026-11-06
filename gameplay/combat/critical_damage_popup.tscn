@@ -16,3 +16,4 @@ font_size = 170
 outline_size = 20
 script = ExtResource("1")
 lifetime = 1.0
+peak_scale = 1.35

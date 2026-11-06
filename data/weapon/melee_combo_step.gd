@@ -20,6 +20,7 @@ extends Resource
 @export var slash_color: Color = Color(1.0, 0.8, 0.4)
 @export_range(0.0, 0.12, 0.005) var hitstop_seconds: float = 0.06
 @export_range(0.0, 8.0, 0.25) var shake_pixels: float = 3.5
+@export_range(0.0, 0.3, 0.01, "suffix:s") var shake_seconds: float = 0.14
 @export_range(0.5, 2.0, 0.05) var audio_pitch: float = 1.2
 @export var heavy_impact: bool = false
 ## Optional future animation set; empty reuses AttackData.animation_prefix.

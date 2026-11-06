@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/player/hud/item_pickup_feedback.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://gameplay/player/hud/item_pickup_feedback_entry.tscn" id="2_entry"]
+
+[node name="ItemPickupFeedback" type="VBoxContainer"]
+offset_right = 275.0
+mouse_filter = 2
+theme_override_constants/separation = 6
+script = ExtResource("1_script")
+entry_scene = ExtResource("2_entry")
