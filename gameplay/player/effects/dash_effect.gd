@@ -1,6 +1,8 @@
 extends Node3D
 
-const SPINE_GHOST_SHADER: Shader = preload("res://gameplay/player/effects/spine_dash_ghost.gdshader")
+const SPINE_GHOST_SHADER: Shader = preload(
+	"res://gameplay/player/effects/spine_dash_ghost.gdshader"
+)
 const SPINE_GHOST_INTERVAL: float = 0.075
 const SPINE_GHOST_LIFETIME: float = 0.12
 const SPINE_GHOST_ALPHA: float = 0.22
@@ -190,7 +192,9 @@ func _snapshot_spine_ghost(index: int, source: Node3D) -> bool:
 		var material := ShaderMaterial.new()
 		material.shader = SPINE_GHOST_SHADER
 		material.render_priority = source_material.render_priority
-		material.set_shader_parameter("spine_texture", source_material.get_shader_parameter("spine_texture"))
+		material.set_shader_parameter(
+			"spine_texture", source_material.get_shader_parameter("spine_texture")
+		)
 		material.set_shader_parameter("spine_camera_relative_depth",
 			source_material.get_shader_parameter("spine_camera_relative_depth"))
 		material.set_shader_parameter("ghost_tint",

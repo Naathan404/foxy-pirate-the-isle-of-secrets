@@ -159,7 +159,10 @@ func _apply_attack_speed() -> void:
 	if not is_instance_valid(_spine):
 		return
 	var window: float = ATTACK_PLAYBACK_WINDOWS.get(_current_spine_animation, 0.0)
-	_spine.set("time_scale", window / _attack_duration if window > 0.0 and _attack_duration > 0.0 else 1.0)
+	var playback_speed := 1.0
+	if window > 0.0 and _attack_duration > 0.0:
+		playback_speed = window / _attack_duration
+	_spine.set("time_scale", playback_speed)
 
 
 ## The dash effect snapshots the meshes currently drawn by Spine.
