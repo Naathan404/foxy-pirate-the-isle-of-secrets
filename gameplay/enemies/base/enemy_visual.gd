@@ -10,16 +10,23 @@ signal death_feedback_finished
 
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
-@export var hit_flash_color: Color = Color(1.0, 0.45, 0.45, 1.0)
-@export_range(0.01, 1.0, 0.01) var hit_flash_duration: float = 0.12
-@export_range(1.0, 2.0, 0.01) var hit_pulse_scale: float = 1.12
+@export_group("Hit Feedback")
+@export var hit_flash_color: Color = Color(2.0, 1.4, 1.2, 1.0)
+@export_range(0.01, 1.0, 0.01) var hit_flash_duration: float = 0.16
+@export_range(1.0, 2.0, 0.01) var hit_pulse_scale: float = 1.18
+@export_range(0.1, 1.0, 0.01) var hit_squash_scale: float = 0.78
+@export_range(0.01, 1.0, 0.01) var hit_rebound_duration: float = 0.1
+@export_range(0.01, 1.0, 0.01) var hit_settle_duration: float = 0.12
+@export_group("Death Feedback")
 @export_range(0.01, 2.0, 0.01) var death_fade_duration: float = 0.3
 
 var _directional_action: StringName = &""
 var _facing: Vector3 = Vector3.BACK
 var _sprite_modulate: Color = Color.WHITE
 var _sprite_scale: Vector3 = Vector3.ONE
+var _sprite_shaded: bool = true
 var _hit_flash_tween: Tween
+var _hit_pose_tween: Tween
 var _death_feedback_tween: Tween
 
 
@@ -27,6 +34,7 @@ func _ready() -> void:
 	if is_instance_valid(sprite):
 		_sprite_modulate = sprite.modulate
 		_sprite_scale = sprite.scale
+		_sprite_shaded = sprite.shaded
 	if is_instance_valid(animation_player):
 		animation_player.animation_finished.connect(_on_animation_finished)
 
@@ -64,11 +72,21 @@ func play_hit_feedback() -> void:
 		return
 	if _hit_flash_tween != null:
 		_hit_flash_tween.kill()
-	sprite.modulate = hit_flash_color
-	sprite.scale = _sprite_scale * hit_pulse_scale
-	_hit_flash_tween = create_tween().set_parallel()
+	if _hit_pose_tween != null:
+		_hit_pose_tween.kill()
+	sprite.shaded = false
+	sprite.modulate = Color(hit_flash_color, _sprite_modulate.a)
+	sprite.scale = _sprite_scale * Vector3(hit_pulse_scale, hit_squash_scale, 1.0)
+	_hit_flash_tween = create_tween().set_ignore_time_scale(true)
 	_hit_flash_tween.tween_property(sprite, "modulate", _sprite_modulate, hit_flash_duration)
-	_hit_flash_tween.tween_property(sprite, "scale", _sprite_scale, hit_flash_duration)
+	_hit_flash_tween.tween_callback(_restore_sprite_shading)
+	_hit_pose_tween = create_tween().set_ignore_time_scale(true)
+	_hit_pose_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_hit_pose_tween.tween_property(
+		sprite, "scale", _sprite_scale * Vector3(hit_squash_scale, hit_pulse_scale, 1.0),
+		hit_rebound_duration
+	)
+	_hit_pose_tween.tween_property(sprite, "scale", _sprite_scale, hit_settle_duration)
 
 
 func play_death_feedback() -> bool:
@@ -76,10 +94,13 @@ func play_death_feedback() -> bool:
 		return false
 	if _hit_flash_tween != null:
 		_hit_flash_tween.kill()
+	if _hit_pose_tween != null:
+		_hit_pose_tween.kill()
 	if _death_feedback_tween != null:
 		_death_feedback_tween.kill()
 	sprite.modulate = _sprite_modulate
 	sprite.scale = _sprite_scale
+	_restore_sprite_shading()
 	_death_feedback_tween = create_tween().set_parallel()
 	_death_feedback_tween.tween_property(sprite, "modulate:a", 0.0, death_fade_duration)
 	_death_feedback_tween.tween_property(sprite, "scale", _sprite_scale * 0.25, death_fade_duration)
@@ -152,3 +173,8 @@ func _on_animation_finished(animation_name: StringName) -> void:
 
 func _on_death_feedback_finished() -> void:
 	death_feedback_finished.emit()
+
+
+func _restore_sprite_shading() -> void:
+	if is_instance_valid(sprite):
+		sprite.shaded = _sprite_shaded

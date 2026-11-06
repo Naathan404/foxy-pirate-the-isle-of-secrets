@@ -11,6 +11,9 @@ size = Vector3(0.14, 0.14, 0.65)
 script = ExtResource("1_arrow")
 hitbox = NodePath("HitBox")
 persist_after_release = true
+hitstop_seconds = 0.065
+hit_shake_pixels = 4.0
+hit_shake_seconds = 0.18
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=543516061]
 transform = Transform3D(-8.7422775e-10, 0, 0.02, 0, 0.02, 0, -0.02, 0, -8.7422775e-10, 0.10992683, 0, 0)

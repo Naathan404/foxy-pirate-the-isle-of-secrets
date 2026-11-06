@@ -15,6 +15,13 @@ const SKILL_HIT_SOUND: AudioStream = preload("res://assets/audio/combat/bow_impa
 @export_range(0.1, 3.0, 0.1) var thrust_height: float = 1.3
 @export_range(0.1, 3.0, 0.1) var dash_tip_reach: float = 1.2
 
+@export_group("Hit Feedback")
+@export_range(0.0, 0.12, 0.005, "suffix:s") var thrust_hitstop_seconds: float = 0.075
+@export_range(0.0, 0.12, 0.005, "suffix:s") var dash_hitstop_seconds: float = 0.1
+@export_range(0.0, 8.0, 0.1) var thrust_shake_pixels: float = 4.5
+@export_range(0.0, 8.0, 0.1) var dash_shake_pixels: float = 6.0
+@export_range(0.0, 0.3, 0.01, "suffix:s") var hit_shake_seconds: float = 0.2
+
 var _elapsed: float = 0.0
 var _impact_played: bool = false
 
@@ -140,9 +147,12 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 		_impact_played = true
 		get_node("/root/HitstopController").request_local(
 			null if dash_attack else context.actor, target as Node3D,
-			(0.1 if dash_attack else 0.035) * power
+			(dash_hitstop_seconds if dash_attack else thrust_hitstop_seconds) * power
 		)
-		get_node("/root/ScreenShakeController").request((6.0 if dash_attack else 1.8) * power, 0.14)
+		get_node("/root/ScreenShakeController").request(
+			(dash_shake_pixels if dash_attack else thrust_shake_pixels) * power,
+			hit_shake_seconds
+		)
 		get_node("/root/AudioManager").play_sfx_3d(
 			SKILL_HIT_SOUND if dash_attack else HIT_SOUND,
 			at, -6.0 if dash_attack else -16.0, 0.85 if dash_attack else 1.3
