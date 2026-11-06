@@ -10,6 +10,8 @@
 [ext_resource type="Resource" path="res://data/items/materials/coral.tres" id="8_coral"]
 [ext_resource type="Resource" path="res://data/weapon/forges/shared_pool.tres" id="9_pool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="dagger"]
+[ext_resource type="Resource" uid="uid://bjm73rcy0l6vt" path="res://data/items/materials/fireflies_tail.tres" id="fireflies"]
+[ext_resource type="Resource" path="res://data/weapon/weapon_meteor_staff.tres" id="meteor_staff"]
 
 [sub_resource type="Resource" id="ForgeCrab"]
 script = ExtResource("3_ingredient")
@@ -60,8 +62,24 @@ weapon = ExtResource("5_harpoon")
 gold_cost = 250
 ingredients = Array[ExtResource("3_ingredient")]([SubResource("HarpoonCrab"), SubResource("HarpoonStarfish"), SubResource("HarpoonCoral")])
 
+[sub_resource type="Resource" id="StaffFireflies"]
+script = ExtResource("3_ingredient")
+item = ExtResource("fireflies")
+amount = 5
+
+[sub_resource type="Resource" id="StaffCoral"]
+script = ExtResource("3_ingredient")
+item = ExtResource("8_coral")
+amount = 5
+
+[sub_resource type="Resource" id="StaffRecipe"]
+script = ExtResource("2_recipe")
+weapon = ExtResource("meteor_staff")
+gold_cost = 250
+ingredients = Array[ExtResource("3_ingredient")]([SubResource("StaffFireflies"), SubResource("StaffCoral")])
+
 [resource]
 script = ExtResource("1_catalog")
-recipes = Array[ExtResource("2_recipe")]([SubResource("DaggerRecipe"), SubResource("BowRecipe"), SubResource("HarpoonRecipe")])
+recipes = Array[ExtResource("2_recipe")]([SubResource("DaggerRecipe"), SubResource("BowRecipe"), SubResource("HarpoonRecipe"), SubResource("StaffRecipe")])
 forge_ingredients = Array[ExtResource("3_ingredient")]([SubResource("ForgeCrab"), SubResource("ForgeStarfish")])
 forge_pool = ExtResource("9_pool")

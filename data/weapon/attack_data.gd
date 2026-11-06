@@ -19,6 +19,7 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var release_to_fire: bool = true
 ## Fit anticipation/strike/recovery poses to their actual forged phase durations.
 @export var phase_driven_animation: bool = false
+@export var lock_input_during_cast: bool = false
 @export_range(0.01, 1000.0, 0.01) var damage_hp: float = 1.0
 @export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 ### Cấu hình mốc thời gain của đòn đánh
@@ -32,6 +33,8 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export_range(0.0, 60.0, 0.01) var cooldown_seconds: float = 0.0
 #### Config tầm nhấm và thầm bay. Cận chieenns chỉnh trực tiếp oewr hitbox
 @export_range(0.01, 100.0, 0.01) var range_units: float = 1.5
+## Let cursor area spells land beyond the normal weapon range.
+@export var target_cursor_without_range_limit: bool = false
 @export_range(0.0, 10000.0, 1.0) var stamina_cost: float = 0.0
 @export var ammo_id: StringName = &""
 @export_range(0, 100, 1) var ammo_cost: int = 0

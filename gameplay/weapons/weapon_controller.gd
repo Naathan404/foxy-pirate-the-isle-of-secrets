@@ -710,7 +710,11 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 		var offset := request.target_position - result.origin
 		offset.y = 0.0
 		result.direction = offset
-		result.target_position = result.origin + offset.limit_length(result.range_units)
+		result.target_position = (
+			request.target_position
+			if attack.target_cursor_without_range_limit
+			else result.origin + offset.limit_length(result.range_units)
+		)
 	if result.direction.is_zero_approx():
 		return null
 	result.direction = result.direction.normalized()

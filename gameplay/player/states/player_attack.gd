@@ -15,6 +15,7 @@ var _combo_step: MeleeComboStep
 var _step_time_scale: float = 1.0
 var _held_action: StringName = &"normal"
 var _uses_aim_pose: bool = false
+var _lock_input_during_cast: bool = false
 
 
 # Controller nhận đòn rồi mới phát animation
@@ -106,8 +107,9 @@ func _update(delta: float) -> void:
 				request_state("dash", 10)
 				return
 		if player.attack_requested:
-			var request := player.build_attack_context()
-			controller.queue_attack(request)
+			if not _lock_input_during_cast:
+				var request := player.build_attack_context()
+				controller.queue_attack(request)
 			player._consume_attack_input()
 	if accepted and player.is_on_floor():
 		_apply_forward_step(delta)
@@ -122,6 +124,7 @@ func _exit() -> void:
 	_step_elapsed = 0.0
 	_combo_step = null
 	_uses_aim_pose = false
+	_lock_input_during_cast = false
 	player.set_horizontal_velocity(Vector3.ZERO)
 	if is_instance_valid(player.visual):
 		player.visual.reset_animation_speed()
@@ -177,6 +180,7 @@ func _on_attack_started(context: AttackContext) -> void:
 	_uses_aim_pose = controller.is_aiming()
 	var attack: AttackData = context.weapon.get_attack(context.action)
 	_uses_aim_pose = _uses_aim_pose or attack.phase_driven_animation
+	_lock_input_during_cast = attack.lock_input_during_cast
 	_held_action = context.action
 	_combo_step = context.combo_step
 	_step_time_scale = 1.0

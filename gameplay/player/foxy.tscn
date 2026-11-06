@@ -56,15 +56,15 @@
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
 [ext_resource type="Resource" uid="uid://ci2bma1bu680p" path="res://gameplay/charms/charm_data/abyssal_whirlpool.tres" id="charm_whirlpool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="collection_dagger"]
+[ext_resource type="Resource" path="res://data/weapon/weapon_meteor_staff.tres" id="collection_meteor_staff"]
 [ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="collection_harpoon"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
+[ext_resource type="PackedScene" uid="uid://vbvptqbcgi1u" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
-[ext_resource type="PackedScene" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
-[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="Script_ammo_item"]
 [ext_resource type="Script" uid="uid://dh5bqe1t7tido" path="res://gameplay/player/spine_idle_preview.gd" id="Script_spine_idle_preview"]
 [ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/_placeholder/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
 [ext_resource type="Script" uid="uid://b0u5ln7tkfogr" path="res://data/weapon/weapon_collection_entry.gd" id="weapon_collection_entry"]
@@ -76,7 +76,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xsuyu"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_l2csx"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -860,6 +860,12 @@ definition = ExtResource("collection_harpoon")
 blueprint_unlocked = true
 owned = true
 
+[sub_resource type="Resource" id="Collection_meteor_staff"]
+script = ExtResource("weapon_collection_entry")
+definition = ExtResource("collection_meteor_staff")
+blueprint_unlocked = true
+owned = true
+
 [sub_resource type="Resource" id="Resource_ieged"]
 script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
@@ -904,7 +910,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_xsuyu")
+process_material = SubResource("ParticleProcessMaterial_l2csx")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
 player = NodePath("../..")
@@ -1046,16 +1052,15 @@ capacity = 30
 script = ExtResource("16_use70")
 default_weapon = SubResource("Resource_jpyye")
 default_forge = SubResource("Resource_orua6")
-collection = Array[ExtResource("weapon_collection_entry")]([SubResource("Resource_o88mx"), SubResource("Resource_34wtv"), SubResource("Collection_harpoon")])
+collection = Array[ExtResource("weapon_collection_entry")]([SubResource("Resource_o88mx"), SubResource("Resource_34wtv"), SubResource("Collection_harpoon"), SubResource("Collection_meteor_staff")])
 metadata/_custom_type_script = "uid://dvaslfpi4s3pd"
 
 [node name="AmmoComponent" type="Node" parent="." unique_id=1115070351 node_paths=PackedStringArray("inventory")]
 script = ExtResource("Script_ammo_inventory")
 inventory = NodePath("../Inventory")
 
-[node name="ItemPickupPopup" parent="." node_paths=PackedStringArray("inventory") instance=ExtResource("pickup_popup")]
+[node name="ItemPickupPopup" parent="." unique_id=70556917 node_paths=PackedStringArray("inventory") instance=ExtResource("pickup_popup")]
 inventory = NodePath("../Inventory")
-ammo_items = Array[ExtResource("Script_ammo_item")]([ExtResource("Item_wooden_arrow")])
 
 [node name="InventoryUI" parent="." unique_id=333365260 node_paths=PackedStringArray("inventory", "potion_component") instance=ExtResource("16_nbuib")]
 inventory = NodePath("../Inventory")

@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://gameplay/weapons/meteor_cast.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/weapons/meteor_impact.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://gameplay/weapons/meteor_charge_vfx.tscn" id="3"]
+
+[node name="MeteorCast" type="Node3D"]
+script = ExtResource("1")
+persist_after_release = true
+meteor_scene = ExtResource("2")
+charge_vfx_scene = ExtResource("3")
