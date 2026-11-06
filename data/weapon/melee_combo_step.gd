@@ -15,6 +15,7 @@ extends Resource
 @export_range(-160.0, 160.0, 1.0) var swing_start_degrees: float = -65.0
 @export_range(-160.0, 160.0, 1.0) var swing_end_degrees: float = 65.0
 @export_range(0.5, 2.0, 0.05) var reach_multiplier: float = 1.0
+@export var straight_thrust: bool = false
 @export_range(0.05, 1.2, 0.01) var slash_width: float = 0.62
 @export var slash_color: Color = Color(1.0, 0.8, 0.4)
 @export_range(0.0, 0.12, 0.005) var hitstop_seconds: float = 0.06

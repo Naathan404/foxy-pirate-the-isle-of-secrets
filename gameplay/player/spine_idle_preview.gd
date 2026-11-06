@@ -1,6 +1,12 @@
 extends Node3D
 ## Spine visual overlay; PlayerVisual's AnimationPlayer keeps gameplay timing.
 
+const ATTACK_PLAYBACK_WINDOWS := {
+	"Attack_1": 0.4,
+	"Attack_2": 0.5,
+	"Attack_3": 1.2,
+}
+
 @export var enabled: bool = true
 @export_file("*.tres")
 var skeleton_data_path: String = "res://assets/spine/compat/foxy_skeleton.tres"
@@ -21,10 +27,14 @@ var _fit_ready: bool = false
 var _current_spine_animation: String = ""
 var _current_spine_skin: String = ""
 var _dagger_combo_index: int = 0
+var _slash_overlay_shaders: Dictionary = {}
+var _attack_duration: float = 0.0
 
 
 func _ready() -> void:
 	visible = false
+	# Let the Spine node rebuild its draw meshes before updating the slash material.
+	process_priority = 100
 
 
 ## Capture the authored idle pose before dash stretch, recoil and animation frames modify it.
@@ -83,10 +93,73 @@ func _process(_delta: float) -> void:
 		_spine.pause()
 	else:
 		_spine.resume()
+	_update_slash_overlay()
+
+
+func _update_slash_overlay() -> void:
+	var core := _spine.get_node_or_null("_SpineSpriteCore3D")
+	if core == null:
+		return
+	var commands: Array = core._get_render_commands_for_external_consumer()
+	var rows: Array = core._get_slot_render_rows_for_external_consumer()
+	for row in rows:
+		var slot_name := str(row.get("slot_name", "")).to_lower()
+		if not slot_name.contains("slash"):
+			continue
+		if not row.has("command"):
+			continue
+		var slot_command: Dictionary = row["command"]
+		# Spine draw commands omit slot_name, so identify the matching mesh by geometry.
+		var index := -1
+		for command_index in commands.size():
+			var command: Dictionary = commands[command_index]
+			if command.get("page_index") == slot_command.get("page_index") \
+					and command.get("positions") == slot_command.get("positions") \
+					and command.get("uvs") == slot_command.get("uvs"):
+				index = command_index
+				break
+		if index < 0:
+			continue
+		var draw := _spine.get_node_or_null("_SpineDraw3D_%d" % index) as MeshInstance3D
+		if draw == null or not draw.visible:
+			continue
+		var material := draw.material_override as ShaderMaterial
+		if material == null or material.shader == null:
+			continue
+		var code := material.shader.code
+		if code.contains("depth_test_disabled"):
+			continue
+		var overlay_code := code.replace("depth_draw_always", "depth_draw_never, depth_test_disabled")
+		if overlay_code == code:
+			overlay_code = code.replace("depth_draw_never", "depth_draw_never, depth_test_disabled")
+		if overlay_code == code:
+			continue
+		if not _slash_overlay_shaders.has(code):
+			var shader := Shader.new()
+			shader.code = overlay_code
+			_slash_overlay_shaders[code] = shader
+		material.shader = _slash_overlay_shaders[code]
 
 
 func set_dagger_combo_index(index: int) -> void:
 	_dagger_combo_index = clampi(index, -1, 2)
+
+
+func fit_attack_duration(duration: float) -> void:
+	_attack_duration = duration
+	_apply_attack_speed()
+
+
+func reset_attack_speed() -> void:
+	_attack_duration = 0.0
+	_apply_attack_speed()
+
+
+func _apply_attack_speed() -> void:
+	if not is_instance_valid(_spine):
+		return
+	var window: float = ATTACK_PLAYBACK_WINDOWS.get(_current_spine_animation, 0.0)
+	_spine.set("time_scale", window / _attack_duration if window > 0.0 and _attack_duration > 0.0 else 1.0)
 
 
 ## The dash effect snapshots the meshes currently drawn by Spine.
@@ -181,6 +254,7 @@ func sync_animation(
 	if not _active:
 		_spine.pause()
 		return
+	_apply_attack_speed()
 	# Mirror the artwork and its fitted offset together.
 	var facing_transform := _fitted_transform
 	if facing_left != artwork_faces_left:

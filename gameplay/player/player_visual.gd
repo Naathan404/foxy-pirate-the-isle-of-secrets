@@ -132,6 +132,8 @@ func fit_animation_duration(duration: float) -> bool:
 		return false
 	_fitted_duration = duration
 	_update_animation_speed()
+	if is_instance_valid(_idle_preview):
+		_idle_preview.fit_attack_duration(duration)
 	return true
 
 
@@ -179,6 +181,8 @@ func reset_animation_speed() -> void:
 	_held_progress = -1.0
 	if is_instance_valid(animation_player):
 		animation_player.speed_scale = _base_animation_speed
+	if is_instance_valid(_idle_preview):
+		_idle_preview.reset_attack_speed()
 
 
 ## Full duration at the current playback speed; zero when no clip is assigned.
@@ -202,6 +206,9 @@ func _update_directional_animation(restart: bool = false) -> bool:
 		suffix = "side"
 	elif screen_direction.z < 0.0:
 		suffix = "up"
+	if _action == &"attack_dagger" or _action == &"attack_bow":
+		# Attack aim stays in world space; only the character pose faces sideways.
+		suffix = "side"
 	if _action == &"run":
 		_idle_after_up_run = suffix == "up"
 	elif _action == &"idle":
@@ -215,8 +222,8 @@ func _update_directional_animation(restart: bool = false) -> bool:
 	# Sprite side vẽ sang phải, muốn nhìn trái thì lật ảnh
 	if is_instance_valid(_active_sprite):
 		_active_sprite.flip_h = false
-		if suffix == "side" and screen_direction.x < 0.0:
-			_active_sprite.flip_h = true
+		if suffix == "side":
+			_active_sprite.flip_h = _last_facing_left
 	return true
 
 
