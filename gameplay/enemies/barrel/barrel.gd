@@ -2,8 +2,6 @@
 class_name Barrel
 extends EnemyBase
 
-const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn")
-
 enum TriggerMode {
 	DETECT_PLAYER,  ## Chỉ bắn khi phát hiện người chơi trong khu vực (mặc định)
 	AUTO,           ## Tự động bắn tuần tự (không cần nhận diện player)
@@ -13,6 +11,8 @@ enum DirectionMode {
 	SINGLE,  ## 1 hướng bắn (như barrel thường)
 	MULTI,   ## Nhiều hướng bắn (như barrel elite - chùm / fan)
 }
+
+const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn")
 
 @export_range(0.1, 100.0, 0.1) var bullet_speed: float = 12.0
 
