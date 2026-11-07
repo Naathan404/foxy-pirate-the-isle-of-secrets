@@ -14,6 +14,8 @@ const ATTACK_RECOVERY_POSE: float = 0.75
 var _action: StringName = &""
 var _facing: Vector3 = Vector3.BACK
 var _last_facing_left: bool = true
+var _idle_after_up_run: bool = false
+var _screen_facing: Vector3 = Vector3.BACK
 var _camera: Camera3D
 # Lưu tốc độ ban đầu để trả lại sau khi đánh
 var _base_animation_speed: float = 1.0
@@ -94,13 +96,21 @@ func has_attack_animation(action: StringName) -> bool:
 func play_animation(animation_name: StringName, restart: bool = false) -> bool:
 	# Phát theo tên cụ thể thì không tự đổi hướng nữa
 	_action = &""
+	_idle_after_up_run = false
 	return _play(animation_name, restart)
+
+
+func set_dagger_combo_index(index: int) -> void:
+	if is_instance_valid(_idle_preview):
+		_idle_preview.set_dagger_combo_index(index)
 
 
 func play_directional(
 	action: StringName, facing: Vector3, camera: Camera3D = null, restart: bool = false
 ) -> bool:
 	_action = action
+	if action != &"run" and action != &"idle":
+		_idle_after_up_run = false
 	# Đứng yên thì giữ hướng nhìn cũ
 	if not facing.is_zero_approx():
 		_facing = facing
@@ -122,6 +132,8 @@ func fit_animation_duration(duration: float) -> bool:
 		return false
 	_fitted_duration = duration
 	_update_animation_speed()
+	if is_instance_valid(_idle_preview):
+		_idle_preview.fit_attack_duration(duration)
 	return true
 
 
@@ -169,6 +181,8 @@ func reset_animation_speed() -> void:
 	_held_progress = -1.0
 	if is_instance_valid(animation_player):
 		animation_player.speed_scale = _base_animation_speed
+	if is_instance_valid(_idle_preview):
+		_idle_preview.reset_attack_speed()
 
 
 ## Full duration at the current playback speed; zero when no clip is assigned.
@@ -184,6 +198,7 @@ func get_current_animation_duration() -> float:
 
 func _update_directional_animation(restart: bool = false) -> bool:
 	var screen_direction := _get_screen_direction()
+	_screen_facing = screen_direction
 	if absf(screen_direction.x) > 0.01:
 		_last_facing_left = screen_direction.x < 0.0
 	var suffix := "down"
@@ -191,6 +206,14 @@ func _update_directional_animation(restart: bool = false) -> bool:
 		suffix = "side"
 	elif screen_direction.z < 0.0:
 		suffix = "up"
+	if _action == &"attack_dagger" or _action == &"attack_bow":
+		# Attack aim stays in world space; only the character pose faces sideways.
+		suffix = "side"
+	if _action == &"run":
+		_idle_after_up_run = suffix == "up"
+	elif _action == &"idle":
+		# Only an upward run leaves Foxy facing away when stopping.
+		suffix = "up" if _idle_after_up_run else "down"
 
 	var animation_name := String(_action) + "_" + suffix
 	if not _play(animation_name, restart):
@@ -199,8 +222,8 @@ func _update_directional_animation(restart: bool = false) -> bool:
 	# Sprite side vẽ sang phải, muốn nhìn trái thì lật ảnh
 	if is_instance_valid(_active_sprite):
 		_active_sprite.flip_h = false
-		if suffix == "side" and screen_direction.x < 0.0:
-			_active_sprite.flip_h = true
+		if suffix == "side":
+			_active_sprite.flip_h = _last_facing_left
 	return true
 
 
@@ -231,7 +254,8 @@ func _play(animation_name: StringName, restart: bool) -> bool:
 	_select_action_sprite(animation_name)
 	if is_instance_valid(_idle_preview):
 		_idle_preview.sync_animation(
-			animation_name, sprite, _active_sprite, _camera, _last_facing_left
+			animation_name, sprite, _active_sprite, _camera,
+			_last_facing_left, _screen_facing, restart
 		)
 
 	# Không phát lại cùng animation mỗi frame, kể cả khi nó đã chạy xong

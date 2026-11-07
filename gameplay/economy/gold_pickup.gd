@@ -134,6 +134,9 @@ func _collect(target: Node3D) -> void:
 		_collected = false
 		_attraction.retry()
 		return
+	var gold_display := target.get_node_or_null("PlayerHUD/GoldDisplay")
+	if gold_display != null and gold_display.has_method("play_pickup_fly"):
+		gold_display.call("play_pickup_fly", global_position)
 	_available = false
 	_attraction.complete()
 

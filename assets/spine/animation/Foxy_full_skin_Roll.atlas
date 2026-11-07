@@ -1,0 +1,1074 @@
+
+Foxy_full_skin_Roll.png
+size: 2027,1830
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+D-Body
+  rotate: false
+  xy: 721, 1459
+  size: 212, 156
+  orig: 219, 161
+  offset: 5, 3
+  index: -1
+Ds-Body
+  rotate: false
+  xy: 721, 1459
+  size: 212, 156
+  orig: 219, 161
+  offset: 5, 3
+  index: -1
+D-Head
+  rotate: false
+  xy: 1371, 155
+  size: 549, 423
+  orig: 553, 428
+  offset: 2, 2
+  index: -1
+Ds-Head
+  rotate: false
+  xy: 1371, 155
+  size: 549, 423
+  orig: 553, 428
+  offset: 2, 2
+  index: -1
+D-Layer 34
+  rotate: false
+  xy: 1336, 1237
+  size: 370, 167
+  orig: 374, 170
+  offset: 3, 1
+  index: -1
+D-Layer 34 copy
+  rotate: false
+  xy: 1391, 1406
+  size: 370, 154
+  orig: 374, 170
+  offset: 3, 1
+  index: -1
+D-Left Ear
+  rotate: false
+  xy: 1834, 809
+  size: 191, 243
+  orig: 194, 246
+  offset: 1, 1
+  index: -1
+Ds-Left Ear
+  rotate: false
+  xy: 1834, 809
+  size: 191, 243
+  orig: 194, 246
+  offset: 1, 1
+  index: -1
+D-LeftHand
+  rotate: true
+  xy: 838, 1075
+  size: 181, 241
+  orig: 183, 246
+  offset: 1, 2
+  index: -1
+Ds-LeftHand
+  rotate: true
+  xy: 838, 1075
+  size: 181, 241
+  orig: 183, 246
+  offset: 1, 2
+  index: -1
+D-LeftLeg
+  rotate: true
+  xy: 2, 1681
+  size: 116, 236
+  orig: 137, 244
+  offset: 19, 6
+  index: -1
+D-P-ring
+  rotate: false
+  xy: 2, 1799
+  size: 218, 29
+  orig: 222, 33
+  offset: 3, 2
+  index: -1
+Ds-P-ring
+  rotate: false
+  xy: 2, 1799
+  size: 218, 29
+  orig: 222, 33
+  offset: 3, 2
+  index: -1
+D-Right Ear
+  rotate: true
+  xy: 1334, 877
+  size: 184, 250
+  orig: 187, 254
+  offset: 2, 2
+  index: -1
+D-RightHand
+  rotate: true
+  xy: 1763, 1397
+  size: 163, 232
+  orig: 167, 239
+  offset: 2, 5
+  index: -1
+Ds-RightHand
+  rotate: true
+  xy: 1763, 1397
+  size: 163, 232
+  orig: 167, 239
+  offset: 2, 5
+  index: -1
+D-RightLeg
+  rotate: true
+  xy: 1090, 1239
+  size: 169, 244
+  orig: 173, 248
+  offset: 2, 2
+  index: -1
+D-ring
+  rotate: false
+  xy: 1081, 1729
+  size: 105, 99
+  orig: 108, 103
+  offset: 1, 1
+  index: -1
+Ds-ring
+  rotate: false
+  xy: 1081, 1729
+  size: 105, 99
+  orig: 108, 103
+  offset: 1, 1
+  index: -1
+U-ring
+  rotate: false
+  xy: 1081, 1729
+  size: 105, 99
+  orig: 108, 103
+  offset: 1, 1
+  index: -1
+Ds-Layer 34
+  rotate: false
+  xy: 2, 1188
+  size: 370, 167
+  orig: 374, 170
+  offset: 1, 1
+  index: -1
+Ds-Layer 42
+  rotate: false
+  xy: 2, 1357
+  size: 370, 154
+  orig: 374, 170
+  offset: 3, 1
+  index: -1
+Ds-LeftLeg
+  rotate: true
+  xy: 1249, 1573
+  size: 143, 259
+  orig: 148, 267
+  offset: 3, 6
+  index: -1
+Ds-Right Ear
+  rotate: true
+  xy: 1342, 1063
+  size: 172, 257
+  orig: 175, 261
+  offset: 2, 2
+  index: -1
+Ds-RightLeg
+  rotate: true
+  xy: 1708, 1226
+  size: 169, 259
+  orig: 173, 264
+  offset: 2, 2
+  index: -1
+G1-Body
+  rotate: false
+  xy: 2, 1525
+  size: 219, 154
+  orig: 219, 155
+  offset: 0, 1
+  index: -1
+G1-Eyes_Quau
+  rotate: false
+  xy: 1401, 1718
+  size: 370, 110
+  orig: 372, 136
+  offset: 0, 1
+  index: -1
+G1-Head
+  rotate: false
+  xy: 533, 2
+  size: 553, 428
+  orig: 553, 428
+  offset: 0, 0
+  index: -1
+G1-Layer 5
+  rotate: false
+  xy: 2, 538
+  size: 347, 211
+  orig: 347, 211
+  offset: 0, 0
+  index: -1
+G1-Layer 5 copy
+  rotate: false
+  xy: 351, 531
+  size: 356, 211
+  orig: 356, 211
+  offset: 0, 0
+  index: -1
+G1-Left Ear
+  rotate: true
+  xy: 997, 687
+  size: 191, 243
+  orig: 194, 246
+  offset: 2, 1
+  index: -1
+G1-LeftEar
+  rotate: true
+  xy: 2, 790
+  size: 186, 249
+  orig: 187, 249
+  offset: 0, 0
+  index: -1
+G1-LeftHand
+  rotate: true
+  xy: 608, 1290
+  size: 167, 239
+  orig: 167, 239
+  offset: 0, 0
+  index: -1
+G1-LeftLeg
+  rotate: true
+  xy: 1117, 880
+  size: 184, 215
+  orig: 229, 234
+  offset: 45, 1
+  index: -1
+G1-P-ring
+  rotate: false
+  xy: 442, 1795
+  size: 222, 33
+  orig: 222, 33
+  offset: 0, 0
+  index: -1
+S-P-ring
+  rotate: false
+  xy: 442, 1795
+  size: 222, 33
+  orig: 222, 33
+  offset: 0, 0
+  index: -1
+G1-Right Ear
+  rotate: true
+  xy: 1586, 868
+  size: 184, 246
+  orig: 187, 249
+  offset: 1, 1
+  index: -1
+G1-RightEar
+  rotate: true
+  xy: 1242, 681
+  size: 194, 246
+  orig: 194, 246
+  offset: 0, 0
+  index: -1
+S-Left Ear
+  rotate: true
+  xy: 1242, 681
+  size: 194, 246
+  orig: 194, 246
+  offset: 0, 0
+  index: -1
+G1-RightHand
+  rotate: true
+  xy: 245, 978
+  size: 183, 246
+  orig: 183, 246
+  offset: 0, 0
+  index: -1
+G1-RightLeg
+  rotate: true
+  xy: 1510, 1563
+  size: 153, 237
+  orig: 180, 237
+  offset: 0, 0
+  index: -1
+G1-ayer 34
+  rotate: false
+  xy: 1601, 1054
+  size: 374, 170
+  orig: 374, 170
+  offset: 0, 0
+  index: -1
+G1-ring
+  rotate: false
+  xy: 1291, 1725
+  size: 108, 103
+  orig: 108, 103
+  offset: 0, 0
+  index: -1
+Hand
+  rotate: true
+  xy: 253, 751
+  size: 225, 233
+  orig: 2560, 1440
+  offset: 1149, 179
+  index: -1
+Layer 34
+  rotate: false
+  xy: 1773, 1714
+  size: 180, 114
+  orig: 180, 114
+  offset: 0, 0
+  index: -1
+Pants
+  rotate: false
+  xy: 890, 1760
+  size: 189, 68
+  orig: 194, 73
+  offset: 3, 3
+  index: -1
+S-Body
+  rotate: false
+  xy: 223, 1513
+  size: 219, 155
+  orig: 219, 155
+  offset: 0, 0
+  index: -1
+S-Dring
+  rotate: false
+  xy: 1188, 1729
+  size: 101, 99
+  orig: 106, 101
+  offset: 2, 1
+  index: -1
+S-LeftHand
+  rotate: true
+  xy: 1749, 1562
+  size: 150, 266
+  orig: 152, 266
+  offset: 2, 0
+  index: -1
+S-LeftLeg
+  rotate: true
+  xy: 374, 1163
+  size: 170, 224
+  orig: 175, 226
+  offset: 5, 2
+  index: -1
+S-Right Ear
+  rotate: true
+  xy: 488, 744
+  size: 187, 249
+  orig: 187, 249
+  offset: 0, 0
+  index: -1
+S-RightHand
+  rotate: true
+  xy: 600, 1118
+  size: 170, 236
+  orig: 171, 236
+  offset: 1, 0
+  index: -1
+S-RightLeg
+  rotate: true
+  xy: 240, 1670
+  size: 123, 231
+  orig: 229, 234
+  offset: 106, 3
+  index: -1
+U-Body
+  rotate: false
+  xy: 1170, 1410
+  size: 219, 161
+  orig: 219, 161
+  offset: 0, 0
+  index: -1
+U-Eyes
+  rotate: false
+  xy: 741, 894
+  size: 374, 170
+  orig: 374, 170
+  offset: 0, 0
+  index: -1
+U-Left Ear
+  rotate: true
+  xy: 1490, 648
+  size: 218, 249
+  orig: 218, 249
+  offset: 0, 0
+  index: -1
+U-LeftHand
+  rotate: true
+  xy: 493, 933
+  size: 183, 246
+  orig: 183, 246
+  offset: 0, 0
+  index: -1
+U-LeftLeg
+  rotate: true
+  xy: 1081, 1066
+  size: 169, 259
+  orig: 169, 259
+  offset: 0, 0
+  index: -1
+U-P-ring
+  rotate: false
+  xy: 666, 1795
+  size: 222, 33
+  orig: 222, 33
+  offset: 0, 0
+  index: -1
+U-Right Ear
+  rotate: true
+  xy: 739, 703
+  size: 189, 256
+  orig: 189, 256
+  offset: 0, 0
+  index: -1
+U-RightHand
+  rotate: true
+  xy: 849, 1258
+  size: 167, 239
+  orig: 167, 239
+  offset: 0, 0
+  index: -1
+U-RightLeg
+  rotate: true
+  xy: 751, 1617
+  size: 141, 272
+  orig: 141, 272
+  offset: 0, 0
+  index: -1
+US-Body
+  rotate: false
+  xy: 935, 1427
+  size: 233, 156
+  orig: 242, 161
+  offset: 3, 3
+  index: -1
+US-Head
+  rotate: false
+  xy: 2, 102
+  size: 529, 427
+  orig: 532, 433
+  offset: 2, 3
+  index: -1
+US-Left Ear
+  rotate: true
+  xy: 1025, 1585
+  size: 142, 222
+  orig: 145, 226
+  offset: 2, 2
+  index: -1
+US-LeftHand
+  rotate: true
+  xy: 2, 1005
+  size: 181, 241
+  orig: 183, 246
+  offset: 1, 2
+  index: -1
+US-LeftLeg
+  rotate: true
+  xy: 444, 1500
+  size: 154, 275
+  orig: 158, 279
+  offset: 2, 2
+  index: -1
+US-P-ring
+  rotate: false
+  xy: 222, 1799
+  size: 218, 29
+  orig: 222, 33
+  offset: 3, 2
+  index: -1
+US-Right Ear
+  rotate: true
+  xy: 1741, 580
+  size: 227, 253
+  orig: 230, 257
+  offset: 1, 3
+  index: -1
+US-RightHand
+  rotate: true
+  xy: 374, 1335
+  size: 163, 232
+  orig: 167, 239
+  offset: 2, 5
+  index: -1
+US-RightLeg
+  rotate: true
+  xy: 473, 1656
+  size: 137, 276
+  orig: 144, 278
+  offset: 2, 1
+  index: -1
+slash
+  rotate: true
+  xy: 709, 432
+  size: 247, 660
+  orig: 1024, 1024
+  offset: 740, 182
+  index: -1
+
+Foxy_full_skin_Roll2.png
+size: 910,1104
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Dagger
+  rotate: false
+  xy: 2, 120
+  size: 476, 982
+  orig: 493, 985
+  offset: 1, 1
+  index: -1
+S-Head
+  rotate: true
+  xy: 480, 2
+  size: 545, 428
+  orig: 545, 428
+  offset: 0, 0
+  index: -1
+U-Head
+  rotate: true
+  xy: 480, 549
+  size: 553, 428
+  orig: 553, 428
+  offset: 0, 0
+  index: -1
+
+Foxy_full_skin_Roll3.png
+size: 1751,2017
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Attack_1/Foxy_full_skin-G1-Attack_1_00
+  rotate: false
+  xy: 2, 2
+  size: 658, 621
+  orig: 660, 624
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_01
+  rotate: false
+  xy: 2, 1374
+  size: 1012, 641
+  orig: 1014, 644
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_04
+  rotate: true
+  xy: 2, 625
+  size: 747, 733
+  orig: 751, 736
+  offset: 2, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_05
+  rotate: false
+  xy: 1016, 1249
+  size: 733, 766
+  orig: 735, 769
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_06
+  rotate: true
+  xy: 737, 521
+  size: 726, 755
+  orig: 730, 758
+  offset: 2, 1
+  index: -1
+
+Foxy_full_skin_Roll4.png
+size: 2019,1486
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Attack_1/Foxy_full_skin-G1-Attack_1_02
+  rotate: true
+  xy: 1431, 2
+  size: 736, 586
+  orig: 739, 592
+  offset: 1, 4
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_03
+  rotate: false
+  xy: 2, 784
+  size: 759, 700
+  orig: 763, 703
+  offset: 2, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_07
+  rotate: false
+  xy: 763, 740
+  size: 708, 744
+  orig: 711, 746
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_08
+  rotate: false
+  xy: 2, 50
+  size: 678, 732
+  orig: 680, 735
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_24
+  rotate: true
+  xy: 682, 74
+  size: 664, 747
+  orig: 666, 749
+  offset: 1, 1
+  index: -1
+
+Foxy_full_skin_Roll5.png
+size: 2030,1419
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Attack_1/Foxy_full_skin-G1-Attack_1_09
+  rotate: true
+  xy: 2, 2
+  size: 670, 698
+  orig: 672, 700
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_20
+  rotate: false
+  xy: 1366, 31
+  size: 662, 721
+  orig: 664, 723
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_21
+  rotate: false
+  xy: 702, 24
+  size: 662, 728
+  orig: 665, 731
+  offset: 2, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_22
+  rotate: true
+  xy: 667, 754
+  size: 663, 736
+  orig: 665, 738
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_23
+  rotate: false
+  xy: 2, 674
+  size: 663, 743
+  orig: 665, 746
+  offset: 1, 1
+  index: -1
+
+Foxy_full_skin_Roll6.png
+size: 2042,1987
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Attack_1/Foxy_full_skin-G1-Attack_1_10
+  rotate: true
+  xy: 1357, 6
+  size: 659, 683
+  orig: 662, 685
+  offset: 2, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_11
+  rotate: true
+  xy: 1365, 667
+  size: 658, 669
+  orig: 660, 671
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_14
+  rotate: true
+  xy: 1365, 1327
+  size: 658, 675
+  orig: 660, 677
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_15
+  rotate: true
+  xy: 665, 2
+  size: 659, 682
+  orig: 661, 685
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_16
+  rotate: true
+  xy: 665, 663
+  size: 659, 690
+  orig: 661, 693
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_17
+  rotate: true
+  xy: 665, 1324
+  size: 661, 698
+  orig: 663, 700
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_18
+  rotate: false
+  xy: 2, 565
+  size: 661, 705
+  orig: 663, 708
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_19
+  rotate: false
+  xy: 2, 1272
+  size: 661, 713
+  orig: 664, 716
+  offset: 2, 1
+  index: -1
+
+Foxy_full_skin_Roll7.png
+size: 1332,661
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Attack_1/Foxy_full_skin-G1-Attack_1_12
+  rotate: true
+  xy: 671, 2
+  size: 657, 659
+  orig: 659, 662
+  offset: 1, 1
+  index: -1
+Attack_1/Foxy_full_skin-G1-Attack_1_13
+  rotate: true
+  xy: 2, 2
+  size: 657, 667
+  orig: 660, 669
+  offset: 2, 1
+  index: -1
+
+Foxy_full_skin_Roll8.png
+size: 1989,1201
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Slash/Slash_00
+  rotate: false
+  xy: 2, 500
+  size: 850, 699
+  orig: 1297, 1064
+  offset: 0, 6
+  index: -1
+Slash/Slash_01
+  rotate: true
+  xy: 854, 2
+  size: 1197, 581
+  orig: 1297, 1064
+  offset: 0, 0
+  index: -1
+Slash/Slash_02
+  rotate: true
+  xy: 854, 2
+  size: 1197, 581
+  orig: 1297, 1064
+  offset: 0, 0
+  index: -1
+Slash/Slash_03
+  rotate: true
+  xy: 1437, 343
+  size: 856, 550
+  orig: 1297, 1064
+  offset: 440, 93
+  index: -1
+Slash/Slash_04
+  rotate: true
+  xy: 1437, 343
+  size: 856, 550
+  orig: 1297, 1064
+  offset: 440, 93
+  index: -1
+Slash/Slash_05
+  rotate: true
+  xy: 1437, 343
+  size: 856, 550
+  orig: 1297, 1064
+  offset: 440, 93
+  index: -1
+Slash/Slash_06
+  rotate: false
+  xy: 2, 109
+  size: 579, 389
+  orig: 1297, 1064
+  offset: 593, 255
+  index: -1
+Slash/Slash_07
+  rotate: false
+  xy: 2, 109
+  size: 579, 389
+  orig: 1297, 1064
+  offset: 593, 255
+  index: -1
+
+Foxy_full_skin_Roll9.png
+size: 1987,1931
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Slash Effect/slash_00
+  rotate: false
+  xy: 833, 6
+  size: 335, 266
+  orig: 600, 600
+  offset: 50, 266
+  index: -1
+Slash Effect/slash_01
+  rotate: true
+  xy: 446, 424
+  size: 464, 306
+  orig: 600, 600
+  offset: 56, 247
+  index: -1
+Slash Effect/slash_02
+  rotate: false
+  xy: 936, 1495
+  size: 478, 434
+  orig: 600, 600
+  offset: 74, 137
+  index: -1
+Slash Effect/slash_03
+  rotate: false
+  xy: 2, 1409
+  size: 472, 520
+  orig: 600, 600
+  offset: 90, 50
+  index: -1
+Slash Effect/slash_04
+  rotate: false
+  xy: 2, 890
+  size: 465, 517
+  orig: 600, 600
+  offset: 97, 48
+  index: -1
+Slash Effect/slash_05
+  rotate: false
+  xy: 476, 1417
+  size: 458, 512
+  orig: 600, 600
+  offset: 104, 44
+  index: -1
+Slash Effect/slash_06
+  rotate: false
+  xy: 2, 396
+  size: 442, 492
+  orig: 600, 600
+  offset: 116, 48
+  index: -1
+Slash Effect/slash_07
+  rotate: true
+  xy: 1416, 1508
+  size: 421, 486
+  orig: 600, 600
+  offset: 134, 53
+  index: -1
+Slash Effect/slash_08
+  rotate: true
+  xy: 936, 1097
+  size: 396, 483
+  orig: 600, 600
+  offset: 153, 56
+  index: -1
+Slash Effect/slash_09
+  rotate: true
+  xy: 1421, 1117
+  size: 389, 475
+  orig: 600, 600
+  offset: 155, 59
+  index: -1
+Slash Effect/slash_10
+  rotate: true
+  xy: 1421, 749
+  size: 366, 462
+  orig: 600, 600
+  offset: 168, 63
+  index: -1
+Slash Effect/slash_11
+  rotate: true
+  xy: 476, 1033
+  size: 382, 452
+  orig: 600, 600
+  offset: 152, 68
+  index: -1
+Slash Effect/slash_12
+  rotate: true
+  xy: 2, 3
+  size: 391, 442
+  orig: 600, 600
+  offset: 140, 72
+  index: -1
+Slash Effect/slash_13
+  rotate: true
+  xy: 930, 707
+  size: 388, 431
+  orig: 600, 600
+  offset: 138, 79
+  index: -1
+Slash Effect/slash_14
+  rotate: false
+  xy: 833, 274
+  size: 382, 431
+  orig: 600, 600
+  offset: 134, 80
+  index: -1
+Slash Effect/slash_15
+  rotate: false
+  xy: 446, 2
+  size: 385, 420
+  orig: 600, 600
+  offset: 123, 78
+  index: -1
+Slash Effect/slash_16
+  rotate: false
+  xy: 1217, 299
+  size: 385, 406
+  orig: 600, 600
+  offset: 114, 81
+  index: -1
+Slash Effect/slash_17
+  rotate: false
+  xy: 1604, 366
+  size: 381, 381
+  orig: 600, 600
+  offset: 118, 87
+  index: -1
+Slash Effect/slash_18
+  rotate: false
+  xy: 1604, 56
+  size: 379, 308
+  orig: 600, 600
+  offset: 113, 98
+  index: -1
+Slash Effect/slash_19
+  rotate: true
+  xy: 1170, 11
+  size: 261, 162
+  orig: 600, 600
+  offset: 121, 108
+  index: -1
+
+Foxy_full_skin_Roll10.png
+size: 1821,1210
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Slash_2/Slash_2_00
+  rotate: false
+  xy: 2, 460
+  size: 791, 748
+  orig: 1090, 1150
+  offset: 299, 243
+  index: -1
+Slash_2/Slash_2_01
+  rotate: true
+  xy: 795, 141
+  size: 1067, 550
+  orig: 1090, 1150
+  offset: 0, 282
+  index: -1
+Slash_2/Slash_2_02
+  rotate: true
+  xy: 795, 141
+  size: 1067, 550
+  orig: 1090, 1150
+  offset: 0, 282
+  index: -1
+Slash_2/Slash_2_03
+  rotate: true
+  xy: 1347, 273
+  size: 935, 472
+  orig: 1090, 1150
+  offset: 68, 235
+  index: -1
+Slash_2/Slash_2_04
+  rotate: true
+  xy: 1347, 273
+  size: 935, 472
+  orig: 1090, 1150
+  offset: 68, 235
+  index: -1
+Slash_2/Slash_2_05
+  rotate: true
+  xy: 1347, 273
+  size: 935, 472
+  orig: 1090, 1150
+  offset: 68, 235
+  index: -1
+Slash_2/Slash_2_06
+  rotate: false
+  xy: 2, 2
+  size: 611, 456
+  orig: 1090, 1150
+  offset: 103, 320
+  index: -1
+Slash_2/Slash_2_07
+  rotate: false
+  xy: 2, 2
+  size: 611, 456
+  orig: 1090, 1150
+  offset: 103, 320
+  index: -1
+
+Foxy_full_skin_Roll11.png
+size: 1700,881
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Slash_3/Slash_3_00
+  rotate: false
+  xy: 2, 3
+  size: 747, 261
+  orig: 1279, 1099
+  offset: 97, 304
+  index: -1
+Slash_3/Slash_3_01
+  rotate: true
+  xy: 1410, 2
+  size: 877, 288
+  orig: 1279, 1099
+  offset: 122, 259
+  index: -1
+Slash_3/Slash_3_02
+  rotate: false
+  xy: 2, 266
+  size: 1015, 303
+  orig: 1279, 1099
+  offset: 161, 281
+  index: -1
+Slash_3/Slash_3_03
+  rotate: false
+  xy: 2, 571
+  size: 1053, 308
+  orig: 1279, 1099
+  offset: 196, 295
+  index: -1
+Slash_3/Slash_3_04
+  rotate: false
+  xy: 2, 571
+  size: 1053, 308
+  orig: 1279, 1099
+  offset: 196, 295
+  index: -1
+Slash_3/Slash_3_05
+  rotate: false
+  xy: 2, 571
+  size: 1053, 308
+  orig: 1279, 1099
+  offset: 196, 295
+  index: -1
+Slash_3/Slash_3_06
+  rotate: true
+  xy: 1057, 91
+  size: 788, 351
+  orig: 1279, 1099
+  offset: 487, 302
+  index: -1
+Slash_3/Slash_3_07
+  rotate: true
+  xy: 1057, 91
+  size: 788, 351
+  orig: 1279, 1099
+  offset: 487, 302
+  index: -1

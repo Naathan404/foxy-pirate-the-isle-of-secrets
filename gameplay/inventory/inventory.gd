@@ -3,6 +3,7 @@ extends Node
 
 ## UI có thể lắng nghe signal này để cập nhật sau khi túi thay đổi
 signal changed
+signal item_picked_up(item: BaseItem, quantity: int)
 signal potion_capacity_changed(kind: Potion.Kind, new_capacity: int)
 
 @export var starting_items: Array[InventorySlot] = []
@@ -11,6 +12,11 @@ signal potion_capacity_changed(kind: Potion.Kind, new_capacity: int)
 @export_range(0, 100000, 1) var default_potion_capacity: int = 3
 var slots: Array[InventorySlot] = []
 var _potion_capacities: Dictionary[Potion.Kind, int] = {}
+
+
+func notify_item_picked_up(item: BaseItem, quantity: int) -> void:
+	if item != null and quantity > 0:
+		item_picked_up.emit(item, quantity)
 
 
 func _ready() -> void:

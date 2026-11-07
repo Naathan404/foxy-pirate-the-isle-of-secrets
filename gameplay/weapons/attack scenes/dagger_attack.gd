@@ -63,11 +63,19 @@ func tick_active(delta: float) -> void:
 			_elapsed = minf(_elapsed + delta, context.active_seconds)
 			var progress := _elapsed / context.active_seconds
 			# Subsample the swept angle, including the final active frame.
-			var degrees := (
-				absf(context.combo_step.swing_end_degrees - context.combo_step.swing_start_degrees)
-				* (progress - previous)
-			)
-			var samples := maxi(1, ceili(degrees / 8.0))
+			var samples := 1
+			if context.combo_step.straight_thrust:
+				var thrust_distance := (
+					context.range_units * context.combo_step.reach_multiplier
+					* 0.5 * (progress - previous)
+				)
+				samples = maxi(1, ceili(thrust_distance / 0.1))
+			else:
+				var degrees := (
+					absf(context.combo_step.swing_end_degrees - context.combo_step.swing_start_degrees)
+					* (progress - previous)
+				)
+				samples = maxi(1, ceili(degrees / 8.0))
 			for index in samples:
 				_sample_swing(lerpf(previous, progress, float(index + 1) / samples))
 				if not active:
@@ -89,17 +97,25 @@ func _configure_swing() -> void:
 	var reach := context.range_units * context.combo_step.reach_multiplier
 	var collider := hitbox.get_node("CollisionShape3D") as CollisionShape3D
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(0.42, 1.4, reach)
+	shape.size = Vector3(0.62 if context.combo_step.straight_thrust else 0.42, 1.4,
+		reach * 0.75 if context.combo_step.straight_thrust else reach)
 	collider.shape = shape
-	collider.position = Vector3(0.0, 0.7, -reach * 0.5)
+	collider.position = Vector3(0.0, 0.7,
+		-reach * 0.375 if context.combo_step.straight_thrust else -reach * 0.5)
 	hitbox.position = Vector3.ZERO
 	_vfx = MeleeSlashVFX.new()
 	get_parent().add_child(_vfx)
 	_vfx.global_transform = global_transform
-	_vfx.setup(context.combo_step, reach * context.hitbox_multiplier)
+	_vfx.setup(context.combo_step, reach * context.hitbox_multiplier, false)
 
 
 func _sample_swing(progress: float) -> void:
+	if context.combo_step.straight_thrust:
+		var reach := context.range_units * context.combo_step.reach_multiplier
+		hitbox.rotation.y = 0.0
+		hitbox.position.z = -reach * 0.5 * progress
+		hitbox.sample_shape()
+		return
 	hitbox.rotation.y = -deg_to_rad(
 		lerpf(
 			context.combo_step.swing_start_degrees, context.combo_step.swing_end_degrees, progress
@@ -141,7 +157,7 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 			context.actor, target as Node3D, step.hitstop_seconds * impact_scale
 		)
 		get_node("/root/ScreenShakeController").request(
-			step.shake_pixels * impact_scale, 0.2 if heavy else 0.14
+			step.shake_pixels * impact_scale, step.shake_seconds
 		)
 		get_node("/root/AudioManager").play_sfx_3d(
 			HIT_SOUND, at, (-8.0 if heavy else -13.0) + linear_to_db(impact_scale), step.audio_pitch

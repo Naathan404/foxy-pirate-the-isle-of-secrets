@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://b13a4v7a0hpxx" path="res://gameplay/player/states/player_fall.gd" id="4_ki8u8"]
 [ext_resource type="Script" uid="uid://bd4tscvehscfo" path="res://gameplay/player/states/player_dash.gd" id="5_tj74x"]
 [ext_resource type="Script" uid="uid://coyt7mve374li" path="res://gameplay/player/states/player_death.gd" id="6_6gmdq"]
-[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/harpoon_placeholder/foxy_harpoon_sheet.png" id="7_r1r5h"]
+[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/_placeholder/foxy_harpoon_sheet.png" id="7_r1r5h"]
 [ext_resource type="Script" uid="uid://dhmsjvrmvedhj" path="res://gameplay/player/states/player_run.gd" id="7_rvh5s"]
 [ext_resource type="Script" uid="uid://bn1u27bm1ho6y" path="res://gameplay/player/states/player_attack.gd" id="8_av71s"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="9_r3fl6"]
@@ -38,37 +38,58 @@
 [ext_resource type="Resource" uid="uid://day6x7bd5e0qu" path="res://data/weapon/weapon_bow.tres" id="27_86838"]
 [ext_resource type="Script" uid="uid://cf5bfu8lcd30s" path="res://data/weapon/weapon_affix.gd" id="27_k8ytl"]
 [ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="28_xsuyu"]
-[ext_resource type="Resource" uid="uid://cmpdo81fwpbrg" path="res://data/weapon/forges/doomsday_edge.tres" id="32_pnplv"]
-[ext_resource type="Resource" uid="uid://e3eg2gjqtnjw" path="res://data/weapon/forges/true_flight.tres" id="34_21pkc"]
 [ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
 [ext_resource type="Script" uid="uid://cl78s3j6pfbde" path="res://gameplay/player/bounded_follow_camera_3d.gd" id="camera_bounds_follow"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
+[ext_resource type="Resource" uid="uid://c1gtfqtbeobfm" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" uid="uid://btyx2ybnfoih7" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/buckshot_salvo.tres" id="charm_buckshot"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/chaos_collector.tres" id="charm_chaos_collector"]
+[ext_resource type="Resource" uid="uid://ejp6w687nhs2" path="res://gameplay/charms/charm_data/buckshot_salvo.tres" id="charm_buckshot"]
+[ext_resource type="Resource" uid="uid://cii1hytncvqey" path="res://gameplay/charms/charm_data/chaos_collector.tres" id="charm_chaos_collector"]
 [ext_resource type="Resource" uid="uid://c1bl3r46frbfh" path="res://gameplay/charms/charm_data/crescent_cleave.tres" id="charm_crescent"]
 [ext_resource type="Resource" uid="uid://duxi2p8uusnex" path="res://gameplay/charms/charm_data/double_strike.tres" id="charm_double_strike"]
 [ext_resource type="Resource" uid="uid://c8poenokmr4rc" path="res://gameplay/charms/charm_data/endurance_vessel.tres" id="charm_endurance"]
 [ext_resource type="Resource" uid="uid://bmaq7dpse1yvf" path="res://gameplay/charms/charm_data/gale_pace.tres" id="charm_gale"]
 [ext_resource type="Resource" uid="uid://ckio67a4p70la" path="res://gameplay/charms/charm_data/life_steal.tres" id="charm_life_steal"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/dead_mans_salute.tres" id="charm_salute"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/shadow_lunge.tres" id="charm_shadow_lunge"]
+[ext_resource type="Resource" uid="uid://bww7xfubk5syh" path="res://gameplay/charms/charm_data/dead_mans_salute.tres" id="charm_salute"]
+[ext_resource type="Resource" uid="uid://idj3o2o06upk" path="res://gameplay/charms/charm_data/shadow_lunge.tres" id="charm_shadow_lunge"]
 [ext_resource type="Resource" uid="uid://cdmevnqdpo77o" path="res://gameplay/charms/charm_data/tide_grapple.tres" id="charm_tide"]
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/abyssal_whirlpool.tres" id="charm_whirlpool"]
+[ext_resource type="Resource" uid="uid://ci2bma1bu680p" path="res://gameplay/charms/charm_data/abyssal_whirlpool.tres" id="charm_whirlpool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="collection_dagger"]
+[ext_resource type="Resource" path="res://data/weapon/weapon_meteor_staff.tres" id="collection_meteor_staff"]
 [ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="collection_harpoon"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
+[ext_resource type="PackedScene" uid="uid://vbvptqbcgi1u" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
-[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="Script_ammo_item"]
 [ext_resource type="Script" uid="uid://dh5bqe1t7tido" path="res://gameplay/player/spine_idle_preview.gd" id="Script_spine_idle_preview"]
-[ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
+[ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/_placeholder/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
 [ext_resource type="Script" uid="uid://b0u5ln7tkfogr" path="res://data/weapon/weapon_collection_entry.gd" id="weapon_collection_entry"]
+
+[sub_resource type="Gradient" id="Gradient_1ejdq"]
+offsets = PackedFloat32Array(0, 0.12, 1)
+colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
+gradient = SubResource("Gradient_1ejdq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_l2csx"]
+resource_local_to_scene = true
+emission_shape = 3
+emission_box_extents = Vector3(0.12, 0.01, 0.08)
+direction = Vector3(0, 0.4, 1)
+spread = 35.0
+initial_velocity_min = 0.4
+initial_velocity_max = 0.9
+gravity = Vector3(0, 0.3, 0)
+damping_min = 1.5
+damping_max = 2.5
+scale_min = 0.79999995
+scale_max = 1.5999999
+color_ramp = SubResource("GradientTexture1D_fi5gb")
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_0"]
 atlas = ExtResource("Texture_bow_sheet")
@@ -825,14 +846,12 @@ script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_dagger")
 blueprint_unlocked = true
 owned = true
-forge = ExtResource("32_pnplv")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
 [sub_resource type="Resource" id="Resource_34wtv"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("27_86838")
 blueprint_unlocked = true
-forge = ExtResource("34_21pkc")
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
 [sub_resource type="Resource" id="Collection_harpoon"]
@@ -841,32 +860,16 @@ definition = ExtResource("collection_harpoon")
 blueprint_unlocked = true
 owned = true
 
+[sub_resource type="Resource" id="Collection_meteor_staff"]
+script = ExtResource("weapon_collection_entry")
+definition = ExtResource("collection_meteor_staff")
+blueprint_unlocked = true
+owned = true
+
 [sub_resource type="Resource" id="Resource_ieged"]
 script = ExtResource("20_ehmwb")
 unlocked_socket_count = 3
 metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
-
-[sub_resource type="Gradient" id="Gradient_1ejdq"]
-offsets = PackedFloat32Array(0, 0.12, 1)
-colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35, 0)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
-gradient = SubResource("Gradient_1ejdq")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xsuyu"]
-resource_local_to_scene = true
-emission_shape = 3
-emission_box_extents = Vector3(0.12, 0.01, 0.08)
-direction = Vector3(0, 0.4, 1)
-spread = 35.0
-initial_velocity_min = 0.4
-initial_velocity_max = 0.9
-gravity = Vector3(0, 0.3, 0)
-damping_min = 1.5
-damping_max = 2.5
-scale_min = 0.79999995
-scale_max = 1.5999999
-color_ramp = SubResource("GradientTexture1D_fi5gb")
 
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "ammo", "charm_socket_manager", "chaos", "potion", "potion_selector", "inventory_ui", "camera") groups=["player"]]
 collision_layer = 2
@@ -891,6 +894,37 @@ camera = NodePath("Camera3D")
 [node name="DrownPoint" type="Marker3D" parent="." unique_id=803702947]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
 
+[node name="Effects" type="Node3D" parent="." unique_id=2014826237]
+
+[node name="DashEffect" parent="Effects" unique_id=292962664 node_paths=PackedStringArray("player", "sprite", "spine_preview", "ghosts") instance=ExtResource("18_mqob0")]
+player = NodePath("../..")
+sprite = NodePath("../../Visual/Sprite3D")
+spine_preview = NodePath("../../Visual/SpineIdlePreview")
+ghosts = []
+ghost_color = Color(1, 1, 1, 1)
+
+[node name="RunDustEffect" parent="Effects" unique_id=2095352562 node_paths=PackedStringArray("player") instance=ExtResource("19_lqbvs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
+player = NodePath("../..")
+heel_offset = 0.1
+
+[node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
+process_material = SubResource("ParticleProcessMaterial_l2csx")
+
+[node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
+player = NodePath("../..")
+weapons = NodePath("../../WeaponController")
+bow_opacity = 0.7
+bow_seconds = 0.15000000000000002
+
+[node name="HitEffect" type="Node3D" parent="Effects" unique_id=210042358 node_paths=PackedStringArray("player", "sprite", "visual", "health")]
+script = ExtResource("hit_feedback")
+player = NodePath("../..")
+sprite = NodePath("../../Visual/Sprite3D")
+visual = NodePath("../../Visual")
+health = NodePath("../../HealthComponent")
+
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
 script = ExtResource("3_nu5xt")
 sprite = NodePath("Sprite3D")
@@ -904,6 +938,21 @@ action_sprite_paths = Dictionary[StringName, NodePath]({
 [node name="SpineIdlePreview" type="Node3D" parent="Visual" unique_id=1978530799]
 transform = Transform3D(1.2, 0, 0, 0, 1.692, 0, 0, 0, 1.2, 0, 0.1570276, 0)
 script = ExtResource("Script_spine_idle_preview")
+skeleton_data_path = "res://assets/spine/animation/foxy_animation_skeleton.tres"
+spine_animation = "G1_Idle"
+spine_skin = "G1"
+animation_mapping = {
+"attack_dagger_down": ["Attack_1", "G1"],
+"attack_dagger_side": ["Attack_1", "G1"],
+"dash_down": ["G1_Dash", "G1"],
+"dash_side": ["G1_Dash", "G1"],
+"dash_up": ["G1_Dash", "G1"],
+"idle_down": ["G1_Idle", "G1"],
+"idle_up": ["U_Idle", "U"],
+"run_side": ["S_Run", "S"],
+"run_up": ["S_Run", "S"]
+}
+artwork_faces_left = false
 size_multiplier = 1.25
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
@@ -970,6 +1019,8 @@ script = ExtResource("7_rvh5s")
 
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
+step_distance = 0.4
+step_duration = 0.1
 
 [node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component", "weapon_controller", "ammo") instance=ExtResource("20_pt1je")]
 health = NodePath("../HealthComponent")
@@ -1001,13 +1052,15 @@ capacity = 30
 script = ExtResource("16_use70")
 default_weapon = SubResource("Resource_jpyye")
 default_forge = SubResource("Resource_orua6")
-collection = Array[ExtResource("weapon_collection_entry")]([SubResource("Resource_o88mx"), SubResource("Resource_34wtv"), SubResource("Collection_harpoon")])
+collection = Array[ExtResource("weapon_collection_entry")]([SubResource("Resource_o88mx"), SubResource("Resource_34wtv"), SubResource("Collection_harpoon"), SubResource("Collection_meteor_staff")])
 metadata/_custom_type_script = "uid://dvaslfpi4s3pd"
 
 [node name="AmmoComponent" type="Node" parent="." unique_id=1115070351 node_paths=PackedStringArray("inventory")]
 script = ExtResource("Script_ammo_inventory")
 inventory = NodePath("../Inventory")
-ammo_items = Array[ExtResource("Script_ammo_item")]([ExtResource("Item_wooden_arrow")])
+
+[node name="ItemPickupPopup" parent="." unique_id=70556917 node_paths=PackedStringArray("inventory") instance=ExtResource("pickup_popup")]
+inventory = NodePath("../Inventory")
 
 [node name="InventoryUI" parent="." unique_id=333365260 node_paths=PackedStringArray("inventory", "potion_component") instance=ExtResource("16_nbuib")]
 inventory = NodePath("../Inventory")
@@ -1088,34 +1141,6 @@ RMB: Weapon Skill
 Shift: Dash
 Tab: Inventory"
 horizontal_alignment = 2
-
-[node name="Effects" type="Node3D" parent="." unique_id=2014826237]
-
-[node name="DashEffect" parent="Effects" unique_id=292962664 node_paths=PackedStringArray("player", "sprite") instance=ExtResource("18_mqob0")]
-player = NodePath("../..")
-sprite = NodePath("../../Visual/Sprite3D")
-
-[node name="RunDustEffect" parent="Effects" unique_id=2095352562 node_paths=PackedStringArray("player") instance=ExtResource("19_lqbvs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
-player = NodePath("../..")
-heel_offset = 0.1
-
-[node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_xsuyu")
-
-[node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
-player = NodePath("../..")
-weapons = NodePath("../../WeaponController")
-bow_opacity = 0.7
-bow_seconds = 0.15000000000000002
-
-[node name="HitEffect" type="Node3D" parent="Effects" unique_id=210042358 node_paths=PackedStringArray("player", "sprite", "visual", "health")]
-script = ExtResource("hit_feedback")
-player = NodePath("../..")
-sprite = NodePath("../../Visual/Sprite3D")
-visual = NodePath("../../Visual")
-health = NodePath("../../HealthComponent")
 
 [node name="PotionQuickSelect" parent="." unique_id=622369222 instance=ExtResource("potion_quick_select")]
 

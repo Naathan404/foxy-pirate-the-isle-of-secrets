@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bibliepp32nwj"]
+
+[ext_resource type="PackedScene" path="res://gameplay/weapons/meteor_cast.tscn" id="1"]
+
+[node name="MeteorRain" unique_id=927879003 instance=ExtResource("1")]
+minimum_meteors = 4
+maximum_meteors = 6
+spread_radius = 3.0

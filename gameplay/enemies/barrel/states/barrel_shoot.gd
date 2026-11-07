@@ -63,12 +63,11 @@ func _update(delta: float) -> void:
 
 func _start_burst() -> void:
 	var barrel := enemy as Barrel
-	if barrel == null:
+	if barrel == null or not barrel.can_trigger_attack():
 		return_to_behavior()
 		return
-	if not barrel.aim_at_target():
-		return_to_behavior()
-		return
+	if barrel.should_aim_at_target() and enemy.has_target():
+		barrel.aim_at_target()
 	shots_in_burst = barrel.get_bullet_count()
 	_shots_fired = 0
 	_shot_remaining = 0.0
@@ -79,7 +78,8 @@ func _start_burst() -> void:
 
 
 func _update_charge(delta: float) -> void:
-	if not enemy.has_target():
+	var barrel := enemy as Barrel
+	if barrel != null and not barrel.can_trigger_attack():
 		return_to_behavior()
 		return
 	_phase_remaining = maxf(0.0, _phase_remaining - maxf(0.0, delta))
@@ -109,11 +109,17 @@ func _fire_next_shot() -> void:
 	if barrel == null:
 		return_to_behavior()
 		return
-	if enemy.has_target():
+	if barrel.should_aim_at_target() and enemy.has_target():
 		barrel.aim_at_target()
+	if enemy.play_directional_animation(&"shoot", true) and is_instance_valid(enemy.visual):
+		var player := enemy.visual.animation_player
+		var animation := player.get_animation(player.assigned_animation)
+		if animation != null:
+			_phase_remaining = maxf(release_duration, animation.length)
 	barrel.fire()
 	_shots_fired += 1
-	_shot_remaining += shot_interval
+	var current_interval := barrel.shot_interval if is_instance_valid(barrel) else shot_interval
+	_shot_remaining += current_interval
 	if _shots_fired >= shots_in_burst:
 		barrel.start_attack_cooldown(burst_cooldown)
 

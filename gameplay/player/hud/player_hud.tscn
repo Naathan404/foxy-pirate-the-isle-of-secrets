@@ -87,10 +87,10 @@ transform = Transform2D(1.25, 0, 0, 1.25, 0, 0)
 script = ExtResource("1_1qgx4")
 
 [node name="GoldDisplay" parent="." unique_id=1585419187 instance=ExtResource("24_gold")]
-offset_left = 17.599998
-offset_top = 356.0
-offset_right = 157.6
-offset_bottom = 396.0
+offset_left = 36.0
+offset_top = 369.6
+offset_right = 176.00003
+offset_bottom = 409.6
 
 [node name="Effects" type="Node" parent="." unique_id=1082976363]
 
@@ -508,10 +508,10 @@ script = ExtResource("16_dv5bc")
 [node name="Q_socket" type="TextureRect" parent="EquipmentControl" unique_id=451445646]
 texture_filter = 1
 layout_mode = 0
-offset_left = 0.0
-offset_top = 73.6
-offset_right = 64.0
-offset_bottom = 137.6
+offset_left = 17.199999
+offset_top = 78.0
+offset_right = 81.2
+offset_bottom = 142.0
 mouse_filter = 2
 texture = ExtResource("19_01apl")
 
@@ -594,10 +594,10 @@ vertical_alignment = 1
 [node name="E_socket" type="TextureRect" parent="EquipmentControl" unique_id=1852458926]
 texture_filter = 1
 layout_mode = 0
-offset_left = 86.4
-offset_top = 73.6
-offset_right = 150.4
-offset_bottom = 137.6
+offset_left = 69.200005
+offset_top = 78.0
+offset_right = 133.2
+offset_bottom = 142.0
 mouse_filter = 2
 texture = ExtResource("19_01apl")
 

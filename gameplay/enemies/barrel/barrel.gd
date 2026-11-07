@@ -1,18 +1,52 @@
+@tool
 class_name Barrel
 extends EnemyBase
+
+enum TriggerMode {
+	DETECT_PLAYER,  ## Chỉ bắn khi phát hiện người chơi trong khu vực (mặc định)
+	AUTO,           ## Tự động bắn tuần tự (không cần nhận diện player)
+}
+
+enum DirectionMode {
+	SINGLE,  ## 1 hướng bắn (như barrel thường)
+	MULTI,   ## Nhiều hướng bắn (như barrel elite - chùm / fan)
+}
 
 const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn")
 
 @export_range(0.1, 100.0, 0.1) var bullet_speed: float = 12.0
+
+@export_group("Shooting Behavior")
+@export var trigger_mode: TriggerMode = TriggerMode.DETECT_PLAYER:
+	set(value):
+		trigger_mode = value
+		notify_property_list_changed()
+
+@export var auto_aim_at_player: bool = false:
+	set(value):
+		auto_aim_at_player = value
+		notify_property_list_changed()
+
+@export var direction_mode: DirectionMode = DirectionMode.SINGLE:
+	set(value):
+		direction_mode = value
+		notify_property_list_changed()
+
 @export_group("Target Detection")
 @export_range(0.1, 50.0, 0.1, "suffix:m") var player_detection_radius: float = 6.5:
 	set(value):
 		player_detection_radius = maxf(0.1, value)
 		_configure_player_detector()
+
 @export_group("Volley")
 @export_range(1, 20, 1) var min_bullets_per_volley: int = 1
 @export_range(1, 20, 1) var max_bullets_per_volley: int = 5
 @export_range(0.0, 90.0, 1.0, "suffix:deg") var max_bullet_angle_offset_degrees: float = 20.0
+@export_range(0.01, 10.0, 0.01, "suffix:s") var shot_interval: float = 0.2
+
+@export_group("Multi Direction")
+@export_range(1, 12, 1) var scattershot_bullet_count: int = 5
+@export_range(0.0, 180.0, 1.0, "suffix:deg") var scattershot_arc_degrees: float = 50.0
 
 var _attack_cooldown_remaining: float = 0.0
 var _projectiles: Array[BarrelBullet] = []
@@ -20,10 +54,39 @@ var _projectiles: Array[BarrelBullet] = []
 @onready var bullet_spawn: Marker3D = $Direction/BulletSpawn
 
 
+func _validate_property(property: Dictionary) -> void:
+	if property.name == "auto_aim_at_player":
+		if trigger_mode != TriggerMode.AUTO:
+			property.usage &= ~PROPERTY_USAGE_EDITOR
+	elif property.name == "player_detection_radius":
+		if trigger_mode == TriggerMode.AUTO and not auto_aim_at_player:
+			property.usage &= ~PROPERTY_USAGE_EDITOR
+	elif property.name in ["scattershot_bullet_count", "scattershot_arc_degrees"]:
+		if direction_mode != DirectionMode.MULTI:
+			property.usage &= ~PROPERTY_USAGE_EDITOR
+	elif property.name == "max_bullet_angle_offset_degrees":
+		if direction_mode != DirectionMode.SINGLE:
+			property.usage &= ~PROPERTY_USAGE_EDITOR
+
+
 func get_bullet_count() -> int:
 	var minimum := mini(min_bullets_per_volley, max_bullets_per_volley)
 	var maximum := maxi(min_bullets_per_volley, max_bullets_per_volley)
 	return randi_range(minimum, maximum)
+
+
+func can_trigger_attack() -> bool:
+	if dead or data == null:
+		return false
+	if trigger_mode == TriggerMode.DETECT_PLAYER:
+		return has_target()
+	return true
+
+
+func should_aim_at_target() -> bool:
+	if trigger_mode == TriggerMode.DETECT_PLAYER:
+		return true
+	return auto_aim_at_player
 
 
 func _ready() -> void:
@@ -49,6 +112,15 @@ func update_attack_cooldown(delta: float) -> bool:
 
 
 func fire() -> void:
+	if dead or data == null:
+		return
+	if direction_mode == DirectionMode.MULTI:
+		fire_fan_volley(scattershot_bullet_count, scattershot_arc_degrees)
+	else:
+		fire_single()
+
+
+func fire_single() -> void:
 	if dead or data == null:
 		return
 	var maximum_offset := deg_to_rad(max_bullet_angle_offset_degrees)

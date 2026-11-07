@@ -141,7 +141,10 @@ func _collect(target: Node3D) -> void:
 	var inventory := target.get_node_or_null("Inventory") as Inventory
 	# Inventory signals may re-enter pickup code; reserve the transaction first.
 	_collecting = true
+	var requested_quantity := quantity
 	quantity = inventory.add_item(item, quantity)
+	var accepted_quantity := requested_quantity - quantity
+	inventory.notify_item_picked_up(item, accepted_quantity)
 	if quantity > 0:
 		_collecting = false
 		_attraction.retry()
