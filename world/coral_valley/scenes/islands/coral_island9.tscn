@@ -5,6 +5,9 @@
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="3_xmiuf"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="4_xmiuf"]
 [ext_resource type="PackedScene" uid="uid://djxjvu6e00r3h" path="res://world/gimmick/coral_valley/crate_reset_lever.tscn" id="5_2myex"]
+[ext_resource type="MeshLibrary" uid="uid://c5hytpo8sb4b1" path="res://assets/meshes/objects/skull.meshlib" id="6_k52yn"]
+[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coral_reef.meshlib" id="7_crwhs"]
+[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/stuffs.meshlib" id="8_htg3x"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -112,3 +115,12 @@ float_draft = 1.4
 [node name="CrateResetLever" parent="Crates" unique_id=1522511598 node_paths=PackedStringArray("crates") instance=ExtResource("5_2myex")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -262, 2, 112)
 crates = [NodePath("../Crate9")]
+
+[node name="Skull" type="GridMap" parent="." unique_id=815058061]
+mesh_library = ExtResource("6_k52yn")
+
+[node name="CoralReef" type="GridMap" parent="." unique_id=1935802880]
+mesh_library = ExtResource("7_crwhs")
+
+[node name="Stuffs" type="GridMap" parent="." unique_id=1912735140]
+mesh_library = ExtResource("8_htg3x")
