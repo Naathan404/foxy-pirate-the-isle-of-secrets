@@ -1,15 +1,15 @@
 [remap]
 
-importer="scene"
+importer="ArrayMesh"
 importer_version=1
-type="PackedScene"
+type="ArrayMesh"
 uid="uid://bn0yxqifp8bwd"
-path="res://.godot/imported/tree-log.glb-630fa4bb06ab91b291e30d2e4ff7c734.scn"
+path="res://.godot/imported/tree-log.glb-630fa4bb06ab91b291e30d2e4ff7c734.res"
 
 [deps]
 
 source_file="res://assets/models/coral valley/tree-log.glb"
-dest_files=["res://.godot/imported/tree-log.glb-630fa4bb06ab91b291e30d2e4ff7c734.scn"]
+dest_files=["res://.godot/imported/tree-log.glb-630fa4bb06ab91b291e30d2e4ff7c734.res"]
 
 [params]
 

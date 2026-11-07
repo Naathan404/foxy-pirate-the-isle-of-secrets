@@ -1,15 +1,15 @@
 [remap]
 
-importer="scene"
+importer="ArrayMesh"
 importer_version=1
-type="PackedScene"
+type="ArrayMesh"
 uid="uid://bh1m7sq54ombr"
-path="res://.godot/imported/Skull_2__0.glb-04a865d287d41f5cf547a5b24dd9c3ac.scn"
+path="res://.godot/imported/Skull_2__0.glb-04a865d287d41f5cf547a5b24dd9c3ac.res"
 
 [deps]
 
 source_file="res://assets/models/coral valley/Bone-and-skull/Skull_2__0.glb"
-dest_files=["res://.godot/imported/Skull_2__0.glb-04a865d287d41f5cf547a5b24dd9c3ac.scn"]
+dest_files=["res://.godot/imported/Skull_2__0.glb-04a865d287d41f5cf547a5b24dd9c3ac.res"]
 
 [params]
 
@@ -19,7 +19,7 @@ nodes/root_script=null
 mesh_library/use_node_names_as_mesh_names=false
 array_mesh/deduplicate_surfaces=true
 nodes/apply_root_scale=true
-nodes/root_scale=1.0
+nodes/root_scale=6.0
 nodes/import_as_skeleton_bones=false
 nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true

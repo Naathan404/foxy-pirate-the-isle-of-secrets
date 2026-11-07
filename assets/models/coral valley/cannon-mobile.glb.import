@@ -1,15 +1,15 @@
 [remap]
 
-importer="scene"
+importer="ArrayMesh"
 importer_version=1
-type="PackedScene"
+type="ArrayMesh"
 uid="uid://0kjw6hwwhdwi"
-path="res://.godot/imported/cannon-mobile.glb-d211c8d4f4fb06cb249b14e24596c0a2.scn"
+path="res://.godot/imported/cannon-mobile.glb-d211c8d4f4fb06cb249b14e24596c0a2.res"
 
 [deps]
 
 source_file="res://assets/models/coral valley/cannon-mobile.glb"
-dest_files=["res://.godot/imported/cannon-mobile.glb-d211c8d4f4fb06cb249b14e24596c0a2.scn"]
+dest_files=["res://.godot/imported/cannon-mobile.glb-d211c8d4f4fb06cb249b14e24596c0a2.res"]
 
 [params]
 

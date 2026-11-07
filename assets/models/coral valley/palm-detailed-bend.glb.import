@@ -1,15 +1,15 @@
 [remap]
 
-importer="scene"
+importer="ArrayMesh"
 importer_version=1
-type="PackedScene"
+type="ArrayMesh"
 uid="uid://cy0lvdi3jj7n0"
-path="res://.godot/imported/palm-detailed-bend.glb-8b2b82f26f99c2160ef9a3ab2cc12d4f.scn"
+path="res://.godot/imported/palm-detailed-bend.glb-8b2b82f26f99c2160ef9a3ab2cc12d4f.res"
 
 [deps]
 
 source_file="res://assets/models/coral valley/palm-detailed-bend.glb"
-dest_files=["res://.godot/imported/palm-detailed-bend.glb-8b2b82f26f99c2160ef9a3ab2cc12d4f.scn"]
+dest_files=["res://.godot/imported/palm-detailed-bend.glb-8b2b82f26f99c2160ef9a3ab2cc12d4f.res"]
 
 [params]
 
