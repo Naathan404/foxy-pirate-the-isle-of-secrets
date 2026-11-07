@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bw1dqoc3ru0pf"]
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
-[ext_resource type="MeshLibrary" uid="uid://c5hytpo8sb4b1" path="res://assets/meshes/objects/skull.meshlib" id="2_7xbgo"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_8vieb"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/stuffs.meshlib" id="4_50k48"]
+[ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_7xbgo"]
+[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_8vieb"]
+[ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_50k48"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -41,9 +41,12 @@ metadata/_editor_floor_ = Vector3(0, -3, 0)
 
 [node name="Skull" type="GridMap" parent="." unique_id=97401058]
 mesh_library = ExtResource("2_7xbgo")
+cell_center_y = false
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=536741509]
 mesh_library = ExtResource("3_8vieb")
+cell_center_y = false
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=470933710]
 mesh_library = ExtResource("4_50k48")
+cell_center_y = false

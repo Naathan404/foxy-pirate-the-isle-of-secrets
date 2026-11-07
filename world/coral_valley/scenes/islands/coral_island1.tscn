@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://rela8ywe0ftb"]
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/skull.meshlib" id="2_5kwh5"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_1ieio"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/stuffs.meshlib" id="4_7s5t5"]
+[ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_5kwh5"]
+[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_1ieio"]
+[ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_7s5t5"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -40,8 +40,8 @@ data = {
 metadata/_editor_floor_ = Vector3(0, 2, 0)
 
 [node name="Skull" type="GridMap" parent="." unique_id=1204876522]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
 mesh_library = ExtResource("2_5kwh5")
+cell_center_y = false
 data = {
 "cells": PackedInt32Array(131063, 79, 0, 131063, 78, 0, 131064, 78, 0, 131064, 77, 0, 196599, 81, 0, 196601, 77, 0)
 }
@@ -49,6 +49,10 @@ metadata/_editor_floor_ = Vector3(0, 3, 0)
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=793351565]
 mesh_library = ExtResource("3_1ieio")
+cell_center_y = false
+metadata/_editor_floor_ = Vector3(0, 3, 0)
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=2053249747]
 mesh_library = ExtResource("4_7s5t5")
+cell_center_y = false
+metadata/_editor_floor_ = Vector3(0, 3, 0)
