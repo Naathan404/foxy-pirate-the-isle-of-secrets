@@ -94,6 +94,17 @@ func _check_trigger(manager: Node) -> void:
 	player.position.x = 4.0
 	await _physics_frames()
 	player.dead = false
+	player.hp.take_damage(7.0)
+	var expected_hp := player.hp.current_hp
+	player.stamina.try_consume(13.0)
+	player.chaos.gain(24.0)
+	player.last_facing_direction = Vector3.LEFT
+	var source_inventory := player.get_node("Inventory") as Inventory
+	var item_id := StringName(source_inventory.slots[0].item.item_id)
+	source_inventory.remove_item(item_id, 1)
+	var item_count := source_inventory.count_item(item_id)
+	player.weapon_controller.set_weapon_owned(&"bow", true)
+	player.charm_registry.set_owned(&"arrow_rain", true)
 	var previous_world: WeakRef = weakref(world)
 	# Keep the destination Player stationary so spawn assertions are independent of gravity.
 	var freeze_player := func(active_player: Player) -> void:
@@ -104,6 +115,20 @@ func _check_trigger(manager: Node) -> void:
 	await scene_changed
 	await process_frame
 	var arrival_player := manager.get("player") as Player
+	_check(is_equal_approx(arrival_player.hp.current_hp, expected_hp),
+		"HP survives a scene change")
+	_check(arrival_player.stamina.current_sp < arrival_player.stamina.get_max_sp(),
+		"Spent stamina survives a scene change")
+	_check(is_equal_approx(arrival_player.chaos.current, 24.0),
+		"Chaos survives a scene change")
+	_check((arrival_player.get_node("Inventory") as Inventory).count_item(item_id) == item_count,
+		"Inventory survives a scene change")
+	_check(arrival_player.weapon_controller.is_weapon_owned(&"bow"),
+		"Weapon ownership survives a scene change")
+	_check(arrival_player.charm_registry.is_owned(&"arrow_rain"),
+		"Charm ownership survives a scene change")
+	_check(arrival_player.last_facing_direction == Vector3.LEFT,
+		"Facing survives a scene change")
 	var marker := current_scene.get_node("ArrivalGate/ExitPosition") as Marker3D
 	_check(
 		arrival_player.global_position.is_equal_approx(marker.global_position),

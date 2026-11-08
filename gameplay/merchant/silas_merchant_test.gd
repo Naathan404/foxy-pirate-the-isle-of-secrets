@@ -6,7 +6,7 @@ const ARROW: BaseItem = preload("res://data/items/consumables/wooden_arrow.tres"
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
-const NPC_TEST_SCENE_PATH := "res://test/silas_test_scene.tscn"
+const NPC_TEST_SCENE_PATH := "res://world/hub/scenes/hub.tscn"
 const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
 const SHOP_PANEL_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_panel.tscn")
@@ -363,11 +363,11 @@ func _test_npc_scene_smoke() -> void:
 	if DisplayServer.get_name() == "headless":
 		_assert_true(
 			ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"),
-			"Silas Hub fixture is present"
+			"Silas Hub scene is present"
 		)
 		# GridMap physics/render RIDs from the complete Hub cannot be torn down
 		# cleanly by Godot's headless script runner. Gameplay smoke coverage still
-		# runs in the editor; CI verifies that the real Hub fixture is present.
+		# runs in the editor; headless validation checks that the Hub is present.
 		return
 	var fixture := ResourceLoader.load(NPC_TEST_SCENE_PATH) as PackedScene
 	_assert_true(fixture != null, "Silas fixture loads")
@@ -377,8 +377,8 @@ func _test_npc_scene_smoke() -> void:
 	root.add_child(scene)
 	await process_frame
 	await process_frame
-	var silas := scene.get_node_or_null("Hub/Silas") as SilasNpc
-	var panel := scene.get_node_or_null("Hub/SilasShopPanel") as SilasShopPanel
+	var silas := scene.get_node_or_null("Silas") as SilasNpc
+	var panel := scene.get_node_or_null("SilasShopPanel") as SilasShopPanel
 	var player := _get_game_manager_player()
 	_assert_true(silas != null, "npc test scene contains Silas")
 	_assert_true(panel != null, "npc test scene contains shop panel")

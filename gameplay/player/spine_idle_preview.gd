@@ -7,6 +7,8 @@ const ATTACK_PLAYBACK_WINDOWS := {
 	"Attack_3": 1.2,
 }
 const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
+## Spine 3.8 exposes G1_Dash by name but not as an animation object.
+const DASH_CLIP_DURATION := 0.5
 
 @export var enabled: bool = true
 @export_file("*.tres")
@@ -30,6 +32,7 @@ var _current_spine_skin: String = ""
 var _dagger_combo_index: int = 0
 var _slash_overlay_shaders: Dictionary = {}
 var _attack_duration: float = 0.0
+var _dash_duration: float = 0.0
 
 
 func _ready() -> void:
@@ -156,6 +159,11 @@ func reset_attack_speed() -> void:
 	_apply_attack_speed()
 
 
+func fit_dash_duration(duration: float) -> void:
+	_dash_duration = duration
+	_apply_attack_speed()
+
+
 func _apply_attack_speed() -> void:
 	if not is_instance_valid(_spine):
 		return
@@ -163,6 +171,14 @@ func _apply_attack_speed() -> void:
 	var playback_speed := 1.0
 	if window > 0.0 and _attack_duration > 0.0:
 		playback_speed = window / _attack_duration
+	elif _current_spine_animation == "G1_Dash" and _dash_duration > 0.0:
+		var skeleton_data = _spine.get("skeleton_data_res")
+		var animation = skeleton_data.get_animation_object(_current_spine_animation)
+		var clip_duration := (
+			float(animation.get_duration()) if animation != null else DASH_CLIP_DURATION
+		)
+		# Leave a small margin so the clip cannot end before movement.
+		playback_speed = clip_duration / (_dash_duration + 0.1)
 	_spine.set("time_scale", playback_speed)
 
 
@@ -245,7 +261,8 @@ func sync_animation(
 			var core = _spine.get_node("_SpineSpriteCore3D")
 			show_preview = core.set_skin(target_skin)
 		if show_preview:
-			var loop := not String(animation_name).begins_with("attack_dagger_")
+			var loop := not (String(animation_name).begins_with("attack_dagger_")
+				or String(animation_name).begins_with("dash_"))
 			show_preview = bool(_spine.set_animation(target_animation, loop, 0))
 		if show_preview:
 			_current_spine_animation = target_animation

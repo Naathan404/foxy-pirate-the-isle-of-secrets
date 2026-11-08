@@ -8,6 +8,7 @@ signal scene_transition_finished
 enum State { PLAYING, INVENTORY, TRANSITION }
 
 const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
+const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 
 @export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.25
 @export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.25
@@ -124,6 +125,10 @@ func _transition_scene(
 	_transition_overlay.show()
 	state_changed.emit(state)
 	await _fade_to(1.0, fade_out_seconds)
+	var player_state: RefCounted
+	if not reload_scene and is_instance_valid(player):
+		player_state = PLAYER_SCENE_STATE.new()
+		player_state.capture(player)
 	var error: Error
 	if reload_scene:
 		error = get_tree().reload_current_scene()
@@ -132,6 +137,8 @@ func _transition_scene(
 	if error == OK:
 		# SceneTree signals after the new scene has entered the tree and run _ready().
 		await get_tree().scene_changed
+		if player_state != null and is_instance_valid(player):
+			player_state.restore(player)
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
 		# Camera processing is paused during the fade. Position it at the arrival

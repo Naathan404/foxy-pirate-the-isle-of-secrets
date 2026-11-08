@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://vbvptqbcgi1u"]
 
 [ext_resource type="Script" uid="uid://lmit1l8g47g8" path="res://gameplay/inventory/item_pickup_popup.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://c6rri8ebn60w7" path="res://assets/sprites/items/Crab_Claw.png" id="2_wdcxa"]
 
 [sub_resource type="Animation" id="Animation_pickup"]
 resource_name = "pickup"
@@ -57,7 +56,6 @@ pixel_size = 0.03
 billboard = 1
 no_depth_test = true
 texture_filter = 0
-texture = ExtResource("2_wdcxa")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1024490767]
 libraries/ = SubResource("AnimationLibrary_popup")

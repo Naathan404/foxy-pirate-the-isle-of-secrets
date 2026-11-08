@@ -55,7 +55,8 @@ foxy-pirate-the-isle-of-secret/
 │       ├── weapon_controller.gd    # Điều khiển các giai đoạn tấn công
 │       └── attack scenes/          # Scene đòn đánh, hiện có dao găm
 ├── test/
-│   └── enemy_player_test.tscn       # Scene chạy thử nhân vật và quái bằng F5
+│   ├── fixtures/                    # Scene phục vụ test tự động
+│   └── *_test.gd                    # Script kiểm tra logic
 ├── ui/                             # Dành cho giao diện
 ├── world/                          # Dành cho thế giới game
 ├── docs/                           # Quy ước và hướng dẫn phát triển
@@ -65,9 +66,9 @@ foxy-pirate-the-isle-of-secret/
 
 ## Đóng góp và kiểm tra
 
-Tạo nhánh công việc từ `dev` và mở pull request về `dev` khi hoàn tất. Quy tắc đặt tên nhánh và commit được ghi trong [Git workflow](docs/git_workflow.md).
+Tạo nhánh công việc từ `dev` và mở pull request về `dev` khi hoàn tất. Quy tắc đặt tên nhánh và commit được ghi trong [Git workflow](docs/project/git_workflow.md).
 
-CI chạy khi push hoặc mở pull request vào `dev`/`main`, bao gồm import dự án, kiểm tra khởi động, test và lint GDScript. Kiểm tra định dạng bằng formatter cần chạy ở máy trước khi push.
+CI chạy khi push hoặc mở pull request vào `dev`/`main`, bao gồm import dự án và lint GDScript. Danh sách test CI hiện trống; xem [hướng dẫn kiểm thử](docs/project/testing.md) để chạy test thủ công. Kiểm tra định dạng bằng formatter cần chạy ở máy trước khi push.
 
 <details>
 <summary><b>Lệnh lint, format và test</b></summary>
@@ -91,20 +92,10 @@ godot --headless --path . --import
 godot --headless --path . --quit-after 10
 ```
 
-Xem thêm [hướng dẫn kiểm tra](docs/testing.md). Không commit thư mục cache `.godot/`; giữ các file `.gd.uid` đi kèm script.
+Xem thêm [hướng dẫn kiểm tra](docs/project/testing.md). Không commit thư mục cache `.godot/`; giữ các file `.gd.uid` đi kèm script.
 
 </details>
 
 ## Tài liệu
 
-| Nội dung | Tài liệu |
-| --- | --- |
-| Hướng dẫn chung | [Development guideline](docs/development_guideline.md) |
-| Tổ chức code và scene | [Kiến trúc](docs/architecture.md) |
-| Luồng Player và state machine hiện tại | [Player business logic](docs/business-logic/player_business_logic.md) |
-| NPC, hội thoại và state tuần tra | [NPC business logic](docs/business-logic/npc_business_logic.md) |
-| Trang bị và luồng chiến đấu của vũ khí | [Weapon business logic](docs/business-logic/weapon_business_logic.md) |
-| Quy tắc đặt tên và định dạng | [Convention](docs/conventions.md) |
-| Nhánh, commit và PR | [Git workflow](docs/git_workflow.md) |
-| Lint và test | [Testing](docs/testing.md) |
-| Va chạm | [Collision layer](docs/collision_layers.md) |
+Xem [mục lục tài liệu](docs/README.md) để tìm hướng dẫn và thiết kế theo chủ đề.

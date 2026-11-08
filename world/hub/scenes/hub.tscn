@@ -506,7 +506,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.390366, 0, 40.362617)
 [node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("19_volat")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61.324005, -1.8116255, -10.234898)
 trigger_id = &"hub_right"
-destination_scene = "uid://df5suj6du08w4"
+destination_scene = "uid://c1xcg6aaua0r0"
 destination_trigger_id = &"cv_1"
 
 [node name="CollisionShape3D" parent="SceneChangeTrigger" index="0" unique_id=482012259]

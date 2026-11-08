@@ -92,6 +92,14 @@ func get_current_hp() -> float:
 	return _current_hp
 
 
+## Restore without firing damage or death effects during a scene transition.
+func set_current_hp(value: float) -> void:
+	if not _configured or not is_finite(value):
+		return
+	_current_hp = clampf(value, 0.0, _max_hp)
+	hp_changed.emit(_current_hp, _max_hp)
+
+
 func get_max_hp() -> float:
 	return _max_hp
 

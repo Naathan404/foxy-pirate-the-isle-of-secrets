@@ -56,8 +56,8 @@
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
 [ext_resource type="Resource" uid="uid://ci2bma1bu680p" path="res://gameplay/charms/charm_data/abyssal_whirlpool.tres" id="charm_whirlpool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="collection_dagger"]
-[ext_resource type="Resource" path="res://data/weapon/weapon_meteor_staff.tres" id="collection_meteor_staff"]
 [ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="collection_harpoon"]
+[ext_resource type="Resource" uid="uid://i1gxkya5r3py" path="res://data/weapon/weapon_meteor_staff.tres" id="collection_meteor_staff"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
@@ -892,7 +892,7 @@ inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
 
 [node name="DrownPoint" type="Marker3D" parent="." unique_id=803702947]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8018878, 0)
 
 [node name="Effects" type="Node3D" parent="." unique_id=2014826237]
 
@@ -1019,7 +1019,7 @@ script = ExtResource("7_rvh5s")
 
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
-step_distance = 0.4
+step_distance = 0.5
 step_duration = 0.1
 
 [node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component", "weapon_controller", "ammo") instance=ExtResource("20_pt1je")]

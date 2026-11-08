@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://cpq4n73dxt3vj"]
+
+[ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="1_owjee"]
+[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_7xvtg"]
+[ext_resource type="PackedScene" uid="uid://c0nu47ksokiuu" path="res://world/biomes/base/oak_tree.tscn" id="3_5cthw"]
+[ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/base/pine_tree.tscn" id="4_7xvtg"]
+[ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="6_p81o7"]
+
+[sub_resource type="Environment" id="Environment_void"]
+background_mode = 1
+background_color = Color(0.012, 0.009, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.68, 0.72, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_void"]
+render_priority = 0
+shader = ExtResource("5_void")
+shader_parameter/void_color = Color(0.012, 0.009, 0.02, 1)
+shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
+shader_parameter/smoke_strength = 0.48
+shader_parameter/rise_speed = 0.150000007125
+
+[sub_resource type="QuadMesh" id="QuadMesh_void"]
+material = SubResource("ShaderMaterial_void")
+size = Vector2(400, 400)
+
+[node name="BaseRoom" type="Node3D" unique_id=1248439267]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=212262502]
+environment = SubResource("Environment_void")
+
+[node name="VoidSmoke" type="MeshInstance3D" parent="." unique_id=593468596]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -1.2, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_void")
+
+[node name="BaseGround" parent="." unique_id=858705461 instance=ExtResource("1_owjee")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, -0.19104576)
+
+[node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("2_7xvtg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0626488, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1545493744]
+transform = Transform3D(0.96080756, 0.15102193, -0.23246765, 0, 0.8385788, 0.54478025, 0.27721623, -0.523429, 0.8057129, 0, 14.950922, 11.933294)
+
+[node name="OakTree" parent="." unique_id=501757653 instance=ExtResource("3_5cthw")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, -4.5668592, 0.14540052, -5.5535803)
+
+[node name="PineTree" parent="." unique_id=1391743500 instance=ExtResource("4_7xvtg")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 5, 0.22658014, 5.513195)
+
+[node name="PineTree2" parent="." unique_id=1441002214 instance=ExtResource("4_7xvtg")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 7.90691, 0.074067116, -4.7753134)
+
+[node name="Starfish" parent="." unique_id=1294052233 instance=ExtResource("6_p81o7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.395172, 0, 0)

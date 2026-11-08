@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="2_attack"]
 [ext_resource type="Texture2D" uid="uid://c8sjf3qvnjf01" path="res://assets/sprites/items/equipment/Meteor_Staff.png" id="3_icon"]
 [ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="4_0nurk"]
-[ext_resource type="PackedScene" path="res://gameplay/weapons/meteor_cast.tscn" id="4_cast"]
+[ext_resource type="PackedScene" uid="uid://bn5s6kfm775vt" path="res://gameplay/weapons/meteor_cast.tscn" id="4_cast"]
 [ext_resource type="PackedScene" uid="uid://bibliepp32nwj" path="res://gameplay/weapons/meteor_rain.tscn" id="5_rain"]
 
 [sub_resource type="Resource" id="Meteor"]
@@ -21,7 +21,7 @@ cooldown_seconds = 0.35
 range_units = 7.0
 stamina_cost = 50.0
 
-[sub_resource type="Resource" id="MeteorRain"]
+[sub_resource type="Resource" id="Resource_1ilep"]
 script = ExtResource("2_attack")
 skill_icon = ExtResource("3_icon")
 display_name = "Meteor Rain"
@@ -30,7 +30,7 @@ attack_scene = ExtResource("5_rain")
 aim_mode = 2
 delivery_type = 2
 lock_input_during_cast = true
-damage_hp = 1.5
+damage_hp = 2.0
 windup_seconds = 0.7
 active_seconds = 0.04
 recovery_seconds = 0.01
@@ -49,4 +49,4 @@ category = 2
 stagger_damage = 24.0
 chaos_per_hit = 50.0
 normal_attack = SubResource("Meteor")
-secondary_attack = SubResource("MeteorRain")
+secondary_attack = SubResource("Resource_1ilep")
