@@ -137,6 +137,15 @@ func fit_animation_duration(duration: float) -> bool:
 	return true
 
 
+func fit_dash_duration(duration: float) -> void:
+	if not is_finite(duration) or duration <= 0.0:
+		return
+	_fitted_duration = duration
+	_update_animation_speed()
+	if is_instance_valid(_idle_preview):
+		_idle_preview.fit_dash_duration(duration)
+
+
 ## Hold a drawn pose while gameplay owns the charge timer; safe across direction changes.
 func hold_animation_pose(progress: float) -> void:
 	_held_progress = clampf(progress, 0.0, 1.0)
@@ -183,6 +192,7 @@ func reset_animation_speed() -> void:
 		animation_player.speed_scale = _base_animation_speed
 	if is_instance_valid(_idle_preview):
 		_idle_preview.reset_attack_speed()
+		_idle_preview.fit_dash_duration(0.0)
 
 
 ## Full duration at the current playback speed; zero when no clip is assigned.

@@ -252,7 +252,17 @@ func _physics_process(delta: float) -> void:
 	# State chọn vận tốc, Player chỉ di chuyển vật lý 1 lần mỗi frame
 	if dead:
 		set_horizontal_velocity(Vector3.ZERO)
-	if not is_on_floor():
+	# Dash keeps its launch height even after crossing a ledge. Resume gravity
+	# on the next state, including when the dash was interrupted.
+	var dash_state := fsm.states.get("dash") as FsmState
+	var dash_holds_height := (
+		fsm.current_state == dash_state
+		and dash_state != null
+		and (bool(dash_state.get("active")) or bool(dash_state.get("completed")))
+	)
+	if dash_holds_height:
+		velocity.y = 0.0
+	elif not is_on_floor():
 		velocity += get_gravity() * delta
 	elif velocity.y < 0.0:
 		velocity.y = 0.0

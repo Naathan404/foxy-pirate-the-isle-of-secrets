@@ -113,5 +113,12 @@ func get_current_sp() -> float:
 	return _current_sp
 
 
+func set_current_sp(value: float) -> void:
+	if not _configured or not is_finite(value):
+		return
+	_current_sp = clampf(value, 0.0, _max_sp)
+	stamina_changed.emit(_current_sp, _max_sp)
+
+
 func get_max_sp() -> float:
 	return _max_sp

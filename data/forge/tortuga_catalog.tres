@@ -11,7 +11,7 @@
 [ext_resource type="Resource" path="res://data/weapon/forges/shared_pool.tres" id="9_pool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="dagger"]
 [ext_resource type="Resource" uid="uid://bjm73rcy0l6vt" path="res://data/items/materials/fireflies_tail.tres" id="fireflies"]
-[ext_resource type="Resource" path="res://data/weapon/weapon_meteor_staff.tres" id="meteor_staff"]
+[ext_resource type="Resource" uid="uid://i1gxkya5r3py" path="res://data/weapon/weapon_meteor_staff.tres" id="meteor_staff"]
 
 [sub_resource type="Resource" id="ForgeCrab"]
 script = ExtResource("3_ingredient")

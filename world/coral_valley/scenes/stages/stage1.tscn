@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://c1xcg6aaua0r0"]
 
-[ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island8.tscn" id="1_jsq15"]
+[ext_resource type="PackedScene" uid="uid://cbw2w5sa6hvip" path="res://world/coral_valley/scenes/islands/coral_island8.tscn" id="1_jsq15"]
 [ext_resource type="PackedScene" uid="uid://d0fte67sn6yi0" path="res://world/hub/objects/bridge.tscn" id="1_u7cb7"]
 [ext_resource type="PackedScene" uid="uid://d1em755mvcub4" path="res://world/coral_valley/scenes/islands/coral_island2.tscn" id="2_u7cb7"]
-[ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island3.tscn" id="3_r5dp7"]
-[ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island4.tscn" id="4_2g3gq"]
+[ext_resource type="PackedScene" uid="uid://csg1hqrr2q725" path="res://world/coral_valley/scenes/islands/coral_island3.tscn" id="3_r5dp7"]
+[ext_resource type="PackedScene" uid="uid://45jl0uvq2cgs" path="res://world/coral_valley/scenes/islands/coral_island4.tscn" id="4_2g3gq"]
 [ext_resource type="PackedScene" uid="uid://bo7ce6vvl81jr" path="res://world/hub/objects/sea_water.tscn" id="6_r5dp7"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="7_2g3gq"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="8_kgb05"]
@@ -44,10 +44,10 @@ shadow_enabled = true
 [node name="CoralIsland8" parent="." unique_id=794729246 instance=ExtResource("1_jsq15")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 10)
 
-[node name="WorldEnvironment" parent="CoralIsland8" index="0"]
+[node name="WorldEnvironment" parent="CoralIsland8" index="0" unique_id=228298735]
 environment = null
 
-[node name="DirectionalLight3D" parent="CoralIsland8" index="1"]
+[node name="DirectionalLight3D" parent="CoralIsland8" index="1" unique_id=197667829]
 visible = false
 
 [node name="CoralIsland2" parent="." unique_id=225693629 instance=ExtResource("2_u7cb7")]
@@ -63,16 +63,16 @@ visible = true
 
 [node name="CoralIsland3" parent="." unique_id=70048280 instance=ExtResource("3_r5dp7")]
 
-[node name="WorldEnvironment" parent="CoralIsland3" index="0"]
+[node name="WorldEnvironment" parent="CoralIsland3" index="0" unique_id=316567072]
 environment = null
 
-[node name="DirectionalLight3D" parent="CoralIsland3" index="1"]
+[node name="DirectionalLight3D" parent="CoralIsland3" index="1" unique_id=614759687]
 visible = false
 
 [node name="CoralIsland4" parent="." unique_id=1550301546 instance=ExtResource("4_2g3gq")]
 transform = Transform3D(-1.5893256e-08, 0, 1, 0, 1, 0, -1, 0, -1.5893256e-08, -363.99997, 0, 88)
 
-[node name="WorldEnvironment" parent="CoralIsland4" index="0"]
+[node name="WorldEnvironment" parent="CoralIsland4" index="0" unique_id=887268417]
 environment = null
 
 [node name="SeaWaters" type="Node3D" parent="." unique_id=752669126]

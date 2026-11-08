@@ -31,6 +31,7 @@ description = "Hold to charge a fan of arrows. A full charge releases up to 6 ar
 attack_scene = ExtResource("4_volley")
 aim_mode = 1
 delivery_type = 1
+damage_hp = 1.5
 stagger_multiplier = 0.5
 windup_seconds = 0.3
 active_seconds = 0.04

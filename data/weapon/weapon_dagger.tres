@@ -68,6 +68,7 @@ display_name = "Returning Dagger"
 description = "Throw your dagger forward. It hits enemies on the way out and returns to your hand."
 attack_scene = ExtResource("4_throw")
 delivery_type = 1
+damage_hp = 2.0
 stagger_multiplier = 1.25
 windup_seconds = 0.15
 active_seconds = 0.05

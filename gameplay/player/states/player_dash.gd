@@ -3,6 +3,8 @@ extends PlayerState
 var direction: Vector3 = Vector3.ZERO
 var active: bool = false
 var completed: bool = false
+var _saved_floor_snap_length: float = 0.0
+var _floor_snap_suspended: bool = false
 
 
 func _enter() -> void:
@@ -31,7 +33,13 @@ func _enter() -> void:
 		player.last_facing_direction = direction
 	timer = player.data.dash_duration
 	active = true
+	_saved_floor_snap_length = player.floor_snap_length
+	player.floor_snap_length = 0.0
+	_floor_snap_suspended = true
+	player.velocity.y = 0.0
 	player.play_directional_animation("dash", true)
+	if is_instance_valid(player.visual):
+		player.visual.fit_dash_duration(timer)
 	player.dash_started.emit()
 
 
@@ -50,6 +58,11 @@ func _update(delta: float) -> void:
 
 
 func _exit() -> void:
+	if _floor_snap_suspended:
+		player.floor_snap_length = _saved_floor_snap_length
+		_floor_snap_suspended = false
+	if is_instance_valid(player.visual):
+		player.visual.reset_animation_speed()
 	if active or completed:
 		player.dash_finished.emit(not completed)
 	active = false

@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://b4qt2tgtd8lpy"]
 
+[ext_resource type="PackedScene" path="res://gameplay/player/foxy.tscn" id="1_foxy"]
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island13.tscn" id="2_id0yi"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="2_lqu66"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="3_okguq"]
@@ -21,6 +22,9 @@ ambient_light_sky_contribution = 0.53
 ambient_light_energy = 0.72
 
 [node name="Stage5" type="Node3D" unique_id=728909387]
+
+[node name="Foxy" parent="." instance=ExtResource("1_foxy")]
+position = Vector3(-110, 2.65, 116)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1872380418]
 environment = SubResource("Environment_1h7xg")
@@ -48,6 +52,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 7.8399997, -110, 2, 106)
 trigger_id = &"stage5_A"
 destination_scene = "uid://dj81lyqu3ry8v"
 destination_trigger_id = &"stage4_B"
+
+[node name="ExitPosition" parent="SceneChangeTrigger" index="1"]
+position = Vector3(0, 0.65, 1.28)
 
 [node name="SeaWater" parent="." unique_id=116442875 instance=ExtResource("3_okguq")]
 transform = Transform3D(2.1, 0, 0, 0, 1, 0, 0, 0, 1.9000001, -42, 0, 102)
