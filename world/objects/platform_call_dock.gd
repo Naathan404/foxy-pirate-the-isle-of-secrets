@@ -6,9 +6,7 @@ extends StaticBody3D
 @export var call_end := false
 
 @onready var hurtbox: HurtBox = $Lever/HurtBox
-@onready var _animator: AnimationPlayer = (
-	$Lever/Visual.find_child("AnimationPlayer", true, false) as AnimationPlayer
-)
+@onready var _lever_sprite: AnimatedSprite3D = $Lever/AnimatedSprite3D
 
 
 func _ready() -> void:
@@ -16,6 +14,8 @@ func _ready() -> void:
 	hurtbox.team = CombatTeams.ENEMY
 	hurtbox.collision_layer = CombatLayers.ENEMY_HURTBOX
 	hurtbox.collision_mask = CombatLayers.PLAYER_ATTACK
+	_lever_sprite.animation_finished.connect(_on_lever_animation_finished)
+	_lever_sprite.play(&"idle")
 
 
 func receive_damage(damage: DamageContext) -> float:
@@ -25,8 +25,11 @@ func receive_damage(damage: DamageContext) -> float:
 	if moving_platform == null:
 		return 0.0
 	moving_platform.request_destination(call_end)
-	if is_instance_valid(_animator):
-		_animator.stop(true)
-		_animator.play(&"toggle-on", 0.1)
-		_animator.queue(&"toggle-off")
+	_lever_sprite.stop()
+	_lever_sprite.play(&"active")
 	return damage.amount_hp
+
+
+func _on_lever_animation_finished() -> void:
+	if _lever_sprite.animation == &"active":
+		_lever_sprite.play(&"idle")

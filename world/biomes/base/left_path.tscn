@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://du1npr0src11h"]
+
+[ext_resource type="Texture2D" uid="uid://dh1rr8kon5k3y" path="res://assets/sprites/biomes/forest/forest_left.png" id="1_jisgf"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="2_qbxpm"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cxbn6"]
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pprb3"]
+size = Vector3(0.5, 2, 4)
+
+[node name="LeftPath" type="Node3D" unique_id=872527392]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("1_jisgf")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=2124921856]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1059153531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, 0.045967095)
+shape = SubResource("BoxShape3D_jpyye")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" unique_id=2046027508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 5.0071125)
+shape = SubResource("BoxShape3D_cxbn6")
+
+[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("2_qbxpm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8878547e-08, 0, 5.4305315)
+
+[node name="CollisionShape3D" parent="SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.37611, 1.1086969, -5.132987)
+shape = SubResource("BoxShape3D_pprb3")
+
+[node name="ExitPosition" parent="SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8945482, 0.6731589, -5.3314714)
+
+[editable path="SceneChangeTrigger"]

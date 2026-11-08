@@ -21,7 +21,9 @@ shake_seconds = 0.26
 pixel_size = 0.028
 offset = Vector2(-14, 88)
 billboard = 1
+alpha_cut = 0
 no_depth_test = true
+render_priority = 1
 texture_filter = 1
 speed_scale = 1.1
 

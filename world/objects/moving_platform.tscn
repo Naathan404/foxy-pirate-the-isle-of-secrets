@@ -2,7 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://c0hpmidu42byx" path="res://assets/textures/bridge/bridge.png" id="1_fa4ld"]
 [ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://db5lhn6q8e826" path="res://assets/models/kenney_platformer_kit/lever.glb" id="3_lever"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="2_ei82e"]
+[ext_resource type="SpriteFrames" uid="uid://dt2mw3jag1itm" path="res://world/objects/lever_sprite_frames.tres" id="3_lever"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="4_hurtbox"]
 [ext_resource type="PackedScene" uid="uid://b51d78vnn7fra" path="res://world/objects/platform_call_dock.tscn" id="5_dock"]
 
@@ -28,7 +29,13 @@ script = ExtResource("1_script")
 
 [node name="Platform" type="AnimatableBody3D" parent="." unique_id=1191972229]
 
+[node name="Sprite3D" type="Sprite3D" parent="Platform" unique_id=209367309]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("2_ei82e")
+
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Platform" unique_id=207054832]
+visible = false
 mesh = SubResource("BoxMesh_373mi")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Platform" unique_id=395830429]
@@ -37,8 +44,13 @@ shape = SubResource("BoxShape3D_ot41l")
 [node name="Lever" type="Node3D" parent="Platform" unique_id=981979026]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.003140211, 0.25, 0)
 
-[node name="Visual" parent="Platform/Lever" unique_id=1529306580 instance=ExtResource("3_lever")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Platform/Lever" unique_id=1529306580]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+pixel_size = 0.004
+billboard = 1
+sprite_frames = ExtResource("3_lever")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="HurtBox" type="Area3D" parent="Platform/Lever" unique_id=1614850832]
 collision_layer = 16
@@ -53,11 +65,11 @@ shape = SubResource("LeverHitShape")
 [node name="Start" type="Marker3D" parent="." unique_id=1064890171]
 
 [node name="End" type="Marker3D" parent="." unique_id=1910727390]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.033314)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.428259, 0, -2.2329617)
 
 [node name="StartDock" parent="." unique_id=1539520790 instance=ExtResource("5_dock")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.05)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -9.499657, 0.77503157, -0.66361666)
 
 [node name="EndDock" parent="." unique_id=1860631709 instance=ExtResource("5_dock")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.083313)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 22.428259, 0.77503157, -0.18296242)
 call_end = true

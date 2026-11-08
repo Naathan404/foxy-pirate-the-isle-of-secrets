@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djnp68hgbhkms"
-path.s3tc="res://.godot/imported/pine_tree.png-5d1eb053e8dc7304da277cfc410433d3.s3tc.ctex"
+uid="uid://dxloc8pg4mmgg"
+path.s3tc="res://.godot/imported/forest_up.png-a49a4c135666deeac80f623ac7c47048.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sprites/biomes/biome_01/pine_tree.png"
-dest_files=["res://.godot/imported/pine_tree.png-5d1eb053e8dc7304da277cfc410433d3.s3tc.ctex"]
+source_file="res://assets/sprites/biomes/forest/forest_up.png"
+dest_files=["res://.godot/imported/forest_up.png-a49a4c135666deeac80f623ac7c47048.s3tc.ctex"]
 
 [params]
 

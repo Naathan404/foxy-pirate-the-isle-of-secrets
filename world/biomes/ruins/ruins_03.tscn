@@ -1,0 +1,133 @@
+[gd_scene format=3 uid="uid://dc0dp5815ss8"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_xe0fx"]
+[ext_resource type="Texture2D" uid="uid://c5m0ixi74avo3" path="res://assets/sprites/biomes/ruins/ruins.png" id="2_qg0qs"]
+[ext_resource type="Texture2D" uid="uid://c7a1d7qm2k8po" path="res://assets/sprites/biomes/ruins/ruins_down.png" id="2_qgx3g"]
+[ext_resource type="Texture2D" uid="uid://bvx7mdo72hxgg" path="res://assets/sprites/biomes/ruins/ruins_up.png" id="3_o57l1"]
+[ext_resource type="Texture2D" uid="uid://48uoarpveakc" path="res://assets/sprites/biomes/ruins/ruins_right.png" id="4_el1ol"]
+[ext_resource type="Texture2D" uid="uid://b6yyim36l77k3" path="res://assets/sprites/biomes/ruins/ruins_left.png" id="5_52os3"]
+[ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_1.tscn" id="6_grass1"]
+[ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_2.tscn" id="7_grass2"]
+[ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_3.tscn" id="8_grass3"]
+[ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_4.tscn" id="9_grass4"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="11_2sjup"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_u1wf0"]
+size = Vector3(11.28363, 1, 10.600037)
+
+[node name="Ruins_03" unique_id=2035749224 instance=ExtResource("1_xe0fx")]
+open_exits = 3
+up_destination_scene = "res://world/biomes/forest/forest_01.tscn"
+right_destination_scene = "res://world/biomes/ruins/ruins_02.tscn"
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="Sprite3D" parent="Exits/DownPath" index="0" unique_id=1887481611]
+texture = ExtResource("2_qgx3g")
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+trigger_id = &"down"
+destination_trigger_id = &"up"
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="Sprite3D" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="0" unique_id=1887481611]
+texture = ExtResource("3_o57l1")
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="2" unique_id=219025603]
+trigger_id = &"up"
+destination_scene = "res://world/biomes/forest/forest_01.tscn"
+destination_trigger_id = &"down"
+
+[node name="Sprite3D" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="0" unique_id=1887481611]
+texture = ExtResource("4_el1ol")
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
+trigger_id = &"right"
+destination_scene = "res://world/biomes/ruins/ruins_02.tscn"
+destination_trigger_id = &"left"
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
+[node name="Sprite3D" parent="Exits/LeftPath" index="0" unique_id=1887481611]
+texture = ExtResource("5_52os3")
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" index="2" unique_id=219025603]
+monitoring = false
+trigger_id = &"left"
+destination_trigger_id = &"right"
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+texture = ExtResource("2_qg0qs")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08163452, -0.41596794, 0.24716187)
+shape = SubResource("BoxShape3D_u1wf0")
+
+[node name="Grass1" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1245693956 instance=ExtResource("8_grass3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -8)
+
+[node name="Grass2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="2" unique_id=227419745 instance=ExtResource("6_grass1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+
+[node name="Grass3" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="3" unique_id=126471768 instance=ExtResource("7_grass2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 8)
+
+[node name="Grass4" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="4" unique_id=2046752599 instance=ExtResource("9_grass4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
+
+[node name="Grass5" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="5" unique_id=1633294456 instance=ExtResource("9_grass4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 8)
+
+[node name="Grass6" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="6" unique_id=1899447318 instance=ExtResource("8_grass3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 6)
+
+[node name="Grass7" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="7" unique_id=1029901701 instance=ExtResource("6_grass1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -3)
+
+[node name="Grass8" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="8" unique_id=839595342 instance=ExtResource("7_grass2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -5)
+
+[node name="Grass9" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="9" unique_id=465612289 instance=ExtResource("9_grass4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -7)
+
+[node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.03756, -6.9159203, 22.620491)
+
+[node name="Starfish" parent="." index="5" unique_id=1294052233 instance=ExtResource("11_2sjup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0546153, 1.1689515, 4.920044)
+
+[node name="Starfish2" parent="." index="6" unique_id=214473565 instance=ExtResource("11_2sjup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.759058, 1.1689515, -4.5003424)
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

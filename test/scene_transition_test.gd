@@ -24,7 +24,7 @@ func _run() -> void:
 			return
 	var manager := root.get_node("GameManager")
 	manager.fade_out_seconds = 0.03
-	manager.fade_in_seconds = 0.03
+	manager.fade_in_seconds = 0.15
 	_check(not manager.change_scene("res://missing_scene.tscn"), "Reject missing scene")
 	_check(not manager.change_scene("res://data/weapon/weapon_dagger.tres"), "Reject non-scene")
 	_check(manager.enter_inventory(), "Can open inventory before transition")
@@ -38,6 +38,13 @@ func _run() -> void:
 	var fade := overlay.get_node("Fade") as ColorRect
 	_check(overlay.visible and is_equal_approx(fade.color.a, 1.0), "Scene changes at full black")
 	_check(current_scene.scene_file_path == DESTINATION, "Destination is current scene")
+	while fade.color.a >= 1.0:
+		await process_frame
+	_check(overlay.visible and fade.color.a > 0.0, "Observe room during fade-in")
+	_check(not paused and manager.state == manager.State.PLAYING,
+		"Gameplay resumes before fade-in finishes")
+	_check(not manager.enter_inventory(), "Inventory cannot interrupt fade-in")
+	_check(not manager.change_scene(DESTINATION), "Another transition cannot interrupt fade-in")
 	await manager.scene_transition_finished
 	_check(not paused and manager.state == manager.State.PLAYING, "Gameplay resumes")
 	_check(not overlay.visible and is_zero_approx(fade.color.a), "Overlay clears after fade-in")

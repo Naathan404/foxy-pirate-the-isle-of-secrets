@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dyg01yg81tp3a"
-path.s3tc="res://.godot/imported/base.png-230f0017fe3529662b9650ee442aca34.s3tc.ctex"
+uid="uid://c5m0ixi74avo3"
+path.s3tc="res://.godot/imported/ruins.png-b8ee533810bd0a882eaaebd4a9d5c3ab.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sprites/biomes/biome_01/base.png"
-dest_files=["res://.godot/imported/base.png-230f0017fe3529662b9650ee442aca34.s3tc.ctex"]
+source_file="res://assets/sprites/biomes/ruins/ruins.png"
+dest_files=["res://.godot/imported/ruins.png-b8ee533810bd0a882eaaebd4a9d5c3ab.s3tc.ctex"]
 
 [params]
 
