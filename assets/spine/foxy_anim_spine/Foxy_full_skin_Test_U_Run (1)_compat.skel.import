@@ -1,0 +1,14 @@
+[remap]
+
+importer="curvature.spine.binary"
+type="SpineSkeletonFileResource"
+uid="uid://dfv6vyegej126"
+path="res://.godot/imported/Foxy_full_skin_Test_U_Run (1)_compat.skel-70e07f14ed4950105a5d0aeb9cf8aa09.tres"
+
+[deps]
+
+source_file="res://assets/spine/foxy_anim_spine/Foxy_full_skin_Test_U_Run (1)_compat.skel"
+dest_files=["res://.godot/imported/Foxy_full_skin_Test_U_Run (1)_compat.skel-70e07f14ed4950105a5d0aeb9cf8aa09.tres"]
+
+[params]
+

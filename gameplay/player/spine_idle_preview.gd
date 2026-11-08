@@ -7,14 +7,16 @@ const ATTACK_PLAYBACK_WINDOWS := {
 	"Attack_3": 1.2,
 }
 const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
-## Spine 3.8 exposes G1_Dash by name but not as an animation object.
+const RUN_SIZE_MULTIPLIERS := {"D_Run": 1.1, "U_Run": 1.08}
+const STRAY_EYE_SLOT := "Eyes/Eyes_01"
+## Some Spine 3.8 dash clips are exposed by name but not as animation objects.
 const DASH_CLIP_DURATION := 0.5
 
 @export var enabled: bool = true
 @export_file("*.tres")
-var skeleton_data_path: String = "res://assets/spine/compat/foxy_skeleton.tres"
-@export var spine_animation: String = "animation"
-@export var spine_skin: String = ""
+var skeleton_data_path: String = "res://assets/spine/foxy_anim_spine/foxy_skeleton.tres"
+@export var spine_animation: String = "G1_Idle"
+@export var spine_skin: String = "G1"
 @export var animation_mapping: Dictionary = {}
 @export var artwork_faces_left: bool = true
 ## Scale the fitted Spine artwork without moving its feet from the sprite baseline.
@@ -26,6 +28,7 @@ var _active: bool = false
 var _fitted_transform: Transform3D = Transform3D.IDENTITY
 var _reference_height: float = 0.0
 var _reference_bottom: Vector3 = Vector3.ZERO
+var _idle_spine_height: float = 0.0
 var _fit_ready: bool = false
 var _current_spine_animation: String = ""
 var _current_spine_skin: String = ""
@@ -98,6 +101,41 @@ func _process(_delta: float) -> void:
 	else:
 		_spine.resume()
 	_update_slash_overlay()
+	_stabilize_dash_size()
+	_stabilize_run_size()
+
+
+func _stabilize_run_size() -> void:
+	var factor: float = RUN_SIZE_MULTIPLIERS.get(_current_spine_animation, 1.0)
+	if factor == 1.0:
+		return
+	var bounds: AABB = _spine.get_aabb()
+	if bounds.size.x <= 0.01 or bounds.size.y <= 0.01:
+		return
+	var pose := _spine.transform
+	var mirrored := signf(pose.basis.x.x) != signf(_fitted_transform.basis.x.x)
+	pose.basis.x = _fitted_transform.basis.x * (-factor if mirrored else factor)
+	pose.basis.y = _fitted_transform.basis.y * factor
+	pose.origin.x = _reference_bottom.x - pose.basis.x.x * bounds.get_center().x
+	pose.origin.y = _reference_bottom.y - pose.basis.y.y * bounds.position.y
+	_spine.transform = pose
+
+
+func _stabilize_dash_size() -> void:
+	if not _current_spine_animation.ends_with("_Dash") or _idle_spine_height <= 0.0:
+		return
+	var bounds: AABB = _spine.get_aabb()
+	if bounds.size.y <= 0.01:
+		return
+	# The exported dash poses shrink vertically. Keep the previous foot anchoring
+	# and limit the side clip's correction so it cannot become long and thin.
+	var factor := maxf(1.0, _idle_spine_height / bounds.size.y)
+	if _current_spine_animation == "G1_Dash":
+		factor = minf(factor, 1.35)
+	var pose := _spine.transform
+	pose.basis.y = _fitted_transform.basis.y * factor
+	pose.origin.y = _reference_bottom.y - pose.basis.y.y * bounds.position.y
+	_spine.transform = pose
 
 
 func _update_slash_overlay() -> void:
@@ -107,8 +145,9 @@ func _update_slash_overlay() -> void:
 	var commands: Array = core._get_render_commands_for_external_consumer()
 	var rows: Array = core._get_slot_render_rows_for_external_consumer()
 	for row in rows:
-		var slot_name := str(row.get("slot_name", "")).to_lower()
-		if not slot_name.contains("slash"):
+		var slot_name := str(row.get("slot_name", ""))
+		var stray_eye := slot_name == STRAY_EYE_SLOT
+		if not stray_eye and not slot_name.to_lower().contains("slash"):
 			continue
 		if not row.has("command"):
 			continue
@@ -126,6 +165,14 @@ func _update_slash_overlay() -> void:
 			continue
 		var draw := _spine.get_node_or_null("_SpineDraw3D_%d" % index) as MeshInstance3D
 		if draw == null or not draw.visible:
+			continue
+		if stray_eye:
+			# This export leaves a setup-pose eye attachment near the feet.
+			# Its animation can restore the attachment every frame, so hide the draw.
+			draw.visible = false
+			var shadow := _spine.get_node_or_null("_SpineShadow3D_%d" % index) as MeshInstance3D
+			if shadow != null:
+				shadow.visible = false
 			continue
 		var material := draw.material_override as ShaderMaterial
 		if material == null or material.shader == null:
@@ -171,7 +218,7 @@ func _apply_attack_speed() -> void:
 	var playback_speed := 1.0
 	if window > 0.0 and _attack_duration > 0.0:
 		playback_speed = window / _attack_duration
-	elif _current_spine_animation == "G1_Dash" and _dash_duration > 0.0:
+	elif _current_spine_animation.ends_with("_Dash") and _dash_duration > 0.0:
 		var skeleton_data = _spine.get("skeleton_data_res")
 		var animation = skeleton_data.get_animation_object(_current_spine_animation)
 		var clip_duration := (
@@ -187,6 +234,22 @@ func get_afterimage_source() -> Node3D:
 	return _spine if _active and visible and is_instance_valid(_spine) else null
 
 
+func _mapping_key_for(animation_name: StringName, screen_facing: Vector3) -> String:
+	var key := String(animation_name)
+	if animation_name == &"idle_side":
+		return "idle_down"
+	if key.begins_with("dash_"):
+		if screen_facing.z < -0.01:
+			return "dash_up"
+		if screen_facing.z > 0.01:
+			return "dash_down"
+		return "dash_side"
+	if key.begins_with("run_") and absf(screen_facing.x) > 0.01 \
+			and absf(screen_facing.z) > 0.01:
+		return "run_side"
+	return key
+
+
 func sync_animation(
 	animation_name: StringName,
 	source: Sprite3D,
@@ -198,15 +261,7 @@ func sync_animation(
 ) -> void:
 	var target_animation := ""
 	var target_skin := spine_skin
-	var mapping_key := String(animation_name)
-	if animation_name == &"idle_side":
-		mapping_key = "idle_down"
-	elif (
-		(mapping_key.begins_with("run_") or mapping_key.begins_with("dash_"))
-		and absf(screen_facing.x) > 0.01
-		and absf(screen_facing.z) > 0.01
-	):
-		mapping_key = mapping_key.get_slice("_", 0) + "_side"
+	var mapping_key := _mapping_key_for(animation_name, screen_facing)
 	var mapping: Array = animation_mapping.get(mapping_key, [])
 	if mapping.size() == 2:
 		target_animation = str(mapping[0])
@@ -328,6 +383,7 @@ func _fit_to_sprite() -> void:
 	var bounds: AABB = _spine.get_aabb()
 	if bounds.size.y <= 0.0 or _reference_height <= 0.0:
 		return
+	_idle_spine_height = bounds.size.y
 	var factor := _reference_height / bounds.size.y * size_multiplier
 	_spine.scale = Vector3.ONE * factor
 	_spine.position = (

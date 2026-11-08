@@ -117,7 +117,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.03756, -6.9159203, 22.620491)
 
 [node name="EliteBarrel" parent="." index="5" unique_id=63146857 instance=ExtResource("11_kekfi")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.21051879, 0.8000126, 1.3578978)
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, -0.21051879, 0.8000126, 1.3578978)
 trigger_mode = 0
 auto_aim_at_player = false
 shot_interval = 0.2
