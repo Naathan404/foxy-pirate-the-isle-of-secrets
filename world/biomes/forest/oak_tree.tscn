@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c0nu47ksokiuu"]
+
+[ext_resource type="Texture2D" uid="uid://c68eelfrr30cj" path="res://assets/sprites/biomes/forest/oak_tree.png" id="1_bc3ko"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
+size = Vector3(6.3823767, 8.886536, 4.0803747)
+
+[node name="OakTree" type="Node3D" unique_id=501757653]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=936383359]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.876317, 0)
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("1_bc3ko")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=460736286]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.449292, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1265577953]
+transform = Transform3D(0.99999976, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, -0.39279675, 0.16159058, 1.7272879)
+shape = SubResource("BoxShape3D_jpyye")

@@ -6,9 +6,12 @@ extends BaseNpc
 enum DialogueIntent { NONE, OPEN_FIRST_SHOP, OPEN_RETURNING_SHOP, CLOSE }
 enum PresentationState { CLOSED, OPENING, OPEN, CLOSING }
 
+const SHOP_PANEL_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_panel.tscn")
+
 @export_group("Silas Merchant")
 @export var data: SilasNpcData
 @export var catalog: MerchantCatalog
+## Optional: use a panel already placed in the scene. Otherwise Silas creates one.
 @export var shop_panel_path: NodePath
 
 var _shop_panel: SilasShopPanel
@@ -33,9 +36,9 @@ func _ready() -> void:
 		return
 	_stock_random.randomize()
 	super()
-	_shop_panel = get_node_or_null(shop_panel_path) as SilasShopPanel
+	_shop_panel = _resolve_shop_panel()
 	if _shop_panel == null:
-		push_error("SilasNpc: shop panel is missing")
+		push_error("SilasNpc: could not create shop panel")
 		return
 	for animation: StringName in [&"idle_close", &"open", &"idle_open", &"close"]:
 		if not sprite.sprite_frames.has_animation(animation):
@@ -46,6 +49,25 @@ func _ready() -> void:
 	_shop_panel.shop_closed.connect(_on_shop_closed)
 	_shop_panel.stock_reroll_requested.connect(reroll_shop_stock)
 	dialogue_finished.connect(_on_dialogue_finished)
+
+
+func _resolve_shop_panel() -> SilasShopPanel:
+	if not shop_panel_path.is_empty():
+		var placed_panel := get_node_or_null(shop_panel_path) as SilasShopPanel
+		if placed_panel != null:
+			return placed_panel
+	var ancestor := get_parent()
+	while ancestor != null and ancestor != get_tree().root:
+		var nearby_panel := ancestor.get_node_or_null("SilasShopPanel") as SilasShopPanel
+		if nearby_panel != null:
+			return nearby_panel
+		ancestor = ancestor.get_parent()
+	var panel := SHOP_PANEL_SCENE.instantiate() as SilasShopPanel
+	if panel == null:
+		return null
+	panel.name = "SilasShopPanel"
+	add_child(panel)
+	return panel
 
 
 func get_npc_data() -> NpcData:

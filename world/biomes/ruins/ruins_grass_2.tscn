@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/biomes/ruins/ruins_grass_2.png" id="1_grass"]
+
+[node name="RuinsGrass2" type="Node3D"]
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+position = Vector3(0, 1.35, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("1_grass")

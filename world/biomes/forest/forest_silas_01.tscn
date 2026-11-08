@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://c6rttsuv8mblk"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_qd1qp"]
+[ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ff7pw"]
+[ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="3_ff7pw"]
+[ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="4_oi1b4"]
+
+[node name="forest_double_01" unique_id=1248439267 instance=ExtResource("1_qd1qp")]
+open_exits = 4
+up_destination_scene = "uid://uqkujjtj6l7"
+down_destination_scene = "uid://uqkujjtj6l7"
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 61.066597, -0.094818115, 0)
+visible = false
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
+[node name="BaseGround2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=858705461 instance=ExtResource("2_ff7pw")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 45.086464, 0, -0.19104576)
+
+[node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76.14349, 0, -27.208366)
+
+[node name="MovingPlatform" parent="." index="5" unique_id=304837597 instance=ExtResource("3_ff7pw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.769839, -0.070939064, 1.8941994)
+
+[node name="Start" parent="MovingPlatform" index="1" unique_id=1064890171]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7499962, 0, 0)
+
+[node name="End" parent="MovingPlatform" index="2" unique_id=1910727390]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.148433, 0, -0.21970749)
+
+[node name="StartDock" parent="MovingPlatform" index="3" unique_id=1539520790]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -5.926487, 0.77503157, -2.6815624)
+
+[node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 18.810513, 0.77503157, -3.1072698)
+
+[node name="Silas" parent="." index="6" unique_id=402759795 instance=ExtResource("4_oi1b4")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 45.222218, 0, -1.3407459)
+
+[editable path="MovingPlatform"]

@@ -1,7 +1,0 @@
-# Foxy Spine animation preview
-
-`Foxy_full_skin_Roll.skel` is the supplied Spine 3.8.75 export. Keep it as the source asset.
-
-The installed SpineBridge 3.8 provider rejects that export's version label. `Foxy_full_skin_Roll_compat.skel` is a copy with only the two version bytes at offsets 33 and 34 changed from `75` to `99`. Its animation data has not been converted or re-exported. The runtime loads this copy and exposes all nine clips and seven skins, but this header change does not guarantee exact visual or timing parity with Spine Editor. A proper 3.8.99 re-export should replace the compatibility copy when available.
-
-`foxy_animation_skeleton.tres` combines the compatibility skeleton with the supplied 11-page atlas. Foxy uses `G1_Idle`/`G1` for idle facing down (including left/right with a down-facing bias), `U_Idle`/`U` for idle facing up (including left/right with an up-facing bias), `S_Run`/`S` for side and diagonal running and straight-up running, `G1_Dash`/`G1` for side and diagonal dash and straight-up dash, and `Attack_1`–`Attack_3`/`G1` for the three normal dagger combo steps facing down or sideways. Straight-down run and dash keep their sprites because this skeleton has no matching clips. The preview calibrates its size from `G1_Idle` and creates a fresh Spine instance when changing clips because the 3.8 provider cannot restore setup pose. The artwork faces right before mirroring. Bow and harpoon attacks, hits, falls, and death still use their existing sprites.

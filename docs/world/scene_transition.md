@@ -6,13 +6,16 @@ Truyền thêm ID cổng đích nếu cần chọn chỗ xuất hiện:
 Hàm trả `true` khi nhận yêu cầu, `false` nếu đang chuyển hoặc đường dẫn không phải scene.
 `GameManager.reload_current_scene()` dùng cùng transition; hồi sinh đã gọi hàm này.
 
-Luồng: dừng gameplay, đóng inventory và xóa input → fade out đen → đổi scene →
-chờ `SceneTree.scene_changed` (scene mới đã chạy `_ready()`) → đặt Player tại marker
-của cổng đích nếu có ID → fade in → tiếp tục gameplay.
+Luồng: dừng gameplay, đóng inventory và xóa input → fade out đen → đổi scene.
+Tài nguyên phòng đích được tải bằng `ResourceLoader.load_threaded_request` trong lúc fade out.
+Sau `SceneTree.scene_changed`, đặt Player tại marker của cổng đích nếu có ID,
+đặt camera và cho các khung render/physics đầu hoàn tất dưới màn hình đen, rồi fade in.
+Nhân vật có thể di chuyển ngay khi phòng mới bắt đầu hiện ra. Inventory và yêu cầu
+chuyển phòng tiếp theo vẫn bị chặn cho đến khi fade in kết thúc.
 `GameManager.scene_transition_finished` phát sau khi fade in hoàn tất, kể cả khi
 đổi scene thất bại và màn hình đã được mở lại. Lỗi đổi scene được ghi bằng `push_error`.
 
-Thời gian mặc định: fade out 0,25 giây, fade in 0,25 giây. Chỉnh
+Thời gian mặc định: fade out 0,4 giây, fade in 0,45 giây. Chỉnh
 `fade_out_seconds` / `fade_in_seconds` trên GameManager. Tween chạy khi pause và
 không phụ thuộc `Engine.time_scale`. Overlay nằm trong autoload nên tồn tại qua scene.
 
@@ -20,13 +23,23 @@ không phụ thuộc `Engine.time_scale`. Overlay nằm trong autoload nên tồ
 
 1. Kéo `world/components/scene_change_trigger.tscn` vào map, đặt ở cửa/lối ra.
 2. Đặt `Trigger Id` cho cổng này, duy nhất trong map (ví dụ `hub_to_coral`).
-3. Gán `Destination Scene` tới file `.tscn` của map đích và `Destination Trigger Id`
-   bằng `Trigger Id` của cổng bên map đích (ví dụ `coral_to_hub`).
+3. Kéo file `.tscn` của map đích vào `Destination Scene`, rồi chọn cửa trong dropdown
+   `Destination Trigger Id`. Danh sách chỉ có cửa đang bật trong scene đích đã lưu.
 4. Bật **Editable Children** trên instance để di chuyển node con `ExitPosition`
    (`Marker3D`) tới vị trí Foxy sẽ xuất hiện khi đi từ map khác tới cổng này.
 5. Chỉnh `CollisionShape3D` → Box Shape → Size để thay đổi vùng kích hoạt.
    Dùng **Make Unique** trước khi sửa shape riêng cho một instance.
 6. Foxy bước vào vùng sẽ tự chuyển map với fade. Có thể tắt bằng `Enabled`.
+
+Với phòng kế thừa **BaseRoom**, chọn node gốc → **Exits** → bật hướng cần dùng,
+rồi chọn `Destination Scene` và `Destination Trigger Id` của hướng đó ngay trên gốc phòng.
+Các trường của hướng đã tắt sẽ được ẩn khỏi Inspector nhưng vẫn giữ cấu hình.
+BaseRoom quản lý các trigger bên trong đường đi; sửa đích trên gốc phòng để tránh bị ghi đè.
+
+Sau khi đổi ID hoặc bật/tắt cửa ở scene đích, **lưu scene đích** và bấm
+**Refresh destination exits** ở phòng nguồn. Cảnh báo trên node chỉ ra đích bị thiếu,
+cửa bị tắt hoặc ID bị trùng; ID cũ được giữ nguyên để tránh tự nối nhầm cửa khác.
+Danh sách đọc dữ liệu scene đã lưu, không chạy gameplay của scene đích.
 
 Ví dụ nối hai chiều:
 

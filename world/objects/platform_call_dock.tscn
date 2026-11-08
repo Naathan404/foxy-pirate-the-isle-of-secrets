@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dyjdi44ctvdoc" path="res://world/objects/platform_call_dock.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://c0hpmidu42byx" path="res://assets/textures/bridge/bridge.png" id="2_texture"]
-[ext_resource type="PackedScene" uid="uid://db5lhn6q8e826" path="res://assets/models/kenney_platformer_kit/lever.glb" id="3_lever"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="4_hurtbox"]
+[ext_resource type="SpriteFrames" uid="uid://dt2mw3jag1itm" path="res://world/objects/lever_sprite_frames.tres" id="5_oq1om"]
 
 [sub_resource type="StandardMaterial3D" id="DockMaterial"]
 albedo_texture = ExtResource("2_texture")
@@ -34,10 +34,14 @@ visible = false
 shape = SubResource("DockShape")
 
 [node name="Lever" type="Node3D" parent="." unique_id=1207379572]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9460716, 0)
 
-[node name="Visual" parent="Lever" unique_id=1271021394 instance=ExtResource("3_lever")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Lever" unique_id=1826349487]
+billboard = 1
+alpha_cut = 1
+sprite_frames = ExtResource("5_oq1om")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="HurtBox" type="Area3D" parent="Lever" unique_id=747903741]
 collision_layer = 16

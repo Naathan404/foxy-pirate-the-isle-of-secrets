@@ -872,6 +872,7 @@ unlocked_socket_count = 3
 metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
 
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "ammo", "charm_socket_manager", "chaos", "potion", "potion_selector", "inventory_ui", "camera") groups=["player"]]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 collision_layer = 2
 collision_mask = 5
 floor_constant_speed = true
@@ -938,25 +939,26 @@ action_sprite_paths = Dictionary[StringName, NodePath]({
 [node name="SpineIdlePreview" type="Node3D" parent="Visual" unique_id=1978530799]
 transform = Transform3D(1.2, 0, 0, 0, 1.692, 0, 0, 0, 1.2, 0, 0.1570276, 0)
 script = ExtResource("Script_spine_idle_preview")
-skeleton_data_path = "res://assets/spine/animation/foxy_animation_skeleton.tres"
-spine_animation = "G1_Idle"
-spine_skin = "G1"
 animation_mapping = {
 "attack_dagger_down": ["Attack_1", "G1"],
 "attack_dagger_side": ["Attack_1", "G1"],
-"dash_down": ["G1_Dash", "G1"],
+"dash_down": ["D_Dash", "D"],
 "dash_side": ["G1_Dash", "G1"],
-"dash_up": ["G1_Dash", "G1"],
+"dash_up": ["U_Dash", "U"],
+"fall_down": ["G1_Idle", "G1"],
+"fall_side": ["G1_Idle", "G1"],
+"fall_up": ["U_Idle", "U"],
 "idle_down": ["G1_Idle", "G1"],
 "idle_up": ["U_Idle", "U"],
+"run_down": ["D_Run", "D"],
 "run_side": ["S_Run", "S"],
-"run_up": ["S_Run", "S"]
+"run_up": ["U_Run", "U"]
 }
 artwork_faces_left = false
-size_multiplier = 1.25
+size_multiplier = 1.6
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
-transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(0.709, 0, 0, 0, 1, 0, 0, 0, 0.709, 0, 0, 0)
 offset = Vector2(0, 14)
 pixel_size = 0.0625
 shaded = true
