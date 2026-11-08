@@ -86,16 +86,28 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -230, 10, 215)
 [node name="Skull" type="GridMap" parent="." unique_id=25581668]
 mesh_library = ExtResource("6_x8se8")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(196489, 103, 655360, 130985, 99, 655361)
+}
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=769014098]
 mesh_library = ExtResource("7_0y4o0")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131003, 104, 1441793, 130973, 88, 1441796, 130987, 130, 3, 130956, 115, 655364, 196510, 102, 655360, 130994, 101, 1441795)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=440426695]
 mesh_library = ExtResource("8_ve000")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(196497, 123, 655364, 130979, 111, 3, 196502, 108, 655362, 130994, 115, 655362, 130980, 123, 1441796, 196508, 118, 655361, 130952, 125, 1048576)
+}
 
 [node name="Deco" type="GridMap" parent="."]
 mesh_library = ExtResource("deco_coastal")
 cell_size = Vector3(4, 4, 4)
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(-32, 50, 655382, -55, 45, 26, -37, 60, 23, -52, 41, 1441815, 65501, 59, 1441852, 65490, 43, 1441847, 65486, 40, 1441853, 65501, 48, 1441849, 65498, 66, 655421, 65473, 62, 1441829, 65488, 65, 655402, 65492, 45, 655402, 65488, 63, 51, 65471, 54, 1048618, 65498, 59, 1048596, 65494, 50, 16, 65497, 65, 34, 65478, 61, 1441819, 65485, 62, 1441808, 65483, 63, 24)
+}
