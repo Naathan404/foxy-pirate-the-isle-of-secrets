@@ -2,9 +2,9 @@
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_7xbgo"]
-[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_8vieb"]
+[ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_8vieb"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_50k48"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -47,12 +47,22 @@ cell_center_y = false
 [node name="CoralReef" type="GridMap" parent="." unique_id=536741509]
 mesh_library = ExtResource("3_8vieb")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131046, 8, 1048579, 196571, 65506, 4, 131033, 2, 1048577, 131043, 65514, 3)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=470933710]
 mesh_library = ExtResource("4_50k48")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131066, 65517, 1441793, 196560, 65527, 655361, 131043, 65523, 1441795, 131062, 65534, 1441795, 196590, 65508, 655363, 196564, 65514, 3, 131051, 65531, 655363, 196569, 65523, 1441797, 131041, 65532, 655365, 131055, 3, 1048581, 131057, 65516, 655365, 262108, 65513, 1441797, 131039, 7, 655364, 196567, 65530, 1048580, 196560, 65520, 1048576, 196583, 65507, 1441792)
+}
+metadata/_editor_floor_ = Vector3(0, 1, 0)
 
-[node name="Deco" type="GridMap" parent="."]
+[node name="Deco" type="GridMap" parent="." unique_id=1634109656]
 mesh_library = ExtResource("deco_coastal")
 cell_size = Vector3(4, 4, 4)
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(-27, 65532, 655386, -25, 65522, 1441818, -12, 65517, 655376, -1, 65523, 655376, -17, 8, 1441817, -25, 1, 23, 65535, 65533, 42, 65527, 65518, 1048636, 65527, 3, 1441829, 65522, 65518, 1441835, 65514, 65518, 655423, 65534, 65527, 1441835, 65534, 65529, 1048619, 65521, 8, 39, 65511, 65520, 1441834, 65516, 65519, 1441831, 65510, 65535, 1441859, 65514, 3, 1048631, 65523, 8, 1048636, 65535, 65525, 67, 65517, 5, 655417, 65512, 65523, 655387, 65524, 7, 655384, 65523, 65519, 655382, 65532, 65530, 1048610, 65510, 65533, 22, 65525, 65531, 19, 65530, 65531, 1441826, 65525, 65528, 1048598)
+}

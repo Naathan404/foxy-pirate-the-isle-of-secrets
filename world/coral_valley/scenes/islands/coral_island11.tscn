@@ -4,11 +4,10 @@
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="2_oyjpp"]
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="3_ow4x7"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="4_ow4x7"]
-[ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="5_oqx3f"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="6_x8se8"]
-[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="7_0y4o0"]
+[ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="7_0y4o0"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="8_ve000"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -80,9 +79,6 @@ push_speed = 3.0
 tide_controller = NodePath("../../TideController")
 float_draft = 2.4
 
-[node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("5_oqx3f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -230, 10, 215)
-
 [node name="Skull" type="GridMap" parent="." unique_id=25581668]
 mesh_library = ExtResource("6_x8se8")
 cell_center_y = false
@@ -104,7 +100,7 @@ data = {
 "cells": PackedInt32Array(196497, 123, 655364, 130979, 111, 3, 196502, 108, 655362, 130994, 115, 655362, 130980, 123, 1441796, 196508, 118, 655361, 130952, 125, 1048576)
 }
 
-[node name="Deco" type="GridMap" parent="."]
+[node name="Deco" type="GridMap" parent="." unique_id=1452133083]
 mesh_library = ExtResource("deco_coastal")
 cell_size = Vector3(4, 4, 4)
 cell_center_y = false

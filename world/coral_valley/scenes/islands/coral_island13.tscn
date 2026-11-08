@@ -2,9 +2,9 @@
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_dbl48"]
-[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_fj40h"]
+[ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_fj40h"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_1h5dg"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -43,16 +43,24 @@ metadata/_editor_floor_ = Vector3(0, -3, 0)
 [node name="Skull" type="GridMap" parent="." unique_id=267697310]
 mesh_library = ExtResource("2_dbl48")
 cell_center_y = false
+metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=738745254]
 mesh_library = ExtResource("3_fj40h")
 cell_center_y = false
+metadata/_editor_floor_ = Vector3(0, 1, 0)
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=631678433]
 mesh_library = ExtResource("4_1h5dg")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131061, 60, 1048581, 131048, 70, 1441795, 131033, 65, 655365, 131034, 48, 1441795, 131051, 45, 1441796)
+}
 
-[node name="Deco" type="GridMap" parent="."]
+[node name="Deco" type="GridMap" parent="." unique_id=113109739]
 mesh_library = ExtResource("deco_coastal")
 cell_size = Vector3(4, 4, 4)
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(-34, 24, 655385, -27, 21, 1048599, -65535, 32, 655382, -9, 40, 26, -4, 37, 1048610, -32, 32, 1048599, 65510, 35, 1441828, 65509, 19, 39, 65529, 37, 64, 65520, 14, 1441859, 65531, 17, 655421, 65515, 39, 1048618, 65518, 16, 1441855, 65508, 34, 61, 65535, 21, 1441855, 1, 26, 655397, 65511, 19, 1441853, 65507, 24, 37, 65533, 19, 655399, 65501, 27, 1048619, 65514, 18, 55, 65534, 31, 27, 65526, 33, 1048610, 65521, 32, 655385, 65530, 35, 1441821, 65520, 36, 31, 65519, 40, 34, 65535, 34, 1048603, 65512, 29, 1048598, 65525, 28, 1048598)
+}
