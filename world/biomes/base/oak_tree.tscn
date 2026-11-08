@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://c68eelfrr30cj" path="res://assets/sprites/biomes/biome_01/oak_tree.png" id="1_bc3ko"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jpyye"]
-size = Vector3(4.1037254, 8.886536, 8.570486)
+size = Vector3(6.3823767, 8.886536, 4.0803747)
 
 [node name="OakTree" type="Node3D" unique_id=501757653]
 
@@ -19,5 +19,5 @@ texture = ExtResource("1_bc3ko")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.449292, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1265577953]
-transform = Transform3D(0.99999976, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, -1.5697722, 0.16159058, -0.104124665)
+transform = Transform3D(0.99999976, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, -0.39279675, 0.16159058, 1.7272879)
 shape = SubResource("BoxShape3D_jpyye")

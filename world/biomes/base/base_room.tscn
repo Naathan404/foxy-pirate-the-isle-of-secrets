@@ -36,7 +36,7 @@ cast_shadow = 0
 mesh = SubResource("QuadMesh_void")
 
 [node name="BaseGround" parent="." unique_id=858705461 instance=ExtResource("1_owjee")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, -0.19104576)
 
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("2_7xvtg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0626488, 0)
