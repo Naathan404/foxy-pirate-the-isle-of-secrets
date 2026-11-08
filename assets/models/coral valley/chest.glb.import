@@ -1,15 +1,15 @@
 [remap]
 
-importer="scene"
+importer="ArrayMesh"
 importer_version=1
-type="PackedScene"
+type="ArrayMesh"
 uid="uid://blp77r4y8l20w"
-path="res://.godot/imported/chest.glb-3db760c9fe6648148d3d3c6d61cd0af0.scn"
+path="res://.godot/imported/chest.glb-3db760c9fe6648148d3d3c6d61cd0af0.res"
 
 [deps]
 
 source_file="res://assets/models/coral valley/chest.glb"
-dest_files=["res://.godot/imported/chest.glb-3db760c9fe6648148d3d3c6d61cd0af0.scn"]
+dest_files=["res://.godot/imported/chest.glb-3db760c9fe6648148d3d3c6d61cd0af0.res"]
 
 [params]
 

@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="2_ihb2r"]
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="3_xrchj"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="4_xrchj"]
+[ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="5_jjjpe"]
+[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="6_qt73g"]
+[ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="7_afo88"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -68,3 +71,15 @@ float_draft = 1.4
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -15.04, -6, 65)
 tide_controller = NodePath("../../TideController")
 float_draft = 1.4
+
+[node name="Skull" type="GridMap" parent="." unique_id=1231544352]
+mesh_library = ExtResource("5_jjjpe")
+cell_center_y = false
+
+[node name="CoralReef" type="GridMap" parent="." unique_id=1193348909]
+mesh_library = ExtResource("6_qt73g")
+cell_center_y = false
+
+[node name="Stuffs" type="GridMap" parent="." unique_id=1126048038]
+mesh_library = ExtResource("7_afo88")
+cell_center_y = false
