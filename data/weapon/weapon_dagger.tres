@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dnv8otqkgp6v5" path="res://data/weapon/weapon_data.gd" id="1_epx0i"]
 [ext_resource type="Script" uid="uid://bl3xskt8h6bl7" path="res://data/weapon/attack_data.gd" id="1_nasaw"]
-[ext_resource type="Texture2D" uid="uid://bn5ic4cn0ed5x" path="res://assets/sprites/items/equipment/Dagger.png" id="1_tjtgk"]
+[ext_resource type="Texture2D" uid="uid://bn5ic4cn0ed5x" path="res://assets/sprites/items/equipment/dagger.png" id="1_tjtgk"]
 [ext_resource type="PackedScene" uid="uid://q2jqrxyd2k31" path="res://gameplay/weapons/attack scenes/dagger_attack.tscn" id="1_up41l"]
 [ext_resource type="PackedScene" uid="uid://bu8agnheexxo8" path="res://gameplay/weapons/attack scenes/dagger_throw.tscn" id="4_throw"]
 [ext_resource type="Script" uid="uid://h4bmmt67610i" path="res://data/weapon/melee_combo_step.gd" id="5_combo"]

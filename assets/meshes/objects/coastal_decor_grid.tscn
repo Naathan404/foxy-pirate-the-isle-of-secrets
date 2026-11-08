@@ -1,0 +1,787 @@
+[gd_scene format=3 uid="uid://bg125lf6cq08o"]
+
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="1_ke3q4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ke3q4"]
+albedo_color = Color(0.09019608, 0.19607843, 0.2509804, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_6lacx"]
+material = SubResource("StandardMaterial3D_ke3q4")
+size = Vector2(192, 90)
+
+[sub_resource type="Environment" id="Environment_lhvho"]
+background_mode = 1
+background_color = Color(0.0627451, 0.14901961, 0.2, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.7
+
+[node name="CoastalDecor2" type="GridMap" unique_id=769588441]
+mesh_library = ExtResource("1_ke3q4")
+cell_size = Vector3(4, 4, 4)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(65501, 65524, 0, 65505, 65524, 1, 65509, 65524, 2, 65513, 65524, 3, 65517, 65524, 4, 65501, 65529, 5, 65505, 65529, 6, 65509, 65529, 7, 65513, 65529, 8, 65517, 65529, 9, 65499, 1, 10, 65502, 1, 11, 65506, 1, 12, 65509, 1, 13, 65513, 1, 14, 65516, 1, 15, 65520, 1, 16, 65499, 5, 17, 65502, 5, 18, 65506, 5, 19, 65509, 5, 20, 65513, 5, 21, 65516, 5, 22, 65520, 5, 23, 65499, 9, 24, 65502, 9, 25, 65506, 9, 26, 65509, 9, 27, 65513, 9, 28, 65516, 9, 29, 65520, 9, 30, 65499, 13, 31, 65502, 13, 32, 65506, 13, 33, 65509, 13, 34, 65513, 13, 35, 65526, 12, 36, 65529, 12, 37, 65532, 12, 38, 65535, 12, 39, 2, 12, 40, 5, 12, 41, 8, 12, 42, 11, 12, 43, 65526, 15, 44, 65529, 15, 45, 11, 15, 51, 65532, 18, 54, 65535, 18, 55, 2, 18, 56, 5, 18, 57, 8, 18, 58, 11, 18, 59, 65526, 21, 60, 65529, 21, 61, 65532, 21, 62, 65535, 21, 63, 2, 21, 64, 5, 21, 65, 8, 21, 66, 11, 21, 67, 16, 1, 75, 40, 1, 78)
+}
+
+[node name="GalleryPreview" type="Node3D" parent="." unique_id=1060858382]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="ItemNames" type="Node3D" parent="GalleryPreview" unique_id=271265506]
+
+[node name="Label_00" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1440924844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -69, 0.15, -20.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "00  dock_platform_dock"
+font_size = 48
+outline_size = 6
+
+[node name="Label_01" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=2114612330]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -61, 0.15, -20.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "01  dock_platform_dock_small"
+font_size = 48
+outline_size = 6
+
+[node name="Label_02" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=178495021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.15, -20.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "02  dock_support_platform"
+font_size = 48
+outline_size = 6
+
+[node name="Label_03" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=484175108]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.15, -20.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "03  dock_support_platform_small"
+font_size = 48
+outline_size = 6
+
+[node name="Label_04" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1632025045]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0.15, -20.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "04  dock_flat_platform"
+font_size = 48
+outline_size = 6
+
+[node name="Label_05" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1661464999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -69, 0.15, -10.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "05  dock_platform_planks"
+font_size = 48
+outline_size = 6
+
+[node name="Label_06" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=739680211]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -61, 0.15, -10.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "06  dock_bridge"
+font_size = 48
+outline_size = 6
+
+[node name="Label_07" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=2013042194]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.15, -10.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "07  dock_rope_fence"
+font_size = 48
+outline_size = 6
+
+[node name="Label_08" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1900388111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.15, -10.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "08  dock_poles"
+font_size = 48
+outline_size = 6
+
+[node name="Label_09" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=194389765]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0.15, -10.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "09  dock_ladder_broken"
+font_size = 48
+outline_size = 6
+
+[node name="Label_10" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=585618209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "10  rock_pirate_a"
+font_size = 48
+outline_size = 6
+
+[node name="Label_11" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=920070109]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -67, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "11  rock_pirate_b"
+font_size = 48
+outline_size = 6
+
+[node name="Label_12" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=691737439]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "12  rock_pirate_c"
+font_size = 48
+outline_size = 6
+
+[node name="Label_13" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=913732896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "13  rock_pirate_sand_a"
+font_size = 48
+outline_size = 6
+
+[node name="Label_14" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=578559952]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "14  rock_pirate_sand_b"
+font_size = 48
+outline_size = 6
+
+[node name="Label_15" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=595572463]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "15  rock_pirate_sand_c"
+font_size = 48
+outline_size = 6
+
+[node name="Label_16" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1230680060]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 0.15, 5.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "16  rock_coast_large"
+font_size = 48
+outline_size = 6
+
+[node name="Label_17" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=716982571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "17  rock_coast_sand_c_005"
+font_size = 48
+outline_size = 6
+
+[node name="Label_18" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=176695711]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -67, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "18  rock_coast_sand_c_007"
+font_size = 48
+outline_size = 6
+
+[node name="Label_19" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1065956477]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "19  rock_coast_sand_c_008"
+font_size = 48
+outline_size = 6
+
+[node name="Label_20" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1663008437]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "20  rock_coast_sand_c_010"
+font_size = 48
+outline_size = 6
+
+[node name="Label_21" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1652720822]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "21  rock_coast_sand_c_020"
+font_size = 48
+outline_size = 6
+
+[node name="Label_22" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1577041261]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "22  rock_coast_small"
+font_size = 48
+outline_size = 6
+
+[node name="Label_23" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1440139800]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 0.15, 13.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "23  rock_survival_a"
+font_size = 48
+outline_size = 6
+
+[node name="Label_24" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1086571243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "24  rock_survival_b"
+font_size = 48
+outline_size = 6
+
+[node name="Label_25" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1776288646]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -67, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "25  rock_survival_c"
+font_size = 48
+outline_size = 6
+
+[node name="Label_26" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=720837384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "26  rock_survival_flat"
+font_size = 48
+outline_size = 6
+
+[node name="Label_27" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1674940247]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "27  rock_survival_sand_a"
+font_size = 48
+outline_size = 6
+
+[node name="Label_28" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1678487636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "28  rock_survival_sand_b"
+font_size = 48
+outline_size = 6
+
+[node name="Label_29" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1884387399]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "29  rock_survival_sand_c"
+font_size = 48
+outline_size = 6
+
+[node name="Label_30" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1635961709]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 0.15, 21.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "30  rock_forest_high"
+font_size = 48
+outline_size = 6
+
+[node name="Label_31" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=374373877]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -73, 0.15, 29.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "31  rock_forest_low"
+font_size = 48
+outline_size = 6
+
+[node name="Label_32" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1296704908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -67, 0.15, 29.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "32  rock_forest_ramp"
+font_size = 48
+outline_size = 6
+
+[node name="Label_33" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=2009701508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59, 0.15, 29.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "33  rock_forest_stones"
+font_size = 48
+outline_size = 6
+
+[node name="Label_34" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=2055942514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.15, 29.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "34  rock_platformer_rocks"
+font_size = 48
+outline_size = 6
+
+[node name="Label_35" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1454184091]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45, 0.15, 29.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "35  rock_platformer_stones"
+font_size = 48
+outline_size = 6
+
+[node name="Label_36" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=2013115421]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "36  coral_002"
+font_size = 48
+outline_size = 6
+
+[node name="Label_37" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=319450662]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "37  coral_016"
+font_size = 48
+outline_size = 6
+
+[node name="Label_38" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1449265744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "38  coral_028"
+font_size = 48
+outline_size = 6
+
+[node name="Label_39" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1628747560]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "39  coral_038"
+font_size = 48
+outline_size = 6
+
+[node name="Label_40" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=91118253]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "40  coral_052"
+font_size = 48
+outline_size = 6
+
+[node name="Label_41" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=369249253]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "41  coral_054"
+font_size = 48
+outline_size = 6
+
+[node name="Label_42" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=418233540]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "42  coral_074"
+font_size = 48
+outline_size = 6
+
+[node name="Label_43" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=809055647]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 0.15, 26.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "43  coral_075"
+font_size = 48
+outline_size = 6
+
+[node name="Label_44" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=43275532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0.15, 32.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "44  coral_086"
+font_size = 48
+outline_size = 6
+
+[node name="Label_45" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=491222705]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.15, 32.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "45  coral_089"
+font_size = 48
+outline_size = 6
+
+[node name="Label_51" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1556248436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 0.15, 32.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "51  coral_112"
+font_size = 48
+outline_size = 6
+
+[node name="Label_54" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=53949254]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.15, 38.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "54  coral_115"
+font_size = 48
+outline_size = 6
+
+[node name="Label_55" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1854955866]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.15, 38.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "55  coral_120"
+font_size = 48
+outline_size = 6
+
+[node name="Label_56" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1097245203]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.15, 38.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "56  coral_125"
+font_size = 48
+outline_size = 6
+
+[node name="Label_57" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=545346324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.15, 38.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "57  coral_135"
+font_size = 48
+outline_size = 6
+
+[node name="Label_58" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1675905348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.15, 38.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "58  coral_140"
+font_size = 48
+outline_size = 6
+
+[node name="Label_59" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=180196869]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 0.15, 38.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "59  coral_144"
+font_size = 48
+outline_size = 6
+
+[node name="Label_60" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=688915657]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "60  coral_149"
+font_size = 48
+outline_size = 6
+
+[node name="Label_61" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1960941526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "61  coral_151"
+font_size = 48
+outline_size = 6
+
+[node name="Label_62" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=833730436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "62  coral_157"
+font_size = 48
+outline_size = 6
+
+[node name="Label_63" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=2142717920]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "63  coral_160"
+font_size = 48
+outline_size = 6
+
+[node name="Label_64" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1775278432]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "64  coral_167"
+font_size = 48
+outline_size = 6
+
+[node name="Label_65" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1088493090]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "65  coral_177"
+font_size = 48
+outline_size = 6
+
+[node name="Label_66" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=317709255]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "66  coral_185"
+font_size = 48
+outline_size = 6
+
+[node name="Label_67" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=315680716]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 0.15, 44.8)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "67  coral_192"
+font_size = 48
+outline_size = 6
+
+[node name="Label_75" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=1508053374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0.15, 12.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "75  ship_ghost"
+font_size = 48
+outline_size = 6
+
+[node name="Label_78" type="Label3D" parent="GalleryPreview/ItemNames" unique_id=945887890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 81, 0.15, 12.2)
+pixel_size = 0.008
+billboard = 1
+no_depth_test = true
+modulate = Color(0.83137256, 0.89411765, 0.91764706, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "78  ship_meowgabyte"
+font_size = 48
+outline_size = 6
+
+[node name="Label_DOCKS" type="Label3D" parent="GalleryPreview" unique_id=1996471666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53, 0.5, -33)
+pixel_size = 0.026
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.81960785, 0.6, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "DOCKS / 10"
+font_size = 48
+outline_size = 6
+
+[node name="Label_ROCKS" type="Label3D" parent="GalleryPreview" unique_id=1398384169]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 0.5, -5)
+pixel_size = 0.026
+billboard = 1
+no_depth_test = true
+modulate = Color(0.6627451, 0.7882353, 0.8901961, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "ROCKS / 26"
+font_size = 48
+outline_size = 6
+
+[node name="Label_CORALS" type="Label3D" parent="GalleryPreview" unique_id=990581523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 17)
+pixel_size = 0.026
+billboard = 1
+no_depth_test = true
+modulate = Color(0.5568628, 0.89411765, 0.77254903, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "CORALS / 25"
+font_size = 48
+outline_size = 6
+
+[node name="Label_SHIPS" type="Label3D" parent="GalleryPreview" unique_id=191357855]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 0.5, -33)
+pixel_size = 0.026
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 0.81960785, 0.6, 1)
+outline_modulate = Color(0.0627451, 0.14901961, 0.2, 1)
+text = "SHIPS / 2"
+font_size = 48
+outline_size = 6
+
+[node name="GalleryFloor" type="MeshInstance3D" parent="GalleryPreview" unique_id=628178401]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -0.12, 5)
+mesh = SubResource("PlaneMesh_6lacx")
+
+[node name="GalleryEnvironment" type="WorldEnvironment" parent="GalleryPreview" unique_id=1937718760]
+environment = SubResource("Environment_lhvho")
+
+[node name="GalleryLight" type="DirectionalLight3D" parent="GalleryPreview" unique_id=1213726320]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
+light_energy = 1.1
+shadow_enabled = true
+
+[node name="GalleryCamera" type="Camera3D" parent="GalleryPreview" unique_id=1593584536]
+transform = Transform3D(1, 0, 0, 0, 0.6950221, 0.71898836, 0, -0.71898836, 0.6950221, 12, 150, 150)
+keep_aspect = 0
+projection = 1
+current = true
+size = 420.0
+far = 500.0

@@ -31,6 +31,14 @@
 - **Theme & Địa hình:** Cát, san hô, biển. Địa hình chia cắt thành nhiều đảo nhỏ, cồn cát, khoảng nước.
 - **Boss:** Thuyền trưởng Cá nóc bụng phệ.
 
+**Bố cục bãi đất trống và floor path (chuẩn stage 1):**
+
+- **Mẫu tham chiếu:** Cách vẽ nền và `floor_path` trong `world/coral_valley/scenes/stages/stage1.tscn` cùng các scene đảo được instance tại đó.
+- **Bãi đất trống:** Chia bố cục mỗi đảo thành 4 phần liền nhau, giữ địa hình đảo liền mạch. Ở mỗi phần, vẽ một ít bãi đất trống sát rìa đảo để cả 4 phần đều có khoảng thoáng và tổng thể cân bằng. Điều chỉnh hình dáng, diện tích theo bờ đảo; giữ các mảng vừa đủ, phân bố quanh đảo.
+- **Đường là xương sống:** Dùng `floor_path` vừa đủ để dẫn tuyến chính giữa các lối kết nối sang đảo khác, bám đầu cầu và điểm vào/ra của đảo. Xác định các điểm kết nối trước rồi mới vẽ tuyến đường.
+- **Tiết chế đường:** Chỉ thêm đoạn đường phục vụ tuyến kết nối liên đảo. Hạn chế nhánh cụt, vòng đường và các nhánh chia nhỏ mặt đảo; giữ diện tích nền thoáng cho bố cục chung.
+- **Kiểm tra bố cục:** Xem toàn đảo từ trên xuống để kiểm tra bãi đất trống ở đủ 4 phần, độ cân bằng quanh rìa và khả năng đọc rõ tuyến đường nối đảo.
+
 - **Cơ chế cần code:**
 
  1. **Tidal Shift (Chu kỳ 25–45s):**
