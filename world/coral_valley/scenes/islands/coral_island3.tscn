@@ -2,8 +2,9 @@
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_6akjq"]
-[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_yxdl6"]
+[ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_yxdl6"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_l3bfl"]
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -42,11 +43,28 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="Skull" type="GridMap" parent="." unique_id=2087400747]
 mesh_library = ExtResource("2_6akjq")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131035, 103, 1, 131028, 114, 655361, 131023, 96, 655361)
+}
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=480246776]
 mesh_library = ExtResource("3_yxdl6")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131017, 114, 1048579, 131025, 116, 655362, 131053, 100, 1441796, 131010, 109, 4, 196580, 105, 655362, 196586, 111, 655362, 131047, 106, 4, 131027, 107, 655360)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=1057991645]
 mesh_library = ExtResource("4_l3bfl")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131015, 102, 655364, 131011, 107, 1, 131030, 95, 1048578, 131020, 99, 1048580, 196574, 97, 0, 196587, 113, 655362, 131025, 93, 655362, 196574, 110, 1048577, 131055, 108, 3)
+}
+
+[node name="Deco" type="GridMap" parent="." unique_id=417765774]
+mesh_library = ExtResource("deco_coastal")
+cell_size = Vector3(4, 4, 4)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(-20, 58, 1048610, -35, 54, 655386, -10, 60, 1441814, -25, 61, 25, -8, 47, 1441823, -28, 60, 655384, -7, 57, 1048610, -19, 60, 1048598, -19, 44, 26, -6, 52, 26, -32, 59, 1048607, -35, 56, 1441826, -6, 55, 1048598, 65520, 46, 1048642, 65522, 58, 51, 65526, 47, 1048618, 65519, 59, 55, 65513, 62, 1048636, 65503, 49, 1441846, 65501, 52, 61, 65530, 50, 51, 65508, 43, 1441843, 65516, 62, 1048637, 65524, 46, 1048633, 65510, 52, 1048612, 65506, 44, 63, -35, 50, 655391, -12, 59, 1048607, 65504, 57, 655411, 65522, 48, 1048617)
+}

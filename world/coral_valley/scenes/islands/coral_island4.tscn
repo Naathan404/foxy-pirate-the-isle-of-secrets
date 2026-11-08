@@ -4,6 +4,7 @@
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_753ko"]
 [ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_ef36x"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_jtugq"]
+[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -42,11 +43,28 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="Skull" type="GridMap" parent="." unique_id=787024052]
 mesh_library = ExtResource("2_753ko")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131070, 104, 1048581)
+}
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=2127026923]
 mesh_library = ExtResource("3_ef36x")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131070, 102, 655363, 131060, 101, 4)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=520908595]
 mesh_library = ExtResource("4_jtugq")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(196601, 108, 1048578, 131064, 112, 1441796)
+}
+
+[node name="Deco" type="GridMap" parent="."]
+mesh_library = ExtResource("deco_coastal")
+cell_size = Vector3(4, 4, 4)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(-6, 48, 655386, -65534, 54, 22, -9, 56, 1441817, -4, 59, 1441823, 65535, 49, 1441846, 65530, 59, 36, 2, 50, 63, 65532, 47, 1441829, 1, 57, 655426, -2, 58, 1048599)
+}

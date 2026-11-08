@@ -5,8 +5,10 @@
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="3_2hijj"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="4_dk6yr"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="5_tal3g"]
-[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="6_4fkpx"]
+[ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="6_4fkpx"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="7_tscl8"]
+[ext_resource type="PackedScene" uid="uid://djxjvu6e00r3h" path="res://world/gimmick/coral_valley/crate_reset_lever.tscn" id="9_tscl8"]
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -79,11 +81,32 @@ float_draft = 2.4
 [node name="Skull" type="GridMap" parent="." unique_id=577692768]
 mesh_library = ExtResource("5_tal3g")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131026, 70, 655365, 196560, 65, 655364, 131026, 80, 5)
+}
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=618396581]
 mesh_library = ExtResource("6_4fkpx")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(196568, 60, 1441796, 131030, 70, 1048577, 196565, 82, 3, 196549, 81, 655360, 196564, 76, 655363, 131017, 63, 1048577, 131022, 83, 1, 131008, 76, 655364)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=682865744]
 mesh_library = ExtResource("7_tscl8")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(196566, 74, 1048581, 131007, 73, 1048578, 196547, 65, 1441794, 131023, 61, 3, 196567, 78, 1441796, 196554, 80, 1048578, 131011, 73, 655360, 196543, 69, 1048579, 131027, 61, 655363)
+}
+
+[node name="Deco" type="GridMap" parent="." unique_id=1801053303]
+mesh_library = ExtResource("deco_coastal")
+cell_size = Vector3(4, 4, 4)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(-37, 34, 655384, -19, 45, 1441823, -17, 36, 1441814, -30, 43, 16, -29, 28, 31, -18, 30, 655382, -32, 29, 655382, -35, 31, 655383, -19, 27, 655394, 65509, 43, 1441829, 65518, 43, 57, 65520, 38, 1048615, 65520, 42, 655426, 65504, 43, 655426, 65499, 40, 43, 65511, 26, 1441856, 65514, 27, 655420, 65501, 43, 655411, 65519, 34, 1048630, -35, 40, 34)
+}
+
+[node name="CrateResetLever" parent="." unique_id=1522511598 node_paths=PackedStringArray("crates") instance=ExtResource("9_tscl8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -123, 2, 147)
+crates = [NodePath("../Crate"), NodePath("../Crate2"), NodePath("../Crate3"), NodePath("../Crate4")]

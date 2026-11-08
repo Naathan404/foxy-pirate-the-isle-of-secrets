@@ -4,6 +4,7 @@
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="2_685aa"]
 [ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_o5amg"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_ejjnn"]
+[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -49,4 +50,9 @@ cell_center_y = false
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=1475612935]
 mesh_library = ExtResource("4_ejjnn")
+cell_center_y = false
+
+[node name="Deco" type="GridMap" parent="."]
+mesh_library = ExtResource("deco_coastal")
+cell_size = Vector3(4, 4, 4)
 cell_center_y = false
