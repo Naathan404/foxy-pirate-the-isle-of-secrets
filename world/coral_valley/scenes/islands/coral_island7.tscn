@@ -5,9 +5,9 @@
 [ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="3_xrchj"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="4_xrchj"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="5_jjjpe"]
-[ext_resource type="MeshLibrary" uid="uid://d4tg2gjp48pj" path="res://assets/meshes/objects/coral_reef.meshlib" id="6_qt73g"]
+[ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="6_qt73g"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="7_afo88"]
-[ext_resource type="MeshLibrary" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
+[ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -76,16 +76,28 @@ float_draft = 1.4
 [node name="Skull" type="GridMap" parent="." unique_id=1231544352]
 mesh_library = ExtResource("5_jjjpe")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131053, 65525, 1, 131052, 65501, 4, 131041, 65501, 1441797)
+}
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=1193348909]
 mesh_library = ExtResource("6_qt73g")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131035, 65521, 655361, 131066, 65518, 655362, 131044, 65525, 1048580, 131058, 65525, 3, 131056, 65516, 1441794, 131050, 65522, 1048579, 131054, 65502, 4, 131047, 65507, 4)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=1126048038]
 mesh_library = ExtResource("7_afo88")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(196586, 65513, 1441793, 196603, 41, 1048581, 131066, 65533, 1048577, 131064, 65501, 1048579, 131036, 65505, 1, 131059, 65509, 3, 131045, 65506, 1441795, 131039, 65514, 0, 131034, 65511, 655364)
+}
 
-[node name="Deco" type="GridMap" parent="."]
+[node name="Deco" type="GridMap" parent="." unique_id=1252282816]
 mesh_library = ExtResource("deco_coastal")
 cell_size = Vector3(4, 4, 4)
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(-9, 19, 655376, -3, 65516, 1048600, -10, 7, 22, -6, 65515, 655382, 65534, 65519, 1048615, 2, 7, 39, 65535, 65524, 1441852, 65514, 65518, 1048636, 2, 1, 655427, 65522, 65515, 67, 65535, 65529, 1441855, 65527, 65535, 1441856, 1, 9, 1048643, 65527, 16, 1441829, 65525, 65528, 1048596, 65518, 65526, 655383, 65530, 65520, 24, 65531, 65521, 655387, 65520, 65530, 31, 65517, 65518, 655376)
+}

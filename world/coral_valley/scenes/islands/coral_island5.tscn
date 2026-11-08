@@ -43,16 +43,28 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="Skull" type="GridMap" parent="." unique_id=1221984033]
 mesh_library = ExtResource("2_685aa")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131041, 39, 0, 131029, 41, 1048577, 131026, 45, 1441796)
+}
 
 [node name="CoralReef" type="GridMap" parent="." unique_id=1388114970]
 mesh_library = ExtResource("3_o5amg")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131033, 41, 1048576, 131046, 28, 1441796, 131044, 47, 655361, 131025, 40, 1441794, 131035, 38, 1048578, 131028, 38, 1048576, 131034, 44, 1441793, 131043, 31, 655361)
+}
 
 [node name="Stuffs" type="GridMap" parent="." unique_id=1475612935]
 mesh_library = ExtResource("4_ejjnn")
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(131028, 50, 1048581, 131036, 31, 1048577, 131047, 41, 1, 131040, 34, 655361, 131030, 45, 1441794, 131038, 43, 1441797, 131032, 32, 4, 131042, 43, 1, 131043, 36, 655362)
+}
 
 [node name="Deco" type="GridMap" parent="."]
 mesh_library = ExtResource("deco_coastal")
 cell_size = Vector3(4, 4, 4)
 cell_center_y = false
+data = {
+"cells": PackedInt32Array(-22, 12, 1048601, -18, 25, 23, -25, 18, 23, -10, 17, 1441823, 65509, 21, 55, 65526, 20, 655411, 65518, 13, 1441835, 65510, 24, 655399, 65509, 19, 1441858, 65520, 25, 655402, 65518, 23, 655414, 65525, 14, 1048627, 65525, 23, 655399, 65511, 16, 1441856, 65517, 24, 19, 65512, 22, 31, 65519, 18, 1441814, 65513, 17, 655380, 65522, 13, 655382, 65516, 17, 1441817)
+}
