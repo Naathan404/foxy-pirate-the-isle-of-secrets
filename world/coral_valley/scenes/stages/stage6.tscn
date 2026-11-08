@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://cc6e6g5fqidwv"]
 
 [ext_resource type="PackedScene" path="res://world/coral_valley/scenes/islands/coral_island14.tscn" id="1_20l80"]
-[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="2_qu0od"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="3_34ets"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
@@ -32,12 +31,6 @@ shadow_enabled = true
 
 [node name="CoralIsland14" parent="." unique_id=1295240040 instance=ExtResource("1_20l80")]
 transform = Transform3D(1.3311836e-07, 0, -1, 0, 1, 0, 1, 0, 1.3311836e-07, 30.000008, 0, 54.999996)
-
-[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("2_qu0od")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 6.6299996, 10, 2, -5)
-trigger_id = &"stage6_A"
-destination_scene = "uid://dj81lyqu3ry8v"
-destination_trigger_id = &"stage4_C"
 
 [node name="SeaWater" parent="." unique_id=116442875 instance=ExtResource("3_34ets")]
 transform = Transform3D(1.7, 0, 0, 0, 1, 0, 0, 0, 1.6, 51, 0, 0)

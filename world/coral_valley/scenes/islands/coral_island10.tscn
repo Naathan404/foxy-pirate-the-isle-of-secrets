@@ -5,6 +5,7 @@
 [ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="3_kodwn"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="4_bsh2m"]
 [ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="island_gate"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -21,6 +22,9 @@ ambient_light_source = 3
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_sky_contribution = 0.53
 ambient_light_energy = 0.72
+
+[sub_resource type="BoxShape3D" id="Box_gate_stage3_A"]
+size = Vector3(4, 3, 2)
 
 [node name="CoralIsland10" type="Node3D" unique_id=1160356963]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
@@ -68,3 +72,18 @@ cell_center_y = false
 data = {
 "cells": PackedInt32Array(-82, 42, 26, -92, 59, 1441818, -98, 56, 1441826, -87, 46, 1048601, 65471, 53, 655401, 65445, 51, 1048636, 65463, 44, 57, 65463, 65, 655417, 65439, 52, 36, 65447, 62, 1441859, 65468, 44, 655411, 65446, 59, 1441858, 65448, 49, 1048618, 65451, 47, 655414, 65464, 55, 1441821, 65454, 65, 31, 65453, 52, 24, 65465, 50, 1441819, 65462, 57, 1048592, 65465, 54, 1048592, 65449, 66, 655376, 65451, 66, 1441816, 65450, 66, 36, 65449, 67, 1048631, 65451, 67, 655421, 65462, 42, 655382, 65464, 42, 1441818, 65463, 42, 37, 65462, 43, 1048630, 65464, 43, 655423)
 }
+
+[node name="SceneChangeTrigger" parent="." instance=ExtResource("island_gate")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -379, 2, 222)
+trigger_id = &"stage3_A"
+destination_scene = "uid://8bajt0wsi25i"
+destination_trigger_id = &"stage2_B"
+
+[node name="CollisionShape3D" parent="SceneChangeTrigger" index="0"]
+position = Vector3(0, 1.5, 0)
+shape = SubResource("Box_gate_stage3_A")
+
+[node name="ExitPosition" parent="SceneChangeTrigger" index="1"]
+position = Vector3(0, 0.68, 3.5)
+
+[editable path="SceneChangeTrigger"]

@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_oxqnf"]
 [ext_resource type="PackedScene" uid="uid://d0fte67sn6yi0" path="res://world/hub/objects/bridge.tscn" id="1_xw0ld"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="6_oxqnf"]
-[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="9_w5ok3"]
 [ext_resource type="PackedScene" uid="uid://rela8ywe0ftb" path="res://world/coral_valley/scenes/islands/coral_island1.tscn" id="island_1"]
 [ext_resource type="PackedScene" uid="uid://biwew7ofkbqt1" path="res://world/coral_valley/scenes/islands/coral_island5.tscn" id="island_5"]
 [ext_resource type="PackedScene" uid="uid://cn2swq7nx2nej" path="res://world/coral_valley/scenes/islands/coral_island6.tscn" id="island_6"]
@@ -54,6 +53,18 @@ environment = null
 [node name="DirectionalLight3D" parent="CoralIsland1" index="1" unique_id=1165239410]
 visible = false
 
+[node name="CollisionShape3D" parent="CoralIsland1/SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="ExitPosition" parent="CoralIsland1/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68, 3)
+
+[node name="CollisionShape3D" parent="CoralIsland1/SceneChangeTrigger2" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="ExitPosition" parent="CoralIsland1/SceneChangeTrigger2" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68, 3.5)
+
 [node name="CoralIsland5" parent="." unique_id=1260701202 instance=ExtResource("island_5")]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -140, 0, 137.99998)
 
@@ -98,20 +109,10 @@ transform = Transform3D(0.17999998, 0, 0, 0, 1, 0, 0, 0, 1.2830399, -66.676544, 
 [node name="SeaWater2" parent="SeaWaters" unique_id=1390153836 instance=ExtResource("6_oxqnf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.166306, 0, -221.58908)
 
-[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("9_w5ok3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.6, -137, 6, -24.6)
-trigger_id = &"stage2_A"
-destination_scene = "uid://c1xcg6aaua0r0"
-destination_trigger_id = &"stage1"
-
-[node name="SceneChangeTrigger2" parent="." unique_id=572038763 instance=ExtResource("9_w5ok3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1.9200001, -49, 4, 16.999998)
-trigger_id = &"stage2_B"
-destination_scene = "uid://c4ev6rtupcfe4"
-destination_trigger_id = &"stage3_A"
-
 [editable path="MovingPlatform"]
 [editable path="CoralIsland1"]
+[editable path="CoralIsland1/SceneChangeTrigger"]
+[editable path="CoralIsland1/SceneChangeTrigger2"]
 [editable path="CoralIsland5"]
 [editable path="CoralIsland6"]
 [editable path="CoralIsland7"]

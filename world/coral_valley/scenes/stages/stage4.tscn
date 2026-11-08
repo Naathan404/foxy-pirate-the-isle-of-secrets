@@ -2,7 +2,6 @@
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="5_ww385"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_jdacn"]
-[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="7_efo3i"]
 [ext_resource type="PackedScene" uid="uid://d0fte67sn6yi0" path="res://world/hub/objects/bridge.tscn" id="7_ghh4f"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="8_efo3i"]
 [ext_resource type="PackedScene" uid="uid://bysge4gycen5u" path="res://world/coral_valley/scenes/islands/coral_island9.tscn" id="island_9"]
@@ -80,24 +79,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -184, -2, -46)
 
 [node name="Bridge2" parent="." unique_id=116366302 instance=ExtResource("7_ghh4f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -192, -2, -46)
-
-[node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("7_efo3i")]
-transform = Transform3D(-4.371139e-08, 0, -4.9979997, 0, 1, 0, 1, 0, -2.1846951e-07, -175.78622, 2, 166)
-trigger_id = &"stage4_A"
-destination_scene = "uid://c4ev6rtupcfe4"
-destination_trigger_id = &"stage3_B"
-
-[node name="SceneChangeTrigger2" parent="." unique_id=1782827298 instance=ExtResource("7_efo3i")]
-transform = Transform3D(-1, 0, 4.3693902e-07, 0, 1, 0, -8.742278e-08, 0, -4.9979997, -100.81823, 2, 119.95258)
-trigger_id = &"stage4_B"
-destination_scene = "uid://b4qt2tgtd8lpy"
-destination_trigger_id = &"stage5_A"
-
-[node name="SceneChangeTrigger3" parent="." unique_id=368205892 instance=ExtResource("7_efo3i")]
-transform = Transform3D(-1, 0, 4.3693902e-07, 0, 1, 0, -8.742278e-08, 0, -4.9979997, -105.38128, 2, -17.018219)
-trigger_id = &"stage4_C"
-destination_scene = "uid://cc6e6g5fqidwv"
-destination_trigger_id = &"stage6_A"
 
 [node name="SeaWaters" type="Node3D" parent="." unique_id=1545627304]
 

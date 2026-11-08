@@ -9,6 +9,7 @@
 [ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="7_crwhs"]
 [ext_resource type="MeshLibrary" uid="uid://bothqbrgwdsab" path="res://assets/meshes/objects/stuffs.meshlib" id="8_htg3x"]
 [ext_resource type="MeshLibrary" uid="uid://ci2lcm3lr4wx6" path="res://assets/meshes/objects/coastal_decor.meshlib" id="deco_coastal"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="island_gate"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ocap6"]
 sky_horizon_color = Color(0.86504203, 0.9309246, 0.96857667, 1)
@@ -25,6 +26,12 @@ ambient_light_source = 3
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_sky_contribution = 0.53
 ambient_light_energy = 0.72
+
+[sub_resource type="BoxShape3D" id="Box_gate_stage4_A"]
+size = Vector3(4, 3, 2)
+
+[sub_resource type="BoxShape3D" id="Box_gate_stage4_B"]
+size = Vector3(4, 3, 2)
 
 [node name="CoralIsland9" type="Node3D" unique_id=219568137]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
@@ -136,3 +143,32 @@ cell_center_y = false
 data = {
 "cells": PackedInt32Array(-74, 17, 1048588, -74, 16, 1048588, -74, 15, 1048586, 65462, 14, 1048588, -74, 13, 1048588, -74, 12, 1048586, -73, 11, 10, -72, 11, 12, 65465, 11, 12, -70, 11, 10, -69, 11, 12, -68, 10, 12, -26, 30, 1048588, -26, 29, 1048588, -26, 28, 1048586, 65510, 27, 1048588, -26, 26, 1048588, -27, 25, 10, -28, 25, 10, -29, 25, 12, 65506, 25, 12, -31, 25, 10, -32, 25, 12, -33, 24, 12, 65464, 13, 36, 65463, 9, 57, 65465, 9, 61, 65512, 26, 36, 65506, 23, 57, 65502, 26, 61, 65484, 41, 655382, 65484, 43, 1441818, 65484, 42, 37, 65483, 41, 1048630, 65483, 43, 655423, 65465, 1, 655376, 65465, 3, 1441816, 65465, 2, 36, 65464, 1, 1048631, 65464, 3, 655421)
 }
+
+[node name="SceneChangeTrigger" parent="." instance=ExtResource("island_gate")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -194, 2, 154)
+trigger_id = &"stage4_A"
+destination_scene = "uid://c4ev6rtupcfe4"
+destination_trigger_id = &"stage3_B"
+
+[node name="CollisionShape3D" parent="SceneChangeTrigger" index="0"]
+position = Vector3(0, 1.5, 0)
+shape = SubResource("Box_gate_stage4_A")
+
+[node name="ExitPosition" parent="SceneChangeTrigger" index="1"]
+position = Vector3(0, 0.68, 3.5)
+
+[node name="SceneChangeTrigger2" parent="." instance=ExtResource("island_gate")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -147, 2, 114)
+trigger_id = &"stage4_B"
+destination_scene = "uid://b4qt2tgtd8lpy"
+destination_trigger_id = &"stage5_A"
+
+[node name="CollisionShape3D" parent="SceneChangeTrigger2" index="0"]
+position = Vector3(0, 1.5, 0)
+shape = SubResource("Box_gate_stage4_B")
+
+[node name="ExitPosition" parent="SceneChangeTrigger2" index="1"]
+position = Vector3(0, 0.68, 3.5)
+
+[editable path="SceneChangeTrigger"]
+[editable path="SceneChangeTrigger2"]
