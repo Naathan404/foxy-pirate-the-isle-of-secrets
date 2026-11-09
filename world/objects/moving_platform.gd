@@ -56,3 +56,7 @@ func request_destination(at_end: bool) -> void:
 	_target_end = at_end
 	var destination := end_marker.position if at_end else start_marker.position
 	_moving = not platform.position.is_equal_approx(destination)
+
+
+func is_targeting_end() -> bool:
+	return _target_end
