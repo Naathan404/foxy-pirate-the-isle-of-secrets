@@ -135,7 +135,10 @@ func _transition_scene(
 		player_state.capture(player)
 	var error: Error = load_error
 	if error == OK:
-		while ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		while (
+			ResourceLoader.load_threaded_get_status(scene_path)
+			== ResourceLoader.THREAD_LOAD_IN_PROGRESS
+		):
 			await get_tree().process_frame
 		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
 			var destination := ResourceLoader.load_threaded_get(scene_path) as PackedScene

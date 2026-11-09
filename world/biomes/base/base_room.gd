@@ -127,18 +127,50 @@ func _validate_property(property: Dictionary) -> void:
 			if not (open_exits & (1 << index)):
 				property.usage = int(property.usage) & ~PROPERTY_USAGE_EDITOR
 			elif property.name == direction + "_destination_trigger_id":
-				EXIT_CATALOG.configure_dropdown(property, get(direction + "_destination_scene"), get(property.name))
+				EXIT_CATALOG.configure_dropdown(
+					property, get(direction + "_destination_scene"), get(property.name)
+				)
 			return
 
 
 func _refresh_exits() -> void:
-	_apply_exit("UpPath", bool(open_exits & UP), up_trigger_id, up_destination_scene, up_destination_trigger_id)
-	_apply_exit("RightPath", bool(open_exits & RIGHT), right_trigger_id, right_destination_scene, right_destination_trigger_id)
-	_apply_exit("DownPath", bool(open_exits & DOWN), down_trigger_id, down_destination_scene, down_destination_trigger_id)
-	_apply_exit("LeftPath", bool(open_exits & LEFT), left_trigger_id, left_destination_scene, left_destination_trigger_id)
+	_apply_exit(
+		"UpPath",
+		bool(open_exits & UP),
+		up_trigger_id,
+		up_destination_scene,
+		up_destination_trigger_id
+	)
+	_apply_exit(
+		"RightPath",
+		bool(open_exits & RIGHT),
+		right_trigger_id,
+		right_destination_scene,
+		right_destination_trigger_id
+	)
+	_apply_exit(
+		"DownPath",
+		bool(open_exits & DOWN),
+		down_trigger_id,
+		down_destination_scene,
+		down_destination_trigger_id
+	)
+	_apply_exit(
+		"LeftPath",
+		bool(open_exits & LEFT),
+		left_trigger_id,
+		left_destination_scene,
+		left_destination_trigger_id
+	)
 
 
-func _apply_exit(path_name: String, is_open: bool, local_id: StringName, destination_scene: String, destination_id: StringName) -> void:
+func _apply_exit(
+	path_name: String,
+	is_open: bool,
+	local_id: StringName,
+	destination_scene: String,
+	destination_id: StringName
+) -> void:
 	var path := get_node_or_null("Exits/" + path_name) as Node3D
 	if path == null:
 		return
@@ -166,13 +198,31 @@ func _get_configuration_warnings() -> PackedStringArray:
 	if open_exits == 0:
 		warnings.append("Keep at least one exit open.")
 	_check_exit(warnings, UP, "Up", up_trigger_id, up_destination_scene, up_destination_trigger_id)
-	_check_exit(warnings, RIGHT, "Right", right_trigger_id, right_destination_scene, right_destination_trigger_id)
-	_check_exit(warnings, DOWN, "Down", down_trigger_id, down_destination_scene, down_destination_trigger_id)
-	_check_exit(warnings, LEFT, "Left", left_trigger_id, left_destination_scene, left_destination_trigger_id)
+	_check_exit(
+		warnings,
+		RIGHT,
+		"Right",
+		right_trigger_id,
+		right_destination_scene,
+		right_destination_trigger_id
+	)
+	_check_exit(
+		warnings, DOWN, "Down", down_trigger_id, down_destination_scene, down_destination_trigger_id
+	)
+	_check_exit(
+		warnings, LEFT, "Left", left_trigger_id, left_destination_scene, left_destination_trigger_id
+	)
 	return warnings
 
 
-func _check_exit(warnings: PackedStringArray, flag: int, label: String, local_id: StringName, destination_scene: String, destination_id: StringName) -> void:
+func _check_exit(
+	warnings: PackedStringArray,
+	flag: int,
+	label: String,
+	local_id: StringName,
+	destination_scene: String,
+	destination_id: StringName
+) -> void:
 	if not (open_exits & flag):
 		return
 	if local_id.is_empty():

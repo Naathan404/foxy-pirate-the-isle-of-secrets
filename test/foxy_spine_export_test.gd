@@ -12,17 +12,44 @@ func _run() -> void:
 	assert(data != null, "Foxy Spine skeleton failed to load")
 	var animations: PackedStringArray = data.get_animation_names()
 	var skins: PackedStringArray = data.get_skin_names()
-	for name in ["Attack_1", "Attack_2", "Attack_3", "D_Dash", "D_Run", "G1_Dash", "G1_Idle", "S_Run", "U_Dash", "U_Idle", "U_Run"]:
+	for name in [
+		"Attack_1",
+		"Attack_2",
+		"Attack_3",
+		"D_Dash",
+		"D_Run",
+		"G1_Dash",
+		"G1_Idle",
+		"S_Run",
+		"U_Dash",
+		"U_Idle",
+		"U_Run"
+	]:
 		assert(animations.has(name), "Missing Foxy animation: " + name)
 	for name in ["D", "G1", "S", "U"]:
 		assert(skins.has(name), "Missing Foxy skin: " + name)
 	var spine_script := load("res://addons/spine_bridge/scripts/spine_sprite_3d.gd") as Script
-	for pair in [["G1_Idle", "G1"], ["U_Idle", "U"], ["D_Run", "D"], ["S_Run", "S"], ["U_Run", "U"], ["D_Dash", "D"], ["G1_Dash", "G1"], ["U_Dash", "U"], ["Attack_1", "G1"], ["Attack_2", "G1"], ["Attack_3", "G1"]]:
+	for pair in [
+		["G1_Idle", "G1"],
+		["U_Idle", "U"],
+		["D_Run", "D"],
+		["S_Run", "S"],
+		["U_Run", "U"],
+		["D_Dash", "D"],
+		["G1_Dash", "G1"],
+		["U_Dash", "U"],
+		["Attack_1", "G1"],
+		["Attack_2", "G1"],
+		["Attack_3", "G1"]
+	]:
 		var sprite = spine_script.new()
 		sprite.skeleton_data_res = data
 		root.add_child(sprite)
 		assert(sprite.is_loaded(), "Foxy Spine failed to load for " + pair[0])
-		assert(sprite.get_node("_SpineSpriteCore3D").set_skin(pair[1]), "Foxy Spine skin failed: " + pair[1])
+		assert(
+			sprite.get_node("_SpineSpriteCore3D").set_skin(pair[1]),
+			"Foxy Spine skin failed: " + pair[1]
+		)
 		assert(sprite.set_animation(pair[0], true, 0), "Foxy Spine playback failed: " + pair[0])
 		sprite.queue_free()
 	var foxy_scene := load("res://gameplay/player/foxy.tscn") as PackedScene
@@ -53,7 +80,9 @@ func _run() -> void:
 	visual.remove_child(preview)
 	preview.owner = null
 	root.add_child(preview)
-	for hit in [[&"hit_down", "G1_Idle", "G1"], [&"hit_side", "G1_Idle", "G1"], [&"hit_up", "U_Idle", "U"]]:
+	for hit in [
+		[&"hit_down", "G1_Idle", "G1"], [&"hit_side", "G1_Idle", "G1"], [&"hit_up", "U_Idle", "U"]
+	]:
 		preview.sync_animation(hit[0], source, source, null, false, Vector3.BACK, true)
 		assert(preview._active and preview.visible, "Spine not visible during " + str(hit[0]))
 		assert(not source.visible, "Old sprite visible during " + str(hit[0]))

@@ -18,11 +18,12 @@ enum DestinationMode { START, END, TOGGLE }
 @export_group("Scene Preview")
 @export var show_target_links_in_editor := true
 
-@onready var hurtbox: HurtBox = $Lever/HurtBox
-@onready var _lever_sprite: AnimatedSprite3D = $Lever/AnimatedSprite3D
 var _link_mesh: ImmediateMesh
 var _link_preview: MeshInstance3D
 var _preview_elapsed := 0.0
+
+@onready var hurtbox: HurtBox = $Lever/HurtBox
+@onready var _lever_sprite: AnimatedSprite3D = $Lever/AnimatedSprite3D
 
 
 func _ready() -> void:
@@ -117,7 +118,9 @@ func _get_targets() -> Array[MovingPlatform]:
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 	if target_platforms.is_empty() and not use_parent_platform_when_unassigned:
-		warnings.append("Assign MovingPlatform nodes to Target Platforms in the Inspector. Drag them from the Scene tree.")
+		warnings.append(
+			"Drag MovingPlatform nodes from the Scene tree into Target Platforms in the Inspector."
+		)
 	for platform in target_platforms:
 		if platform == null:
 			warnings.append("Target Platforms contains an empty slot.")
