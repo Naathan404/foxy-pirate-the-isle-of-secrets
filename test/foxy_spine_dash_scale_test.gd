@@ -37,8 +37,14 @@ func _run() -> void:
 				assert(pose.basis.x.x < 0.0, "Side dash mirror direction changed")
 				assert(pose.basis.y.length() <= 1.351, "Side dash became too tall")
 			else:
-				assert(is_equal_approx(pose.basis.y.y * bounds.size.y, idle_height), "Dash height differs from idle")
-			assert(is_zero_approx(pose.origin.y + pose.basis.y.y * bounds.position.y), "Dash feet moved")
+				assert(
+					is_equal_approx(pose.basis.y.y * bounds.size.y, idle_height),
+					"Dash height differs from idle"
+				)
+			assert(
+				is_zero_approx(pose.origin.y + pose.basis.y.y * bounds.position.y),
+				"Dash feet moved"
+			)
 		preview.queue_free()
 		await process_frame
 	print("Foxy side dash keeps its width and limited height")

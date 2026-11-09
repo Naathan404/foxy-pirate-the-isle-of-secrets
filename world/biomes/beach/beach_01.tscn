@@ -6,6 +6,7 @@
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="2_kdm2m"]
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="5_3o6mh"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_5ryi1"]
+[ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="7_5ryi1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mu62o"]
 render_priority = 0
@@ -27,6 +28,7 @@ open_exits = 1
 up_destination_scene = "uid://cywu6xden3ef8"
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.058254242, -1.200001, 0.016539574)
 mesh = SubResource("QuadMesh_3o6mh")
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
@@ -64,10 +66,10 @@ texture = ExtResource("2_h1ql0")
 shape = SubResource("BoxShape3D_77c0w")
 
 [node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6226, -6.9159203, 22.157547)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.51091, -6.9159203, 22.157547)
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.871082, 0, -31.914928)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.153927, 0, -31.914928)
 
 [node name="MovingPlatform" parent="." index="5" unique_id=304837597 instance=ExtResource("6_5ryi1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.72044, -0.17125607, 0)
@@ -77,12 +79,35 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, 4.514025, -0.0199
 
 [node name="StartDock" parent="MovingPlatform" index="3" unique_id=1539520790]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4.4272537, 0.77503157, -1.9815831)
+use_parent_platform_when_unassigned = false
 
 [node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 4.798712, 4.5211864, -3.5246503)
+destination_mode = 0
+use_parent_platform_when_unassigned = false
+
+[node name="MovingPlatform2" parent="." index="6" unique_id=487391356 instance=ExtResource("6_5ryi1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.72044, 4.2972116, 6.051466)
+
+[node name="End" parent="MovingPlatform2" index="2" unique_id=1910727390]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, -4.213009, -0.019938469)
+
+[node name="StartDock" parent="MovingPlatform2" index="3" unique_id=1539520790]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4.4272537, -3.9644513, -1.9815831)
+use_parent_platform_when_unassigned = false
+
+[node name="EndDock" parent="MovingPlatform2" index="4" unique_id=1860631709]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 4.798712, -0.218297, -3.5246503)
+destination_mode = 0
+use_parent_platform_when_unassigned = false
+
+[node name="PlatformPuzzleLever" parent="." index="7" unique_id=692335542 node_paths=PackedStringArray("target_platforms") instance=ExtResource("7_5ryi1")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 5.609226, 0.73775387, 6.99253)
+target_platforms = [NodePath("../MovingPlatform"), NodePath("../MovingPlatform2")]
 
 [editable path="Exits/UpPath"]
 [editable path="Exits/UpPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround"]
 [editable path="Environment/BaseGround2"]
 [editable path="MovingPlatform"]
+[editable path="MovingPlatform2"]

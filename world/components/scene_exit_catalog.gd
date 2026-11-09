@@ -28,9 +28,14 @@ static func get_exit_ids(scene_path: String) -> PackedStringArray:
 			var child_path := _join(path, "Exits/" + PATH_NAMES[index] + "/SceneChangeTrigger")
 			if nodes.has(child_path):
 				nodes[child_path]["enabled"] = bool(flags & (1 << index))
-				nodes[child_path]["trigger_id"] = properties.get(DIRECTIONS[index] + "_trigger_id", DIRECTIONS[index])
+				nodes[child_path]["trigger_id"] = properties.get(
+					DIRECTIONS[index] + "_trigger_id", DIRECTIONS[index]
+				)
 	for properties: Dictionary in nodes.values():
-		if _uses_script(properties.get("script"), TRIGGER_SCRIPT) and properties.get("enabled", true):
+		if (
+			_uses_script(properties.get("script"), TRIGGER_SCRIPT)
+			and properties.get("enabled", true)
+		):
 			var id := String(properties.get("trigger_id", ""))
 			if not id.is_empty():
 				ids.append(id)
@@ -38,7 +43,9 @@ static func get_exit_ids(scene_path: String) -> PackedStringArray:
 	return ids
 
 
-static func configure_dropdown(property: Dictionary, scene_path: String, selected: StringName) -> void:
+static func configure_dropdown(
+	property: Dictionary, scene_path: String, selected: StringName
+) -> void:
 	var choices := PackedStringArray([""])
 	for id: String in get_exit_ids(scene_path):
 		if not choices.has(id):
@@ -59,7 +66,10 @@ static func destination_warning(scene_path: String, id: StringName) -> String:
 		return "Choose a Destination Trigger Id; leaving it empty uses the scene's default spawn."
 	var count := get_exit_ids(scene_path).count(String(id))
 	if count == 0:
-		return "Destination exit '%s' is missing or disabled. Save the destination scene, then refresh exits." % id
+		return (
+			"Destination exit '%s' is missing or disabled. Save the destination scene, then refresh exits."
+			% id
+		)
 	if count > 1:
 		return "Destination exit ID '%s' is duplicated. Give each exit a unique ID." % id
 	return ""
@@ -77,7 +87,9 @@ static func _collect(state: SceneState, prefix: String, nodes: Dictionary) -> vo
 		if not nodes.has(path):
 			nodes[path] = {}
 		for property_index in state.get_node_property_count(index):
-			nodes[path][String(state.get_node_property_name(index, property_index))] = state.get_node_property_value(index, property_index)
+			nodes[path][String(state.get_node_property_name(index, property_index))] = (
+				state.get_node_property_value(index, property_index)
+			)
 
 
 static func _join(prefix: String, path: String) -> String:
