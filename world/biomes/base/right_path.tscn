@@ -31,7 +31,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 5.
 shape = SubResource("BoxShape3D_cxbn6")
 
 [node name="SceneChangeTrigger" parent="." unique_id=219025603 instance=ExtResource("2_3t1ag")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.871426)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.327335, 0, 4.871426)
 
 [node name="CollisionShape3D" parent="SceneChangeTrigger" index="0" unique_id=482012259]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4334264, 1, -4.5629807)

@@ -16,30 +16,18 @@
 size = Vector3(11.51355, 1, 10.686737)
 
 [node name="Ruins_02" unique_id=823545398 instance=ExtResource("1_xe0fx")]
-open_exits = 10
+open_exits = 14
 right_destination_scene = "res://world/biomes/ruins/ruins_01.tscn"
+down_destination_scene = "uid://bni628jtpmd0r"
 left_destination_scene = "res://world/biomes/ruins/ruins_03.tscn"
 
-[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
-visible = false
-
-[node name="Sprite3D" parent="Exits/DownPath" index="0" unique_id=1887481611]
+[node name="Sprite3D" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="0" unique_id=1887481611]
 texture = ExtResource("2_qgx3g")
 
-[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-disabled = true
-
-[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-disabled = true
-
-[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
-monitoring = false
+[node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
 trigger_id = &"down"
+destination_scene = "uid://bni628jtpmd0r"
 destination_trigger_id = &"up"
-enabled = false
-
-[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
-disabled = true
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false

@@ -43,6 +43,22 @@ func _run() -> void:
 	assert(preview.animation_mapping["fall_down"] == preview.animation_mapping["idle_down"])
 	assert(preview.animation_mapping["fall_side"] == preview.animation_mapping["idle_down"])
 	assert(preview.animation_mapping["fall_up"] == preview.animation_mapping["idle_up"])
+	assert(preview.animation_mapping["hit_down"] == preview.animation_mapping["idle_down"])
+	assert(preview.animation_mapping["hit_side"] == preview.animation_mapping["idle_down"])
+	assert(preview.animation_mapping["hit_up"] == preview.animation_mapping["idle_up"])
+	var visual := foxy.get_node("Visual")
+	var source := visual.get_node("Sprite3D") as Sprite3D
+	var animator := visual.get_node("AnimationPlayer") as AnimationPlayer
+	preview.configure_reference(source, animator)
+	visual.remove_child(preview)
+	preview.owner = null
+	root.add_child(preview)
+	for hit in [[&"hit_down", "G1_Idle", "G1"], [&"hit_side", "G1_Idle", "G1"], [&"hit_up", "U_Idle", "U"]]:
+		preview.sync_animation(hit[0], source, source, null, false, Vector3.BACK, true)
+		assert(preview._active and preview.visible, "Spine not visible during " + str(hit[0]))
+		assert(not source.visible, "Old sprite visible during " + str(hit[0]))
+		assert(preview._current_spine_animation == hit[1] and preview._current_spine_skin == hit[2])
+	preview.queue_free()
 	foxy.free()
 	print("Foxy Spine export contains all mapped animations and skins")
 	quit()
