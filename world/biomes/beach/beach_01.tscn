@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://bni628jtpmd0r"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_4owi3"]
+[ext_resource type="Texture2D" uid="uid://ciujmv2c5k4u5" path="res://assets/sprites/biomes/beach/beach_up.png" id="2_77c0w"]
+[ext_resource type="Texture2D" uid="uid://bl64yrwnpyr3p" path="res://assets/sprites/biomes/beach/beach.png" id="2_h1ql0"]
+[ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="2_kdm2m"]
+[ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="5_3o6mh"]
+[ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_5ryi1"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mu62o"]
+render_priority = 0
+shader = ExtResource("2_kdm2m")
+shader_parameter/void_color = Color(0.13902983, 0.37645656, 0.44962913, 1)
+shader_parameter/smoke_color = Color(0.0615262, 0.117113106, 0.29852238, 1)
+shader_parameter/smoke_strength = 0.48
+shader_parameter/rise_speed = 0.150000007125
+
+[sub_resource type="QuadMesh" id="QuadMesh_3o6mh"]
+material = SubResource("ShaderMaterial_mu62o")
+size = Vector2(400, 400)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_77c0w"]
+size = Vector3(11.5, 1, 11.242)
+
+[node name="Beach_01" unique_id=1248439267 instance=ExtResource("1_4owi3")]
+open_exits = 1
+up_destination_scene = "uid://cywu6xden3ef8"
+
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+mesh = SubResource("QuadMesh_3o6mh")
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="Sprite3D" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="0" unique_id=1887481611]
+texture = ExtResource("2_77c0w")
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="2" unique_id=219025603]
+trigger_id = &"up"
+destination_scene = "uid://cywu6xden3ef8"
+destination_trigger_id = &"down"
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
+[node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+texture = ExtResource("2_h1ql0")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+shape = SubResource("BoxShape3D_77c0w")
+
+[node name="BaseGround2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=858705461 instance=ExtResource("5_3o6mh")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 26.590645, 4.349984, -0.5731373)
+
+[node name="Sprite3D" parent="Environment/BaseGround2" index="0" unique_id=516185212]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+texture = ExtResource("2_h1ql0")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround2/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+shape = SubResource("BoxShape3D_77c0w")
+
+[node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6226, -6.9159203, 22.157547)
+
+[node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.871082, 0, -31.914928)
+
+[node name="MovingPlatform" parent="." index="5" unique_id=304837597 instance=ExtResource("6_5ryi1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.72044, -0.17125607, 0)
+
+[node name="End" parent="MovingPlatform" index="2" unique_id=1910727390]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, 4.514025, -0.019938469)
+
+[node name="StartDock" parent="MovingPlatform" index="3" unique_id=1539520790]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4.4272537, 0.77503157, -1.9815831)
+
+[node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 4.798712, 4.5211864, -3.5246503)
+
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
+[editable path="Environment/BaseGround2"]
+[editable path="MovingPlatform"]
