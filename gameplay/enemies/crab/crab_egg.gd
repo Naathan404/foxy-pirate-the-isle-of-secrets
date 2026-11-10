@@ -51,7 +51,9 @@ func _physics_process(delta: float) -> void:
 		var delay := maxf(0.0, hatch_delay)
 		var warning := clampf(warning_duration, 0.0, delay)
 		if warning > 0.0 and _incubation_elapsed >= delay - warning:
-			sprite.position.x = _sprite_origin.x + sin(_incubation_elapsed * shake_frequency * TAU) * shake_distance
+			sprite.position.x = (
+				_sprite_origin.x + sin(_incubation_elapsed * shake_frequency * TAU) * shake_distance
+			)
 		if _incubation_elapsed >= delay:
 			_hatch()
 		return
@@ -71,7 +73,10 @@ func _physics_process(delta: float) -> void:
 
 
 func receive_damage(damage: DamageContext) -> float:
-	if not _landed or _hatched or damage == null or damage.source_team != CombatTeams.PLAYER or damage.amount_hp <= 0.0:
+	if (
+		not _landed or _hatched or damage == null
+		or damage.source_team != CombatTeams.PLAYER or damage.amount_hp <= 0.0
+	):
 		return 0.0
 	var applied := minf(_hp, damage.amount_hp)
 	_hp -= applied

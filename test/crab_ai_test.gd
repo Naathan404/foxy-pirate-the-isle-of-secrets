@@ -282,10 +282,22 @@ func _check_egg_lifecycle() -> void:
 	for child in arena.get_children():
 		if child is CrabEgg:
 			eggs += 1
-			_check(is_equal_approx(child.hatch_delay, elite.egg_hatch_delay), "Egg must inherit incubation time")
-			_check(is_equal_approx(child.warning_duration, elite.egg_warning_duration), "Egg must inherit warning time")
-			_check(is_equal_approx(child.shake_distance, elite.egg_shake_distance), "Egg must inherit shake distance")
-			_check(is_equal_approx(child.shake_frequency, elite.egg_shake_frequency), "Egg must inherit shake frequency")
+			_check(
+				is_equal_approx(child.hatch_delay, elite.egg_hatch_delay),
+				"Egg must inherit incubation time"
+			)
+			_check(
+				is_equal_approx(child.warning_duration, elite.egg_warning_duration),
+				"Egg must inherit warning time"
+			)
+			_check(
+				is_equal_approx(child.shake_distance, elite.egg_shake_distance),
+				"Egg must inherit shake distance"
+			)
+			_check(
+				is_equal_approx(child.shake_frequency, elite.egg_shake_frequency),
+				"Egg must inherit shake frequency"
+			)
 	_check(eggs == 2, "Elite should release eggs before dying")
 	elite.receive_damage(_damage(AttackData.DeliveryType.MELEE, elite.hp.current_hp))
 	await create_timer(1.3).timeout
@@ -387,17 +399,35 @@ func _check_egg_entity() -> void:
 	await physics_frame
 	hitbox.begin_attack(1.0)
 	hitbox.sample_shape()
-	_check(egg.hurtbox.collision_layer == 0 and other_egg.hurtbox.collision_layer == 0, "Flying eggs must not intercept attacks")
-	_check(is_zero_approx(egg.receive_damage(_damage(AttackData.DeliveryType.MELEE, 1.0))), "Flying eggs must reject direct damage")
-	_check(is_equal_approx(egg._hp, 1.0) and is_equal_approx(other_egg._hp, 1.0), "One attack must not damage eggs as they launch")
+	_check(
+		egg.hurtbox.collision_layer == 0 and other_egg.hurtbox.collision_layer == 0,
+		"Flying eggs must not intercept attacks"
+	)
+	_check(
+		is_zero_approx(egg.receive_damage(_damage(AttackData.DeliveryType.MELEE, 1.0))),
+		"Flying eggs must reject direct damage"
+	)
+	_check(
+		is_equal_approx(egg._hp, 1.0) and is_equal_approx(other_egg._hp, 1.0),
+		"One attack must not damage eggs as they launch"
+	)
 	hitbox.end_attack()
 	hitbox.queue_free()
 	await create_timer(0.9).timeout
 	_check(egg._landed and other_egg._landed, "Surviving eggs should land")
-	_check(egg.hurtbox.enabled and egg.hurtbox.collision_layer == CombatLayers.ENEMY_HURTBOX, "Landed eggs must become vulnerable")
-	_check(is_equal_approx(egg.hurtbox.take_damage(_damage(AttackData.DeliveryType.MELEE, 0.4)), 0.4), "Landed egg should have one HP")
+	_check(
+		egg.hurtbox.enabled and egg.hurtbox.collision_layer == CombatLayers.ENEMY_HURTBOX,
+		"Landed eggs must become vulnerable"
+	)
+	_check(
+		is_equal_approx(egg.hurtbox.take_damage(_damage(AttackData.DeliveryType.MELEE, 0.4)), 0.4),
+		"Landed egg should have one HP"
+	)
 	_check(not egg.is_queued_for_deletion(), "Partial damage must not destroy a landed egg")
-	_check(is_equal_approx(egg.hurtbox.take_damage(_damage(AttackData.DeliveryType.MELEE, 0.6)), 0.6), "Remaining HP should be damageable after landing")
+	_check(
+		is_equal_approx(egg.hurtbox.take_damage(_damage(AttackData.DeliveryType.MELEE, 0.6)), 0.6),
+		"Remaining HP should be damageable after landing"
+	)
 	_check(egg.is_queued_for_deletion(), "A landed egg should be destroyable")
 	await create_timer(1.1).timeout
 	_check(_normal_crab_count() == before + 1, "Only the surviving egg should hatch")
