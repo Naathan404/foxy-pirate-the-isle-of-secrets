@@ -49,6 +49,11 @@ var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
+## Applied by environmental surfaces to ordinary ground movement only.
+var environment_move_speed_multiplier: float = 1.0
+## Hệ số quãng đường dash do địa hình cung cấp; được lấy khi bắt đầu dash.
+var environment_dash_distance_multiplier: float = 1.0
+var environment_is_water: bool = false
 var potion_selection_active: bool = false
 var _charm_grapple_tween: Tween
 var _dash_pushed_crates: Dictionary[int, bool] = {}
@@ -640,5 +645,8 @@ func _get_move_speed() -> float:
 		charm_socket_manager.modify_stats(stats)
 	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
 	return maxf(
-		0.0, (data.move_speed + stats[&"move_speed_flat"]) * stats[&"move_speed_multiplier"]
+		0.0,
+		(data.move_speed + stats[&"move_speed_flat"])
+		* stats[&"move_speed_multiplier"]
+		* environment_move_speed_multiplier
 	)

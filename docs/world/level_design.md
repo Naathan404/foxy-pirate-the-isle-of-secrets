@@ -14,7 +14,7 @@
 | Khu vực | Nguyên tố | Gimmick & Thông số kỹ thuật | Phần thưởng / Mở khóa |
 | :--- | :--- | :--- | :--- |
 | **Castaway Cove** | Hub | Khu an toàn (không quái/bẫy). Chứa NPC, chỗ đổi Charm, Forge/Upgrade, `Ancient Stone Tablet`. | - |
-| **Coral Valley** | Nước | • **Tidal Shift:** Chu kỳ **25–45s**.<br>• **Wooden Crates:** Đẩy thùng lúc nước rút, nổi thành bục khi nước dâng (có nút Reset). | • `Ancient Key of Tides`<br>• Charm: `Tide Grapple`<br>• NPC: Thợ rèn<br>• Mở 3 map còn lại |
+| **Coral Valley** | Nước | • **Thủy triều:** Vùng nước lan và rút trên nền phẳng.<br>• **Wooden Crates:** Thùng đẩy có nút Reset. | • `Ancient Key of Tides`<br>• Charm: `Tide Grapple`<br>• NPC: Thợ rèn<br>• Mở 3 map còn lại |
 | **Misty Swamp** | Mộc | • **Mud:** **-50% Speed**, **Cấm Dash**.<br>• **Fog:** Overlay che camera, giảm tầm nhìn. | • `Ancient Key of Flora`<br>• Charm: `Devil Contract`<br>• NPC: Ếch phù thủy |
 | **Smithy Mountain** | Lửa | • **Heatstroke:** Mỗi **30s = -0.5 Tim** (Kháng bằng Charm `Lava Shield`).<br>• **Lava Pool:** **-1 HP/s** khi chạm. Có lava ẩn (lại gần mới bốc khói). | • `Ancient Key of Embers`<br>• Charm: `Meteor Strike` |
 | **Frostwind Graveyard** | Gió | • **Blizzard:** Chu kỳ **20–30s**. Giảm tầm nhìn, **-30% Speed**, **-30% hồi Stamina**, spawn quái riêng.<br>• **Ice Slide:** Trượt thẳng tới khi hết băng/chạm vật cản. **Khóa mọi input** khi trượt. | • `Ancient Key of Gale`<br>• Charm: `Glacial Spikes` |
@@ -41,14 +41,14 @@
 
 - **Cơ chế cần code:**
 
- 1. **Tidal Shift (Chu kỳ 25–45s):**
+ 1. **Thủy triều trên nền phẳng:**
 
-	 - *Nước rút:* Lộ bãi cát ngầm, mở đường đi/giải đố, spawn một số quái.
-	 - *Nước dâng:* Ngập đường đi, quái dưới nước biến mất. **Player đứng ở vùng ngập lúc nước dâng = Chết ngay (Insta-kill)**.
+	 - *Nước rút:* Enemy có thể xuất hiện khi từng vị trí lộ khỏi nước.
+	 - *Nước dâng:* Vùng ngập làm giảm tốc độ di chuyển và quãng dash. Cấu hình hiện tại ở [thủy triều cho nền phẳng](flat_tide.md).
   
  2. **Wooden Crates (Thùng gỗ):**
 
-	 - Đẩy được khi nước rút. Khi nước dâng thì nổi lên làm bục nhảy.
+	 - Có thể đẩy khi nằm trên nền; hành vi thùng nổi cũ đã được gỡ.
 	 - Có **Nút bấm (Button)** để reset vị trí thùng về mặc định.
 
 - **Flow:** `Entrance` ➔ `Bãi biển` ➔ `Khu vực thủy triều` ➔ `Puzzle thùng gỗ` ➔ `Combat Area` ➔ `Checkpoint` ➔ `Boss Approach` ➔ `Boss Room`.

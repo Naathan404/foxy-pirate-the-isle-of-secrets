@@ -53,8 +53,8 @@ Material hiện nằm trên mesh, không phải Material Override.
 Sửa resource dùng chung sẽ đổi các instance cùng dùng material. Khi cần màu
 riêng cho một khu vực, dùng Make Unique trên mesh/material trước khi chỉnh.
 
-TideController vẫn điều khiển Y của SeaWater. Shader lấy độ cao world mới khi
-tính độ sâu và bọt, không tự thay đổi chu kỳ thủy triều hoặc collision.
+SeaWater là nước tĩnh trong các scene cũ. Thủy triều mới trên địa hình phẳng
+được mô tả tại [Thủy triều cho nền phẳng](../../world/flat_tide.md).
 
 ## Renderer
 
