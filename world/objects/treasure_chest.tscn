@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://f5db4eqg3ocu"]
+
+[ext_resource type="Texture2D" uid="uid://cc4dwpdsx7yxf" path="res://assets/sprites/objects/chest_closed.png" id="1_foi4c"]
+[ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="2_oqsst"]
+[ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="3_prqp1"]
+[ext_resource type="Script" uid="uid://bvwquybgasata" path="res://world/objects/treasure_chest.gd" id="4_chest"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4ttts"]
+size = Vector3(2, 2, 0.8)
+
+[node name="TreasureChest" type="Node3D" unique_id=1708090331 node_paths=PackedStringArray("visual_root")]
+script = ExtResource("4_chest")
+open_shake = 8.0
+zoom_out_seconds = 0.4
+max_hp = 6.0
+visual_root = NodePath("Visual/Sprite3D")
+
+[node name="Visual" type="Node3D" parent="." unique_id=317130523]
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1447600848]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4944776, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("1_foi4c")
+
+[node name="HurtBox" type="Area3D" parent="." unique_id=1298682244]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("2_oqsst")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HurtBox" unique_id=484415278]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_4ttts")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1412330017]
+script = ExtResource("3_prqp1")
+metadata/_custom_type_script = "uid://dsiiopnlfqio7"

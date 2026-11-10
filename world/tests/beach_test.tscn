@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="12_ral77"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="13_hfst8"]
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="14_fv4rj"]
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="15_hfst8"]
 
 [sub_resource type="Resource" id="Resource_flat_enemy_starfish"]
 script = ExtResource("12_ral77")
@@ -89,6 +90,9 @@ player = NodePath("../../Foxy")
 
 [node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
 enemies = Array[ExtResource("12_ral77")]([SubResource("Resource_flat_enemy_starfish"), SubResource("Resource_pin4q")])
+
+[node name="TreasureChest" parent="." index="18" unique_id=1708090331 instance=ExtResource("15_hfst8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.46411943, 7)
 
 [editable path="Environment/BaseGround"]
 [editable path="FlatTide"]

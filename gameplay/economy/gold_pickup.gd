@@ -6,6 +6,7 @@ signal recycle_requested(pickup: GoldPickup)
 
 @export_range(1, 100000, 1) var amount: int = 1
 @export_range(0.1, 2.0, 0.05) var drop_height: float = 0.8
+@export_range(0.05, 3.0, 0.01, "suffix:s") var drop_duration: float = 0.46
 @export var show_value_label: bool = false
 
 var pooled: bool = false
@@ -64,14 +65,14 @@ func park() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
-func activate(at: Vector3, direction: Vector3) -> void:
+func activate(at: Vector3, direction: Vector3, flight_height: float = -1.0, flight_duration: float = -1.0) -> void:
 	park()
 	amount = 1
 	_value_label.text = "1 G"
 	global_position = at
 	process_mode = Node.PROCESS_MODE_INHERIT
 	show()
-	play_drop_animation(direction)
+	play_drop_animation(direction, flight_height, flight_duration)
 
 
 func _play_drop() -> void:
@@ -79,12 +80,14 @@ func _play_drop() -> void:
 		play_drop_animation()
 
 
-func play_drop_animation(direction: Vector3 = Vector3.ZERO) -> void:
+func play_drop_animation(direction: Vector3 = Vector3.ZERO, flight_height: float = -1.0, flight_duration: float = -1.0) -> void:
 	if _drop_started:
 		return
 	_drop_started = true
 	_sprite.position = _rest_position
-	_scatter.launch(drop_height, 0.46, direction)
+	var height := drop_height if flight_height < 0.0 else flight_height
+	var duration := drop_duration if flight_duration < 0.0 else flight_duration
+	_scatter.launch(height, duration, direction)
 
 
 func _land() -> void:
