@@ -8,6 +8,14 @@ const HIT_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_hit.wav
 @export var hitbox: HitBox
 @export var forward_offset: float = 0.8
 @export_range(0.0, 3.0, 0.05) var heavy_crate_knockback_distance: float = 0.9
+@export_range(1.0, 2.0, 0.05) var destructible_shake_multiplier: float = 1.15
+
+@export_group("Combo Hitbox")
+@export_range(0.05, 3.0, 0.01) var swing_width: float = 0.42
+@export_range(0.05, 3.0, 0.01) var thrust_width: float = 0.62
+@export_range(0.05, 4.0, 0.01) var hitbox_height: float = 1.4
+@export_range(0.0, 3.0, 0.01) var hitbox_center_height: float = 0.7
+@export_range(0.1, 2.0, 0.01) var thrust_length_ratio: float = 0.75
 
 var _elapsed: float = 0.0
 var _vfx: MeleeSlashVFX
@@ -97,11 +105,14 @@ func _configure_swing() -> void:
 	var reach := context.range_units * context.combo_step.reach_multiplier
 	var collider := hitbox.get_node("CollisionShape3D") as CollisionShape3D
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(0.62 if context.combo_step.straight_thrust else 0.42, 1.4,
-		reach * 0.75 if context.combo_step.straight_thrust else reach)
+	var length_ratio := thrust_length_ratio if context.combo_step.straight_thrust else 1.0
+	shape.size = Vector3(
+		thrust_width if context.combo_step.straight_thrust else swing_width,
+		hitbox_height,
+		reach * length_ratio
+	)
 	collider.shape = shape
-	collider.position = Vector3(0.0, 0.7,
-		-reach * 0.375 if context.combo_step.straight_thrust else -reach * 0.5)
+	collider.position = Vector3(0.0, hitbox_center_height, -reach * length_ratio * 0.5)
 	hitbox.position = Vector3.ZERO
 	_vfx = MeleeSlashVFX.new()
 	get_parent().add_child(_vfx)
@@ -157,7 +168,9 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 			context.actor, target as Node3D, step.hitstop_seconds * impact_scale
 		)
 		get_node("/root/ScreenShakeController").request(
-			step.shake_pixels * impact_scale, step.shake_seconds
+			step.shake_pixels * impact_scale
+			* (destructible_shake_multiplier if target is DestructibleProp else 1.0),
+			step.shake_seconds
 		)
 		get_node("/root/AudioManager").play_sfx_3d(
 			HIT_SOUND, at, (-8.0 if heavy else -13.0) + linear_to_db(impact_scale), step.audio_pitch

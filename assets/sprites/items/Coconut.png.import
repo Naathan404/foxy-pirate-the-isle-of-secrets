@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmf80hnhhysyi"
-path="res://.godot/imported/Coral.svg-d3bcdd68af5146095b76bd7e2598f3cf.ctex"
+uid="uid://dcrv14mnxtexa"
+path="res://.godot/imported/Coconut.png-5628e312617c7c25b480cae535034c2b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/items/Coral.svg"
-dest_files=["res://.godot/imported/Coral.svg-d3bcdd68af5146095b76bd7e2598f3cf.ctex"]
+source_file="res://assets/sprites/items/Coconut.png"
+dest_files=["res://.godot/imported/Coconut.png-5628e312617c7c25b480cae535034c2b.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

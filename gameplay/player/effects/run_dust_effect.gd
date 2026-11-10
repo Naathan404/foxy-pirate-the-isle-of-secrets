@@ -43,8 +43,8 @@ func _create_bursts() -> void:
 		material.spread = 55.0 if index < 3 else 80.0
 		material.initial_velocity_min = 0.6 if index < 3 else 1.2
 		material.initial_velocity_max = 1.2 if index < 3 else 2.0
-		material.scale_min = 0.65 if index < 3 else 1.0
-		material.scale_max = 1.15 if index < 3 else 1.8
+		material.scale_min = 1.0 if index < 3 else 1.0
+		material.scale_max = 1.85 if index < 3 else 1.8
 		add_child(burst)
 		burst.top_level = true
 		_bursts.append(burst)

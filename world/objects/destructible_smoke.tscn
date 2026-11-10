@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://bt3bvedqmmkco"]
+
+[ext_resource type="Texture2D" uid="uid://4rqwduaxp1ya" path="res://assets/sprites/effects/smoke/smoke_04.png" id="1_w6aen"]
+
+[sub_resource type="Gradient" id="SmokeGradient"]
+offsets = PackedFloat32Array(0, 0.2, 1)
+colors = PackedColorArray(0.78, 0.76, 0.7, 0.8, 0.63, 0.62, 0.58, 0.65, 0.48, 0.48, 0.46, 0)
+
+[sub_resource type="GradientTexture1D" id="SmokeRamp"]
+gradient = SubResource("SmokeGradient")
+
+[sub_resource type="ParticleProcessMaterial" id="SmokeProcess"]
+emission_shape = 1
+emission_sphere_radius = 0.2
+direction = Vector3(0, 1, 0)
+spread = 85.0
+initial_velocity_min = 1.2
+initial_velocity_max = 2.8
+gravity = Vector3(0, 0.4, 0)
+damping_min = 1.0
+damping_max = 2.0
+scale_min = 0.8
+scale_max = 1.5
+color_ramp = SubResource("SmokeRamp")
+
+[sub_resource type="StandardMaterial3D" id="SmokeMaterial"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_w6aen")
+texture_filter = 0
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="SmokeMesh"]
+material = SubResource("SmokeMaterial")
+size = Vector2(0.5, 0.5)
+
+[node name="DestructibleSmoke" type="GPUParticles3D" unique_id=789590322]
+cast_shadow = 0
+emitting = false
+amount = 12
+lifetime = 0.55
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-3, -2, -3, 6, 5, 6)
+process_material = SubResource("SmokeProcess")
+draw_pass_1 = SubResource("SmokeMesh")
+
+[connection signal="finished" from="." to="." method="queue_free"]

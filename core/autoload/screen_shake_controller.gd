@@ -1,7 +1,7 @@
 extends Node
 
 ## Rung Camera3D theo thời gian thực, độc lập với hitstop và chuyển động của nhân vật.
-@export_range(0.0, 20.0, 0.5) var maximum_pixels: float = 8.0
+@export_range(0.0, 20.0, 0.5) var maximum_pixels: float = 14.0
 @export_range(0.01, 1.0, 0.01) var maximum_duration: float = 0.3
 @export_range(1.0, 60.0, 1.0) var frequency: float = 35.0
 ## Dùng khi camera không có cha Node3D làm mốc quy đổi pixel sang khoảng cách thế giới.
