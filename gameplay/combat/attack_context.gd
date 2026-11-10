@@ -24,6 +24,8 @@ var has_target: bool = false
 
 var weapon: WeaponInstance
 var weapon_category: int = -1
+## AttackData.DeliveryType, or -1 when the source has no declared delivery.
+var delivery_type: int = -1
 
 # chỉ số sau khi rèn
 var damage_hp: float = 1
@@ -57,6 +59,7 @@ func create_damage_context() -> DamageContext:
 	damage.stagger_damage = stagger_damage
 	damage.tag = action
 	damage.weapon_category = weapon_category
+	damage.delivery_type = delivery_type
 	damage.origin = origin
 	damage.direction = direction
 	damage.knockback_multiplier = knockback_multiplier

@@ -19,7 +19,7 @@ gameplay/enemies/base/enemy_base.tscn
 
 | Enemy | Hành vi thường | Biến thể elite / lưu ý |
 | --- | --- | --- |
-| **Crab** | Tuần tra trên bốn hướng XZ, đổi trục sau khi sống sót qua một đòn đánh và gây contact damage. | **EliteCrab** phát hiện Foxy, telegraph, charge, rồi slam diện rộng trước khi vào cooldown. Patrol và charge chỉ đi theo bốn hướng. Khi mục tiêu nằm chéo, Crab khóa vị trí đó, đi dọc theo trục Z rồi rẽ 90° theo trục X để đến gần vị trí đã khóa; nó không di chuyển chéo và hủy charge nếu bất kỳ chặng nào gặp tường hoặc mép rơi. |
+| **Crab** | Nhận diện và đuổi player theo từng trục X/Z trong vùng hoạt động; tuần tra khi không có mục tiêu. Trúng projectile của player khiến Crab tức giận và tạm mở rộng vùng nhận diện/di chuyển. | **EliteCrab** kế thừa hành vi Crab, giữ telegraph, charge và slam. Một lần khi còn tối đa 50% HP, Elite phóng số trứng ngẫu nhiên; trứng rơi và nở thành Crab thường. |
 | **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
 | **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
 | **WarLordTurtle** | Archetype enemy lớn độc lập, có data và animation riêng. | Không phải biến thể Turtle elite thứ hai. Luật boss hoặc Tide Grapple chỉ được gán khi game design quy định rõ. |
@@ -41,6 +41,25 @@ thời gian sống giới hạn tổng số lần nảy, không có giới hạn
 Tăng trọng lực để đạn rơi và nảy thường xuyên hơn; tăng độ đàn hồi để giữ chiều
 cao nảy qua nhiều lần chạm đất.
 
+Crab có thể chỉnh bán kính nhận diện, bán kính hoạt động quanh điểm sinh, độ dài
+đoạn đuổi và thời gian/hệ số mở rộng khi tức giận trong Inspector. Crab chỉ tính
+đòn projectile của player đã gây damage; hit tiếp theo làm mới thời gian tức giận.
+Sau khi gây damage cho player bằng contact hoặc slam, Crab thường và Elite tạm
+ngừng đuổi player đó và tiếp tục tuần tra. Khi player ra khỏi detector, Crab mới
+có thể nhận diện lại ở lần player đi vào vùng; đòn không gây damage không kích hoạt.
+Tốc độ tuần tra và tốc độ đuổi player của Crab được chỉnh riêng bằng
+`patrol_speed_scale` và `chase_speed_scale`, nhân với `move_speed` trong data.
+Hệ số đuổi mặc định trong script là 1.2; scene Crab thường hiện đặt 1.5. Khi quay
+về vùng hoạt động, Crab dùng tốc độ tuần tra. EliteCrab kế thừa hệ số đuổi từ
+scene Crab và có thể cấu hình riêng.
+Trứng Elite chọn điểm rơi có nền và khoảng trống, có bóng, va chạm và 1 HP.
+Sau khi rơi, trứng chờ ấp và rung cảnh báo trước khi nở thành Crab thường.
+Trứng không nhận sát thương khi đang bay; sau khi rơi, đòn của player có thể phá
+trứng trước khi nở. Cả khi phá và khi nở đều tạo khói.
+Một đòn chí mạng không kích hoạt đợt trứng; trứng đã phóng vẫn nở nếu Elite chết.
+Số trứng, bán kính rải, thời gian bay, thời gian ấp, thời gian cảnh báo và độ rung
+được cấu hình trên Elite trong nhóm **Elite Crab Eggs**.
+
 Mọi elite có 12 HP, 2 attack damage, 50% kháng hất văng và rơi đúng item của enemy thường với số lượng gấp ba.
 Nhận diện thường trực là một overlay shader xanh-trắng trực tiếp trên `Visual/Sprite3D`: mười hai đốm sáng
 nhỏ, trắng ở lõi và cyan ở viền, bay theo quỹ đạo chậm sát quanh elite. Shader đồng bộ UV của từng frame atlas
@@ -60,15 +79,14 @@ trong scene test; đây là debug presentation, không phải UI gameplay.
 
 Mỗi archetype có root script riêng, kể cả khi chỉ dùng để chứa cấu hình. Scene chỉ gán giá trị
 gameplay, còn script áp dụng chúng vào component lúc `_ready()`; vì vậy level design không cần
-chỉnh trực tiếp `CollisionShape3D` chỉ để đổi vùng nhận diện. Script có `player_detection_radius`
-(`EliteCrab`, `Starfish`/`EliteStarfish`, `Barrel`/`EliteBarrel`) dùng setter để đồng bộ collider
-khi scene chạy. Giá trị mặc định của `CylinderShape3D` trong từng `.tscn` cũng phải trùng export,
-để collision đúng ngay khi scene được mở và khi gameplay bắt đầu.
+chỉnh trực tiếp `CollisionShape3D` chỉ để đổi vùng nhận diện. Crab và EliteCrab
+dùng `player_detection_radius` để thiết lập detector riêng khi scene chạy; detector
+Crab thường được tạo khi khởi tạo. Starfish và Barrel đồng bộ collider bằng setter.
 
 | Script | Cấu hình đặc trưng |
 | --- | --- |
-| `crab/crab.gd` | Contact damage và speed scale của patrol Crab. |
-| `crab/elite_crab.gd` | `player_detection_radius` cho TargetDetector của EliteCrab. |
+| `crab/crab.gd` | Contact damage, nhận diện, vùng di chuyển và tức giận của Crab. |
+| `crab/elite_crab.gd` | Sinh trứng một lần và cấu hình số lượng/vị trí trứng của EliteCrab. |
 | `starfish/starfish.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector của Starfish và lớp kế thừa elite. |
 | `starfish/elite_starfish.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |

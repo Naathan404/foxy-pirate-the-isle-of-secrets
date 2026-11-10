@@ -655,6 +655,7 @@ func _make_context(request: AttackContext, attack: AttackData) -> AttackContext:
 	result.action = request.action
 	result.weapon = equipped
 	result.weapon_category = equipped.definition.category
+	result.delivery_type = attack.delivery_type
 	result.origin = actor.global_position
 	result.direction = Vector3(request.direction.x, 0, request.direction.z)
 	result.target_position = request.target_position
