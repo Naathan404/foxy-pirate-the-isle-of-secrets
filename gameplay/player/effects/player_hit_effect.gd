@@ -141,12 +141,14 @@ func _create_dust() -> void:
 func _create_death_smoke() -> void:
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array([0.0, 0.18, 0.52, 1.0])
-	gradient.colors = PackedColorArray([
-		Color(1, 1, 1, 0.0),
-		Color(1, 1, 1, 1.0),
-		Color(1, 1, 1, 0.95),
-		Color(1, 1, 1, 0.0),
-	])
+	gradient.colors = PackedColorArray(
+		[
+			Color(1, 1, 1, 0.0),
+			Color(1, 1, 1, 1.0),
+			Color(1, 1, 1, 0.95),
+			Color(1, 1, 1, 0.0),
+		]
+	)
 	var ramp := GradientTexture1D.new()
 	ramp.gradient = gradient
 	for index in SMOKE_TEXTURES.size():
@@ -268,17 +270,29 @@ func _on_died() -> void:
 	if spine_preview != null:
 		spine_preview.set_hit_tint(0.0)
 	visual.position = _rest_position
-	_death_camera = player.camera if is_instance_valid(player.camera) else get_viewport().get_camera_3d()
+	_death_camera = (
+		player.camera if is_instance_valid(player.camera) else get_viewport().get_camera_3d()
+	)
 	if is_instance_valid(_death_camera):
 		_rest_camera_fov = _death_camera.fov
 		_camera_tween = create_tween().set_ignore_time_scale(true)
-		_camera_tween.tween_property(
-			_death_camera, "fov", _rest_camera_fov * death_zoom_factor, death_zoom_duration
-		).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		(
+			_camera_tween
+			. tween_property(
+				_death_camera, "fov", _rest_camera_fov * death_zoom_factor, death_zoom_duration
+			)
+			. set_trans(Tween.TRANS_SINE)
+			. set_ease(Tween.EASE_OUT)
+		)
 	_death_tween = create_tween().set_ignore_time_scale(true)
-	_death_tween.tween_property(
-		visual, "scale", _rest_scale * Vector3(0.025, 0.005, 0.025), vanish_duration
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	(
+		_death_tween
+		. tween_property(
+			visual, "scale", _rest_scale * Vector3(0.025, 0.005, 0.025), vanish_duration
+		)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
 	_death_tween.tween_callback(_finish_vanish)
 	_smoke_tween = create_tween().set_ignore_time_scale(true)
 	_smoke_tween.tween_interval(vanish_duration * 0.45)

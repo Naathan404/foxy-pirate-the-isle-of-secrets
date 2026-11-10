@@ -1,10 +1,14 @@
 class_name DestructibleProp
 extends Node3D
 
-const HIT_FLASH_SHADER: Shader = preload("res://world/objects/destructible_hit_flash.gdshader")
-
 signal damaged(applied_hp: float)
 signal destroyed
+
+const HIT_FLASH_SHADER: Shader = preload("res://world/objects/destructible_hit_flash.gdshader")
+const DEFAULT_FRAGMENTS_SCENE: PackedScene = preload(
+	"res://world/objects/destructible_fragments.tscn"
+)
+const FragmentSettings = preload("res://world/objects/destructible_fragment_settings.gd")
 
 @export_group("Durability")
 @export_range(0.01, 100000.0, 0.01) var max_hp: float = 1.0
@@ -23,7 +27,7 @@ signal destroyed
 
 @export_group("Break Fragments")
 @export var fragment_source: Sprite3D
-@export var fragments_scene: PackedScene = preload("res://world/objects/destructible_fragments.tscn")
+@export var fragments_scene: PackedScene = DEFAULT_FRAGMENTS_SCENE
 @export_range(1, 32, 1) var fragment_count: int = 9
 @export_range(0.01, 0.5, 0.01) var fragment_min_size: float = 0.09
 @export_range(0.01, 0.5, 0.01) var fragment_max_size: float = 0.24
@@ -43,15 +47,15 @@ signal destroyed
 @export_range(1, 99, 1) var drop_quantity: int = 1
 @export var pickup_scene: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
 
-@onready var _health: HealthComponent = $HealthComponent
-@onready var _hurtbox: HurtBox = $HurtBox
-
 var _destroyed: bool = false
 var _visual_scale: Vector3
 var _previous_overlay: Material
 var _flash_material: ShaderMaterial
 var _hit_tween: Tween
 var _flash_tween: Tween
+
+@onready var _health: HealthComponent = $HealthComponent
+@onready var _hurtbox: HurtBox = $HurtBox
 
 
 func _ready() -> void:
@@ -113,7 +117,9 @@ func _play_hit_feedback() -> void:
 	sprite.material_overlay = _flash_material
 	_flash_tween = create_tween().set_ignore_time_scale(true)
 	_flash_tween.tween_interval(hit_flash_hold_duration)
-	_flash_tween.tween_property(_flash_material, "shader_parameter/strength", 0.0, hit_flash_duration)
+	_flash_tween.tween_property(
+		_flash_material, "shader_parameter/strength", 0.0, hit_flash_duration
+	)
 	_flash_tween.tween_callback(_restore_flash_overlay)
 
 
@@ -147,21 +153,20 @@ func _spawn_fragments() -> void:
 		return
 	get_parent().add_child(fragments)
 	fragments.global_position = fragment_source.global_position
-	fragments.burst_from_sprite(
-		fragment_source,
-		fragment_count,
-		fragment_min_size,
-		fragment_max_size,
-		fragment_alpha_threshold,
-		fragment_min_horizontal_speed,
-		fragment_max_horizontal_speed,
-		fragment_min_launch_speed,
-		fragment_max_launch_speed,
-		fragment_gravity,
-		fragment_max_spin,
-		fragment_lifetime,
-		fragment_lifetime * fragment_fade_start
-	)
+	var settings := FragmentSettings.new()
+	settings.count = fragment_count
+	settings.min_size = fragment_min_size
+	settings.max_size = fragment_max_size
+	settings.alpha_threshold = fragment_alpha_threshold
+	settings.min_horizontal_speed = fragment_min_horizontal_speed
+	settings.max_horizontal_speed = fragment_max_horizontal_speed
+	settings.min_launch_speed = fragment_min_launch_speed
+	settings.max_launch_speed = fragment_max_launch_speed
+	settings.gravity = fragment_gravity
+	settings.max_spin = fragment_max_spin
+	settings.lifetime = fragment_lifetime
+	settings.fade_start = fragment_lifetime * fragment_fade_start
+	fragments.burst_from_sprite(fragment_source, settings)
 
 
 func _drop_loot() -> void:

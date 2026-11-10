@@ -6,6 +6,7 @@ extends Node3D
 const MIN_SIDES: int = 5
 const MAX_SIDES: int = 8
 const CENTER_ATTEMPTS: int = 48
+const FragmentSettings = preload("res://world/objects/destructible_fragment_settings.gd")
 
 var _pieces: Array[MeshInstance3D] = []
 var _origins: Array[Vector3] = []
@@ -17,21 +18,7 @@ var _elapsed: float = 0.0
 var _fade_start: float
 
 
-func burst_from_sprite(
-	source: Sprite3D,
-	count: int,
-	min_size: float,
-	max_size: float,
-	alpha_threshold: float,
-	min_horizontal_speed: float,
-	max_horizontal_speed: float,
-	min_launch_speed: float,
-	max_launch_speed: float,
-	gravity: float,
-	max_spin: float,
-	lifetime: float,
-	fade_start: float
-) -> void:
+func burst_from_sprite(source: Sprite3D, settings: FragmentSettings) -> void:
 	if source == null or source.texture == null:
 		queue_free()
 		return
@@ -44,16 +31,15 @@ func burst_from_sprite(
 		queue_free()
 		return
 	var frame_size := Vector2i(
-		image.get_width() / maxi(1, source.hframes),
-		image.get_height() / maxi(1, source.vframes)
+		image.get_width() / maxi(1, source.hframes), image.get_height() / maxi(1, source.vframes)
 	)
 	var frame_origin := Vector2i(
 		(source.frame % maxi(1, source.hframes)) * frame_size.x,
 		(source.frame / maxi(1, source.hframes)) * frame_size.y
 	)
-	_gravity = gravity
-	_lifetime = lifetime
-	_fade_start = fade_start
+	_gravity = settings.gravity
+	_lifetime = settings.lifetime
+	_fade_start = settings.fade_start
 	var camera := get_viewport().get_camera_3d()
 	var camera_basis := camera.global_basis if camera != null else Basis.IDENTITY
 	var right := camera_basis.x
@@ -66,15 +52,23 @@ func burst_from_sprite(
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.albedo_texture = source.texture
 	material.albedo_color = source.modulate
-	for index in count:
-		var center := _pick_opaque_center(image, frame_origin, frame_size, alpha_threshold)
+	for index in settings.count:
+		var center := _pick_opaque_center(image, frame_origin, frame_size, settings.alpha_threshold)
 		if center.x < 0.0:
 			continue
-		var diameter := float(mini(frame_size.x, frame_size.y)) * randf_range(min_size, max_size)
+		var diameter := (
+			float(mini(frame_size.x, frame_size.y))
+			* randf_range(settings.min_size, settings.max_size)
+		)
 		var piece := MeshInstance3D.new()
 		piece.mesh = _make_piece_mesh(
-			center, diameter, image.get_size(), pixel_scale_x, pixel_scale_y,
-			source.flip_h, source.flip_v
+			center,
+			diameter,
+			image.get_size(),
+			pixel_scale_x,
+			pixel_scale_y,
+			source.flip_h,
+			source.flip_v
 		)
 		piece.material_override = material
 		piece.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -85,14 +79,18 @@ func burst_from_sprite(
 		piece.position = right * (offset.x * pixel_scale_x) - up * (offset.y * pixel_scale_y)
 		_pieces.append(piece)
 		_origins.append(piece.position)
-		var angle := TAU * float(index) / float(count) + randf_range(-0.45, 0.45)
-		var horizontal_speed := randf_range(min_horizontal_speed, max_horizontal_speed)
-		_velocities.append(Vector3(
-			cos(angle) * horizontal_speed,
-			randf_range(min_launch_speed, max_launch_speed),
-			sin(angle) * horizontal_speed
-		))
-		_spins.append(randf_range(-max_spin, max_spin))
+		var angle := TAU * float(index) / float(settings.count) + randf_range(-0.45, 0.45)
+		var horizontal_speed := randf_range(
+			settings.min_horizontal_speed, settings.max_horizontal_speed
+		)
+		_velocities.append(
+			Vector3(
+				cos(angle) * horizontal_speed,
+				randf_range(settings.min_launch_speed, settings.max_launch_speed),
+				sin(angle) * horizontal_speed
+			)
+		)
+		_spins.append(randf_range(-settings.max_spin, settings.max_spin))
 	if _pieces.is_empty():
 		queue_free()
 
@@ -101,8 +99,9 @@ func _pick_opaque_center(
 	image: Image, frame_origin: Vector2i, frame_size: Vector2i, threshold: float
 ) -> Vector2:
 	for attempt in CENTER_ATTEMPTS:
-		var pixel := frame_origin + Vector2i(
-			randi_range(0, frame_size.x - 1), randi_range(0, frame_size.y - 1)
+		var pixel := (
+			frame_origin
+			+ Vector2i(randi_range(0, frame_size.x - 1), randi_range(0, frame_size.y - 1))
 		)
 		if image.get_pixelv(pixel).a >= threshold:
 			return Vector2(pixel)
@@ -132,13 +131,10 @@ func _make_piece_mesh(
 	for side in sides:
 		for point in [Vector2.ZERO, outline[side], outline[(side + 1) % sides]]:
 			vertices.append(Vector3(point.x * pixel_scale_x, point.y * pixel_scale_y, 0.0))
-			var texel := center + Vector2(
-				(-point.x if flip_h else point.x),
-				(point.y if flip_v else -point.y)
+			var texel := (
+				center + Vector2(-point.x if flip_h else point.x, point.y if flip_v else -point.y)
 			)
-			uvs.append(Vector2(
-				texel.x / float(texture_size.x), texel.y / float(texture_size.y)
-			))
+			uvs.append(Vector2(texel.x / float(texture_size.x), texel.y / float(texture_size.y)))
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices

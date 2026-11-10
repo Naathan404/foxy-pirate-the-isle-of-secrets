@@ -27,12 +27,20 @@ func _run() -> void:
 		assert(not (prop.get_node("HealthComponent") as HealthComponent).is_alive())
 		assert(not (prop.get_node("HurtBox") as HurtBox).enabled)
 		var flash := (prop.visual_root as Sprite3D).material_overlay as ShaderMaterial
-		assert(flash != null and flash.get_shader_parameter("strength") == 1.0, "Destroyed grass should flash")
+		assert(
+			flash != null and flash.get_shader_parameter("strength") == 1.0,
+			"Destroyed grass should flash"
+		)
 		var fragments := root.get_child(root.get_child_count() - 1) as DestructibleFragments
 		assert(fragments != null and fragments.get_child_count() > 0)
 		var first_piece := fragments.get_child(0) as MeshInstance3D
 		assert(first_piece != null and first_piece.mesh is ArrayMesh)
-		assert((first_piece.material_override as StandardMaterial3D).albedo_texture == prop.fragment_source.texture)
+		assert(
+			(
+				(first_piece.material_override as StandardMaterial3D).albedo_texture
+				== prop.fragment_source.texture
+			)
+		)
 		var start_height := first_piece.position.y
 		fragments._process(0.25)
 		var raised_height := first_piece.position.y
@@ -56,7 +64,10 @@ func _run() -> void:
 	assert(not durable_prop.is_queued_for_deletion())
 	var durable_flash := (durable_prop.visual_root as Sprite3D).material_overlay as ShaderMaterial
 	assert(durable_flash != null and durable_flash.get_shader_parameter("strength") == 1.0)
-	await create_timer(durable_prop.hit_flash_hold_duration + durable_prop.hit_flash_duration + 0.05).timeout
+	await (
+		create_timer(durable_prop.hit_flash_hold_duration + durable_prop.hit_flash_duration + 0.05)
+		. timeout
+	)
 	assert((durable_prop.visual_root as Sprite3D).material_overlay == null)
 	durable_prop.queue_free()
 	await process_frame

@@ -2,7 +2,9 @@ class_name LowHealthVignette
 extends Node
 ## Persistent screen edge warning driven only by the player's health ratio.
 
-const VIGNETTE_SHADER: Shader = preload("res://gameplay/player/effects/low_health_vignette.gdshader")
+const VIGNETTE_SHADER: Shader = preload(
+	"res://gameplay/player/effects/low_health_vignette.gdshader"
+)
 const FULL_CYCLE_RADIANS: float = TAU
 
 @export var health: HealthComponent
@@ -64,10 +66,17 @@ func _on_hp_changed(current_hp: float, max_hp: float) -> void:
 		_breath_time = 0.0
 		_overlay.show()
 	_transition = create_tween().set_ignore_time_scale(true)
-	_transition.tween_property(
-		self, "_visibility", 1.0 if should_show else 0.0,
-		fade_in_seconds if should_show else fade_out_seconds
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	(
+		_transition
+		. tween_property(
+			self,
+			"_visibility",
+			1.0 if should_show else 0.0,
+			fade_in_seconds if should_show else fade_out_seconds
+		)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
 	if not should_show:
 		_transition.tween_callback(_hide_if_inactive)
 
