@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="5_3o6mh"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_5ryi1"]
 [ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="7_5ryi1"]
+[ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="7_smtw3"]
 [ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="8_4olvq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mu62o"]
@@ -83,10 +84,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, 4.514025, -0.0199
 
 [node name="StartDock" parent="MovingPlatform" index="3" unique_id=1539520790]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4.4272537, 0.77503157, -1.9815831)
+visible = false
 use_parent_platform_when_unassigned = false
 
 [node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 4.798712, 4.5211864, -3.5246503)
+visible = false
 destination_mode = 0
 use_parent_platform_when_unassigned = false
 
@@ -101,12 +104,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, -4.2707295, -0.01
 
 [node name="StartDock" parent="MovingPlatform2" index="3" unique_id=1539520790]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4.4272537, -3.9644513, -1.9815831)
+visible = false
 use_parent_platform_when_unassigned = false
 
 [node name="EndDock" parent="MovingPlatform2" index="4" unique_id=1860631709]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 4.798712, -0.218297, -3.5246503)
+visible = false
 destination_mode = 0
 use_parent_platform_when_unassigned = false
+
+[node name="Crate" parent="MovingPlatform2" index="5" unique_id=70792245 instance=ExtResource("7_smtw3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.931731, -4.3073616, -3.5436802)
 
 [node name="PlatformPuzzleLever" parent="." index="7" unique_id=692335542 node_paths=PackedStringArray("target_platforms") instance=ExtResource("7_5ryi1")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 5.609226, 0.73775387, 6.99253)

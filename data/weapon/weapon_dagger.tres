@@ -14,8 +14,9 @@ windup_seconds = 0.02
 active_seconds = 0.23
 recovery_seconds = 0.09
 knockback_multiplier = 0.6
+reach_multiplier = 1.5
 hitstop_seconds = 0.115
-shake_pixels = 7.0
+shake_pixels = 9.5
 shake_seconds = 0.2
 
 [sub_resource type="Resource" id="ComboStep_second"]
@@ -24,24 +25,10 @@ windup_seconds = 0.02
 active_seconds = 0.23
 recovery_seconds = 0.09
 knockback_multiplier = 0.6
+reach_multiplier = 1.5
 hitstop_seconds = 0.115
-shake_pixels = 7.0
+shake_pixels = 9.5
 shake_seconds = 0.2
-
-[sub_resource type="Resource" id="ComboStep_fourth"]
-script = ExtResource("5_combo")
-windup_seconds = 0.02
-active_seconds = 0.19
-recovery_seconds = 0.15
-knockback_multiplier = 0.6
-step_distance = 0.22
-swing_start_degrees = 70.0
-swing_end_degrees = -65.0
-slash_color = Color(0.6509804, 0.9411765, 1, 1)
-hitstop_seconds = 0.115
-shake_pixels = 7.0
-shake_seconds = 0.2
-audio_pitch = 1.35
 
 [sub_resource type="Resource" id="ComboStep_finisher"]
 script = ExtResource("5_combo")
@@ -56,12 +43,12 @@ step_duration = 0.16
 dash_cancel_fraction = 0.75
 swing_start_degrees = -90.0
 swing_end_degrees = 90.0
-reach_multiplier = 1.2
+reach_multiplier = 1.8
 straight_thrust = true
 slash_width = 1.0
 slash_color = Color(1, 0.61, 0.22, 1)
 hitstop_seconds = 0.12
-shake_pixels = 8.0
+shake_pixels = 12.0
 shake_seconds = 0.26
 audio_pitch = 0.85
 heavy_impact = true
@@ -69,7 +56,7 @@ heavy_impact = true
 [sub_resource type="Resource" id="Resource_nasaw"]
 script = ExtResource("1_nasaw")
 attack_scene = ExtResource("1_up41l")
-combo_steps = Array[ExtResource("5_combo")]([SubResource("ComboStep_first"), SubResource("ComboStep_second"), SubResource("ComboStep_first"), SubResource("ComboStep_fourth"), SubResource("ComboStep_finisher")])
+combo_steps = Array[ExtResource("5_combo")]([SubResource("ComboStep_first"), SubResource("ComboStep_second"), SubResource("ComboStep_first"), SubResource("ComboStep_finisher")])
 metadata/_custom_type_script = "uid://bl3xskt8h6bl7"
 
 [sub_resource type="Resource" id="Resource_throw"]

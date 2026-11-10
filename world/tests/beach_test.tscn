@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://bie1352pj4fw5"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_mf2w3"]
+[ext_resource type="Texture2D" uid="uid://bl64yrwnpyr3p" path="res://assets/sprites/biomes/beach/beach.png" id="2_aimq4"]
+[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/beach/beach_coral_pink.tscn" id="3_cvepx"]
+[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/beach/beach_coral_orange.tscn" id="4_i2uwp"]
+[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/beach/beach_coral_turquoise.tscn" id="5_adkab"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="6_8dvq8"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="7_txy4b"]
+
+[node name="BeachTest" unique_id=1248439267 instance=ExtResource("1_mf2w3")]
+open_exits = 8
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
+
+[node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -0.19104576)
+
+[node name="Sprite3D" parent="Environment/BaseGround" index="0" unique_id=516185212]
+transform = Transform3D(1.15, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0.23909378)
+texture = ExtResource("2_aimq4")
+
+[node name="BeachCoralPink" parent="." index="5" unique_id=917493758 instance=ExtResource("3_cvepx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.914507, -0.28897715, 0)
+
+[node name="BeachCoralPink2" parent="." index="6" unique_id=632843185 instance=ExtResource("3_cvepx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0860386, -0.24835718, 10.11347)
+
+[node name="BeachCoralOrange" parent="." index="7" unique_id=832095968 instance=ExtResource("4_i2uwp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.635122, -0.3916645, -3.4191256)
+
+[node name="BeachCoralOrange2" parent="." index="8" unique_id=83440429 instance=ExtResource("4_i2uwp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.055193, -0.3916645, 6.5650215)
+
+[node name="BeachCoralTurquoise" parent="." index="9" unique_id=1090038367 instance=ExtResource("5_adkab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.217375, -0.5328312, 9.242811)
+
+[node name="BeachCoralTurquoise2" parent="." index="10" unique_id=957311374 instance=ExtResource("5_adkab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8968143, -0.5328312, -9.8024845)
+
+[node name="Starfish" parent="." index="11" unique_id=1294052233 instance=ExtResource("6_8dvq8")]
+
+[node name="EliteStarfish" parent="." index="12" unique_id=554202254 instance=ExtResource("7_txy4b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.115259)
+
+[editable path="Environment/BaseGround"]

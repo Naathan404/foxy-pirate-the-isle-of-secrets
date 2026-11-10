@@ -1,14 +1,22 @@
 [gd_scene format=3]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/biomes/ruins/ruins_grass_3.png" id="1_grass"]
+[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/biomes/ruins/ruins_grass_3.png" id="2_grass"]
 
-[node name="RuinsGrass3" type="Node3D"]
+[node name="RuinsGrass3" node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+max_hp = 1.0
+visual_root = NodePath("Visual/Sprite3D")
+fragment_source = NodePath("Visual/Sprite3D")
+drop_chance = 0.0
 
-[node name="Sprite3D" type="Sprite3D" parent="."]
+[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0"]
 position = Vector3(0, 1.35, 0)
 pixel_size = 0.0025
 billboard = 1
 shaded = true
 alpha_cut = 1
 texture_filter = 0
-texture = ExtResource("1_grass")
+texture = ExtResource("2_grass")
+
+[node name="CollisionShape3D" parent="HurtBox" index="0"]
+position = Vector3(0, 1.35, 0)

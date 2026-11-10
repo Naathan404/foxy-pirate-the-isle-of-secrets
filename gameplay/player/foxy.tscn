@@ -62,6 +62,7 @@
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
+[ext_resource type="Script" path="res://gameplay/player/effects/low_health_vignette.gd" id="low_health_vignette"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
 [ext_resource type="PackedScene" uid="uid://vbvptqbcgi1u" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
@@ -926,8 +927,7 @@ player = NodePath("../..")
 heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-emitting = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3670205, 0)
 process_material = SubResource("ParticleProcessMaterial_l2csx")
 draw_pass_1 = SubResource("QuadMesh_nnacp")
 
@@ -944,10 +944,15 @@ sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
 
+[node name="LowHealthVignette" type="Node" parent="Effects" node_paths=PackedStringArray("health")]
+script = ExtResource("low_health_vignette")
+health = NodePath("../../HealthComponent")
+
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
 script = ExtResource("3_nu5xt")
 sprite = NodePath("Sprite3D")
 animation_player = NodePath("AnimationPlayer")
+run_animation_speed = 2.0
 action_sprite_paths = Dictionary[StringName, NodePath]({
 &"attack_bow": NodePath("BowSprite"),
 &"harpoon/pierce": NodePath("HarpoonSprite"),

@@ -10,5 +10,5 @@ move_speed = 10.0
 acceleration = 50.0
 deceleration = 50.0
 dash_distance = 8.0
-dash_duration = 0.6
+dash_duration = 0.4
 dash_cost = 1.0

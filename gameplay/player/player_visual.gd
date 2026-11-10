@@ -8,6 +8,7 @@ const ATTACK_RECOVERY_POSE: float = 0.75
 
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
+@export_range(0.25, 3.0, 0.05) var run_animation_speed: float = 1.2
 ## Optional sprites for actions that use another sheet/layout, keyed by animation prefix.
 @export var action_sprite_paths: Dictionary[StringName, NodePath] = {}
 
@@ -32,6 +33,7 @@ func _ready() -> void:
 	_active_sprite = sprite
 	if is_instance_valid(_idle_preview):
 		_idle_preview.configure_reference(sprite, animation_player)
+		_idle_preview.set_run_playback_speed(run_animation_speed)
 	for prefix: StringName in action_sprite_paths:
 		var action_sprite := get_node_or_null(action_sprite_paths[prefix]) as Sprite3D
 		if action_sprite == null:
@@ -189,7 +191,7 @@ func reset_animation_speed() -> void:
 	_fitted_duration = 0.0
 	_held_progress = -1.0
 	if is_instance_valid(animation_player):
-		animation_player.speed_scale = _base_animation_speed
+		_update_animation_speed()
 	if is_instance_valid(_idle_preview):
 		_idle_preview.reset_attack_speed()
 		_idle_preview.fit_dash_duration(0.0)
@@ -328,6 +330,11 @@ func _get_animation_progress() -> float:
 
 func _update_animation_speed() -> void:
 	if _fitted_duration <= 0.0:
+		animation_player.speed_scale = (
+			_base_animation_speed * run_animation_speed
+			if String(animation_player.assigned_animation).begins_with("run_")
+			else _base_animation_speed
+		)
 		return
 	var animation := animation_player.get_animation(animation_player.assigned_animation)
 	animation_player.speed_scale = animation.length / _fitted_duration

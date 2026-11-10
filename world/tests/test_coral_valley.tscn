@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bksgxs2vrw50a"]
+[gd_scene format=3 uid="uid://bkxxcngo8mm4g"]
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_75j7u"]
 [ext_resource type="MeshLibrary" uid="uid://bb7wxqh2ru0di" path="res://assets/meshes/objects/objects.meshlib" id="2_uha13"]

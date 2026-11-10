@@ -6,7 +6,7 @@ const ATTACK_PLAYBACK_WINDOWS := {
 	"Attack_2": 0.5,
 	"Attack_3": 1.2,
 }
-const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_2", "Attack_3"]
+const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
 const RUN_SIZE_MULTIPLIERS := {"D_Run": 1.1, "U_Run": 1.08}
 const STRAY_EYE_SLOT := "Eyes/Eyes_01"
 ## Some Spine 3.8 dash clips are exposed by name but not as animation objects.
@@ -36,6 +36,7 @@ var _dagger_combo_index: int = 0
 var _slash_overlay_shaders: Dictionary = {}
 var _attack_duration: float = 0.0
 var _dash_duration: float = 0.0
+var _run_playback_speed: float = 1.0
 var _hit_tint_strength: float = 0.0
 var _hit_overlay: StandardMaterial3D
 
@@ -233,6 +234,11 @@ func fit_dash_duration(duration: float) -> void:
 	_apply_attack_speed()
 
 
+func set_run_playback_speed(speed: float) -> void:
+	_run_playback_speed = maxf(0.01, speed)
+	_apply_attack_speed()
+
+
 func _apply_attack_speed() -> void:
 	if not is_instance_valid(_spine):
 		return
@@ -248,6 +254,8 @@ func _apply_attack_speed() -> void:
 		)
 		# Leave a small margin so the clip cannot end before movement.
 		playback_speed = clip_duration / (_dash_duration + 0.1)
+	elif _current_spine_animation.ends_with("_Run"):
+		playback_speed = _run_playback_speed
 	_spine.set("time_scale", playback_speed)
 
 

@@ -9,6 +9,7 @@ size = Vector3(12.983887, 1, 11.242432)
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=516185212]
 transform = Transform3D(1, 0, 0, 0, -5.4639237e-08, 1, 0, -1.25, -4.371139e-08, 0, 0, 0)
+alpha_cut = 1
 texture = ExtResource("1_tuw1b")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=822018133]
