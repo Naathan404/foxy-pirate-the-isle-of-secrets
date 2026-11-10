@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="5_3o6mh"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="6_5ryi1"]
 [ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="7_5ryi1"]
+[ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="8_4olvq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mu62o"]
 render_priority = 0
@@ -74,6 +75,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.153927, 0, -31.914928)
 [node name="MovingPlatform" parent="." index="5" unique_id=304837597 instance=ExtResource("6_5ryi1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.72044, -0.17125607, 0)
 
+[node name="Lever" parent="MovingPlatform/Platform" parent_id_path=PackedInt32Array(304837597, 1191972229) index="3" unique_id=981979026]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0031404495, -0.45086765, 0)
+
 [node name="End" parent="MovingPlatform" index="2" unique_id=1910727390]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, 4.514025, -0.019938469)
 
@@ -89,8 +93,11 @@ use_parent_platform_when_unassigned = false
 [node name="MovingPlatform2" parent="." index="6" unique_id=487391356 instance=ExtResource("6_5ryi1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.72044, 4.2972116, 6.051466)
 
+[node name="Lever" parent="MovingPlatform2/Platform" parent_id_path=PackedInt32Array(487391356, 1191972229) index="3" unique_id=981979026]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0031404495, -0.47521973, 0)
+
 [node name="End" parent="MovingPlatform2" index="2" unique_id=1910727390]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, -4.213009, -0.019938469)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30970764, -4.2707295, -0.019938469)
 
 [node name="StartDock" parent="MovingPlatform2" index="3" unique_id=1539520790]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4.4272537, -3.9644513, -1.9815831)
@@ -104,6 +111,9 @@ use_parent_platform_when_unassigned = false
 [node name="PlatformPuzzleLever" parent="." index="7" unique_id=692335542 node_paths=PackedStringArray("target_platforms") instance=ExtResource("7_5ryi1")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 5.609226, 0.73775387, 6.99253)
 target_platforms = [NodePath("../MovingPlatform"), NodePath("../MovingPlatform2")]
+
+[node name="MasterTortugaNpc" parent="." index="8" unique_id=122461608 instance=ExtResource("8_4olvq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.44932, -0.06862259, 0)
 
 [editable path="Exits/UpPath"]
 [editable path="Exits/UpPath/SceneChangeTrigger"]

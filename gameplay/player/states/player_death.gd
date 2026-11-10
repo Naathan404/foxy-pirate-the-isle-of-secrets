@@ -1,6 +1,6 @@
 extends PlayerState
 
-@export_range(0.0, 5.0, 0.1) var reload_delay: float = 1.0
+@export_range(0.0, 5.0, 0.1) var reload_delay: float = 1.5
 
 var _reload_requested: bool = false
 

@@ -6,7 +6,7 @@ const ATTACK_PLAYBACK_WINDOWS := {
 	"Attack_2": 0.5,
 	"Attack_3": 1.2,
 }
-const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
+const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_2", "Attack_3"]
 const RUN_SIZE_MULTIPLIERS := {"D_Run": 1.1, "U_Run": 1.08}
 const STRAY_EYE_SLOT := "Eyes/Eyes_01"
 ## Some Spine 3.8 dash clips are exposed by name but not as animation objects.
@@ -36,12 +36,32 @@ var _dagger_combo_index: int = 0
 var _slash_overlay_shaders: Dictionary = {}
 var _attack_duration: float = 0.0
 var _dash_duration: float = 0.0
+var _hit_tint_strength: float = 0.0
+var _hit_overlay: StandardMaterial3D
 
 
 func _ready() -> void:
 	visible = false
 	# Let the Spine node rebuild its draw meshes before updating the slash material.
 	process_priority = 100
+	_hit_overlay = StandardMaterial3D.new()
+	_hit_overlay.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_hit_overlay.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_hit_overlay.albedo_color = Color(1.0, 0.04, 0.04, 0.0)
+
+
+func set_hit_tint(strength: float) -> void:
+	_hit_tint_strength = clampf(strength, 0.0, 1.0)
+	_update_hit_tint()
+
+
+func _update_hit_tint() -> void:
+	if not is_instance_valid(_spine) or _hit_overlay == null:
+		return
+	_hit_overlay.albedo_color = Color(1.0, 0.04, 0.04, _hit_tint_strength)
+	for child in _spine.get_children():
+		if child is MeshInstance3D and String(child.name).begins_with("_SpineDraw3D_"):
+			(child as MeshInstance3D).material_overlay = _hit_overlay if _hit_tint_strength > 0.0 else null
 
 
 ## Capture the authored idle pose before dash stretch, recoil and animation frames modify it.
@@ -101,6 +121,8 @@ func _process(_delta: float) -> void:
 	else:
 		_spine.resume()
 	_update_slash_overlay()
+	if _hit_tint_strength > 0.0:
+		_update_hit_tint()
 	_stabilize_dash_size()
 	_stabilize_run_size()
 
@@ -193,7 +215,7 @@ func _update_slash_overlay() -> void:
 
 
 func set_dagger_combo_index(index: int) -> void:
-	_dagger_combo_index = clampi(index, -1, 3)
+	_dagger_combo_index = clampi(index, -1, DAGGER_COMBO_ANIMATIONS.size() - 1)
 
 
 func fit_attack_duration(duration: float) -> void:
