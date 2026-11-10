@@ -21,8 +21,25 @@ gameplay/enemies/base/enemy_base.tscn
 | --- | --- | --- |
 | **Crab** | Tuần tra trên bốn hướng XZ, đổi trục sau khi sống sót qua một đòn đánh và gây contact damage. | **EliteCrab** phát hiện Foxy, telegraph, charge, rồi slam diện rộng trước khi vào cooldown. Patrol và charge chỉ đi theo bốn hướng. Khi mục tiêu nằm chéo, Crab khóa vị trí đó, đi dọc theo trục Z rồi rẽ 90° theo trục X để đến gần vị trí đã khóa; nó không di chuyển chéo và hủy charge nếu bất kỳ chặng nào gặp tường hoặc mép rơi. |
 | **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
-| **Barrel** | Đứng yên, aim theo bốn hướng, charge rồi bắn burst với độ lệch đạn ngẫu nhiên; sau đó chờ cooldown. | **EliteBarrel** dùng Scattershot: sau telegraph pulse, nó bắn chính xác năm viên theo hình quạt cố định. Damage đạn lấy từ elite data và toàn bộ đạn đang bay bị xóa khi Barrel chết. |
+| **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
 | **WarLordTurtle** | Archetype enemy lớn độc lập, có data và animation riêng. | Không phải biến thể Turtle elite thứ hai. Luật boss hoặc Tide Grapple chỉ được gán khi game design quy định rõ. |
+
+Các nhóm **Elite Normal Attack**, **Elite Special Attack** và **Elite Charged
+Feedback** trong Inspector của EliteBarrel cấu hình số đợt, số viên, góc bắn,
+nhịp bắn và cảnh báo. Một lượt thường bị ngắt không được tính; nếu lượt đặc
+biệt bị ngắt trước khi hoàn tất, Elite giữ trạng thái tích lũy và thử lại khi có
+thể tấn công. Damage của các viên vẫn lấy từ dữ liệu Elite.
+Ngưỡng trong script mặc định là 5 lượt; scene EliteBarrel hiện cấu hình 3 lượt.
+
+Đạn Barrel phản xạ trên world và thân enemy, không gây sát thương hay đẩy chúng.
+Đạn chỉ gây damage cho player, không knockback; chạm player hoặc hết thời gian
+sống thì biến mất cùng VFX. Barrel chết cũng kết thúc các viên đạn do nó bắn.
+Chế độ AUTO có thể bắn theo hướng đặt sẵn hoặc chỉ bắn khi có player để ngắm.
+Trong Inspector của Barrel, nhóm **Bullet Physics** cho phép chỉnh thời gian sống,
+trọng lực và độ đàn hồi khi chạm đất. Đạn tạo hạt va chạm khi nảy đủ mạnh;
+thời gian sống giới hạn tổng số lần nảy, không có giới hạn đếm riêng.
+Tăng trọng lực để đạn rơi và nảy thường xuyên hơn; tăng độ đàn hồi để giữ chiều
+cao nảy qua nhiều lần chạm đất.
 
 Mọi elite có 12 HP, 2 attack damage, 50% kháng hất văng và rơi đúng item của enemy thường với số lượng gấp ba.
 Nhận diện thường trực là một overlay shader xanh-trắng trực tiếp trên `Visual/Sprite3D`: mười hai đốm sáng
@@ -55,7 +72,7 @@ khi scene chạy. Giá trị mặc định của `CylinderShape3D` trong từng 
 | `starfish/starfish.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector của Starfish và lớp kế thừa elite. |
 | `starfish/elite_starfish.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
-| `barrel/elite_barrel.gd` | Số đạn và góc quạt cố định của Scattershot. |
+| `barrel/elite_barrel.gd` | Thông số lượt thường, lượt 360°, tích lũy và cảnh báo. |
 | `war_lord_turtle/war_lord_turtle.gd` | Speed, contact damage và đổi trục patrol của WarLordTurtle. |
 
 Ví dụ, đổi vùng nhận diện EliteCrab chỉ cần sửa `player_detection_radius` trên node root

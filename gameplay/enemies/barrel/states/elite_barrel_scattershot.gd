@@ -12,21 +12,23 @@ var shots_in_burst: int = 0
 var _shots_fired: int = 0
 var _shot_remaining: float = 0.0
 var _phase: AttackPhase = AttackPhase.TELEGRAPH
+var _special_attack: bool = false
 
 
 func _enter() -> void:
-	var barrel := enemy as Barrel
+	var barrel := enemy as EliteBarrel
 	if barrel == null or not barrel.can_trigger_attack():
 		request_state(&"idle")
 		return
 	if barrel.should_aim_at_target() and enemy.has_target():
 		barrel.aim_at_target()
+	_special_attack = barrel.special_ready()
 	_phase = AttackPhase.TELEGRAPH
 	timer = telegraph_duration
 	enemy.stop_movement()
 	enemy.play_directional_animation(&"idle", true)
 	var feedback := _get_feedback()
-	if feedback != null:
+	if feedback != null and not _special_attack:
 		feedback.begin_telegraph()
 
 
@@ -38,7 +40,7 @@ func _exit() -> void:
 
 func _update(delta: float) -> void:
 	enemy.stop_movement(delta)
-	var barrel := enemy as Barrel
+	var barrel := enemy as EliteBarrel
 	if _phase == AttackPhase.TELEGRAPH:
 		if barrel != null and not barrel.can_trigger_attack():
 			var feedback := _get_feedback()
@@ -49,6 +51,9 @@ func _update(delta: float) -> void:
 		if _timer_finished(delta):
 			_release()
 		return
+	if barrel == null or not barrel.can_trigger_attack():
+		request_state(&"idle")
+		return
 	if _shots_fired < shots_in_burst:
 		_shot_remaining -= maxf(0.0, delta)
 		while _shot_remaining <= 0.0 and _shots_fired < shots_in_burst:
@@ -58,7 +63,7 @@ func _update(delta: float) -> void:
 
 
 func _release() -> void:
-	var barrel := enemy as Barrel
+	var barrel := enemy as EliteBarrel
 	if barrel == null:
 		request_state(&"idle")
 		return
@@ -66,7 +71,10 @@ func _release() -> void:
 	if feedback != null:
 		feedback.end_telegraph()
 	_phase = AttackPhase.RELEASE
-	shots_in_burst = barrel.get_bullet_count()
+	shots_in_burst = (
+		maxi(1, barrel.special_volley_count)
+		if _special_attack else maxi(1, barrel.normal_volley_count)
+	)
 	_shots_fired = 0
 	_shot_remaining = 0.0
 	timer = release_duration
@@ -74,19 +82,28 @@ func _release() -> void:
 
 
 func _fire_next_shot() -> void:
-	var barrel := enemy as Barrel
+	var barrel := enemy as EliteBarrel
 	if barrel == null:
 		request_state(&"idle")
 		return
-	if barrel.should_aim_at_target() and enemy.has_target():
+	if not _special_attack and barrel.should_aim_at_target() and enemy.has_target():
 		barrel.aim_at_target()
 	enemy.play_directional_animation(&"shoot", true)
-	barrel.fire()
+	if _special_attack:
+		barrel.fire_radial_volley(barrel.special_bullets_per_volley)
+	else:
+		barrel.fire_fan_volley(barrel.normal_bullets_per_volley, barrel.normal_fan_angle)
 	_shots_fired += 1
-	var current_interval := barrel.shot_interval if is_instance_valid(barrel) else shot_interval
+	var current_interval := (
+		barrel.special_volley_interval if _special_attack else barrel.normal_volley_interval
+	)
 	_shot_remaining += current_interval
 	timer = release_duration
 	if _shots_fired >= shots_in_burst:
+		if _special_attack:
+			barrel.complete_special_attack()
+		else:
+			barrel.complete_normal_attack()
 		barrel.start_attack_cooldown(cooldown)
 
 

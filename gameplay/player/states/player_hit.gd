@@ -10,9 +10,10 @@ func _enter() -> void:
 	timer = player.pending_hit_duration
 	player.dash_buffer_remaining = 0.0
 
-	player.set_horizontal_velocity(player.pending_hit_direction * knockback_speed)
-	if hop_speed > 0.0:
-		player.velocity.y = maxf(player.velocity.y, hop_speed)
+	var knockback := player.pending_hit_knockback_multiplier
+	player.set_horizontal_velocity(player.pending_hit_direction * knockback_speed * knockback)
+	if hop_speed > 0.0 and knockback > 0.0:
+		player.velocity.y = maxf(player.velocity.y, hop_speed * knockback)
 
 	player.cancel_attack()
 	player.play_directional_animation("hit", true)

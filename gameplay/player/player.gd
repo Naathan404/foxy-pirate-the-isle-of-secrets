@@ -46,6 +46,7 @@ var pending_attack_action: StringName = &"normal"
 var dead: bool = false
 var pending_hit_duration: float = 0.0
 var pending_hit_direction: Vector3 = Vector3.ZERO
+var pending_hit_knockback_multiplier: float = 1.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
@@ -204,6 +205,7 @@ func receive_damage(damage: DamageContext) -> float:
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
 	pending_hit_direction = _get_hit_direction(damage.source)
+	pending_hit_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
 	var amount := damage.amount_hp
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
