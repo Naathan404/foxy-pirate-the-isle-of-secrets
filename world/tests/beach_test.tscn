@@ -7,6 +7,9 @@
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/beach/beach_coral_turquoise.tscn" id="5_adkab"]
 [ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="6_8dvq8"]
 [ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="7_txy4b"]
+[ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/beach/beach_palm_01.tscn" id="8_8dvq8"]
+[ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/beach/beach_palm_02.tscn" id="9_txy4b"]
+[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/beach/beach_palm_03.tscn" id="10_ryrkc"]
 
 [node name="BeachTest" unique_id=1248439267 instance=ExtResource("1_mf2w3")]
 open_exits = 8
@@ -46,8 +49,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.217375, -0.5328312, 9.2428
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8968143, -0.5328312, -9.8024845)
 
 [node name="Starfish" parent="." index="11" unique_id=1294052233 instance=ExtResource("6_8dvq8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.439989)
 
 [node name="EliteStarfish" parent="." index="12" unique_id=554202254 instance=ExtResource("7_txy4b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.115259)
+
+[node name="BeachPalm01" parent="." index="13" unique_id=2038227956 instance=ExtResource("8_8dvq8")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -10.723943, -0.01902628, 9.549429)
+
+[node name="BeachPalm02" parent="." index="14" unique_id=1258651850 instance=ExtResource("9_txy4b")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -11.476313, 0.039654255, -6.721592)
+
+[node name="BeachPalm03" parent="." index="15" unique_id=263936662 instance=ExtResource("10_ryrkc")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.6550527, -0.14819193, 2.0440178)
+
+[node name="BeachPalm04" parent="." index="16" unique_id=572503273 instance=ExtResource("9_txy4b")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239526)
 
 [editable path="Environment/BaseGround"]
