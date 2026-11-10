@@ -3,6 +3,7 @@ extends PlayerState
 var direction: Vector3 = Vector3.ZERO
 var active: bool = false
 var completed: bool = false
+var _dash_distance: float = 0.0
 var _saved_floor_snap_length: float = 0.0
 var _floor_snap_suspended: bool = false
 
@@ -28,6 +29,7 @@ func _enter() -> void:
 		return
 
 	direction = free_direction if free_dash else player.last_facing_direction.normalized()
+	_dash_distance = player.data.dash_distance * player.environment_dash_distance_multiplier
 
 	if free_dash:
 		player.last_facing_direction = direction
@@ -49,7 +51,7 @@ func _update(delta: float) -> void:
 		return
 	var step_fraction := minf(timer, delta) / delta if delta > 0.0 else 0.0
 	player.set_horizontal_velocity(
-		direction * player.data.dash_distance / player.data.dash_duration * step_fraction
+		direction * _dash_distance / player.data.dash_duration * step_fraction
 	)
 	if update_timer(delta):
 		completed = true

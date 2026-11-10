@@ -14,7 +14,7 @@ Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn 
 | Nhóm | Tài liệu |
 | --- | --- |
 | Player | [Luồng Player](gameplay/player/player_business_logic.md) · [Hút vật phẩm](gameplay/player/player_attraction.md) |
-| Enemy | [Hành vi enemy](gameplay/enemies/enemy_business_logic.md) · [Tidal spawner](gameplay/enemies/tidal_spawner.md) |
+| Enemy | [Hành vi enemy](gameplay/enemies/enemy_business_logic.md) · [Enemy khi thủy triều rút](world/flat_tide.md#enemy-khi-nước-rút) |
 | NPC | [Hệ NPC](gameplay/npcs/npc_business_logic.md) · [Silas](gameplay/npcs/silas_merchant.md) · [Master Tortuga](gameplay/npcs/master_tortuga.md) |
 | Vũ khí | [Tổng quan](gameplay/weapons/weapon_business_logic.md) · [Thu thập](gameplay/weapons/weapon_collection.md) · [Rèn](gameplay/weapons/weapon_forges.md) · [Dao găm](gameplay/weapons/dagger_combo.md) · [Cung](gameplay/weapons/bow_weapon.md) · [Harpoon](gameplay/weapons/harpoon_weapon.md) · [Meteor staff](gameplay/weapons/meteor_staff.md) |
 | Trang bị và tài nguyên | [Inventory](gameplay/economy/equipment_inventory.md) · [Item data](gameplay/economy/item_data.md) · [Tiền](gameplay/economy/currency_system.md) · [Charm](gameplay/economy/charm_system.md) · [Potion](gameplay/economy/potion_capacity.md) |

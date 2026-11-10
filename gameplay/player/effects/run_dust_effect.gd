@@ -58,7 +58,13 @@ func _process(delta: float) -> void:
 	var movement = player.get_real_velocity()
 	movement.y = 0.0
 	var running = player.fsm.current_state == player.fsm.states.get("run")
-	if not running or player.dead or not player.is_on_floor() or movement.length() <= minimum_speed:
+	if (
+		not running
+		or player.dead
+		or player.environment_is_water
+		or not player.is_on_floor()
+		or movement.length() <= minimum_speed
+	):
 		var idle: bool = player.fsm.current_state == player.fsm.states.get("idle")
 		_stop_running(idle and not player.dead and player.is_on_floor())
 		return

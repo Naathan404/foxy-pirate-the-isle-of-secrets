@@ -152,19 +152,6 @@ func _get_safe_destination(
 	var floor_position: Vector3 = floor_hit.position
 	if absf(floor_position.y - marker.y) > 0.5:
 		return null
-	for crate in targets:
-		var tide := crate.tide_controller
-		if is_instance_valid(tide) and is_instance_valid(tide.water):
-			var water := tide.water as MeshInstance3D
-			if water != null and water.mesh != null:
-				var point := water.to_local(floor_position)
-				var bounds := water.get_aabb()
-				if point.x < bounds.position.x or point.x > bounds.end.x:
-					continue
-				if point.z < bounds.position.z or point.z > bounds.end.z:
-					continue
-			if floor_position.y <= maxf(tide.high_height, tide.get_water_height()) + 0.05:
-				return null
 	var collider := player.get_node("CollisionShape3D") as CollisionShape3D
 	var bounds: AABB = (
 		Transform3D(player.global_basis, Vector3.ZERO)

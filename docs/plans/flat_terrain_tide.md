@@ -1,5 +1,7 @@
 # Thiết kế thủy triều cho địa hình phẳng
 
+> Tài liệu đề xuất ban đầu. Bản đang chạy và thiết lập hiện tại được mô tả tại [Thủy triều cho nền phẳng](../world/flat_tide.md). Controller và thùng nổi theo độ cao của bản cũ đã được gỡ.
+
 ## Mục tiêu
 
 Chuyển cơ chế thủy triều từ **mực nước dâng theo chiều cao Y** sang **vùng nước lan và rút trên mặt nền theo mặt phẳng XZ**. Người chơi phải nhìn được ranh giới nước, biết trước vùng sắp ngập và có lựa chọn vị trí khi chiến đấu. Tài liệu này là đặc tả để triển khai; các con số bên dưới là giá trị thử nghiệm, cần chỉnh sau khi chơi thử.
@@ -10,9 +12,8 @@ Chuyển cơ chế thủy triều từ **mực nước dâng theo chiều cao Y*
 
 - Các phòng tham chiếu kế thừa `world/biomes/base/base_room.tscn`. Nền dùng `BaseGround` với `Sprite3D` nằm ngang và `StaticBody3D` mỏng; hình ảnh không có chiều sâu đáy biển như các đảo cũ.
 - `beach_01` có thêm `BaseGround2` ở cao độ khác, cầu di chuyển và puzzle cần giữ hoạt động. Cao độ Y vẫn cần cho nhân vật, va chạm và các nền cao; nó không nên là cách duy nhất xác định vùng ngập.
-- Các scene tham chiếu chưa đặt `TideController` hay nước thủy triều. Dùng chúng làm chuẩn về hình ảnh và bố cục, không coi chúng là scene đã có thủy triều.
-- `world/gimmick/coral_valley/tide_controller.gd` hiện có bốn pha `LOW`, `RISING`, `HIGH`, `FALLING`, nhưng điều khiển `water.global_position.y` và tính `get_depth_at()` bằng độ chênh Y.
-- `tidal_spawner.gd`, `tidal_enemy.gd` và thùng nổi đang phụ thuộc vào độ sâu/mực nước. Không chuyển nguyên trạng các hành vi đó sang nền phẳng. Các scene Coral Valley cũ vẫn cần hoạt động theo logic hiện tại.
+- Các scene tham chiếu được dùng làm chuẩn về hình ảnh và bố cục. Bản thử hiện tại nằm trong `world/tests/beach_test.tscn`.
+- Bản hiện tại dùng `FlatTideController`, `FlatTideZone` và `FlatTideEnemySpawner`; các scene Coral Valley cũ chưa được chuyển sang cơ chế mới.
 
 ## Trải nghiệm mong muốn
 
@@ -37,9 +38,9 @@ Khi pause game, chu kỳ, hiệu ứng sóng và hành vi liên quan cùng dừn
 
 ### Địch và vật thể
 
-- Nếu phòng dùng `TidalSpawner`, giữ ý tưởng bắt đầu đợt mới lúc `FALLING` và chỉ cho địch xuất hiện khi điểm spawn đã lộ khỏi nước. Thay điều kiện `get_depth_at()` bằng trạng thái ngập của điểm trên đúng mặt nền. Giữ giới hạn số địch, khoảng cách an toàn, HP của địch sống sót và các quy tắc spawn hiện có, trừ khi có lý do gameplay được ghi rõ.
+- `FlatTideEnemySpawner` chọn vị trí ở đầu pha `FALLING` và tạo địch khi điểm spawn lộ khỏi nước.
 - Địch ẩn dưới nước nên có dấu hiệu nhìn thấy được trên mặt nước; lúc hiện ra dùng bọt/sóng và khóa combat cho đến khi hoạt ảnh kết thúc. Tránh cho sprite chui xuống dưới tấm nền mỏng rồi hiện đột ngột. Nếu một loại địch không hợp với hành vi ẩn nước, không gắn cơ chế này cho nó.
-- Thùng nổi của Coral Valley là hệ riêng phụ thuộc chiều cao nước. Chưa đưa thùng đó vào bản thử nghiệm nền phẳng; nếu cần puzzle mới, thiết kế hành vi trôi ngang theo dòng nước như một hạng mục riêng.
+- Cơ chế thùng nổi cũ đã được gỡ; nếu cần puzzle mới, thiết kế hành vi trôi ngang theo dòng nước như một hạng mục riêng.
 
 ## Áp dụng theo biome
 

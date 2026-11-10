@@ -10,6 +10,21 @@
 [ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/beach/beach_palm_01.tscn" id="8_8dvq8"]
 [ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/beach/beach_palm_02.tscn" id="9_txy4b"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/beach/beach_palm_03.tscn" id="10_ryrkc"]
+[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="11_txy4b"]
+[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="12_ral77"]
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="13_hfst8"]
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="14_fv4rj"]
+
+[sub_resource type="Resource" id="Resource_flat_enemy_starfish"]
+script = ExtResource("12_ral77")
+normal_scene = ExtResource("6_8dvq8")
+elite_scene = ExtResource("7_txy4b")
+
+[sub_resource type="Resource" id="Resource_pin4q"]
+script = ExtResource("12_ral77")
+normal_scene = ExtResource("14_fv4rj")
+elite_scene = ExtResource("13_hfst8")
+metadata/_custom_type_script = "uid://juar8i43t1me"
 
 [node name="BeachTest" unique_id=1248439267 instance=ExtResource("1_mf2w3")]
 open_exits = 8
@@ -66,4 +81,14 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.6550527, -0.14819193, 2.044
 [node name="BeachPalm04" parent="." index="16" unique_id=572503273 instance=ExtResource("9_txy4b")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239526)
 
+[node name="FlatTide" parent="." index="17" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
+player = NodePath("../Foxy")
+
+[node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
+player = NodePath("../../Foxy")
+
+[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
+enemies = Array[ExtResource("12_ral77")]([SubResource("Resource_flat_enemy_starfish"), SubResource("Resource_pin4q")])
+
 [editable path="Environment/BaseGround"]
+[editable path="FlatTide"]
