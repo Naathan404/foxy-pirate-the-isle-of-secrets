@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://omebdi2g2vcg"]
+[gd_scene format=3 uid="uid://bbauj40amsqe3"]
 
-[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_small_room.tscn" id="1_xrbjm"]
+[ext_resource type="PackedScene" uid="uid://dcw1y5w1rsbtx" path="res://world/biomes/coral_valley/base_scenes/base_large_room.tscn" id="1_s0giu"]
 
-[node name="QuizRoom" unique_id=525086743 instance=ExtResource("1_xrbjm")]
+[node name="BossRoom" unique_id=1672893012 instance=ExtResource("1_s0giu")]
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

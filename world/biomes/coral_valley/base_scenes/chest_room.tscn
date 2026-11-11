@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://bqb7obcbj7wb5"]
+[gd_scene format=3 uid="uid://ib0gmhsv0wp1"]
 
-[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_medium_room.tscn" id="1_5k2ng"]
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_eth44"]
 
-[node name="EmptyRoom" unique_id=326595456 instance=ExtResource("1_5k2ng")]
+[node name="ChestRoom" unique_id=525086743 instance=ExtResource("1_eth44")]
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
