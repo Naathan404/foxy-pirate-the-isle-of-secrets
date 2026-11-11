@@ -98,7 +98,12 @@ func _play_wobble(angle_degrees: float) -> void:
 	var angle := deg_to_rad(angle_degrees)
 	_wobble = create_tween().set_ignore_time_scale(true)
 	_wobble.tween_property(visual_root, "rotation:z", _rest_rotation.z + angle, wobble_step_seconds)
-	_wobble.tween_property(visual_root, "rotation:z", _rest_rotation.z - angle * wobble_return_ratio, wobble_step_seconds)
+	_wobble.tween_property(
+		visual_root,
+		"rotation:z",
+		_rest_rotation.z - angle * wobble_return_ratio,
+		wobble_step_seconds
+	)
 	_wobble.tween_property(visual_root, "rotation:z", _rest_rotation.z, wobble_step_seconds)
 
 
@@ -116,12 +121,23 @@ func _punch_camera() -> void:
 	var tween := camera.create_tween().set_ignore_time_scale(true)
 	camera.set_meta(CAMERA_ZOOM_TWEEN_META, tween)
 	camera.set_meta(CAMERA_ZOOM_BASE_META, original)
-	tween.tween_property(camera, property, original * zoom_factor, zoom_in_seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(camera, property, original, zoom_out_seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_callback(func():
-		if is_instance_valid(camera) and camera.get_meta(CAMERA_ZOOM_TWEEN_META, null) == tween:
-			camera.remove_meta(CAMERA_ZOOM_TWEEN_META)
-			camera.remove_meta(CAMERA_ZOOM_BASE_META)
+	(
+		tween
+		. tween_property(camera, property, original * zoom_factor, zoom_in_seconds)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_OUT)
+	)
+	(
+		tween
+		. tween_property(camera, property, original, zoom_out_seconds)
+		. set_trans(Tween.TRANS_SINE)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
+	tween.tween_callback(
+		func():
+			if is_instance_valid(camera) and camera.get_meta(CAMERA_ZOOM_TWEEN_META, null) == tween:
+				camera.remove_meta(CAMERA_ZOOM_TWEEN_META)
+				camera.remove_meta(CAMERA_ZOOM_BASE_META)
 	)
 
 
@@ -132,6 +148,9 @@ func _drop_gold() -> void:
 	var count := _random.randi_range(mini(gold_min, gold_max), maxi(gold_min, gold_max))
 	var angle := _random.randf_range(0.0, TAU)
 	pool.spawn_gold(
-		to_global(gold_origin_offset), count, Vector3(cos(angle), 0.0, sin(angle)),
-		gold_flight_height, gold_flight_duration
+		to_global(gold_origin_offset),
+		count,
+		Vector3(cos(angle), 0.0, sin(angle)),
+		gold_flight_height,
+		gold_flight_duration
 	)

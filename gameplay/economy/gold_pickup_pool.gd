@@ -33,13 +33,25 @@ func _ready() -> void:
 	set_process(prewarm_count > 0)
 
 
-func spawn_gold(at: Vector3, total: int, direction: Vector3, flight_height: float = -1.0, flight_duration: float = -1.0) -> void:
+func spawn_gold(
+	at: Vector3,
+	total: int,
+	direction: Vector3,
+	flight_height: float = -1.0,
+	flight_duration: float = -1.0
+) -> void:
 	if total <= 0:
 		return
 	# Store one request per reward, rather than allocating a request for every coin.
 	_pending.append(
-		{"at": at, "remaining": total, "index": 0, "angle": atan2(direction.z, direction.x),
-		"flight_height": flight_height, "flight_duration": flight_duration}
+		{
+			"at": at,
+			"remaining": total,
+			"index": 0,
+			"angle": atan2(direction.z, direction.x),
+			"flight_height": flight_height,
+			"flight_duration": flight_duration
+		}
 	)
 	set_process(true)
 

@@ -36,6 +36,7 @@ func activate(context: CharmActivationContext) -> bool:
 		_executions.append(execution)
 		execution.tree_exited.connect(_on_execution_exited.bind(execution), CONNECT_ONE_SHOT)
 		execution.context = AttackContext.new()
+		execution.context.delivery_type = AttackData.DeliveryType.PROJECTILE
 		execution.context.actor = actor
 		execution.context.team = actor.get("team")
 		execution.context.attack_id = Time.get_ticks_usec() + index

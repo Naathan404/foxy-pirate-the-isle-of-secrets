@@ -75,7 +75,8 @@ func _begin_wave() -> void:
 				zone = candidate
 				break
 		var local := Vector3(
-			_random.randf_range(-zone.size.x * 0.5, zone.size.x * 0.5), 0.0,
+			_random.randf_range(-zone.size.x * 0.5, zone.size.x * 0.5),
+			0.0,
 			_random.randf_range(-zone.size.y * 0.5, zone.size.y * 0.5)
 		)
 		var point := zone.to_global(local)
@@ -109,7 +110,8 @@ func _on_coverage_changed(_coverage: float) -> void:
 func _find_ground(point: Vector3, zone: FlatTideZone) -> Variant:
 	var ray := PhysicsRayQueryParameters3D.create(
 		point + Vector3.UP * ground_search_distance,
-		point + Vector3.DOWN * ground_search_distance, ground_collision_mask
+		point + Vector3.DOWN * ground_search_distance,
+		ground_collision_mask
 	)
 	var hit := get_world_3d().direct_space_state.intersect_ray(ray)
 	if hit.is_empty() or not hit.collider is StaticBody3D or hit.normal.y < 0.7:
@@ -132,7 +134,10 @@ func _away_from_player(point: Vector3) -> bool:
 	if not is_instance_valid(controller.player):
 		return true
 	var player_position := controller.player.global_position
-	return Vector2(point.x - player_position.x, point.z - player_position.z).length() >= minimum_player_distance
+	return (
+		Vector2(point.x - player_position.x, point.z - player_position.z).length()
+		>= minimum_player_distance
+	)
 
 
 func _spawn(point: Vector3, scene: PackedScene, is_elite: bool) -> void:
@@ -154,7 +159,9 @@ func _spawn(point: Vector3, scene: PackedScene, is_elite: bool) -> void:
 		var query := PhysicsShapeQueryParameters3D.new()
 		query.shape = collider.shape
 		query.transform = Transform3D(enemy.basis, spawn_position) * collider.transform
-		query.collision_mask = ground_collision_mask | CombatLayers.PLAYER_BODY | CombatLayers.ENEMY_BODY
+		query.collision_mask = (
+			ground_collision_mask | CombatLayers.PLAYER_BODY | CombatLayers.ENEMY_BODY
+		)
 		if not get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
 			enemy.free()
 			return

@@ -1,5 +1,9 @@
 extends Node3D
 
+const FOOTPRINT_SHADER := preload("res://world/gimmick/flat_tide/water_footprint.gdshader")
+const MIN_DELTA := 0.001
+const FOOTPRINT_PRIORITY_OFFSET := 1
+
 ## Controller dùng để xác định vùng nước và cao độ mặt sóng.
 @export var controller: FlatTideController
 ## Nhân vật tạo dấu chân nước; gán node Foxy.
@@ -20,10 +24,6 @@ extends Node3D
 @export_range(0.0, 0.3, 0.005) var surface_clearance: float = 0.035
 ## Quãng dịch chuyển tối đa trong một frame; lớn hơn sẽ xem là dịch chuyển tức thời.
 @export_range(0.1, 10.0, 0.1) var max_step_displacement: float = 2.0
-
-const FOOTPRINT_SHADER := preload("res://world/gimmick/flat_tide/water_footprint.gdshader")
-const MIN_DELTA := 0.001
-const FOOTPRINT_PRIORITY_OFFSET := 1
 
 var _marks: Array[MeshInstance3D] = []
 var _ages: Array[float] = []

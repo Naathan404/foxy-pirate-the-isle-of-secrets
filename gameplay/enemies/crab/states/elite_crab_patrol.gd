@@ -9,7 +9,7 @@ var _charge_cooldown_remaining: float = 0.0
 
 func _update(delta: float) -> void:
 	_charge_cooldown_remaining = maxf(0.0, _charge_cooldown_remaining - maxf(0.0, delta))
-	if _charge_cooldown_remaining <= 0.0 and enemy.has_target():
+	if _charge_cooldown_remaining <= 0.0 and (enemy as Crab).can_chase_target():
 		request_state(&"charge")
 		return
 	super(delta)

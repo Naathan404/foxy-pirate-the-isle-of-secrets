@@ -60,6 +60,7 @@ func activate() -> void:
 		snapshot.team = context.team
 		snapshot.weapon = context.weapon
 		snapshot.weapon_category = context.weapon_category
+		snapshot.delivery_type = context.delivery_type
 		snapshot.attack_id = context.attack_id
 		snapshot.action = context.action
 		snapshot.origin = context.actor.global_position

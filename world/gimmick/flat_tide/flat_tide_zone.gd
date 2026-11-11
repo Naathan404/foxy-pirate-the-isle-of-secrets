@@ -2,6 +2,16 @@
 class_name FlatTideZone
 extends MeshInstance3D
 
+const DEFAULT_MATERIAL := preload("res://world/gimmick/flat_tide/flat_tide_volume_material.tres")
+const VOLUME_MESH := preload("res://world/gimmick/flat_tide/flat_tide_volume_mesh.gd")
+const DEBUG_MESH := preload("res://world/gimmick/flat_tide/flat_tide_debug_mesh.gd")
+const MIN_SIZE := 0.1
+const MIN_DEPTH := 0.02
+const MIN_SEGMENTS := 2
+const MIN_COVERAGE_SPAN := 0.001
+const MIN_WAVE_LENGTH := 0.1
+const DEBUG_HEIGHT_OFFSET := 0.03
+
 @export_group("Area")
 ## Kích thước tối đa của vùng nước trên mặt đất: X theo trục X, Y theo trục Z.
 ## Nước tiến từ phía X dương sang X âm trong tọa độ của vùng.
@@ -112,16 +122,6 @@ extends MeshInstance3D
 		_update_editor_preview()
 ## Cho sóng chuyển động trong editor để xem trước hình dáng mặt nước.
 @export var animate_editor_preview: bool = true
-
-const DEFAULT_MATERIAL := preload("res://world/gimmick/flat_tide/flat_tide_volume_material.tres")
-const VOLUME_MESH := preload("res://world/gimmick/flat_tide/flat_tide_volume_mesh.gd")
-const DEBUG_MESH := preload("res://world/gimmick/flat_tide/flat_tide_debug_mesh.gd")
-const MIN_SIZE := 0.1
-const MIN_DEPTH := 0.02
-const MIN_SEGMENTS := 2
-const MIN_COVERAGE_SPAN := 0.001
-const MIN_WAVE_LENGTH := 0.1
-const DEBUG_HEIGHT_OFFSET := 0.03
 
 var _material: ShaderMaterial
 var _fill: float = 0.0

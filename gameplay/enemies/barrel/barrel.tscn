@@ -20,11 +20,20 @@ radius = 0.75
 
 [node name="Barrel" unique_id=1050350307 instance=ExtResource("1_base")]
 script = ExtResource("2_barrel")
-bullet_speed = 10.0
+bullet_speed = 8.0
+bullet_lifetime = 4.0
+bullet_gravity = 22.0
+bullet_ground_bounce = 0.95
+trigger_mode = 0
+auto_aim_at_player = false
+direction_mode = 0
 player_detection_radius = 6.5
 min_bullets_per_volley = 1
 max_bullets_per_volley = 5
-max_bullet_angle_offset_degrees = 6.0
+max_bullet_angle_offset_degrees = 0.0
+shot_interval = 0.2
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
 data = ExtResource("3_data")
 initial_facing = 2
 destroy_on_death = true

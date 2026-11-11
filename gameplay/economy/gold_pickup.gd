@@ -65,7 +65,9 @@ func park() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
-func activate(at: Vector3, direction: Vector3, flight_height: float = -1.0, flight_duration: float = -1.0) -> void:
+func activate(
+	at: Vector3, direction: Vector3, flight_height: float = -1.0, flight_duration: float = -1.0
+) -> void:
 	park()
 	amount = 1
 	_value_label.text = "1 G"
@@ -80,7 +82,9 @@ func _play_drop() -> void:
 		play_drop_animation()
 
 
-func play_drop_animation(direction: Vector3 = Vector3.ZERO, flight_height: float = -1.0, flight_duration: float = -1.0) -> void:
+func play_drop_animation(
+	direction: Vector3 = Vector3.ZERO, flight_height: float = -1.0, flight_duration: float = -1.0
+) -> void:
 	if _drop_started:
 		return
 	_drop_started = true
