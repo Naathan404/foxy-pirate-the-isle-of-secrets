@@ -467,6 +467,16 @@ scattershot_bullet_count = 5
 scattershot_arc_degrees = 50.0
 initial_facing = 0
 
+[node name="Barrel5" parent="World" unique_id=1508494456 instance=ExtResource("16_dxx27")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62284946, 5.042698, 23.770195)
+trigger_mode = 1
+auto_aim_at_player = true
+direction_mode = 0
+shot_interval = 0.2
+scattershot_bullet_count = 5
+scattershot_arc_degrees = 50.0
+initial_facing = 0
+
 [node name="Barrel2" parent="World" unique_id=893582788 instance=ExtResource("16_dxx27")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.157921, 3.8701534, -19.61535)
 trigger_mode = 0

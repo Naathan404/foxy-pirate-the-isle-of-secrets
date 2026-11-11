@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://world/gimmick/coral_valley/tidal_enemy.gd" id="1_script"]
-
-[node name="TidalEnemy" type="Node"]
-script = ExtResource("1_script")

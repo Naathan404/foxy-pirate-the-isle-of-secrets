@@ -24,7 +24,7 @@ func _run() -> void:
 			return
 	var manager := root.get_node("GameManager")
 	manager.fade_out_seconds = 0.03
-	manager.fade_in_seconds = 0.03
+	manager.fade_in_seconds = 0.15
 	_check(not manager.change_scene("res://missing_scene.tscn"), "Reject missing scene")
 	_check(not manager.change_scene("res://data/weapon/weapon_dagger.tres"), "Reject non-scene")
 	_check(manager.enter_inventory(), "Can open inventory before transition")
@@ -38,6 +38,13 @@ func _run() -> void:
 	var fade := overlay.get_node("Fade") as ColorRect
 	_check(overlay.visible and is_equal_approx(fade.color.a, 1.0), "Scene changes at full black")
 	_check(current_scene.scene_file_path == DESTINATION, "Destination is current scene")
+	while fade.color.a >= 1.0:
+		await process_frame
+	_check(overlay.visible and fade.color.a > 0.0, "Observe room during fade-in")
+	_check(not paused and manager.state == manager.State.PLAYING,
+		"Gameplay resumes before fade-in finishes")
+	_check(not manager.enter_inventory(), "Inventory cannot interrupt fade-in")
+	_check(not manager.change_scene(DESTINATION), "Another transition cannot interrupt fade-in")
 	await manager.scene_transition_finished
 	_check(not paused and manager.state == manager.State.PLAYING, "Gameplay resumes")
 	_check(not overlay.visible and is_zero_approx(fade.color.a), "Overlay clears after fade-in")
@@ -94,6 +101,17 @@ func _check_trigger(manager: Node) -> void:
 	player.position.x = 4.0
 	await _physics_frames()
 	player.dead = false
+	player.hp.take_damage(7.0)
+	var expected_hp := player.hp.current_hp
+	player.stamina.try_consume(13.0)
+	player.chaos.gain(24.0)
+	player.last_facing_direction = Vector3.LEFT
+	var source_inventory := player.get_node("Inventory") as Inventory
+	var item_id := StringName(source_inventory.slots[0].item.item_id)
+	source_inventory.remove_item(item_id, 1)
+	var item_count := source_inventory.count_item(item_id)
+	player.weapon_controller.set_weapon_owned(&"bow", true)
+	player.charm_registry.set_owned(&"arrow_rain", true)
 	var previous_world: WeakRef = weakref(world)
 	# Keep the destination Player stationary so spawn assertions are independent of gravity.
 	var freeze_player := func(active_player: Player) -> void:
@@ -104,6 +122,20 @@ func _check_trigger(manager: Node) -> void:
 	await scene_changed
 	await process_frame
 	var arrival_player := manager.get("player") as Player
+	_check(is_equal_approx(arrival_player.hp.current_hp, expected_hp),
+		"HP survives a scene change")
+	_check(arrival_player.stamina.current_sp < arrival_player.stamina.get_max_sp(),
+		"Spent stamina survives a scene change")
+	_check(is_equal_approx(arrival_player.chaos.current, 24.0),
+		"Chaos survives a scene change")
+	_check((arrival_player.get_node("Inventory") as Inventory).count_item(item_id) == item_count,
+		"Inventory survives a scene change")
+	_check(arrival_player.weapon_controller.is_weapon_owned(&"bow"),
+		"Weapon ownership survives a scene change")
+	_check(arrival_player.charm_registry.is_owned(&"arrow_rain"),
+		"Charm ownership survives a scene change")
+	_check(arrival_player.last_facing_direction == Vector3.LEFT,
+		"Facing survives a scene change")
 	var marker := current_scene.get_node("ArrivalGate/ExitPosition") as Marker3D
 	_check(
 		arrival_player.global_position.is_equal_approx(marker.global_position),

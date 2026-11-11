@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://c42matpmx1epd" path="res://gameplay/enemies/crab/states/elite_crab_patrol.gd" id="5_patrol"]
 [ext_resource type="Script" uid="uid://v5u3xwdr8upp" path="res://gameplay/enemies/crab/states/elite_crab_charge.gd" id="6_charge"]
 [ext_resource type="Script" uid="uid://dehsy4ja64t1" path="res://gameplay/enemies/crab/elite_crab.gd" id="7_elite_crab"]
+[ext_resource type="Script" uid="uid://cf2dbu13f761k" path="res://gameplay/enemies/crab/states/elite_crab_egg_spawn.gd" id="8_egg_spawn"]
 
 [sub_resource type="BoxShape3D" id="HurtShape"]
 size = Vector3(4, 1.8, 4)
@@ -26,9 +27,16 @@ radius = 6.7
 
 [node name="EliteCrab" unique_id=1976613988 instance=ExtResource("1_base")]
 script = ExtResource("7_elite_crab")
-player_detection_radius = 7.0
-patrol_contact_damage = true
-patrol_speed_scale = 1.0
+egg_count_min = 4
+egg_count_max = 8
+egg_scatter_radius = 6.0
+egg_flight_duration = 0.8
+egg_arc_height = 4.0
+egg_min_spacing = 4.0
+egg_hatch_delay = 2.0
+egg_warning_duration = 0.7
+egg_shake_distance = 0.08
+egg_shake_frequency = 15.0
 data = ExtResource("2_data")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
@@ -64,6 +72,9 @@ unreachable_target_cooldown = 2.0
 
 [node name="Charge" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=899666673]
 script = ExtResource("6_charge")
+
+[node name="EggSpawn" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="5" unique_id=275865330]
+script = ExtResource("8_egg_spawn")
 
 [node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.291855, 0)

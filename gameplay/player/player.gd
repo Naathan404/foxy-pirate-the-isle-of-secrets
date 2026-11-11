@@ -46,9 +46,15 @@ var pending_attack_action: StringName = &"normal"
 var dead: bool = false
 var pending_hit_duration: float = 0.0
 var pending_hit_direction: Vector3 = Vector3.ZERO
+var pending_hit_knockback_multiplier: float = 1.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
+## Applied by environmental surfaces to ordinary ground movement only.
+var environment_move_speed_multiplier: float = 1.0
+## Hệ số quãng đường dash do địa hình cung cấp; được lấy khi bắt đầu dash.
+var environment_dash_distance_multiplier: float = 1.0
+var environment_is_water: bool = false
 var potion_selection_active: bool = false
 var _charm_grapple_tween: Tween
 var _dash_pushed_crates: Dictionary[int, bool] = {}
@@ -204,6 +210,7 @@ func receive_damage(damage: DamageContext) -> float:
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
 	pending_hit_direction = _get_hit_direction(damage.source)
+	pending_hit_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
 	var amount := damage.amount_hp
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
@@ -252,7 +259,17 @@ func _physics_process(delta: float) -> void:
 	# State chọn vận tốc, Player chỉ di chuyển vật lý 1 lần mỗi frame
 	if dead:
 		set_horizontal_velocity(Vector3.ZERO)
-	if not is_on_floor():
+	# Dash keeps its launch height even after crossing a ledge. Resume gravity
+	# on the next state, including when the dash was interrupted.
+	var dash_state := fsm.states.get("dash") as FsmState
+	var dash_holds_height := (
+		fsm.current_state == dash_state
+		and dash_state != null
+		and (bool(dash_state.get("active")) or bool(dash_state.get("completed")))
+	)
+	if dash_holds_height:
+		velocity.y = 0.0
+	elif not is_on_floor():
 		velocity += get_gravity() * delta
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
@@ -630,5 +647,8 @@ func _get_move_speed() -> float:
 		charm_socket_manager.modify_stats(stats)
 	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
 	return maxf(
-		0.0, (data.move_speed + stats[&"move_speed_flat"]) * stats[&"move_speed_multiplier"]
+		0.0,
+		(data.move_speed + stats[&"move_speed_flat"])
+		* stats[&"move_speed_multiplier"]
+		* environment_move_speed_multiplier
 	)

@@ -1,0 +1,15 @@
+[remap]
+
+importer="curvature.spine.atlas"
+type="SpineAtlasResource"
+uid="uid://cu1q5skt7w8xj"
+path="res://.godot/imported/Foxy_full_skin_Test_U_Run (1).atlas-481bc49d1e92588a183dc7fa87fc1179.tres"
+
+[deps]
+
+source_file="res://assets/spine/foxy_anim_spine/Foxy_full_skin_Test_U_Run (1).atlas"
+dest_files=["res://.godot/imported/Foxy_full_skin_Test_U_Run (1).atlas-481bc49d1e92588a183dc7fa87fc1179.tres"]
+
+[params]
+
+normal_map_prefix="n"

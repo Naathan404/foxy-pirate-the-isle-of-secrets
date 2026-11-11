@@ -14,9 +14,7 @@ var _target_end := false
 @onready var start_marker: Marker3D = $Start
 @onready var end_marker: Marker3D = $End
 @onready var lever_hurtbox: HurtBox = $Platform/Lever/HurtBox
-@onready var _lever_animator: AnimationPlayer = (
-	$Platform/Lever/Visual.find_child("AnimationPlayer", true, false) as AnimationPlayer
-)
+@onready var _lever_sprite: AnimatedSprite3D = $Platform/Lever/AnimatedSprite3D
 
 
 func _ready() -> void:
@@ -25,6 +23,8 @@ func _ready() -> void:
 	lever_hurtbox.team = CombatTeams.ENEMY
 	lever_hurtbox.collision_layer = CombatLayers.ENEMY_HURTBOX
 	lever_hurtbox.collision_mask = CombatLayers.PLAYER_ATTACK
+	_lever_sprite.animation_finished.connect(_on_lever_animation_finished)
+	_lever_sprite.play(&"idle")
 
 
 func _physics_process(delta: float) -> void:
@@ -42,13 +42,21 @@ func receive_damage(damage: DamageContext) -> float:
 	if damage == null or damage.source_team != CombatTeams.PLAYER or damage.amount_hp <= 0.0:
 		return 0.0
 	request_destination(not _target_end)
-	if is_instance_valid(_lever_animator):
-		var animation: StringName = &"toggle-on" if _target_end else &"toggle-off"
-		_lever_animator.play(animation, 0.1)
+	_lever_sprite.stop()
+	_lever_sprite.play(&"active")
 	return damage.amount_hp
+
+
+func _on_lever_animation_finished() -> void:
+	if _lever_sprite.animation == &"active":
+		_lever_sprite.play(&"idle")
 
 
 func request_destination(at_end: bool) -> void:
 	_target_end = at_end
 	var destination := end_marker.position if at_end else start_marker.position
 	_moving = not platform.position.is_equal_approx(destination)
+
+
+func is_targeting_end() -> bool:
+	return _target_end

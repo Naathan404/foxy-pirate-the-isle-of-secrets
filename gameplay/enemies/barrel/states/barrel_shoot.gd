@@ -52,6 +52,10 @@ func _update(delta: float) -> void:
 	if _phase == AttackPhase.CHARGE:
 		_update_charge(delta)
 		return
+	var barrel := enemy as Barrel
+	if barrel == null or not barrel.can_trigger_attack():
+		return_to_behavior()
+		return
 	_phase_remaining = maxf(0.0, _phase_remaining - maxf(0.0, delta))
 	if _shots_fired < shots_in_burst:
 		_shot_remaining -= maxf(0.0, delta)

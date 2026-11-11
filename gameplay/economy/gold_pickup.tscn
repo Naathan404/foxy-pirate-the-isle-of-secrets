@@ -17,6 +17,7 @@ script = ExtResource("1_pickup")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78836787, 0)
 pixel_size = 0.0012
 billboard = 1
+alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("2_4jcvl")
 

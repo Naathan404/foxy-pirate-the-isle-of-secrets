@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://d0jtisdjsgu0u" path="res://gameplay/player/states/player_hit.gd" id="3_r3fl6"]
 [ext_resource type="Script" uid="uid://b13a4v7a0hpxx" path="res://gameplay/player/states/player_fall.gd" id="4_ki8u8"]
 [ext_resource type="Script" uid="uid://bd4tscvehscfo" path="res://gameplay/player/states/player_dash.gd" id="5_tj74x"]
+[ext_resource type="Texture2D" uid="uid://4rqwduaxp1ya" path="res://assets/sprites/effects/smoke/smoke_04.png" id="5_xsuyu"]
 [ext_resource type="Script" uid="uid://coyt7mve374li" path="res://gameplay/player/states/player_death.gd" id="6_6gmdq"]
 [ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/_placeholder/foxy_harpoon_sheet.png" id="7_r1r5h"]
 [ext_resource type="Script" uid="uid://dhmsjvrmvedhj" path="res://gameplay/player/states/player_run.gd" id="7_rvh5s"]
@@ -56,12 +57,13 @@
 [ext_resource type="Resource" uid="uid://sd4o6x3x5xya" path="res://gameplay/charms/charm_data/turtle_shell.tres" id="charm_turtle"]
 [ext_resource type="Resource" uid="uid://ci2bma1bu680p" path="res://gameplay/charms/charm_data/abyssal_whirlpool.tres" id="charm_whirlpool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="collection_dagger"]
-[ext_resource type="Resource" path="res://data/weapon/weapon_meteor_staff.tres" id="collection_meteor_staff"]
 [ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="collection_harpoon"]
+[ext_resource type="Resource" uid="uid://i1gxkya5r3py" path="res://data/weapon/weapon_meteor_staff.tres" id="collection_meteor_staff"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
+[ext_resource type="Script" uid="uid://dgl3y0vqmhfra" path="res://gameplay/player/effects/low_health_vignette.gd" id="low_health_vignette"]
 [ext_resource type="PackedScene" uid="uid://vbvptqbcgi1u" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
@@ -76,7 +78,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_l2csx"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_s1tal"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -90,6 +92,21 @@ damping_max = 2.5
 scale_min = 0.79999995
 scale_max = 1.5999999
 color_ramp = SubResource("GradientTexture1D_fi5gb")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s1tal"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("5_xsuyu")
+texture_filter = 0
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_nnacp"]
+material = SubResource("StandardMaterial3D_s1tal")
+size = Vector2(0.22, 0.22)
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_0"]
 atlas = ExtResource("Texture_bow_sheet")
@@ -872,6 +889,7 @@ unlocked_socket_count = 3
 metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
 
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "ammo", "charm_socket_manager", "chaos", "potion", "potion_selector", "inventory_ui", "camera") groups=["player"]]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 collision_layer = 2
 collision_mask = 5
 floor_constant_speed = true
@@ -892,7 +910,7 @@ inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
 
 [node name="DrownPoint" type="Marker3D" parent="." unique_id=803702947]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8018878, 0)
 
 [node name="Effects" type="Node3D" parent="." unique_id=2014826237]
 
@@ -909,8 +927,9 @@ player = NodePath("../..")
 heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0216887, 0)
-process_material = SubResource("ParticleProcessMaterial_l2csx")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3670205, 0)
+process_material = SubResource("ParticleProcessMaterial_s1tal")
+draw_pass_1 = SubResource("QuadMesh_nnacp")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
 player = NodePath("../..")
@@ -925,10 +944,16 @@ sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
 
+[node name="LowHealthVignette" type="Node" parent="Effects" unique_id=1834395635 node_paths=PackedStringArray("health", "player")]
+script = ExtResource("low_health_vignette")
+health = NodePath("../../HealthComponent")
+player = NodePath("../..")
+
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
 script = ExtResource("3_nu5xt")
 sprite = NodePath("Sprite3D")
 animation_player = NodePath("AnimationPlayer")
+run_animation_speed = 2.0
 action_sprite_paths = Dictionary[StringName, NodePath]({
 &"attack_bow": NodePath("BowSprite"),
 &"harpoon/pierce": NodePath("HarpoonSprite"),
@@ -938,25 +963,30 @@ action_sprite_paths = Dictionary[StringName, NodePath]({
 [node name="SpineIdlePreview" type="Node3D" parent="Visual" unique_id=1978530799]
 transform = Transform3D(1.2, 0, 0, 0, 1.692, 0, 0, 0, 1.2, 0, 0.1570276, 0)
 script = ExtResource("Script_spine_idle_preview")
-skeleton_data_path = "res://assets/spine/animation/foxy_animation_skeleton.tres"
-spine_animation = "G1_Idle"
-spine_skin = "G1"
 animation_mapping = {
 "attack_dagger_down": ["Attack_1", "G1"],
 "attack_dagger_side": ["Attack_1", "G1"],
-"dash_down": ["G1_Dash", "G1"],
+"dash_down": ["D_Dash", "D"],
 "dash_side": ["G1_Dash", "G1"],
-"dash_up": ["G1_Dash", "G1"],
+"dash_up": ["U_Dash", "U"],
+"fall_down": ["G1_Idle", "G1"],
+"fall_side": ["G1_Idle", "G1"],
+"fall_up": ["U_Idle", "U"],
+"hit_down": ["G1_Idle", "G1"],
+"hit_side": ["G1_Idle", "G1"],
+"hit_up": ["U_Idle", "U"],
 "idle_down": ["G1_Idle", "G1"],
 "idle_up": ["U_Idle", "U"],
+"run_down": ["D_Run", "D"],
 "run_side": ["S_Run", "S"],
-"run_up": ["S_Run", "S"]
+"run_up": ["U_Run", "U"]
 }
 artwork_faces_left = false
-size_multiplier = 1.25
+size_multiplier = 1.6
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
-transform = Transform3D(1, 0, 0, 0, 1.41, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(0.709, 0, 0, 0, 1, 0, 0, 0, 0.709, 0, 0, 0)
+visible = false
 offset = Vector2(0, 14)
 pixel_size = 0.0625
 shaded = true
@@ -993,6 +1023,7 @@ libraries/harpoon = ExtResource("harpoon_animations")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=953316873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.023983002, 0.4617207, 0.002353549)
 shape = SubResource("CapsuleShape3D_jpyye")
+debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="FSM" type="Node" parent="." unique_id=92062524]
 script = ExtResource("2_6gmdq")
@@ -1019,7 +1050,7 @@ script = ExtResource("7_rvh5s")
 
 [node name="Attack" type="Node" parent="States" unique_id=1316916218]
 script = ExtResource("8_av71s")
-step_distance = 0.4
+step_distance = 0.5
 step_duration = 0.1
 
 [node name="PlayerHUD" parent="." unique_id=400788151 node_paths=PackedStringArray("health", "stamina", "chaos", "charm_socket_manager", "potion_component", "weapon_controller", "ammo") instance=ExtResource("20_pt1je")]

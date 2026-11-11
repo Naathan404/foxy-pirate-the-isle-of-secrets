@@ -8,9 +8,10 @@ signal scene_transition_finished
 enum State { PLAYING, INVENTORY, TRANSITION }
 
 const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
+const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 
-@export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.25
-@export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.25
+@export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.4
+@export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.45
 
 var player: Player
 var inventory: Inventory
@@ -64,7 +65,7 @@ func unregister_player(departing_player: Player) -> void:
 
 
 func enter_inventory() -> bool:
-	if state != State.PLAYING or get_tree().paused:
+	if _transition_pending or state != State.PLAYING or get_tree().paused:
 		return false
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
@@ -123,32 +124,61 @@ func _transition_scene(
 	get_node("/root/ScreenShakeController").cancel()
 	_transition_overlay.show()
 	state_changed.emit(state)
+	# Read destination resources in parallel with fade-out, without blocking a frame.
+	var load_error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
 	await _fade_to(1.0, fade_out_seconds)
-	var error: Error
-	if reload_scene:
-		error = get_tree().reload_current_scene()
-	else:
-		error = get_tree().change_scene_to_file(scene_path)
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+	var player_state: RefCounted
+	if not reload_scene and is_instance_valid(player):
+		player_state = PLAYER_SCENE_STATE.new()
+		player_state.capture(player)
+	var error: Error = load_error
+	if error == OK:
+		while (
+			ResourceLoader.load_threaded_get_status(scene_path)
+			== ResourceLoader.THREAD_LOAD_IN_PROGRESS
+		):
+			await get_tree().process_frame
+		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
+			var destination := ResourceLoader.load_threaded_get(scene_path) as PackedScene
+			error = get_tree().change_scene_to_packed(destination)
+		else:
+			error = ERR_CANT_OPEN
 	if error == OK:
 		# SceneTree signals after the new scene has entered the tree and run _ready().
 		await get_tree().scene_changed
+		if player_state != null and is_instance_valid(player):
+			player_state.restore(player)
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
-		# Camera processing is paused during the fade. Position it at the arrival
-		# point now, then render a fully black frame before revealing the scene.
+		# _ready/process_frame do not mean rendering has finished. Keep the first
+		# draw and its resource/pipeline setup behind black, including deferred UI.
 		_settle_arrival_camera()
-		await get_tree().process_frame
-	await _fade_to(0.0, fade_in_seconds)
-	_transition_overlay.hide()
+		await _prepare_arrival_render()
+	# Resume before revealing the room so held movement continues during fade-in.
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
 	state = State.PLAYING
 	get_tree().paused = was_paused if error != OK else false
-	_transition_pending = false
 	state_changed.emit(state)
+	# The first active physics/animation tick can also upload new visual resources.
+	# Finish that tick behind black instead of letting it stall the visible fade.
+	await _prepare_arrival_render(6)
+	await _fade_to(0.0, fade_in_seconds)
+	_transition_overlay.hide()
+	_transition_pending = false
 	scene_transition_finished.emit()
 	if error != OK:
 		push_error("GameManager: chuyển scene thất bại: %s" % error_string(error))
+
+
+func _prepare_arrival_render(frame_count: int = 2) -> void:
+	if DisplayServer.get_name() != "headless":
+		for frame in frame_count:
+			await RenderingServer.frame_post_draw
+	# Start the fade on a fresh tick, rather than consuming the load hitch as its delta.
+	await get_tree().process_frame
 
 
 func _place_player_at_trigger(trigger_id: StringName) -> void:
@@ -189,5 +219,6 @@ func _fade_to(alpha: float, duration: float) -> void:
 	var tween := create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.set_ignore_time_scale(true)
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(_fade_rect, "color:a", alpha, duration)
 	await tween.finished

@@ -498,10 +498,10 @@ vertical_alignment = 1
 [node name="EquipmentControl" type="Control" parent="." unique_id=143244385]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 10.0
-offset_top = 390.0
-offset_right = 50.0
-offset_bottom = 430.0
+offset_left = 10.4
+offset_top = 379.19998
+offset_right = 50.4
+offset_bottom = 419.19998
 mouse_filter = 2
 script = ExtResource("16_dv5bc")
 

@@ -14,7 +14,15 @@ enum DirectionMode {
 
 const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn")
 
-@export_range(0.1, 100.0, 0.1) var bullet_speed: float = 12.0
+@export_range(0.1, 100.0, 0.1) var bullet_speed: float = 8.0
+
+@export_group("Bullet Physics")
+## Thời gian đạn tồn tại.
+@export_range(0.1, 30.0, 0.1, "suffix:s") var bullet_lifetime: float = 8.0
+## Gia tốc rơi; giá trị lớn khiến đạn chạm đất và nảy thường xuyên hơn.
+@export_range(0.0, 50.0, 0.1, "suffix:m/s²") var bullet_gravity: float = 22.0
+## Phần vận tốc theo phương pháp tuyến được giữ lại khi nảy khỏi mặt đất.
+@export_range(0.0, 1.0, 0.01) var bullet_ground_bounce: float = 0.95
 
 @export_group("Shooting Behavior")
 @export var trigger_mode: TriggerMode = TriggerMode.DETECT_PLAYER:
@@ -41,7 +49,7 @@ const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn"
 @export_group("Volley")
 @export_range(1, 20, 1) var min_bullets_per_volley: int = 1
 @export_range(1, 20, 1) var max_bullets_per_volley: int = 5
-@export_range(0.0, 90.0, 1.0, "suffix:deg") var max_bullet_angle_offset_degrees: float = 20.0
+@export_range(0.0, 90.0, 1.0, "suffix:deg") var max_bullet_angle_offset_degrees: float = 0.0
 @export_range(0.01, 10.0, 0.01, "suffix:s") var shot_interval: float = 0.2
 
 @export_group("Multi Direction")
@@ -50,6 +58,7 @@ const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn"
 
 var _attack_cooldown_remaining: float = 0.0
 var _projectiles: Array[BarrelBullet] = []
+var _aim_direction: Vector3 = Vector3.ZERO
 
 @onready var bullet_spawn: Marker3D = $Direction/BulletSpawn
 
@@ -78,7 +87,7 @@ func get_bullet_count() -> int:
 func can_trigger_attack() -> bool:
 	if dead or data == null:
 		return false
-	if trigger_mode == TriggerMode.DETECT_PLAYER:
+	if should_aim_at_target():
 		return has_target()
 	return true
 
@@ -125,7 +134,7 @@ func fire_single() -> void:
 		return
 	var maximum_offset := deg_to_rad(max_bullet_angle_offset_degrees)
 	var offset := randf_range(-maximum_offset, maximum_offset)
-	_fire_in_direction(last_facing_direction.rotated(Vector3.UP, offset))
+	_fire_in_direction(_get_firing_direction().rotated(Vector3.UP, offset))
 
 
 func fire_fan_volley(count: int, arc_degrees: float) -> void:
@@ -135,32 +144,51 @@ func fire_fan_volley(count: int, arc_degrees: float) -> void:
 	var arc_radians := deg_to_rad(maxf(0.0, arc_degrees))
 	var angle_step := 0.0 if bullet_count == 1 else arc_radians / float(bullet_count - 1)
 	var start_angle := -arc_radians * 0.5
+	var aim := _get_firing_direction()
 	for index in range(bullet_count):
 		var angle := start_angle + angle_step * index
-		_fire_in_direction(last_facing_direction.rotated(Vector3.UP, angle))
+		_fire_in_direction(aim.rotated(Vector3.UP, angle))
 
 
 func aim_at_target() -> bool:
 	if not has_target():
 		return false
 	var offset := target.global_position - global_position
-	if absf(offset.x) >= absf(offset.z):
-		face_direction(Vector3.RIGHT if offset.x >= 0.0 else Vector3.LEFT)
-	else:
-		face_direction(Vector3.BACK if offset.z >= 0.0 else Vector3.FORWARD)
+	offset.y = 0.0
+	if offset.is_zero_approx():
+		return true
+	# Face the target first so the muzzle marker is in its final position.
+	face_direction(offset)
+	offset = target.global_position - bullet_spawn.global_position
+	offset.y = 0.0
+	if not offset.is_zero_approx():
+		_aim_direction = offset.normalized()
 	return true
 
 
+func _get_firing_direction() -> Vector3:
+	if should_aim_at_target() and not _aim_direction.is_zero_approx():
+		return _aim_direction
+	return last_facing_direction
+
+
 func _fire_in_direction(direction: Vector3) -> void:
+	_spawn_bullet(direction, bullet_spawn.global_position)
+
+
+func _spawn_bullet(direction: Vector3, spawn_position: Vector3) -> void:
 	var bullet := BULLET_SCENE.instantiate() as BarrelBullet
 	if bullet == null:
 		return
+	bullet.lifetime = bullet_lifetime
+	bullet.gravity = bullet_gravity
+	bullet.ground_bounce = bullet_ground_bounce
 	bullet.launch(self, team, direction, bullet_speed, data.attack_damage)
 	var projectile_parent := get_tree().current_scene
 	if not is_instance_valid(projectile_parent):
 		projectile_parent = get_tree().root
 	projectile_parent.add_child(bullet)
-	bullet.global_position = bullet_spawn.global_position
+	bullet.global_position = spawn_position
 	_projectiles.append(bullet)
 	bullet.tree_exited.connect(_on_projectile_tree_exited.bind(bullet), CONNECT_ONE_SHOT)
 
@@ -168,7 +196,7 @@ func _fire_in_direction(direction: Vector3) -> void:
 func _clear_projectiles() -> void:
 	for projectile: BarrelBullet in _projectiles:
 		if is_instance_valid(projectile):
-			projectile.queue_free()
+			projectile.finish()
 	_projectiles.clear()
 
 

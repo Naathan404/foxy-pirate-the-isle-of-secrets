@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="BaseItem" format=3]
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://ngxkp0j5jl2b"]
 
-[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/items/Coral.svg" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://0ogu6cbj2b83" path="res://assets/sprites/items/Coral.png" id="1_27373"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
 item_id = "coral"
 display_name = "Coral"
-icon = ExtResource("2_icon")
+icon = ExtResource("1_27373")
 description = "A sturdy piece of coral used in weapon crafting."
-max_stack = 99
+max_stack = 10

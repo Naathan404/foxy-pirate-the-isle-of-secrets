@@ -9,6 +9,8 @@ size = Vector3(1.6028976, 1, 1.7224426)
 [node name="DaggerAttack" type="Node3D" unique_id=1964697998 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("1_sleko")
 hitbox = NodePath("HitBox")
+swing_width = 0.6000000000000001
+thrust_length_ratio = 0.85
 
 [node name="HitBox" type="Area3D" parent="." unique_id=1658291656 node_paths=PackedStringArray("actor")]
 collision_layer = 32

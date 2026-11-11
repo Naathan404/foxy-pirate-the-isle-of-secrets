@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://rddhc21v7egm"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://c0nu47ksokiuu" path="res://world/biomes/forest/oak_tree.tscn" id="2_oak"]
+[ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/forest/pine_tree.tscn" id="3_pine"]
+
+[node name="Forest_03" unique_id=340104391 instance=ExtResource("1_base")]
+open_exits = 12
+down_destination_scene = "res://world/biomes/ruins/ruins_01.tscn"
+left_destination_scene = "res://world/biomes/forest/forest_02.tscn"
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
+
+[node name="OakTreeA" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1302372724 instance=ExtResource("2_oak")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -8, 0, -6)
+
+[node name="PineTreeA" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="2" unique_id=1075259643 instance=ExtResource("3_pine")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 9, 0, -7)
+
+[node name="OakTreeB" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="3" unique_id=1726070442 instance=ExtResource("2_oak")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 7, 0, 6)
+
+[node name="PineTreeB" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="4" unique_id=2023250599 instance=ExtResource("3_pine")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -8, 0, 7)
+
+[node name="OakTreeC" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="5" unique_id=1191224656 instance=ExtResource("2_oak")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -2, 0, -8)
