@@ -33,6 +33,8 @@ var _fit_ready: bool = false
 var _current_spine_animation: String = ""
 var _current_spine_skin: String = ""
 var _dagger_combo_index: int = 0
+var _attack_spine_animation: String = ""
+var _attack_spine_skin: String = ""
 var _slash_overlay_shaders: Dictionary = {}
 var _attack_duration: float = 0.0
 var _dash_duration: float = 0.0
@@ -219,6 +221,11 @@ func set_dagger_combo_index(index: int) -> void:
 	_dagger_combo_index = clampi(index, -1, DAGGER_COMBO_ANIMATIONS.size() - 1)
 
 
+func set_attack_spine_override(animation_name: String, skin_name: String) -> void:
+	_attack_spine_animation = animation_name
+	_attack_spine_skin = skin_name
+
+
 func fit_attack_duration(duration: float) -> void:
 	_attack_duration = duration
 	_apply_attack_speed()
@@ -303,6 +310,10 @@ func sync_animation(
 			)
 	elif animation_mapping.is_empty() and animation_name == &"idle_down":
 		target_animation = spine_animation
+	if String(animation_name).begins_with("attack_") and not _attack_spine_animation.is_empty():
+		target_animation = _attack_spine_animation
+		if not _attack_spine_skin.is_empty():
+			target_skin = _attack_spine_skin
 	var show_preview := enabled and not target_animation.is_empty()
 	if show_preview and is_instance_valid(_spine) and (
 		restart

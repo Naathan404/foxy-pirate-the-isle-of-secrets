@@ -5,6 +5,7 @@ signal damaged(applied_hp: float)
 signal destroyed
 
 const HIT_FLASH_SHADER: Shader = preload("res://world/objects/destructible_hit_flash.gdshader")
+const WIND_SHADER: Shader = preload("res://world/objects/destructible_wind.gdshader")
 const DEFAULT_FRAGMENTS_SCENE: PackedScene = preload(
 	"res://world/objects/destructible_fragments.tscn"
 )
@@ -24,6 +25,15 @@ const FragmentSettings = preload("res://world/objects/destructible_fragment_sett
 @export var smoke_offset: Vector3 = Vector3(0.0, 0.8, 0.0)
 @export_range(1, 128, 1) var hit_smoke_amount: int = 5
 @export_range(1, 256, 1) var destroy_smoke_amount: int = 14
+
+@export_group("Wind Sway")
+@export var swingable: bool = false
+@export_range(0.0, 0.5, 0.005) var wind_amplitude: float = 0.28
+@export_range(0.1, 6.0, 0.05) var wind_speed: float = 4.4
+@export_range(0.0, 1.0, 0.01) var wind_gust_strength: float = 0.38
+@export_range(0.0, 0.9, 0.01) var wind_root_height: float = 0.08
+@export_range(0.5, 4.0, 0.05) var wind_bend_power: float = 1.35
+@export_range(0.0, 6.28, 0.01) var wind_phase_offset: float = 0.0
 
 @export_group("Break Fragments")
 @export var fragment_source: Sprite3D
@@ -51,6 +61,7 @@ var _destroyed: bool = false
 var _visual_scale: Vector3
 var _previous_overlay: Material
 var _flash_material: ShaderMaterial
+var _wind_material: ShaderMaterial
 var _hit_tween: Tween
 var _flash_tween: Tween
 
@@ -66,6 +77,46 @@ func _ready() -> void:
 	_hurtbox.collision_mask = CombatLayers.PLAYER_ATTACK
 	if is_instance_valid(visual_root):
 		_visual_scale = visual_root.scale
+	if swingable:
+		_configure_wind()
+
+
+func _configure_wind() -> void:
+	var sprite := visual_root as Sprite3D
+	if sprite == null or sprite.texture == null:
+		push_warning("DestructibleProp: swingable requires a Sprite3D with a texture")
+		return
+	_wind_material = ShaderMaterial.new()
+	_wind_material.shader = WIND_SHADER
+	var columns := maxi(sprite.hframes, 1)
+	var rows := maxi(sprite.vframes, 1)
+	var frame_width := 1.0 / float(columns)
+	var frame_height := 1.0 / float(rows)
+	var frame_x := sprite.frame % columns
+	var frame_y := sprite.frame / columns
+	_wind_material.set_shader_parameter("sprite_texture", sprite.texture)
+	_wind_material.set_shader_parameter(
+		"frame_uv", Vector4(frame_x * frame_width, frame_y * frame_height, frame_width, frame_height)
+	)
+	_wind_material.set_shader_parameter(
+		"sprite_width", sprite.texture.get_width() * frame_width * sprite.pixel_size
+	)
+	_wind_material.set_shader_parameter("wind_amplitude", wind_amplitude)
+	_wind_material.set_shader_parameter("wind_speed", wind_speed)
+	_wind_material.set_shader_parameter("gust_strength", wind_gust_strength)
+	_wind_material.set_shader_parameter("root_height", wind_root_height)
+	_wind_material.set_shader_parameter("bend_power", wind_bend_power)
+	_wind_material.set_shader_parameter(
+		"wind_phase", wind_phase_offset + fposmod(float(get_instance_id()), TAU)
+	)
+	_wind_material.set_shader_parameter(
+		"horizontal_uv_direction", -1.0 if sprite.flip_h else 1.0
+	)
+	_wind_material.set_shader_parameter(
+		"vertical_uv_direction", -1.0 if sprite.flip_v else 1.0
+	)
+	_wind_material.set_shader_parameter("flash_color", hit_flash_color)
+	sprite.material_override = _wind_material
 
 
 func receive_damage(damage: DamageContext) -> float:
@@ -107,6 +158,15 @@ func _play_hit_feedback() -> void:
 		return
 	if _flash_tween != null and _flash_tween.is_valid():
 		_flash_tween.kill()
+	if _wind_material != null:
+		_wind_material.set_shader_parameter("flash_color", hit_flash_color)
+		_wind_material.set_shader_parameter("flash_strength", 1.0)
+		_flash_tween = create_tween().set_ignore_time_scale(true)
+		_flash_tween.tween_interval(hit_flash_hold_duration)
+		_flash_tween.tween_property(
+			_wind_material, "shader_parameter/flash_strength", 0.0, hit_flash_duration
+		)
+		return
 	if _flash_material == null:
 		_previous_overlay = sprite.material_overlay
 		_flash_material = ShaderMaterial.new()

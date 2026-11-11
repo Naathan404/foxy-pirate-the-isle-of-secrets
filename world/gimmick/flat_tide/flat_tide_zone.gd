@@ -12,7 +12,14 @@ const MIN_COVERAGE_SPAN := 0.001
 const MIN_WAVE_LENGTH := 0.1
 const DEBUG_HEIGHT_OFFSET := 0.03
 
+enum FlowDirection { NEGATIVE_X, POSITIVE_X, NEGATIVE_Z, POSITIVE_Z }
+
 @export_group("Area")
+## Hướng nước tiến vào, theo trục cục bộ của vùng.
+@export var flow_direction: FlowDirection = FlowDirection.NEGATIVE_X:
+	set(value):
+		flow_direction = value
+		_request_rebuild()
 ## Kích thước tối đa của vùng nước trên mặt đất: X theo trục X, Y theo trục Z.
 ## Nước tiến từ phía X dương sang X âm trong tọa độ của vùng.
 @export var size: Vector2 = Vector2(12.0, 12.0):
@@ -126,6 +133,8 @@ const DEBUG_HEIGHT_OFFSET := 0.03
 var _material: ShaderMaterial
 var _fill: float = 0.0
 var _visual_time: float = 0.0
+var _rising: bool = false
+var _falling: bool = false
 var _debug_mesh: MeshInstance3D
 var _preview_mesh: MeshInstance3D
 
@@ -196,17 +205,20 @@ func _rebuild() -> void:
 		return
 	_material = water_material.duplicate() as ShaderMaterial
 	_material.render_priority = water_render_priority
-	var volume := VOLUME_MESH.build(size, volume_depth, surface_segments_x, surface_segments_z)
+	var volume := VOLUME_MESH.build(_flow_size(), volume_depth, surface_segments_x, surface_segments_z)
+	var bounds := AABB(Vector3(-size.x * 0.5, 0.0, -size.y * 0.5), Vector3(size.x, volume_depth, size.y))
 	if editor_preview:
 		_preview_mesh.mesh = volume
+		_preview_mesh.custom_aabb = bounds
 		_preview_mesh.material_override = _material
-		_preview_mesh.extra_cull_margin = surface_wave_height + surface_detail_height
+		_preview_mesh.extra_cull_margin = 2.0 + surface_wave_height + surface_detail_height
 		_update_editor_preview()
 		return
 	mesh = volume
+	custom_aabb = bounds
 	material_override = _material
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	extra_cull_margin = surface_wave_height + surface_detail_height
+	extra_cull_margin = 2.0 + surface_wave_height + surface_detail_height
 	_sync_material(false)
 
 
@@ -216,7 +228,8 @@ func _update_editor_preview() -> void:
 
 
 func set_coverage(
-	coverage: float, warning: bool, animation_time: float = 0.0, warning_strength: float = 1.0
+	coverage: float, warning: bool, animation_time: float = 0.0, warning_strength: float = 1.0,
+	rising: bool = false, falling: bool = false
 ) -> void:
 	_fill = clampf(
 		(coverage - start_coverage) / maxf(MIN_COVERAGE_SPAN, full_coverage - start_coverage),
@@ -224,6 +237,8 @@ func set_coverage(
 		1.0
 	)
 	_visual_time = animation_time
+	_rising = rising
+	_falling = falling
 	_sync_material(warning, warning_strength)
 	if debug_in_game and show_debug_area and not Engine.is_editor_hint():
 		_rebuild_debug()
@@ -232,13 +247,16 @@ func set_coverage(
 func _sync_material(warning: bool, warning_strength: float = 1.0) -> void:
 	if _material == null:
 		return
-	_material.set_shader_parameter("zone_size", size)
+	_material.set_shader_parameter("zone_size", _flow_size())
+	_material.set_shader_parameter("flow_direction", flow_direction)
 	_material.set_shader_parameter("fill", _fill)
 	_material.set_shader_parameter(
 		"warning", clampf(warning_strength, 0.0, 1.0) if warning else 0.0
 	)
 	_material.set_shader_parameter("warning_width", warning_width)
 	_material.set_shader_parameter("tide_time", _visual_time)
+	_material.set_shader_parameter("tide_rising", 1.0 if _rising else 0.0)
+	_material.set_shader_parameter("tide_falling", 1.0 if _falling else 0.0)
 	_material.set_shader_parameter("shore_wave_amplitude", shore_wave_amplitude)
 	_material.set_shader_parameter("shore_wave_length", maxf(MIN_WAVE_LENGTH, shore_wave_length))
 	_material.set_shader_parameter("shore_wave_speed", shore_wave_speed)
@@ -262,25 +280,64 @@ func _sync_material(warning: bool, warning_strength: float = 1.0) -> void:
 func contains_flooded_point(point: Vector3) -> bool:
 	if _fill <= 0.0:
 		return false
-	var local := to_local(point)
+	var local := _to_flow(to_local(point))
+	var flow_size := _flow_size()
 	if absf(local.y) > floor_tolerance:
 		return false
-	if absf(local.z) > size.y * 0.5 or local.x > size.x * 0.5:
+	if absf(local.z) > flow_size.y * 0.5 or local.x > flow_size.x * 0.5:
 		return false
 	return local.x >= _shore_x(local.z)
 
 
+## Ground-level leading edge of the advancing visual wave, including its sloping foot.
+func is_point_in_advancing_wave(point: Vector3) -> bool:
+	if not _rising or _fill <= 0.0:
+		return false
+	var local := _to_flow(to_local(point))
+	var flow_size := _flow_size()
+	if absf(local.y) > floor_tolerance or absf(local.z) > flow_size.y * 0.5:
+		return false
+	if local.x < -flow_size.x * 0.5 - 2.0 or local.x > flow_size.x * 0.5:
+		return false
+	var segment := (local.z / flow_size.y + 0.5) * surface_segments_z
+	var first := clampi(floori(segment), 0, surface_segments_z - 1)
+	var z0 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first) / surface_segments_z)
+	var z1 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first + 1) / surface_segments_z)
+	var front := lerpf(_wave_foot_at_vertex(z0), _wave_foot_at_vertex(z1), clampf(segment - first, 0.0, 1.0))
+	return local.x >= front
+
+
+func _wave_foot_at_vertex(z: float) -> float:
+	var flow_size := _flow_size()
+	var front := _shore_at_vertex(z)
+	var width := maxf(0.0, flow_size.x * 0.5 - front)
+	var motion := smoothstep(0.0, 0.08, _fill) * (1.0 - smoothstep(0.88, 1.0, _fill))
+	var slope := 4.2
+	var resting := 0.55
+	if _material:
+		var slope_override: Variant = _material.get_shader_parameter("shore_slope")
+		var resting_override: Variant = _material.get_shader_parameter("resting_slope")
+		if slope_override != null:
+			slope = float(slope_override)
+		if resting_override != null:
+			resting = float(resting_override)
+	var surge := minf(lerpf(resting, slope, motion), width * 0.9)
+	return maxf(-flow_size.x * 0.5 - resting * (1.0 - motion), front - surge)
+
+
 func _shore_x(local_z: float) -> float:
 	# Match the straight segments joining the shader-displaced mesh vertices.
-	var segment := (local_z / size.y + 0.5) * surface_segments_z
+	var flow_size := _flow_size()
+	var segment := (local_z / flow_size.y + 0.5) * surface_segments_z
 	var first := clampi(floori(segment), 0, surface_segments_z - 1)
-	var z0 := lerpf(-size.y * 0.5, size.y * 0.5, float(first) / surface_segments_z)
-	var z1 := lerpf(-size.y * 0.5, size.y * 0.5, float(first + 1) / surface_segments_z)
+	var z0 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first) / surface_segments_z)
+	var z1 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first + 1) / surface_segments_z)
 	return lerpf(_shore_at_vertex(z0), _shore_at_vertex(z1), clampf(segment - first, 0.0, 1.0))
 
 
 func _shore_at_vertex(local_z: float) -> float:
-	var half_width := size.x * 0.5
+	var flow_size := _flow_size()
+	var half_width := flow_size.x * 0.5
 	var wave := shore_wave_amplitude * sin(PI * _fill)
 	wave *= sin(
 		TAU * local_z / maxf(MIN_WAVE_LENGTH, shore_wave_length) + _visual_time * shore_wave_speed
@@ -295,12 +352,12 @@ func _shore_at_vertex(local_z: float) -> float:
 			)
 		)
 	)
-	return clampf(half_width - size.x * _fill + wave, -half_width, half_width)
+	return clampf(half_width - flow_size.x * _fill + wave, -half_width, half_width)
 
 
 ## Height of the animated water surface at this horizontal world position.
 func get_surface_height_at(point: Vector3) -> float:
-	var local := to_local(point)
+	var local := _to_flow(to_local(point))
 	var wave := sin(
 		(
 			TAU * (local.x + local.z) / maxf(MIN_WAVE_LENGTH, surface_wave_length)
@@ -314,7 +371,39 @@ func get_surface_height_at(point: Vector3) -> float:
 		)
 	)
 	local.y = volume_depth + surface_wave_height * wave + surface_detail_height * detail
-	return to_global(local).y
+	return to_global(_from_flow(local)).y
+
+
+func _flow_size() -> Vector2:
+	return Vector2(size.y, size.x) if flow_direction >= FlowDirection.NEGATIVE_Z else size
+
+
+func _from_flow(point: Vector3) -> Vector3:
+	match flow_direction:
+		FlowDirection.POSITIVE_X:
+			return Vector3(-point.x, point.y, -point.z)
+		FlowDirection.NEGATIVE_Z:
+			return Vector3(-point.z, point.y, point.x)
+		FlowDirection.POSITIVE_Z:
+			return Vector3(point.z, point.y, -point.x)
+	return point
+
+
+func _to_flow(point: Vector3) -> Vector3:
+	match flow_direction:
+		FlowDirection.POSITIVE_X:
+			return Vector3(-point.x, point.y, -point.z)
+		FlowDirection.NEGATIVE_Z:
+			return Vector3(point.z, point.y, -point.x)
+		FlowDirection.POSITIVE_Z:
+			return Vector3(-point.z, point.y, point.x)
+	return point
+
+
+func get_flow_direction() -> Vector3:
+	var direction := global_transform.basis * _from_flow(Vector3.LEFT)
+	direction.y = 0.0
+	return direction.normalized()
 
 
 func _rebuild_debug() -> void:
@@ -324,9 +413,12 @@ func _rebuild_debug() -> void:
 	if _debug_mesh.visible:
 		var shoreline := PackedVector3Array()
 		if not Engine.is_editor_hint() and _fill > 0.0:
+			var flow_size := _flow_size()
 			for index in range(surface_segments_z + 1):
-				var z := lerpf(-size.y * 0.5, size.y * 0.5, float(index) / surface_segments_z)
-				shoreline.append(Vector3(_shore_at_vertex(z), DEBUG_HEIGHT_OFFSET, z))
+				var z := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(index) / surface_segments_z)
+				shoreline.append(_from_flow(Vector3(_shore_at_vertex(z), DEBUG_HEIGHT_OFFSET, z)))
 		_debug_mesh.mesh = DEBUG_MESH.build(
-			size, volume_depth, debug_color, DEBUG_HEIGHT_OFFSET, active_debug_color, shoreline
+			size, volume_depth, debug_color, DEBUG_HEIGHT_OFFSET, active_debug_color, shoreline,
+			_from_flow(Vector3(_flow_size().x * 0.5, DEBUG_HEIGHT_OFFSET, -_flow_size().y * 0.5)),
+			_from_flow(Vector3(_flow_size().x * 0.5, DEBUG_HEIGHT_OFFSET, _flow_size().y * 0.5))
 		)

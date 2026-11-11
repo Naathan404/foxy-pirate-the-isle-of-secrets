@@ -68,7 +68,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8968143, -0.5328312, -9.80
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.439989)
 
 [node name="EliteStarfish" parent="." index="12" unique_id=554202254 instance=ExtResource("7_txy4b")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.115259)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.141174, 0, -11.115259)
 
 [node name="BeachPalm01" parent="." index="13" unique_id=2038227956 instance=ExtResource("8_8dvq8")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -10.723943, -0.01902628, 9.549429)
@@ -84,6 +84,8 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239
 
 [node name="FlatTide" parent="." index="17" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
 player = NodePath("../Foxy")
+wave_knockback_speed = 10.0
+wave_knockback_duration = 0.2
 
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
@@ -92,7 +94,7 @@ player = NodePath("../../Foxy")
 enemies = Array[ExtResource("12_ral77")]([SubResource("Resource_flat_enemy_starfish"), SubResource("Resource_pin4q")])
 
 [node name="TreasureChest" parent="." index="18" unique_id=1708090331 instance=ExtResource("15_hfst8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.46411943, 7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.46411943, 2)
 
 [editable path="Environment/BaseGround"]
 [editable path="FlatTide"]

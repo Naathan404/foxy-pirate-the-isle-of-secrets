@@ -29,12 +29,16 @@ enum State { LOW, RISING, HIGH, FALLING }
 @export_range(0.0, 1.0, 0.01) var flooded_dash_multiplier: float = 0.5
 ## Khoảng cách từ gốc nhân vật xuống chân để kiểm tra Foxy có đứng trong nước không.
 @export_range(0.0, 2.0, 0.01) var player_ground_offset: float = 0.75
+## Horizontal speed applied when an advancing wave reaches the player; 0 disables it.
+@export_range(0.0, 15.0, 0.1, "suffix:m/s") var wave_knockback_speed: float = 4.0
+@export_range(0.05, 1.0, 0.05, "suffix:s") var wave_knockback_duration: float = 0.3
 
 var state: State = State.LOW
 var coverage: float = 0.0
 var _elapsed: float = 0.0
 var _warned: bool = false
 var _visual_time: float = 0.0
+var _wave_hit_player: bool = false
 
 
 func _ready() -> void:
@@ -92,6 +96,8 @@ func _enter_state(next_state: State) -> void:
 	_elapsed = 0.0
 	if state == State.LOW:
 		_warned = false
+	if state == State.RISING:
+		_wave_hit_player = false
 	state_changed.emit(state)
 
 
@@ -113,7 +119,21 @@ func _apply_coverage() -> void:
 		warning_strength = clampf((_phase_duration() - _elapsed) / warning_fade_duration, 0.0, 1.0)
 	for zone in zones:
 		if is_instance_valid(zone):
-			zone.set_coverage(coverage, warning, _visual_time, warning_strength)
+			var ground_point := Vector3.ZERO
+			var was_wet := false
+			var check_wave := state == State.RISING and not _wave_hit_player and is_instance_valid(player)
+			if check_wave:
+				ground_point = player.global_position + Vector3.DOWN * player_ground_offset
+				was_wet = zone.is_point_in_advancing_wave(ground_point)
+			zone.set_coverage(
+				coverage, warning, _visual_time, warning_strength,
+				state == State.RISING, state == State.FALLING
+			)
+			if check_wave and not was_wet and zone.is_point_in_advancing_wave(ground_point):
+				_wave_hit_player = true
+				player.apply_environment_knockback(
+					zone.get_flow_direction(), wave_knockback_speed, wave_knockback_duration
+				)
 	coverage_changed.emit(coverage)
 
 

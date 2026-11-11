@@ -11,6 +11,7 @@ size = Vector3(1.6, 2, 0.8)
 max_hp = 3.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
+swingable = true
 fragment_source = NodePath("Visual/Sprite3D")
 drop_item = ExtResource("2_gluyk")
 

@@ -9,6 +9,7 @@
 
 [sub_resource type="Resource" id="Meteor"]
 script = ExtResource("2_attack")
+spine_animation = "G1_Idle"
 attack_scene = ExtResource("4_cast")
 aim_mode = 2
 delivery_type = 2
@@ -23,6 +24,7 @@ stamina_cost = 50.0
 
 [sub_resource type="Resource" id="Resource_1ilep"]
 script = ExtResource("2_attack")
+spine_animation = "G1_Idle"
 skill_icon = ExtResource("3_icon")
 display_name = "Meteor Rain"
 description = "Summon 4 to 6 meteors around the selected location. Stand still until the first meteor appears."
