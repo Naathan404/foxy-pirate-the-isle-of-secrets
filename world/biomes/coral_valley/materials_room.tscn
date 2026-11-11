@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dx85yw3vlv0b1"]
+
+[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_medium_room.tscn" id="1_eaqlk"]
+
+[node name="MaterialsRoom" unique_id=326595456 instance=ExtResource("1_eaqlk")]
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

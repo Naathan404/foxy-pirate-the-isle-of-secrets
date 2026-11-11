@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://dcw1y5w1rsbtx"]
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_b8wk4"]
-[ext_resource type="Texture2D" uid="uid://cgq245siynel2" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_35 PM-1.png" id="2_cpl0o"]
 [ext_resource type="Texture2D" uid="uid://cs5pt0b1wog7u" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_40 PM-5.png" id="2_isv0v"]
 [ext_resource type="Texture2D" uid="uid://ca2aih3832nn8" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png" id="3_swrs4"]
 [ext_resource type="Texture2D" uid="uid://dhi68ukq6st5f" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_36 PM-2.png" id="4_cvvyi"]
 [ext_resource type="Texture2D" uid="uid://bhbqjhvvkvd3r" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_38 PM-4.png" id="5_swrs4"]
+[ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://world/biomes/coral_valley/Whimsical Square Beach Island Tile.png" id="6_swrs4"]
 
 [node name="BaseLargeRoom" unique_id=1672893012 instance=ExtResource("1_b8wk4")]
 
@@ -20,7 +20,7 @@ trigger_id = &"down"
 destination_trigger_id = &"up"
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
-transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -1.2079664e-06, 0.05484534, -31.489079)
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -1.509958e-06, 0.05484534, -33.48908)
 
 [node name="Sprite3D" parent="Exits/UpPath" index="0" unique_id=1887481611]
 texture = ExtResource("3_swrs4")
@@ -41,7 +41,7 @@ trigger_id = &"right"
 destination_trigger_id = &"left"
 
 [node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -34.38701, -0.0542326, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -32.38701, -0.0542326, 0)
 
 [node name="Sprite3D" parent="Exits/LeftPath" index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0, 0)
@@ -55,7 +55,7 @@ destination_trigger_id = &"right"
 transform = Transform3D(3.5, 0, 0, 0, 3.5, 0, 0, 0, 3.5, 0, 0, -0.19104576)
 
 [node name="Sprite3D" parent="Environment/BaseGround" index="0" unique_id=516185212]
-texture = ExtResource("2_cpl0o")
+texture = ExtResource("6_swrs4")
 
 [node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.889, -6.9159203, 30.97371)

@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_medium_room.tscn" id="1_5k2ng"]
 
-[node name="BaseMediumRoom" unique_id=326595456 instance=ExtResource("1_5k2ng")]
+[node name="EmptyRoom" unique_id=326595456 instance=ExtResource("1_5k2ng")]
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

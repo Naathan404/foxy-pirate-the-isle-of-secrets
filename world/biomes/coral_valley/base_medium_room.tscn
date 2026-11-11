@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://p0q25uhsjrb3"]
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_base"]
-[ext_resource type="Texture2D" uid="uid://cgq245siynel2" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_35 PM-1.png" id="2_cpl0o"]
 [ext_resource type="Texture2D" uid="uid://cs5pt0b1wog7u" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_40 PM-5.png" id="2_isv0v"]
 [ext_resource type="Texture2D" uid="uid://ca2aih3832nn8" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png" id="3_swrs4"]
 [ext_resource type="Texture2D" uid="uid://dhi68ukq6st5f" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_36 PM-2.png" id="4_cvvyi"]
 [ext_resource type="Texture2D" uid="uid://bhbqjhvvkvd3r" path="res://world/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_38 PM-4.png" id="5_swrs4"]
+[ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://world/biomes/coral_valley/Whimsical Square Beach Island Tile.png" id="6_h54wj"]
 
 [node name="BaseMediumRoom" unique_id=326595456 instance=ExtResource("1_base")]
 
@@ -55,7 +55,7 @@ destination_trigger_id = &"right"
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, -0.19104576)
 
 [node name="Sprite3D" parent="Environment/BaseGround" index="0" unique_id=516185212]
-texture = ExtResource("2_cpl0o")
+texture = ExtResource("6_h54wj")
 
 [node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.605186, -6.9159203, 28.034988)

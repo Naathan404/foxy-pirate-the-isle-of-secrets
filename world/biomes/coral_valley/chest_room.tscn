@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://ib0gmhsv0wp1"]
+
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_small_room.tscn" id="1_eth44"]
+
+[node name="ChestRoom" unique_id=525086743 instance=ExtResource("1_eth44")]
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
