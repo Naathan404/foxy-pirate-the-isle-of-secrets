@@ -891,7 +891,7 @@ metadata/_custom_type_script = "uid://c4fmspxxv4ifk"
 [node name="Foxy" type="CharacterBody3D" unique_id=1350175917 node_paths=PackedStringArray("stamina", "hp", "hurtbox", "weapon_controller", "ammo", "charm_socket_manager", "chaos", "potion", "potion_selector", "inventory_ui", "camera") groups=["player"]]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 collision_layer = 2
-collision_mask = 5
+collision_mask = 261
 floor_constant_speed = true
 floor_max_angle = 0.83775806
 floor_snap_length = 0.3
@@ -1129,6 +1129,7 @@ metadata/_custom_type_script = "uid://b4jjfhk68ly5q"
 transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 24, 24)
 fov = 30.0
 script = ExtResource("camera_bounds_follow")
+bob_vertical_amplitude = 0.04
 
 [node name="TestHUD" type="CanvasLayer" parent="." unique_id=404690851]
 

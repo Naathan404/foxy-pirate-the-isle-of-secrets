@@ -198,6 +198,7 @@ swap_potion={
 3d_physics/layer_6="PlayerAttack"
 3d_physics/layer_7="EnemyAttack"
 3d_physics/layer_8="TargetDetector"
+3d_physics/layer_9="PlayerBoundary"
 
 [physics]
 

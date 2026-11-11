@@ -15,10 +15,16 @@ func _run() -> void:
 		assert(prop != null, "Grass must inherit DestructibleProp")
 		root.add_child(prop)
 		assert(prop.max_hp == 1.0)
+		assert(prop.swingable)
 		assert(prop.drop_item == null and prop.drop_chance == 0.0)
 		assert(prop.visual_root == prop.get_node("Visual/Sprite3D"))
 		assert(prop.fragment_source == prop.visual_root)
 		assert(prop.get_node("HurtBox").actor == prop)
+		var grass_sprite := prop.visual_root as Sprite3D
+		var wind := grass_sprite.material_override as ShaderMaterial
+		assert(wind != null and wind.shader == prop.WIND_SHADER)
+		assert(wind.get_shader_parameter("sprite_texture") == grass_sprite.texture)
+		assert(wind.get_shader_parameter("wind_amplitude") == prop.wind_amplitude)
 		var damage := DamageContext.new()
 		damage.source = source
 		damage.source_team = CombatTeams.PLAYER
@@ -26,9 +32,9 @@ func _run() -> void:
 		assert((prop.get_node("HurtBox") as HurtBox).take_damage(damage) == 1.0)
 		assert(not (prop.get_node("HealthComponent") as HealthComponent).is_alive())
 		assert(not (prop.get_node("HurtBox") as HurtBox).enabled)
-		var flash := (prop.visual_root as Sprite3D).material_overlay as ShaderMaterial
+		var flash := grass_sprite.material_override as ShaderMaterial
 		assert(
-			flash != null and flash.get_shader_parameter("strength") == 1.0,
+			flash != null and flash.get_shader_parameter("flash_strength") == 1.0,
 			"Destroyed grass should flash"
 		)
 		var fragments := root.get_child(root.get_child_count() - 1) as DestructibleFragments
@@ -55,6 +61,7 @@ func _run() -> void:
 	var durable_scene := load("res://world/biomes/ruins/ruins_grass_1.tscn") as PackedScene
 	var durable_prop := durable_scene.instantiate() as DestructibleProp
 	durable_prop.max_hp = 2.0
+	durable_prop.swingable = false
 	root.add_child(durable_prop)
 	var durable_damage := DamageContext.new()
 	durable_damage.source = source
@@ -70,6 +77,20 @@ func _run() -> void:
 	)
 	assert((durable_prop.visual_root as Sprite3D).material_overlay == null)
 	durable_prop.queue_free()
+	var swaying_prop := durable_scene.instantiate() as DestructibleProp
+	swaying_prop.max_hp = 2.0
+	root.add_child(swaying_prop)
+	var swaying_sprite := swaying_prop.visual_root as Sprite3D
+	var swaying_material := swaying_sprite.material_override as ShaderMaterial
+	assert((swaying_prop.get_node("HurtBox") as HurtBox).take_damage(durable_damage) == 1.0)
+	assert(swaying_material.get_shader_parameter("flash_strength") == 1.0)
+	await (
+		create_timer(swaying_prop.hit_flash_hold_duration + swaying_prop.hit_flash_duration + 0.05)
+		. timeout
+	)
+	assert(swaying_material.get_shader_parameter("flash_strength") == 0.0)
+	assert(swaying_sprite.material_override == swaying_material)
+	swaying_prop.queue_free()
 	await process_frame
 	source.queue_free()
 	print("destructible_prop_test: PASS")

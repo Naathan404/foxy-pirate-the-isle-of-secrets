@@ -8,8 +8,8 @@ extends Resource
 @export_range(0.1, 5.0, 0.05) var damage_multiplier: float = 1.0
 @export_range(0.0, 5.0, 0.05) var stagger_multiplier: float = 1.0
 @export_range(0.0, 3.0, 0.05) var knockback_multiplier: float = 0.5
-@export_range(0.0, 0.6, 0.01) var step_distance: float = 0.28
-@export_range(0.02, 0.4, 0.01) var step_duration: float = 0.12
+@export_range(0.0, 5.0, 0.01) var step_distance: float = 0.28
+@export_range(0.02, 0.5, 0.01) var step_duration: float = 0.12
 ## Fraction of recovery that must finish before dash can cancel.
 @export_range(0.0, 1.0, 0.05) var dash_cancel_fraction: float = 0.45
 @export_range(-160.0, 160.0, 1.0) var swing_start_degrees: float = -65.0

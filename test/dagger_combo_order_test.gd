@@ -10,7 +10,11 @@ func _run() -> void:
 	assert(dagger != null and dagger.normal_attack != null)
 	var steps := dagger.normal_attack.combo_steps
 	assert(steps.size() == 4, "Dagger combo must have exactly four attacks")
-	assert(steps[0] == steps[2], "Third attack must retain the first attack's timing")
+	assert(steps[0] != steps[2], "Third attack must have independent settings")
+	assert(is_equal_approx(steps[0].active_seconds, steps[2].active_seconds))
+	var original_damage := steps[0].damage_multiplier
+	steps[2].damage_multiplier = original_damage + 1.0
+	assert(is_equal_approx(steps[0].damage_multiplier, original_damage))
 	assert(steps[3].straight_thrust and steps[3].heavy_impact)
 	assert(is_equal_approx(steps[3].damage_multiplier, 2.0))
 	assert(is_equal_approx(steps[0].shake_pixels, 9.5))

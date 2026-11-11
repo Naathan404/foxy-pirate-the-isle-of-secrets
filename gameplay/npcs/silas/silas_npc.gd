@@ -74,6 +74,10 @@ func get_npc_data() -> NpcData:
 	return data
 
 
+func _get_dialogue_preload_paths() -> Array[String]:
+	return [data.dialogue_timeline, data.greeting_timeline, data.farewell_timeline]
+
+
 func _focus_dialogue_camera(interactor: Player) -> void:
 	# The greeting already focused the camera. Farewell must not focus it again
 	# while the greeting's restore tween may still be running.
@@ -222,7 +226,7 @@ func _finish_closing() -> void:
 
 
 func _hold_player_idle(interactor: Player) -> void:
-	interactor.clear_gameplay_input()
+	interactor.hold_for_dialogue()
 	interactor.set_horizontal_velocity(Vector3.ZERO)
 	if is_instance_valid(interactor.visual):
 		interactor.visual.reset_animation_speed()

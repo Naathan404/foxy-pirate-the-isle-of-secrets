@@ -107,6 +107,11 @@ func set_dagger_combo_index(index: int) -> void:
 		_idle_preview.set_dagger_combo_index(index)
 
 
+func set_attack_spine_override(animation_name: String, skin_name: String = "") -> void:
+	if is_instance_valid(_idle_preview):
+		_idle_preview.set_attack_spine_override(animation_name, skin_name)
+
+
 func play_directional(
 	action: StringName, facing: Vector3, camera: Camera3D = null, restart: bool = false
 ) -> bool:

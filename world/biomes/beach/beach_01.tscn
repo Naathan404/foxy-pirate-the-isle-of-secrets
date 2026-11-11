@@ -26,6 +26,7 @@ size = Vector2(400, 400)
 size = Vector3(11.5, 1, 11.242)
 
 [node name="Beach_01" unique_id=1248439267 instance=ExtResource("1_4owi3")]
+boundary_openings = Array[Rect2]([Rect2(10, -2.2, 7, 10.5)])
 open_exits = 1
 up_destination_scene = "uid://cywu6xden3ef8"
 

@@ -6,6 +6,9 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 
 # Phần prefix của tên animation
 @export var animation_prefix: String = "attack_dagger"
+## Optional Spine clip for this attack; empty keeps the normal animation mapping.
+@export var spine_animation: String = ""
+@export var spine_skin: String = "G1"
 ## HUD artwork for this skill; secondary attacks supply the player's weapon skill icon.
 @export var skill_icon: Texture2D
 @export var display_name: String = ""

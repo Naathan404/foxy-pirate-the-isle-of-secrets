@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://ds0gjtuwmrxnt"]
-
-[ext_resource type="ArrayMesh" uid="uid://dp41kt7ek1l4w" path="res://assets/models/kenney_mini_forest/tree.glb" id="1_8qayx"]
-
-[node name="TreeSilhouette" type="Node3D" unique_id=2025682114]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1066344989]
-mesh = ExtResource("1_8qayx")

@@ -5,6 +5,7 @@
 
 [node name="RuinsGrass3" node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
 max_hp = 1.0
+swingable = true
 visual_root = NodePath("Visual/Sprite3D")
 fragment_source = NodePath("Visual/Sprite3D")
 drop_chance = 0.0

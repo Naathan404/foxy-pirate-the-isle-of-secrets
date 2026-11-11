@@ -130,7 +130,7 @@ func _transition_scene(
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 	var player_state: RefCounted
-	if not reload_scene and is_instance_valid(player):
+	if is_instance_valid(player):
 		player_state = PLAYER_SCENE_STATE.new()
 		player_state.capture(player)
 	var error: Error = load_error
@@ -149,7 +149,7 @@ func _transition_scene(
 		# SceneTree signals after the new scene has entered the tree and run _ready().
 		await get_tree().scene_changed
 		if player_state != null and is_instance_valid(player):
-			player_state.restore(player)
+			player_state.restore(player, not reload_scene)
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
 		# _ready/process_frame do not mean rendering has finished. Keep the first
