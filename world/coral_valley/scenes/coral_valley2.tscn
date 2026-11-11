@@ -6,7 +6,6 @@
 [ext_resource type="MeshLibrary" uid="uid://bp3bf5kj1f8ml" path="res://assets/meshes/objects/ship.meshlib" id="4_bljp2"]
 [ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="5_ao67u"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="5_lvpdc"]
-[ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="6_n346v"]
 [ext_resource type="PackedScene" uid="uid://djxjvu6e00r3h" path="res://world/gimmick/coral_valley/crate_reset_lever.tscn" id="7_65b04"]
 [ext_resource type="PackedScene" uid="uid://ba6tg1dc872os" path="res://world/coral_valley/scenes/coral_valley_water.tscn" id="7_ywsg1"]
 
@@ -63,32 +62,6 @@ trigger_id = &"Coral_2"
 destination_scene = "uid://df5suj6du08w4"
 destination_trigger_id = &"Coral_1"
 
-[node name="TideController" type="Node" parent="." unique_id=881686686 node_paths=PackedStringArray("water")]
-script = ExtResource("6_n346v")
-water = NodePath("../SeaWaters/SeaWater2")
-low_height = -4.5
-high_height = 1.5
-high_duration = 4.0
-metadata/_custom_type_script = "uid://dxep0ykiglw86"
-
-[node name="TideController2" type="Node" parent="." unique_id=1077635319 node_paths=PackedStringArray("water")]
-script = ExtResource("6_n346v")
-water = NodePath("../SeaWaters/SeaWater6")
-low_height = -4.5
-high_height = 1.5
-low_duration = 15.0
-high_duration = 4.0
-metadata/_custom_type_script = "uid://dxep0ykiglw86"
-
-[node name="TideController3" type="Node" parent="." unique_id=1183086758 node_paths=PackedStringArray("water")]
-script = ExtResource("6_n346v")
-water = NodePath("../SeaWaters/SeaWater7")
-low_height = -4.5
-high_height = 1.5
-low_duration = 4.0
-high_duration = 4.0
-metadata/_custom_type_script = "uid://dxep0ykiglw86"
-
 [node name="SeaWaters" type="Node3D" parent="." unique_id=581786872]
 
 [node name="SeaWater" parent="SeaWaters" unique_id=116442875 instance=ExtResource("7_ywsg1")]
@@ -133,72 +106,46 @@ transform = Transform3D(-0.11340001, 0, 0, 0, 1, 0, 0, 0, -0.080640025, -195, -5
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -261, 2, 111)
 crates = [NodePath("../Crate13")]
 
-[node name="Crate" parent="Crates" unique_id=70792245 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate" parent="Crates" unique_id=70792245 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -232, 4, 216)
 push_speed = 3.0
-tide_controller = NodePath("../../TideController")
-float_draft = 2.4
 
-[node name="Crate2" parent="Crates" unique_id=1270575092 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate2" parent="Crates" unique_id=1270575092 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -224, 2, 257)
 push_speed = 3.0
-tide_controller = NodePath("../../TideController")
-float_draft = 2.4
 
-[node name="Crate3" parent="Crates" unique_id=1740224895 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate3" parent="Crates" unique_id=1740224895 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -168, 2, 253)
 push_speed = 3.0
-tide_controller = NodePath("../../TideController")
-float_draft = 2.4
 
-[node name="Crate4" parent="Crates" unique_id=1574250529 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate4" parent="Crates" unique_id=1574250529 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -168, -4, 222)
 push_speed = 3.0
-tide_controller = NodePath("../../TideController")
-float_draft = 2.4
 
-[node name="Crate5" parent="Crates" unique_id=151746617 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate5" parent="Crates" unique_id=151746617 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -183, -6.180834, 115)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate6" parent="Crates" unique_id=1846788442 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate6" parent="Crates" unique_id=1846788442 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -205, -6.180834, 115)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate7" parent="Crates" unique_id=330220597 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate7" parent="Crates" unique_id=330220597 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -213, -6.180834, 103)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate8" parent="Crates" unique_id=1598299600 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate8" parent="Crates" unique_id=1598299600 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -193, -6.180834, 103)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate9" parent="Crates" unique_id=1082068186 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate9" parent="Crates" unique_id=1082068186 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -171, -6.180834, 103)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate10" parent="Crates" unique_id=455015005 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate10" parent="Crates" unique_id=455015005 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -173, -6.180834, 127)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate11" parent="Crates" unique_id=380886011 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate11" parent="Crates" unique_id=380886011 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -193, -6.180834, 127)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate12" parent="Crates" unique_id=765930247 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate12" parent="Crates" unique_id=765930247 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -211, -6.180834, 127)
-tide_controller = NodePath("../../TideController2")
-float_draft = 1.4
 
-[node name="Crate13" parent="Crates" unique_id=2054814192 node_paths=PackedStringArray("tide_controller") instance=ExtResource("5_lvpdc")]
+[node name="Crate13" parent="Crates" unique_id=2054814192 instance=ExtResource("5_lvpdc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -255, 1.8191662, 115)
 push_speed = 3.0
-tide_controller = NodePath("../../TideController3")
-float_draft = 1.4

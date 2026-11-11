@@ -62,8 +62,8 @@
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/combat_screen_flash.tscn" id="combat_screen_flash"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
-[ext_resource type="Script" path="res://gameplay/player/effects/low_health_vignette.gd" id="low_health_vignette"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
+[ext_resource type="Script" uid="uid://dgl3y0vqmhfra" path="res://gameplay/player/effects/low_health_vignette.gd" id="low_health_vignette"]
 [ext_resource type="PackedScene" uid="uid://vbvptqbcgi1u" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
@@ -78,7 +78,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_l2csx"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_s1tal"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -928,7 +928,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3670205, 0)
-process_material = SubResource("ParticleProcessMaterial_l2csx")
+process_material = SubResource("ParticleProcessMaterial_s1tal")
 draw_pass_1 = SubResource("QuadMesh_nnacp")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
@@ -944,9 +944,10 @@ sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
 
-[node name="LowHealthVignette" type="Node" parent="Effects" node_paths=PackedStringArray("health")]
+[node name="LowHealthVignette" type="Node" parent="Effects" unique_id=1834395635 node_paths=PackedStringArray("health", "player")]
 script = ExtResource("low_health_vignette")
 health = NodePath("../../HealthComponent")
+player = NodePath("../..")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
 script = ExtResource("3_nu5xt")
@@ -1022,6 +1023,7 @@ libraries/harpoon = ExtResource("harpoon_animations")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=953316873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.023983002, 0.4617207, 0.002353549)
 shape = SubResource("CapsuleShape3D_jpyye")
+debug_color = Color(0, 1, 0, 0.41960785)
 
 [node name="FSM" type="Node" parent="." unique_id=92062524]
 script = ExtResource("2_6gmdq")

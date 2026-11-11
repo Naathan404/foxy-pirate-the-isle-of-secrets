@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dm08r13abppf3"]
+
+[ext_resource type="Script" uid="uid://bnwp7k6u561jr" path="res://world/gimmick/flat_tide/flat_tide_controller.gd" id="1_nkn8q"]
+[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="2_rybyk"]
+[ext_resource type="Script" uid="uid://cqg6kk5dyjbfi" path="res://world/gimmick/flat_tide/flat_tide_footsteps.gd" id="3_ob4lr"]
+[ext_resource type="Script" uid="uid://cy7giyxuyjq4x" path="res://world/gimmick/flat_tide/flat_tide_enemy_spawner.gd" id="4_00omx"]
+[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="5_awy0v"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="6_g1fdm"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="7_wk3c4"]
+
+[sub_resource type="Resource" id="Resource_flat_enemy_starfish"]
+script = ExtResource("5_awy0v")
+normal_scene = ExtResource("7_wk3c4")
+elite_scene = ExtResource("6_g1fdm")
+
+[node name="FlatTide" type="Node3D" unique_id=477601140 node_paths=PackedStringArray("player", "zones")]
+script = ExtResource("1_nkn8q")
+player = NodePath("")
+zones = [NodePath("NorthShallows")]
+low_duration = 6.0
+high_duration = 6.0
+flooded_move_multiplier = 0.3
+player_ground_offset = 0.5
+
+[node name="NorthShallows" type="MeshInstance3D" parent="." unique_id=928133442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.200718, 0.08, 0.40002728)
+script = ExtResource("2_rybyk")
+size = Vector2(20, 28)
+full_coverage = 0.78
+volume_depth = 2.75
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
+
+[node name="WaterFootsteps" type="Node3D" parent="." unique_id=839092960 node_paths=PackedStringArray("controller", "player")]
+script = ExtResource("3_ob4lr")
+controller = NodePath("..")
+player = NodePath("")
+step_width = 0.1
+
+[node name="EnemySpawner" type="Node3D" parent="." unique_id=888280207 node_paths=PackedStringArray("controller")]
+script = ExtResource("4_00omx")
+controller = NodePath("..")
+enemies = Array[ExtResource("5_awy0v")]([SubResource("Resource_flat_enemy_starfish")])

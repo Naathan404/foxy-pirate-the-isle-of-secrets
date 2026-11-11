@@ -2,7 +2,6 @@
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
 [ext_resource type="PackedScene" path="res://world/hub/objects/sea_water.tscn" id="2_obu5n"]
-[ext_resource type="Script" uid="uid://dxep0ykiglw86" path="res://world/gimmick/coral_valley/tide_controller.gd" id="3_2hijj"]
 [ext_resource type="PackedScene" uid="uid://bk7dgqdctlcjk" path="res://world/gimmick/coral_valley/crate.tscn" id="4_dk6yr"]
 [ext_resource type="MeshLibrary" uid="uid://bsnf5hyhc5ub" path="res://assets/meshes/objects/skull.meshlib" id="5_tal3g"]
 [ext_resource type="MeshLibrary" uid="uid://cksc8nunu7vlw" path="res://assets/meshes/objects/coral_reef.meshlib" id="6_4fkpx"]
@@ -52,35 +51,19 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 transform = Transform3D(0.10999996, 0, 0, 0, 0.6, 0, 0, 0, 0.1188, -108, 0, 146)
 visible = false
 
-[node name="TideController" type="Node" parent="." unique_id=2120747622 node_paths=PackedStringArray("water")]
-script = ExtResource("3_2hijj")
-water = NodePath("../SeaWater")
-low_height = -4.5
-high_height = 1.5
-high_duration = 4.0
-metadata/_custom_type_script = "uid://dxep0ykiglw86"
-
 [node name="Crates" type="Node3D" parent="." unique_id=1081237200]
 
-[node name="Crate" parent="." unique_id=70792245 node_paths=PackedStringArray("tide_controller") instance=ExtResource("4_dk6yr")]
+[node name="Crate" parent="." unique_id=70792245 instance=ExtResource("4_dk6yr")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -105, -4, 144)
-tide_controller = NodePath("../TideController")
-float_draft = 2.4
 
-[node name="Crate2" parent="." unique_id=944126363 node_paths=PackedStringArray("tide_controller") instance=ExtResource("4_dk6yr")]
+[node name="Crate2" parent="." unique_id=944126363 instance=ExtResource("4_dk6yr")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -113, -4, 141)
-tide_controller = NodePath("../TideController")
-float_draft = 2.4
 
-[node name="Crate3" parent="." unique_id=1016196854 node_paths=PackedStringArray("tide_controller") instance=ExtResource("4_dk6yr")]
+[node name="Crate3" parent="." unique_id=1016196854 instance=ExtResource("4_dk6yr")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -109, -4, 152)
-tide_controller = NodePath("../TideController")
-float_draft = 2.4
 
-[node name="Crate4" parent="." unique_id=193096783 node_paths=PackedStringArray("tide_controller") instance=ExtResource("4_dk6yr")]
+[node name="Crate4" parent="." unique_id=193096783 instance=ExtResource("4_dk6yr")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -101, -4, 148)
-tide_controller = NodePath("../TideController")
-float_draft = 2.4
 
 [node name="Skull" type="GridMap" parent="." unique_id=577692768]
 mesh_library = ExtResource("5_tal3g")
