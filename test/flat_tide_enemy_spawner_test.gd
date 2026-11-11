@@ -25,9 +25,10 @@ func _run() -> void:
 	spawner.enemies_per_tide = 5
 	spawner.minimum_player_distance = 0.0
 	spawner.elite_chance = 100.0
-	spawner.enemy_spawned.connect(func(enemy: EnemyBase, elite: bool):
-		spawned.append(enemy)
-		elite_flags.append(elite)
+	spawner.enemy_spawned.connect(
+		func(enemy: EnemyBase, elite: bool):
+			spawned.append(enemy)
+			elite_flags.append(elite)
 	)
 	tide._enter_state(FlatTideController.State.HIGH)
 	tide._apply_coverage()
@@ -38,13 +39,19 @@ func _run() -> void:
 		_check(tide.is_point_flooded(a), "Selected position starts flooded")
 		for j in range(i):
 			var b: Vector3 = spawner._pending[j].position
-			_check(Vector2(a.x - b.x, a.z - b.z).length() >= spawner.minimum_spacing, "Positions respect spacing")
+			_check(
+				Vector2(a.x - b.x, a.z - b.z).length() >= spawner.minimum_spacing,
+				"Positions respect spacing"
+			)
 	_check(spawned.is_empty(), "No spawn while all selected points are submerged")
 	for step in range(1, 101):
 		tide._elapsed = tide.fall_duration * float(step) / 100.0
 		tide._apply_coverage()
 		for enemy in spawned:
-			_check(not tide.is_point_flooded(enemy.global_position), "Enemy appears only after water recedes")
+			_check(
+				not tide.is_point_flooded(enemy.global_position),
+				"Enemy appears only after water recedes"
+			)
 	_check(spawner._pending.is_empty(), "All points processed by low tide")
 	_check(not spawned.is_empty(), "At least one enemy spawned on available ground")
 	_check(elite_flags.all(func(flag: bool): return flag), "100 percent elite chance spawns elites")

@@ -136,7 +136,7 @@ func _is_riding_crate(player: Player, targets: Array[PushableCrate]) -> bool:
 
 
 func _get_safe_destination(
-	player: Player, targets: Array[PushableCrate], excluded: Array[RID]
+	player: Player, _targets: Array[PushableCrate], excluded: Array[RID]
 ) -> Variant:
 	if not is_instance_valid(safe_point):
 		return null
