@@ -30,6 +30,9 @@ ambient_light_energy = 0.72
 [node name="MovingPlatform" parent="." unique_id=304837597 instance=ExtResource("1_dggme")]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -89.25977, 5.8089876, 38.899483)
 
+[node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
+destination_mode = 0
+
 [node name="Foxy" parent="." unique_id=1350175917 instance=ExtResource("1_oxqnf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -130.84038, 8, -22.633942)
 

@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://7d2l7h8n02vv" path="res://data/weapon/weapon_harpoon.tres" id="5_harpoon"]
 [ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="6_starfish"]
 [ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="7_crab"]
-[ext_resource type="Resource" uid="uid://ngxkp0j5jl2b" path="res://data/items/materials/coral.tres" id="8_coral"]
+[ext_resource type="Resource" path="res://data/items/materials/coral.tres" id="8_coral"]
 [ext_resource type="Resource" path="res://data/weapon/forges/shared_pool.tres" id="9_pool"]
 [ext_resource type="Resource" uid="uid://bcjxa7s3n5qkl" path="res://data/weapon/weapon_dagger.tres" id="dagger"]
 [ext_resource type="Resource" uid="uid://bjm73rcy0l6vt" path="res://data/items/materials/fireflies_tail.tres" id="fireflies"]
