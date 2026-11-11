@@ -19,9 +19,15 @@ func _run() -> void:
 	for timeline_path in npc._get_dialogue_preload_paths():
 		if not ResourceLoader.exists(timeline_path):
 			continue
-		while ResourceLoader.load_threaded_get_status(timeline_path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		while (
+			ResourceLoader.load_threaded_get_status(timeline_path)
+			== ResourceLoader.THREAD_LOAD_IN_PROGRESS
+		):
 			await process_frame
-		if ResourceLoader.load_threaded_get_status(timeline_path) == ResourceLoader.THREAD_LOAD_LOADED:
+		if (
+			ResourceLoader.load_threaded_get_status(timeline_path)
+			== ResourceLoader.THREAD_LOAD_LOADED
+		):
 			ResourceLoader.load_threaded_get(timeline_path)
 	npc.queue_free()
 	layout.queue_free()
