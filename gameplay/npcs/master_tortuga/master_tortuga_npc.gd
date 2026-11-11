@@ -32,6 +32,10 @@ func get_npc_data() -> NpcData:
 	return data
 
 
+func _get_dialogue_preload_paths() -> Array[String]:
+	return [data.dialogue_timeline, farewell_timeline]
+
+
 func _focus_dialogue_camera(interactor: Player) -> void:
 	# The greeting already focused the camera; keep its original restore target.
 	if _is_farewell_dialogue:

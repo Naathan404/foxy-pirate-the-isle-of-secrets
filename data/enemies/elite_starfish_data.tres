@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_data")
-max_hp = 24.0
+max_hp = 18.0
 move_speed = 1.5
 acceleration = 24.0
 deceleration = 30.0

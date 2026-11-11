@@ -27,13 +27,13 @@ radius = 6.7
 
 [node name="EliteCrab" unique_id=1976613988 instance=ExtResource("1_base")]
 script = ExtResource("7_elite_crab")
-egg_count_min = 4
-egg_count_max = 8
+egg_count_min = 3
+egg_count_max = 5
 egg_scatter_radius = 6.0
 egg_flight_duration = 0.8
 egg_arc_height = 4.0
 egg_min_spacing = 4.0
-egg_hatch_delay = 2.0
+egg_hatch_delay = 3.0
 egg_warning_duration = 0.7
 egg_shake_distance = 0.08
 egg_shake_frequency = 15.0

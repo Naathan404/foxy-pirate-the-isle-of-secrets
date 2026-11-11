@@ -64,6 +64,17 @@ func _run() -> void:
 		"Shader uses the same wave time"
 	)
 	_check(zone.get_surface_height_at(Vector3.ZERO) > 0.0, "Footsteps have a surface height")
+	zone.size = Vector2(20.0, 12.0)
+	for direction in range(4):
+		zone.flow_direction = direction as FlatTideZone.FlowDirection
+		zone.set_coverage(0.5, false, 0.0)
+		var wet := zone._from_flow(Vector3(1.0, 0.0, 0.0))
+		var dry := zone._from_flow(Vector3(-1.0, 0.0, 0.0))
+		_check(zone.contains_flooded_point(wet), "Direction %d keeps the wet side" % direction)
+		_check(not zone.contains_flooded_point(dry), "Direction %d keeps the dry side" % direction)
+		_check(zone.get_flow_direction().dot((dry - wet).normalized()) > 0.99, "Direction %d points toward shore" % direction)
+	zone.flow_direction = FlatTideZone.FlowDirection.NEGATIVE_X
+	zone.size = Vector2(12.0, 12.0)
 	zone.position = Vector3(3.0, 1.0, -2.0)
 	zone.rotation.y = PI / 3.0
 	var wet_point := zone.to_global(Vector3(0.5, 0.0, 0.0))

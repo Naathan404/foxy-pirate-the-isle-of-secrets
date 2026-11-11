@@ -1,3 +1,5 @@
+# gdlint: disable=max-public-methods
+# Player remains the gameplay API for locomotion, combat, inventory and dialogue callers.
 class_name Player
 extends CharacterBody3D
 
@@ -9,6 +11,8 @@ signal dash_finished(interrupted: bool)
 signal dash_started
 ## Emitted for confirmed outgoing or incoming damage, including Charm hits.
 signal combat_activity
+
+const DIALOGUE_STATE_PRIORITY: int = 20
 
 @export var data: PlayerData
 
@@ -385,6 +389,18 @@ func clear_gameplay_input() -> void:
 	dash_buffer_remaining = 0.0
 
 
+func hold_for_dialogue() -> void:
+	if dead:
+		return
+	clear_gameplay_input()
+	set_horizontal_velocity(Vector3.ZERO)
+	var idle_state := fsm.states.get("idle") as FsmState
+	if is_instance_valid(idle_state) and fsm.change_state(idle_state, DIALOGUE_STATE_PRIORITY):
+		fsm._update(0.0)
+	else:
+		play_directional_animation("idle")
+
+
 func is_gameplay_input_blocked() -> bool:
 	return (
 		blocked
@@ -583,6 +599,19 @@ func play_directional_animation(action: String, restart: bool = false) -> void:
 
 
 # Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
+## Reuse hit recovery without applying damage when an environmental wave hits.
+func apply_environment_knockback(direction: Vector3, speed: float, duration: float) -> void:
+	if dead or speed <= 0.0 or direction.length_squared() < 0.0001:
+		return
+	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
+		return
+	pending_hit_direction = Vector3(direction.x, 0.0, direction.z).normalized()
+	pending_hit_knockback_multiplier = speed / 8.0
+	notify_hit(duration)
+	# A second hit in the hit state refreshes its timer without re-entering it.
+	set_horizontal_velocity(pending_hit_direction * speed)
+
+
 func notify_hit(duration: float = -1.0) -> void:
 	if dead:
 		return

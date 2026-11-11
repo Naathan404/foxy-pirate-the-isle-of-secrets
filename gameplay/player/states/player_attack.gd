@@ -127,6 +127,7 @@ func _exit() -> void:
 	_lock_input_during_cast = false
 	player.set_horizontal_velocity(Vector3.ZERO)
 	if is_instance_valid(player.visual):
+		player.visual.set_attack_spine_override("")
 		player.visual.reset_animation_speed()
 	#player.end_hitbox_attack()
 	if is_instance_valid(controller):
@@ -179,6 +180,7 @@ func _on_attack_started(context: AttackContext) -> void:
 	finished = false
 	_uses_aim_pose = controller.is_aiming()
 	var attack: AttackData = context.weapon.get_attack(context.action)
+	player.visual.set_attack_spine_override(attack.spine_animation, attack.spine_skin)
 	_uses_aim_pose = _uses_aim_pose or attack.phase_driven_animation
 	_lock_input_during_cast = attack.lock_input_during_cast
 	_held_action = context.action

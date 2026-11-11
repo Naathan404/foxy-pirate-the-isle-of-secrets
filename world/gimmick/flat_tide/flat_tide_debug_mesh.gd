@@ -9,7 +9,9 @@ static func build(
 	color: Color,
 	height_offset: float,
 	active_color: Color,
-	shoreline: PackedVector3Array
+	shoreline: PackedVector3Array,
+	sea_start: Vector3,
+	sea_end: Vector3
 ) -> ImmediateMesh:
 	var lines := ImmediateMesh.new()
 	lines.surface_begin(Mesh.PRIMITIVE_LINES, _make_material(color))
@@ -34,8 +36,6 @@ static func build(
 		for index in range(shoreline.size() - 1):
 			lines.surface_add_vertex(shoreline[index])
 			lines.surface_add_vertex(shoreline[index + 1])
-		var sea_start := Vector3(half.x, height_offset, -half.y)
-		var sea_end := Vector3(half.x, height_offset, half.y)
 		for pair in [
 			[shoreline[0], sea_start],
 			[sea_start, sea_end],

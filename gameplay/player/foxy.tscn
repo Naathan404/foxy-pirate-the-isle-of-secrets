@@ -1129,6 +1129,7 @@ metadata/_custom_type_script = "uid://b4jjfhk68ly5q"
 transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 24, 24)
 fov = 30.0
 script = ExtResource("camera_bounds_follow")
+bob_vertical_amplitude = 0.04
 
 [node name="TestHUD" type="CanvasLayer" parent="." unique_id=404690851]
 
