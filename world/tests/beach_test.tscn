@@ -5,27 +5,11 @@
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/beach/beach_coral_pink.tscn" id="3_cvepx"]
 [ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/beach/beach_coral_orange.tscn" id="4_i2uwp"]
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/beach/beach_coral_turquoise.tscn" id="5_adkab"]
-[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="6_8dvq8"]
-[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="7_txy4b"]
 [ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/beach/beach_palm_01.tscn" id="8_8dvq8"]
 [ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/beach/beach_palm_02.tscn" id="9_txy4b"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/beach/beach_palm_03.tscn" id="10_ryrkc"]
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="11_txy4b"]
-[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="12_ral77"]
-[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="13_hfst8"]
-[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="14_fv4rj"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="15_hfst8"]
-
-[sub_resource type="Resource" id="Resource_flat_enemy_starfish"]
-script = ExtResource("12_ral77")
-normal_scene = ExtResource("6_8dvq8")
-elite_scene = ExtResource("7_txy4b")
-
-[sub_resource type="Resource" id="Resource_pin4q"]
-script = ExtResource("12_ral77")
-normal_scene = ExtResource("14_fv4rj")
-elite_scene = ExtResource("13_hfst8")
-metadata/_custom_type_script = "uid://juar8i43t1me"
 
 [node name="BeachTest" unique_id=1248439267 instance=ExtResource("1_mf2w3")]
 open_exits = 8
@@ -46,6 +30,9 @@ transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -0.19104576)
 transform = Transform3D(1.15, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0.23909378)
 texture = ExtResource("2_aimq4")
 
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+collision_mask = 5
+
 [node name="BeachCoralPink" parent="." index="5" unique_id=917493758 instance=ExtResource("3_cvepx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.914507, -0.28897715, 0)
 
@@ -64,25 +51,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.217375, -0.5328312, 9.2428
 [node name="BeachCoralTurquoise2" parent="." index="10" unique_id=957311374 instance=ExtResource("5_adkab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8968143, -0.5328312, -9.8024845)
 
-[node name="Starfish" parent="." index="11" unique_id=1294052233 instance=ExtResource("6_8dvq8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.439989)
-
-[node name="EliteStarfish" parent="." index="12" unique_id=554202254 instance=ExtResource("7_txy4b")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.141174, 0, -11.115259)
-
-[node name="BeachPalm01" parent="." index="13" unique_id=2038227956 instance=ExtResource("8_8dvq8")]
+[node name="BeachPalm01" parent="." index="11" unique_id=2038227956 instance=ExtResource("8_8dvq8")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -10.723943, -0.01902628, 9.549429)
 
-[node name="BeachPalm02" parent="." index="14" unique_id=1258651850 instance=ExtResource("9_txy4b")]
+[node name="BeachPalm02" parent="." index="12" unique_id=1258651850 instance=ExtResource("9_txy4b")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -11.476313, 0.039654255, -6.721592)
 
-[node name="BeachPalm03" parent="." index="15" unique_id=263936662 instance=ExtResource("10_ryrkc")]
+[node name="BeachPalm03" parent="." index="13" unique_id=263936662 instance=ExtResource("10_ryrkc")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.6550527, -0.14819193, 2.0440178)
 
-[node name="BeachPalm04" parent="." index="16" unique_id=572503273 instance=ExtResource("9_txy4b")]
+[node name="BeachPalm04" parent="." index="14" unique_id=572503273 instance=ExtResource("9_txy4b")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239526)
 
-[node name="FlatTide" parent="." index="17" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
+[node name="FlatTide" parent="." index="15" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
 player = NodePath("../Foxy")
 wave_knockback_speed = 10.0
 wave_knockback_duration = 0.2
@@ -90,10 +71,7 @@ wave_knockback_duration = 0.2
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
 
-[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
-enemies = Array[ExtResource("12_ral77")]([SubResource("Resource_flat_enemy_starfish"), SubResource("Resource_pin4q")])
-
-[node name="TreasureChest" parent="." index="18" unique_id=1708090331 instance=ExtResource("15_hfst8")]
+[node name="TreasureChest" parent="." index="16" unique_id=1708090331 instance=ExtResource("15_hfst8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.46411943, 2)
 
 [editable path="Environment/BaseGround"]

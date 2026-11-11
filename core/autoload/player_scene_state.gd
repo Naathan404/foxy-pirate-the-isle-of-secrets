@@ -41,7 +41,8 @@ func capture(player: Player) -> void:
 		equipped_charms = loadout.equipped_charm_ids.duplicate()
 
 
-func restore(player: Player) -> void:
+## A room reload restores progression but starts the new player at full health and stamina.
+func restore(player: Player, restore_vitals: bool = true) -> void:
 	var inventory := player.get_node("Inventory") as Inventory
 	inventory.slots.clear()
 	for slot: InventorySlot in inventory_slots:
@@ -69,9 +70,13 @@ func restore(player: Player) -> void:
 	if is_instance_valid(player.charm_socket_manager):
 		player.charm_socket_manager.restore_progression(unlocked_sockets, equipped_charms)
 
-	player.hp.set_current_hp(hp)
-	player.stamina.set_current_sp(sp)
-	player.chaos.gain(chaos)
+	if restore_vitals:
+		player.hp.set_current_hp(hp)
+		player.stamina.set_current_sp(sp)
+		player.chaos.gain(chaos)
+	else:
+		player.hp.set_current_hp(player.hp.get_max_hp())
+		player.stamina.set_current_sp(player.stamina.get_max_sp())
 	player.last_facing_direction = facing
 	player.potion.equipped_potion = primary_potion
 	player.potion.secondary_potion = secondary_potion
