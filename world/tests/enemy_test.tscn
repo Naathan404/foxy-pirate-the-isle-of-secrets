@@ -1,9 +1,6 @@
 [gd_scene format=3 uid="uid://duotfvqlbh66k"]
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_player"]
-[ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="2_barrel"]
-[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="3_elite"]
-[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="4_crab"]
 
 [sub_resource type="Environment" id="Environment_arena"]
 background_mode = 1
@@ -111,27 +108,3 @@ shape = SubResource("Shape_obstacle")
 
 [node name="Foxy" parent="." unique_id=40793424 instance=ExtResource("1_player")]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0.5, 3)
-
-[node name="Barrel" parent="." unique_id=939155174 instance=ExtResource("2_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -2)
-bullet_lifetime = null
-bullet_gravity = null
-bullet_ground_bounce = null
-trigger_mode = 0
-auto_aim_at_player = false
-direction_mode = 0
-shot_interval = 0.2
-scattershot_bullet_count = 5
-scattershot_arc_degrees = 50.0
-
-[node name="EliteBarrel" parent="." unique_id=1401837502 instance=ExtResource("3_elite")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -2)
-bullet_lifetime = null
-bullet_gravity = null
-bullet_ground_bounce = null
-trigger_mode = 0
-auto_aim_at_player = false
-shot_interval = 0.2
-
-[node name="Crab" parent="." unique_id=806958252 instance=ExtResource("4_crab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
