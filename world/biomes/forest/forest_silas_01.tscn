@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="4_oi1b4"]
 
 [node name="forest_double_01" unique_id=1248439267 instance=ExtResource("1_qd1qp")]
+boundary_openings = Array[Rect2]([Rect2(11, -0.4, 23, 4.5)])
 open_exits = 4
 up_destination_scene = "uid://uqkujjtj6l7"
 down_destination_scene = "uid://uqkujjtj6l7"

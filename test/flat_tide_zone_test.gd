@@ -72,7 +72,10 @@ func _run() -> void:
 		var dry := zone._from_flow(Vector3(-1.0, 0.0, 0.0))
 		_check(zone.contains_flooded_point(wet), "Direction %d keeps the wet side" % direction)
 		_check(not zone.contains_flooded_point(dry), "Direction %d keeps the dry side" % direction)
-		_check(zone.get_flow_direction().dot((dry - wet).normalized()) > 0.99, "Direction %d points toward shore" % direction)
+		_check(
+			zone.get_flow_direction().dot((dry - wet).normalized()) > 0.99,
+			"Direction %d points toward shore" % direction
+		)
 	zone.flow_direction = FlatTideZone.FlowDirection.NEGATIVE_X
 	zone.size = Vector2(12.0, 12.0)
 	zone.position = Vector3(3.0, 1.0, -2.0)

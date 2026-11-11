@@ -2,6 +2,8 @@
 class_name FlatTideZone
 extends MeshInstance3D
 
+enum FlowDirection { NEGATIVE_X, POSITIVE_X, NEGATIVE_Z, POSITIVE_Z }
+
 const DEFAULT_MATERIAL := preload("res://world/gimmick/flat_tide/flat_tide_volume_material.tres")
 const VOLUME_MESH := preload("res://world/gimmick/flat_tide/flat_tide_volume_mesh.gd")
 const DEBUG_MESH := preload("res://world/gimmick/flat_tide/flat_tide_debug_mesh.gd")
@@ -11,8 +13,6 @@ const MIN_SEGMENTS := 2
 const MIN_COVERAGE_SPAN := 0.001
 const MIN_WAVE_LENGTH := 0.1
 const DEBUG_HEIGHT_OFFSET := 0.03
-
-enum FlowDirection { NEGATIVE_X, POSITIVE_X, NEGATIVE_Z, POSITIVE_Z }
 
 @export_group("Area")
 ## Hướng nước tiến vào, theo trục cục bộ của vùng.
@@ -205,8 +205,12 @@ func _rebuild() -> void:
 		return
 	_material = water_material.duplicate() as ShaderMaterial
 	_material.render_priority = water_render_priority
-	var volume := VOLUME_MESH.build(_flow_size(), volume_depth, surface_segments_x, surface_segments_z)
-	var bounds := AABB(Vector3(-size.x * 0.5, 0.0, -size.y * 0.5), Vector3(size.x, volume_depth, size.y))
+	var volume := VOLUME_MESH.build(
+		_flow_size(), volume_depth, surface_segments_x, surface_segments_z
+	)
+	var bounds := AABB(
+		Vector3(-size.x * 0.5, 0.0, -size.y * 0.5), Vector3(size.x, volume_depth, size.y)
+	)
 	if editor_preview:
 		_preview_mesh.mesh = volume
 		_preview_mesh.custom_aabb = bounds
@@ -228,8 +232,12 @@ func _update_editor_preview() -> void:
 
 
 func set_coverage(
-	coverage: float, warning: bool, animation_time: float = 0.0, warning_strength: float = 1.0,
-	rising: bool = false, falling: bool = false
+	coverage: float,
+	warning: bool,
+	animation_time: float = 0.0,
+	warning_strength: float = 1.0,
+	rising: bool = false,
+	falling: bool = false
 ) -> void:
 	_fill = clampf(
 		(coverage - start_coverage) / maxf(MIN_COVERAGE_SPAN, full_coverage - start_coverage),
@@ -303,7 +311,9 @@ func is_point_in_advancing_wave(point: Vector3) -> bool:
 	var first := clampi(floori(segment), 0, surface_segments_z - 1)
 	var z0 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first) / surface_segments_z)
 	var z1 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first + 1) / surface_segments_z)
-	var front := lerpf(_wave_foot_at_vertex(z0), _wave_foot_at_vertex(z1), clampf(segment - first, 0.0, 1.0))
+	var front := lerpf(
+		_wave_foot_at_vertex(z0), _wave_foot_at_vertex(z1), clampf(segment - first, 0.0, 1.0)
+	)
 	return local.x >= front
 
 
@@ -415,10 +425,17 @@ func _rebuild_debug() -> void:
 		if not Engine.is_editor_hint() and _fill > 0.0:
 			var flow_size := _flow_size()
 			for index in range(surface_segments_z + 1):
-				var z := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(index) / surface_segments_z)
+				var z := lerpf(
+					-flow_size.y * 0.5, flow_size.y * 0.5, float(index) / surface_segments_z
+				)
 				shoreline.append(_from_flow(Vector3(_shore_at_vertex(z), DEBUG_HEIGHT_OFFSET, z)))
 		_debug_mesh.mesh = DEBUG_MESH.build(
-			size, volume_depth, debug_color, DEBUG_HEIGHT_OFFSET, active_debug_color, shoreline,
+			size,
+			volume_depth,
+			debug_color,
+			DEBUG_HEIGHT_OFFSET,
+			active_debug_color,
+			shoreline,
 			_from_flow(Vector3(_flow_size().x * 0.5, DEBUG_HEIGHT_OFFSET, -_flow_size().y * 0.5)),
 			_from_flow(Vector3(_flow_size().x * 0.5, DEBUG_HEIGHT_OFFSET, _flow_size().y * 0.5))
 		)
