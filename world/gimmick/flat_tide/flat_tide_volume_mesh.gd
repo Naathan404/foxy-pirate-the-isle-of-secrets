@@ -34,39 +34,37 @@ static func build(size: Vector2, depth: float, segments_x: int, segments_z: int)
 				Vector3(x0, depth, z1),
 				false
 			)
-		_add_quad(
-			builder,
-			size,
-			depth,
-			Vector3(x0, 0.0, -half.y),
-			Vector3(x1, 0.0, -half.y),
-			Vector3(x1, depth, -half.y),
-			Vector3(x0, depth, -half.y),
-			true
-		)
-		_add_quad(
-			builder,
-			size,
-			depth,
-			Vector3(x0, 0.0, half.y),
-			Vector3(x1, 0.0, half.y),
-			Vector3(x1, depth, half.y),
-			Vector3(x0, depth, half.y),
-			true
-		)
+		for row in range(4):
+			var y0 := depth * float(row) / 4.0
+			var y1 := depth * float(row + 1) / 4.0
+			for edge_z in [-half.y, half.y]:
+				_add_quad(
+					builder,
+					size,
+					depth,
+					Vector3(x0, y0, edge_z),
+					Vector3(x1, y0, edge_z),
+					Vector3(x1, y1, edge_z),
+					Vector3(x0, y1, edge_z),
+					true
+				)
 	for z in range(segments_z):
 		var z0 := lerpf(-half.y, half.y, float(z) / segments_z)
 		var z1 := lerpf(-half.y, half.y, float(z + 1) / segments_z)
-		_add_quad(
-			builder,
-			size,
-			depth,
-			Vector3(-half.x, 0.0, z0),
-			Vector3(-half.x, 0.0, z1),
-			Vector3(-half.x, depth, z1),
-			Vector3(-half.x, depth, z0),
-			true
-		)
+		# Extra rows only on the advancing face let the shader round the breaker.
+		for row in range(4):
+			var y0 := depth * float(row) / 4.0
+			var y1 := depth * float(row + 1) / 4.0
+			_add_quad(
+				builder,
+				size,
+				depth,
+				Vector3(-half.x, y0, z0),
+				Vector3(-half.x, y0, z1),
+				Vector3(-half.x, y1, z1),
+				Vector3(-half.x, y1, z0),
+				true
+			)
 		_add_quad(
 			builder,
 			size,

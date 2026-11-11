@@ -87,6 +87,18 @@ func _run() -> void:
 		assert(preview._active and preview.visible, "Spine not visible during " + str(hit[0]))
 		assert(not source.visible, "Old sprite visible during " + str(hit[0]))
 		assert(preview._current_spine_animation == hit[1] and preview._current_spine_skin == hit[2])
+	var meteor_staff := load("res://data/weapon/weapon_meteor_staff.tres") as WeaponData
+	assert(meteor_staff.normal_attack.spine_animation == "G1_Idle")
+	assert(meteor_staff.secondary_attack.spine_animation == "G1_Idle")
+	preview.set_dagger_combo_index(-1)
+	preview.set_attack_spine_override(
+		meteor_staff.secondary_attack.spine_animation,
+		meteor_staff.secondary_attack.spine_skin
+	)
+	preview.sync_animation(&"attack_dagger_down", source, source, null, false, Vector3.BACK, true)
+	assert(preview._active and preview.visible, "Meteor skill should use Spine")
+	assert(preview._current_spine_animation == "G1_Idle")
+	assert(not source.visible, "Meteor skill should hide the legacy sprite")
 	preview.queue_free()
 	foxy.free()
 	print("Foxy Spine export contains all mapped animations and skins")

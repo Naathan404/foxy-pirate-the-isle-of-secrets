@@ -15,6 +15,9 @@ enum InitialFacing {
 	RIGHT,
 }
 
+const DIALOGUE_STYLE_PATH := "res://dialog/ui/pirate_dialogue_style.tres"
+const DIALOGUE_LAYOUT_KEEP_HIDDEN := 1
+
 @export_group("Initial State")
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var initial_state_name: StringName = &"Idle"
@@ -56,6 +59,29 @@ func _ready() -> void:
 	face_direction(_get_initial_facing_direction())
 	if not fsm.setup(self, initial_state.get_parent(), initial_state):
 		set_physics_process(false)
+	_prepare_dialogue_resources.call_deferred()
+
+
+func _prepare_dialogue_resources() -> void:
+	var dialogic := _get_dialogic()
+	if dialogic == null or not is_instance_valid(get_npc_data()):
+		return
+	ProjectSettings.set_setting("dialogic/layout/default_style", DIALOGUE_STYLE_PATH)
+	ProjectSettings.set_setting("dialogic/layout/end_behaviour", DIALOGUE_LAYOUT_KEEP_HIDDEN)
+	for timeline_path in _get_dialogue_preload_paths():
+		if not timeline_path.is_empty() and ResourceLoader.exists(timeline_path):
+			ResourceLoader.load_threaded_request(timeline_path)
+	var styles: Node = dialogic.call(&"get_subsystem", "Styles")
+	if not is_instance_valid(styles) or dialogic.get("current_timeline") != null:
+		return
+	styles.call(&"preload_style", DIALOGUE_STYLE_PATH)
+	var layout := styles.call(&"change_style", DIALOGUE_STYLE_PATH) as Node
+	if is_instance_valid(layout) and layout.has_method(&"hide"):
+		layout.call(&"hide")
+
+
+func _get_dialogue_preload_paths() -> Array[String]:
+	return [get_npc_data().dialogue_timeline]
 
 
 func _exit_tree() -> void:
@@ -287,7 +313,7 @@ func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 	_conversation_player = interactor
 	_conversation_player_was_blocked = interactor.blocked
 	interactor.blocked = true
-	interactor.clear_gameplay_input()
+	interactor.hold_for_dialogue()
 	interaction_area.set_interaction_enabled(false)
 	face_target(interactor)
 	_focus_dialogue_camera(interactor)
@@ -296,12 +322,11 @@ func _start_dialogue(interactor: Player, timeline_path: String = "") -> bool:
 		fsm.change_state(talk_state)
 	# Dialogic.start() clears its base style before the first text event. That
 	# event then resolves the default style again, so keep both paths aligned.
-	ProjectSettings.set_setting(
-		"dialogic/layout/default_style", "res://dialog/ui/pirate_dialogue_style.tres"
-	)
+	ProjectSettings.set_setting("dialogic/layout/default_style", DIALOGUE_STYLE_PATH)
+	ProjectSettings.set_setting("dialogic/layout/end_behaviour", DIALOGUE_LAYOUT_KEEP_HIDDEN)
 	var styles: Node = dialogic.call(&"get_subsystem", "Styles")
 	if is_instance_valid(styles):
-		styles.call(&"change_style", "res://dialog/ui/pirate_dialogue_style.tres")
+		styles.call(&"change_style", DIALOGUE_STYLE_PATH)
 	dialogic.connect(&"timeline_ended", _on_dialogue_ended, CONNECT_ONE_SHOT)
 	dialogic.call(&"start", resolved_timeline)
 	dialogue_started.emit(interactor)
