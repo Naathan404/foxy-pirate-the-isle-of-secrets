@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://duotfvqlbh66k"]
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="2_654ia"]
 [ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="3_coral_skeleton"]
 
 [sub_resource type="Environment" id="Environment_arena"]
@@ -109,6 +110,9 @@ shape = SubResource("Shape_obstacle")
 
 [node name="Foxy" parent="." unique_id=40793424 instance=ExtResource("1_player")]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0.5, 3)
+
+[node name="EliteCrab" parent="." unique_id=1976613988 instance=ExtResource("2_654ia")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
 
 [node name="CoralSkeleton" parent="." unique_id=1381459304 instance=ExtResource("3_coral_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
