@@ -29,28 +29,44 @@ func _run() -> void:
 	var visual := skeleton.visual
 	visual.play_directional(&"sleep", Vector3.BACK, true)
 	await create_timer(0.03).timeout
-	_check(visual.sprite.texture.resource_path.ends_with("sleep_6.png"), "Sleep sheet was not selected")
+	_check(
+		visual.sprite.texture.resource_path.ends_with("sleep_6.png"), "Sleep sheet was not selected"
+	)
 	_check(visual.sleep_indicator.visible, "Sleep indicator was not shown")
 	visual.play_directional(&"idle", Vector3.BACK, true)
 	await process_frame
 	var first_frame := visual.sprite.frame
 	await create_timer(0.25).timeout
 	_check(visual.sprite.frame != first_frame, "Idle animation did not advance")
-	_check(visual.sprite.hframes == 6 and visual.sprite.vframes == 3, "Sprite sheet does not have six frames per direction")
+	_check(
+		visual.sprite.hframes == 6 and visual.sprite.vframes == 3,
+		"Sprite sheet does not have six frames per direction"
+	)
 	visual.play_directional(&"walk", Vector3.RIGHT, true)
 	await create_timer(0.03).timeout
 	_check(visual.sprite.texture.resource_path.ends_with("walk_6.png"), "Walk sheet was not selected")
-	_check(visual.sprite.frame >= 6 and visual.sprite.frame < 12, "Side direction did not select side row")
+	_check(
+		visual.sprite.frame >= 6 and visual.sprite.frame < 12,
+		"Side direction did not select side row"
+	)
 	await create_timer(0.5).timeout
-	_check(visual.sprite.texture.resource_path.ends_with("walk_opposite_6.png"), "Walk did not switch to the opposite step")
+	_check(
+		visual.sprite.texture.resource_path.ends_with("walk_opposite_6.png"),
+		"Walk did not switch to the opposite step"
+	)
 	visual.play_directional(&"shoot", Vector3.RIGHT, true)
 	visual.call("show_fire")
 	await create_timer(0.03).timeout
-	_check(visual.sprite.texture.resource_path.ends_with("shoot_6.png"), "Shoot sheet was not selected")
+	_check(
+		visual.sprite.texture.resource_path.ends_with("shoot_6.png"), "Shoot sheet was not selected"
+	)
 	_check(visual.sprite.frame == 9, "Muzzle flash frame is not synchronized with shot")
 	visual.play_hit_feedback()
 	await create_timer(0.03).timeout
-	_check(visual.sprite.texture.resource_path.ends_with("hit_death_6.png"), "Hit sheet was not selected")
+	_check(
+		visual.sprite.texture.resource_path.ends_with("hit_death_6.png"),
+		"Hit sheet was not selected"
+	)
 	skeleton.set_physics_process(true)
 	skeleton.die()
 	await create_timer(1.8).timeout

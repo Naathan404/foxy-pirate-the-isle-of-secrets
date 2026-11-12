@@ -9,12 +9,14 @@ var direction := Vector3.FORWARD
 var speed := 0.0
 var damage := 0.0
 var remaining := 0.0
+var trail: GPUParticles3D
 @onready var sweep: ShapeCast3D = $Sweep
 @onready var hitbox: HitBox = $HitBox
-var trail: GPUParticles3D
 
 
-func setup(owner_node: Node, team: int, heading: Vector3, shot_speed: float, amount: float, lifetime: float) -> void:
+func setup(
+	owner_node: Node, team: int, heading: Vector3, shot_speed: float, amount: float, lifetime: float
+) -> void:
 	source = owner_node
 	source_team = team
 	direction = heading.normalized()

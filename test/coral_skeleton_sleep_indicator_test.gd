@@ -38,7 +38,10 @@ func _run() -> void:
 		_check(first.modulate.a < full_alpha, "Sleep indicator did not fade before disappearing")
 		visual.play_directional(&"idle", Vector3.BACK, true)
 		visual._process(0.01)
-		_check(not first.visible and not second.visible and not third.visible, "Indicators remained visible after waking")
+		_check(
+			not first.visible and not second.visible and not third.visible,
+			"Indicators remained visible after waking"
+		)
 		visual.set("show_sleep_indicator", false)
 		visual.play_directional(&"sleep", Vector3.BACK, true)
 		visual._process(0.1)

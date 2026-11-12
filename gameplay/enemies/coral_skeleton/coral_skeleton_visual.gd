@@ -2,7 +2,9 @@ extends EnemyVisual
 
 const IDLE_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/idle_6.png")
 const WALK_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/walk_6.png")
-const WALK_OPPOSITE_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/walk_opposite_6.png")
+const WALK_OPPOSITE_SHEET := preload(
+	"res://assets/sprites/enemies/coral_skeleton/walk_opposite_6.png"
+)
 const SLEEP_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/sleep_6.png")
 const SHOOT_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/shoot_6.png")
 const HIT_DEATH_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/hit_death_6.png")
@@ -28,10 +30,10 @@ var action: StringName = &"idle"
 var elapsed := 0.0
 var fire_feedback_remaining := 0.0
 var flinch_remaining := 0.0
-@onready var sleep_indicator: Label3D = get_node_or_null(^"SleepIndicator") as Label3D
 var _sleep_indicators: Array[Label3D] = []
 var _sleep_indicator_origin := Vector3.ZERO
 var _sleep_indicator_base_color := Color.WHITE
+@onready var sleep_indicator: Label3D = get_node_or_null(^"SleepIndicator") as Label3D
 
 
 func _ready() -> void:

@@ -81,7 +81,9 @@ func _apply_detection_radius() -> void:
 		return
 	var shape := collision.shape as CylinderShape3D
 	if shape != null:
-		shape.radius = maxf(sleep_detection_radius, detection_radius) if is_awake else sleep_detection_radius
+		shape.radius = (
+			maxf(sleep_detection_radius, detection_radius) if is_awake else sleep_detection_radius
+		)
 
 
 func _physics_process(delta: float) -> void:

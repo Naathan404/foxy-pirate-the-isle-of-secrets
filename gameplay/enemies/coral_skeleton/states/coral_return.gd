@@ -35,7 +35,9 @@ func _update(delta: float) -> void:
 			var max_angle := maxf(skeleton.return_min_turn_angle, skeleton.return_max_turn_angle)
 			var angle := turn_sign * deg_to_rad(randf_range(min_angle, max_angle))
 			direction = skeleton.choose_safe_direction(home.normalized().rotated(Vector3.UP, angle))
-			remaining = minf(skeleton.return_segment_time, home.length() / maxf(0.1, skeleton.data.move_speed))
+			remaining = minf(
+				skeleton.return_segment_time, home.length() / maxf(0.1, skeleton.data.move_speed)
+			)
 	if pausing or direction.is_zero_approx() or not skeleton.safe_direction(direction):
 		skeleton._set_horizontal_velocity(Vector3.ZERO)
 		skeleton.play_directional_animation(&"idle")
