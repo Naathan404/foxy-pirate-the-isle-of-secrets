@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://duotfvqlbh66k"]
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="3_coral_skeleton"]
 
 [sub_resource type="Environment" id="Environment_arena"]
 background_mode = 1
@@ -108,3 +109,26 @@ shape = SubResource("Shape_obstacle")
 
 [node name="Foxy" parent="." unique_id=40793424 instance=ExtResource("1_player")]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0.5, 3)
+
+[node name="CoralSkeleton" parent="." unique_id=1381459304 instance=ExtResource("3_coral_skeleton")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
+sleep_detection_radius = 3.5
+detection_radius = 8.0
+sleep_delay = 4.0
+wake_duration = 0.35
+wake_attack_delay = 1.0
+shooting_range = 4.5
+home_tolerance = 0.6
+return_segment_time = 0.8
+return_pause_time = 0.35
+return_min_turn_angle = 20.0
+return_max_turn_angle = 49.0
+shot_mode = 0
+bullets_per_burst = 3
+fan_angle = 30.0
+shot_interval = 0.2
+fire_delay = 0.4
+burst_cooldown = 2.0
+shoot_recovery_time = 0.24
+bullet_speed = 10.0
+bullet_lifetime = 3.0

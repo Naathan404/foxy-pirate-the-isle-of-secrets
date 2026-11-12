@@ -1,0 +1,95 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="PackedScene" path="res://gameplay/enemies/base/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.gd" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/coral_skeleton_data.tres" id="3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/coral_skeleton/sleep_6.png" id="4"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/coral_skeleton_visual.gd" id="5"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_guard.gd" id="6"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_chase.gd" id="7"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_return.gd" id="8"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_shoot.gd" id="9"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_sleep.gd" id="10"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_wake.gd" id="11"]
+
+[sub_resource type="CylinderShape3D" id="Detector"]
+height = 3.0
+radius = 3.5
+
+[sub_resource type="CapsuleShape3D" id="Body"]
+radius = 0.55
+height = 2.3
+
+[sub_resource type="CapsuleShape3D" id="Hurtbox"]
+radius = 0.65
+height = 2.5
+
+[node name="CoralSkeleton" instance=ExtResource("1")]
+script = ExtResource("2")
+data = ExtResource("3")
+initial_state_name = &"Sleep"
+destroy_on_death = true
+
+[node name="Visual" parent="." index="0" node_paths=PackedStringArray("sprite", "animation_player")]
+script = ExtResource("5")
+sprite = NodePath("Sprite3D")
+animation_player = NodePath("AnimationPlayer")
+
+[node name="Sprite3D" parent="Visual" index="0"]
+pixel_size = 0.012
+offset = Vector2(0, 135)
+texture_filter = 1
+texture = ExtResource("4")
+hframes = 6
+vframes = 3
+
+[node name="SleepIndicator" type="Label3D" parent="Visual" index="2"]
+position = Vector3(0.35, 3.05, 0)
+billboard = 1
+pixel_size = 0.008
+modulate = Color(0.65, 0.95, 0.91, 1)
+outline_size = 5
+font_size = 56
+text = "z"
+visible = false
+
+[node name="FrontRayCast3D" parent="Direction" index="0"]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" index="1"]
+enabled = true
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
+position = Vector3(0, 1.25, 0)
+shape = SubResource("Hurtbox")
+
+[node name="BulletSpawn" type="Marker3D" parent="Direction" index="3"]
+position = Vector3(0, 1.45, 0.75)
+
+[node name="Guard" type="Node" parent="States" index="3"]
+script = ExtResource("6")
+
+[node name="Chase" type="Node" parent="States" index="4"]
+script = ExtResource("7")
+
+[node name="Return" type="Node" parent="States" index="5"]
+script = ExtResource("8")
+
+[node name="Shoot" type="Node" parent="States" index="6"]
+script = ExtResource("9")
+
+[node name="Sleep" type="Node" parent="States" index="7"]
+script = ExtResource("10")
+
+[node name="Wake" type="Node" parent="States" index="8"]
+script = ExtResource("11")
+
+[node name="TargetDetector" type="Area3D" parent="." index="4"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector"]
+position = Vector3(0, 1, 0)
+shape = SubResource("Detector")
+
+[node name="CollisionShape3D" parent="." index="5"]
+position = Vector3(0, 1.15, 0)
+shape = SubResource("Body")

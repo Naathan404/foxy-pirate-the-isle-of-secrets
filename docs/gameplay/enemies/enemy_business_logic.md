@@ -22,6 +22,7 @@ gameplay/enemies/base/enemy_base.tscn
 | **Crab** | Nhận diện và đuổi player theo từng trục X/Z trong vùng hoạt động; tuần tra khi không có mục tiêu. Trúng projectile của player khiến Crab tức giận và tạm mở rộng vùng nhận diện/di chuyển. | **EliteCrab** kế thừa hành vi Crab, giữ telegraph, charge và slam. Một lần khi còn tối đa 50% HP, Elite phóng số trứng ngẫu nhiên; trứng rơi và nở thành Crab thường. |
 | **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
 | **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
+| **Coral Skeleton** | Bắt đầu ngủ; thức dậy khi player vào vùng gần, đuổi và bắn chùm hoặc liên tiếp. Mất mục tiêu thì đi quanh co về vị trí ban đầu, canh gác rồi ngủ lại. | Enemy thường; quy tắc và cấu hình chi tiết trong [business logic Coral Skeleton](./coral_skeleton_business_logic.md). |
 | **WarLordTurtle** | Archetype enemy lớn độc lập, có data và animation riêng. | Không phải biến thể Turtle elite thứ hai. Luật boss hoặc Tide Grapple chỉ được gán khi game design quy định rõ. |
 
 Các nhóm **Elite Normal Attack**, **Elite Special Attack** và **Elite Charged
@@ -91,6 +92,7 @@ Crab thường được tạo khi khởi tạo. Starfish và Barrel đồng bộ
 | `starfish/elite_starfish.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
 | `barrel/elite_barrel.gd` | Thông số lượt thường, lượt 360°, tích lũy và cảnh báo. |
+| `coral_skeleton/coral_skeleton.gd` | Vùng nhận diện khi ngủ/thức, thời gian thức và ngủ, di chuyển về nhà và cấu hình đợt bắn. |
 | `war_lord_turtle/war_lord_turtle.gd` | Speed, contact damage và đổi trục patrol của WarLordTurtle. |
 
 Ví dụ, đổi vùng nhận diện EliteCrab chỉ cần sửa `player_detection_radius` trên node root
