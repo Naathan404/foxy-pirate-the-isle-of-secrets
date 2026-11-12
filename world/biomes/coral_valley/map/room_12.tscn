@@ -1,17 +1,17 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://db4ejej5h45hm"]
 
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="3_vbg61"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 
-
-[sub_resource type="Environment" id="Environment_void"]
+[sub_resource type="Environment" id="Environment_adtaq"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.012, 0.009, 0.02, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.7, 0.68, 0.72, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_void"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vbg61"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("5_void")
@@ -20,106 +20,147 @@ shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
 shader_parameter/smoke_strength = 0.48
 shader_parameter/rise_speed = 0.150000007125
 
-[sub_resource type="QuadMesh" id="QuadMesh_void"]
+[sub_resource type="QuadMesh" id="QuadMesh_hiiy2"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_void")
+material = SubResource("ShaderMaterial_vbg61")
 size = Vector2(400, 400)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_down_floor"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_3t0d0"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_down_join"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8x5kd"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_down_trigger"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_il3nm"]
 resource_local_to_scene = true
 size = Vector3(4, 2, 0.5)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_up_floor"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_ulwrp"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_up_join"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_wtrjc"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_up_trigger"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_t0nks"]
 resource_local_to_scene = true
 size = Vector3(4, 2, 0.5)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_right_floor"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_nvwow"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_right_join"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_uu8vd"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_right_trigger"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_r6qyp"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_left_floor"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_yr4j2"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_left_join"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_3gj2n"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_left_trigger"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_fm43y"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[node name="room_12" instance=ExtResource("1_base")]
+[sub_resource type="BoxShape3D" id="BoxShape3D_erioa"]
+resource_local_to_scene = true
+size = Vector3(10.95, 1, 12.5)
+
+[node name="room_12" unique_id=2010306067 instance=ExtResource("1_base")]
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_11.tscn"
 
-[node name="WorldEnvironment" parent="General" index="0" unique_id=212262502 parent_id_path=PackedInt32Array(461960862)]
-environment = SubResource("Environment_void")
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
+environment = SubResource("Environment_adtaq")
 
-[node name="VoidSmoke" parent="General" index="2" unique_id=593468596 parent_id_path=PackedInt32Array(461960862)]
-mesh = SubResource("QuadMesh_void")
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+mesh = SubResource("QuadMesh_hiiy2")
 
-[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" index="0" unique_id=1059153531 parent_id_path=PackedInt32Array(872527392, 2124921856)]
-shape = SubResource("BoxShape3D_down_floor")
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
 
-[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" index="1" unique_id=2046027508 parent_id_path=PackedInt32Array(872527392, 2124921856)]
-shape = SubResource("BoxShape3D_down_join")
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_3t0d0")
+disabled = true
 
-[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259 parent_id_path=PackedInt32Array(872527392, 219025603)]
-shape = SubResource("BoxShape3D_down_trigger")
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_8x5kd")
+disabled = true
 
-[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" index="0" unique_id=1059153531 parent_id_path=PackedInt32Array(505451922, 2124921856)]
-shape = SubResource("BoxShape3D_up_floor")
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
 
-[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" index="1" unique_id=2046027508 parent_id_path=PackedInt32Array(505451922, 2124921856)]
-shape = SubResource("BoxShape3D_up_join")
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_il3nm")
+disabled = true
 
-[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259 parent_id_path=PackedInt32Array(505451922, 219025603)]
-shape = SubResource("BoxShape3D_up_trigger")
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
 
-[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" index="0" unique_id=1059153531 parent_id_path=PackedInt32Array(1048204863, 2124921856)]
-shape = SubResource("BoxShape3D_right_floor")
+[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_ulwrp")
+disabled = true
 
-[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" index="1" unique_id=2046027508 parent_id_path=PackedInt32Array(1048204863, 2124921856)]
-shape = SubResource("BoxShape3D_right_join")
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_wtrjc")
+disabled = true
 
-[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259 parent_id_path=PackedInt32Array(1048204863, 219025603)]
-shape = SubResource("BoxShape3D_right_trigger")
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
 
-[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" index="0" unique_id=1059153531 parent_id_path=PackedInt32Array(192273160, 2124921856)]
-shape = SubResource("BoxShape3D_left_floor")
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_t0nks")
+disabled = true
 
-[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" index="1" unique_id=2046027508 parent_id_path=PackedInt32Array(192273160, 2124921856)]
-shape = SubResource("BoxShape3D_left_join")
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
 
-[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259 parent_id_path=PackedInt32Array(192273160, 219025603)]
-shape = SubResource("BoxShape3D_left_trigger")
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_nvwow")
+disabled = true
 
-[editable path="Environment/BaseGround"]
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_uu8vd")
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_r6qyp")
+disabled = true
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_yr4j2")
+
+[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_3gj2n")
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_11.tscn"
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_fm43y")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+shape = SubResource("BoxShape3D_erioa")
+
+[node name="TreasureChest" parent="." index="5" unique_id=1708090331 instance=ExtResource("3_vbg61")]
+
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
 [editable path="Exits/UpPath"]
@@ -128,3 +169,4 @@ shape = SubResource("BoxShape3D_left_trigger")
 [editable path="Exits/RightPath/SceneChangeTrigger"]
 [editable path="Exits/LeftPath"]
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
