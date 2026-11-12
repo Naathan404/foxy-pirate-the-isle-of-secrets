@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://2jqhf2ew8c63"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_xdmpo"]
+[ext_resource type="Texture2D" uid="uid://cs5pt0b1wog7u" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_40 PM-5.png" id="2_blwiy"]
+[ext_resource type="Texture2D" uid="uid://ca2aih3832nn8" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png" id="3_p48t0"]
+[ext_resource type="Texture2D" uid="uid://dhi68ukq6st5f" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_36 PM-2.png" id="4_it2ow"]
+[ext_resource type="Texture2D" uid="uid://bhbqjhvvkvd3r" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_38 PM-4.png" id="5_q2jnd"]
+[ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://world/biomes/coral_valley/base_scenes/Whimsical Square Beach Island Tile.png" id="6_8m7ht"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xdmpo"]
+resource_local_to_scene = true
+size = Vector3(10.95, 1, 12.5)
+
+[node name="BaseSmallRoom" unique_id=525086743 instance=ExtResource("1_xdmpo")]
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -0.53301895, -0.02048206, 24.479424)
+
+[node name="Sprite3D" parent="Exits/DownPath" index="0" unique_id=1887481611]
+texture = ExtResource("2_blwiy")
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 3.0071125)
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+trigger_id = &"down"
+destination_trigger_id = &"up"
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -6.6359587)
+
+[node name="ExitPosition" parent="Exits/DownPath/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6731589, -5.5109587)
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -1.509958e-06, -0.02918672, -28.124086)
+
+[node name="Sprite3D" parent="Exits/UpPath" index="0" unique_id=1887481611]
+texture = ExtResource("3_p48t0")
+
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, -5.4155645)
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+trigger_id = &"up"
+destination_trigger_id = &"down"
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4.987197)
+
+[node name="ExitPosition" parent="Exits/UpPath/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6731589, -6.112197)
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 27.654852, -0.05280208, 0)
+
+[node name="Sprite3D" parent="Exits/RightPath" index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1, 0, 0)
+texture = ExtResource("4_it2ow")
+
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, 1.0459671)
+
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 6.0071125)
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+trigger_id = &"right"
+destination_trigger_id = &"left"
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5584259, 1, -4.5629807)
+
+[node name="ExitPosition" parent="Exits/RightPath/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5665741, 0.6731589, -4.89767)
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -27.819382, -0.13826466, 0)
+
+[node name="Sprite3D" parent="Exits/LeftPath" index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0, 0)
+texture = ExtResource("5_q2jnd")
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, 1.0459671)
+
+[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 6.0071125)
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" index="2" unique_id=219025603]
+trigger_id = &"left"
+destination_trigger_id = &"right"
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4988899, 1.1086969, -5.132987)
+
+[node name="ExitPosition" parent="Exits/LeftPath/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.62389, 0.6731589, -5.3314714)
+
+[node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -0.19104576)
+
+[node name="Sprite3D" parent="Environment/BaseGround" index="0" unique_id=516185212]
+texture = ExtResource("6_8m7ht")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, 0.31086218)
+shape = SubResource("BoxShape3D_xdmpo")
+
+[node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.321373, -6.9159203, 25.096268)
+
+[node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.538887, 0, -34.597424)
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

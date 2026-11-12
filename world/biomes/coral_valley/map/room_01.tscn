@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://c80l22yeqcc67"]
+
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="2_70qls"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="3_diqag"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bs66b"]
+resource_local_to_scene = true
+size = Vector3(10.95, 1, 12.5)
+
+[node name="room_01" unique_id=1826943073 instance=ExtResource("1_base")]
+open_exits = 11
+up_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+right_destination_scene = "res://world/biomes/coral_valley/map/room_02.tscn"
+left_destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_02.tscn"
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+shape = SubResource("BoxShape3D_bs66b")
+
+[node name="Crab" parent="." index="5" unique_id=1674830806 instance=ExtResource("2_70qls")]
+
+[node name="Crab2" parent="." index="6" unique_id=1629859492 instance=ExtResource("2_70qls")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 0)
+
+[node name="Starfish" parent="." index="7" unique_id=1294052233 instance=ExtResource("3_diqag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

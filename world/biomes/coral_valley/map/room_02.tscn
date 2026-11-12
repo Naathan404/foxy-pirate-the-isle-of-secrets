@@ -1,0 +1,189 @@
+[gd_scene format=3 uid="uid://b0m38aaoxajec"]
+
+[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_flat_tide"]
+[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="4_8k8c3"]
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="5_jl2ph"]
+[ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+
+[sub_resource type="Environment" id="Environment_lx4jg"]
+resource_local_to_scene = true
+background_mode = 1
+background_color = Color(0.012, 0.009, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.68, 0.72, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yndt2"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("5_void")
+shader_parameter/void_color = Color(0.012, 0.009, 0.02, 1)
+shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
+shader_parameter/smoke_strength = 0.48
+shader_parameter/rise_speed = 0.150000007125
+
+[sub_resource type="QuadMesh" id="QuadMesh_8k8c3"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_yndt2")
+size = Vector2(400, 400)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jl2ph"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bsm6o"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aqbfk"]
+resource_local_to_scene = true
+size = Vector3(4, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qje2f"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cbdvd"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vphl5"]
+resource_local_to_scene = true
+size = Vector3(4, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5ic1t"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_70a5f"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_spjh6"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_avom7"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1s8xf"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_um2gv"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhbww"]
+resource_local_to_scene = true
+size = Vector3(10.95, 1, 12.5)
+
+[sub_resource type="Resource" id="Resource_lx4jg"]
+script = ExtResource("4_8k8c3")
+normal_scene = ExtResource("5_jl2ph")
+metadata/_custom_type_script = "uid://juar8i43t1me"
+
+[node name="room_02" unique_id=1362667654 instance=ExtResource("1_base")]
+open_exits = 14
+right_destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
+down_destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
+left_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
+
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
+environment = SubResource("Environment_lx4jg")
+
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+mesh = SubResource("QuadMesh_8k8c3")
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_jl2ph")
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_bsm6o")
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_aqbfk")
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_qje2f")
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_cbdvd")
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_vphl5")
+disabled = true
+
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_5ic1t")
+
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_70a5f")
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_spjh6")
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_avom7")
+
+[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_1s8xf")
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_um2gv")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+shape = SubResource("BoxShape3D_bhbww")
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.0626488, 0)
+
+[node name="FlatTide" parent="." index="5" unique_id=607415664 node_paths=PackedStringArray("player") instance=ExtResource("2_flat_tide")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+player = NodePath("../Foxy")
+low_duration = 8.0
+high_duration = 4.0
+flooded_move_multiplier = 0.5
+
+[node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.200718, 0.25, -0.5999727)
+size = Vector2(20, 36)
+volume_depth = 2.0
+
+[node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
+player = NodePath("../../Foxy")
+
+[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
+enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg")])
+enemies_per_tide = 4
+elite_chance = 0.0
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
+[editable path="FlatTide"]

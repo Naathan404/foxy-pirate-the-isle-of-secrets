@@ -47,7 +47,7 @@ mesh = SubResource("QuadMesh_void")
 [node name="Exits" type="Node" parent="." unique_id=2100215242]
 
 [node name="DownPath" parent="Exits" unique_id=872527392 instance=ExtResource("6_p81o7")]
-transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -0.53302, -0.062498093, 14.540703)
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -0.53301984, -0.062498093, 15.540703)
 
 [node name="UpPath" parent="Exits" unique_id=505451922 instance=ExtResource("4_mv3px")]
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 0, -0.071202755, -15.441592)

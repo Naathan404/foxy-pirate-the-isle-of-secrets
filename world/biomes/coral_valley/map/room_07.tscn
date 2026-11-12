@@ -1,0 +1,388 @@
+[gd_scene format=3 uid="uid://cudpljg1kwced"]
+
+[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
+[ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+[ext_resource type="Script" uid="uid://c4k3wwcsjm5v8" path="res://world/objects/destructible_prop.gd" id="6_destructible"]
+[ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="7_health"]
+[ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="8_hurtbox"]
+[ext_resource type="Resource" path="res://data/items/materials/coral.tres" id="9_coral"]
+[ext_resource type="Texture2D" uid="uid://qqifnb33mtsm" path="res://assets/sprites/biomes/beach/coral_brain_purple.png" id="10_pink"]
+[ext_resource type="Texture2D" uid="uid://dv134gsp1lmg6" path="res://assets/sprites/biomes/beach/coral_branching_red.png" id="11_orange"]
+[ext_resource type="Texture2D" uid="uid://c0ib7dcswoc0q" path="res://assets/sprites/biomes/beach/coral_fan_turquoise.png" id="12_turquoise"]
+
+[sub_resource type="Environment" id="Environment_oufxx"]
+resource_local_to_scene = true
+background_mode = 1
+background_color = Color(0.012, 0.009, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.68, 0.72, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6frur"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("5_void")
+shader_parameter/void_color = Color(0.012, 0.009, 0.02, 1)
+shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
+shader_parameter/smoke_strength = 0.48
+shader_parameter/rise_speed = 0.150000007125
+
+[sub_resource type="QuadMesh" id="QuadMesh_h8iri"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_6frur")
+size = Vector2(400, 400)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_44icn"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1l5sb"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tpkfo"]
+resource_local_to_scene = true
+size = Vector3(4, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2u5w8"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vphkp"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hmpet"]
+resource_local_to_scene = true
+size = Vector3(4, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l3qt4"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_41kbq"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1ruro"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7s4be"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ncph4"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6yyxv"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y6cau"]
+resource_local_to_scene = true
+size = Vector3(10.95, 1, 12.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_coral_pink"]
+resource_local_to_scene = true
+size = Vector3(2, 2, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_coral_orange"]
+resource_local_to_scene = true
+size = Vector3(1.6, 2, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_coral_turquoise"]
+resource_local_to_scene = true
+size = Vector3(2, 2, 0.8)
+
+[node name="room_07" unique_id=1104197973 instance=ExtResource("1_base")]
+open_exits = 12
+down_destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
+left_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
+environment = SubResource("Environment_oufxx")
+
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+mesh = SubResource("QuadMesh_h8iri")
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_44icn")
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_1l5sb")
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_tpkfo")
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_2u5w8")
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_vphkp")
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_hmpet")
+disabled = true
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_l3qt4")
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_41kbq")
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_1ruro")
+disabled = true
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
+shape = SubResource("BoxShape3D_7s4be")
+
+[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_ncph4")
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_6yyxv")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+shape = SubResource("BoxShape3D_y6cau")
+
+[node name="Coral" type="Node3D" parent="." index="5" unique_id=201495937]
+
+[node name="BeachCoralPink" type="Node3D" parent="Coral" index="0" unique_id=480774052 node_paths=PackedStringArray("visual_root", "fragment_source")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0860386, -0.24835718, 10.11347)
+script = ExtResource("6_destructible")
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+swingable = true
+fragment_source = NodePath("Visual/Sprite3D")
+drop_item = ExtResource("9_coral")
+
+[node name="Visual" type="Node3D" parent="Coral/BeachCoralPink" index="0" unique_id=175744723]
+
+[node name="Sprite3D" type="Sprite3D" parent="Coral/BeachCoralPink/Visual" index="0" unique_id=734836391]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("10_pink")
+
+[node name="HealthComponent" type="Node" parent="Coral/BeachCoralPink" index="1" unique_id=768612818]
+script = ExtResource("7_health")
+
+[node name="HurtBox" type="Area3D" parent="Coral/BeachCoralPink" index="2" unique_id=1673617795]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("8_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Coral/BeachCoralPink/HurtBox" index="0" unique_id=1983778644]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_coral_pink")
+
+[node name="BeachCoralPink2" type="Node3D" parent="Coral" index="1" unique_id=178235881 node_paths=PackedStringArray("visual_root", "fragment_source")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.9139614, -0.24835718, 5.11347)
+script = ExtResource("6_destructible")
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+swingable = true
+fragment_source = NodePath("Visual/Sprite3D")
+drop_item = ExtResource("9_coral")
+
+[node name="Visual" type="Node3D" parent="Coral/BeachCoralPink2" index="0" unique_id=870782732]
+
+[node name="Sprite3D" type="Sprite3D" parent="Coral/BeachCoralPink2/Visual" index="0" unique_id=19105082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("10_pink")
+
+[node name="HealthComponent" type="Node" parent="Coral/BeachCoralPink2" index="1" unique_id=1013494336]
+script = ExtResource("7_health")
+
+[node name="HurtBox" type="Area3D" parent="Coral/BeachCoralPink2" index="2" unique_id=1578620569]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("8_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Coral/BeachCoralPink2/HurtBox" index="0" unique_id=1099391627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_coral_pink")
+
+[node name="BeachCoralOrange" type="Node3D" parent="Coral" index="2" unique_id=1595234661 node_paths=PackedStringArray("visual_root", "fragment_source")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.635122, -0.3916645, -3.4191256)
+script = ExtResource("6_destructible")
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+swingable = true
+fragment_source = NodePath("Visual/Sprite3D")
+drop_item = ExtResource("9_coral")
+
+[node name="Visual" type="Node3D" parent="Coral/BeachCoralOrange" index="0" unique_id=1203150649]
+
+[node name="Sprite3D" type="Sprite3D" parent="Coral/BeachCoralOrange/Visual" index="0" unique_id=1582836947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6070293, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("11_orange")
+
+[node name="HealthComponent" type="Node" parent="Coral/BeachCoralOrange" index="1" unique_id=964374106]
+script = ExtResource("7_health")
+
+[node name="HurtBox" type="Area3D" parent="Coral/BeachCoralOrange" index="2" unique_id=1917753110]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("8_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Coral/BeachCoralOrange/HurtBox" index="0" unique_id=1517326960]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_coral_orange")
+
+[node name="BeachCoralOrange2" type="Node3D" parent="Coral" index="3" unique_id=1106818377 node_paths=PackedStringArray("visual_root", "fragment_source")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3648777, -0.3916645, -3.4191256)
+script = ExtResource("6_destructible")
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+swingable = true
+fragment_source = NodePath("Visual/Sprite3D")
+drop_item = ExtResource("9_coral")
+
+[node name="Visual" type="Node3D" parent="Coral/BeachCoralOrange2" index="0" unique_id=80103871]
+
+[node name="Sprite3D" type="Sprite3D" parent="Coral/BeachCoralOrange2/Visual" index="0" unique_id=898141613]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6070293, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("11_orange")
+
+[node name="HealthComponent" type="Node" parent="Coral/BeachCoralOrange2" index="1" unique_id=1488766009]
+script = ExtResource("7_health")
+
+[node name="HurtBox" type="Area3D" parent="Coral/BeachCoralOrange2" index="2" unique_id=733676696]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("8_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Coral/BeachCoralOrange2/HurtBox" index="0" unique_id=1020990915]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_coral_orange")
+
+[node name="BeachCoralTurquoise" type="Node3D" parent="Coral" index="4" unique_id=586483398 node_paths=PackedStringArray("visual_root", "fragment_source")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8968143, -0.5328312, -9.8024845)
+script = ExtResource("6_destructible")
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+swingable = true
+fragment_source = NodePath("Visual/Sprite3D")
+drop_item = ExtResource("9_coral")
+
+[node name="Visual" type="Node3D" parent="Coral/BeachCoralTurquoise" index="0" unique_id=1052020189]
+
+[node name="Sprite3D" type="Sprite3D" parent="Coral/BeachCoralTurquoise/Visual" index="0" unique_id=166348332]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4944779, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("12_turquoise")
+
+[node name="HealthComponent" type="Node" parent="Coral/BeachCoralTurquoise" index="1" unique_id=2135221819]
+script = ExtResource("7_health")
+
+[node name="HurtBox" type="Area3D" parent="Coral/BeachCoralTurquoise" index="2" unique_id=808286173]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("8_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Coral/BeachCoralTurquoise/HurtBox" index="0" unique_id=1596765559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_coral_turquoise")
+
+[node name="BeachCoralTurquoise2" type="Node3D" parent="Coral" index="5" unique_id=752172515 node_paths=PackedStringArray("visual_root", "fragment_source")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.89681435, -0.5328312, 10.1975155)
+script = ExtResource("6_destructible")
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+swingable = true
+fragment_source = NodePath("Visual/Sprite3D")
+drop_item = ExtResource("9_coral")
+
+[node name="Visual" type="Node3D" parent="Coral/BeachCoralTurquoise2" index="0" unique_id=263010762]
+
+[node name="Sprite3D" type="Sprite3D" parent="Coral/BeachCoralTurquoise2/Visual" index="0" unique_id=599665747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4944779, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("12_turquoise")
+
+[node name="HealthComponent" type="Node" parent="Coral/BeachCoralTurquoise2" index="1" unique_id=795492544]
+script = ExtResource("7_health")
+
+[node name="HurtBox" type="Area3D" parent="Coral/BeachCoralTurquoise2" index="2" unique_id=1743444972]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("8_hurtbox")
+team = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Coral/BeachCoralTurquoise2/HurtBox" index="0" unique_id=1965203232]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+shape = SubResource("BoxShape3D_coral_turquoise")
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
