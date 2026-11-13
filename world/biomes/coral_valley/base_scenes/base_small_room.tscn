@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://2jqhf2ew8c63"]
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_xdmpo"]
-[ext_resource type="Texture2D" uid="uid://cs5pt0b1wog7u" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_40 PM-5.png" id="2_blwiy"]
-[ext_resource type="Texture2D" uid="uid://ca2aih3832nn8" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png" id="3_p48t0"]
-[ext_resource type="Texture2D" uid="uid://dhi68ukq6st5f" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_36 PM-2.png" id="4_it2ow"]
-[ext_resource type="Texture2D" uid="uid://bhbqjhvvkvd3r" path="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_38 PM-4.png" id="5_q2jnd"]
-[ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground.png" id="6_8m7ht"]
+[ext_resource type="Texture2D" uid="uid://cs5pt0b1wog7u" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_40 PM-5.png" id="2_blwiy"]
+[ext_resource type="Texture2D" uid="uid://ca2aih3832nn8" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png" id="3_p48t0"]
+[ext_resource type="Texture2D" uid="uid://dhi68ukq6st5f" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_36 PM-2.png" id="4_it2ow"]
+[ext_resource type="Texture2D" uid="uid://bhbqjhvvkvd3r" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_38 PM-4.png" id="5_q2jnd"]
+[ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://assets/sprites/biomes/coral_valley/coral_valley_ground.png" id="6_8m7ht"]
 [ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="7_ground_shape"]
 
 [node name="BaseSmallRoom" unique_id=525086743 instance=ExtResource("1_xdmpo")]

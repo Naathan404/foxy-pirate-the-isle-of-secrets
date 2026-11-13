@@ -75,7 +75,7 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="Resource" id="Resource_kaakm"]
+[sub_resource type="Resource" id="Resource_ikala"]
 resource_local_to_scene = true
 script = ExtResource("3_enemy_entry")
 normal_scene = ExtResource("4_tide_enemy")
@@ -167,15 +167,15 @@ high_duration = 4.0
 flooded_move_multiplier = 0.5
 
 [node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.200718, 0.25, -0.5999727)
-size = Vector2(20, 36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.200718, 0.25, 0.40002728)
+size = Vector2(20, 40)
 volume_depth = 2.0
 
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
 
 [node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
-enemies = Array[ExtResource("3_enemy_entry")]([SubResource("Resource_kaakm")])
+enemies = Array[ExtResource("3_enemy_entry")]([SubResource("Resource_ikala")])
 enemies_per_tide = 4
 elite_chance = 0.0
 

@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://wdjgvf5t15xw" path="res://assets/sprites/biomes/coral_valley/shell.png" id="2_texture"]
+
+[sub_resource type="BoxShape3D" id="HitShape"]
+size = Vector3(2.3, 2, 0.8)
+
+[node name="Shell" node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+max_hp = 3.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+fragment_source = NodePath("Visual/Sprite3D")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0"]
+position = Vector3(0, 0.99, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape3D" parent="HurtBox" index="0"]
+position = Vector3(0, 1, 0)
+shape = SubResource("HitShape")
