@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="coral_orange"]
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="coral_pink"]
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="coral_turquoise"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [node name="room_01" unique_id=1826943073 instance=ExtResource("1_base")]
 open_exits = 11
@@ -62,6 +63,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.51, -0.2903732, 3.81)
 
 [node name="BeachCoralOrange2" parent="Coral" index="4" unique_id=845701306 instance=ExtResource("coral_orange")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.09, -0.43368053, 6.23)
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-7, 0, -10, -4, 0, -3, 8, 0, -10, 10, 0, 2, -3, 0, 7, -9, 0, 11)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

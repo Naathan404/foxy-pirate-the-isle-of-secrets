@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="3_qogha"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_q7kha"]
 resource_local_to_scene = true
@@ -148,6 +149,10 @@ disabled = true
 
 [node name="Silas" parent="." index="5" unique_id=402759795 instance=ExtResource("3_qogha")]
 shop_panel_path = NodePath("")
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-9, 0, -6, -7, 0, 7, 6, 0, -9, 8, 0, 6, -5, 0, -10, 4, 0, 11)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

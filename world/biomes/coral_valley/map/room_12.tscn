@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="3_vbg61"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_vbg61"]
 resource_local_to_scene = true
@@ -153,6 +154,10 @@ destination_scene = "res://world/biomes/coral_valley/map/room_11.tscn"
 shape = SubResource("BoxShape3D_erioa")
 
 [node name="TreasureChest" parent="." index="5" unique_id=1708090331 instance=ExtResource("3_vbg61")]
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-8, 0, -6, -6, 0, 8, 5, 0, -8, 9, 0, 5, -4, 0, -10, 4, 0, 10)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="4_8k8c3"]
 [ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="5_8k8c3"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_8k8c3"]
 resource_local_to_scene = true
@@ -169,6 +170,10 @@ player = NodePath("../../Foxy")
 enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg")])
 enemies_per_tide = 4
 elite_chance = 0.0
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-8, 0, -10, -9, 0, -2, -6, 0, 9, 8, 0, -9, 11, 0, -4, 8, 0, 8)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

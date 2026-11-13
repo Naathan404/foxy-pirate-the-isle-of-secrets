@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="coral_orange"]
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="coral_pink"]
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="coral_turquoise"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_xv0gh"]
 resource_local_to_scene = true
@@ -161,6 +162,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.38, -0.5328312, 9.4)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.99, -0.24835718, 13.46)
 
 [node name="EliteStarfish" parent="." index="6" unique_id=554202254 instance=ExtResource("6_jene7")]
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-8, 0, -4, -9, 0, 5, 6, 0, -9, 9, 0, -4, 7, 0, 3, 3, 0, 13)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
