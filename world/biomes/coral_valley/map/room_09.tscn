@@ -75,10 +75,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ikala"]
-resource_local_to_scene = true
-size = Vector3(10.95, 1, 12.5)
-
 [sub_resource type="Resource" id="Resource_kaakm"]
 resource_local_to_scene = true
 script = ExtResource("3_enemy_entry")
@@ -162,9 +158,6 @@ destination_scene = "res://world/biomes/coral_valley/map/room_08.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_28ru6")
-
-[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
-shape = SubResource("BoxShape3D_ikala")
 
 [node name="FlatTide" parent="." index="5" unique_id=1353469362 node_paths=PackedStringArray("player") instance=ExtResource("2_flat_tide")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)

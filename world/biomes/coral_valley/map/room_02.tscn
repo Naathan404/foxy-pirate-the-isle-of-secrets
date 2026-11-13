@@ -75,10 +75,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_bhbww"]
-resource_local_to_scene = true
-size = Vector3(10.95, 1, 12.5)
-
 [sub_resource type="Resource" id="Resource_lx4jg"]
 script = ExtResource("4_8k8c3")
 normal_scene = ExtResource("5_jl2ph")
@@ -150,9 +146,6 @@ destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_um2gv")
-
-[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
-shape = SubResource("BoxShape3D_bhbww")
 
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.0626488, 0)

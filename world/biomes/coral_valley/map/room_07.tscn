@@ -79,10 +79,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_y6cau"]
-resource_local_to_scene = true
-size = Vector3(10.95, 1, 12.5)
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_coral_pink"]
 resource_local_to_scene = true
 size = Vector3(2, 2, 0.8)
@@ -167,9 +163,6 @@ destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_6yyxv")
-
-[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
-shape = SubResource("BoxShape3D_y6cau")
 
 [node name="Coral" type="Node3D" parent="." index="5" unique_id=201495937]
 
