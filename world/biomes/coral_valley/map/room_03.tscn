@@ -3,9 +3,6 @@
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="6_jene7"]
-[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="coral_orange"]
-[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="coral_pink"]
-[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="coral_turquoise"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_xv0gh"]
@@ -144,24 +141,7 @@ destination_scene = "res://world/biomes/coral_valley/map/room_02.tscn"
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_n8y1p")
 
-[node name="Coral" type="Node3D" parent="." index="5" unique_id=878486469]
-
-[node name="BeachCoralTurquoise" parent="Coral" index="0" unique_id=98264503 instance=ExtResource("coral_turquoise")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.14, -0.5328312, -9.62)
-
-[node name="BeachCoralPink" parent="Coral" index="1" unique_id=951447082 instance=ExtResource("coral_pink")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.36, -0.24835718, 8.25)
-
-[node name="BeachCoralOrange" parent="Coral" index="2" unique_id=1487673492 instance=ExtResource("coral_orange")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.3916645, 9.52)
-
-[node name="BeachCoralTurquoise2" parent="Coral" index="3" unique_id=928116255 instance=ExtResource("coral_turquoise")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.38, -0.5328312, 9.4)
-
-[node name="BeachCoralPink2" parent="Coral" index="4" unique_id=828863480 instance=ExtResource("coral_pink")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.99, -0.24835718, 13.46)
-
-[node name="EliteStarfish" parent="." index="6" unique_id=554202254 instance=ExtResource("6_jene7")]
+[node name="EliteStarfish" parent="." index="5" unique_id=554202254 instance=ExtResource("6_jene7")]
 
 [node name="RandomProps" type="Node3D" parent="."]
 script = ExtResource("random_props")

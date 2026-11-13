@@ -10,6 +10,7 @@ size = Vector3(2, 1.9, 0.8)
 max_hp = 3.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
+swingable = true
 fragment_source = NodePath("Visual/Sprite3D")
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" index="0" unique_id=1753361934]
