@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://cwcjm2qq8066b"]
+
+[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://ccxyb1sog0m28" path="res://assets/sprites/biomes/hub/training_dummy.png" id="2_texture"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jgtnm"]
+resource_local_to_scene = true
+size = Vector3(1.75, 2.4, 0.85)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0dyr4"]
+resource_local_to_scene = true
+height = 0.8
+radius = 0.45
+
+[node name="TrainingDummy" unique_id=1284245929 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+max_hp = 100000.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+fragment_source = NodePath("Visual/Sprite3D")
+drop_chance = 0.0
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0" unique_id=1950536306]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.212, 0)
+pixel_size = 0.003
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape3D" parent="HurtBox" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("BoxShape3D_jgtnm")
+
+[node name="CollisionShape3D" parent="MovementBody" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("CylinderShape3D_0dyr4")
+disabled = false

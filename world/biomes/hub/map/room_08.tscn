@@ -1,11 +1,18 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" uid="uid://d28ts6bee173j" path="res://world/biomes/hub/base_scenes/base_medium_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="2_silas"]
 
 [node name="room_08" instance=ExtResource("1_base")]
 open_exits = 2
 right_destination_scene = "res://world/biomes/hub/map/room_09.tscn"
 metadata/room_role = "NPC2"
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+position = Vector3(5, 2.0626488, 0)
+
+[node name="Silas" parent="." index="5" instance=ExtResource("2_silas")]
+position = Vector3(0, 0.252096, 0)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
