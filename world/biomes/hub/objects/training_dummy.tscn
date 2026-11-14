@@ -13,6 +13,7 @@ height = 0.8
 radius = 0.45
 
 [node name="TrainingDummy" unique_id=1284245929 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+scale = Vector3(1.5, 1.5, 1.5)
 max_hp = 100000.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15

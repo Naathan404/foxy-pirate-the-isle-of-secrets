@@ -35,19 +35,22 @@ destination_scene = "res://world/biomes/hub/map/room_07.tscn"
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/hub/map/room_05.tscn"
 
+[node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252096, 0)
+
 [node name="Dummies" type="Node3D" parent="." index="5" unique_id=440033535]
 
 [node name="TrainingDummy" parent="Dummies" index="0" unique_id=1284245929 instance=ExtResource("2_36glm")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 7)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 8, 0, 7)
 
 [node name="TrainingDummy2" parent="Dummies" index="1" unique_id=835803654 instance=ExtResource("2_36glm")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 7)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -8, 0, 7)
 
 [node name="TrainingDummy3" parent="Dummies" index="2" unique_id=35108991 instance=ExtResource("2_36glm")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -8, 0, -8)
 
 [node name="TrainingDummy4" parent="Dummies" index="3" unique_id=1961023449 instance=ExtResource("2_36glm")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 8, 0, -8)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

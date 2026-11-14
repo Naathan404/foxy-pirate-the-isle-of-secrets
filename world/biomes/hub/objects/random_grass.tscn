@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://s2mtwh6pckli"]
+
+[ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="1_random_props"]
+[ext_resource type="PackedScene" uid="uid://ces2nr1vkvbqs" path="res://world/biomes/hub/objects/hub_grass.tscn" id="2_grass"]
+
+[node name="RandomGrass" type="Node3D" unique_id=203918870]
+script = ExtResource("1_random_props")
+prop_scenes = Array[PackedScene]([ExtResource("2_grass")])
+max_spawn_count = 5
