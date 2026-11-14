@@ -67,6 +67,7 @@ var _flash_tween: Tween
 
 @onready var _health: HealthComponent = $HealthComponent
 @onready var _hurtbox: HurtBox = $HurtBox
+@onready var _movement_shape: CollisionShape3D = $MovementBody/CollisionShape3D
 
 
 func _ready() -> void:
@@ -133,6 +134,7 @@ func receive_damage(damage: DamageContext) -> float:
 		_destroyed = true
 		_hurtbox.enabled = false
 		_hurtbox.set_deferred("monitorable", false)
+		_movement_shape.set_deferred("disabled", true)
 		_spawn_smoke(destroy_smoke_amount)
 		_spawn_fragments()
 		_drop_loot()

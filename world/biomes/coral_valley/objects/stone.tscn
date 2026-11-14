@@ -24,3 +24,6 @@ texture = ExtResource("2_texture")
 [node name="CollisionShape3D" parent="HurtBox" index="0"]
 position = Vector3(0, 0.775, 0)
 shape = SubResource("HitShape")
+
+[node name="CollisionShape3D" parent="MovementBody" index="0"]
+disabled = false

@@ -6,6 +6,9 @@
 [sub_resource type="BoxShape3D" id="HitShape"]
 size = Vector3(2.3, 2, 0.8)
 
+[sub_resource type="BoxShape3D" id="MovementShape"]
+size = Vector3(1.15, 0.8, 0.85)
+
 [node name="Shell" node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
 max_hp = 3.0
 visual_root = NodePath("Visual/Sprite3D")
@@ -24,3 +27,8 @@ texture = ExtResource("2_texture")
 [node name="CollisionShape3D" parent="HurtBox" index="0"]
 position = Vector3(0, 1, 0)
 shape = SubResource("HitShape")
+
+[node name="CollisionShape3D" parent="MovementBody" index="0"]
+position = Vector3(-0.05, 0.4, 0)
+shape = SubResource("MovementShape")
+disabled = false
