@@ -10,12 +10,14 @@ const PROP_SCENES: Array[PackedScene] = [
 ]
 
 @export var spawn_positions: PackedVector3Array
+@export var fixed_spawn_count := 0
 
 
 func _ready() -> void:
 	var positions := Array(spawn_positions)
 	positions.shuffle()
-	for index in mini(randi_range(3, 6), positions.size()):
+	var count := fixed_spawn_count if fixed_spawn_count > 0 else randi_range(3, 6)
+	for index in mini(count, positions.size()):
 		var prop := PROP_SCENES.pick_random().instantiate() as Node3D
 		prop.position = positions[index]
 		add_child(prop, true)

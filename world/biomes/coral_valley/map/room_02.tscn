@@ -168,12 +168,13 @@ player = NodePath("../../Foxy")
 
 [node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
 enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg")])
-enemies_per_tide = 4
+enemies_per_tide = 2
 elite_chance = 0.0
 
 [node name="RandomProps" type="Node3D" parent="." index="6" unique_id=2042189859]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-8, 0, -10, -9, 0, -2, -6, 0, 9, 8, 0, -9, 11, 0, -4, 8, 0, 8)
+fixed_spawn_count = 3
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
