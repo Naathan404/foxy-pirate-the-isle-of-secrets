@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://d28ts6bee173j" path="res://world/biomes/hub/base_scenes/base_medium_room.tscn" id="1_base"]
+
+[node name="room_07" instance=ExtResource("1_base")]
+open_exits = 8
+left_destination_scene = "res://world/biomes/hub/map/room_06.tscn"
+metadata/room_role = "NPC3"
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

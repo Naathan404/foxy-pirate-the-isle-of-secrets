@@ -75,8 +75,9 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_00" unique_id=1211314045 instance=ExtResource("1_base")]
-open_exits = 2
+open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
+left_destination_scene = "res://world/biomes/hub/map/room_04.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_w8c4o")
@@ -134,24 +135,17 @@ destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_0jxjm")
 
-[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
-visible = false
-
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_vib4w")
-disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
 shape = SubResource("BoxShape3D_gbjkc")
-disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" index="2" unique_id=219025603]
-monitoring = false
-enabled = false
+destination_scene = "res://world/biomes/hub/map/room_04.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_tpgxu")
-disabled = true
 
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.0626488, 0)

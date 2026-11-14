@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dvcp054f5fk0n" path="res://world/biomes/hub/base_scenes/base_large_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://3v06vwpc6plb" path="res://gameplay/checkpoint/checkpoint.tscn" id="2_checkpoint"]
+
+[node name="room_02" instance=ExtResource("1_base")]
+open_exits = 15
+up_destination_scene = "res://world/biomes/hub/map/room_06.tscn"
+right_destination_scene = "res://world/biomes/hub/map/room_03.tscn"
+down_destination_scene = "res://world/biomes/hub/map/room_09.tscn"
+left_destination_scene = "res://world/biomes/hub/map/room_01.tscn"
+metadata/room_role = "Checkpoint"
+
+[node name="Checkpoint" parent="." index="5" instance=ExtResource("2_checkpoint")]
+position = Vector3(0, 0.294, -5)
+id = "hub_checkpoint"
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
