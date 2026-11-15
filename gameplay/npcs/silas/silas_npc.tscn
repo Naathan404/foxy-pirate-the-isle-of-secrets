@@ -272,9 +272,11 @@ height = 3.0
 radius = 3.0
 
 [node name="Silas" unique_id=402759795 instance=ExtResource("1_base")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 script = ExtResource("2_silas")
 data = ExtResource("3_data")
 catalog = ExtResource("4_catalog")
+shop_panel_path = NodePath("")
 dialogue_camera_focus_ratio = 0.42
 dialogue_camera_transition_duration = 0.28
 

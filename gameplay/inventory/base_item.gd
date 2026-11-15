@@ -7,3 +7,5 @@ extends Resource
 @export_multiline var description: String = &""
 @export_range(1, 99, 1) var max_stack: int = 1
 @export var type: GlobalConstants.ItemType = GlobalConstants.ItemType.MATERIAL
+## Notes and diaries must be collected through a pickup linked to a bestiary entry.
+@export var opens_note: bool = false

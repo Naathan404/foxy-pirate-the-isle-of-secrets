@@ -7,6 +7,9 @@ open_exits = 2
 right_destination_scene = "res://world/biomes/hub/map/room_01.tscn"
 metadata/room_role = "Swamp"
 
+[node name="DirectionalLight3D" parent="General" index="1"]
+light_energy = 1.5
+
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 visible = false
 

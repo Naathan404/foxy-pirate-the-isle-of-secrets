@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MonsterNote" format=3 uid="uid://c8p2d5sfb87ah"]
+
+[ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://deyivuk8sxchx" path="res://assets/sprites/enemies/starfish/starfish_sprite_sheet.png" id="2"]
+[ext_resource type="Resource" uid="uid://5rciww3j1f7s" path="res://data/enemies/starfish_data.tres" id="3"]
+
+[sub_resource type="AtlasTexture" id="portrait"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 64, 64)
+
+[resource]
+script = ExtResource("1")
+note_id = &"starfish"
+display_name = "Starfish"
+unlocked = true
+portrait = SubResource("portrait")
+enemy_data = ExtResource("3")
+description = "A creature found along the coast."
+behavior = "Moves toward intruders and attacks at close range."
+strategy = "Keep moving and watch for its charge."

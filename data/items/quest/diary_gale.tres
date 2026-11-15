@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items/Boss_Diary.png" id="icon"]
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="script"]
+
+[resource]
+script = ExtResource("script")
+item_id = "diary_gale"
+display_name = "Diary of Gale"
+icon = ExtResource("icon")
+description = "A diary about the boss of Gale."
+max_stack = 1
+type = 3
+opens_note = true

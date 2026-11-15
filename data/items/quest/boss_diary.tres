@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://p5obo133n4e5"]
+
+[ext_resource type="Texture2D" uid="uid://cekuresxaq6wu" path="res://assets/sprites/items/Boss_Diary.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="2_script"]
+
+[resource]
+script = ExtResource("2_script")
+item_id = "boss_diary"
+display_name = "Boss Diary"
+icon = ExtResource("1_icon")
+description = "A diary containing the story and secrets of a boss."
+type = 3
+opens_note = true

@@ -10,6 +10,9 @@ down_destination_scene = "res://world/biomes/hub/map/room_02.tscn"
 left_destination_scene = "res://world/biomes/hub/map/room_05.tscn"
 metadata/room_role = "Train"
 
+[node name="DirectionalLight3D" parent="General" index="1"]
+light_energy = 1.5
+
 [node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/hub/map/room_02.tscn"
 

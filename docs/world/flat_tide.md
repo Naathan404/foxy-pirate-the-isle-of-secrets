@@ -37,12 +37,15 @@ Controller giữ bốn pha `LOW`, `RISING`, `HIGH`, `FALLING`. `Warning Seconds`
 
 Nếu không tìm được đủ nền hợp lệ, hoặc vị trí bị nhân vật/vật cản chiếm khi nước rút đến, đợt đó có thể xuất hiện ít enemy hơn cấu hình. Gán `Controller` cho spawner khi dùng trong scene khác.
 
+Hiệu ứng xuất hiện của enemy dùng `flat_tide_spawn_effect.tscn`: hai vòng nước và hạt nước tại vị trí vừa khô; elite có hiệu ứng lớn hơn. Trong Inspector của `EnemySpawner`, thay `Spawn Effect Scene` để dùng hiệu ứng khác, hoặc để trống để tắt. Hiệu ứng chỉ chạy sau khi spawn thành công, không trì hoãn AI hay va chạm.
+
 ## Kiểm tra
 
 ```powershell
 Godot --headless --path . --script res://test/flat_tide_zone_test.gd
 Godot --headless --path . --script res://test/flat_tide_footsteps_test.gd
 Godot --headless --path . --script res://test/flat_tide_enemy_spawner_test.gd
+Godot --headless --path . --script res://test/flat_tide_spawn_effect_test.gd
 Godot --headless --editor --path . --script res://test/flat_tide_editor_test.gd
 ```
 

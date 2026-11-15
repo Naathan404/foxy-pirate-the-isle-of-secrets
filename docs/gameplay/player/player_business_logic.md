@@ -150,8 +150,8 @@ controller và nối `damage_dealt` trước khi gọi setup vũ khí.
 
 Luật tích và dùng CP:
 
-- `PlayerData.max_chaos` m?c ??nh 100. CP/hit l?y t? `WeaponData.chaos_per_hit` (m?c ??nh 5), nh?n `WeaponForge.chaos_gain_multiplier`; tr??ng c? tr?n PlayerData kh?ng c?n ???c d?ng.
-- ??i sang m?t WeaponInstance kh?c ho?c b? v? kh? ??t CP v? 0. ??n c?a l?n trang b? tr??c kh?ng c?ng CP, k? c? ?? ??i l?i v? kh? c?.
+- `PlayerData.max_chaos` mặc định 100. CP/hit lấy từ `WeaponData.chaos_per_hit` (mặc định 5), nhân `WeaponForge.chaos_gain_multiplier`; trường cũ trên PlayerData không còn được dùng.
+- Đổi sang một WeaponInstance khác hoặc bỏ vũ khí đặt CP về 0. Đòn của lần trang bị trước không cộng CP, kể cả đã đổi lại vũ khí cũ.
 - Player chỉ cộng khi còn sống, có chaos, `applied_hp > 0`, nguồn damage là chính
   Player và target là `EnemyBase`. Lượng cộng cố định theo hit, không nhân damage.
 - Đánh hụt hoặc không gây mất HP không tăng CP. Normal và secondary đều có thể

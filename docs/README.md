@@ -35,3 +35,5 @@ Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn 
 ## Kế hoạch · `plans/`
 
 [Kế hoạch Charm System](plans/charm-system-development-plan.md)
+
+Sổ quái: [Monster Notes](gameplay/economy/monster_notes.md).

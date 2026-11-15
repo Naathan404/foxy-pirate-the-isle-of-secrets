@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="MonsterNote" format=3 uid="uid://dw5w2kkpxvucr"]
+
+[ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dgg8euwsnpull" path="res://assets/sprites/enemies/coral_skeleton/sleep_6.png" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/coral_skeleton_data.tres" id="3"]
+
+[sub_resource type="AtlasTexture" id="portrait"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 295, 295)
+
+[resource]
+script = ExtResource("1")
+note_id = &"coral_skeleton"
+display_name = "Coral Skeleton"
+portrait = SubResource("portrait")
+enemy_data = ExtResource("3")
+description = "A skeleton resting among the coral."
+behavior = "Awakens to defend its territory."
+strategy = "Stay alert when approaching its resting place."
