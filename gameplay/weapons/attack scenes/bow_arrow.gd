@@ -14,6 +14,12 @@ const STORM_PARTICLES: PackedScene = preload(
 @export_range(0.0, 3.0, 0.05) var release_height: float = 0.9
 @export_range(0.1, 10.0, 0.1) var lifetime: float = 4.0
 
+@export_group("Stormstring Targeting")
+## Full horizontal acquisition cone, centered on the arrow's current heading.
+@export_range(1.0, 180.0, 1.0) var homing_cone_degrees: float = 120.0
+@export_range(0.0, 1.0, 0.01) var homing_acquire_delay: float = 0.12
+@export_range(0.1, 20.0, 0.1) var homing_tracking_speed: float = 5.0
+
 @export_group("Hit Feedback")
 @export var impact_scene: PackedScene = preload("res://gameplay/weapons/bow_impact_vfx.tscn")
 @export_range(0.0, 0.1, 0.001) var hitstop_seconds: float = 0.045
@@ -78,6 +84,8 @@ var _age: float = 0.0
 var _finished: bool = false
 var _previous_position: Vector3
 var _sprite_offset: Vector3
+var _homing_target: EnemyBase
+var _had_homing_target: bool = false
 
 @onready var _sprite: Sprite3D = $Sprite3D
 @onready var _sprite_scale: Vector3 = _sprite.scale
@@ -145,6 +153,8 @@ func _physics_process(delta: float) -> void:
 		return
 	_age += maxf(0.0, delta)
 	_previous_position = global_position
+	if converge_on_target and _age >= homing_acquire_delay:
+		_update_homing(delta)
 	var distance := minf(speed * maxf(0.0, delta), _path_length - _travelled)
 	var progress := _progress_at_distance(_travelled + distance)
 	var destination := _start.bezier_interpolate(_control, _control_end, _end, progress)
@@ -188,6 +198,10 @@ func _build_flight_path() -> void:
 	# Separate departure/convergence controls keep each lane on its own side of aim.
 	_control = _start.lerp(_end, 0.24) + side * width + Vector3.UP * curve_height
 	_control_end = _start.lerp(_end, 0.76) + side * width * 0.3
+	_measure_flight_path()
+
+
+func _measure_flight_path() -> void:
 	_curve_lengths.clear()
 	_curve_lengths.append(0.0)
 	_path_length = 0.0
@@ -199,6 +213,65 @@ func _build_flight_path() -> void:
 		_path_length += previous.distance_to(point)
 		_curve_lengths.append(_path_length)
 		previous = point
+
+
+func _find_homing_target() -> EnemyBase:
+	var heading := -global_basis.z
+	heading.y = 0.0
+	if heading.is_zero_approx():
+		return null
+	heading = heading.normalized()
+	var min_dot := cos(deg_to_rad(clampf(homing_cone_degrees, 1.0, 180.0) * 0.5))
+	var closest_distance := context.range_units * context.range_units
+	var closest: EnemyBase
+	for node in get_tree().get_nodes_in_group("enemy"):
+		var enemy := node as EnemyBase
+		if not is_instance_valid(enemy) or enemy.dead or enemy.is_queued_for_deletion():
+			continue
+		var offset := enemy.global_position - global_position
+		offset.y = 0.0
+		var distance := offset.length_squared()
+		if distance > closest_distance or distance < 0.0001:
+			continue
+		if heading.dot(offset.normalized()) < min_dot:
+			continue
+		closest = enemy
+		closest_distance = distance
+	return closest
+
+
+func _update_homing(delta: float) -> void:
+	if not is_instance_valid(_homing_target) or _homing_target.dead or _homing_target.is_queued_for_deletion():
+		_homing_target = _find_homing_target()
+		if not is_instance_valid(_homing_target) and _had_homing_target:
+			# Continue forward along the last heading if the target disappears.
+			var remaining := maxf(0.0, _path_length - _travelled)
+			_start = global_position
+			_end = _start - global_basis.z * remaining
+			curve_offset = 0.0
+			curve_height = 0.0
+			_travelled = 0.0
+			_build_flight_path()
+			_had_homing_target = false
+	if not is_instance_valid(_homing_target):
+		return
+	_had_homing_target = true
+	# Split the existing curve at the current position. Its remaining control points
+	# preserve the tangent, so retargeting does not teleport or snap the arrow.
+	var progress := _progress_at_distance(_travelled)
+	var b := _control.lerp(_control_end, progress)
+	var c := _control_end.lerp(_end, progress)
+	var e := b.lerp(c, progress)
+	_start = global_position
+	_control = e
+	_control_end = c
+	var target_position := _homing_target.global_position
+	target_position.y = _start.y
+	var new_end := _end.lerp(target_position, 1.0 - exp(-homing_tracking_speed * maxf(delta, 0.0)))
+	_control_end += (new_end - _end) * 0.5
+	_end = new_end
+	_travelled = 0.0
+	_measure_flight_path()
 
 
 ## Arc-length lookup avoids slowing at the bend and accelerating out of it.

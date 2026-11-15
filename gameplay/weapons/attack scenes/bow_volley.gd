@@ -120,6 +120,7 @@ func activate() -> void:
 		else:
 			_vfx.queue_free()
 	if count > 1:
+		get_node("/root/CombatMomentController").request(&"bow_skill")
 		var burst := RELEASE_BURST.instantiate() as Node3D
 		get_parent().add_child(burst)
 		burst.global_position = (

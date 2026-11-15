@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/player_hud/inventory/notes_icon.png" id="1_icon"]
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="2_script"]
+
+[resource]
+script = ExtResource("2_script")
+item_id = "note"
+display_name = "Note"
+icon = ExtResource("1_icon")
+description = "A note containing a message."
+max_stack = 1
+type = 3
