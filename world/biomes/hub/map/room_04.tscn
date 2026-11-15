@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://cwrljro2qwmen" path="res://world/biomes/hub/base_scenes/base_small_room.tscn" id="1_base"]
+
+[node name="room_04" instance=ExtResource("1_base")]
+open_exits = 10
+right_destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
+left_destination_scene = "res://world/biomes/hub/map/room_03.tscn"
+metadata/room_role = "Coral"
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

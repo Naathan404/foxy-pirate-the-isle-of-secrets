@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ca2aih3832nn8"
-path.s3tc="res://.godot/imported/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png-3961df394c39c0ae146908e1266e25ff.s3tc.ctex"
+uid="uid://ccxyb1sog0m28"
+path.s3tc="res://.godot/imported/training_dummy.png-0a3d3d17831f40743ae6b4b50983b0b6.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://world/biomes/coral_valley/base_scenes/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png"
-dest_files=["res://.godot/imported/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png-3961df394c39c0ae146908e1266e25ff.s3tc.ctex"]
+source_file="res://assets/sprites/biomes/hub/training_dummy.png"
+dest_files=["res://.godot/imported/training_dummy.png-0a3d3d17831f40743ae6b4b50983b0b6.s3tc.ctex"]
 
 [params]
 

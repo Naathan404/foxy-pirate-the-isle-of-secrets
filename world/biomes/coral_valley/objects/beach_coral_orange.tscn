@@ -7,6 +7,9 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_yqj0l"]
 size = Vector3(1.6, 2, 0.8)
 
+[sub_resource type="BoxShape3D" id="MovementShape"]
+size = Vector3(1.05, 0.8, 0.85)
+
 [node name="BeachCoralOrange" unique_id=917493758 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_yqj0l")]
 max_hp = 3.0
 visual_root = NodePath("Visual/Sprite3D")
@@ -27,3 +30,8 @@ texture = ExtResource("3_yqj0l")
 [node name="CollisionShape3D" parent="HurtBox" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
 shape = SubResource("BoxShape3D_yqj0l")
+
+[node name="CollisionShape3D" parent="MovementBody" index="0"]
+position = Vector3(-0.15, 0.4, 0)
+shape = SubResource("MovementShape")
+disabled = false

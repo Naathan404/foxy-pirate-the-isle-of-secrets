@@ -2,9 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_mf2w3"]
 [ext_resource type="Texture2D" uid="uid://bl64yrwnpyr3p" path="res://assets/sprites/biomes/beach/beach.png" id="2_aimq4"]
-[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/beach/beach_coral_pink.tscn" id="3_cvepx"]
-[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/beach/beach_coral_orange.tscn" id="4_i2uwp"]
-[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/beach/beach_coral_turquoise.tscn" id="5_adkab"]
+[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="3_cvepx"]
+[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="4_i2uwp"]
+[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="5_adkab"]
 [ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/beach/beach_palm_01.tscn" id="8_8dvq8"]
 [ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/beach/beach_palm_02.tscn" id="9_txy4b"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/beach/beach_palm_03.tscn" id="10_ryrkc"]
