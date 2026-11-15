@@ -1,31 +1,37 @@
-# ?nh s?ng v? m?i tr??ng Hub
+# Ánh sáng và môi trường Hub
 
-## Ph?m vi
-11 ph?ng trong `world/biomes/hub/map` k? th?a small/medium/large ? `hub_room.tscn` ? `base_room.tscn`. Ch?nh ?nh s?ng hub t?i `hub_room.tscn`, kh?ng ch?nh base chung c?a m?i biome.
+## Phạm vi
 
-## C?c node t?i s? d?ng
-- `world/effects/room_atmosphere.tscn`: k?o v?o root ph?ng. CanvasLayer -1 n?m d??i HUD, n??c v? c?nh b?o m?u th?p, kh?ng ch?n chu?t.
-- `Overlay/Vintage`: Material ? Shader Parameters: exposure (?? s?ng), saturation (?? b?o h?a), tint (m?u vintage), vignette_strength (t?i g?c). Material local-to-scene ?? override t?ng instance.
-- `Overlay/WindAndLeaves`: Inspector ch?nh s? l?/v?t gi?, v?n t?c, m?u/alpha, k?ch th??c l?, chi?u d?i v?t, sway v? gust_period. T?a ?? t? co gi?n theo viewport. L? v? gi? neo v?o m?t ph?ng c?a ph?ng, ???c chi?u qua camera v? kh?ng va ch?m v?i v?t th?. S? l??ng ???c kh?i t?o khi ch?y scene.
-- Script `wind_overlay.gd` c? th? g?n l?n Node2D trong CanvasLayer ri?ng ? biome kh?c.
-- `RoomAtmosphere.replace_player_ambient`: t?t ambient v?ng/motes c? tr?n Foxy khi ph?ng ?? c? ambient ri?ng; gi? overlay n??c v? low-health. Ph?ng hi?n d?ng node Foxy tr?c ti?p d??i root; n?u ??i c?u tr?c c?n c?p nh?t ???ng d?n trong script.
+11 phòng trong `world/biomes/hub/map` kế thừa small/medium/large → `hub_room.tscn` → `base_room.tscn`. Chỉnh ánh sáng hub tại `hub_room.tscn`, không chỉnh base chung của mọi biome.
 
-## ?nh s?ng
-`hub_room.tscn/General/WorldEnvironment` c? ambient xanh x?m; DirectionalLight3D t?o ?nh s?ng l?nh d?u. N?n hub ?? chuy?n t? unshaded sang nh?n ?nh s?ng, roughness cao v? kh?ng specular ?? gi? ch?t tranh/pixel.
+## Các node tái sử dụng
+
+- `world/effects/room_atmosphere.tscn`: kéo vào root phòng. CanvasLayer -1 nằm dưới HUD, nước và cảnh báo máu thấp, không chặn chuột.
+- `Overlay/Vintage`: Material → Shader Parameters: exposure (độ sáng), saturation (độ bão hòa), tint (màu vintage), vignette_strength (tối góc). Material local-to-scene để override từng instance.
+- `Overlay/WindAndLeaves`: Inspector chỉnh số lá và vệt gió, vận tốc, màu và alpha, kích thước lá, chiều dài vệt, sway và gust_period. Lá và gió neo vào mặt phẳng của phòng, được chiếu qua camera và không va chạm với vật thể. Số lượng được khởi tạo khi chạy scene.
+- Script `wind_overlay.gd` có thể gắn lên Node2D trong CanvasLayer riêng ở biome khác.
+- `RoomAtmosphere.replace_player_ambient`: tắt ambient vàng và motes cũ trên Foxy khi phòng đã có ambient riêng; giữ overlay nước và low-health. Phòng hiện dùng node Foxy trực tiếp dưới root; nếu đổi cấu trúc cần cập nhật đường dẫn trong script.
+
+## Ánh sáng
+
+`hub_room.tscn/General/WorldEnvironment` có ambient xanh xám; DirectionalLight3D tạo ánh sáng lạnh dịu. Nền hub đã chuyển từ unshaded sang nhận ánh sáng, roughness cao và không specular để giữ chất tranh/pixel.
 
 ## Campfire
-`world/effects/fire_light.tscn` l? OmniLight3D t?i s? d?ng, ?? g?n v?o scene campfire chung (c? c?c instance ngo?i hub c?ng c? ??n). ?nh s?ng h?t l?n n?n v? sprite c? shaded b?t.
-- Base Energy: c??ng ?? trung b?nh.
-- Flicker Amount / Speed: bi?n ?? v? t?c ?? dao ??ng noise li?n t?c, kh?ng nh?p nh?y random t?ng frame.
-- Warm Color / Hot Color: hai s?c nhi?t c?a l?a.
-- Omni Range / Attenuation: b?n k?nh v? ?? gi?m s?ng; nh? instance campfire c? scale 2.
-- Preview In Editor: xem nh?p nh?y trong editor. Script @tool; ??n kh?ng t?o shadow ?? gi? chi ph? th?p.
 
-## Ki?m tra
-Ch?y `Godot --headless --path . --script res://test/hub_atmosphere_test.gd` ?? ki?m tra c? 11 ph?ng, kh?ng ch?n input, gi? n??c v? n?ng l??ng ??n dao ??ng. B? --headless ?? xu?t preview ph?ng 02 v?o `test/hub_atmosphere_preview.png`.
+`world/effects/fire_light.tscn` là OmniLight3D tái sử dụng, đã gắn vào scene campfire chung; các instance ngoài hub cũng có đèn. Ánh sáng hắt lên nền và sprite có shaded bật.
 
+- Base Energy: cường độ trung bình.
+- Flicker Amount / Speed: biên độ và tốc độ dao động noise liên tục, không nhấp nháy ngẫu nhiên từng frame.
+- Warm Color / Hot Color: hai sắc nhiệt của lửa.
+- Omni Range / Attenuation: bán kính và độ giảm sáng; lưu ý instance campfire có scale 2.
+- Preview In Editor: xem nhấp nháy trong editor. Script dùng `@tool`; đèn không tạo shadow để giữ chi phí thấp.
 
-## ?i?u ch?nh l? v? gi?
-Ch?n `RoomAtmosphere/Overlay/WindAndLeaves` trong Inspector. Nh?m **Leaves** c? `Leaf Size`, `Leaf Min Scale`, `Leaf Width Ratio`, t?c ?? xoay v? ?? l?t. Nh?m **Wind Trails** c? m?u v? alpha, chi?u d?i, ?? r?ng, bi?n ??/s? v?ng/t?c ?? u?n, chu k? v? th?i l??ng t?ng ??t gi?. M?p d?i gi? v? hai ??u m? d?n; c?c v?t c? pha ri?ng. `Wind Velocity` ?i?u khi?n h??ng di chuy?n chung. K?ch th??c d?ng pixel theo `Reference Size` v? t? co gi?n theo viewport. S? l??ng l? v? v?t ???c kh?i t?o khi scene b?t ??u.
+## Kiểm tra
 
-L? v? gi? d?ng v?ng x?c ??nh b?i `CameraBounds/CornerA` v? `CornerB`, b?m theo v? tr? trong ph?ng khi camera di chuy?n. `Field Height` ch?nh ?? cao m?t ph?ng; `Fallback Field Size` d?ng khi ph?ng kh?ng c? c?c marker n?y. Vignette v? m?u vintage v?n ph? m?n h?nh.
+Chạy `Godot --headless --path . --script res://test/hub_atmosphere_test.gd` để kiểm tra cả 11 phòng, không chặn input, giữ hiệu ứng nước và năng lượng đèn dao động. Bỏ `--headless` để xuất preview phòng 02 vào `test/hub_atmosphere_preview.png`.
+
+## Điều chỉnh lá và gió
+
+Chọn `RoomAtmosphere/Overlay/WindAndLeaves` trong Inspector. Nhóm **Leaves** có `Leaf Size`, `Leaf Min Scale`, `Leaf Width Ratio`, tốc độ xoay và độ lật. Nhóm **Wind Trails** có màu và alpha, chiều dài, độ rộng, biên độ, số vòng và tốc độ uốn, chu kỳ và thời lượng từng đợt gió. Mép dải gió và hai đầu mờ dần; các vệt có pha riêng. `Wind Velocity` điều khiển hướng di chuyển chung. Kích thước dùng pixel theo `Reference Size` và tự co giãn theo viewport. Số lượng lá và vệt được khởi tạo khi scene bắt đầu.
+
+Lá và gió dùng vùng xác định bởi `CameraBounds/CornerA` và `CornerB`, bám theo vị trí trong phòng khi camera di chuyển. `Field Height` chỉnh độ cao mặt phẳng; `Fallback Field Size` dùng khi phòng không có các marker này. Vignette và màu vintage vẫn phủ màn hình.
