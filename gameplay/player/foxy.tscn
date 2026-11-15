@@ -31,7 +31,6 @@
 [ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="20_a64i1"]
 [ext_resource type="Script" uid="uid://c4fmspxxv4ifk" path="res://gameplay/charms/socket/charm_loadout.gd" id="20_ehmwb"]
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
-[ext_resource type="PackedScene" path="res://gameplay/player/effects/charm_cast_animator.tscn" id="charm_cast_animator"]
 [ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="21_86838"]
 [ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
@@ -47,6 +46,7 @@
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" uid="uid://btyx2ybnfoih7" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
 [ext_resource type="Resource" uid="uid://ejp6w687nhs2" path="res://gameplay/charms/charm_data/buckshot_salvo.tres" id="charm_buckshot"]
+[ext_resource type="PackedScene" path="res://gameplay/player/effects/charm_cast_animator.tscn" id="charm_cast_animator"]
 [ext_resource type="Resource" uid="uid://cii1hytncvqey" path="res://gameplay/charms/charm_data/chaos_collector.tres" id="charm_chaos_collector"]
 [ext_resource type="Resource" uid="uid://c1bl3r46frbfh" path="res://gameplay/charms/charm_data/crescent_cleave.tres" id="charm_crescent"]
 [ext_resource type="Resource" uid="uid://duxi2p8uusnex" path="res://gameplay/charms/charm_data/double_strike.tres" id="charm_double_strike"]
@@ -81,7 +81,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_2jaat"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_e102i"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -932,7 +932,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3670205, 0)
-process_material = SubResource("ParticleProcessMaterial_2jaat")
+process_material = SubResource("ParticleProcessMaterial_e102i")
 draw_pass_1 = SubResource("QuadMesh_nnacp")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
@@ -972,7 +972,7 @@ action_sprite_paths = Dictionary[StringName, NodePath]({
 &"harpoon/thrust": NodePath("HarpoonSprite")
 })
 
-[node name="CharmCastAnimator" parent="Visual" node_paths=PackedStringArray("actor") instance=ExtResource("charm_cast_animator")]
+[node name="CharmCastAnimator" parent="Visual" unique_id=222532060 node_paths=PackedStringArray("actor") instance=ExtResource("charm_cast_animator")]
 actor = NodePath("../..")
 
 [node name="SpineIdlePreview" type="Node3D" parent="Visual" unique_id=1978530799]

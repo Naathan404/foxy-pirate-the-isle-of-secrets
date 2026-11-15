@@ -5,6 +5,14 @@ signal animation_finished(animation_name: StringName)
 
 const ATTACK_RELEASE_POSE: float = 0.5
 const ATTACK_RECOVERY_POSE: float = 0.75
+const BOW_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/bow.png")
+const HARPOON_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/harpoon.png")
+const METEOR_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/meteor_staff.png")
+const BOW_SKILL_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/bow_stormstring.png")
+const HARPOON_SKILL_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/harpoon_lightning_pierce.png")
+const METEOR_SKILL_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/meteor_staff_skill.png")
+const WEAPON_BODY_HEIGHT_FRACTION: float = 0.52
+const WEAPON_FOOT_ANCHOR: Vector2 = Vector2(0.5, 230.0 / 256.0)
 
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
@@ -26,12 +34,25 @@ var _fitted_duration: float = 0.0
 var _held_progress: float = -1.0
 var _active_sprite: Sprite3D
 var _action_sprites: Dictionary[StringName, Sprite3D] = {}
+var _bow_sheet_sprite: Sprite3D
+var _attack_weapon_id: StringName = &""
+var _attack_action: StringName = &"normal"
 
 @onready var _idle_preview: Node = get_node_or_null("SpineIdlePreview")
 
 
 func _ready() -> void:
 	_active_sprite = sprite
+	_bow_sheet_sprite = Sprite3D.new()
+	_bow_sheet_sprite.name = "BowSheetSprite"
+	_bow_sheet_sprite.texture = BOW_SHEET
+	_bow_sheet_sprite.hframes = 4
+	_bow_sheet_sprite.vframes = 2
+	_bow_sheet_sprite.shaded = false
+	_bow_sheet_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_bow_sheet_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+	_bow_sheet_sprite.hide()
+	add_child(_bow_sheet_sprite)
 	if is_instance_valid(charm_cast_animator):
 		charm_cast_animator.finished.connect(_on_charm_cast_finished)
 	if is_instance_valid(_idle_preview):
@@ -56,7 +77,65 @@ func _process(_delta: float) -> void:
 	# Camera đổi góc thì sprite cũng đổi hướng theo
 	if not _action.is_empty():
 		_update_directional_animation()
+	_update_bow_sheet()
 	_apply_charm_cast_visibility()
+
+
+func _update_bow_sheet() -> void:
+	if not is_instance_valid(_bow_sheet_sprite):
+		return
+	var sheet: Texture2D
+	var body_height := WEAPON_BODY_HEIGHT_FRACTION
+	var foot_anchor := WEAPON_FOOT_ANCHOR
+	var frame_progress := _get_animation_progress()
+	if _held_progress >= 0.0:
+		frame_progress = _held_progress
+	if _action == &"attack_bow":
+		sheet = BOW_SKILL_SHEET if _attack_action == &"secondary" else BOW_SHEET
+	elif _action in [&"harpoon/thrust", &"harpoon/pierce"]:
+		sheet = (
+			HARPOON_SKILL_SHEET
+			if _action == &"harpoon/pierce" and _attack_action == &"secondary"
+			else HARPOON_SHEET
+		)
+	elif _attack_weapon_id == &"meteor_staff" and _action == &"attack_dagger":
+		sheet = METEOR_SKILL_SHEET if _attack_action == &"secondary" else METEOR_SHEET
+	if sheet == null or not is_instance_valid(animation_player):
+		_bow_sheet_sprite.hide()
+		return
+	var metrics := Vector2(3.0, 0.0)
+	if is_instance_valid(_idle_preview):
+		metrics = _idle_preview.get_fitted_body_metrics()
+	if metrics.x <= 0.0:
+		_bow_sheet_sprite.hide()
+		return
+	_bow_sheet_sprite.texture = sheet
+	var frame_size := Vector2(sheet.get_size()) / Vector2(4.0, 2.0)
+	_bow_sheet_sprite.pixel_size = metrics.x / (frame_size.y * body_height)
+	_bow_sheet_sprite.position.y = metrics.y + 0.02
+	_bow_sheet_sprite.offset = Vector2(
+		(0.5 - foot_anchor.x) * frame_size.x * (-1.0 if _last_facing_left else 1.0),
+		(foot_anchor.y - 0.5) * frame_size.y
+	)
+	_bow_sheet_sprite.flip_h = _last_facing_left
+	var progress := clampf(frame_progress, 0.0, 0.9999)
+	if progress < ATTACK_RELEASE_POSE:
+		_bow_sheet_sprite.frame = mini(2, floori(progress * 6.0))
+	elif progress < ATTACK_RECOVERY_POSE:
+		_bow_sheet_sprite.frame = 3 + floori((progress - ATTACK_RELEASE_POSE) * 8.0)
+	else:
+		_bow_sheet_sprite.frame = 5 + mini(2, floori((progress - ATTACK_RECOVERY_POSE) * 12.0))
+	if is_instance_valid(_active_sprite):
+		_active_sprite.hide()
+	if is_instance_valid(_idle_preview):
+		_idle_preview.hide()
+	_bow_sheet_sprite.show()
+
+
+func set_attack_weapon_id(weapon_id: StringName, attack_action: StringName = &"normal") -> void:
+	_attack_weapon_id = weapon_id
+	_attack_action = attack_action
+	_update_bow_sheet()
 
 
 func play_charm_cast(
@@ -89,6 +168,8 @@ func _apply_charm_cast_visibility() -> void:
 	sprite.hide()
 	for action_sprite: Sprite3D in _action_sprites.values():
 		action_sprite.hide()
+	if is_instance_valid(_bow_sheet_sprite):
+		_bow_sheet_sprite.hide()
 	if is_instance_valid(_idle_preview):
 		_idle_preview.hide()
 
@@ -113,6 +194,8 @@ func _face_sprites_to_camera() -> void:
 	for action_sprite: Sprite3D in _action_sprites.values():
 		if is_instance_valid(action_sprite):
 			action_sprite.rotation.y = yaw
+	if is_instance_valid(_bow_sheet_sprite):
+		_bow_sheet_sprite.rotation.y = yaw
 
 
 # Mỗi hành động cần đủ 3 animation: down, up và side
