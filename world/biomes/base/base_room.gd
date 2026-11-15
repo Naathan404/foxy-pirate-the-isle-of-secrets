@@ -173,7 +173,7 @@ func _refresh_exits() -> void:
 		_rebuild_ground_boundaries.call_deferred()
 
 
-## Generate walls along the exposed edges of the union of floor boxes. Paths are
+## Generate walls along the exposed edges of the floors. Paths are
 ## included only while open, so their overlap with the ground remains walkable.
 func _rebuild_ground_boundaries() -> void:
 	var old := get_node_or_null("GroundBoundaries")
@@ -187,10 +187,10 @@ func _rebuild_ground_boundaries() -> void:
 	if environment:
 		for child in environment.get_children():
 			if String(child.name).begins_with("BaseGround"):
-				_collect_floor_boxes(child.get_node_or_null("StaticBody3D"), floors)
+				_collect_floors(child.get_node_or_null("StaticBody3D"), floors)
 	for entry in [["UpPath", UP], ["RightPath", RIGHT], ["DownPath", DOWN], ["LeftPath", LEFT]]:
 		if open_exits & entry[1]:
-			_collect_floor_boxes(get_node_or_null("Exits/%s/StaticBody3D" % entry[0]), floors)
+			_collect_floors(get_node_or_null("Exits/%s/StaticBody3D" % entry[0]), floors)
 	var walls := StaticBody3D.new()
 	walls.name = "GroundBoundaries"
 	# Only Foxy's body uses this layer; combat and other actors ignore the walls.
@@ -198,89 +198,85 @@ func _rebuild_ground_boundaries() -> void:
 	walls.collision_mask = 0
 	add_child(walls)
 	for floor_data: Dictionary in floors:
-		var rect: Rect2 = floor_data.rect
-		var xs: Array[float] = [rect.position.x, rect.end.x]
-		var zs: Array[float] = [rect.position.y, rect.end.y]
-		for other: Dictionary in floors:
-			if absf(float(other.top) - float(floor_data.top)) < 0.5:
-				var r: Rect2 = other.rect
-				for x in [r.position.x, r.end.x]:
-					if x > rect.position.x and x < rect.end.x:
-						xs.append(x)
-				for z in [r.position.y, r.end.y]:
-					if z > rect.position.y and z < rect.end.y:
-						zs.append(z)
-		for opening: Rect2 in boundary_openings:
-			for x in [opening.position.x, opening.end.x]:
-				if x > rect.position.x and x < rect.end.x:
-					xs.append(x)
-			for z in [opening.position.y, opening.end.y]:
-				if z > rect.position.y and z < rect.end.y:
-					zs.append(z)
-		xs.sort()
-		zs.sort()
-		for i in range(xs.size() - 1):
-			_add_boundary(
-				walls,
-				floors,
-				Vector2(xs[i], rect.position.y),
-				Vector2(xs[i + 1], rect.position.y),
-				Vector2(0, -1),
-				floor_data.top
-			)
-			_add_boundary(
-				walls,
-				floors,
-				Vector2(xs[i], rect.end.y),
-				Vector2(xs[i + 1], rect.end.y),
-				Vector2(0, 1),
-				floor_data.top
-			)
-		for i in range(zs.size() - 1):
-			_add_boundary(
-				walls,
-				floors,
-				Vector2(rect.position.x, zs[i]),
-				Vector2(rect.position.x, zs[i + 1]),
-				Vector2(-1, 0),
-				floor_data.top
-			)
-			_add_boundary(
-				walls,
-				floors,
-				Vector2(rect.end.x, zs[i]),
-				Vector2(rect.end.x, zs[i + 1]),
-				Vector2(1, 0),
-				floor_data.top
-			)
+		var outline: PackedVector2Array = floor_data.outline
+		for i in range(outline.size() - 1):
+			_add_floor_edge(walls, floors, outline[i], outline[i + 1], floor_data.top)
 
 
-func _collect_floor_boxes(body: Node, floors: Array[Dictionary]) -> void:
+func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
 	if body == null:
 		return
 	for node in body.get_children():
-		if not node is CollisionShape3D or node.disabled or not node.shape is BoxShape3D:
+		if not node is CollisionShape3D or node.disabled:
+			continue
+		var points: PackedVector3Array
+		if node.shape is BoxShape3D:
+			var half: Vector3 = node.shape.size * 0.5
+			points = PackedVector3Array(
+				[
+					Vector3(-half.x, half.y, -half.z),
+					Vector3(half.x, half.y, -half.z),
+					Vector3(half.x, half.y, half.z),
+					Vector3(-half.x, half.y, half.z)
+				]
+			)
+		elif node.shape is ConvexPolygonShape3D:
+			points = node.shape.points
+		else:
 			continue
 		var t: Transform3D = global_transform.affine_inverse() * node.global_transform
-		var half: Vector3 = node.shape.size * 0.5
-		# Room floors must be horizontal, axis-aligned boxes (quarter turns are fine).
-		if (
-			absf(t.basis.x.y) > 0.001
-			or absf(t.basis.z.y) > 0.001
-			or (absf(t.basis.x.x) > 0.001 and absf(t.basis.x.z) > 0.001)
-		):
-			push_warning("Ground boundaries require axis-aligned floor boxes: %s" % node.get_path())
+		if absf(t.basis.x.y) > 0.001 or absf(t.basis.z.y) > 0.001:
+			push_warning("Ground boundaries require horizontal floors: %s" % node.get_path())
 			continue
-		var extent := Vector2(
-			absf(t.basis.x.x) * half.x + absf(t.basis.z.x) * half.z,
-			absf(t.basis.x.z) * half.x + absf(t.basis.z.z) * half.z
+		var projected := PackedVector2Array()
+		var top := -INF
+		for point: Vector3 in points:
+			var position := t * point
+			projected.append(Vector2(position.x, position.z))
+			top = maxf(top, position.y)
+		# The hull is counterclockwise and repeats the first point at the end.
+		var outline := Geometry2D.convex_hull(projected)
+		if outline.size() >= 4:
+			floors.append({"outline": outline, "top": top})
+
+
+func _add_floor_edge(
+	walls: StaticBody3D, floors: Array[Dictionary], start: Vector2, end: Vector2, top: float
+) -> void:
+	var edge := end - start
+	if edge.length_squared() < 0.0001:
+		return
+	var cuts: Array[float] = [0.0, 1.0]
+	for other: Dictionary in floors:
+		if absf(float(other.top) - top) < 0.5:
+			_split_edge(start, end, other.outline, cuts)
+	for opening: Rect2 in boundary_openings:
+		var outline := PackedVector2Array(
+			[
+				opening.position,
+				Vector2(opening.end.x, opening.position.y),
+				opening.end,
+				Vector2(opening.position.x, opening.end.y),
+				opening.position
+			]
 		)
-		floors.append(
-			{
-				"rect": Rect2(Vector2(t.origin.x, t.origin.z) - extent, extent * 2.0),
-				"top": t.origin.y + absf(t.basis.y.y) * half.y
-			}
+		_split_edge(start, end, outline, cuts)
+	cuts.sort()
+	var outward := Vector2(edge.y, -edge.x).normalized()
+	for i in range(cuts.size() - 1):
+		_add_boundary(walls, floors, start + edge * cuts[i], start + edge * cuts[i + 1], outward, top)
+
+
+func _split_edge(
+	start: Vector2, end: Vector2, outline: PackedVector2Array, cuts: Array[float]
+) -> void:
+	var edge := end - start
+	for i in range(outline.size() - 1):
+		var intersection: Variant = Geometry2D.segment_intersects_segment(
+			start, end, outline[i], outline[i + 1]
 		)
+		if intersection != null:
+			cuts.append(clampf((intersection - start).dot(edge) / edge.length_squared(), 0.0, 1.0))
 
 
 func _add_boundary(
@@ -300,17 +296,14 @@ func _add_boundary(
 	for other: Dictionary in floors:
 		if (
 			absf(float(other.top) - top) < 0.5
-			and (other.rect as Rect2).has_point(midpoint + outward * 0.01)
+			and Geometry2D.is_point_in_polygon(midpoint + outward * 0.01, other.outline)
 		):
 			return
 	var wall := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(
-		absf(end.x - start.x) + absf(outward.x) * 0.15,
-		3.0,
-		absf(end.y - start.y) + absf(outward.y) * 0.15
-	)
+	box.size = Vector3(start.distance_to(end), 3.0, 0.15)
 	wall.shape = box
+	wall.rotation.y = -(end - start).angle()
 	wall.position = Vector3(
 		midpoint.x + outward.x * 0.075, top + 1.45, midpoint.y + outward.y * 0.075
 	)

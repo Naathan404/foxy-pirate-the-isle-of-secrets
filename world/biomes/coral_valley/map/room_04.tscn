@@ -3,8 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ground"]
-[ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://world/biomes/coral_valley/base_scenes/Whimsical Square Beach Island Tile.png" id="3_ground_texture"]
+[ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://assets/sprites/biomes/coral_valley/Whimsical Square Beach Island Tile.png" id="3_ground_texture"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="4_platform"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_void"]
 resource_local_to_scene = true
@@ -168,6 +169,10 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4, 0.77503157, -4)
 
 [node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 18.425, 0.77503157, -4)
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-8, 0, -7, 8, 0, -8, -7, 0, 8, 36, 0, 6, 42, 0, -8, 49, 0, 5)
 
 [editable path="Environment/BaseGround"]
 [editable path="Exits/DownPath"]
