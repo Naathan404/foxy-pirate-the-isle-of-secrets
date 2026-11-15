@@ -17,6 +17,8 @@ var player: Player
 var inventory: Inventory
 var gold_wallet: GoldWallet = GoldWallet.new()
 var state: State = State.PLAYING
+## Encounter state survives scene changes for the current game session.
+var boss_encounters: Dictionary[StringName, Dictionary] = {}
 # Debug-only progression flag. Each map owns a fresh Player scene, so keep the
 # HUD grant state on the autoload instead of on the scene-local CharmRegistry.
 var debug_all_charms_granted: bool = false

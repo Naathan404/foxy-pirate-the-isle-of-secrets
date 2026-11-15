@@ -1,0 +1,21 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://world/objects/treasure_chest.tscn" id="1"]
+[ext_resource type="Script" path="res://gameplay/bosses/boss_reward_chest.gd" id="2"]
+[ext_resource type="Resource" path="res://data/items/materials/coral.tres" id="3"]
+[ext_resource type="Resource" path="res://data/items/materials/gunpowder_bag.tres" id="4"]
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="5"]
+[ext_resource type="Resource" path="res://data/items/quest/key_tide.tres" id="6"]
+
+[sub_resource type="BoxShape3D" id="ChestBody"]
+size = Vector3(1.5, 1.5, 0.8)
+
+[node name="BossRewardChest" instance=ExtResource("1")]
+script = ExtResource("2")
+rewards = Array[ExtResource("5")]([ExtResource("6"), ExtResource("3"), ExtResource("4")])
+
+[node name="MovementBody" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MovementBody"]
+position = Vector3(0, 0.75, 0)
+shape = SubResource("ChestBody")

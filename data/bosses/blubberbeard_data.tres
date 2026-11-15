@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="BossData" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://data/bosses/boss_data.gd" id="1"]
+[ext_resource type="Script" path="res://data/bosses/boss_phase_data.gd" id="2"]
+[ext_resource type="Script" path="res://data/bosses/boss_skill_data.gd" id="3"]
+[ext_resource type="Script" path="res://data/bosses/blubberbeard_skill_data.gd" id="4"]
+
+[sub_resource type="Resource" id="barrel1"]
+script = ExtResource("4")
+kind = 0
+damage = 2.0
+windup = 1.6
+radius = 2.5
+recovery = 0.5
+
+[sub_resource type="Resource" id="charge1"]
+script = ExtResource("4")
+kind = 1
+damage = 3.0
+windup = 1.2
+speed = 9.0
+duration = 0.8
+recovery = 2.0
+
+[sub_resource type="Resource" id="barrel2"]
+script = ExtResource("4")
+kind = 0
+damage = 2.0
+windup = 1.2
+radius = 3.5
+recovery = 0.3
+
+[sub_resource type="Resource" id="charge2"]
+script = ExtResource("4")
+kind = 1
+damage = 3.0
+windup = 0.9
+speed = 14.0
+duration = 0.8
+recovery = 0.8
+
+[sub_resource type="Resource" id="spikes"]
+script = ExtResource("4")
+kind = 2
+damage = 1.5
+windup = 1.1
+speed = 9.0
+duration = 2.2
+recovery = 0.5
+
+[sub_resource type="Resource" id="phase1"]
+script = ExtResource("2")
+hp_threshold = 1.0
+skill_interval = 1.5
+skills = Array[ExtResource("3")]([SubResource("barrel1"), SubResource("charge1")])
+
+[sub_resource type="Resource" id="phase2"]
+script = ExtResource("2")
+hp_threshold = 0.5
+skill_interval = 0.6
+skills = Array[ExtResource("3")]([SubResource("barrel2"), SubResource("charge2"), SubResource("spikes")])
+
+[resource]
+script = ExtResource("1")
+display_name = "Captain Blubberbeard"
+max_hp = 100.0
+phases = Array[ExtResource("2")]([SubResource("phase1"), SubResource("phase2")])

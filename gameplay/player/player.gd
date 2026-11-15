@@ -200,7 +200,7 @@ func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: fl
 		return
 	if damage == null or damage.source != self or not is_instance_valid(target):
 		return
-	if target is EnemyBase or target.is_in_group("training_dummy"):
+	if target is EnemyBase or target is BossBase or target.is_in_group("training_dummy"):
 		chaos.gain(damage.chaos_gain)
 
 

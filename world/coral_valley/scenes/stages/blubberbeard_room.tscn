@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/base_scenes/boss_room.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/bosses/blubberbeard/blubberbeard.tscn" id="2"]
+[ext_resource type="Script" path="res://gameplay/bosses/boss_encounter.gd" id="3"]
+
+[node name="BlubberbeardRoom" instance=ExtResource("1")]
+open_exits = 8
+left_destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
+left_destination_trigger_id = &"stage5_boss"
+
+[node name="Foxy" parent="." index="3"]
+position = Vector3(-25, 2.1, 0)
+
+[node name="CaptainBlubberbeard" parent="." instance=ExtResource("2")]
+position = Vector3(6, 0.4, 0)
+
+[node name="BossEncounter" type="Node" parent="." node_paths=PackedStringArray("boss")]
+script = ExtResource("3")
+encounter_id = &"captain_blubberbeard"
+boss = NodePath("../CaptainBlubberbeard")
