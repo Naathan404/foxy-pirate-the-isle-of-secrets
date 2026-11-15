@@ -45,7 +45,11 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _flash_material != null and is_instance_valid(sprite) and sprite.material_overlay == _flash_material:
+	if (
+		_flash_material != null
+		and is_instance_valid(sprite)
+		and sprite.material_overlay == _flash_material
+	):
 		_flash_material.set_shader_parameter("sprite_texture", sprite.texture)
 	if not _directional_action.is_empty():
 		_play_directional()
@@ -101,7 +105,9 @@ func play_hit_feedback() -> void:
 	_hit_pose_tween = create_tween().set_ignore_time_scale(true)
 	_hit_pose_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_hit_pose_tween.tween_property(
-		sprite, "scale", _sprite_scale * Vector3(hit_squash_scale, hit_pulse_scale, 1.0),
+		sprite,
+		"scale",
+		_sprite_scale * Vector3(hit_squash_scale, hit_pulse_scale, 1.0),
 		hit_rebound_duration
 	)
 	_hit_pose_tween.tween_property(sprite, "scale", _sprite_scale, hit_settle_duration)

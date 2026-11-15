@@ -1,4 +1,4 @@
-﻿class_name MonsterNote
+class_name MonsterNote
 extends Resource
 ## One bestiary entry. Unlock defaults are authored here; runtime overrides live in the tab.
 

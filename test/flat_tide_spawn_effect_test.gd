@@ -1,4 +1,4 @@
-﻿extends SceneTree
+extends SceneTree
 const ENEMY: PackedScene = preload("res://gameplay/enemies/starfish/starfish.tscn")
 var spawned := 0
 var failures := 0

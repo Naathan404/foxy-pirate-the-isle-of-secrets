@@ -1,4 +1,4 @@
-﻿class_name ChestItemDrop
+class_name ChestItemDrop
 extends Resource
 ## Each entry rolls independently when the chest opens.
 @export var item: BaseItem

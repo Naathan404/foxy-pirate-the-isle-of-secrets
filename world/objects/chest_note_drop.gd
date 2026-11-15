@@ -1,4 +1,4 @@
-﻿class_name ChestNoteDrop
+class_name ChestNoteDrop
 extends Resource
 ## Select the actual bestiary entry; no handwritten ID is needed.
 @export var note: MonsterNote

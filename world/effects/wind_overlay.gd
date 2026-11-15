@@ -1,6 +1,18 @@
 extends Node2D
 ## Wind and foliage move across a room-sized world plane, projected onto the screen.
 
+const WRAP_MARGIN := 100.0
+const LEAF_PROFILE := [
+	Vector2(-1.0, 0.0),
+	Vector2(-0.45, -0.8),
+	Vector2(0.15, -1.0),
+	Vector2(0.7, -0.55),
+	Vector2(1.0, 0.0),
+	Vector2(0.45, 0.8),
+	Vector2(-0.15, 1.0),
+	Vector2(-0.7, 0.55),
+]
+
 @export_group("Motion")
 @export var reference_size := Vector2(1920, 1080)
 ## Used when the room has no CameraBounds markers.
@@ -30,13 +42,6 @@ extends Node2D
 @export_range(0.5, 20.0, 0.5) var gust_period: float = 7.0
 @export_range(0.1, 1.0, 0.05) var gust_duration: float = 0.55
 @export_range(8, 64, 1) var trail_segments: int = 32
-
-const WRAP_MARGIN := 100.0
-const LEAF_PROFILE := [
-	Vector2(-1.0, 0.0), Vector2(-0.45, -0.8), Vector2(0.15, -1.0),
-	Vector2(0.7, -0.55), Vector2(1.0, 0.0), Vector2(0.45, 0.8),
-	Vector2(-0.15, 1.0), Vector2(-0.7, 0.55),
-]
 
 var _elapsed := 0.0
 var _seeds: Array[Vector2] = []
@@ -74,7 +79,9 @@ func _draw() -> void:
 	if _reference_camera_size <= 0.0:
 		_reference_camera_size = camera.size
 		_reference_camera_fov = camera.fov
-		_reference_depth = maxf(camera.to_local(_field_center + Vector3.UP * field_height).z * -1.0, camera.near)
+		_reference_depth = maxf(
+			camera.to_local(_field_center + Vector3.UP * field_height).z * -1.0, camera.near
+		)
 	for index in range(_seeds.size()):
 		var seed := _seeds[index]
 		var phase := seed.x * TAU
@@ -96,15 +103,20 @@ func _projection_scale(camera: Camera3D, world_point: Vector3) -> float:
 	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
 		return _reference_camera_size / maxf(camera.size, 0.01)
 	var depth := maxf(-camera.to_local(world_point).z, camera.near)
-	var fov_scale := tan(deg_to_rad(_reference_camera_fov) * 0.5) / tan(deg_to_rad(camera.fov) * 0.5)
+	var fov_scale := (
+		tan(deg_to_rad(_reference_camera_fov) * 0.5) / tan(deg_to_rad(camera.fov) * 0.5)
+	)
 	return _reference_depth / depth * fov_scale
 
 
 func _world_position(field_point: Vector2) -> Vector3:
-	return _field_center + Vector3(
-		(field_point.x / reference_size.x - 0.5) * _field_size.x,
-		field_height,
-		(field_point.y / reference_size.y - 0.5) * _field_size.y
+	return (
+		_field_center
+		+ Vector3(
+			(field_point.x / reference_size.x - 0.5) * _field_size.x,
+			field_height,
+			(field_point.y / reference_size.y - 0.5) * _field_size.y
+		)
 	)
 
 
@@ -151,7 +163,9 @@ func _draw_trail(point: Vector2, ratio: Vector2, seed: Vector2, phase: float) ->
 	if cycle >= gust_duration:
 		return
 	var gust := sin(PI * cycle / gust_duration)
-	var direction := wind_velocity.normalized() if not wind_velocity.is_zero_approx() else Vector2.RIGHT
+	var direction := (
+		wind_velocity.normalized() if not wind_velocity.is_zero_approx() else Vector2.RIGHT
+	)
 	var normal := Vector2(-direction.y, direction.x)
 	var vertices := PackedVector2Array()
 	var colors := PackedColorArray()
@@ -159,7 +173,11 @@ func _draw_trail(point: Vector2, ratio: Vector2, seed: Vector2, phase: float) ->
 		var progress := float(step) / float(trail_segments)
 		var envelope := sin(PI * progress)
 		var wave := sin(progress * TAU * trail_wave_cycles - _elapsed * trail_wave_speed + phase)
-		var center := point - direction * trail_length * progress + normal * wave * trail_wave_height * envelope
+		var center := (
+			point
+			- direction * trail_length * progress
+			+ normal * wave * trail_wave_height * envelope
+		)
 		var half_width := trail_width * envelope * 0.5
 		var color := trail_color
 		color.a *= envelope * gust
@@ -177,6 +195,8 @@ func _draw_trail(point: Vector2, ratio: Vector2, seed: Vector2, phase: float) ->
 		for side in range(2):
 			var i := step * 3 + side
 			draw_polygon(
-				PackedVector2Array([vertices[i], vertices[i + 1], vertices[i + 4], vertices[i + 3]]),
+				PackedVector2Array(
+					[vertices[i], vertices[i + 1], vertices[i + 4], vertices[i + 3]]
+				),
 				PackedColorArray([colors[i], colors[i + 1], colors[i + 4], colors[i + 3]])
 			)

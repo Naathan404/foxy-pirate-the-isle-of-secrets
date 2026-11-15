@@ -1,4 +1,4 @@
-﻿extends SceneTree
+extends SceneTree
 
 const CHEST_SCENE = preload("res://world/objects/treasure_chest.tscn")
 const NOTE = preload("res://data/notes/crab.tres")
@@ -7,13 +7,19 @@ var test_save := "res://_note_progress_test_%d.save" % Time.get_ticks_usec()
 var failures := 0
 var popup_count := 0
 
-class TestPlayer extends Player:
+
+class TestPlayer:
+	extends Player
+
 	func _ready() -> void:
 		pass
+
 	func _exit_tree() -> void:
 		pass
+
 	func _physics_process(_delta: float) -> void:
 		pass
+
 	func is_gameplay_input_blocked() -> bool:
 		return false
 
@@ -98,12 +104,17 @@ func run_tests() -> void:
 	check(store.is_unlocked(NOTE), "collecting note unlocks its linked entry")
 	check(inventory.count_item(&"note") == 0, "note does not occupy inventory")
 	check(popup_count == 1, "note emits the normal item pickup signal")
-	var duplicate := preload("res://gameplay/inventory/item_pickup.tscn").instantiate() as ItemPickup
+	var duplicate := (
+		preload("res://gameplay/inventory/item_pickup.tscn").instantiate() as ItemPickup
+	)
 	duplicate.note = NOTE
 	holder.add_child(duplicate)
 	duplicate._attraction._awaiting_commit = true
 	duplicate._collect(player)
-	check(popup_count == 2 and inventory.count_item(&"note") == 0, "duplicate note still shows popup without a slot")
+	check(
+		popup_count == 2 and inventory.count_item(&"note") == 0,
+		"duplicate note still shows popup without a slot"
+	)
 	check(store.load_progress() and store.is_unlocked(NOTE), "unlock survives reload")
 	var tab = load("res://gameplay/inventory/notes_tab.tscn").instantiate()
 	root.add_child(tab)

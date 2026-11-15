@@ -1,4 +1,4 @@
-﻿extends Node
+extends Node
 ## Coordinates short combat moments in real time with shared hitstop and camera follow.
 
 const PRESETS := {
@@ -29,7 +29,13 @@ func _ready() -> void:
 
 
 ## Focus nodes are optional; the bow passes its live arrows and the shooter.
-func request(moment: StringName, camera: Camera3D = null, focus_nodes: Array = [], anchor: Node3D = null, direction: Vector3 = Vector3.ZERO) -> void:
+func request(
+	moment: StringName,
+	camera: Camera3D = null,
+	focus_nodes: Array = [],
+	anchor: Node3D = null,
+	direction: Vector3 = Vector3.ZERO
+) -> void:
 	if get_tree().paused or not PRESETS.has(moment):
 		return
 	var preset: Dictionary = PRESETS[moment]
@@ -47,7 +53,9 @@ func request(moment: StringName, camera: Camera3D = null, focus_nodes: Array = [
 	_preset = preset
 	_camera = camera if is_instance_valid(camera) else get_viewport().get_camera_3d()
 	if is_instance_valid(_camera):
-		_base_zoom = _camera.size if _camera.projection == Camera3D.PROJECTION_ORTHOGONAL else _camera.fov
+		_base_zoom = (
+			_camera.size if _camera.projection == Camera3D.PROJECTION_ORTHOGONAL else _camera.fov
+		)
 	for node in focus_nodes:
 		if node is Node3D and is_instance_valid(node):
 			_focus_nodes.append(weakref(node))
@@ -58,7 +66,12 @@ func request(moment: StringName, camera: Camera3D = null, focus_nodes: Array = [
 
 
 func _process(_delta: float) -> void:
-	if get_tree().paused or not is_instance_valid(_camera) or not _camera.is_inside_tree() or get_viewport().get_camera_3d() != _camera:
+	if (
+		get_tree().paused
+		or not is_instance_valid(_camera)
+		or not _camera.is_inside_tree()
+		or get_viewport().get_camera_3d() != _camera
+	):
 		cancel()
 		return
 	var elapsed := float(Time.get_ticks_msec() - _started_at) / 1000.0
@@ -92,7 +105,12 @@ func _update_focus(weight: float, real_delta: float) -> void:
 	var count := 0
 	for reference in _focus_nodes:
 		var arrow := reference.get_ref() as Node3D
-		if is_instance_valid(arrow) and arrow.is_inside_tree() and arrow.visible and not arrow.is_queued_for_deletion():
+		if (
+			is_instance_valid(arrow)
+			and arrow.is_inside_tree()
+			and arrow.visible
+			and not arrow.is_queued_for_deletion()
+		):
 			center += arrow.global_position
 			count += 1
 	if count > 0:

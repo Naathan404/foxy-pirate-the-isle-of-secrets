@@ -29,7 +29,16 @@ func receive_damage(damage: DamageContext) -> float:
 		overlay.name = INK_OVERLAY_NAME
 		player.add_child(overlay)
 	if _destroyed:
-		overlay.splash(true, ink_color, defeat_spread_time, defeat_hold_time, defeat_fade_time, defeat_ink_opacity)
+		overlay.splash(
+			true,
+			ink_color,
+			defeat_spread_time,
+			defeat_hold_time,
+			defeat_fade_time,
+			defeat_ink_opacity
+		)
 	else:
-		overlay.splash(false, ink_color, hit_spread_time, hit_hold_time, hit_fade_time, hit_ink_opacity)
+		overlay.splash(
+			false, ink_color, hit_spread_time, hit_hold_time, hit_fade_time, hit_ink_opacity
+		)
 	return applied

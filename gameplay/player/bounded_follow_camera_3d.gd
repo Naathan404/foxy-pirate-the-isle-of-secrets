@@ -63,16 +63,20 @@ func _update_dash_follow(target: Vector3, delta: float) -> Vector3:
 	if not dash_follow_enabled or not _dash_follow_active:
 		_dash_follow_active = false
 		return target
-	var horizontal_lag := Vector3(
-		_dash_camera_position.x - target.x, 0.0, _dash_camera_position.z - target.z
-	).limit_length(dash_max_lag_distance)
+	var horizontal_lag := (
+		Vector3(_dash_camera_position.x - target.x, 0.0, _dash_camera_position.z - target.z)
+		. limit_length(dash_max_lag_distance)
+	)
 	_dash_camera_position = target + horizontal_lag
 	var catch_up_delta := maxf(0.0, delta - _dash_hold_remaining)
 	_dash_hold_remaining = maxf(0.0, _dash_hold_remaining - delta)
 	if catch_up_delta > 0.0:
 		var blend := 1.0 - exp(-dash_catch_up_speed * catch_up_delta)
 		_dash_camera_position = _dash_camera_position.lerp(target, blend)
-	if _dash_hold_remaining <= 0.0 and _dash_camera_position.distance_to(target) <= dash_settle_distance:
+	if (
+		_dash_hold_remaining <= 0.0
+		and _dash_camera_position.distance_to(target) <= dash_settle_distance
+	):
 		_dash_follow_active = false
 		return target
 	return _dash_camera_position
@@ -104,16 +108,17 @@ func _get_movement_bob(delta: float) -> Vector3:
 	var speed_ratio := 0.0
 	if speed > bob_minimum_speed and _player.data.move_speed > 0.0:
 		speed_ratio = clampf(speed / _player.data.move_speed, 0.0, 1.0)
-		_bob_phase = fposmod(
-			_bob_phase + TAU * bob_cycles_per_second * speed_ratio * delta, TAU
-		)
+		_bob_phase = fposmod(_bob_phase + TAU * bob_cycles_per_second * speed_ratio * delta, TAU)
 	var blend := 1.0 - exp(-bob_blend_speed * delta)
 	_bob_weight = lerpf(_bob_weight, speed_ratio, blend)
-	return Vector3(
-		sin(_bob_phase) * bob_horizontal_amplitude,
-		cos(_bob_phase * 2.0) * bob_vertical_amplitude,
-		0.0
-	) * _bob_weight
+	return (
+		Vector3(
+			sin(_bob_phase) * bob_horizontal_amplitude,
+			cos(_bob_phase * 2.0) * bob_vertical_amplitude,
+			0.0
+		)
+		* _bob_weight
+	)
 
 
 func snap_to_follow() -> void:

@@ -6,7 +6,9 @@ signal enemy_spawned(enemy: EnemyBase, is_elite: bool)
 
 @export_group("Spawn Effect")
 ## Set to empty to disable the visual; the enemy still spawns normally.
-@export var spawn_effect_scene: PackedScene = preload("res://world/gimmick/flat_tide/flat_tide_spawn_effect.tscn")
+@export var spawn_effect_scene: PackedScene = preload(
+	"res://world/gimmick/flat_tide/flat_tide_spawn_effect.tscn"
+)
 @export_group("")
 
 ## Controller cung cấp các vùng nước và chu kỳ triều.

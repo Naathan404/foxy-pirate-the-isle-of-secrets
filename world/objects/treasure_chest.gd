@@ -177,7 +177,12 @@ func _drop_items_and_notes() -> void:
 		_spawn_pickup(drop.item, null, drop.quantity, angle + index * LOOT_SPREAD_ANGLE)
 		index += 1
 	for drop in note_drops:
-		if drop == null or drop.note == null or drop.note.note_id.is_empty() or not _roll_drop(drop.chance):
+		if (
+			drop == null
+			or drop.note == null
+			or drop.note.note_id.is_empty()
+			or not _roll_drop(drop.chance)
+		):
 			continue
 		_spawn_pickup(null, drop.note, 1, angle + index * LOOT_SPREAD_ANGLE)
 		index += 1

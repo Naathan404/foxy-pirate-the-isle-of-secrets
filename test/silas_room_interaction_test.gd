@@ -1,16 +1,24 @@
-﻿extends SceneTree
+extends SceneTree
 
 const SILAS: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const ROOM: PackedScene = preload("res://world/biomes/coral_valley/map/room_13.tscn")
 
+
 func _initialize() -> void:
 	call_deferred("run_test")
+
 
 func run_test() -> void:
 	var shared := SILAS.instantiate() as SilasNpc
 	root.add_child(shared)
 	await process_frame
-	if shared.catalog == null or not shared.catalog.validate().is_empty() or not shared.interaction_area.interaction_requested.is_connected(shared._on_interaction_requested):
+	if (
+		shared.catalog == null
+		or not shared.catalog.validate().is_empty()
+		or not shared.interaction_area.interaction_requested.is_connected(
+			shared._on_interaction_requested
+		)
+	):
 		push_error("Shared Silas scene must load its catalog and interaction handler")
 		quit(1)
 		return
@@ -27,7 +35,9 @@ func run_test() -> void:
 		push_error("Silas catalog must load and validate in room_13")
 		quit(1)
 		return
-	if not silas.interaction_area.interaction_requested.is_connected(silas._on_interaction_requested):
+	if not silas.interaction_area.interaction_requested.is_connected(
+		silas._on_interaction_requested
+	):
 		push_error("Silas must connect its interaction handler")
 		quit(1)
 		return

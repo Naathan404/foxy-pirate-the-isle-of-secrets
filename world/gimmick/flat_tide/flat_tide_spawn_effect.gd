@@ -1,4 +1,4 @@
-﻿extends Node3D
+extends Node3D
 ## A short splash and two expanding ripples at a newly exposed spawn point.
 
 @export_range(0.1, 3.0, 0.05) var duration: float = 0.85
@@ -22,5 +22,10 @@ func play(is_elite: bool = false) -> void:
 	_droplets.emitting = true
 	var tween := create_tween()
 	tween.tween_property(first, "shader_parameter/progress", 1.0, duration)
-	tween.parallel().tween_property(second, "shader_parameter/progress", 1.0, duration * 0.72).set_delay(duration * 0.18)
+	(
+		tween
+		. parallel()
+		. tween_property(second, "shader_parameter/progress", 1.0, duration * 0.72)
+		. set_delay(duration * 0.18)
+	)
 	tween.tween_callback(queue_free)

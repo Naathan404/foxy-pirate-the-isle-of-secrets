@@ -1,14 +1,17 @@
-﻿extends SceneTree
+extends SceneTree
 const PLAYER: PackedScene = preload("res://gameplay/player/foxy.tscn")
 var failures := 0
 
+
 func _initialize() -> void:
 	call_deferred("run_test")
+
 
 func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
 
 func run_test() -> void:
 	var world := Node3D.new()
@@ -19,7 +22,9 @@ func run_test() -> void:
 	var vignette = player.get_node("Effects/LowHealthVignette")
 	effect.set_process(false)
 	check(effect.player == player, "atmosphere is connected to player")
-	check(effect._overlay.mouse_filter == Control.MOUSE_FILTER_IGNORE, "overlay never blocks controls")
+	check(
+		effect._overlay.mouse_filter == Control.MOUSE_FILTER_IGNORE, "overlay never blocks controls"
+	)
 	check(is_zero_approx(effect._water_amount), "water effect starts dry")
 	player.environment_is_water = true
 	effect._process(effect.water_fade_in * 0.5)
@@ -28,7 +33,10 @@ func run_test() -> void:
 	check(is_equal_approx(effect._water_amount, 1.0), "water reaches full effect")
 	player.hp.take_damage(player.hp.get_max_hp() * 0.8)
 	check(vignette._active, "low health vignette remains active in water")
-	check(is_equal_approx(float(effect._material.get_shader_parameter("water_amount")), 1.0), "water overlay remains active at low health")
+	check(
+		is_equal_approx(float(effect._material.get_shader_parameter("water_amount")), 1.0),
+		"water overlay remains active at low health"
+	)
 	player.environment_is_water = false
 	effect._process(effect.water_fade_out * 0.5)
 	check(is_equal_approx(effect._water_amount, 0.5), "water fades out smoothly")

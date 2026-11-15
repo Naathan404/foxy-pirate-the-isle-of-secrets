@@ -3,13 +3,16 @@ const DUMMY: PackedScene = preload("res://world/biomes/hub/objects/training_dumm
 const ARROW: PackedScene = preload("res://gameplay/weapons/attack scenes/bow_arrow.tscn")
 var failures := 0
 
+
 func _initialize() -> void:
 	call_deferred("run_test")
+
 
 func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
 
 func run_test() -> void:
 	var arena := Node3D.new()
@@ -22,21 +25,38 @@ func run_test() -> void:
 	var damage := DamageContext.new()
 	damage.source_team = CombatTeams.PLAYER
 	damage.amount_hp = 1000000.5
-	check(dummy.receive_damage(damage) == damage.amount_hp, "dummy reports full damage even beyond its health")
+	check(
+		dummy.receive_damage(damage) == damage.amount_hp,
+		"dummy reports full damage even beyond its health"
+	)
 	damage.amount_hp = 2.5
 	damage.is_critical = true
 	check(dummy.receive_damage(damage) == 2.5, "dummy accepts repeated critical damage")
-	check(health.current_hp == starting_hp and not dummy._destroyed, "dummy health and lifetime do not decrease")
-	check(dummy._hurtbox.enabled and not dummy._movement_shape.disabled, "dummy remains hittable and solid")
+	check(
+		health.current_hp == starting_hp and not dummy._destroyed,
+		"dummy health and lifetime do not decrease"
+	)
+	check(
+		dummy._hurtbox.enabled and not dummy._movement_shape.disabled,
+		"dummy remains hittable and solid"
+	)
 	var popups: Array[Label3D] = []
 	for child in arena.get_children():
 		if child is Label3D:
 			popups.append(child)
 	check(popups.size() == 2, "normal and critical hits create popups")
 	if popups.size() == 2:
-		check(popups[0].text == "1000000.5" and popups[1].text == "2.5", "popups display actual damage")
-		check(popups[0].global_position.y > dummy.global_position.y + 3.0, "popup appears above dummy")
-		check(popups[0].modulate == popups[1].modulate, "high damage and critical use emphasized popup")
+		check(
+			popups[0].text == "1000000.5" and popups[1].text == "2.5",
+			"popups display actual damage"
+		)
+		check(
+			popups[0].global_position.y > dummy.global_position.y + 3.0, "popup appears above dummy"
+		)
+		check(
+			popups[0].modulate == popups[1].modulate,
+			"high damage and critical use emphasized popup"
+		)
 	damage.amount_hp = -5
 	check(dummy.receive_damage(damage) == 0.0, "invalid damage is ignored")
 	var hitbox := HitBox.new()

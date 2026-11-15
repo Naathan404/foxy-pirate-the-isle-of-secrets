@@ -1,4 +1,4 @@
-﻿extends Node
+extends Node
 ## Standalone persistence until a game-wide save system is available.
 signal changed(note_id: StringName)
 

@@ -1,12 +1,12 @@
 extends Control
 ## Bestiary pages in the inventory book. Entries and their defaults are edited in Inspector.
 
-@export var notes: Array[MonsterNote] = []
-
 const TITLE_FONT: Font = preload("res://assets/fonts/BlackCrest-gwPyY.otf")
 const BODY_FONT: Font = preload("res://assets/fonts/unifont-17.0.03.otf")
 const INK := Color(0.24, 0.12, 0.10)
 const MUTED := Color(0.40, 0.25, 0.19)
+
+@export var notes: Array[MonsterNote] = []
 
 var _rows: VBoxContainer
 var _detail: VBoxContainer
@@ -51,7 +51,9 @@ func refresh() -> void:
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.disabled = not unlocked
 		row.focus_mode = Control.FOCUS_ALL if unlocked else Control.FOCUS_NONE
-		row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if unlocked else Control.CURSOR_ARROW
+		row.mouse_default_cursor_shape = (
+			Control.CURSOR_POINTING_HAND if unlocked else Control.CURSOR_ARROW
+		)
 		row.add_theme_font_override("font", BODY_FONT)
 		row.add_theme_font_size_override("font_size", 16)
 		row.add_theme_color_override("font_color", INK)
@@ -101,7 +103,9 @@ func _build_layout() -> void:
 
 	var left_column := _column(left)
 	_add_label(left_column, "Field Notes", 38, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER)
-	_add_label(left_column, "CREATURES OF THE ISLE", 12, BODY_FONT, HORIZONTAL_ALIGNMENT_CENTER, MUTED)
+	_add_label(
+		left_column, "CREATURES OF THE ISLE", 12, BODY_FONT, HORIZONTAL_ALIGNMENT_CENTER, MUTED
+	)
 	_add_divider(left_column)
 	var list_scroll := ScrollContainer.new()
 	list_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -128,11 +132,27 @@ func _render_detail(note: MonsterNote) -> void:
 		_add_label(_detail, "The Bestiary", 38, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER)
 		_add_divider(_detail)
 		_add_spacer(_detail, 110)
-		_add_label(_detail, "Select an unlocked note to read about the creatures of the isle.", 17, BODY_FONT, HORIZONTAL_ALIGNMENT_CENTER, MUTED)
+		_add_label(
+			_detail,
+			"Select an unlocked note to read about the creatures of the isle.",
+			17,
+			BODY_FONT,
+			HORIZONTAL_ALIGNMENT_CENTER,
+			MUTED
+		)
 		return
 	var boss := note.layout == MonsterNote.Layout.BOSS
-	_add_label(_detail, "BOSS ENCOUNTER" if boss else "CREATURE RECORD", 12, BODY_FONT, HORIZONTAL_ALIGNMENT_CENTER, MUTED)
-	_add_label(_detail, note.display_name, 36 if boss else 32, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER)
+	_add_label(
+		_detail,
+		"BOSS ENCOUNTER" if boss else "CREATURE RECORD",
+		12,
+		BODY_FONT,
+		HORIZONTAL_ALIGNMENT_CENTER,
+		MUTED
+	)
+	_add_label(
+		_detail, note.display_name, 36 if boss else 32, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER
+	)
 	_add_divider(_detail)
 	if boss:
 		_add_portrait(_detail, note.portrait, Vector2(0, 160))
@@ -169,7 +189,17 @@ func _add_portrait(parent: Node, texture: Texture2D, minimum: Vector2) -> void:
 
 func _add_stats(parent: Node, note: MonsterNote, alignment: HorizontalAlignment) -> void:
 	if note.enemy_data != null:
-		_add_label(parent, "HEALTH  %s    ATTACK  %s" % [str(note.enemy_data.max_hp), str(note.enemy_data.attack_damage)], 13, BODY_FONT, alignment, MUTED)
+		_add_label(
+			parent,
+			(
+				"HEALTH  %s    ATTACK  %s"
+				% [str(note.enemy_data.max_hp), str(note.enemy_data.attack_damage)]
+			),
+			13,
+			BODY_FONT,
+			alignment,
+			MUTED
+		)
 
 
 func _section(title: String, body: String) -> void:
@@ -187,7 +217,14 @@ func _column(parent: Control) -> VBoxContainer:
 	return column
 
 
-func _add_label(parent: Node, text: String, font_size: int, font: Font, alignment: HorizontalAlignment = HORIZONTAL_ALIGNMENT_LEFT, color: Color = INK) -> Label:
+func _add_label(
+	parent: Node,
+	text: String,
+	font_size: int,
+	font: Font,
+	alignment: HorizontalAlignment = HORIZONTAL_ALIGNMENT_LEFT,
+	color: Color = INK
+) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.horizontal_alignment = alignment

@@ -1,7 +1,9 @@
-﻿extends Node
+extends Node
 ## Screen-space atmosphere sits below HUD; water fades in without replacing health feedback.
 
-const ATMOSPHERE_SHADER: Shader = preload("res://gameplay/player/effects/environment_atmosphere.gdshader")
+const ATMOSPHERE_SHADER: Shader = preload(
+	"res://gameplay/player/effects/environment_atmosphere.gdshader"
+)
 
 @export var player: Player
 @export_group("Ambient")
@@ -41,7 +43,12 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	var wet := water_enabled and is_instance_valid(player) and not player.dead and player.environment_is_water
+	var wet := (
+		water_enabled
+		and is_instance_valid(player)
+		and not player.dead
+		and player.environment_is_water
+	)
 	var target := 1.0 if wet else 0.0
 	var duration := water_fade_in if wet else water_fade_out
 	_water_amount = move_toward(_water_amount, target, maxf(delta, 0.0) / maxf(duration, 0.01))

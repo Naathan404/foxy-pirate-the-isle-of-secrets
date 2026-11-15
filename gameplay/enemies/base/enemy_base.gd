@@ -312,7 +312,11 @@ func receive_damage(damage: DamageContext) -> float:
 
 func _damage_popup_position() -> Vector3:
 	var position := global_position + Vector3.UP * damage_popup_min_height
-	if is_instance_valid(visual) and is_instance_valid(visual.sprite) and visual.sprite.texture != null:
+	if (
+		is_instance_valid(visual)
+		and is_instance_valid(visual.sprite)
+		and visual.sprite.texture != null
+	):
 		var sprite := visual.sprite
 		var bounds := sprite.get_aabb()
 		var top := sprite.to_global(Vector3(0.0, bounds.end.y, 0.0))
@@ -560,11 +564,7 @@ func _refresh_direction_checks() -> void:
 
 func _refresh_target() -> void:
 	# Disabling the detector during death can still deliver a queued body_exited callback.
-	if (
-		dead
-		or not is_instance_valid(target_detector)
-		or not target_detector.monitoring
-	):
+	if dead or not is_instance_valid(target_detector) or not target_detector.monitoring:
 		return
 	var nearest_target: Node3D = null
 	var nearest_distance := INF

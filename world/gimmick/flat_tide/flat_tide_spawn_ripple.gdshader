@@ -1,4 +1,4 @@
-﻿shader_type spatial;
+shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, fog_disabled;
 
 uniform vec4 ripple_color : source_color = vec4(0.55, 0.92, 1.0, 0.8);

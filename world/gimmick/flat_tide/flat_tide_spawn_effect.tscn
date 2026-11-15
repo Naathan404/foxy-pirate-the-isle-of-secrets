@@ -1,4 +1,4 @@
-﻿[gd_scene format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://world/gimmick/flat_tide/flat_tide_spawn_effect.gd" id="1"]
 [ext_resource type="Shader" path="res://world/gimmick/flat_tide/flat_tide_spawn_ripple.gdshader" id="2"]

@@ -35,7 +35,17 @@ func run() -> void:
 	player.dash_started.emit()
 	player.global_position += Vector3.RIGHT * (camera.dash_max_lag_distance * 2.0)
 	camera._process(0.0)
-	check(is_equal_approx(camera.global_position.x, player.global_position.x + camera._follow_offset.x * player.global_basis.x.length() - camera.dash_max_lag_distance), "Dash lag is limited")
+	check(
+		is_equal_approx(
+			camera.global_position.x,
+			(
+				player.global_position.x
+				+ camera._follow_offset.x * player.global_basis.x.length()
+				- camera.dash_max_lag_distance
+			)
+		),
+		"Dash lag is limited"
+	)
 	player.dash_started.emit()
 	check(camera._dash_follow_active, "Consecutive dash restarts the effect")
 	camera.begin_dialogue_override()
@@ -47,7 +57,10 @@ func run() -> void:
 	player.dash_started.emit()
 	player.global_position += Vector3.RIGHT
 	camera._process(0.0)
-	check(camera.global_position.distance_to(focused_start) < 0.01, "Combat focus does not jump on dash")
+	check(
+		camera.global_position.distance_to(focused_start) < 0.01,
+		"Combat focus does not jump on dash"
+	)
 	camera.combat_focus_offset = Vector3.ZERO
 	camera.snap_to_follow()
 	player.dash_started.emit()

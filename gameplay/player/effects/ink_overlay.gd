@@ -6,11 +6,6 @@ const OVERLAY_LAYER := 2
 const HIT_COVERAGE := 0.125
 const FULL_COVERAGE := 1.0
 
-var _overlay: ColorRect
-var _material: ShaderMaterial
-var _tween: Tween
-var _fatal_active := false
-var _random := RandomNumberGenerator.new()
 var coverage := 0.0:
 	set(value):
 		coverage = value
@@ -21,6 +16,11 @@ var opacity := 0.0:
 		opacity = value
 		if _material != null:
 			_material.set_shader_parameter("opacity", value)
+var _overlay: ColorRect
+var _material: ShaderMaterial
+var _tween: Tween
+var _fatal_active := false
+var _random := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
@@ -38,7 +38,14 @@ func _ready() -> void:
 	_overlay.hide()
 
 
-func splash(fatal: bool, ink_color: Color, spread_time: float, hold_time: float, fade_time: float, strength: float) -> void:
+func splash(
+	fatal: bool,
+	ink_color: Color,
+	spread_time: float,
+	hold_time: float,
+	fade_time: float,
+	strength: float
+) -> void:
 	if _fatal_active and not fatal:
 		return
 	if _tween != null and _tween.is_valid():

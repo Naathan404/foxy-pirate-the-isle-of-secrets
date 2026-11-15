@@ -1,15 +1,18 @@
-﻿extends SceneTree
+extends SceneTree
 const PLAYER_SCENE: PackedScene = preload("res://gameplay/player/foxy.tscn")
 const DUMMY_SCENE: PackedScene = preload("res://world/biomes/hub/objects/training_dummy.tscn")
 var failures := 0
 
+
 func _initialize() -> void:
 	call_deferred("run_test")
+
 
 func check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
 
 func run_test() -> void:
 	var arena := Node3D.new()
@@ -28,10 +31,27 @@ func run_test() -> void:
 	player.chaos._idle_remaining = 0.0
 	var applied := dummy.receive_damage(damage)
 	check(player.chaos._idle_remaining > 0.0, "dummy hit counts as combat activity")
-	player.weapon_controller._on_damage_applied(damage, dummy, applied, weapon, weapon.get_chaos_gain(), player.weapon_controller._equip_revision)
-	check(is_equal_approx(player.chaos.current, weapon.get_chaos_gain()), "confirmed dummy hit grants equipped weapon chaos")
+	player.weapon_controller._on_damage_applied(
+		damage,
+		dummy,
+		applied,
+		weapon,
+		weapon.get_chaos_gain(),
+		player.weapon_controller._equip_revision
+	)
+	check(
+		is_equal_approx(player.chaos.current, weapon.get_chaos_gain()),
+		"confirmed dummy hit grants equipped weapon chaos"
+	)
 	var previous := player.chaos.current
-	player.weapon_controller._on_damage_applied(damage, dummy, applied, weapon, weapon.get_chaos_gain(), player.weapon_controller._equip_revision - 1)
+	player.weapon_controller._on_damage_applied(
+		damage,
+		dummy,
+		applied,
+		weapon,
+		weapon.get_chaos_gain(),
+		player.weapon_controller._equip_revision - 1
+	)
 	check(is_equal_approx(player.chaos.current, previous), "stale projectiles do not grant chaos")
 	var other := Node3D.new()
 	arena.add_child(other)
