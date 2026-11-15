@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://cd0keqwgvhsaf" path="res://assets/sprites/biomes/hub/hub.png" id="6_2sqji"]
 [ext_resource type="Shape3D" path="res://world/biomes/hub/base_scenes/hub_ground_collision.tres" id="7_ground_shape"]
 [ext_resource type="Shader" uid="uid://s6h5x7l57l6v" path="res://world/biomes/hub/base_scenes/hub_ground.gdshader" id="8_hub_ground"]
-[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/random_grass.tscn" id="9_random_grass"]
+[ext_resource type="PackedScene" uid="uid://s2mtwh6pckli" path="res://world/biomes/hub/objects/random_grass.tscn" id="9_random_grass"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_Down"]
 render_priority = 0
@@ -120,7 +120,7 @@ transform = Transform3D(1.1601508e-07, 0, 1, 0, 1, 0, -1.5366662, 0, 7.54979e-08
 shape = SubResource("BoxShape3D_ExtendedPathApron")
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.141657, -0.005393, 4.645204)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6252441, -0.005393, 4.645204)
 trigger_id = &"right"
 destination_trigger_id = &"left"
 
@@ -150,7 +150,7 @@ transform = Transform3D(1.18173176e-07, 0, 1, 0, 1, 0, -1.5652511, 0, 7.54979e-0
 shape = SubResource("BoxShape3D_ExtendedPathApron")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" index="2" unique_id=219025603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.604137, -0.048124, 5.204309)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3025017, -0.048124, 5.204309)
 trigger_id = &"left"
 destination_trigger_id = &"right"
 
@@ -172,15 +172,15 @@ texture = ExtResource("6_2sqji")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.41596794, 0.65731)
 shape = ExtResource("7_ground_shape")
 
-[node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" instance=ExtResource("9_random_grass")]
-position = Vector3(0, 0.252096, 0)
+[node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1121706454 instance=ExtResource("9_random_grass")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252096, 0)
 spawn_positions = PackedVector3Array(-12, 0, -8, -6, 0, -13, 6, 0, -13, 12, 0, -8, -12, 0, 8, -6, 0, 13, 6, 0, 13, 12, 0, 8)
 
 [node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43.925, -6.9159203, 46.672443)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.789814, -6.9159203, 32.417187)
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.925, 0, -45.767555)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.914555, 0, -35.960503)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

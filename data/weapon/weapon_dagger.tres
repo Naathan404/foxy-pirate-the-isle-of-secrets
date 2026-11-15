@@ -68,6 +68,7 @@ shake_pixels = 12.0
 shake_seconds = 0.26
 audio_pitch = 0.85
 heavy_impact = true
+emphasize_damage_popup = true
 
 [sub_resource type="Resource" id="Resource_nasaw"]
 script = ExtResource("1_nasaw")

@@ -19,6 +19,8 @@ var amount_hp: float = 1
 var critical_rate: float = 0.0
 var critical_damage_multiplier: float = 1.5
 var is_critical: bool = false
+## Visual emphasis authored on an attack; independent of critical damage.
+var emphasize_popup: bool = false
 var stagger_damage: float = 0.0
 ## Confirmed weapon hit reward; assigned by WeaponController from its attack snapshot.
 var chaos_gain: float = 0.0
@@ -47,6 +49,7 @@ func create_hit_copy(hit_target: Node = null) -> DamageContext:
 	result.attack_id = attack_id
 	result.base_amount_hp = base_amount_hp
 	result.amount_hp = base_amount_hp
+	result.emphasize_popup = emphasize_popup
 	result.critical_rate = critical_rate
 	result.critical_damage_multiplier = critical_damage_multiplier
 	result.stagger_damage = stagger_damage

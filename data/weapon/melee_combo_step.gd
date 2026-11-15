@@ -23,6 +23,8 @@ extends Resource
 @export_range(0.0, 0.3, 0.01, "suffix:s") var shake_seconds: float = 0.14
 @export_range(0.5, 2.0, 0.05) var audio_pitch: float = 1.2
 @export var heavy_impact: bool = false
+## Show this attack using the emphasized damage-number style.
+@export var emphasize_damage_popup: bool = false
 ## Optional future animation set; empty reuses AttackData.animation_prefix.
 @export var animation_prefix: String = ""
 

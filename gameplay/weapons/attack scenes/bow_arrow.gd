@@ -84,7 +84,7 @@ var _age: float = 0.0
 var _finished: bool = false
 var _previous_position: Vector3
 var _sprite_offset: Vector3
-var _homing_target: EnemyBase
+var _homing_target: Node3D
 var _had_homing_target: bool = false
 
 @onready var _sprite: Sprite3D = $Sprite3D
@@ -215,7 +215,7 @@ func _measure_flight_path() -> void:
 		previous = point
 
 
-func _find_homing_target() -> EnemyBase:
+func _find_homing_target() -> Node3D:
 	var heading := -global_basis.z
 	heading.y = 0.0
 	if heading.is_zero_approx():
@@ -223,25 +223,35 @@ func _find_homing_target() -> EnemyBase:
 	heading = heading.normalized()
 	var min_dot := cos(deg_to_rad(clampf(homing_cone_degrees, 1.0, 180.0) * 0.5))
 	var closest_distance := context.range_units * context.range_units
-	var closest: EnemyBase
-	for node in get_tree().get_nodes_in_group("enemy"):
-		var enemy := node as EnemyBase
-		if not is_instance_valid(enemy) or enemy.dead or enemy.is_queued_for_deletion():
+	var closest: Node3D
+	var candidates := get_tree().get_nodes_in_group("enemy")
+	candidates.append_array(get_tree().get_nodes_in_group("training_dummy"))
+	for node in candidates:
+		var target := node as Node3D
+		if not _is_homing_target_valid(target):
 			continue
-		var offset := enemy.global_position - global_position
+		var offset := target.global_position - global_position
 		offset.y = 0.0
 		var distance := offset.length_squared()
 		if distance > closest_distance or distance < 0.0001:
 			continue
 		if heading.dot(offset.normalized()) < min_dot:
 			continue
-		closest = enemy
+		closest = target
 		closest_distance = distance
 	return closest
 
 
+func _is_homing_target_valid(target: Node3D) -> bool:
+	if not is_instance_valid(target) or target.is_queued_for_deletion() or not target.is_inside_tree():
+		return false
+	if target is EnemyBase:
+		return not (target as EnemyBase).dead
+	return target.is_in_group("training_dummy")
+
+
 func _update_homing(delta: float) -> void:
-	if not is_instance_valid(_homing_target) or _homing_target.dead or _homing_target.is_queued_for_deletion():
+	if not _is_homing_target_valid(_homing_target):
 		_homing_target = _find_homing_target()
 		if not is_instance_valid(_homing_target) and _had_homing_target:
 			# Continue forward along the last heading if the target disappears.

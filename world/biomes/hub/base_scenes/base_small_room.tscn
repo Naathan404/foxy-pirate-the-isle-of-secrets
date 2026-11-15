@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://cd0keqwgvhsaf" path="res://assets/sprites/biomes/hub/hub.png" id="6_8m7ht"]
 [ext_resource type="Shape3D" path="res://world/biomes/hub/base_scenes/hub_ground_collision.tres" id="7_ground_shape"]
 [ext_resource type="Shader" uid="uid://s6h5x7l57l6v" path="res://world/biomes/hub/base_scenes/hub_ground.gdshader" id="8_hub_ground"]
-[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/random_grass.tscn" id="9_random_grass"]
+[ext_resource type="PackedScene" uid="uid://s2mtwh6pckli" path="res://world/biomes/hub/objects/random_grass.tscn" id="9_random_grass"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_Down"]
 render_priority = 0
@@ -120,7 +120,7 @@ transform = Transform3D(1.5312442e-07, 0, 0.8612902, 0, 1, 0, -2.0281944, 0, 6.5
 shape = SubResource("BoxShape3D_ExtendedPathApron")
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.593659, -0.026401, 4.578371)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6702566, -0.026401, 4.578371)
 trigger_id = &"right"
 destination_trigger_id = &"left"
 
@@ -172,15 +172,15 @@ texture = ExtResource("6_8m7ht")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.41596794, 0.753676)
 shape = ExtResource("7_ground_shape")
 
-[node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" instance=ExtResource("9_random_grass")]
-position = Vector3(0, 0.21008, 0)
+[node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=28040767 instance=ExtResource("9_random_grass")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21008, 0)
 spawn_positions = PackedVector3Array(-9, 0, -7, -6, 0, -10, 6, 0, -10, 9, 0, -6, -10, 0, 5, -5, 0, 11, 5, 0, 11, 10, 0, 5)
 
 [node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -41.1875, -6.9159203, 43.68611)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.64141, -6.9159203, 27.646736)
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.1875, 0, -42.51389)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.87538, 0, -33.986248)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

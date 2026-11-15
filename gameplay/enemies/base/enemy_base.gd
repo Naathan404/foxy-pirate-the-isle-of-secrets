@@ -20,8 +20,7 @@ enum InitialFacing {
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
 
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
-const CRITICAL_POPUP: PackedScene = preload("res://gameplay/combat/critical_damage_popup.tscn")
-const NORMAL_POPUP: PackedScene = preload("res://gameplay/combat/normal_damage_popup.tscn")
+const DAMAGE_POPUP = preload("res://gameplay/combat/damage_popup_presenter.gd")
 const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive drops.
 
 @export var data: EnemyData
@@ -29,6 +28,13 @@ const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var destroy_on_death: bool = false
 @export var charm_grapple_large: bool = false
+
+@export_group("Damage Popup")
+## Minimum world-space height above the enemy origin.
+@export_range(0.0, 20.0, 0.1, "suffix:m") var damage_popup_min_height: float = 1.4
+## Extra clearance above the sprite, in world units.
+@export_range(0.0, 5.0, 0.05, "suffix:m") var damage_popup_headroom: float = 0.3
+@export_range(0.25, 4.0, 0.05) var damage_popup_size_multiplier: float = 1.25
 
 @export_group("External Push")
 ## Tốc độ giảm của lực đẩy không gây sát thương.
@@ -298,12 +304,20 @@ func receive_damage(damage: DamageContext) -> float:
 			damage.source.emit_signal("combat_activity")
 		if not dead and hp.is_alive():
 			_accumulate_stagger(damage.stagger_damage)
-		var popup_scene := CRITICAL_POPUP if damage.is_critical else NORMAL_POPUP
-		var popup := popup_scene.instantiate() as Label3D
-		get_parent().add_child(popup)
-		popup.global_position = global_position + Vector3.UP * 1.4
-		popup.call("show_damage", applied_hp)
+		DAMAGE_POPUP.show_damage(
+			get_parent(), _damage_popup_position(), damage, applied_hp, damage_popup_size_multiplier
+		)
 	return applied_hp
+
+
+func _damage_popup_position() -> Vector3:
+	var position := global_position + Vector3.UP * damage_popup_min_height
+	if is_instance_valid(visual) and is_instance_valid(visual.sprite) and visual.sprite.texture != null:
+		var sprite := visual.sprite
+		var bounds := sprite.get_aabb()
+		var top := sprite.to_global(Vector3(0.0, bounds.end.y, 0.0))
+		position.y = maxf(position.y, top.y + damage_popup_headroom)
+	return position
 
 
 ## Hit and fatal recoil share forge scaling, resistance and boss immunity.
