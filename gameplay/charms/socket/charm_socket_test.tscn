@@ -1,17 +1,16 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cbe0c3qdpxh4v"]
 
-[ext_resource type="Script" path="res://gameplay/charms/socket/charm_socket_manager.gd" id="1_manager"]
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_registry.gd" id="2_registry"]
+[ext_resource type="Script" uid="uid://byhka8abge5xp" path="res://gameplay/charms/socket/charm_socket_manager.gd" id="1_manager"]
+[ext_resource type="Script" uid="uid://c1ofpsqxwk0l6" path="res://gameplay/charms/base/charm_registry.gd" id="2_registry"]
 
-[node name="CharmSocketTest" type="Node3D"]
+[node name="CharmSocketTest" type="Node3D" unique_id=2020624727]
 
-[node name="Actor" type="Node3D" parent="."]
+[node name="Actor" type="Node3D" parent="." unique_id=1962101670]
 
-[node name="CharmSocketManager" type="Node" parent="Actor" node_paths=PackedStringArray("registry", "actor")]
+[node name="CharmSocketManager" type="Node" parent="Actor" unique_id=1075437951 node_paths=PackedStringArray("registry", "actor")]
 script = ExtResource("1_manager")
 registry = NodePath("CharmRegistry")
 actor = NodePath("..")
 
-[node name="CharmRegistry" type="Node" parent="Actor/CharmSocketManager"]
+[node name="CharmRegistry" type="Node" parent="Actor/CharmSocketManager" unique_id=744731799]
 script = ExtResource("2_registry")
-

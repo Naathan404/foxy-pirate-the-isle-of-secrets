@@ -9,16 +9,20 @@ extends CharmActiveAttack
 @export_range(0.0, 1.0, 0.01) var impact_activation_progress: float = 0.5
 @export_range(0.01, 1.0, 0.01) var impact_hold_seconds: float = 0.18
 
+var volley_finisher: bool = false
+
 var _elapsed: float = 0.0
 var _impact_hold_remaining: float = 0.0
 var _impact_armed: bool = false
 var _previous_position: Vector3 = Vector3.ZERO
+var _landed: bool = false
 
 @onready var _sprite: Sprite3D = $Sprite3D
 @onready var _sprite_scale: Vector3 = _sprite.scale
 
 
 func _ready() -> void:
+	super._ready()
 	hitbox.damage_prepared.connect(_on_damage_prepared)
 	hitbox.damage_applied.connect(_on_damage_applied)
 
@@ -41,7 +45,10 @@ func activate() -> void:
 	_elapsed = 0.0
 	_impact_hold_remaining = maxf(0.01, impact_hold_seconds)
 	_impact_armed = false
+	_landed = false
+	_impact_reported = false
 	_previous_position = global_position
+	_start_trail()
 	_update_visual_basis(flight_control - flight_start)
 	set_physics_process(true)
 
@@ -62,6 +69,8 @@ func _physics_process(delta: float) -> void:
 	var tangent := _quadratic_bezier_derivative(progress)
 	if not tangent.is_zero_approx():
 		_update_visual_basis(tangent)
+		if not _landed:
+			_update_trail(tangent)
 
 	if not _impact_armed and progress >= impact_activation_progress:
 		_impact_armed = true
@@ -74,6 +83,14 @@ func _physics_process(delta: float) -> void:
 		_sweep_hit(_previous_position, global_position)
 
 	if progress >= 1.0:
+		if not _landed:
+			_landed = true
+			if is_instance_valid(_trail):
+				_trail.hide()
+			CharmVfx.spawn(get_parent(), flight_end, trail_color, 1.1 if volley_finisher else 0.65)
+			get_node("/root/ScreenShakeController").request(
+				3.5 if volley_finisher else 1.4, 0.16 if volley_finisher else 0.08
+			)
 		_impact_hold_remaining -= step
 		if _impact_hold_remaining <= 0.0:
 			_cancel_and_free()
@@ -137,4 +154,3 @@ func _update_visual_basis(direction: Vector3) -> void:
 func _cancel_and_free() -> void:
 	deactivate()
 	queue_free()
-

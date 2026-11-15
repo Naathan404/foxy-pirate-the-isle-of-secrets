@@ -183,7 +183,7 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 
 | Charm | Acquisition | SP | Cooldown | Business effect |
 | --- | --- | ---: | ---: | --- |
-| Arrow Rain | Merchant/enemy drop 5% | 100 | 6 giây | Mưa 8 mũi trong vùng tròn tại con trỏ trong 1,4 giây; mỗi mũi gây 35% base weapon damage. |
+| Arrow Rain | Merchant/enemy drop 5% | 100 | 6 giây | Mưa 8 mũi trong vùng tròn tại con trỏ trong 1 giây, thời gian bay 0,34 giây; damage lấy từ `damage_percent` trong resource. |
 | Crescent Cleave | Merchant/enemy drop 5% | 100 | 4 giây | Gây 200% base weapon damage trong bán nguyệt 180 độ phía trước, bán kính 2,8 units. Mỗi target chỉ bị hit một lần mỗi activation. |
 | Shadow Lunge | Merchant/enemy drop 5% | 125 | 6 giây | Lướt bằng khoảng Dash và gây 300% base weapon damage phía trước. |
 | Buckshot Salvo | Merchant/enemy drop 5% | 150 | 7 giây | Burst 360 độ; pellet khác nhau có thể cùng trúng một target. |
@@ -318,3 +318,176 @@ Các test độc lập chính:
 
 Trước khi merge phải đạt `gdlint`, `gdformat --check`, Godot import/reference check, toàn bộ
 harness Charm, Player combat regression và smoke test scene liên quan.
+
+## 16. VFX và phản hồi khi Charm kích hoạt
+
+Các Active dùng VFX có fade và màu riêng, thay phần mesh placeholder hiển thị.
+Collision shape vẫn giữ nhiệm vụ hit detection; VFX không quyết định damage.
+
+| Charm | Phần nhìn và impact |
+| --- | --- |
+| Arrow Rain | Telegraph vàng, vệt sáng theo hướng bay, tia va chạm từng mũi và nhịp kết mạnh hơn. Hitstop cục bộ lên mục tiêu, không ngắt cả loạt tên. |
+| Crescent Cleave | Tái sử dụng `MeleeSlashVFX` cho vệt chém 180 độ, lõi sáng và vệt phụ. Hit đầu mỗi lần cast gọi global hitstop 65 ms, rung 6 px. |
+| Shadow Lunge | Vệt năng lượng tím nhiều lớp theo quãng lướt thực tế, burst ở đầu/cuối và va chạm. Hit đầu gọi hitstop 60 ms, rung 5,5 px. |
+| Buckshot Salvo | Sprite viên đạn kim loại có đuôi lửa tỏa tròn, khói thuốc tại nòng và atlas spark/mảnh đạn khi trúng; hitstop cục bộ khi trúng. |
+| Tide Grapple | Móc thép phóng ra cùng dây xích có mắt kim loại. Trúng: flash bám, dây căng theo mục tiêu đang bị kéo rồi thu về. Hụt: móc rỗng chúc xuống, dây chùng và thu về, không có flash trúng. |
+| Abyssal Whirlpool | Các nhánh nước xoắn vào tâm, kết thúc bằng sóng nổ và rung; chỉ hitstop khi có damage thực tế. |
+| Dead Man's Anchor | Ấn mỏ neo tại điểm trở về; đường sáng và burst khi recast. |
+| Dead Man's Salute | Vòng năng lượng co vào khi charge, bám theo người chơi và mở rộng đúng radius; sóng nổ khi thả, impact tăng theo thời gian charge. |
+
+`CharmVfx` tại `gameplay/charms/active/charm_vfx.gd/.tscn` dùng
+`charm_energy.gdshader` cho burst, stream, vortex, anchor, charge và telegraph.
+Scene sở hữu material riêng từng instance và tự giải phóng VFX ngắn hạn.
+Field/charge được effect giữ và hủy cùng activation. Tide/Buckshot dùng thêm atlas alpha
+trong `assets/sprites/effects/charms/`; không cần autoload mới hoặc wiring bổ sung
+trong scene Player. Có thể chỉnh palette, lifetime và kích thước ở
+`CharmVfx`; hitstop/shake của các execution dùng hitbox nằm trong nhóm `Presentation`.
+
+`CharmSpriteVfx` phát atlas 4×3 và quay sprite theo hướng bay chiếu lên camera.
+`BuckshotProjectileAttack` gắn sprite vào chính execution sở hữu hitbox, nên viên
+đạn và vùng gây damage cùng di chuyển. `TideGrappleVisual` nhận hai đầu dây từ
+execution; mesh ribbon chỉ mang texture mắt xích lặp, không còn vẽ line xanh.
+Tide dùng raycast chọn điểm đến, sau đó **chỉ resolve damage/pull khi móc bay tới**.
+Hitstop/shake cũng xảy ra ở thời điểm chạm đó. Mục tiêu di chuyển hoặc bị kéo thì
+móc bám theo; mục tiêu mất trước khi chạm chuyển sang nhánh hụt.
+
+Atlas `tide_hook.png` có hàng outbound / contact-latch / empty-return;
+`buckshot_projectile.png` có hàng projectile / impact / muzzle. Cả hai là 1024×768,
+12 frame vuông 256×256. `tide_chain.png` là texture 768×256 lặp ngang, lỗ mắt xích
+có alpha. `generation.json` cùng thư mục ghi đầy đủ prompt, ảnh nguồn và kích thước.
+Chiều rộng móc, mắt xích, độ dài một tile chỉnh trong `TideGrappleVisual`.
+Tốc độ phóng/thu chỉnh bằng `hook_speed` / `return_speed` tại `tide_grapple.tres`.
+
+`CharmRuntime.proc_triggered(message, color)` là signal chỉ dành cho presentation.
+Effect phát signal sau khi lợi ích có điều kiện thực sự xảy ra. `EquipmentControl` nối
+signal cho từng runtime đang equip và ngắt khi đổi/tháo Charm hoặc HUD rời scene.
+`gameplay/player/hud/charm_proc_feedback.gd/.tscn` quản lý punch scale 1,3 lần, tint và
+nhãn nổi 0,7 giây. Tween dùng thời gian thực để vẫn rõ trong hitstop; các proc trong
+120 ms được gộp về mặt trình bày để tránh chồng animation.
+
+| Passive | Nhãn / điều kiện |
+| --- | --- |
+| Life Steal | `+1 HP` (hoặc lượng HP thực hồi); chỉ hiện khi `heal()` trả về giá trị dương, không hiện khi đầy HP. Mốc hit vẫn đọc từ resource, hiện là 12. |
+| Double Strike | `DOUBLE!` sau hit gây damage có kết quả proc thành công. |
+| Backstabber | `BACKSTAB` sau hit gây damage được áp dụng bonus đánh sau lưng. |
+| Adrenaline Surge | `RESET +SP` khi kill proc thành công và reset cooldown/hồi SP. |
+| Chaos Collector | `CHAOS READY` khi chính lượng Chaos cộng bởi Charm đưa thanh từ chưa đầy sang đầy; không nhấp nháy ở mọi hit. |
+
+Các passive cộng stat liên tục không phát proc. Timing Arrow Rain được rút ngắn;
+damage, SP cost, cooldown và quy tắc proc không đổi. Ba Active prototype vẫn giữ
+content status và đường truy cập debug hiện có.
+
+Các file tích hợp của phần presentation:
+
+| Thư mục | File | Vai trò |
+| --- | --- | --- |
+| `gameplay/charms/active/` | `charm_vfx.gd`, `charm_vfx.tscn`, `charm_energy.gdshader` và các `.uid` tương ứng | VFX dùng chung, palette, lifetime và shader. |
+| `gameplay/charms/active/` | `charm_active_attack.gd`, `charm_active_attack.tscn` | Trail và impact từ hitbox, bỏ mesh placeholder. |
+| `gameplay/charms/active/` | `arrow_rain_attack.gd`, `arrow_rain_attack.tscn`, `arrow_rain_effect.gd`, `arrow_rain_telegraph.gd`, `arrow_rain_telegraph.tscn` | Trail từng tên, nhịp kết và vùng báo trước. |
+| `gameplay/charms/active/` | `crescent_cleave_attack.gd`, `crescent_cleave_attack.tscn` | Quét vệt chém và impact một lần mỗi cast. |
+| `gameplay/charms/active/` | `shadow_lunge_effect.gd`, `buckshot_salvo_effect.gd` | Palette lướt và điều phối loạt đạn. |
+| `gameplay/charms/active/` | `buckshot_projectile_attack.gd`, `.tscn`, `charm_sprite_vfx.gd`, `charm_sprite_vfx.gdshader` | Projectile/impact/muzzle bằng atlas và playback dùng chung. |
+| `gameplay/charms/active/` | `tide_grapple_attack.gd`, `.tscn`, `tide_grapple_visual.gd`, `.tscn`, `tide_chain.gdshader` | Các pha bay/chạm/thu, móc và mắt xích, hit/miss riêng. |
+| `gameplay/charms/active/` | `abyssal_whirlpool_effect.gd`, `dead_mans_anchor_effect.gd`, `dead_mans_salute_effect.gd` | Field, marker, charge và release VFX. |
+| `gameplay/charms/charm_data/` | `arrow_rain.tres`, `tide_grapple.tres` | Timing loạt tên, thời gian bay và tốc độ phóng/thu móc. |
+| `assets/sprites/effects/charms/` | `tide_hook.png`, `tide_chain.png`, `buckshot_projectile.png`, `generation.json` và import tương ứng | Sprite VFX, nguồn và prompt tạo ảnh. |
+| `gameplay/charms/base/` | `charm_runtime.gd` | Signal proc cho UI. |
+| `gameplay/charms/passive/` | `life_steal_effect.gd`, `double_strike_effect.gd`, `backstabber_effect.gd`, `adrenaline_surge_effect.gd`, `chaos_collector_effect.gd` | Phát feedback tại điều kiện thực sự có hiệu lực. |
+| `gameplay/player/hud/` | `charm_proc_feedback.gd`, `charm_proc_feedback.tscn`, `charm_proc_feedback.gd.uid`, `equipment_control.gd` | Animation icon và kết nối/ngắt runtime theo loadout. |
+| `docs/gameplay/economy/` | `charm_system.md` | Thông số, cách tích hợp và điểm chỉnh sửa. |
+
+## 17. Sprite animation riêng khi cast Active
+
+Tám Active hiện có đều dùng sheet Foxy + VFX riêng trong
+`assets/sprites/foxy/charm_casts/`. Mỗi sheet có kích thước 1024×512, lưới 4×2,
+tám frame 256×256 với alpha. `foxy_reference.png` được render từ Foxy Spine đang
+dùng trong `gameplay/player/foxy.tscn`; `generation.json` lưu đầy đủ prompt và nguồn
+của từng sheet được tạo bằng imagegen.
+
+| Sheet / profile | Động tác |
+| --- | --- |
+| `arrow_rain` | Kéo cung năng lượng, bắn lên cao, thu cung và tan vệt gió. |
+| `crescent_cleave` | Lấy đà, vung đao trăng vàng, kéo theo vệt phụ và thu thế. |
+| `shadow_lunge` | Co người, đâm lướt, dư ảnh tím và khói tan. |
+| `buckshot_salvo` | Gọi súng, bắn loạt đạn tỏa, giật tay và tan khói. |
+| `tide_grapple` | Vung neo, phóng xích nước, ghì kéo và thu xích. |
+| `abyssal_whirlpool` | Gom xoáy nước, vỗ tay xuống, cuộn sóng và tan bọt nước. |
+| `dead_mans_anchor` | Frame 0–3 đặt ấn; frame 4–7 gọi về và tái hiện. |
+| `dead_mans_salute` | Frame 0–3 vào charge, lặp 2–3 khi giữ; frame 4–7 nổ và thu thế. |
+
+Artwork dùng góc 3/4 và mirror trái/phải theo hướng ngắm, cùng cách biểu diễn
+đòn đánh side hiện tại. Bộ này chưa có các sheet góc lưng riêng. Vị trí chân được
+căn từng frame; chiều cao và điểm chân khi phát được fit từ reference của Spine,
+để khớp với Foxy khi quay lại idle/run.
+
+`Visual/CharmCastAnimator` là child scene trong Foxy. `PlayerVisual` sở hữu quyền
+hiển thị: khi cast, ẩn các lớp nhân vật bên dưới; khi kết thúc, hiện lại pose hiện
+tại. Idle/run vẫn cập nhật bên dưới. Một hành động combat mới, trạng thái hit/death
+hoặc unequip Charm ngắt cast tương ứng. Animation tôn trọng hitstop và SceneTree
+pause. Sprite chỉ quyết định presentation; damage, collision, SP và cooldown vẫn
+do execution/CharmRuntime hiện có quản lý.
+
+Timing và pivot chỉnh trong tám resource cùng tên tại
+`gameplay/charms/charm_data/cast_animations/`:
+
+- `frame_seconds`: tỷ lệ thời gian giữ từng frame; playback được fit theo thời lượng
+  pha mà execution truyền vào, thay vì chạy hết sheet theo một timer cố định;
+- `foot_anchors`: điểm chân chuẩn hóa trong từng ô, tính từ góc trên trái;
+- `standing_height_fraction`: tỷ lệ chiều cao artwork đứng trong một ô;
+- `frame_regions`: cửa sổ crop tùy chọn để bỏ phần VFX tràn từ ô lân cận; Tide còn
+  crop phần móc/nước được vẽ sẵn bên phải Foxy để nhường chỗ cho móc bay thật;
+- `phase_frames`, `looping_phases`: các frame và pha lặp được execution điều khiển;
+- `cast_frames`, `channel_loop_frames`, `release_frames`, `recall_frames`: các đoạn
+  dùng cho từng pha.
+
+| Charm | Nguồn timing Foxy |
+| --- | --- |
+| Arrow Rain | Mỗi sự kiện bắn tên thực tế bắt đầu một chu kỳ `volley` dài đúng khoảng giữa hai phát. Giữ/lặp đến phát cuối, sau đó `finish` tối đa 0,1 giây. Đổi số tên hoặc `volley_duration_seconds` thì nhịp Foxy đổi cùng. Không đợi tên cuối rơi xong mới thu cung. |
+| Crescent Cleave | `active` theo `hit_duration_seconds`; execution hoàn tất mới chuyển `recover` 0,22 giây, cùng cửa sổ fade của vệt chém. |
+| Shadow Lunge | `active` theo quãng quét/tốc độ execution; signal `travel_finished` bắt đầu `recover` 0,1 giây. |
+| Buckshot Salvo | `active` theo tầm/tốc độ đạn; chỉ bắt đầu `recover` 0,12 giây khi mọi pellet execution kết thúc. |
+| Tide Grapple | Execution phát `active` khi phóng, `latch` khi trúng, `miss` khi thu rỗng hoặc `retract` sau bám; mỗi pha truyền thời lượng bay/kéo thực tế. `recover` chỉ bắt đầu khi móc về tay. Contact giữ ít nhất 0,16 giây để đọc được cú bám. |
+| Abyssal Whirlpool | `sustain` lặp theo duration của field, chỉ chuyển `detonate` 0,4 giây tại chính sự kiện nổ. |
+| Dead Man's Anchor | Cast/recall dài 0,3 giây, trùng burst đặt ấn/gọi về. |
+| Dead Man's Salute | Giữ `channel` đến khi nhả/cạn SP; `release` dài 0,45 giây, trùng blast. |
+
+Các pha đang lặp giữ quyền hiển thị tới khi execution chuyển pha/kết thúc. API
+`play_charm_cast` nhận thêm hai tham số tùy chọn `duration_seconds`, `continue_only`.
+Pha tiếp diễn dùng `continue_only=true`: sau hit, dash, đòn mới, chết hoặc unequip,
+callback muộn từ loạt tên/móc cũ không giành lại pose của Foxy. Call site cũ vẫn
+dùng được vì các tham số mới có giá trị mặc định. Không khóa input hoặc thay
+combat state để giữ animation.
+
+Các điểm tích hợp code/scene:
+
+- `gameplay/player/effects/charm_cast_clip.gd`: cấu hình và kiểm tra clip;
+- `gameplay/player/effects/charm_cast_animator.gd`, `.tscn`: playback và catalog;
+- `gameplay/player/effects/charm_cast_sprite.gdshader`: alpha và mép ô sprite;
+- `gameplay/player/foxy.tscn`: nối animator với Player/Visual;
+- `gameplay/player/player_visual.gd`: quyền hiển thị và ngắt animation;
+- `gameplay/player/spine_idle_preview.gd`: cung cấp kích thước/điểm chân chuẩn;
+- `gameplay/player/player.gd`: API `play_charm_cast` / `cancel_charm_cast`;
+- `gameplay/charms/base/charm_effect.gd`: helper presentation cho effect;
+- tám script `*_effect.gd` tương ứng trong `gameplay/charms/active/`: gọi đúng pha
+  cast, channel, release hoặc recall.
+
+Salute phát release từ chính effect nên vẫn có animation nổ khi tự nhả do cạn SP.
+Anchor chỉ phát recall khi việc quay về được execution chấp nhận. Các actor kiểm
+thử không có visual API vẫn chạy logic Charm như trước.
+
+Kiểm chứng cập nhật VFX/timing (15/11/2026):
+
+- Godot 4.7.2 import bằng `--editor --recovery-mode --import --quit` đăng ký class,
+  scene và atlas thành công; môi trường hiện tại báo không ghi được editor settings
+  trong AppData. Bản render cũng báo không ghi được shader cache, nhưng vẫn xuất
+  được hình thực tế và chạy hết walkthrough.
+- `gdlint` và `gdformat --check --line-length 100` qua trên 23 script liên quan.
+- Các harness `charm_passive_test.gd`, `charm_event_passive_test.gd`,
+  `charm_progression_test.gd`, `player_death_progress_test.gd` qua.
+- `charm_active_test.gd` còn hai mismatch đã có trước: test kỳ vọng Arrow Rain
+  damage 0,35 / projectile 35 HP, resource hiện là 1,5 / 150 HP. Không đổi balance
+  hoặc expected value để làm xanh test trong công việc phần nhìn.
+- Walkthrough dùng scene Foxy thật: Arrow Rain đủ tám phát ở volley 0,5 / 1 / 1,7
+  giây; Tide hụt và trúng/kéo Crab; Buckshot gây damage và phát impact trên Crab;
+  cả tám Active trả lại pose; hit ngắt không bị callback muộn giành lại; Salute
+  cạn SP tự chuyển release và kết thúc. Không thêm test case hoặc CI.

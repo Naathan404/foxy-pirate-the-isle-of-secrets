@@ -3,6 +3,8 @@ extends RefCounted
 ## Trạng thái runtime của một Charm đang sở hữu hoặc được gắn.
 
 signal cooldown_changed(remaining_seconds: float)
+## Emitted after a conditional benefit actually resolves, for equipped-slot presentation.
+signal proc_triggered(message: String, color: Color)
 
 var definition: CharmData
 var socket_id: int = CharmConstants.SocketId.UNASSIGNED

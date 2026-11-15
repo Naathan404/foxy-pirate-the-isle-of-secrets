@@ -2,18 +2,23 @@ class_name EquipmentControl
 extends Control
 ## Hiển thị ô Charm và cooldown thật từ runtime; không quản lý trang bị hay tài nguyên
 
+const PROC_FEEDBACK_SCENE = preload("res://gameplay/player/hud/charm_proc_feedback.tscn")
+
 @export_group("Potion Feedback")
 @export_range(1.0, 1.5, 0.01) var potion_use_scale := 1.2
 @export_range(0.01, 0.5, 0.01) var potion_use_in_duration := 0.08
 @export_range(0.01, 0.5, 0.01) var potion_use_out_duration := 0.16
 
 var _manager: CharmSocketManager
+var _charm_registry: CharmRegistry
 var _slots: Dictionary[int, TextureRect] = {}
 var _icons: Dictionary[int, TextureRect] = {}
 var _cooldowns: Dictionary[int, TextureProgressBar] = {}
 var _cooldown_labels: Dictionary[int, Label] = {}
 var _potion_tween: Tween
 var _potion_rest_scale: Vector2
+var _charm_runtimes: Dictionary[int, CharmRuntime] = {}
+var _charm_feedback: Dictionary[int, CharmProcFeedback] = {}
 
 @onready var q_socket: TextureRect = $Q_socket
 @onready var e_socket: TextureRect = $E_socket
@@ -48,6 +53,10 @@ func _ready() -> void:
 		_cooldown_labels[socket_id] = slot.get_node("CooldownLabel") as Label
 
 		_cooldowns[socket_id].texture_progress = slot.texture
+		var feedback := PROC_FEEDBACK_SCENE.instantiate() as CharmProcFeedback
+		slot.add_child(feedback)
+		feedback.bind_icon(_icons[socket_id])
+		_charm_feedback[socket_id] = feedback
 
 	_potion_rest_scale = potion_icon.scale
 
@@ -60,10 +69,32 @@ func _process(_delta: float) -> void:
 		refresh()
 
 
+func _exit_tree() -> void:
+	_disconnect_registry()
+	for socket_id: int in _charm_runtimes:
+		_disconnect_charm_feedback(socket_id)
+
+
 # HUD gọi sau khi các node của Player đã ready để có loadout và registry hợp lệ
 func bind_manager(manager: CharmSocketManager) -> void:
+	_disconnect_registry()
 	_manager = manager
+	_charm_registry = _manager.registry if is_instance_valid(_manager) else null
+	if is_instance_valid(_charm_registry):
+		_charm_registry.charm_equipped.connect(_on_charm_loadout_changed)
+		_charm_registry.charm_unequipped.connect(_on_charm_loadout_changed)
 	set_process(is_instance_valid(_manager))
+	refresh()
+
+
+func _disconnect_registry() -> void:
+	if not is_instance_valid(_charm_registry):
+		return
+	_charm_registry.charm_equipped.disconnect(_on_charm_loadout_changed)
+	_charm_registry.charm_unequipped.disconnect(_on_charm_loadout_changed)
+
+
+func _on_charm_loadout_changed(_charm_id: StringName, _socket_id: int) -> void:
 	refresh()
 
 
@@ -76,10 +107,28 @@ func refresh() -> void:
 		var runtime: CharmRuntime
 		if unlocked and is_instance_valid(_manager.registry):
 			runtime = _manager.registry.get_equipped(socket_id)
+		_bind_charm_feedback(socket_id, runtime)
 		_update_icon(socket_id, runtime)
 		_update_cooldown(socket_id, runtime)
 	if not manager_valid:
 		set_process(false)
+
+
+func _bind_charm_feedback(socket_id: int, runtime: CharmRuntime) -> void:
+	if _charm_runtimes.get(socket_id) == runtime:
+		return
+	_disconnect_charm_feedback(socket_id)
+	_charm_feedback[socket_id].reset()
+	_charm_runtimes[socket_id] = runtime
+	if runtime != null:
+		runtime.proc_triggered.connect(_charm_feedback[socket_id].play)
+
+
+func _disconnect_charm_feedback(socket_id: int) -> void:
+	var previous := _charm_runtimes.get(socket_id) as CharmRuntime
+	var feedback := _charm_feedback[socket_id]
+	if previous != null and previous.proc_triggered.is_connected(feedback.play):
+		previous.proc_triggered.disconnect(feedback.play)
 
 
 func _update_icon(socket_id: int, runtime: CharmRuntime) -> void:

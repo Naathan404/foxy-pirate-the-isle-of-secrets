@@ -19,7 +19,12 @@ func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) ->
 		or not damage.is_normal_attack()
 	):
 		return
-	_get_chaos().gain(definition.get_param_float(&"chaos_per_hit", 2.0))
+	var chaos := _get_chaos()
+	var was_full := chaos.is_full()
+	chaos.gain(definition.get_param_float(&"chaos_per_hit", 2.0))
+	# A per-hit notification would obscure the HUD; celebrate the useful threshold instead.
+	if not was_full and chaos.is_full():
+		runtime.proc_triggered.emit("CHAOS READY", Color(1.0, 0.4, 0.24))
 
 
 func _get_chaos() -> ChaosComponent:

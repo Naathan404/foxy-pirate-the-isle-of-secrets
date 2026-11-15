@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CharmCastClip" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
+[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/arrow_rain.png" id="2_sheet"]
+
+[resource]
+script = ExtResource("1_clip")
+charm_id = &"arrow_rain"
+texture = ExtResource("2_sheet")
+foot_anchors = PackedVector2Array(0.4512, 0.8906, 0.457, 0.8906, 0.4629, 0.8906, 0.44, 0.8906, 0.457, 0.8945, 0.4336, 0.8945, 0.4492, 0.8945, 0.4609, 0.8945)
+standing_height_fraction = 0.73
+phase_frames = Dictionary[StringName, PackedInt32Array]({
+&"volley": PackedInt32Array(3, 4, 1, 2),
+&"finish": PackedInt32Array(3, 6, 7)
+})
+looping_phases = Array[StringName]([&"volley"])

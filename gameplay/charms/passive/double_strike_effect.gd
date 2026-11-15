@@ -34,3 +34,11 @@ func modify_outgoing_damage(amount_hp: float, damage: DamageContext) -> float:
 func cancel_active() -> void:
 	_hit_count = 0
 	super.cancel_active()
+
+
+func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) -> void:
+	if damage == null or damage.source != actor or applied_hp <= 0.0:
+		return
+	var result: Dictionary = damage.proc_results.get(definition.charm_id, {})
+	if bool(result.get(&"success", false)):
+		runtime.proc_triggered.emit("DOUBLE!", Color(1.0, 0.76, 0.25))

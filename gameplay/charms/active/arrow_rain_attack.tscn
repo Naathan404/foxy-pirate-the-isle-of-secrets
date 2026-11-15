@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://gameplay/charms/active/arrow_rain_attack.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/weapons/Arrow.png" id="2_arrow"]
@@ -10,11 +10,17 @@ size = Vector3(0.18, 0.18, 0.7)
 [node name="ArrowRainAttack" type="Node3D" node_paths=PackedStringArray("hitbox")]
 script = ExtResource("1_script")
 hitbox = NodePath("HitBox")
+trail_length = 1.9
+trail_width = 0.28
+trail_height = 0.0
+hitstop_seconds = 0.025
+shake_pixels = 2.5
+local_hitstop = true
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(-8.7422775e-10, 0, 0.02, 0, 0.02, 0, -0.02, 0, -8.7422775e-10, 0.10992683, 0, 0)
 pixel_size = 0.0625
-shaded = true
+shaded = false
 alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("2_arrow")

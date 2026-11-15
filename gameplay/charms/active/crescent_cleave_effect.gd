@@ -5,6 +5,7 @@ extends CharmEffect
 const CHARM_ATTACK_SCENE = preload("res://gameplay/charms/active/crescent_cleave_attack.tscn")
 
 var _execution: CrescentCleaveAttack
+var _cast_direction: Vector3 = Vector3.BACK
 
 
 func can_activate(context: CharmActivationContext) -> bool:
@@ -41,11 +42,14 @@ func activate(context: CharmActivationContext) -> bool:
 	_execution = execution
 	execution.tree_exited.connect(_on_execution_exited.bind(execution), CONNECT_ONE_SHOT)
 	execution.context = _build_context(context)
+	_cast_direction = execution.context.direction
+	execution.completed.connect(_on_active_completed)
 	execution.global_position = actor.global_position
 	execution.radius_units = definition.get_param_float(&"radius_units")
 	execution.half_angle_degrees = definition.get_param_float(&"half_angle_degrees", 90.0)
 	execution.active_seconds = definition.get_param_float(&"hit_duration_seconds", 0.12)
 	if execution.activate():
+		_play_cast_animation(&"active", _cast_direction, execution.active_seconds)
 		return true
 	execution.queue_free()
 	_execution = null
@@ -57,9 +61,15 @@ func on_unequipped() -> void:
 
 
 func cancel_active() -> void:
+	_stop_cast_animation()
 	if is_instance_valid(_execution):
 		_execution.cancel()
 	_execution = null
+
+
+func _on_active_completed() -> void:
+	# Same fade window used by the heavy MeleeSlashVFX.
+	_play_cast_animation(&"recover", _cast_direction, 0.22, true)
 
 
 func _build_context(activation: CharmActivationContext) -> AttackContext:
