@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://bh3m6d50c6isl"]
 
-[ext_resource type="Texture2D" uid="uid://klen7x2khlx3" path="res://assets/sprites/items/Mushroom_Cap.png" id="1_iy5l2"]
+[ext_resource type="Texture2D" uid="uid://klen7x2khlx3" path="res://assets/sprites/items/materials/Mushroom_Cap.png" id="1_iy5l2"]
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_jauva"]
 
 [resource]

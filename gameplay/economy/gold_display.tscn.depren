@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://bulcvbok8qvje"]
+
+[ext_resource type="Script" uid="uid://b33hl5mw8xdvg" path="res://gameplay/economy/gold_display.gd" id="1_display"]
+[ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_gcxsi"]
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_gcxsi"]
+
+[node name="GoldDisplay" type="Control" unique_id=1723458651]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 140.0
+offset_bottom = 40.0
+tooltip_text = "Gold"
+mouse_filter = 2
+script = ExtResource("1_display")
+
+[node name="Row" type="HBoxContainer" parent="." unique_id=1075265742]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 128.0
+offset_bottom = 35.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Row" unique_id=307438156]
+texture_filter = 1
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_gcxsi")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="Row" unique_id=707305948]
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position_ratio = Vector2(0, 0.1)
+theme_override_colors/font_color = Color(1, 0.86, 0.45, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.045, 0.015, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("3_gcxsi")
+theme_override_font_sizes/font_size = 42
+text = "0"
+vertical_alignment = 1
+
+[node name="Gain" type="Label" parent="." unique_id=1310774866]
+visible = false
+layout_mode = 0
+offset_left = 54.0
+offset_top = -9.0
+offset_right = 172.0
+offset_bottom = 22.0
+theme_override_colors/font_color = Color(0.9506008, 0.90322334, 0.7311294, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.045, 0.015, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_gcxsi")
+theme_override_font_sizes/font_size = 30
+text = "+5 G"

@@ -2,6 +2,9 @@ class_name TreasureChest
 extends DestructibleProp
 ## Rương giữ nguyên sau khi mở; dùng chung máu, hurtbox và flash với vật thể phá được.
 
+const ITEM_PICKUP: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
+const LOOT_SPREAD_ANGLE := 2.39996323
+
 const CAMERA_ZOOM_TWEEN_META := &"treasure_chest_zoom_tween"
 const CAMERA_ZOOM_BASE_META := &"treasure_chest_zoom_base"
 
@@ -45,6 +48,12 @@ const CAMERA_ZOOM_BASE_META := &"treasure_chest_zoom_base"
 @export_range(0.0, 10.0, 0.1, "suffix:m") var gold_flight_height: float = 2.0
 @export_range(0.05, 3.0, 0.05, "suffix:s") var gold_flight_duration: float = 0.8
 
+@export_group("Item Drops")
+## Each entry rolls once independently. Empty arrays mean no item or note drops.
+@export var item_drops: Array[ChestItemDrop] = []
+@export var note_drops: Array[ChestNoteDrop] = []
+@export var loot_origin_offset: Vector3 = Vector3.ZERO
+
 var _wobble: Tween
 var _rest_rotation: Vector3
 var _random := RandomNumberGenerator.new()
@@ -86,6 +95,7 @@ func receive_damage(damage: DamageContext) -> float:
 	if opening:
 		_punch_camera()
 		_drop_gold()
+		_drop_items_and_notes()
 		destroyed.emit()
 	return applied
 
@@ -154,3 +164,34 @@ func _drop_gold() -> void:
 		gold_flight_height,
 		gold_flight_duration
 	)
+
+
+func _drop_items_and_notes() -> void:
+	if not is_inside_tree() or get_parent() == null:
+		return
+	var index := 0
+	var angle := _random.randf_range(0.0, TAU)
+	for drop in item_drops:
+		if drop == null or drop.item == null or drop.quantity <= 0 or not _roll_drop(drop.chance):
+			continue
+		_spawn_pickup(drop.item, null, drop.quantity, angle + index * LOOT_SPREAD_ANGLE)
+		index += 1
+	for drop in note_drops:
+		if drop == null or drop.note == null or drop.note.note_id.is_empty() or not _roll_drop(drop.chance):
+			continue
+		_spawn_pickup(null, drop.note, 1, angle + index * LOOT_SPREAD_ANGLE)
+		index += 1
+
+
+func _roll_drop(chance: float) -> bool:
+	return chance >= 1.0 or (chance > 0.0 and _random.randf() < chance)
+
+
+func _spawn_pickup(item: BaseItem, note: MonsterNote, quantity: int, angle: float) -> void:
+	var pickup := ITEM_PICKUP.instantiate() as ItemPickup
+	pickup.item = item
+	pickup.note = note
+	pickup.quantity = quantity
+	get_parent().add_child(pickup)
+	pickup.global_position = to_global(loot_origin_offset)
+	pickup.play_drop_animation(Vector3(cos(angle), 0.0, sin(angle)))

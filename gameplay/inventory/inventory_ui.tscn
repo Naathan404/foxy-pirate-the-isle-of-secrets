@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://csjd6ws35fa3l" path="res://assets/ui/player_hud/inventory/Blue_Markbook.png" id="15_gv8eq"]
 [ext_resource type="Texture2D" uid="uid://c6ekls8nx38sw" path="res://assets/ui/player_hud/inventory/Gray_Markbook.png" id="17_mgn5m"]
 [ext_resource type="PackedScene" uid="uid://c6lni27p5k43v" path="res://gameplay/inventory/equipment_tab.tscn" id="equipment_tab"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/notes_tab.tscn" id="notes_tab"]
 [ext_resource type="Texture2D" uid="uid://bootcj1j63ful" path="res://assets/ui/silas_shop/PNG/34_purchase_button_blank.png" id="shop_action"]
 [ext_resource type="Texture2D" uid="uid://cyvd8yj0r05td" path="res://assets/ui/silas_shop/PNG/12_money_bag_skull_with_coins.png" id="shop_bag"]
 [ext_resource type="Texture2D" uid="uid://cmg1ofjv3y76t" path="res://assets/ui/silas_shop/PNG/30_description_box_outline.png" id="shop_description_frame"]
@@ -392,7 +393,7 @@ vertical_alignment = 1
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="Notes" type="Control" parent="PanelContainer/MarginContainer/Tabs" unique_id=930459895]
+[node name="Notes" parent="PanelContainer/MarginContainer/Tabs" unique_id=930459895 instance=ExtResource("notes_tab")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2

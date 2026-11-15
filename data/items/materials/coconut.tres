@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://os3iull80808"]
 
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_1vna2"]
-[ext_resource type="Texture2D" uid="uid://dcrv14mnxtexa" path="res://assets/sprites/items/Coconut.png" id="1_2ycry"]
+[ext_resource type="Texture2D" uid="uid://dcrv14mnxtexa" path="res://assets/sprites/items/materials/Coconut.png" id="1_2ycry"]
 
 [resource]
 script = ExtResource("1_1vna2")

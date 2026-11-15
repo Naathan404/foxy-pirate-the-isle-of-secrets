@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/notes_tab.gd" id="script"]
+[ext_resource type="Script" path="res://data/notes/monster_note.gd" id="note_type"]
+[ext_resource type="Resource" path="res://data/notes/starfish.tres" id="starfish"]
+[ext_resource type="Resource" path="res://data/notes/crab.tres" id="crab"]
+[ext_resource type="Resource" path="res://data/notes/barrel.tres" id="barrel"]
+[ext_resource type="Resource" path="res://data/notes/coral_skeleton.tres" id="coral_skeleton"]
+[ext_resource type="Resource" path="res://data/notes/elite_starfish.tres" id="elite_starfish"]
+[ext_resource type="Resource" path="res://data/notes/elite_crab.tres" id="elite_crab"]
+[ext_resource type="Resource" path="res://data/notes/elite_barrel.tres" id="elite_barrel"]
+[ext_resource type="Resource" path="res://data/notes/war_lord_turtle.tres" id="war_lord_turtle"]
+
+[node name="Notes" type="Control"]
+script = ExtResource("script")
+notes = Array[ExtResource("note_type")]([ExtResource("starfish"), ExtResource("crab"), ExtResource("barrel"), ExtResource("coral_skeleton"), ExtResource("elite_starfish"), ExtResource("elite_crab"), ExtResource("elite_barrel"), ExtResource("war_lord_turtle")])

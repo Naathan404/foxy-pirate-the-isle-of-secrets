@@ -908,6 +908,7 @@ potion = NodePath("PotionComponent")
 potion_selector = NodePath("PotionQuickSelect/Wheel")
 inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
+post_hit_invulnerability_duration = 1.0
 
 [node name="DrownPoint" type="Marker3D" parent="." unique_id=803702947]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8018878, 0)

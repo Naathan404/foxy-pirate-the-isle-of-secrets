@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="MonsterNote" format=3 uid="uid://qk8dftmqxf77"]
+
+[ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dxkc50p2rl15x" path="res://assets/sprites/enemies/crab/crab_sprite_sheet.png" id="2"]
+[ext_resource type="Resource" uid="uid://c8bcjh7tos032" path="res://data/enemies/elite_crab_data.tres" id="3"]
+
+[sub_resource type="AtlasTexture" id="portrait"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 64, 64)
+
+[resource]
+script = ExtResource("1")
+note_id = &"elite_crab"
+display_name = "Elite Crab"
+portrait = SubResource("portrait")
+enemy_data = ExtResource("3")
+description = "A powerful crab that commands the coast."
+behavior = "Uses a charged attack and can spawn eggs."
+strategy = "Watch its wind-up and control the space around it."
