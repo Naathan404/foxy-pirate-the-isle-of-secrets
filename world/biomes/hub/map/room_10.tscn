@@ -7,6 +7,9 @@ open_exits = 8
 left_destination_scene = "res://world/biomes/hub/map/room_09.tscn"
 metadata/room_role = "Lava"
 
+[node name="DirectionalLight3D" parent="General" index="1"]
+light_energy = 1.5
+
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
 [editable path="Exits/UpPath"]

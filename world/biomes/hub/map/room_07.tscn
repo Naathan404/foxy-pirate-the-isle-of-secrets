@@ -8,6 +8,9 @@ open_exits = 8
 left_destination_scene = "res://world/biomes/hub/map/room_06.tscn"
 metadata/room_role = "NPC3"
 
+[node name="DirectionalLight3D" parent="General" index="1"]
+light_energy = 1.5
+
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 position = Vector3(-5, 2.0626488, 0)
 

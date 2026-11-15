@@ -17,6 +17,6 @@ environment = SubResource("HubEnvironment")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 light_color = Color(0.82, 0.86, 0.92, 1)
-light_energy = 1.0
+light_energy = 0.95
 
 [node name="RoomAtmosphere" parent="." index="5" unique_id=1766076537 instance=ExtResource("2")]
