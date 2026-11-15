@@ -26,6 +26,7 @@ func on_target_defeated(target: Node, damage: DamageContext) -> void:
 		return
 	_get_charm_manager().reset_active_cooldowns()
 	_get_stamina_component().restore(definition.get_param_float(&"restore_sp"))
+	runtime.proc_triggered.emit("RESET +SP", Color(0.3, 0.9, 1.0))
 
 
 func _get_stamina_component() -> StaminaComponent:

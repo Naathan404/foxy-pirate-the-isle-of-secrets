@@ -205,6 +205,7 @@ position = Vector3(-5.4523506, 0, -2.3347488)
 rotation = Vector3(0, 3.1415927, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldPivot" unique_id=1887658636]
+light_color = Color(1, 0.94, 0.84, 1)
 transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
 light_energy = 0.35
 shadow_enabled = true

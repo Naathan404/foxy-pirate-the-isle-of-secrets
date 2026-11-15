@@ -20,6 +20,8 @@ drop_chance = 1.0
 tags = Array[StringName]([&"active", &"grapple", &"boss_reward"])
 effect_params = {
 "damage_multiplier": 2.5,
+"hook_speed": 24.0,
+"return_speed": 28.0,
 "pull_speed_units_per_second": 16.0,
 "pull_stop_distance": 1.0,
 "range_units": 4.0,

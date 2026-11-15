@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://cfdi6vtr5r10y" path="res://assets/sprites/biomes/coral_valley/octopus.png" id="2_texture"]
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/octopus.gd" id="3_script"]
 
 [sub_resource type="BoxShape3D" id="HitShape"]
 size = Vector3(2, 1.9, 0.8)
@@ -10,6 +11,7 @@ size = Vector3(2, 1.9, 0.8)
 size = Vector3(1.75, 0.8, 1.15)
 
 [node name="Octopus" unique_id=635249029 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+script = ExtResource("3_script")
 max_hp = 3.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15

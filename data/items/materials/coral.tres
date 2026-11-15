@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://ngxkp0j5jl2b"]
 
-[ext_resource type="Texture2D" uid="uid://0ogu6cbj2b83" path="res://assets/sprites/items/Coral.png" id="1_27373"]
+[ext_resource type="Texture2D" uid="uid://0ogu6cbj2b83" path="res://assets/sprites/items/materials/Coral.png" id="1_27373"]
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_script"]
 
 [resource]

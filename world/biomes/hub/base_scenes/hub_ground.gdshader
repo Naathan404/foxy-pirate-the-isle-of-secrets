@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, cull_disabled;
+render_mode cull_disabled, diffuse_lambert;
 
 uniform sampler2D sprite_texture : source_color, filter_linear, repeat_disable;
 
@@ -12,4 +12,6 @@ void fragment() {
 		discard;
 	}
 	ALBEDO = sprite.rgb;
+	ROUGHNESS = 1.0;
+	SPECULAR = 0.0;
 }

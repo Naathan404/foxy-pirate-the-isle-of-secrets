@@ -103,6 +103,7 @@ func activate() -> void:
 	_trail.call("push_point", _body.global_position + Vector3.UP * 0.8 + context.direction)
 	context.crate_knockback_distance = crate_knockback_distance
 	super.activate()
+	get_node("/root/CombatMomentController").request(&"harpoon_skill")
 	get_node("/root/AudioManager").play_sfx_3d(DASH_SOUND, _body.global_position, -9.0, 0.9)
 	get_node("/root/ScreenShakeController").request(3.5, 0.13)
 

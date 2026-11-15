@@ -259,6 +259,7 @@ func _on_died() -> void:
 	if not _configured or _dying:
 		return
 	_dying = true
+	get_node("/root/CombatMomentController").cancel()
 	get_node("/root/HitstopController").request(death_hitstop_duration)
 	get_node("/root/ScreenShakeController").request(death_shake_pixels, death_shake_duration)
 	for animation: Tween in [_flash_tween, _spine_flash_tween, _pose_tween]:

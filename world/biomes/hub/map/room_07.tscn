@@ -8,8 +8,16 @@ open_exits = 8
 left_destination_scene = "res://world/biomes/hub/map/room_06.tscn"
 metadata/room_role = "NPC3"
 
+<<<<<<< HEAD
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 visible = false
+=======
+[node name="DirectionalLight3D" parent="General" index="1"]
+light_energy = 1.5
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+position = Vector3(-5, 2.0626488, 0)
+>>>>>>> a6f1b44654e25a018884b86eb6ea376628aee99e
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
 disabled = true

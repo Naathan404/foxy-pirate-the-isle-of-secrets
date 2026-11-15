@@ -5,6 +5,7 @@ extends CharmEffect
 var _zone: Area3D
 var _remaining: float = 0.0
 var _exploded: bool = false
+var _cast_direction: Vector3 = Vector3.BACK
 
 
 func activate(context: CharmActivationContext) -> bool:
@@ -19,25 +20,17 @@ func activate(context: CharmActivationContext) -> bool:
 	_zone.add_child(shape)
 	_zone.collision_layer = 0
 	_zone.collision_mask = 16
-	_zone.global_position = context.target_position
 	actor.get_parent().add_child(_zone)
-	var visual := MeshInstance3D.new()
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = radius
-	mesh.bottom_radius = radius
-	mesh.height = 0.05
-	visual.mesh = mesh
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(0.15, 0.4, 0.9, 0.55)
-	material.emission_enabled = true
-	material.emission = Color(0.05, 0.2, 0.8, 1.0)
-	material.emission_energy_multiplier = 1.5
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	visual.material_override = material
-	_zone.add_child(visual)
+	_zone.global_position = context.target_position
 	_remaining = definition.get_param_float(&"duration_seconds", 1.5)
+	var visual := CharmVfx.spawn(
+		_zone, _zone.global_position, CharmVfx.TIDE, radius, _remaining, CharmVfx.Style.VORTEX
+	)
+	visual.sustained = true
 	_exploded = false
 	set_physics_process(true)
+	_cast_direction = context.target_position - actor.global_position
+	_play_cast_animation(&"sustain", _cast_direction, _remaining / 4.0)
 	return true
 
 
@@ -73,6 +66,9 @@ func _explode() -> void:
 	_exploded = true
 	var radius := definition.get_param_float(&"radius_units", 2.5)
 	var damage := _get_base_damage() * definition.get_param_float(&"damage_multiplier", 1.0)
+	CharmVfx.spawn(actor.get_parent(), _zone.global_position, CharmVfx.TIDE, radius * 1.2, 0.4)
+	get_node("/root/ScreenShakeController").request(7.0, 0.22)
+	var hit_confirmed := false
 	for node in actor.get_tree().get_nodes_in_group("enemy"):
 		if not node is Node3D or node.is_in_group("boss"):
 			continue
@@ -85,11 +81,20 @@ func _explode() -> void:
 			context.amount_hp = damage
 			context.base_amount_hp = damage
 			context.tag = definition.charm_id
-			node.call("receive_damage", context)
-	cancel_active()
+			if float(node.call("receive_damage", context)) > 0.0:
+				hit_confirmed = true
+	if hit_confirmed:
+		get_node("/root/HitstopController").request(0.07)
+	_play_cast_animation(&"detonate", _cast_direction, 0.4, true)
+	_clear_zone()
 
 
 func cancel_active() -> void:
+	_stop_cast_animation()
+	_clear_zone()
+
+
+func _clear_zone() -> void:
 	set_physics_process(false)
 	if is_instance_valid(_zone):
 		_zone.queue_free()

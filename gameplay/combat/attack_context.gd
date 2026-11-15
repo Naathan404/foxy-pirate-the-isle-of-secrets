@@ -66,4 +66,5 @@ func create_damage_context() -> DamageContext:
 	damage.crate_knockback_distance = crate_knockback_distance
 	if combo_step != null:
 		damage.knockback_multiplier *= combo_step.knockback_multiplier
+		damage.emphasize_popup = combo_step.emphasize_damage_popup
 	return damage

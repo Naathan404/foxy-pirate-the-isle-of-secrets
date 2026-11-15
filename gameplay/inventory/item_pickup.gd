@@ -1,7 +1,12 @@
 class_name ItemPickup
 extends Area3D
 
+const NOTE_ITEM: BaseItem = preload("res://data/items/quest/note.tres")
+const BOSS_DIARY_ITEM: BaseItem = preload("res://data/items/quest/boss_diary.tres")
+
 @export var item: BaseItem
+## A note pickup unlocks this entry instead of taking an inventory slot.
+@export var note: MonsterNote
 @export_range(1, 999, 1) var quantity: int = 1
 
 @export_group("Idle Animation")
@@ -31,6 +36,10 @@ var _collecting: bool = false
 
 
 func _ready() -> void:
+	if note != null:
+		item = note.pickup_item
+		if item == null:
+			item = BOSS_DIARY_ITEM if note.layout == MonsterNote.Layout.BOSS else NOTE_ITEM
 	if item != null:
 		sprite.texture = item.icon
 	_rest_scale = sprite.scale
@@ -117,7 +126,14 @@ func _can_attract(target: Node3D) -> bool:
 	if player.dead or player.is_gameplay_input_blocked():
 		return false
 	var inventory := player.get_node_or_null("Inventory") as Inventory
-	return inventory != null and inventory.get_available_space(item) > 0
+	if inventory == null:
+		return false
+	if note != null:
+		return not note.note_id.is_empty()
+	# A generic note without an entry cannot grant anything and must not enter inventory.
+	if item.opens_note or item.item_id == NOTE_ITEM.item_id or item.item_id == BOSS_DIARY_ITEM.item_id:
+		return false
+	return inventory.get_available_space(item) > 0
 
 
 func _on_attraction_started(_target: Node3D) -> void:
@@ -141,6 +157,13 @@ func _collect(target: Node3D) -> void:
 	var inventory := target.get_node_or_null("Inventory") as Inventory
 	# Inventory signals may re-enter pickup code; reserve the transaction first.
 	_collecting = true
+	if note != null:
+		get_node("/root/NoteProgress").set_unlocked(note.note_id, true)
+		quantity = 0
+		inventory.notify_item_picked_up(item, 1)
+		_can_be_picked_up = false
+		_attraction.complete()
+		return
 	var requested_quantity := quantity
 	quantity = inventory.add_item(item, quantity)
 	var accepted_quantity := requested_quantity - quantity

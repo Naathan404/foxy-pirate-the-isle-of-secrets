@@ -271,6 +271,15 @@ func get_afterimage_source() -> Node3D:
 	return _spine if _active and visible and is_instance_valid(_spine) else null
 
 
+## Stable idle dimensions in PlayerVisual space, shared by temporary cast artwork.
+func get_reference_body_metrics() -> Vector2:
+	var multiplier := size_multiplier if _active else 1.0
+	return Vector2(
+		absf(transform.basis.y.y) * _reference_height * multiplier,
+		(transform * _reference_bottom).y
+	)
+
+
 func _mapping_key_for(animation_name: StringName, screen_facing: Vector3) -> String:
 	var key := String(animation_name)
 	if animation_name == &"idle_side":

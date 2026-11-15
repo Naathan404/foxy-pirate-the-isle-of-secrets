@@ -4,7 +4,8 @@ extends CharmEffect
 
 var _charging: bool = false
 var _charge_seconds: float = 0.0
-var _ring: MeshInstance3D
+var _ring: CharmVfx
+var _cast_direction: Vector3 = Vector3.BACK
 
 
 func get_cooldown_policy() -> StringName:
@@ -15,27 +16,23 @@ func get_activation_cost(_context: CharmActivationContext) -> float:
 	return 0.0
 
 
-func activate(_context: CharmActivationContext) -> bool:
+func activate(context: CharmActivationContext) -> bool:
 	if _charging or not is_instance_valid(actor):
 		return false
 	_charging = true
 	_charge_seconds = 0.0
-	_ring = MeshInstance3D.new()
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.2
-	mesh.bottom_radius = 0.2
-	mesh.height = 0.04
-	_ring.mesh = mesh
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(1.0, 0.65, 0.2, 0.7)
-	material.emission_enabled = true
-	material.emission = Color(0.9, 0.25, 0.02, 1.0)
-	material.emission_energy_multiplier = 2.0
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_ring.material_override = material
-	_ring.global_position = actor.global_position + Vector3.UP * 0.05
-	actor.get_parent().add_child(_ring)
+	_cast_direction = context.direction
+	_ring = CharmVfx.spawn(
+		actor.get_parent(),
+		actor.global_position,
+		CharmVfx.GOLD,
+		definition.get_param_float(&"min_radius_units", 0.75),
+		1.0,
+		CharmVfx.Style.CHARGE
+	)
+	_ring.sustained = true
 	set_physics_process(true)
+	_play_cast_animation(&"channel", _cast_direction)
 	return true
 
 
@@ -64,7 +61,8 @@ func _physics_process(delta: float) -> void:
 			definition.get_param_float(&"min_radius_units", 0.75)
 			+ (_charge_seconds * definition.get_param_float(&"radius_per_second", 1.5))
 		)
-		_ring.scale = Vector3(radius, 1.0, radius)
+		_ring.set_radius(radius)
+		_ring.global_position = actor.global_position + Vector3.UP * 0.06
 
 
 func on_input_released(_context: CharmActivationContext) -> bool:
@@ -82,6 +80,9 @@ func _release() -> void:
 		+ (_charge_seconds * definition.get_param_float(&"radius_per_second", 1.5))
 	)
 	var damage := _get_base_damage() * definition.get_param_float(&"damage_multiplier", 1.0)
+	CharmVfx.spawn(actor.get_parent(), actor.global_position, CharmVfx.GOLD, radius, 0.45)
+	get_node("/root/ScreenShakeController").request(minf(10.0, 4.0 + _charge_seconds * 2.0), 0.24)
+	var hit_confirmed := false
 	for node in actor.get_tree().get_nodes_in_group("enemy"):
 		if (
 			not node is Node3D
@@ -95,12 +96,21 @@ func _release() -> void:
 			context.amount_hp = damage
 			context.base_amount_hp = damage
 			context.tag = definition.charm_id
-			node.call("receive_damage", context)
+			if float(node.call("receive_damage", context)) > 0.0:
+				hit_confirmed = true
+	if hit_confirmed:
+		get_node("/root/HitstopController").request(minf(0.09, 0.04 + _charge_seconds * 0.015))
 	runtime.start_cooldown()
-	cancel_active()
+	_play_cast_animation(&"release", _cast_direction, 0.45, true)
+	_clear_charge()
 
 
 func cancel_active() -> void:
+	_stop_cast_animation()
+	_clear_charge()
+
+
+func _clear_charge() -> void:
 	set_physics_process(false)
 	_charging = false
 	_charge_seconds = 0.0

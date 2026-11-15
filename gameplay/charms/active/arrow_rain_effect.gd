@@ -18,6 +18,7 @@ var _socket_id: int = CharmConstants.SocketId.UNASSIGNED
 var _executions: Array[CharmActiveAttack] = []
 var _launched_projectile_count: int = 0
 var _telegraph: Node3D
+var _volley_finished: bool = false
 
 
 func can_activate(context: CharmActivationContext) -> bool:
@@ -62,6 +63,7 @@ func activate(context: CharmActivationContext) -> bool:
 	_has_target_position = true
 	_socket_id = context.socket_id
 	_launched_projectile_count = 0
+	_volley_finished = false
 	_spawn_telegraph()
 	set_physics_process(true)
 	var launch_context := CharmActivationContext.new()
@@ -78,8 +80,10 @@ func on_unequipped() -> void:
 
 
 func cancel_active() -> void:
+	_stop_cast_animation()
 	set_physics_process(false)
 	_remaining_projectiles = 0
+	_volley_finished = false
 	_has_target_position = false
 	if is_instance_valid(_telegraph):
 		_telegraph.queue_free()
@@ -96,6 +100,8 @@ func _physics_process(delta: float) -> void:
 		cancel_active()
 		return
 	if _remaining_projectiles <= 0:
+		if not _volley_finished:
+			_stop_cast_animation()
 		set_physics_process(false)
 		return
 	_projectile_timer -= maxf(delta, 0.0)
@@ -133,6 +139,7 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 	execution.context.origin = actor.global_position
 	var index := _launched_projectile_count
 	var count := maxi(1, definition.get_param_int(&"projectile_count", 8))
+	execution.volley_finisher = index == count - 1
 	var radius := definition.get_param_float(&"impact_radius_units", 2.0)
 	# Golden-angle distribution fills the full circle instead of placing every arrow
 	# on the outer rim, while remaining deterministic for replays and tests.
@@ -169,6 +176,21 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 		return
 	_remaining_projectiles -= 1
 	_launched_projectile_count += 1
+	if _remaining_projectiles > 0:
+		_play_cast_animation(
+			&"volley",
+			_activation_direction,
+			_get_projectile_interval(),
+			_launched_projectile_count > 1
+		)
+	else:
+		_volley_finished = true
+		_play_cast_animation(
+			&"finish",
+			_activation_direction,
+			minf(0.1, _get_projectile_interval()),
+			_launched_projectile_count > 1
+		)
 	projectile_launched.emit(
 		_launched_projectile_count,
 		definition.get_param_int(&"projectile_count"),
@@ -212,11 +234,14 @@ func _spawn_telegraph() -> void:
 	if _telegraph == null:
 		return
 	_telegraph.set("radius", definition.get_param_float(&"impact_radius_units", 2.0))
-	_telegraph.set("lifetime", (
-		definition.get_param_float(&"volley_duration_seconds", 1.4)
-		+ definition.get_param_float(&"flight_duration_seconds", 0.8)
-		+ definition.get_param_float(&"impact_lifetime_seconds", 0.18)
-	))
+	_telegraph.set(
+		"lifetime",
+		(
+			definition.get_param_float(&"volley_duration_seconds", 1.4)
+			+ definition.get_param_float(&"flight_duration_seconds", 0.8)
+			+ definition.get_param_float(&"impact_lifetime_seconds", 0.18)
+		)
+	)
 	var parent := actor.get_parent()
 	if is_instance_valid(parent):
 		parent.add_child(_telegraph)

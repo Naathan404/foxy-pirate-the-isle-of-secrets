@@ -30,7 +30,8 @@ func kick(direction: Vector3, distance: float, flash: bool = false, strength: fl
 	_pose_tween = create_tween()
 	_pose_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_pose_tween.tween_property(_sprite, "position", _rest_position, 0.18)
-	if flash:
+	# EnemyVisual owns the shared flash so it can restore elite overlays reliably.
+	if flash and not _sprite.get_parent() is EnemyVisual:
 		_play_flash(strength)
 
 

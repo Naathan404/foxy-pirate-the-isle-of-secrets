@@ -1,6 +1,7 @@
 extends SceneTree
 
 const BULLET := preload("res://gameplay/enemies/coral_skeleton/coral_skeleton_bullet.tscn")
+const VFX_SCRIPT := preload("res://gameplay/enemies/coral_skeleton/coral_skeleton_vfx.gd")
 
 class Target extends Node3D:
 	var hits := 0
@@ -39,7 +40,24 @@ func _run() -> void:
 	target.add_child(hurtbox)
 	await physics_frame
 	var bullet := _spawn()
-	await create_timer(0.4).timeout
+	await physics_frame
+	_check(not bullet.shadow.visible, "Shadow should stay hidden with no ground below")
+	var floor_body := StaticBody3D.new()
+	floor_body.collision_layer = CombatLayers.WORLD
+	var floor_collision := CollisionShape3D.new()
+	var floor_shape := BoxShape3D.new()
+	floor_shape.size = Vector3(30, 0.5, 30)
+	floor_collision.shape = floor_shape
+	floor_body.add_child(floor_collision)
+	floor_body.position = Vector3(0, -0.25, 0)
+	arena.add_child(floor_body)
+	await create_timer(0.05).timeout
+	_check(bullet.shadow.visible, "Shadow did not project onto ground below bullet")
+	_check(
+		absf(bullet.shadow.global_position.y - 0.025) < 0.02,
+		"Shadow did not snap near ground surface"
+	)
+	await create_timer(0.45).timeout
 	_check(target.hits == 1, "Bullet did not hit player exactly once")
 	_check(not is_instance_valid(bullet), "Bullet survived player collision")
 	target.queue_free()
@@ -55,14 +73,21 @@ func _run() -> void:
 	arena.add_child(wall)
 	await physics_frame
 	bullet = _spawn()
-	await create_timer(0.4).timeout
+	await create_timer(0.5).timeout
 	_check(not is_instance_valid(bullet), "Bullet survived collision with wall")
 	wall.queue_free()
 	await physics_frame
+	var smoke_before := _count_smoke()
 	bullet = _spawn()
 	bullet.remaining = 0.05
 	await create_timer(0.15).timeout
-	_check(not is_instance_valid(bullet), "Bullet did not expire")
+	_check(is_instance_valid(bullet), "Bullet skipped its death duration on expiry")
+	_check(
+		_count_smoke() > smoke_before,
+		"Bullet did not spawn rising smoke VFX when dying"
+	)
+	await create_timer(0.25).timeout
+	_check(not is_instance_valid(bullet), "Bullet did not finish dying after death duration")
 	arena.queue_free()
 	await process_frame
 	if failures.is_empty():
@@ -80,6 +105,14 @@ func _spawn() -> CoralSkeletonBullet:
 	arena.add_child(bullet)
 	bullet.global_position = Vector3(0, 3, 0)
 	return bullet
+
+
+func _count_smoke() -> int:
+	var count := 0
+	for child in arena.get_children():
+		if child.get_script() == VFX_SCRIPT and child.get("effect") == &"smoke":
+			count += 1
+	return count
 
 
 func _check(condition: bool, message: String) -> void:
