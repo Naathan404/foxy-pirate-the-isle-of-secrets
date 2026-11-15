@@ -43,6 +43,9 @@ shader_parameter/sprite_texture = ExtResource("6_n48ku")
 
 [node name="BaseLargeRoom" unique_id=1672893012 instance=ExtResource("1_5rjr3")]
 
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
+light_energy = 0.95
+
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 38.885536)
 

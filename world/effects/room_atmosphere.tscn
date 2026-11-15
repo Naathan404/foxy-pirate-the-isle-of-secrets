@@ -1,27 +1,35 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://d2iseqdcsafil"]
 
-[ext_resource type="Script" path="res://world/effects/room_atmosphere.gd" id="1"]
-[ext_resource type="Shader" path="res://world/effects/vintage_overlay.gdshader" id="2"]
-[ext_resource type="Script" path="res://world/effects/wind_overlay.gd" id="3"]
+[ext_resource type="Script" uid="uid://dlkaiy2h78psy" path="res://world/effects/room_atmosphere.gd" id="1"]
+[ext_resource type="Shader" uid="uid://b11blnw20i5e" path="res://world/effects/vintage_overlay.gdshader" id="2"]
+[ext_resource type="Script" uid="uid://cfu2en7fcbfbs" path="res://world/effects/wind_overlay.gd" id="3"]
 
 [sub_resource type="ShaderMaterial" id="Grade"]
 resource_local_to_scene = true
 shader = ExtResource("2")
+shader_parameter/exposure = 1.00000002375
+shader_parameter/saturation = 0.78
+shader_parameter/tint = Color(1, 0.94, 0.83, 1)
+shader_parameter/vignette_strength = 0.150000007125
 
-[node name="RoomAtmosphere" type="Node"]
+[node name="RoomAtmosphere" type="Node" unique_id=1152680177]
 script = ExtResource("1")
 
-[node name="Overlay" type="CanvasLayer" parent="."]
+[node name="Overlay" type="CanvasLayer" parent="." unique_id=1300233738]
 layer = -1
 
-[node name="Vintage" type="ColorRect" parent="Overlay"]
+[node name="Vintage" type="ColorRect" parent="Overlay" unique_id=1611482802]
+material = SubResource("Grade")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-material = SubResource("Grade")
 
-[node name="WindAndLeaves" type="Node2D" parent="Overlay"]
+[node name="WindAndLeaves" type="Node2D" parent="Overlay" unique_id=1448896067]
 script = ExtResource("3")
+leaf_count = 20
+leaf_color = Color(0.39215687, 0.41568628, 0.2, 0.88235295)
+trail_count = 8
+trail_color = Color(0.76862746, 0.81960785, 0.70980394, 0.5882353)

@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bqdk2i44s10bf"]
 
-[ext_resource type="PackedScene" path="res://world/biomes/base/base_room.tscn" id="1"]
-[ext_resource type="PackedScene" path="res://world/effects/room_atmosphere.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="2"]
 
 [sub_resource type="Environment" id="HubEnvironment"]
 background_mode = 1
@@ -10,13 +10,13 @@ ambient_light_source = 2
 ambient_light_color = Color(0.45, 0.52, 0.58, 1)
 ambient_light_energy = 0.65
 
-[node name="HubRoom" instance=ExtResource("1")]
+[node name="HubRoom" unique_id=371468771 instance=ExtResource("1")]
 
-[node name="WorldEnvironment" parent="General" index="0"]
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("HubEnvironment")
 
-[node name="DirectionalLight3D" parent="General" index="1"]
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 light_color = Color(0.82, 0.86, 0.92, 1)
-light_energy = 0.65
+light_energy = 1.0
 
-[node name="RoomAtmosphere" parent="." instance=ExtResource("2")]
+[node name="RoomAtmosphere" parent="." index="5" unique_id=1766076537 instance=ExtResource("2")]
