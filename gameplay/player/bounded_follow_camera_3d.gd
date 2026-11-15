@@ -9,6 +9,13 @@ extends Camera3D
 @export_range(0.1, 30.0, 0.1) var bob_blend_speed: float = 9.0
 @export_range(0.0, 5.0, 0.1) var bob_minimum_speed: float = 0.5
 
+@export_group("Dash Follow")
+@export var dash_follow_enabled: bool = true
+@export_range(0.0, 0.3, 0.01, "suffix:s") var dash_hold_duration: float = 0.08
+@export_range(1.0, 30.0, 0.5) var dash_catch_up_speed: float = 10.0
+@export_range(0.1, 10.0, 0.1) var dash_max_lag_distance: float = 3.0
+@export_range(0.001, 0.5, 0.001) var dash_settle_distance: float = 0.02
+
 ## Temporary world-space framing offset; still clamped by camera bounds.
 var combat_focus_offset: Vector3 = Vector3.ZERO
 var _follow_offset: Vector3
@@ -17,12 +24,17 @@ var _player: Player
 var _dialogue_override := false
 var _bob_phase: float = 0.0
 var _bob_weight: float = 0.0
+var _dash_follow_active := false
+var _dash_hold_remaining := 0.0
+var _dash_camera_position := Vector3.ZERO
 
 
 func _ready() -> void:
 	_follow_offset = position
 	process_priority = 100
 	_player = get_parent() as Player
+	if is_instance_valid(_player):
+		_player.dash_started.connect(_on_dash_started)
 	if is_instance_valid(_player) and is_instance_valid(_player.get_parent()):
 		_bounds = _player.get_parent().get_node_or_null("CameraBounds") as CameraBounds3D
 
@@ -32,8 +44,43 @@ func _process(delta: float) -> void:
 		# A boundary clamp changes a child camera's local position. Rebuild the
 		# desired follow offset each frame so it follows when Foxy moves back.
 		position = _follow_offset + _get_movement_bob(delta)
-		global_position += combat_focus_offset
+		var follow_position := _update_dash_follow(global_position, delta)
+		global_position = follow_position + combat_focus_offset
 	set_bounded_global_position(global_position)
+
+
+func _on_dash_started() -> void:
+	if not dash_follow_enabled or _dialogue_override:
+		return
+	# Capture the displayed camera position before dash movement; combat focus is
+	# applied separately so cinematic framing can continue during the delay.
+	_dash_camera_position = global_position - combat_focus_offset
+	_dash_hold_remaining = dash_hold_duration
+	_dash_follow_active = true
+
+
+func _update_dash_follow(target: Vector3, delta: float) -> Vector3:
+	if not dash_follow_enabled or not _dash_follow_active:
+		_dash_follow_active = false
+		return target
+	var horizontal_lag := Vector3(
+		_dash_camera_position.x - target.x, 0.0, _dash_camera_position.z - target.z
+	).limit_length(dash_max_lag_distance)
+	_dash_camera_position = target + horizontal_lag
+	var catch_up_delta := maxf(0.0, delta - _dash_hold_remaining)
+	_dash_hold_remaining = maxf(0.0, _dash_hold_remaining - delta)
+	if catch_up_delta > 0.0:
+		var blend := 1.0 - exp(-dash_catch_up_speed * catch_up_delta)
+		_dash_camera_position = _dash_camera_position.lerp(target, blend)
+	if _dash_hold_remaining <= 0.0 and _dash_camera_position.distance_to(target) <= dash_settle_distance:
+		_dash_follow_active = false
+		return target
+	return _dash_camera_position
+
+
+func _reset_dash_follow() -> void:
+	_dash_follow_active = false
+	_dash_hold_remaining = 0.0
 
 
 func _get_movement_bob(delta: float) -> Vector3:
@@ -71,6 +118,7 @@ func _get_movement_bob(delta: float) -> Vector3:
 
 func snap_to_follow() -> void:
 	_dialogue_override = false
+	_reset_dash_follow()
 	_bob_weight = 0.0
 	position = _follow_offset
 	set_bounded_global_position(global_position)
@@ -79,11 +127,13 @@ func snap_to_follow() -> void:
 
 func begin_dialogue_override() -> void:
 	_dialogue_override = true
+	_reset_dash_follow()
 	_bob_weight = 0.0
 
 
 func end_dialogue_override() -> void:
 	_dialogue_override = false
+	_reset_dash_follow()
 	_bob_weight = 0.0
 	position = _follow_offset
 	set_bounded_global_position(global_position)

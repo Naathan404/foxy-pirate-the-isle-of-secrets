@@ -1,10 +1,10 @@
-﻿extends Control
+extends Control
 ## Bestiary pages in the inventory book. Entries and their defaults are edited in Inspector.
 
 @export var notes: Array[MonsterNote] = []
 
 const TITLE_FONT: Font = preload("res://assets/fonts/BlackCrest-gwPyY.otf")
-const BODY_FONT: Font = preload("res://assets/fonts/Minecraft.ttf")
+const BODY_FONT: Font = preload("res://assets/fonts/unifont-17.0.03.otf")
 const INK := Color(0.24, 0.12, 0.10)
 const MUTED := Color(0.40, 0.25, 0.19)
 
