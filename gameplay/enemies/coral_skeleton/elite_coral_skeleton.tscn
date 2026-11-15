@@ -1,0 +1,82 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://data/enemies/elite_coral_skeleton_data.tres" id="2_data"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.gd" id="3_script"]
+[ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="4_feedback"]
+[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/elite_coral_revive.gd" id="5_revive"]
+
+[sub_resource type="CapsuleShape3D" id="HurtShape"]
+radius = 0.975
+height = 3.75
+
+[sub_resource type="CylinderShape3D" id="DetectorShape"]
+height = 3.0
+radius = 9.5
+
+[sub_resource type="CapsuleShape3D" id="BodyShape"]
+radius = 0.825
+height = 3.45
+
+[node name="EliteCoralSkeleton" instance=ExtResource("1_base")]
+script = ExtResource("3_script")
+normal_attacks_before_special = 3
+mortar_shot_count = 5
+mortar_flight_duration = 1.1
+mortar_arc_height = 4.5
+mortar_min_distance = 3.0
+mortar_max_distance = 6.5
+poison_cloud_radius = 1.8
+poison_cloud_duration = 3.5
+poison_tick_interval = 0.9
+poison_tick_damage = 0.5
+charged_color = Color(1, 0.25, 0.25, 1)
+charged_scale = 1.18
+charged_shake = 0.05
+charged_shake_frequency = 32.0
+can_sleep = false
+detection_radius = 9.5
+wake_duration = 0.0
+wake_attack_delay = 0.3
+shooting_range = 5.2
+roam_when_guarding = true
+guard_roam_radius = 3.5
+guard_roam_segment_time = 1.2
+guard_roam_pause_time = 1.0
+randomize_shot_mode = true
+bullets_per_burst = 3
+data = ExtResource("2_data")
+initial_state_name = &"Guard"
+
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+target_position = Vector3(0, 0, 1.5)
+
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 1.35)
+target_position = Vector3(0, -2.25, 0)
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.875, 0)
+shape = SubResource("HurtShape")
+
+[node name="BulletSpawn" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=1695438606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 1.55)
+
+[node name="Revive" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="9"]
+script = ExtResource("5_revive")
+
+[node name="CollisionShape3D" parent="TargetDetector" parent_id_path=PackedInt32Array(1293323255) index="0" unique_id=502862166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("DetectorShape")
+
+[node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.725, 0)
+shape = SubResource("BodyShape")
+
+[node name="EliteFeedback" type="Node3D" parent="." index="8"]
+script = ExtResource("4_feedback")
+telegraph_ring_radius = 1.65
