@@ -2,8 +2,13 @@ class_name BuckshotSalvoEffect
 extends CharmEffect
 ## Radial burst; each pellet has independent target reservation.
 
-const ATTACK_SCENE := preload("res://gameplay/charms/active/charm_active_attack.tscn")
+const ATTACK_SCENE := preload("res://gameplay/charms/active/buckshot_projectile_attack.tscn")
+const PROJECTILE_SHEET: Texture2D = preload(
+	"res://assets/sprites/effects/charms/buckshot_projectile.png"
+)
 var _executions: Array[CharmActiveAttack] = []
+var _casting: bool = false
+var _cast_direction: Vector3 = Vector3.BACK
 
 
 func can_activate(context: CharmActivationContext) -> bool:
@@ -12,7 +17,10 @@ func can_activate(context: CharmActivationContext) -> bool:
 		and context != null
 		and context.is_valid()
 		and is_instance_valid(actor)
+		and is_instance_valid(actor.get_parent())
 		and definition.get_param_int(&"projectile_count", 8) > 0
+		and definition.get_param_float(&"projectile_speed", 14.0) > 0.0
+		and definition.get_param_float(&"range_units", 5.0) > 0.0
 	)
 
 
@@ -25,7 +33,17 @@ func activate(context: CharmActivationContext) -> bool:
 	if base_direction.is_zero_approx():
 		base_direction = Vector3.BACK
 	base_direction = base_direction.normalized()
+	_cast_direction = base_direction
 	var base_angle := atan2(base_direction.x, base_direction.z)
+	CharmSpriteVfx.spawn(
+		actor.get_parent(),
+		actor.global_position + Vector3.UP * 0.65,
+		PROJECTILE_SHEET,
+		2,
+		1.7,
+		0.24
+	)
+	get_node("/root/ScreenShakeController").request(3.5, 0.12)
 	for index in count:
 		var angle := base_angle + TAU * float(index) / float(count)
 		var direction := Vector3(sin(angle), 0.0, cos(angle))
@@ -57,10 +75,23 @@ func activate(context: CharmActivationContext) -> bool:
 		execution.release_after(
 			execution.max_travel_distance / execution.travel_speed_units_per_second + 0.1
 		)
-	return not _executions.is_empty()
+	if _executions.is_empty():
+		return false
+	_casting = true
+	_play_cast_animation(
+		&"active",
+		base_direction,
+		(
+			definition.get_param_float(&"range_units", 5.0)
+			/ maxf(0.01, definition.get_param_float(&"projectile_speed", 14.0))
+		)
+	)
+	return true
 
 
 func cancel_active() -> void:
+	_casting = false
+	_stop_cast_animation()
 	for execution: CharmActiveAttack in _executions:
 		if is_instance_valid(execution):
 			execution.deactivate()
@@ -79,3 +110,6 @@ func _get_base_damage() -> float:
 
 func _on_execution_exited(execution: CharmActiveAttack) -> void:
 	_executions.erase(execution)
+	if _casting and _executions.is_empty():
+		_casting = false
+		_play_cast_animation(&"recover", _cast_direction, 0.12, true)

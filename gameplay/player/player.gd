@@ -166,6 +166,33 @@ func _setup_charm_system() -> void:
 		push_error("Player: CharmRegistry chưa được gắn dưới CharmSocketManager")
 		return
 	charm_socket_manager.actor = self
+	charm_registry.charm_unequipped.connect(_on_charm_unequipped)
+
+
+func play_charm_cast(
+	charm_id: StringName,
+	phase: StringName,
+	direction: Vector3,
+	duration_seconds: float = 0.0,
+	continue_only: bool = false
+) -> void:
+	if not dead and is_instance_valid(visual):
+		visual.play_charm_cast(
+			charm_id,
+			phase,
+			direction if not direction.is_zero_approx() else last_facing_direction,
+			duration_seconds,
+			continue_only
+		)
+
+
+func cancel_charm_cast(charm_id: StringName) -> void:
+	if is_instance_valid(visual):
+		visual.stop_charm_cast(charm_id)
+
+
+func _on_charm_unequipped(charm_id: StringName, _socket_id: int) -> void:
+	cancel_charm_cast(charm_id)
 
 
 func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> void:
@@ -308,8 +335,9 @@ func _push_collided_crates() -> void:
 			continue
 		if dashing:
 			var crate_id := crate.get_instance_id()
-			if not _dash_pushed_crates.has(crate_id) and crate.request_knockback(
-				push_direction, dash_crate_knockback_distance
+			if (
+				not _dash_pushed_crates.has(crate_id)
+				and crate.request_knockback(push_direction, dash_crate_knockback_distance)
 			):
 				_dash_pushed_crates[crate_id] = true
 			continue
@@ -679,7 +707,9 @@ func _get_move_speed() -> float:
 	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
 	return maxf(
 		0.0,
-		(data.move_speed + stats[&"move_speed_flat"])
-		* stats[&"move_speed_multiplier"]
-		* environment_move_speed_multiplier
+		(
+			(data.move_speed + stats[&"move_speed_flat"])
+			* stats[&"move_speed_multiplier"]
+			* environment_move_speed_multiplier
+		)
 	)

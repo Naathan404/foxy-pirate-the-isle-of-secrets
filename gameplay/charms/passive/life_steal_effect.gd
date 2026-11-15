@@ -20,7 +20,10 @@ func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) ->
 	if _hit_count < definition.get_param_int(&"hit_threshold", 12):
 		return
 	_hit_count = 0
-	_get_health_component().heal(definition.get_param_float(&"heal_hp"))
+	var healed := _get_health_component().heal(definition.get_param_float(&"heal_hp"))
+	if healed > 0.0:
+		var amount := str(int(healed)) if healed == roundf(healed) else String.num(healed, 2)
+		runtime.proc_triggered.emit("+%s HP" % amount, Color(0.4, 1.0, 0.55))
 
 
 func cancel_active() -> void:

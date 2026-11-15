@@ -8,6 +8,7 @@ const ATTACK_RECOVERY_POSE: float = 0.75
 
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
+@export var charm_cast_animator: CharmCastAnimator
 @export_range(0.25, 3.0, 0.05) var run_animation_speed: float = 1.2
 ## Optional sprites for actions that use another sheet/layout, keyed by animation prefix.
 @export var action_sprite_paths: Dictionary[StringName, NodePath] = {}
@@ -31,6 +32,8 @@ var _action_sprites: Dictionary[StringName, Sprite3D] = {}
 
 func _ready() -> void:
 	_active_sprite = sprite
+	if is_instance_valid(charm_cast_animator):
+		charm_cast_animator.finished.connect(_on_charm_cast_finished)
 	if is_instance_valid(_idle_preview):
 		_idle_preview.configure_reference(sprite, animation_player)
 		_idle_preview.set_run_playback_speed(run_animation_speed)
@@ -51,6 +54,48 @@ func _process(_delta: float) -> void:
 	if get_node("/root/HitstopController").is_frozen(get_parent()):
 		return
 	# Camera đổi góc thì sprite cũng đổi hướng theo
+	if not _action.is_empty():
+		_update_directional_animation()
+	_apply_charm_cast_visibility()
+
+
+func play_charm_cast(
+	charm_id: StringName,
+	phase: StringName,
+	direction: Vector3,
+	duration_seconds: float = 0.0,
+	continue_only: bool = false
+) -> void:
+	if not is_instance_valid(charm_cast_animator):
+		return
+	if continue_only and not charm_cast_animator.is_playing_charm(charm_id):
+		return
+	if is_instance_valid(_idle_preview):
+		var metrics: Vector2 = _idle_preview.get_reference_body_metrics()
+		charm_cast_animator.body_height_units = metrics.x
+		charm_cast_animator.position.y = metrics.y + 0.02
+	if charm_cast_animator.play(charm_id, phase, direction, duration_seconds):
+		_apply_charm_cast_visibility()
+
+
+func stop_charm_cast(charm_id: StringName = &"") -> void:
+	if is_instance_valid(charm_cast_animator):
+		charm_cast_animator.stop(charm_id)
+
+
+func _apply_charm_cast_visibility() -> void:
+	if not is_instance_valid(charm_cast_animator) or not charm_cast_animator.is_playing():
+		return
+	sprite.hide()
+	for action_sprite: Sprite3D in _action_sprites.values():
+		action_sprite.hide()
+	if is_instance_valid(_idle_preview):
+		_idle_preview.hide()
+
+
+func _on_charm_cast_finished() -> void:
+	if is_instance_valid(_active_sprite):
+		_active_sprite.show()
 	if not _action.is_empty():
 		_update_directional_animation()
 
@@ -96,6 +141,7 @@ func has_attack_animation(action: StringName) -> bool:
 
 
 func play_animation(animation_name: StringName, restart: bool = false) -> bool:
+	stop_charm_cast()
 	# Phát theo tên cụ thể thì không tự đổi hướng nữa
 	_action = &""
 	_idle_after_up_run = false
@@ -115,6 +161,9 @@ func set_attack_spine_override(animation_name: String, skin_name: String = "") -
 func play_directional(
 	action: StringName, facing: Vector3, camera: Camera3D = null, restart: bool = false
 ) -> bool:
+	# A newly requested combat action wins; idle/run continue underneath a short cast.
+	if action not in [&"idle", &"run"] and (action != _action or restart):
+		stop_charm_cast()
 	_action = action
 	if action != &"run" and action != &"idle":
 		_idle_after_up_run = false
@@ -271,8 +320,13 @@ func _play(animation_name: StringName, restart: bool) -> bool:
 	_select_action_sprite(animation_name)
 	if is_instance_valid(_idle_preview):
 		_idle_preview.sync_animation(
-			animation_name, sprite, _active_sprite, _camera,
-			_last_facing_left, _screen_facing, restart
+			animation_name,
+			sprite,
+			_active_sprite,
+			_camera,
+			_last_facing_left,
+			_screen_facing,
+			restart
 		)
 
 	# Không phát lại cùng animation mỗi frame, kể cả khi nó đã chạy xong

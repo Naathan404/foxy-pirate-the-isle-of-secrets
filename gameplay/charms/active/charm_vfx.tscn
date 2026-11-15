@@ -1,0 +1,32 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/active/charm_vfx.gd" id="1_script"]
+[ext_resource type="Shader" path="res://gameplay/charms/active/charm_energy.gdshader" id="2_energy"]
+[ext_resource type="Shader" path="res://gameplay/weapons/dagger_slash_overlay.gdshader" id="3_flash"]
+
+[sub_resource type="QuadMesh" id="Quad_surface"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="Material_energy"]
+shader = ExtResource("2_energy")
+
+[sub_resource type="ShaderMaterial" id="Material_flash"]
+shader = ExtResource("3_flash")
+shader_parameter/shape = 1
+shader_parameter/energy = 1.4
+
+[node name="CharmVfx" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Surface" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.06, 0)
+rotation = Vector3(-1.5707964, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Quad_surface")
+material_override = SubResource("Material_energy")
+
+[node name="Flash" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.25, 0)
+cast_shadow = 0
+mesh = SubResource("Quad_surface")
+material_override = SubResource("Material_flash")
