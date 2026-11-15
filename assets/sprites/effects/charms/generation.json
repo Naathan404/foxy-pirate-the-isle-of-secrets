@@ -1,0 +1,71 @@
+{
+  "tool": "image_gen.imagegen",
+  "generated_on": "2026-11-15",
+  "style_references": [
+    "assets/sprites/foxy/charm_casts/tide_grapple.png",
+    "assets/sprites/foxy/charm_casts/buckshot_salvo.png"
+  ],
+  "processing": "Transparent PNGs resized with System.Drawing high-quality bicubic. No recoloring or painted edits.",
+  "assets": [
+    {
+      "file": "tide_hook.png",
+      "source": "exec-cac54127-0303-4686-81b1-93f770873334.png",
+      "source_size": [
+        1448,
+        1086
+      ],
+      "size": [
+        1024,
+        768
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "rows": [
+        "outbound",
+        "enemy/terrain contact latch",
+        "empty miss return"
+      ],
+      "facing": "right",
+      "prompt": "Use case: stylized-concept. Production 2D VFX sprite atlas for the pirate action RPG skill TIDE GRAPPLE. The supplied image is a STYLE AND PALETTE reference only; the output must contain NO FOX, no person, no hands. Generate the flying HOOK itself and its two distinct outcomes. Exactly TWELVE isolated frames in a strict FOUR-COLUMN by THREE-ROW grid on a 4:3 canvas; equal SQUARE cells; true transparent alpha background; no drawn grid, panels, labels, numbers or text. Each cell uses the same scale, centered pivot at 50%,50%, with generous 12% clear padding. Match the reference's clean hand-inked cel shading and turquoise/ivory/gold palette, not pixel art or realistic metal photography. TOP ROW (4 frames): a substantial three-barbed grappling hook FACING RIGHT, brass-gold shank, pale steel sharpened curved flukes, a clearly visible attachment eye on the LEFT, short crisp teal water ribbons behind it. Animate a fast outbound flight: small changes in fluttering water wake and metallic glints, keep the solid hook consistent and centered. MIDDLE ROW (4 frames, HIT animation): the same right-facing hook visibly CATCHES and CLAMPS, pronounced ivory/cyan contact star at the right-hand barbs in frame 1, wider gold sparks and a taut blue energy pulse frame 2, settling clamped claws with droplets frame 3, firm latched hook with small residual contact glow frame 4. No monster or environmental object is drawn; the contact effect alone will attach to the target in game. BOTTOM ROW (4 frames, MISS/EMPTY RETRACT animation): the same hook returns empty, slightly nose-down and loose, subdued gray-teal trailing wisps and falling droplets; progressively less wake through frame 4. Absolutely NO contact star, NO hit flash, NO golden impact burst in this row. Keep the eye and hook anatomy readable at small size. Do not draw any long chain, cable, beam, line or scenery; the game attaches a separate real chain texture. Every hook and wake must stay within its own cell, with clear space between all cells."
+    },
+    {
+      "file": "tide_chain.png",
+      "source": "exec-f6b3e714-7b77-4a12-a2da-4725e498f624.png",
+      "source_size": [
+        2172,
+        724
+      ],
+      "size": [
+        768,
+        256
+      ],
+      "tiling": "horizontal chain links, alpha holes",
+      "prompt": "Use case: stylized-concept. One production 2D game texture: a seamless HORIZONTAL strip of connected nautical chain links, for a real grappling-hook chain in the same hand-inked pirate RPG style as the reference. The supplied image is a metal, color and linework reference only. Output a SINGLE straight strip, not an atlas, no hook, no characters. Canvas 3:1 landscape, true transparent background above and below the chain. Three or four chunky INTERLOCKING oval links, alternating broad face-on pale steel loops and narrow turned brass-gold links, with dark ink outline, ivory highlight facets, muted steel-gray shadows and tiny turquoise reflections. Chain centered exactly vertically, occupying only the central 40 percent of the canvas height. The links continue cleanly through BOTH LEFT AND RIGHT EDGES at the same height, shape and shading so the image repeats horizontally without a seam; no tapered ends, no connector, no free chain tip. Keep the loop holes actually transparent so the floor can show through. A real visible metal-link silhouette, never a cyan beam or a glowing thin line. Flat cel shading, sharp readable forms suitable for small in-game display. No text, labels, border, solid-color backdrop or enormous aura."
+    },
+    {
+      "file": "buckshot_projectile.png",
+      "source": "exec-3c886204-9607-473b-88eb-89dcebe309ac.png",
+      "source_size": [
+        1448,
+        1086
+      ],
+      "size": [
+        1024,
+        768
+      ],
+      "grid": [
+        4,
+        3
+      ],
+      "rows": [
+        "flying metal pellet",
+        "contact sparks/debris",
+        "muzzle powder/smoke"
+      ],
+      "facing": "right",
+      "prompt": "Use case: stylized-concept. Production 2D VFX sprite atlas for BUCKSHOT SALVO, a radial pirate flintlock shotgun volley. The supplied image is STYLE, palette and lighting reference only. Output NO FOX, no person, no pistol or character: only separate PROJECTILE and IMPACT sprites. Exactly TWELVE distinct isolated frames in a strict FOUR-COLUMN by THREE-ROW grid, 4:3 canvas, equal SQUARE cells, genuinely transparent alpha background. Identical center pivot within every cell, generous 14% padding, no effects may cross cell edges. TOP ROW, four animation frames of ONE tangible fast buckshot pellet FACING RIGHT: a clearly visible round metallic bronze/lead BALL at the front, white-ivory highlight and warm orange rim, with a short broad tapered orange-gold flame wake trailing LEFT and two tiny ember fragments. The solid round bullet head must remain readable and substantial in every frame; NOT a thin laser beam, not a straight yellow line, not an arrow, not a missile. The four frames vary the flame flicker and trailing embers without changing the pellet scale. MIDDLE ROW, four HIT frames: compact hot ivory/gold contact flash at center, then jagged orange spark fan and tiny metal debris, then cooling golden ember fragments, then a few fading warm sparks. BOTTOM ROW, four MUZZLE frames: short punchy ivory-core orange/gold powder burst, round warm smoke curls expanding, dissipating gray-gold smoke and a couple of falling embers, then very faint final powder wisps. Use clean dark ink outlines on metal, cel-shaded amber/brass/ivory forms, matching the reference's hand-drawn game VFX. Bright but compact effects with transparent gaps. No text, no labels, no frame numbers, no frame border, no background, no giant explosion covering the whole grid."
+    }
+  ]
+}

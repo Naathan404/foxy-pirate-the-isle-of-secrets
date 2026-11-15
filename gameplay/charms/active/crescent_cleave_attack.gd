@@ -3,6 +3,7 @@ extends Node3D
 ## Một lần quét vùng bán nguyệt phía trước và chỉ gây sát thương một lần mỗi mục tiêu.
 
 signal target_hit(target: Node, applied_hp: float)
+signal completed
 
 @export var hit_area: Area3D
 
@@ -14,8 +15,8 @@ var active_seconds: float = 0.12
 var _active: bool = false
 var _remaining_seconds: float = 0.0
 var _hit_actor_ids: Dictionary[int, bool] = {}
-
-@onready var placeholder: MeshInstance3D = $Placeholder
+var _slash: MeleeSlashVFX
+var _impact_reported: bool = false
 
 
 func _ready() -> void:
@@ -36,13 +37,18 @@ func _physics_process(delta: float) -> void:
 	for area: Area3D in hit_area.get_overlapping_areas():
 		_try_hit(area)
 	_remaining_seconds = maxf(0.0, _remaining_seconds - maxf(0.0, delta))
+	if is_instance_valid(_slash):
+		_slash.set_progress(1.0 - _remaining_seconds / maxf(0.01, active_seconds))
 	if _remaining_seconds <= 0.0:
+		completed.emit()
 		_finish()
 
 
 func _exit_tree() -> void:
 	_active = false
 	_hit_actor_ids.clear()
+	if is_instance_valid(_slash):
+		_slash.finish()
 
 
 func validate() -> bool:
@@ -60,9 +66,19 @@ func activate() -> bool:
 	if sphere == null:
 		return false
 	sphere.radius = radius_units
-	if is_instance_valid(placeholder):
-		placeholder.scale = Vector3(radius_units, 1.0, radius_units)
 	_hit_actor_ids.clear()
+	_impact_reported = false
+	var step := MeleeComboStep.new()
+	step.swing_start_degrees = -half_angle_degrees
+	step.swing_end_degrees = half_angle_degrees
+	step.slash_color = CharmVfx.GOLD
+	step.slash_width = 0.85
+	step.heavy_impact = true
+	_slash = MeleeSlashVFX.new()
+	get_parent().add_child(_slash)
+	_slash.global_transform = global_transform
+	# The melee renderer adds 15% reach for weapon art; the Charm shows its actual AoE.
+	_slash.setup(step, radius_units / 1.15)
 	_remaining_seconds = maxf(0.01, active_seconds)
 	_active = true
 	set_physics_process(true)
@@ -106,9 +122,17 @@ func _try_hit(area: Area3D) -> void:
 	if applied_hp > 0:
 		context.damage_applied.emit(damage, hurtbox.actor, applied_hp)
 		target_hit.emit(hurtbox.actor, applied_hp)
+		var at := (hurtbox.actor as Node3D).global_position + Vector3.UP * 0.7
+		CharmVfx.spawn(get_parent(), at, CharmVfx.GOLD, 0.85)
+		if not _impact_reported:
+			_impact_reported = true
+			get_node("/root/HitstopController").request(0.065)
+			get_node("/root/ScreenShakeController").request(6.0, 0.18)
 
 
 func _finish() -> void:
 	_active = false
+	if is_instance_valid(_slash):
+		_slash.finish()
 	set_physics_process(false)
 	queue_free()

@@ -101,5 +101,27 @@ func get_cooldown_policy() -> StringName:
 	return &"on_activate"
 
 
+func _play_cast_animation(
+	phase: StringName,
+	direction: Vector3 = Vector3.ZERO,
+	duration_seconds: float = 0.0,
+	continue_only: bool = false
+) -> void:
+	if is_instance_valid(actor) and actor.has_method("play_charm_cast"):
+		actor.call(
+			"play_charm_cast",
+			definition.charm_id,
+			phase,
+			direction,
+			duration_seconds,
+			continue_only
+		)
+
+
+func _stop_cast_animation() -> void:
+	if is_instance_valid(actor) and actor.has_method("cancel_charm_cast"):
+		actor.call("cancel_charm_cast", definition.charm_id)
+
+
 func can_bypass_cooldown(_context: CharmActivationContext) -> bool:
 	return false

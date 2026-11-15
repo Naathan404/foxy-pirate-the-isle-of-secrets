@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://gameplay/charms/active/charm_active_attack.tscn" id="1_base"]
+[ext_resource type="Script" path="res://gameplay/charms/active/buckshot_projectile_attack.gd" id="2_script"]
+
+[node name="BuckshotProjectileAttack" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+local_hitstop = true
+hitstop_seconds = 0.025
+shake_pixels = 2.5

@@ -31,6 +31,7 @@
 [ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="20_a64i1"]
 [ext_resource type="Script" uid="uid://c4fmspxxv4ifk" path="res://gameplay/charms/socket/charm_loadout.gd" id="20_ehmwb"]
 [ext_resource type="PackedScene" uid="uid://xdoo8a6qp5po" path="res://gameplay/player/hud/player_hud.tscn" id="20_pt1je"]
+[ext_resource type="PackedScene" path="res://gameplay/player/effects/charm_cast_animator.tscn" id="charm_cast_animator"]
 [ext_resource type="Resource" uid="uid://dnigjwvge146m" path="res://data/items/consumables/stamina_potion.tres" id="21_86838"]
 [ext_resource type="Script" uid="uid://dd2p3i33afvs5" path="res://core/components/chaos_component.gd" id="21_chaos"]
 [ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="21_upw5f"]
@@ -949,16 +950,20 @@ script = ExtResource("low_health_vignette")
 health = NodePath("../../HealthComponent")
 player = NodePath("../..")
 
-[node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player")]
+[node name="Visual" type="Node3D" parent="." unique_id=1468628045 node_paths=PackedStringArray("sprite", "animation_player", "charm_cast_animator")]
 script = ExtResource("3_nu5xt")
 sprite = NodePath("Sprite3D")
 animation_player = NodePath("AnimationPlayer")
+charm_cast_animator = NodePath("CharmCastAnimator")
 run_animation_speed = 2.0
 action_sprite_paths = Dictionary[StringName, NodePath]({
 &"attack_bow": NodePath("BowSprite"),
 &"harpoon/pierce": NodePath("HarpoonSprite"),
 &"harpoon/thrust": NodePath("HarpoonSprite")
 })
+
+[node name="CharmCastAnimator" parent="Visual" node_paths=PackedStringArray("actor") instance=ExtResource("charm_cast_animator")]
+actor = NodePath("../..")
 
 [node name="SpineIdlePreview" type="Node3D" parent="Visual" unique_id=1978530799]
 transform = Transform3D(1.2, 0, 0, 0, 1.692, 0, 0, 0, 1.2, 0, 0.1570276, 0)
