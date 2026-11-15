@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d28ts6bee173j"]
 
-[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_gp4fs"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/base_scenes/hub_room.tscn" id="1_gp4fs"]
 [ext_resource type="Texture2D" uid="uid://bmofy7enyhpwk" path="res://assets/sprites/biomes/hub/hub_down.png" id="2_lka8h"]
 [ext_resource type="Texture2D" uid="uid://bqdnep0w70hhi" path="res://assets/sprites/biomes/hub/hub_up.png" id="3_7h3w2"]
 [ext_resource type="Texture2D" uid="uid://olsucfx3fn5" path="res://assets/sprites/biomes/hub/hub_right.png" id="4_40eiq"]

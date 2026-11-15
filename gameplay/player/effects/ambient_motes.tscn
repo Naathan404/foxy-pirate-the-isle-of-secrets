@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/Dust Particle.png" id="1_texture"]
+
+[sub_resource type="Gradient" id="mote_gradient"]
+offsets = PackedFloat32Array(0, 0.18, 0.75, 1)
+colors = PackedColorArray(1, 0.88, 0.63, 0, 1, 0.88, 0.63, 0.35, 1, 0.9, 0.7, 0.26, 1, 0.9, 0.7, 0)
+
+[sub_resource type="GradientTexture1D" id="mote_ramp"]
+gradient = SubResource("mote_gradient")
+
+[sub_resource type="ParticleProcessMaterial" id="mote_process"]
+emission_shape = 3
+emission_box_extents = Vector3(8, 2, 8)
+direction = Vector3(0.5, 1, 0.15)
+spread = 45.0
+initial_velocity_min = 0.08
+initial_velocity_max = 0.3
+gravity = Vector3(0, 0.04, 0)
+scale_min = 0.35
+scale_max = 0.85
+color_ramp = SubResource("mote_ramp")
+
+[sub_resource type="StandardMaterial3D" id="mote_material"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_texture")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="mote_mesh"]
+material = SubResource("mote_material")
+size = Vector2(0.12, 0.12)
+
+[node name="AmbientMotes" type="GPUParticles3D"]
+position = Vector3(0, 2, 0)
+cast_shadow = 0
+amount = 24
+lifetime = 5.0
+preprocess = 3.0
+fixed_fps = 30
+local_coords = false
+visibility_aabb = AABB(-12, -4, -12, 24, 10, 24)
+process_material = SubResource("mote_process")
+draw_pass_1 = SubResource("mote_mesh")

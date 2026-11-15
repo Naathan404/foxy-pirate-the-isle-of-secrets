@@ -64,6 +64,8 @@
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
 [ext_resource type="Script" uid="uid://dgl3y0vqmhfra" path="res://gameplay/player/effects/low_health_vignette.gd" id="low_health_vignette"]
+[ext_resource type="Script" path="res://gameplay/player/effects/environment_atmosphere.gd" id="environment_atmosphere"]
+[ext_resource type="PackedScene" path="res://gameplay/player/effects/ambient_motes.tscn" id="ambient_motes"]
 [ext_resource type="PackedScene" uid="uid://vbvptqbcgi1u" path="res://gameplay/inventory/item_pickup_popup.tscn" id="pickup_popup"]
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
@@ -944,6 +946,12 @@ player = NodePath("../..")
 sprite = NodePath("../../Visual/Sprite3D")
 visual = NodePath("../../Visual")
 health = NodePath("../../HealthComponent")
+
+[node name="AmbientMotes" parent="Effects" instance=ExtResource("ambient_motes")]
+
+[node name="EnvironmentAtmosphere" type="Node" parent="Effects" node_paths=PackedStringArray("player")]
+script = ExtResource("environment_atmosphere")
+player = NodePath("../..")
 
 [node name="LowHealthVignette" type="Node" parent="Effects" unique_id=1834395635 node_paths=PackedStringArray("health", "player")]
 script = ExtResource("low_health_vignette")
