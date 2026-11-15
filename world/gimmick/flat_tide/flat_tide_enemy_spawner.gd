@@ -4,6 +4,11 @@ extends Node3D
 
 signal enemy_spawned(enemy: EnemyBase, is_elite: bool)
 
+@export_group("Spawn Effect")
+## Set to empty to disable the visual; the enemy still spawns normally.
+@export var spawn_effect_scene: PackedScene = preload("res://world/gimmick/flat_tide/flat_tide_spawn_effect.tscn")
+@export_group("")
+
 ## Controller cung cấp các vùng nước và chu kỳ triều.
 @export var controller: FlatTideController
 ## Danh sách loại enemy; mỗi phần tử gồm scene thường và scene elite tương ứng.
@@ -168,4 +173,20 @@ func _spawn(point: Vector3, scene: PackedScene, is_elite: bool) -> void:
 	enemy.position = to_local(spawn_position)
 	enemy.destroy_on_death = true
 	add_child(enemy)
+	_spawn_effect(point, is_elite)
 	enemy_spawned.emit(enemy, is_elite)
+
+
+func _spawn_effect(point: Vector3, is_elite: bool) -> void:
+	if spawn_effect_scene == null:
+		return
+	var instance := spawn_effect_scene.instantiate()
+	var effect := instance as Node3D
+	if effect == null:
+		instance.free()
+		push_warning("FlatTideEnemySpawner: spawn effect root must be Node3D.")
+		return
+	add_child(effect)
+	effect.global_position = point
+	if effect.has_method("play"):
+		effect.call("play", is_elite)

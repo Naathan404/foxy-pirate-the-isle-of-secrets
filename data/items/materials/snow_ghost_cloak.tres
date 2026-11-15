@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="BaseItem" format=3]
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://btgw3svx2w1ro"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/items/Snow_Ghost_Cloak.png" id="1_icon"]
-[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://byp3bqhfxfjyg" path="res://assets/sprites/items/materials/Snow_Ghost_Cloak.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="2_script"]
 
 [resource]
 script = ExtResource("2_script")

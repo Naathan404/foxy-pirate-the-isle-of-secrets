@@ -132,6 +132,7 @@ func _process(delta: float) -> void:
 	sprite.pixel_size = character_pixel_size
 	sprite.offset = Vector2(0.0, 135.0)
 	sprite.frame = row * 6 + column
+	super._process(delta)
 
 
 func _update_sleep_indicators() -> void:

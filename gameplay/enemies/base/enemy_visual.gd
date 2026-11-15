@@ -8,10 +8,13 @@ extends Node3D
 signal animation_finished(animation_name: StringName)
 signal death_feedback_finished
 
+const HIT_FLASH_SHADER: Shader = preload("res://world/objects/destructible_hit_flash.gdshader")
+
 @export var sprite: Sprite3D
 @export var animation_player: AnimationPlayer
 @export_group("Hit Feedback")
-@export var hit_flash_color: Color = Color(2.0, 1.4, 1.2, 1.0)
+@export var hit_flash_color: Color = Color(1.0, 0.97, 0.9, 1.0)
+@export_range(0.0, 1.0, 0.01) var hit_flash_hold_duration: float = 0.05
 @export_range(0.01, 1.0, 0.01) var hit_flash_duration: float = 0.16
 @export_range(1.0, 2.0, 0.01) var hit_pulse_scale: float = 1.18
 @export_range(0.1, 1.0, 0.01) var hit_squash_scale: float = 0.78
@@ -25,6 +28,8 @@ var _facing: Vector3 = Vector3.BACK
 var _sprite_modulate: Color = Color.WHITE
 var _sprite_scale: Vector3 = Vector3.ONE
 var _sprite_shaded: bool = true
+var _flash_material: ShaderMaterial
+var _previous_overlay: Material
 var _hit_flash_tween: Tween
 var _hit_pose_tween: Tween
 var _death_feedback_tween: Tween
@@ -40,6 +45,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if _flash_material != null and is_instance_valid(sprite) and sprite.material_overlay == _flash_material:
+		_flash_material.set_shader_parameter("sprite_texture", sprite.texture)
 	if not _directional_action.is_empty():
 		_play_directional()
 
@@ -74,12 +81,23 @@ func play_hit_feedback() -> void:
 		_hit_flash_tween.kill()
 	if _hit_pose_tween != null:
 		_hit_pose_tween.kill()
-	sprite.shaded = false
-	sprite.modulate = Color(hit_flash_color, _sprite_modulate.a)
+	if _flash_material == null:
+		_flash_material = ShaderMaterial.new()
+		_flash_material.shader = HIT_FLASH_SHADER
+		_flash_material.render_priority = 2
+	if sprite.material_overlay != _flash_material:
+		_previous_overlay = sprite.material_overlay
+	sprite.material_overlay = _flash_material
+	_flash_material.set_shader_parameter("sprite_texture", sprite.texture)
+	_flash_material.set_shader_parameter("flash_color", hit_flash_color)
+	_flash_material.set_shader_parameter("strength", 1.0)
 	sprite.scale = _sprite_scale * Vector3(hit_pulse_scale, hit_squash_scale, 1.0)
 	_hit_flash_tween = create_tween().set_ignore_time_scale(true)
-	_hit_flash_tween.tween_property(sprite, "modulate", _sprite_modulate, hit_flash_duration)
-	_hit_flash_tween.tween_callback(_restore_sprite_shading)
+	_hit_flash_tween.tween_interval(hit_flash_hold_duration)
+	_hit_flash_tween.tween_property(
+		_flash_material, "shader_parameter/strength", 0.0, hit_flash_duration
+	)
+	_hit_flash_tween.tween_callback(_restore_hit_flash)
 	_hit_pose_tween = create_tween().set_ignore_time_scale(true)
 	_hit_pose_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_hit_pose_tween.tween_property(
@@ -96,6 +114,7 @@ func play_death_feedback() -> bool:
 		_hit_flash_tween.kill()
 	if _hit_pose_tween != null:
 		_hit_pose_tween.kill()
+	_restore_hit_flash()
 	if _death_feedback_tween != null:
 		_death_feedback_tween.kill()
 	sprite.modulate = _sprite_modulate
@@ -178,3 +197,13 @@ func _on_death_feedback_finished() -> void:
 func _restore_sprite_shading() -> void:
 	if is_instance_valid(sprite):
 		sprite.shaded = _sprite_shaded
+
+
+func _restore_hit_flash() -> void:
+	if is_instance_valid(sprite) and sprite.material_overlay == _flash_material:
+		sprite.material_overlay = _previous_overlay
+	_previous_overlay = null
+
+
+func _exit_tree() -> void:
+	_restore_hit_flash()

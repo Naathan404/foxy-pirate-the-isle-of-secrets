@@ -70,7 +70,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0626488, 0)
 script = ExtResource("7_qcdtk")
 
 [node name="CornerA" type="Marker3D" parent="CameraBounds" unique_id=477795238]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.03756, -6.9159203, 22.157547)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.47347, -6.9159203, 17.93475)
 
 [node name="CornerB" type="Marker3D" parent="CameraBounds" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.330757, 0, -31.914928)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.46524, 0, -27.193975)
