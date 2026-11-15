@@ -8,9 +8,15 @@ const ATTACK_RECOVERY_POSE: float = 0.75
 const BOW_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/bow.png")
 const HARPOON_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/harpoon.png")
 const METEOR_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/meteor_staff.png")
-const BOW_SKILL_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/bow_stormstring.png")
-const HARPOON_SKILL_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/harpoon_lightning_pierce.png")
-const METEOR_SKILL_SHEET: Texture2D = preload("res://assets/sprites/foxy/weapon_casts/meteor_staff_skill.png")
+const BOW_SKILL_SHEET: Texture2D = preload(
+	"res://assets/sprites/foxy/weapon_casts/bow_stormstring.png"
+)
+const HARPOON_SKILL_SHEET: Texture2D = preload(
+	"res://assets/sprites/foxy/weapon_casts/harpoon_lightning_pierce.png"
+)
+const METEOR_SKILL_SHEET: Texture2D = preload(
+	"res://assets/sprites/foxy/weapon_casts/meteor_staff_skill.png"
+)
 const WEAPON_BODY_HEIGHT_FRACTION: float = 0.52
 const WEAPON_FOOT_ANCHOR: Vector2 = Vector2(0.5, 230.0 / 256.0)
 
