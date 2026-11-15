@@ -1,16 +1,20 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene format=3 uid="uid://cc1ru3vys4du"]
 
-[ext_resource type="PackedScene" path="res://gameplay/enemies/base/enemy_base.tscn" id="1"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1"]
+[ext_resource type="Script" uid="uid://btb63kjlkcsyj" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.gd" id="2"]
 [ext_resource type="Resource" path="res://data/enemies/coral_skeleton_data.tres" id="3"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemies/coral_skeleton/sleep_6.png" id="4"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/coral_skeleton_visual.gd" id="5"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_guard.gd" id="6"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_chase.gd" id="7"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_return.gd" id="8"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_shoot.gd" id="9"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_sleep.gd" id="10"]
-[ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/coral_wake.gd" id="11"]
+[ext_resource type="Texture2D" uid="uid://dgg8euwsnpull" path="res://assets/sprites/enemies/coral_skeleton/sleep_6.png" id="4"]
+[ext_resource type="Script" uid="uid://cxt72vdxj3m1j" path="res://gameplay/enemies/coral_skeleton/coral_skeleton_visual.gd" id="5"]
+[ext_resource type="Script" uid="uid://c2srgxjod8ycq" path="res://gameplay/enemies/coral_skeleton/states/coral_guard.gd" id="6"]
+[ext_resource type="Script" uid="uid://dgh3vhemkwm2e" path="res://gameplay/enemies/coral_skeleton/states/coral_chase.gd" id="7"]
+[ext_resource type="Script" uid="uid://dx8c5pm6mettb" path="res://gameplay/enemies/coral_skeleton/states/coral_return.gd" id="8"]
+[ext_resource type="Script" uid="uid://x6xeny51rgu8" path="res://gameplay/enemies/coral_skeleton/states/coral_shoot.gd" id="9"]
+[ext_resource type="Script" uid="uid://dqehucjpwp20p" path="res://gameplay/enemies/coral_skeleton/states/coral_sleep.gd" id="10"]
+[ext_resource type="Script" uid="uid://0rt1ob4uwdkc" path="res://gameplay/enemies/coral_skeleton/states/coral_wake.gd" id="11"]
+
+[sub_resource type="CapsuleShape3D" id="Hurtbox"]
+radius = 0.65
+height = 2.5
 
 [sub_resource type="CylinderShape3D" id="Detector"]
 height = 3.0
@@ -20,76 +24,101 @@ radius = 3.5
 radius = 0.55
 height = 2.3
 
-[sub_resource type="CapsuleShape3D" id="Hurtbox"]
-radius = 0.65
-height = 2.5
-
-[node name="CoralSkeleton" instance=ExtResource("1")]
+[node name="CoralSkeleton" unique_id=1180889992 instance=ExtResource("1")]
 script = ExtResource("2")
+sleep_detection_radius = 3.5
+detection_radius = 8.0
+sleep_delay = 4.0
+wake_duration = 0.35
+wake_attack_delay = 1.0
+shooting_range = 4.5
+home_tolerance = 0.6
+return_segment_time = 0.8
+return_pause_time = 0.35
+return_min_turn_angle = 20.0
+return_max_turn_angle = 49.0
+shot_mode = 1
+bullets_per_burst = 3
+fan_angle = 30.0
+shot_interval = 0.2
+fire_delay = 0.4
+burst_cooldown = 2.0
+shoot_recovery_time = 0.24
+bullet_speed = 10.0
+bullet_lifetime = 1.5
 data = ExtResource("3")
 initial_state_name = &"Sleep"
 destroy_on_death = true
 
-[node name="Visual" parent="." index="0" node_paths=PackedStringArray("sprite", "animation_player")]
+[node name="Visual" parent="." index="0" unique_id=1278788323]
 script = ExtResource("5")
-sprite = NodePath("Sprite3D")
-animation_player = NodePath("AnimationPlayer")
+character_pixel_size = 0.012
+idle_fps = 5.0
+walk_fps = 12.0
+sleep_fps = 3.0
+show_sleep_indicator = true
+sleep_indicator_count = 3
+sleep_indicator_lifetime = 2.4
+sleep_indicator_rise = 1.0
+sleep_indicator_drift = 0.4
+sleep_indicator_start_scale = 0.65
+sleep_indicator_end_scale = 1.45
 
-[node name="Sprite3D" parent="Visual" index="0"]
-pixel_size = 0.012
+[node name="Sprite3D" parent="Visual" index="0" unique_id=718327590]
 offset = Vector2(0, 135)
+pixel_size = 0.012
 texture_filter = 1
 texture = ExtResource("4")
 hframes = 6
 vframes = 3
 
-[node name="SleepIndicator" type="Label3D" parent="Visual" index="2"]
-position = Vector3(0.35, 3.05, 0)
-billboard = 1
-pixel_size = 0.008
-modulate = Color(0.65, 0.95, 0.91, 1)
-outline_size = 5
-font_size = 56
-text = "z"
+[node name="SleepIndicator" type="Label3D" parent="Visual" index="2" unique_id=1592165343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 3.05, 0)
 visible = false
+pixel_size = 0.008
+billboard = 1
+modulate = Color(0.65, 0.95, 0.91, 1)
+text = "z"
+font_size = 56
+outline_size = 5
 
-[node name="FrontRayCast3D" parent="Direction" index="0"]
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
 enabled = true
 
-[node name="GroundRayCast3D" parent="Direction" index="1"]
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
 enabled = true
 
-[node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
-position = Vector3(0, 1.25, 0)
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 shape = SubResource("Hurtbox")
 
-[node name="BulletSpawn" type="Marker3D" parent="Direction" index="3"]
-position = Vector3(0, 1.45, 0.75)
+[node name="BulletSpawn" type="Marker3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=1695438606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0020216, 1.1579323)
 
-[node name="Guard" type="Node" parent="States" index="3"]
+[node name="Guard" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=552462168]
 script = ExtResource("6")
 
-[node name="Chase" type="Node" parent="States" index="4"]
+[node name="Chase" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1952034051]
 script = ExtResource("7")
 
-[node name="Return" type="Node" parent="States" index="5"]
+[node name="Return" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="5" unique_id=678393517]
 script = ExtResource("8")
 
-[node name="Shoot" type="Node" parent="States" index="6"]
+[node name="Shoot" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="6" unique_id=512998563]
 script = ExtResource("9")
 
-[node name="Sleep" type="Node" parent="States" index="7"]
+[node name="Sleep" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="7" unique_id=1389455567]
 script = ExtResource("10")
 
-[node name="Wake" type="Node" parent="States" index="8"]
+[node name="Wake" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="8" unique_id=1946598366]
 script = ExtResource("11")
 
-[node name="TargetDetector" type="Area3D" parent="." index="4"]
+[node name="TargetDetector" type="Area3D" parent="." index="4" unique_id=1293323255]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector"]
-position = Vector3(0, 1, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector" index="0" unique_id=502862166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("Detector")
 
-[node name="CollisionShape3D" parent="." index="5"]
-position = Vector3(0, 1.15, 0)
+[node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
 shape = SubResource("Body")
