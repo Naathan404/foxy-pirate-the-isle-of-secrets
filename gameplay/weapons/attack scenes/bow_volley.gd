@@ -53,6 +53,7 @@ func activate() -> void:
 	var strength := context.charge_progress
 	var count := context.projectile_count
 	var storm_burst_state: Dictionary = {}
+	var released_arrows: Array[Node3D] = []
 	for index in count:
 		var arrow := ARROW.instantiate() as WeaponAttack
 		var snapshot := AttackContext.new()
@@ -114,13 +115,16 @@ func activate() -> void:
 		arrow.set("energy_strength", strength if count > 1 else 0.0)
 		get_parent().add_child(arrow)
 		arrow.activate()
+		released_arrows.append(arrow)
 	if is_instance_valid(_vfx):
 		if count > 1:
 			_vfx.call("burst", strength)
 		else:
 			_vfx.queue_free()
 	if count > 1:
-		get_node("/root/CombatMomentController").request(&"bow_skill")
+		get_node("/root/CombatMomentController").request(
+			&"bow_skill", null, released_arrows, context.actor, context.direction
+		)
 		var burst := RELEASE_BURST.instantiate() as Node3D
 		get_parent().add_child(burst)
 		burst.global_position = (

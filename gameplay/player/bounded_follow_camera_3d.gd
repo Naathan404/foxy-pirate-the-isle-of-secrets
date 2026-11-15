@@ -9,6 +9,8 @@ extends Camera3D
 @export_range(0.1, 30.0, 0.1) var bob_blend_speed: float = 9.0
 @export_range(0.0, 5.0, 0.1) var bob_minimum_speed: float = 0.5
 
+## Temporary world-space framing offset; still clamped by camera bounds.
+var combat_focus_offset: Vector3 = Vector3.ZERO
 var _follow_offset: Vector3
 var _bounds: CameraBounds3D
 var _player: Player
@@ -30,6 +32,7 @@ func _process(delta: float) -> void:
 		# A boundary clamp changes a child camera's local position. Rebuild the
 		# desired follow offset each frame so it follows when Foxy moves back.
 		position = _follow_offset + _get_movement_bob(delta)
+		global_position += combat_focus_offset
 	set_bounded_global_position(global_position)
 
 

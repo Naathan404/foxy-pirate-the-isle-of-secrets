@@ -18,13 +18,13 @@ config/icon="res://icon.svg"
 [autoload]
 
 HitstopController="*res://core/autoload/hitstop_controller.gd"
-CombatMomentController="*res://core/autoload/combat_moment_controller.gd"
 ScreenShakeController="*res://core/autoload/screen_shake_controller.gd"
 GameManager="*res://core/autoload/game_manager.gd"
 Dialogic="*uid://ds2q0uclmolvu"
 AudioManager="*res://core/autoload/audio_manager.gd"
 SilasProgress="*res://gameplay/merchant/silas_progress_store.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+CombatMomentController="*res://core/autoload/combat_moment_controller.gd"
 
 [dialogic]
 
