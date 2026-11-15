@@ -10,3 +10,4 @@ display_name = "Note"
 icon = ExtResource("1_i1a8h")
 description = "A note containing a message."
 type = 3
+opens_note = true

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cd8adeiyriaix"
-path="res://.godot/imported/material_icon.png-7d3afbdb94c6409f805e595639247f16.ctex"
+uid="uid://b7x62ae1cepw5"
+path="res://.godot/imported/Key_Tide.png-af590bbe7fcb627414d29176e7b1fd2b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/inventory/material_icon.png"
-dest_files=["res://.godot/imported/material_icon.png-7d3afbdb94c6409f805e595639247f16.ctex"]
+source_file="res://assets/sprites/items/Key_Tide.png"
+dest_files=["res://.godot/imported/Key_Tide.png-af590bbe7fcb627414d29176e7b1fd2b.ctex"]
 
 [params]
 

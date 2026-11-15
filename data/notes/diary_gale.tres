@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MonsterNote" format=3]
+
+[ext_resource type="Script" path="res://data/notes/monster_note.gd" id="script"]
+[ext_resource type="Resource" path="res://data/items/quest/diary_gale.tres" id="diary"]
+
+[resource]
+script = ExtResource("script")
+note_id = &"diary_gale"
+display_name = "Diary of Gale"
+layout = 1
+pickup_item = ExtResource("diary")

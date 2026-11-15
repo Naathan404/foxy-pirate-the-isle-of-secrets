@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccgws552lcxup"
-path="res://.godot/imported/white_button.png-eb23f57f4e22b98380471c4648c1839f.ctex"
+uid="uid://cekuresxaq6wu"
+path="res://.godot/imported/Boss_Diary.png-13be1787aea3ce15ba94f264b0e34dfd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/inventory/white_button.png"
-dest_files=["res://.godot/imported/white_button.png-eb23f57f4e22b98380471c4648c1839f.ctex"]
+source_file="res://assets/sprites/items/Boss_Diary.png"
+dest_files=["res://.godot/imported/Boss_Diary.png-13be1787aea3ce15ba94f264b0e34dfd.ctex"]
 
 [params]
 

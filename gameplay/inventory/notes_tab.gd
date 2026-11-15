@@ -158,6 +158,7 @@ func _render_detail(note: MonsterNote) -> void:
 		_add_portrait(_detail, note.portrait, Vector2(0, 160))
 		_add_stats(_detail, note, HORIZONTAL_ALIGNMENT_CENTER)
 		_section("THE ENCOUNTER", note.description)
+		_section("THE STORY", note.story)
 		_section("BATTLE NOTES", note.behavior)
 		_section("PIRATE'S STRATEGY", note.strategy)
 	else:

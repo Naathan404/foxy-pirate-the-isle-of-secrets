@@ -29,6 +29,11 @@ const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive
 @export var destroy_on_death: bool = false
 @export var charm_grapple_large: bool = false
 
+@export_group("Note Drop")
+## Assign a bestiary entry to drop its note (or diary for a boss entry).
+@export var note_drop: MonsterNote
+@export_range(0.0, 1.0, 0.01) var note_drop_chance: float = 1.0
+
 @export_group("Damage Popup")
 ## Minimum world-space height above the enemy origin.
 @export_range(0.0, 20.0, 0.1, "suffix:m") var damage_popup_min_height: float = 1.4
@@ -429,6 +434,7 @@ func die() -> void:
 	_loot_drop_index = 0
 	_drop_loot.call_deferred()
 	_drop_gold.call_deferred()
+	_drop_note.call_deferred()
 	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
 		_charm_grapple_tween.kill()
 	_charm_grapple_tween = null
@@ -682,6 +688,23 @@ func _drop_loot() -> void:
 	# gán trước add_child để _ready của pickup lấy đúng icon
 	pickup.item = data.drop_item
 	pickup.quantity = data.drop_quantity
+	loot_parent.add_child(pickup)
+	pickup.global_position = global_position
+	pickup.play_drop_animation(_next_loot_direction())
+
+
+func _drop_note() -> void:
+	if note_drop == null or note_drop.note_id.is_empty() or note_drop_chance <= 0.0:
+		return
+	if note_drop_chance < 1.0 and randf() >= note_drop_chance:
+		return
+	if not is_inside_tree():
+		return
+	var loot_parent := get_parent()
+	if loot_parent == null or loot_parent.is_queued_for_deletion():
+		return
+	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
+	pickup.note = note_drop
 	loot_parent.add_child(pickup)
 	pickup.global_position = global_position
 	pickup.play_drop_animation(_next_loot_direction())

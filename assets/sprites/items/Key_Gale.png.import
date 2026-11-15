@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0238nj7dotvg"
-path="res://.godot/imported/disable_blue_button.png-42222b6a91b8c01dc13e17a42f144479.ctex"
+uid="uid://btphx32l34ht5"
+path="res://.godot/imported/Key_Gale.png-104fd94a7e031733ffa5aaffe3a22879.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/player_hud/inventory/disable_blue_button.png"
-dest_files=["res://.godot/imported/disable_blue_button.png-42222b6a91b8c01dc13e17a42f144479.ctex"]
+source_file="res://assets/sprites/items/Key_Gale.png"
+dest_files=["res://.godot/imported/Key_Gale.png-104fd94a7e031733ffa5aaffe3a22879.ctex"]
 
 [params]
 
