@@ -3245,6 +3245,3 @@ potion = NodePath("PotionComponent")
 potion_selector = NodePath("PotionQuickSelect/Wheel")
 inventory_ui = NodePath("InventoryUI")
 camera = NodePath("Camera3D")
-
-[connection signal="dash_finished" from="Foxy" to="Foxy/Effects/DashEffect" method="_on_foxy_dash_finished"]
-[connection signal="dash_started" from="Foxy" to="Foxy/Effects/DashEffect" method="_on_foxy_dash_started"]
