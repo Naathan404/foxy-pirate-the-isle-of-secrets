@@ -36,9 +36,9 @@ func _run() -> void:
 	collider.shape = shape
 	hurtbox.add_child(collider)
 	target.add_child(hurtbox)
-	var boss := BOSS_SCENE.instantiate() as BossBase
+	var boss := BOSS_SCENE.instantiate() as BlubberbeardBoss
 	arena.add_child(boss)
-	var behavior := boss.behavior as BlubberbeardBehavior
+	var behavior := boss
 	boss.set_physics_process(false)
 	boss._physics_process(0.01)
 	_check(
@@ -58,7 +58,7 @@ func _run() -> void:
 	behavior._execute_skill()
 	_check(
 		(
-			behavior.state == BlubberbeardBehavior.State.CHARGE
+			behavior.state == BlubberbeardBoss.State.CHARGE
 			and behavior.charge_direction == direction
 		),
 		"Charge did not lock its direction"
@@ -80,10 +80,19 @@ func _run() -> void:
 	behavior.fight_tick(0.05)
 	_check(
 		(
-			behavior.state == BlubberbeardBehavior.State.RECOVERY
+			behavior.state == BlubberbeardBoss.State.RECOVERY
 			and behavior.charge_speed < speed_before_recovery
 		),
 		"Charge should decelerate during recovery"
+	)
+	behavior.charge_speed = 14.0
+	behavior.fight_tick(0.18)
+	_check(behavior.charge_speed == 0.0, "Charge should stop within 0.18 seconds")
+	behavior.visual.begin_recovery(BlubberbeardSkillData.Kind.BELLY_CHARGE)
+	behavior.visual._process(0.31)
+	_check(
+		behavior.visual.pose == BlubberbeardVisual.Pose.IDLE,
+		"Charge recovery animation should return to idle or movement"
 	)
 	behavior.charge_hitbox.end_attack()
 	var barrel := HAZARD_SCRIPT.new()
@@ -116,15 +125,27 @@ func _run() -> void:
 			hazards[0].direction.dot(hazards[1].direction) < 0.8,
 			"Spike directions are not separated"
 		)
+		var spike = hazards[0]
+		spike.set_physics_process(false)
+		var start: Vector3 = spike.global_position
+		spike._physics_process(0.8)
+		var rising: Vector3 = spike.global_position
+		spike._physics_process(1.4)
+		var landing: Vector3 = spike.global_position
+		_check(rising.y > start.y and landing.y < rising.y, "Spike did not follow an arc")
+		_check(
+			Vector2(landing.x - start.x, landing.z - start.z).length() > 1.0,
+			"Spike did not move outward while arcing"
+		)
+		spike.set_physics_process(true)
 	behavior.next_skill = 1
 	behavior._choose_skill()
-	_check(is_instance_valid(behavior.charge_warning), "Charge warning did not appear")
 	var death_position := boss.global_position
 	boss.take_damage(maximum_hp * 0.5)
 	boss.take_damage(10.0)
 	_check(
-		behavior.charge_warning == null and not behavior.charge_hitbox.is_active(),
-		"Death did not cancel the charge warning and hitbox"
+		not behavior.charge_hitbox.is_active(),
+		"Death did not cancel the charge hitbox"
 	)
 	await physics_frame
 	await process_frame

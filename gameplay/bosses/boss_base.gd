@@ -43,6 +43,7 @@ func _ready() -> void:
 	hp.died.connect(_on_death)
 	if is_instance_valid(behavior):
 		behavior.setup(self)
+	_on_boss_setup()
 	hp.init(boss_data.max_hp)
 
 
@@ -59,12 +60,18 @@ func _physics_process(delta: float) -> void:
 			start_fight(player)
 	elif not is_instance_valid(target):
 		target = get_tree().get_first_node_in_group("player") as Node3D
-	if fighting and is_instance_valid(target) and is_instance_valid(behavior):
-		behavior.fight_tick(delta)
+	if fighting and is_instance_valid(target):
+		_on_fight_tick(delta)
+		if is_instance_valid(behavior):
+			behavior.fight_tick(delta)
 
 
 func receive_damage(damage: DamageContext) -> float:
 	if dead or damage == null or damage.source == self or damage.source_team == CombatTeams.ENEMY:
+		return 0.0
+	if not _on_can_receive_damage(damage):
+		return 0.0
+	if is_instance_valid(behavior) and not behavior.can_receive_damage(damage):
 		return 0.0
 	if (
 		damage.amount_hp > 0.0
@@ -85,6 +92,7 @@ func start_fight(player: Node3D) -> void:
 		return
 	target = player
 	fighting = true
+	_on_fight_started()
 	if is_instance_valid(behavior):
 		behavior.fight_started()
 	fight_started.emit()
@@ -125,6 +133,7 @@ func _on_hp_changed(current: float, maximum: float) -> void:
 			next = index
 	if next != phase_index:
 		phase_index = next
+		_on_phase_entered(phase_index)
 		if is_instance_valid(behavior):
 			behavior.phase_entered(phase_index)
 		phase_changed.emit(phase_index)
@@ -140,10 +149,35 @@ func _on_death() -> void:
 	hurtbox.set_deferred("monitorable", false)
 	set_deferred("collision_layer", 0)
 	set_deferred("collision_mask", 0)
+	_on_fight_ended()
 	if is_instance_valid(behavior):
 		behavior.fight_ended()
 	fight_finished.emit()
 	_spawn_reward.call_deferred()
+
+
+func _on_boss_setup() -> void:
+	pass
+
+
+func _on_fight_started() -> void:
+	pass
+
+
+func _on_can_receive_damage(_damage: DamageContext) -> bool:
+	return true
+
+
+func _on_fight_tick(_delta: float) -> void:
+	pass
+
+
+func _on_phase_entered(_index: int) -> void:
+	pass
+
+
+func _on_fight_ended() -> void:
+	pass
 
 
 func _spawn_reward() -> void:

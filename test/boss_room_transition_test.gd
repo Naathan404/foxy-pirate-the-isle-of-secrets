@@ -36,7 +36,7 @@ func _run() -> void:
 	var player := room.get_node("Foxy") as Player
 	_check(manager.player == player, "Boss room player was not registered")
 	boss.take_damage(500.0)
-	(boss.behavior as BlubberbeardBehavior).sound.stop()
+	(boss as BlubberbeardBoss).sound.stop()
 	await process_frame
 	var chest := room.get_node_or_null("BossRewardChest") as BossRewardChest
 	if chest == null:

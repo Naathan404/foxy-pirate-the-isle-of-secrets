@@ -48,7 +48,7 @@ func _run() -> void:
 		"The boss room return gate is invalid"
 	)
 	boss.take_damage(500.0)
-	(boss.behavior as BlubberbeardBehavior).sound.stop()
+	(boss as BlubberbeardBoss).sound.stop()
 	room.queue_free()
 	await process_frame
 	room = _new_room()
@@ -116,18 +116,19 @@ func _check_size(boss: BossBase, player: Player) -> void:
 	if image.is_compressed():
 		image.decompress()
 	var width := image.get_width() / sprite.hframes
-	var top := image.get_height()
+	var row_height := image.get_height() / sprite.vframes
+	var top := row_height
 	var bottom := 0
-	for y in image.get_height():
+	for y in row_height:
 		for x in width:
 			if image.get_pixel(x, y).a > 0.5:
 				top = mini(top, y)
 				bottom = maxi(bottom, y)
 	var ratio := (bottom - top + 1) * sprite.pixel_size / player_height
 	_check(ratio >= 3.0 and ratio <= 4.0, "Boss idle size is outside 3–4 times Foxy")
-	top = image.get_height()
+	top = row_height
 	bottom = 0
-	for y in image.get_height():
+	for y in row_height:
 		for x in width:
 			if image.get_pixel(x + width * 3, y).a > 0.5:
 				top = mini(top, y)

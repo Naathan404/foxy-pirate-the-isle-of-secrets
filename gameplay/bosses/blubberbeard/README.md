@@ -7,7 +7,7 @@ player enters `activation_range`. The `fight_started`, `phase_changed` and `figh
 signals are available for other encounter progression.
 
 Edit `res://data/bosses/blubberbeard_data.tres` to tune HP, phase thresholds, skill order,
-damage and timing. The `Behavior` node also exposes charge acceleration and recovery
+damage and timing. The `CaptainBlubberbeard` root node (`BlubberbeardBoss`) also exposes charge acceleration and recovery
 deceleration. The four generated poses are combined with procedural breathing, anticipation,
 charge lean and recovery motion; they are not a full frame-by-frame animation set. The
 reward chest scene exposes its `rewards` array in the Inspector;
@@ -30,6 +30,37 @@ audio clips are synthesized placeholders; the arena's existing AudioManager owns
 It also widens the player camera during the fight and restores its original field of view
 on defeat or when leaving the scene. HP and attack damage remain editable through the
 boss data resource.
+
+The enraged spike attack launches eight projectiles on outward parabolic arcs. Their
+sprite is `res://assets/sprites/bosses/blubberbeard/enraged_spike.png`, generated with
+the built-in image tool using the prompt: "A single large, thick pufferfish spine,
+diagonal and pointing upper right, ivory tip, turquoise base, orange accents, bold dark
+outline, pixel art, isolated on a transparent background; no text or characters."
+The sprite and swept collision follow the same arc in `boss_hazard.gd`.
+
+The first `hits_before_evade` damaging hits show the hurt animation; the next hit makes
+Blubberbeard exhale at the starting position, fly away in a small wrinkled balloon-like
+form with a steam trail, and then stop and inhale to reinflate. The triggering hit deals
+damage; he is immune through the entire defense. The counter resets when an evade starts.
+Hits during the cooldown count toward the next evade, which can start on a subsequent hit
+after the cooldown. `hits_before_evade` (default 2), `evade_speed` and `evade_cooldown`
+are exposed on the `CaptainBlubberbeard` root node (`BlubberbeardBoss`). `evade_speed` is the initial horizontal launch speed;
+air drag slows the boss, ground contact causes a small bounce and friction, and wall
+collisions reflect the motion with reduced speed.
+
+Powder barrels show their damage radius on the ground as soon as the throw is prepared;
+the indicator intensifies until detonation. The barrels travel more slowly, and the
+default barrage throws one to three barrels with a longer gap between throws. Its count
+and timing remain configurable in the `Barrel Barrage` properties of each barrel skill
+resource.
+
+The eight-frame sheets `deflate_front.png`, `deflate_side.png`, and `deflate_back.png`
+in `assets/sprites/bosses/blubberbeard/` cover all four facing directions (the side view
+is mirrored). They were generated with the built-in image tool from the existing boss
+inflation sheet. Prompt: "Eight sequential pixel-art frames of the pirate pufferfish:
+inflated, exhaling, belly collapsing and spines folding, small wrinkled deflated balloon,
+airborne, inhaling, reinflating, fully inflated. Preserve the hat and coat; transparent
+background; use a consistent front, side or back view for each sheet."
 The built-in image generation tool created
 `res://assets/sprites/bosses/blubberbeard/powder_explosion_placeholder.png` with this prompt:
 "Use case: stylized-concept. Asset type: transparent game VFX spritesheet for a pixel-art

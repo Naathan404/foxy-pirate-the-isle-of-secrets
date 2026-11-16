@@ -4,6 +4,10 @@ extends Node
 
 const EFFECTS = preload("res://gameplay/bosses/boss_effects.gd")
 const EXPLOSION = preload("res://gameplay/bosses/blubberbeard/powder_explosion_vfx.tscn")
+const MOVE_DUST_SHEET = preload("res://assets/sprites/bosses/blubberbeard/boss_move_dust.png")
+const ASH_SCORCH_TEXTURE = preload(
+	"res://assets/sprites/bosses/blubberbeard/barrel_ash_scorch.png"
+)
 const BOOM = preload("res://gameplay/bosses/blubberbeard/boss_explosion.wav")
 const CHARGE = preload("res://gameplay/bosses/blubberbeard/boss_charge.wav")
 const ROAR = preload("res://gameplay/bosses/blubberbeard/boss_roar.wav")
@@ -40,7 +44,13 @@ func charge_start() -> void:
 	_trail_timer = 0.0
 	_stomp_timer = 0.0
 	_play(CHARGE, boss.global_position, -7.0, 0.85)
-	_shake(5.0, 0.16)
+	_shake(8.0, 0.2)
+	var flat := Vector3(boss.velocity.x, 0.0, boss.velocity.z)
+	for offset_angle in [-0.45, 0.45]:
+		var dir := (flat.normalized() if not flat.is_zero_approx() else Vector3.BACK).rotated(
+			Vector3.UP, offset_angle
+		)
+		spawn_move_dust(boss.global_position - dir * 0.9, dir, true)
 	EFFECTS.shockwave(boss.get_parent(), boss.global_position, 3.2, Color(1.0, 0.45, 0.1, 0.8))
 	EFFECTS.burst(
 		boss.get_parent(), boss.global_position + Vector3.UP, Color(1, 0.45, 0.1), 30, 1.4, 5.0
@@ -53,14 +63,21 @@ func charge_tick(delta: float) -> void:
 	if _trail_timer <= 0.0:
 		_trail_timer = 0.09
 		_spawn_afterimage()
+		var flat := Vector3(boss.velocity.x, 0.0, boss.velocity.z)
+		var heading := flat.normalized() if not flat.is_zero_approx() else Vector3.BACK
+		spawn_move_dust(boss.global_position - heading * 1.1, heading, true)
 	if _stomp_timer <= 0.0:
 		_stomp_timer = 0.18
-		_shake(2.2, 0.09)
+		_shake(4.5, 0.13)
 
 
 func charge_end(wall_impact: bool) -> void:
-	_shake(8.0 if wall_impact else 5.0, 0.2)
+	_shake(11.0 if wall_impact else 8.0, 0.24)
 	_play(BOOM, boss.global_position, -12.0, 1.25)
+	for index in 3:
+		var angle := (index - 1) * 0.55
+		var dir := Vector3.BACK.rotated(Vector3.UP, angle)
+		spawn_move_dust(boss.global_position + dir * 0.8, dir, true)
 	EFFECTS.shockwave(boss.get_parent(), boss.global_position, 4.0, Color(1, 0.45, 0.15, 0.8))
 	EFFECTS.burst(
 		boss.get_parent(),
@@ -84,11 +101,17 @@ func charge_hit(target: Node) -> void:
 
 func barrel_explosion(at: Vector3, radius: float) -> void:
 	_spawn_explosion(at, radius / 2.5)
+	spawn_barrel_ash(at, radius)
 	_play(BOOM, at, -5.0, randf_range(0.92, 1.08))
-	_shake(10.0, 0.26)
+	_shake(12.0, 0.3)
 	_screen_flash(Color(1.0, 0.45, 0.08), 0.07, 0.18)
 	EFFECTS.shockwave(boss.get_parent(), at, radius * 1.4, Color(1.0, 0.65, 0.12, 0.95))
 	EFFECTS.burst(boss.get_parent(), at + Vector3.UP, Color(1.0, 0.55, 0.12), 54, 0.8, 8.0)
+
+
+func evade_land() -> void:
+	_shake(5.0, 0.16)
+	visual.impact(0.12, 0.18)
 
 
 func spikes_release() -> void:
@@ -166,6 +189,77 @@ func _spawn_afterimage() -> void:
 	tween.tween_property(ghost, "modulate:a", 0.0, 0.3)
 	tween.tween_property(ghost, "scale", ghost.scale * 1.1, 0.3)
 	tween.chain().tween_callback(ghost.queue_free)
+
+
+func spawn_move_dust(at: Vector3, heading: Vector3, heavy: bool = false) -> void:
+	if not is_instance_valid(boss) or not is_instance_valid(boss.get_parent()):
+		return
+	var parent := boss.get_parent()
+	if parent.is_queued_for_deletion():
+		return
+	var puff := Sprite3D.new()
+	puff.name = "BossMoveDustPuff"
+	puff.texture = MOVE_DUST_SHEET
+	puff.hframes = 4
+	puff.vframes = 1
+	puff.frame = 0
+	puff.pixel_size = 0.016 if heavy else 0.0145
+	puff.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	puff.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	puff.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	puff.render_priority = 2
+	puff.sorting_offset = 1.5
+	puff.flip_h = randf() < 0.5
+	puff.modulate = Color(1.0, 0.96, 0.88, 0.96 if heavy else 0.92)
+	parent.add_child(puff)
+	var drift_dir := Vector3(heading.x, 0.0, heading.z)
+	if drift_dir.is_zero_approx():
+		drift_dir = Vector3.BACK
+	drift_dir = drift_dir.normalized()
+	var jitter := Vector3(randf_range(-0.3, 0.3), 0.0, randf_range(-0.3, 0.3))
+	puff.global_position = at + jitter + Vector3.UP * (0.95 if heavy else 0.85)
+	puff.scale = Vector3.ONE * (1.05 if heavy else 0.95)
+	var life := 0.55 if heavy else 0.48
+	var target_pos := puff.global_position - drift_dir * (2.0 if heavy else 1.2) + Vector3.UP * (
+		1.25 if heavy else 0.95
+	)
+	var tween := puff.create_tween().set_parallel(true)
+	tween.tween_property(puff, "global_position", target_pos, life).set_ease(Tween.EASE_OUT)
+	tween.tween_property(
+		puff, "scale", Vector3.ONE * (1.75 if heavy else 1.55), life
+	).set_ease(Tween.EASE_OUT)
+	tween.tween_property(puff, "modulate:a", 0.0, life).set_ease(Tween.EASE_IN)
+	tween.tween_method(
+		func(step: float) -> void:
+			if is_instance_valid(puff):
+				puff.frame = mini(3, int(step * 4.0)),
+		0.0,
+		0.99,
+		life
+	)
+	tween.chain().tween_callback(puff.queue_free)
+
+
+func spawn_barrel_ash(at: Vector3, radius: float) -> void:
+	if not is_instance_valid(boss) or not is_instance_valid(boss.get_parent()):
+		return
+	var parent := boss.get_parent()
+	if parent.is_queued_for_deletion():
+		return
+	var ash := Sprite3D.new()
+	ash.name = "BarrelAshScorch"
+	ash.texture = ASH_SCORCH_TEXTURE
+	ash.pixel_size = 0.016 * maxf(0.75, radius / 2.5)
+	ash.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	ash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ash.modulate = Color(1.0, 1.0, 1.0, 0.92)
+	parent.add_child(ash)
+	ash.global_position = Vector3(at.x, at.y + 0.03, at.z)
+	ash.rotation = Vector3(-PI * 0.5, randf() * TAU, 0.0)
+	var tween := ash.create_tween()
+	tween.tween_interval(5.5)
+	tween.tween_property(ash, "modulate:a", 0.0, 1.5).set_ease(Tween.EASE_IN)
+	tween.tween_callback(ash.queue_free)
 
 
 func _play(stream: AudioStream, at: Vector3, volume: float, pitch: float) -> void:

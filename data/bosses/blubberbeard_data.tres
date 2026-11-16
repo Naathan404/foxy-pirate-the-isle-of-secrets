@@ -58,4 +58,5 @@ skills = Array[ExtResource("3")]([SubResource("barrel2"), SubResource("charge2")
 [resource]
 script = ExtResource("1")
 display_name = "Captain Blubberbeard"
+max_hp = 10.0
 phases = Array[ExtResource("2")]([SubResource("phase1"), SubResource("phase2")])

@@ -21,14 +21,30 @@ func _run() -> void:
 	player.add_child(camera)
 	camera.fov = 30.0
 	camera.make_current()
-	var boss := BOSS_SCENE.instantiate() as BossBase
+	var boss := BOSS_SCENE.instantiate() as BlubberbeardBoss
 	arena.add_child(boss)
 	boss.set_physics_process(false)
 	boss.start_fight(player)
-	var behavior := boss.behavior as BlubberbeardBehavior
+	var behavior := boss
 	var feedback := behavior.feedback
 	await create_timer(0.75).timeout
 	_check(is_equal_approx(camera.fov, feedback.fight_camera_fov), "Fight camera did not zoom out")
+	behavior.timer = 0.05
+	boss.take_damage(1.0)
+	behavior.fight_tick(0.3)
+	behavior.visual._process(0.3)
+	_check(
+		behavior.state == BlubberbeardBoss.State.WAIT
+		and behavior.visual.texture == behavior.visual.HIT_DEATH_SHEET,
+		"Hurt reaction should hold the boss and remain visible after 0.3 seconds"
+	)
+	behavior.fight_tick(0.36)
+	behavior.visual._process(0.36)
+	behavior.fight_tick(0.06)
+	_check(
+		behavior.state == BlubberbeardBoss.State.WINDUP,
+		"Boss should resume its next attack after the hurt reaction"
+	)
 	behavior.skill = boss.boss_data.phases[0].skills[0] as BlubberbeardSkillData
 	behavior._spawn_barrel(Vector3(5, 0, 0))
 	var hazard: Node3D
@@ -37,7 +53,12 @@ func _run() -> void:
 			hazard = node as Node3D
 	_check(hazard != null, "Barrel hazard not created")
 	if hazard != null:
+		root.get_node("ScreenShakeController").cancel()
 		hazard._physics_process(behavior.skill.windup + 0.1)
+		_check(
+			root.get_node("ScreenShakeController").get("_strength") >= 12.0,
+			"Barrel detonation did not shake the camera"
+		)
 	var effect := arena.get_node_or_null("PowderExplosionVFX") as Node3D
 	_check(
 		effect != null and effect.scene_file_path == EXPLOSION.resource_path,
@@ -47,8 +68,18 @@ func _run() -> void:
 		var sprite := effect.get_node("Explosion") as AnimatedSprite3D
 		_check(sprite.sprite_frames.get_frame_count(&"explode") == 4, "Explosion needs four frames")
 		_check(sprite.is_playing(), "Explosion animation did not start")
+	root.get_node("ScreenShakeController").cancel()
 	feedback.charge_start()
+	_check(
+		root.get_node("ScreenShakeController").get("_strength") >= 8.0,
+		"Charge start did not shake the camera"
+	)
+	root.get_node("ScreenShakeController").cancel()
 	feedback.charge_tick(0.1)
+	_check(
+		root.get_node("ScreenShakeController").get("_strength") >= 4.5,
+		"Charge movement did not shake the camera"
+	)
 	_check(arena.get_node_or_null("BossChargeAfterimage") != null, "Charge afterimage not spawned")
 	feedback.phase_changed()
 	_check(feedback.aura.emitting, "Phase 2 ember aura not started")
