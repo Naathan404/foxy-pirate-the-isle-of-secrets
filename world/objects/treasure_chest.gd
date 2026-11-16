@@ -123,7 +123,9 @@ func _punch_camera() -> void:
 		return
 	var property := "size" if camera.projection == Camera3D.PROJECTION_ORTHOGONAL else "fov"
 	var original := float(camera.get(property))
-	var previous := camera.get_meta(CAMERA_ZOOM_TWEEN_META, null) as Tween
+	var previous: Tween
+	if camera.has_meta(CAMERA_ZOOM_TWEEN_META):
+		previous = camera.get_meta(CAMERA_ZOOM_TWEEN_META) as Tween
 	if previous != null and previous.is_valid():
 		original = float(camera.get_meta(CAMERA_ZOOM_BASE_META, original))
 		previous.kill()
@@ -145,7 +147,11 @@ func _punch_camera() -> void:
 	)
 	tween.tween_callback(
 		func():
-			if is_instance_valid(camera) and camera.get_meta(CAMERA_ZOOM_TWEEN_META, null) == tween:
+			if (
+				is_instance_valid(camera)
+				and camera.has_meta(CAMERA_ZOOM_TWEEN_META)
+				and camera.get_meta(CAMERA_ZOOM_TWEEN_META) == tween
+			):
 				camera.remove_meta(CAMERA_ZOOM_TWEEN_META)
 				camera.remove_meta(CAMERA_ZOOM_BASE_META)
 	)
