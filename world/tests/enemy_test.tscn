@@ -2,7 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="2_654ia"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="3_coral_skeleton"]
+[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="3_coral_skeleton"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="4_mo7q8"]
 
 [sub_resource type="Environment" id="Environment_arena"]
 background_mode = 1
@@ -116,23 +117,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
 
 [node name="CoralSkeleton" parent="." unique_id=1381459304 instance=ExtResource("3_coral_skeleton")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
-sleep_detection_radius = 3.5
-detection_radius = 8.0
-sleep_delay = 4.0
-wake_duration = 0.35
-wake_attack_delay = 1.0
-shooting_range = 4.5
-home_tolerance = 0.6
-return_segment_time = 0.8
-return_pause_time = 0.35
-return_min_turn_angle = 20.0
-return_max_turn_angle = 49.0
+can_sleep = true
+roam_when_guarding = false
+guard_roam_radius = 3.5
+guard_roam_segment_time = 1.2
+guard_roam_pause_time = 1.0
+randomize_shot_mode = true
 shot_mode = 0
-bullets_per_burst = 3
-fan_angle = 30.0
-shot_interval = 0.2
-fire_delay = 0.4
-burst_cooldown = 2.0
-shoot_recovery_time = 0.24
-bullet_speed = 10.0
 bullet_lifetime = 3.0
+aim_height_offset = 0.85
+max_aim_pitch_deg = 42.0
+
+[node name="EliteCoralSkeleton" parent="CoralSkeleton" unique_id=709104367 instance=ExtResource("4_mo7q8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3)
+total_lives = 3
+life_hp_ratios = Array[float]([1.0, 0.8, 0.6])
+aim_height_offset = 0.85
+max_aim_pitch_deg = 42.0

@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://c60eka7xvsqh8"]
+
+[ext_resource type="Script" uid="uid://cjqw2opldwekw" path="res://gameplay/bosses/blubberbeard/blubberbeard.gd" id="1"]
+[ext_resource type="Resource" path="res://data/bosses/blubberbeard_data.tres" id="2"]
+[ext_resource type="PackedScene" path="res://gameplay/bosses/blubberbeard/reward_chest.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bosses/blubberbeard/blubberbeard_idle_4dir.png" id="4"]
+[ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="5"]
+[ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="6"]
+[ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="7"]
+[ext_resource type="PackedScene" path="res://gameplay/bosses/boss_health_ui.tscn" id="8"]
+[ext_resource type="AudioStream" uid="uid://b0scw3p1t1gpd" path="res://gameplay/bosses/blubberbeard/placeholder_impact.wav" id="9"]
+[ext_resource type="Script" uid="uid://b3xicye6vlhsl" path="res://gameplay/bosses/blubberbeard/blubberbeard_visual.gd" id="11"]
+[ext_resource type="Script" uid="uid://bmgk1v0jilwgw" path="res://gameplay/bosses/blubberbeard/blubberbeard_feedback.gd" id="12"]
+
+[sub_resource type="CylinderShape3D" id="Body"]
+height = 5.0
+radius = 2.2
+
+[sub_resource type="CapsuleShape3D" id="Hurt"]
+radius = 2.6
+height = 7.0
+
+[sub_resource type="SphereShape3D" id="Hit"]
+radius = 2.7
+
+[node name="CaptainBlubberbeard" type="CharacterBody3D" unique_id=463222174]
+script = ExtResource("1")
+boss_data = ExtResource("2")
+reward_chest = ExtResource("3")
+grapple_stop_distance = 3.0
+
+[node name="Feedback" type="Node" parent="." unique_id=1499711967]
+script = ExtResource("12")
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=454030351]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.9, 0)
+pixel_size = 0.032
+billboard = 1
+alpha_cut = 1
+texture_filter = 2
+texture = ExtResource("4")
+hframes = 4
+vframes = 3
+script = ExtResource("11")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=82984662]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+shape = SubResource("Body")
+
+[node name="HurtBox" type="Area3D" parent="." unique_id=1559561606]
+script = ExtResource("6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HurtBox" unique_id=1127605732]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+shape = SubResource("Hurt")
+
+[node name="ChargeHitBox" type="Area3D" parent="." unique_id=372848596]
+script = ExtResource("7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ChargeHitBox" unique_id=1857908497]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+shape = SubResource("Hit")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=796396691]
+script = ExtResource("5")
+
+[node name="Sound" type="AudioStreamPlayer3D" parent="." unique_id=233629911]
+stream = ExtResource("9")
+
+[node name="BossHealthUI" parent="." unique_id=2131061260 instance=ExtResource("8")]

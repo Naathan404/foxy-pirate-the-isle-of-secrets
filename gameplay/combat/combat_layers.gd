@@ -15,6 +15,7 @@ const ENEMY_HURTBOX: int = 1 << 4
 const PLAYER_ATTACK: int = 1 << 5
 const ENEMY_ATTACK: int = 1 << 6
 const TARGET_DETECTOR: int = 1 << 7
+const PLAYER_BOUNDARY: int = 1 << 8
 
 const PLAYER_BODY_MASK: int = WORLD | ENEMY_BODY
 ## Enemy bodies block one another, preventing simultaneous charges from stacking on Foxy.

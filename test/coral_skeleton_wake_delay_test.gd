@@ -27,6 +27,8 @@ func _run() -> void:
 	skeleton.wake_duration = 0.1
 	skeleton.wake_attack_delay = 1.0
 	skeleton.fire_delay = 0.0
+	skeleton.randomize_shot_mode = false
+	skeleton.shot_mode = CoralSkeleton.ShotMode.FAN
 	arena.add_child(skeleton)
 	var target := Node3D.new()
 	target.position = Vector3(2, 0, 0)
