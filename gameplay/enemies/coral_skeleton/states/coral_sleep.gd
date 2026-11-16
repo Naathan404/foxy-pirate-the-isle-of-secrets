@@ -5,10 +5,11 @@ func _enter() -> void:
 	var skeleton := enemy as CoralSkeleton
 	# Shared Hit state returns to the default state. Resume the awake behavior
 	# after a stagger instead of putting an alert skeleton back to sleep.
-	if skeleton.is_awake:
+	if skeleton.is_awake or not skeleton.can_sleep:
+		skeleton.set_awake(true)
 		if skeleton.has_target():
 			request_state(&"chase")
-		elif skeleton.distance_from_home() > skeleton.home_tolerance:
+		elif skeleton.distance_from_home() > skeleton.home_tolerance and not skeleton.roam_when_guarding:
 			request_state(&"return")
 		else:
 			request_state(&"guard")

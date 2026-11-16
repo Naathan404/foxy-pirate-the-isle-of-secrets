@@ -16,6 +16,8 @@ func _run() -> void:
 	var skeleton := SKELETON.instantiate() as CoralSkeleton
 	skeleton.wake_duration = 0.0
 	skeleton.wake_attack_delay = 0.0
+	skeleton.randomize_shot_mode = false
+	skeleton.shot_mode = CoralSkeleton.ShotMode.FAN
 	arena.add_child(skeleton)
 	skeleton.process_mode = Node.PROCESS_MODE_DISABLED
 	var target := Node3D.new()
@@ -33,6 +35,7 @@ func _run() -> void:
 	var fan := _bullets()
 	if fan.size() == 3:
 		_check(fan[0].direction.dot(fan[2].direction) < 0.99, "Fan directions are not separated")
+		_check(fan[1].direction.y < -0.05, "Pitched bullet did not angle downward toward target")
 	_clear_bullets()
 	skeleton.shot_mode = CoralSkeleton.ShotMode.SEQUENTIAL
 	skeleton.fsm._update(0.25)
@@ -57,6 +60,16 @@ func _run() -> void:
 	skeleton.fsm._update(0.01)
 	skeleton.fsm._update(0.01)
 	_check(skeleton.fsm.current_state.name == &"Guard", "Returning home did not resume guard")
+	skeleton.randomize_shot_mode = true
+	var saw_fan := false
+	var saw_seq := false
+	for _i in 32:
+		var chosen := skeleton.choose_shot_mode()
+		if chosen == CoralSkeleton.ShotMode.FAN:
+			saw_fan = true
+		elif chosen == CoralSkeleton.ShotMode.SEQUENTIAL:
+			saw_seq = true
+	_check(saw_fan and saw_seq, "Randomized shot mode did not pick both FAN and SEQUENTIAL")
 	arena.queue_free()
 	await process_frame
 	if failures.is_empty():

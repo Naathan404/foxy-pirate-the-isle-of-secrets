@@ -8,8 +8,11 @@ const WALK_OPPOSITE_SHEET := preload(
 const SLEEP_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/sleep_6.png")
 const SHOOT_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/shoot_6.png")
 const HIT_DEATH_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/hit_death_6.png")
+const BONE_CURL_SHEET := preload("res://assets/sprites/enemies/coral_skeleton/bone_curl_6.png")
 const DEATH_ANIMATION := &"coral_death"
 const DEATH_DURATION := 0.8
+const BONE_CURL_DURATION := 0.75
+const BONE_REASSEMBLE_DURATION := 0.75
 const SHOT_FEEDBACK_DURATION := 0.24
 
 @export_range(0.005, 0.03, 0.0005) var character_pixel_size := 0.012
@@ -120,9 +123,21 @@ func _process(delta: float) -> void:
 		&"death":
 			texture = HIT_DEATH_SHEET
 			column = mini(5, 2 + int(elapsed / DEATH_DURATION * 4.0))
+		&"bone_curl":
+			texture = BONE_CURL_SHEET
+			var curl_dur := _get_revive_duration(&"curl_duration", BONE_CURL_DURATION)
+			column = mini(4, int(elapsed / curl_dur * 5.0))
+		&"bone_dormant":
+			texture = BONE_CURL_SHEET
+			column = 4 if int(elapsed * 2.5) % 2 == 0 else 5
+		&"bone_revive":
+			texture = BONE_CURL_SHEET
+			var revive_dur := _get_revive_duration(&"reassemble_duration", BONE_REASSEMBLE_DURATION)
+			column = maxi(0, 4 - int(elapsed / revive_dur * 5.0))
 		_:
 			column = int(elapsed * idle_fps) % 6
-	if flinch_remaining > 0.0 and action != &"death":
+	var in_bone_curl := action in [&"bone_curl", &"bone_dormant", &"bone_revive"]
+	if flinch_remaining > 0.0 and action != &"death" and not in_bone_curl:
 		texture = HIT_DEATH_SHEET
 		column = 1 if flinch_remaining > 0.1 else 2
 	if sprite.texture != texture:
@@ -156,3 +171,15 @@ func _update_sleep_indicators() -> void:
 		var fade_out := clampf((1.0 - progress) / 0.35, 0.0, 1.0)
 		indicator.modulate = _sleep_indicator_base_color
 		indicator.modulate.a *= minf(fade_in, fade_out)
+
+
+func _get_revive_duration(property_name: StringName, fallback: float) -> float:
+	var owner_node := get_parent()
+	if not is_instance_valid(owner_node):
+		return fallback
+	var revive_node := owner_node.get_node_or_null(^"States/Revive")
+	if is_instance_valid(revive_node):
+		var value: Variant = revive_node.get(property_name)
+		if value is float or value is int:
+			return maxf(0.05, float(value))
+	return fallback
