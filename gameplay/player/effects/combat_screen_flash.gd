@@ -43,7 +43,7 @@ func _on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) ->
 		or applied_hp <= 0.0
 		or not damage.target_defeated
 		or not is_instance_valid(target)
-		or not target is EnemyBase
+		or not (target is EnemyBase or target is BossBase)
 	):
 		return
 	# The current turtle scene has no boss group; recognize it for presentation only.

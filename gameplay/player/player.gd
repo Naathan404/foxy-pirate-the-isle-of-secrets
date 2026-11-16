@@ -171,7 +171,7 @@ func _setup_charm_system() -> void:
 func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	if dead or not is_instance_valid(chaos) or applied_hp <= 0:
 		return
-	if damage.source == self and target is EnemyBase:
+	if damage.source == self and (target is EnemyBase or target is BossBase):
 		chaos.gain(damage.chaos_gain)
 
 
