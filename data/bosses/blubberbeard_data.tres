@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="barrel1"]
 script = ExtResource("4")
-damage = 18.0
+damage = 2.0
 windup = 1.6
 recovery = 0.5
 
@@ -16,7 +16,7 @@ script = ExtResource("4")
 kind = 1
 speed = 9.0
 duration = 0.8
-damage = 24.0
+damage = 4.0
 windup = 1.2
 recovery = 2.0
 
@@ -27,7 +27,7 @@ skills = Array[ExtResource("3")]([SubResource("barrel1"), SubResource("charge1")
 [sub_resource type="Resource" id="barrel2"]
 script = ExtResource("4")
 radius = 3.5
-damage = 18.0
+damage = 4.0
 windup = 1.2
 recovery = 0.3
 
@@ -36,7 +36,7 @@ script = ExtResource("4")
 kind = 1
 speed = 14.0
 duration = 0.8
-damage = 24.0
+damage = 6.0
 windup = 0.9
 recovery = 0.8
 
@@ -45,7 +45,7 @@ script = ExtResource("4")
 kind = 2
 speed = 9.0
 duration = 2.2
-damage = 14.0
+damage = 6.0
 windup = 1.1
 recovery = 0.5
 
