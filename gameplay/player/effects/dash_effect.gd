@@ -156,7 +156,7 @@ func _show_next_ghost() -> void:
 	g.offset = sprite.offset
 	g.centered = sprite.centered
 	g.flip_h = sprite.flip_h
-	g.billboard = sprite.billboard
+	g.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	g.global_transform = sprite.global_transform
 
 	g.modulate = Color(0.9, 1.0, 1.0, minf(ghost_color.a, SPINE_GHOST_ALPHA))
