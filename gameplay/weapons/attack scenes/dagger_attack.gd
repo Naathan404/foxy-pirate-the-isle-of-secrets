@@ -5,6 +5,11 @@ const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_fe
 const SWING_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_throw.wav")
 const HIT_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_hit.wav")
 
+const SHOCKWAVE_DURATION := 0.24
+const SHOCKWAVE_STRENGTH := 0.003
+const SHOCKWAVE_COLOR := Color("f8e7bd")
+const SHOCKWAVE_RADIUS_PIXELS := 80.0
+
 @export var hitbox: HitBox
 @export var forward_offset: float = 0.8
 @export_range(0.0, 3.0, 0.05) var heavy_crate_knockback_distance: float = 0.9
@@ -166,7 +171,8 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 		_impact_played = true
 		if heavy:
 			get_node("/root/ShockwaveController").request_world(
-				at, 0.3, 0.007 * impact_scale, Color("f8e7bd")
+				at, SHOCKWAVE_DURATION, SHOCKWAVE_STRENGTH * impact_scale,
+				SHOCKWAVE_COLOR, SHOCKWAVE_RADIUS_PIXELS
 			)
 		get_node("/root/HitstopController").request_local(
 			null, target as Node3D, step.hitstop_seconds * impact_scale

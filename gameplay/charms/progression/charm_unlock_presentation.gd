@@ -9,6 +9,9 @@ const RETURN := 1.5
 const SPEED := 1.25
 const UNLOCK_UI := preload("res://gameplay/charms/progression/charm_unlock_ui.tscn")
 
+const SHOCKWAVE_DURATION := 0.9
+const SHOCKWAVE_STRENGTH := 0.06
+
 var pickup: ItemPickup
 var player: Player
 var camera: Camera3D
@@ -161,7 +164,7 @@ func _process(delta: float) -> void:
 		committed = true
 		_play_tone(220.0, 0.8)
 		get_node("/root/ShockwaveController").request_world(
-			player.global_position + Vector3.UP, 0.9, 0.06
+			player.global_position + Vector3.UP, SHOCKWAVE_DURATION, SHOCKWAVE_STRENGTH
 		)
 	if phase == 2 and elapsed >= CHARGE + FLIGHT + BURST + RETURN:
 		_finish(true)

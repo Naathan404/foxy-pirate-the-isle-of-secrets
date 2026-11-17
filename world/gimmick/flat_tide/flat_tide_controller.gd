@@ -7,6 +7,11 @@ signal rising_warned(seconds_remaining: float)
 
 enum State { LOW, RISING, HIGH, FALLING }
 
+const SHOCKWAVE_DURATION := 0.3
+const SHOCKWAVE_STRENGTH := 0.005
+const SHOCKWAVE_COLOR := Color("78dfff")
+const SHOCKWAVE_RADIUS_PIXELS := 110.0
+
 ## Nhân vật chịu ảnh hưởng của nước; gán node Foxy trong phòng.
 @export var player: Player
 ## Danh sách các vùng nước cùng chạy theo chu kỳ thủy triều này.
@@ -142,7 +147,11 @@ func _apply_coverage() -> void:
 					)
 					if wave_knockback_speed > 0.0:
 						get_node("/root/ShockwaveController").request_world(
-							player.global_position + Vector3.UP, 0.38, 0.01, Color("78dfff")
+							player.global_position + Vector3.UP,
+							SHOCKWAVE_DURATION,
+							SHOCKWAVE_STRENGTH,
+							SHOCKWAVE_COLOR,
+							SHOCKWAVE_RADIUS_PIXELS
 						)
 	coverage_changed.emit(coverage)
 

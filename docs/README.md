@@ -6,7 +6,7 @@ Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn 
 
 | Bắt đầu | Quy trình |
 | --- | --- |
-| [Hướng dẫn phát triển](project/development_guideline.md) · [Kiến trúc](project/architecture.md) | [Quy ước code](project/conventions.md) · [Git workflow](project/git_workflow.md) |
+| [Hướng dẫn phát triển](project/development_guideline.md) · [Kiến trúc](project/architecture.md) | [Quy tắc code và thiết kế](project/conventions.md) · [Git workflow](project/git_workflow.md) |
 | [Kiểm thử](project/testing.md) | [Agent contract](project/AGENTS_CONTRACT.md) |
 
 ## Gameplay · `gameplay/`

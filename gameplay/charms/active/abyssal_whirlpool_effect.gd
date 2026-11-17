@@ -2,6 +2,11 @@ class_name AbyssalWhirlpoolEffect
 extends CharmEffect
 ## Pulls ordinary enemies for a short window, then resolves one AoE blast.
 
+const SHOCKWAVE_DURATION := 0.45
+const SHOCKWAVE_STRENGTH := 0.013
+const SHOCKWAVE_COLOR := Color("68caff")
+const SHOCKWAVE_RADIUS_PIXELS := 160.0
+
 var _zone: Area3D
 var _remaining: float = 0.0
 var _exploded: bool = false
@@ -69,7 +74,11 @@ func _explode() -> void:
 	CharmVfx.spawn(actor.get_parent(), _zone.global_position, CharmVfx.TIDE, radius * 1.2, 0.4)
 	get_node("/root/ScreenShakeController").request(7.0, 0.22)
 	get_node("/root/ShockwaveController").request_world(
-		_zone.global_position, 0.65, 0.032, Color("68caff")
+		_zone.global_position,
+		SHOCKWAVE_DURATION,
+		SHOCKWAVE_STRENGTH,
+		SHOCKWAVE_COLOR,
+		SHOCKWAVE_RADIUS_PIXELS
 	)
 	var hit_confirmed := false
 	for node in actor.get_tree().get_nodes_in_group("enemy"):

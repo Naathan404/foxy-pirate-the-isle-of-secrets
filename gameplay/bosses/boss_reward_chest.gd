@@ -3,6 +3,11 @@ extends TreasureChest
 
 signal reward_pickup_spawned(index: int, pickup: ItemPickup)
 
+const SHOCKWAVE_DURATION := 0.35
+const SHOCKWAVE_STRENGTH := 0.007
+const SHOCKWAVE_COLOR := Color("ffe3a0")
+const SHOCKWAVE_RADIUS_PIXELS := 110.0
+
 @export var rewards: Array[BaseItem] = []
 
 
@@ -13,7 +18,8 @@ func _ready() -> void:
 
 func _drop_rewards() -> void:
 	get_node("/root/ShockwaveController").request_world(
-		global_position + Vector3.UP, 0.45, 0.016, Color("ffe3a0")
+		global_position + Vector3.UP,
+		SHOCKWAVE_DURATION, SHOCKWAVE_STRENGTH, SHOCKWAVE_COLOR, SHOCKWAVE_RADIUS_PIXELS
 	)
 	for index in rewards.size():
 		if rewards[index] == null:
