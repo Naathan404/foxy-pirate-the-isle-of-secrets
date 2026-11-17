@@ -165,7 +165,7 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 	if not _impact_played:
 		_impact_played = true
 		get_node("/root/HitstopController").request_local(
-			context.actor, target as Node3D, step.hitstop_seconds * impact_scale
+			null, target as Node3D, step.hitstop_seconds * impact_scale
 		)
 		get_node("/root/ScreenShakeController").request(
 			step.shake_pixels * impact_scale

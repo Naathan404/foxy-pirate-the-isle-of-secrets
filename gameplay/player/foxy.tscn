@@ -11,7 +11,6 @@
 [ext_resource type="Script" uid="uid://bd4tscvehscfo" path="res://gameplay/player/states/player_dash.gd" id="5_tj74x"]
 [ext_resource type="Texture2D" uid="uid://4rqwduaxp1ya" path="res://assets/sprites/effects/smoke/smoke_04.png" id="5_xsuyu"]
 [ext_resource type="Script" uid="uid://coyt7mve374li" path="res://gameplay/player/states/player_death.gd" id="6_6gmdq"]
-[ext_resource type="Texture2D" uid="uid://cw35c08eom8te" path="res://assets/sprites/foxy/_placeholder/foxy_harpoon_sheet.png" id="7_r1r5h"]
 [ext_resource type="Script" uid="uid://dhmsjvrmvedhj" path="res://gameplay/player/states/player_run.gd" id="7_rvh5s"]
 [ext_resource type="Script" uid="uid://bn1u27bm1ho6y" path="res://gameplay/player/states/player_attack.gd" id="8_av71s"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="9_r3fl6"]
@@ -71,7 +70,6 @@
 [ext_resource type="PackedScene" uid="uid://dlalbyjl0ra0y" path="res://gameplay/inventory/potion_quick_select.tscn" id="potion_quick_select"]
 [ext_resource type="Script" uid="uid://bg3hf1gcwrp1a" path="res://gameplay/combat/ammo_component.gd" id="Script_ammo_inventory"]
 [ext_resource type="Script" uid="uid://dh5bqe1t7tido" path="res://gameplay/player/spine_idle_preview.gd" id="Script_spine_idle_preview"]
-[ext_resource type="Texture2D" uid="uid://0vq5h2ps1g32" path="res://assets/sprites/foxy/_placeholder/foxy_bow_sprite_sheet.png" id="Texture_bow_sheet"]
 [ext_resource type="Script" uid="uid://b0u5ln7tkfogr" path="res://data/weapon/weapon_collection_entry.gd" id="weapon_collection_entry"]
 
 [sub_resource type="Gradient" id="Gradient_1ejdq"]
@@ -81,7 +79,7 @@ colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35,
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
 gradient = SubResource("Gradient_1ejdq")
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_e102i"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_nnacp"]
 resource_local_to_scene = true
 emission_shape = 3
 emission_box_extents = Vector3(0.12, 0.01, 0.08)
@@ -112,13 +110,11 @@ material = SubResource("StandardMaterial3D_s1tal")
 size = Vector2(0.22, 0.22)
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_0"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(113, 170, 152, 184)
 margin = Rect2(52, 26, 104, 72)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Frame_8"]
-atlas = ExtResource("7_r1r5h")
 region = Rect2(66, 725, 189, 214)
 margin = Rect2(105, 106, 259, 234)
 filter_clip = true
@@ -151,19 +147,16 @@ tracks/1/keys = {
 }
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_1"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(401, 169, 159, 185)
 margin = Rect2(52, 25, 97, 71)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_2"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(691, 169, 158, 185)
 margin = Rect2(52, 25, 98, 71)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_3"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(993, 167, 151, 187)
 margin = Rect2(52.5, 23, 105, 69)
 filter_clip = true
@@ -185,25 +178,21 @@ tracks/0/keys = {
 }
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_4"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(108, 448, 172, 180)
 margin = Rect2(61.5, 30, 84, 76)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_5"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(400, 448, 196, 180)
 margin = Rect2(56, 30, 60, 76)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_6"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(692, 448, 169, 180)
 margin = Rect2(51, 30, 87, 76)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_7"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(1004, 448, 143, 179)
 margin = Rect2(58, 31, 113, 77)
 filter_clip = true
@@ -225,25 +214,21 @@ tracks/0/keys = {
 }
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_8"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(97, 704, 173, 177)
 margin = Rect2(31.5, 33, 83, 79)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_9"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(406, 702, 147, 178)
 margin = Rect2(54.5, 32, 109, 78)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_10"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(690, 704, 164, 177)
 margin = Rect2(44.5, 33, 92, 79)
 filter_clip = true
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_11"]
-atlas = ExtResource("Texture_bow_sheet")
 region = Rect2(996, 703, 147, 177)
 margin = Rect2(54.5, 33, 109, 79)
 filter_clip = true
@@ -932,7 +917,7 @@ heel_offset = 0.1
 
 [node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3670205, 0)
-process_material = SubResource("ParticleProcessMaterial_e102i")
+process_material = SubResource("ParticleProcessMaterial_nnacp")
 draw_pass_1 = SubResource("QuadMesh_nnacp")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]

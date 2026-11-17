@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/arrow_rain.png" id="2_icon"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="3_charm"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "charm_arrow_rain"
+display_name = "Arrow Rain"
+icon = ExtResource("2_icon")
+description = "Unlocks the Arrow Rain Charm."
+type = 3
+charm = ExtResource("3_charm")

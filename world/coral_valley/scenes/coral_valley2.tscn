@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c7v4k2mrs8awh"]
+[gd_scene format=3 uid="uid://c216wgahspnra"]
 
 [ext_resource type="MeshLibrary" uid="uid://dnyuwp5w445vv" path="res://assets/meshes/world/sand_library.meshlib" id="1_l16f3"]
 [ext_resource type="PackedScene" uid="uid://bug5ypktngs38" path="res://gameplay/player/foxy.tscn" id="2_uc2ql"]

@@ -26,6 +26,7 @@ SilasProgress="*res://gameplay/merchant/silas_progress_store.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 CombatMomentController="*res://core/autoload/combat_moment_controller.gd"
 NoteProgress="*res://gameplay/inventory/note_progress_store.gd"
+ShockwaveController="*res://core/autoload/shockwave_controller.gd"
 
 [dialogic]
 

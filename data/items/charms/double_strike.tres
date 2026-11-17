@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/double_strike.png" id="2_icon"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/double_strike.tres" id="3_charm"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "charm_double_strike"
+display_name = "Double Strike"
+icon = ExtResource("2_icon")
+description = "Unlocks the Double Strike Charm."
+type = 3
+charm = ExtResource("3_charm")

@@ -247,6 +247,14 @@ func set_attack_spine_override(animation_name: String, skin_name: String = "") -
 		_idle_preview.set_attack_spine_override(animation_name, skin_name)
 
 
+## A paused cinematic can keep only the visual animation running independently.
+func play_cinematic_idle_down(camera: Camera3D) -> void:
+	stop_charm_cast()
+	reset_animation_speed()
+	_idle_after_up_run = false
+	play_directional(&"idle", Vector3.BACK, camera, true)
+
+
 func play_directional(
 	action: StringName, facing: Vector3, camera: Camera3D = null, restart: bool = false
 ) -> bool:
