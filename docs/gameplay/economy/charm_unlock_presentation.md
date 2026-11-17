@@ -34,6 +34,12 @@ chiếu qua camera. Các dải năng lượng quanh icon và vệt lúc bay về
 màu xanh ngọc bích, với dải liền mạch, hai đầu nhọn và lớp sáng chồng nhau.
 Các vệt dùng additive blending và nhiều lớp quầng sáng; icon được vẽ riêng để
 giữ màu gốc. Shockwave khi hấp thụ lan vượt góc xa nhất của viewport.
+Các dải cong dùng lưới tam giác có chung đỉnh dọc theo đường cong, độ dày giảm
+về hai đầu. Nhờ đó các đoạn không chồng alpha thành sọc và Godot không cần
+triangulate một polygon tự cắt.
+Lúc icon bay về, ba vệt sáng tách và nhập theo quỹ đạo, đầu vệt có điểm lóe
+sáng. Khi chạm Player, quầng sáng nổi lên cùng một vòng ngọc bích mở rộng
+được vẽ bằng ba lớp glow và lõi trắng; các tia và hạt cũ tiếp tục bung ra.
 Các hiệu ứng nhấn khác thay đổi theo Charm; âm thanh là các nốt tổng hợp và
 phát qua bus UI. Camera hỗ trợ perspective và orthographic, trả lại vị trí, zoom
 và offset ban đầu khi kết thúc hoặc hủy. Nếu Player, pickup hoặc registry không còn
