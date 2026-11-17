@@ -11,6 +11,18 @@ const UNLOCK_UI := preload("res://gameplay/charms/progression/charm_unlock_ui.ts
 
 const SHOCKWAVE_DURATION := 0.9
 const SHOCKWAVE_STRENGTH := 0.06
+const IMPACT_RING_SPEED_PIXELS := 265.0
+const IMPACT_RING_DURATION := 1.15
+const IMPACT_RING_WIDTH_PIXELS := 8.0
+const IMPACT_RING_SEGMENTS := 96
+const IMPACT_GLOW_LAYERS := 5
+const IMPACT_FLASH_RADIUS_PIXELS := 74.0
+const FLIGHT_TRAIL_SPREAD_PIXELS := 22.0
+const FLIGHT_TRAIL_LAG := 0.30
+const FLIGHT_TRAIL_WAVE := 1.5
+const FLIGHT_HEAD_FLARE_PIXELS := 8.0
+const RIBBON_MIN_SEGMENT_PIXELS := 0.3
+const RIBBON_TAPER_EXPONENT := 0.8
 
 var pickup: ItemPickup
 var player: Player
@@ -261,6 +273,7 @@ func _draw_effects() -> void:
 	if phase == 2 and elapsed >= 2.0:
 		var t := elapsed - 2.0
 		var strength := maxf(0.0, 1.0 - t / 1.3)
+		_draw_absorption_flash(destination, t)
 		_draw_impact_streaks(destination, t, strength)
 		for i in range(36):
 			var angle := float(i) * TAU / 36.0
@@ -343,25 +356,46 @@ func _draw_energy_streams(center: Vector2, alpha: float) -> void:
 
 
 func _draw_ribbon(points: PackedVector2Array, width: float, color: Color) -> void:
+	if points.size() < 2 or color.a <= 0.0:
+		return
+	# One indexed mesh shares vertices between triangles, so translucent
+	# segments neither overlap nor leave visible seams. Explicit indices also
+	# avoid Godot's polygon triangulation on a curved, tapered silhouette.
 	var filtered := PackedVector2Array()
 	for point in points:
-		if filtered.is_empty() or filtered[filtered.size() - 1].distance_squared_to(point) > 0.01:
+		if (
+			filtered.is_empty()
+			or (
+				filtered[-1].distance_squared_to(point)
+				>= RIBBON_MIN_SEGMENT_PIXELS * RIBBON_MIN_SEGMENT_PIXELS
+			)
+		):
 			filtered.append(point)
-	if filtered.size() < 3:
+	if filtered.size() < 2:
 		return
-	var left := PackedVector2Array()
-	var right := PackedVector2Array()
+	var vertices := PackedVector2Array()
+	var colors := PackedColorArray()
+	var indices := PackedInt32Array()
 	var last := filtered.size() - 1
 	for i in filtered.size():
-		var t := float(i) / float(last)
+		var t := float(i) / last
 		var tangent := (filtered[mini(i + 1, last)] - filtered[maxi(i - 1, 0)]).normalized()
 		var normal := Vector2(-tangent.y, tangent.x)
-		var thickness := maxf(0.1, width * pow(maxf(0.0, sin(PI * t)), 0.8))
-		left.append(filtered[i] + normal * thickness * 0.5)
-		right.append(filtered[i] - normal * thickness * 0.5)
-	for i in range(last, -1, -1):
-		left.append(right[i])
-	_surface.draw_colored_polygon(left, color)
+		var thickness := maxf(0.1, width * pow(sin(PI * t), RIBBON_TAPER_EXPONENT))
+		vertices.append(filtered[i] + normal * thickness * 0.5)
+		vertices.append(filtered[i] - normal * thickness * 0.5)
+		colors.append(color)
+		colors.append(color)
+		if i == 0:
+			continue
+		var previous := (i - 1) * 2
+		var current := i * 2
+		indices.append_array(
+			PackedInt32Array([previous, previous + 1, current, previous + 1, current + 1, current])
+		)
+	RenderingServer.canvas_item_add_triangle_array(
+		_surface.get_canvas_item(), indices, vertices, colors, PackedVector2Array()
+	)
 
 
 func _draw_flight_trails(high: Vector2, destination: Vector2, alpha: float) -> void:
@@ -371,15 +405,65 @@ func _draw_flight_trails(high: Vector2, destination: Vector2, alpha: float) -> v
 		var points := PackedVector2Array()
 		for i in range(33):
 			var t := float(i) / 32.0
-			var flight_t := maxf(0.0, progress - (1.0 - t) * 0.20)
+			var flight_t := maxf(0.0, progress - (1.0 - t) * FLIGHT_TRAIL_LAG)
 			var point := high.lerp(destination, flight_t) + Vector2(0, -80.0 * sin(flight_t * PI))
-			point.x += (strand - 1) * 7.0 * sin(t * PI) * (1.0 - progress)
+			var spread := sin(t * PI) * (1.0 - flight_t) * FLIGHT_TRAIL_SPREAD_PIXELS
+			point.x += (strand - 1) * spread
+			point.x += sin(t * TAU * FLIGHT_TRAIL_WAVE + clock * 5.0 + strand) * spread * 0.3
 			points.append(point)
-		if points[0].distance_squared_to(points[32]) < 1.0:
+		if points[0].distance_squared_to(points[32]) < RIBBON_MIN_SEGMENT_PIXELS:
 			continue
-		_draw_ribbon(points, 14.0, Color(jade, alpha * 0.12))
-		_draw_ribbon(points, 4.5, Color(jade, alpha * 0.55))
-		_draw_ribbon(points, 1.5, Color("eafff6", alpha * 0.85))
+		_draw_ribbon(points, 26.0, Color(jade, alpha * 0.045))
+		_draw_ribbon(points, 13.0, Color(jade, alpha * 0.15))
+		_draw_ribbon(points, 5.0, Color(jade, alpha * 0.55))
+		_draw_ribbon(points, 1.8, Color("eafff6", alpha * 0.95))
+	var head := high.lerp(destination, progress) + Vector2(0, -80.0 * sin(progress * PI))
+	_surface.draw_circle(head, FLIGHT_HEAD_FLARE_PIXELS * 2.0, Color(jade, alpha * 0.12))
+	_surface.draw_circle(head, FLIGHT_HEAD_FLARE_PIXELS, Color("eafff6", alpha * 0.3))
+	_surface.draw_circle(head, FLIGHT_HEAD_FLARE_PIXELS * 0.3, Color.WHITE * alpha)
+
+
+func _draw_absorption_flash(center: Vector2, time: float) -> void:
+	var life := 1.0 - smoothstep(0.0, IMPACT_RING_DURATION, time)
+	if life <= 0.0:
+		return
+	var jade := Color("35e2b3")
+	var radius := IMPACT_FLASH_RADIUS_PIXELS + time * IMPACT_RING_SPEED_PIXELS
+	for layer in range(IMPACT_GLOW_LAYERS, 0, -1):
+		var fraction := float(layer) / IMPACT_GLOW_LAYERS
+		_surface.draw_circle(
+			center, IMPACT_FLASH_RADIUS_PIXELS * fraction, Color(jade, life * 0.018)
+		)
+	_surface.draw_arc(
+		center,
+		radius,
+		0.0,
+		TAU,
+		IMPACT_RING_SEGMENTS,
+		Color(jade, life * 0.12),
+		IMPACT_RING_WIDTH_PIXELS * 3.0,
+		true
+	)
+	_surface.draw_arc(
+		center,
+		radius,
+		0.0,
+		TAU,
+		IMPACT_RING_SEGMENTS,
+		Color(jade, life * 0.42),
+		IMPACT_RING_WIDTH_PIXELS,
+		true
+	)
+	_surface.draw_arc(
+		center,
+		radius,
+		0.0,
+		TAU,
+		IMPACT_RING_SEGMENTS,
+		Color("eafff6", life * 0.85),
+		IMPACT_RING_WIDTH_PIXELS * 0.25,
+		true
+	)
 
 
 func _draw_impact_streaks(center: Vector2, time: float, strength: float) -> void:

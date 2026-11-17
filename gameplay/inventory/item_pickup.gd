@@ -4,6 +4,7 @@ extends Area3D
 const NOTE_ITEM: BaseItem = preload("res://data/items/quest/note.tres")
 const BOSS_DIARY_ITEM: BaseItem = preload("res://data/items/quest/boss_diary.tres")
 const CHARM_UNLOCK := preload("res://gameplay/charms/progression/charm_unlock_presentation.gd")
+const BLUEPRINT_UNLOCK_PATH := "res://gameplay/weapons/blueprints/blueprint_unlock.tscn"
 
 @export var item: BaseItem
 ## A note pickup unlocks this entry instead of taking an inventory slot.
@@ -119,6 +120,8 @@ func _on_body_entered(body: Node3D) -> void:
 
 
 func _can_attract(target: Node3D) -> bool:
+	if get_tree().paused:
+		return false
 	if not _can_be_picked_up or _collecting or is_queued_for_deletion():
 		return false
 	if item == null or quantity <= 0 or not target is Player:
@@ -145,7 +148,11 @@ func _can_attract(target: Node3D) -> bool:
 		var weapon_id := item.weapon_blueprint.weapon_id
 		return is_instance_valid(weapons) and weapons.has_weapon_definition(weapon_id)
 	# A generic note without an entry cannot grant anything and must not enter inventory.
-	if item.opens_note or item.item_id == NOTE_ITEM.item_id or item.item_id == BOSS_DIARY_ITEM.item_id:
+	if (
+		item.opens_note
+		or item.item_id == NOTE_ITEM.item_id
+		or item.item_id == BOSS_DIARY_ITEM.item_id
+	):
 		return false
 	return inventory.get_available_space(item) > 0
 
@@ -163,6 +170,27 @@ func _on_attraction_started(target: Node3D) -> void:
 		var presentation := CHARM_UNLOCK.new()
 		get_tree().root.add_child(presentation)
 		presentation.begin(self, target as Player)
+	elif item != null and item.weapon_blueprint != null:
+		var player := target as Player
+		if player.weapon_controller.is_blueprint_unlocked(item.weapon_blueprint.weapon_id):
+			return
+		_attraction.reset()
+		_collecting = true
+		# Load on demand: the presentation references ItemPickup in its public API.
+		var presentation := (load(BLUEPRINT_UNLOCK_PATH) as PackedScene).instantiate()
+		get_tree().root.add_child(presentation)
+		presentation.begin(self, player)
+
+
+## The presentation owns the reward transaction; this only releases the reserved pickup.
+func finish_blueprint_presentation(consumed: bool) -> void:
+	if consumed:
+		queue_free()
+		return
+	sprite.show()
+	_collecting = false
+	_attraction.set_enabled(true)
+	_start_idle_animation()
 
 
 func _on_attraction_cancelled() -> void:
@@ -191,7 +219,9 @@ func _collect(target: Node3D) -> void:
 		return
 	if item.weapon_blueprint != null:
 		var player := target as Player
-		if not player.weapon_controller.set_blueprint_unlocked(item.weapon_blueprint.weapon_id, true):
+		if not player.weapon_controller.set_blueprint_unlocked(
+			item.weapon_blueprint.weapon_id, true
+		):
 			_collecting = false
 			_attraction.retry()
 			return
