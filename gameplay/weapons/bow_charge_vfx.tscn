@@ -4,7 +4,9 @@
 
 [node name="BowChargeVFX" type="Node3D" unique_id=1378555746]
 script = ExtResource("1_vfx")
+effect_color = Color(0.16078432, 0.6509804, 1, 0.9019608)
+core_color = Color(0.89653075, 1, 0.7748055, 1)
 burst_duration = 0.5
-focus_forward_offset = 0.65
+focus_forward_offset = 1.5
 ring_count = 4
 spark_count = 20

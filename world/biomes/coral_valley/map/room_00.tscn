@@ -74,7 +74,7 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[node name="room_00" unique_id=1211314045 instance=ExtResource("1_base")]
+[node name="room_01" unique_id=1211314045 instance=ExtResource("1_base")]
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 left_destination_scene = "res://world/biomes/hub/map/room_04.tscn"

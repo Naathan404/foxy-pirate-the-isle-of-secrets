@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://br6hulcfucawv"]
+
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="1_title"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="2_sj51j"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_info"]
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0.015686275, 0.03529412, 0.05882353, 0.99607843)
+border_color = Color(0.68, 0.83, 0.72, 0.55)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="CharmUnlockUI" type="Control" unique_id=2102525365]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Heading" type="Label" parent="." unique_id=1726820484]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 50.0
+offset_bottom = 110.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.709804, 0.913726, 0.862745, 1)
+theme_override_colors/font_shadow_color = Color(0.0352941, 0.0745098, 0.129412, 1)
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("1_title")
+theme_override_font_sizes/font_size = 60
+text = "CHARM UNLOCKED"
+horizontal_alignment = 1
+
+[node name="InfoFrame" type="PanelContainer" parent="." unique_id=1671323873]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 400.0
+offset_top = -220.0
+offset_right = -400.0
+offset_bottom = -106.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_info")
+
+[node name="Rows" type="VBoxContainer" parent="InfoFrame" unique_id=556039178]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="CharmName" type="Label" parent="InfoFrame/Rows" unique_id=2051741339]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.941176, 0.764706, 1)
+theme_override_colors/font_shadow_color = Color(0, 0.02, 0.04, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("1_title")
+theme_override_font_sizes/font_size = 50
+text = "Arrow Rain"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="InfoFrame/Rows" unique_id=1961291104]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.929412, 0.964706, 0.960784, 1)
+theme_override_colors/font_shadow_color = Color(0, 0.02, 0.04, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_sj51j")
+theme_override_font_sizes/font_size = 20
+text = "Call down a rain of arrows."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Prompt" type="Label" parent="InfoFrame/Rows" unique_id=2013519351]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.658824, 0.87451, 0.894118, 1)
+theme_override_colors/font_shadow_color = Color(0, 0.02, 0.04, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_sj51j")
+theme_override_font_sizes/font_size = 16
+text = "[ SPACE ]"
+horizontal_alignment = 1
