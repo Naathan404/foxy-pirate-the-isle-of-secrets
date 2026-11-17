@@ -16,7 +16,7 @@ The source for the prototype recipes is the [Weapons tab of the balance sheet](h
 | Bow | 100 | Starfish Core ×5, Crab Claw ×5 |
 | Harpoon | 250 | Crab Claw ×2, Starfish Core ×1, Coral ×5 |
 
-Only Bow and Harpoon are implemented as craftable non-starter weapons. Dagger is the starter and normally appears as already owned. The other five weapons in the sheet have no gameplay `WeaponData` yet. `Coral` has a temporary icon and item resource but no world drop source yet. The debug-only **Debug: Supplies** button gives sample materials and gold for testing.
+Storm Bow, Harpoon and Meteor Staff are implemented as craftable non-starter weapons. Dagger is the starter and normally appears as already owned. Their blueprint items unlock the corresponding Craft recipes when collected; see [weapon blueprints](../weapons/weapon_collection.md#blueprint-pickups). Meteor Staff currently costs 250 gold, 5 Fireflies Tails and 5 Coral. The debug-only **Debug: Supplies** button gives sample materials and gold for testing.
 
 ## Forge
 
@@ -24,6 +24,6 @@ The Forge tab lists owned weapons. Pressing **Forge weapon** pays once and draws
 
 The GDD specifies gold and materials for each Forge but the balance sheet does not specify their amounts. The temporary values are **75 Gold, 2 Crab Claws, 1 Starfish Core** per roll, editable on `TortugaCatalog` in the Inspector. Payment occurs when the pair is rolled. Cost chips show a currency or item icon and current/required counts; their layout is in `gameplay/forge/tortuga_cost_chip.tscn`. The two-column popup and comparison row layouts are in `tortuga_forge_popup.tscn`, `tortuga_forge_card.tscn`, and `tortuga_stat_row.tscn` in the same directory.
 
-Blueprint/weapon ownership, inventory and Forge changes are runtime state. The project still needs its general save system to retain them between launches, and blueprint/world-drop progression is not added here.
+Blueprint/weapon ownership, inventory and Forge changes are runtime state. The project still needs its general save system to retain them between launches. Blueprint item resources are available for pickup or drop configuration; their world locations and drop rates are not configured here.
 
 Run `godot --headless --path . --script res://test/tortuga_test.gd` to check scene loading, payment, crafting, distinct Forge options and the dialogue-to-panel flow.

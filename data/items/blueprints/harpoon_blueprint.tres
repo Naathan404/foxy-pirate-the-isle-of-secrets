@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/blueprints/harpoon_blueprint.png" id="2_icon"]
+[ext_resource type="Resource" path="res://data/weapon/weapon_harpoon.tres" id="3_weapon"]
+
+[resource]
+script = ExtResource("1_item")
+item_id = "blueprint_harpoon"
+display_name = "Harpoon Blueprint"
+icon = ExtResource("2_icon")
+description = "Unlocks the Harpoon recipe at Master Tortuga."
+type = 3
+weapon_blueprint = ExtResource("3_weapon")
