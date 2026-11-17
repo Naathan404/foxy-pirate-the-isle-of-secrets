@@ -73,6 +73,10 @@ func charge_tick(delta: float) -> void:
 
 func charge_end(wall_impact: bool) -> void:
 	_shake(11.0 if wall_impact else 8.0, 0.24)
+	if wall_impact:
+		get_node("/root/ShockwaveController").request_world(
+			boss.global_position + Vector3.UP, 0.55, 0.038 * intensity, Color("ff9c46")
+		)
 	_play(BOOM, boss.global_position, -12.0, 1.25)
 	for index in 3:
 		var angle := (index - 1) * 0.55
@@ -150,6 +154,9 @@ func death() -> void:
 	_play(BOOM, boss.global_position, -5.0, 0.7)
 	_shake(14.0, 0.3)
 	_screen_flash(Color(1.0, 0.35, 0.08), 0.18, 0.3)
+	get_node("/root/ShockwaveController").request_world(
+		boss.global_position + Vector3.UP * 2.0, 0.9, 0.055 * intensity, Color("ffb25f")
+	)
 	_spawn_explosion(boss.global_position, 1.5)
 	EFFECTS.shockwave(boss.get_parent(), boss.global_position, 7.0, Color(1.0, 0.55, 0.12, 0.95))
 	EFFECTS.burst(

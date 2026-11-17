@@ -42,6 +42,9 @@ func _physics_process(_delta: float) -> void:
 		_hitbox.end_attack()
 	get_node("/root/HitstopController").request(hitstop_seconds)
 	get_node("/root/ScreenShakeController").request(shake_pixels, shake_seconds)
+	get_node("/root/ShockwaveController").request_world(
+		global_position, 0.48, 0.028, Color("ff9a4d")
+	)
 	if impact_sound != null:
 		get_node("/root/AudioManager").play_sfx_3d(impact_sound, global_position, impact_volume_db)
 

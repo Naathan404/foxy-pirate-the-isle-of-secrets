@@ -74,8 +74,6 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239
 [node name="FlatTide" parent="." index="15" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36796284, 0, 0)
 player = NodePath("../Foxy")
-wave_knockback_speed = 10.0
-wave_knockback_duration = 0.2
 
 [node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8256235, 0.08, 0.40002728)

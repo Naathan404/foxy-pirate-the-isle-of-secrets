@@ -22,6 +22,8 @@ Khung debug là hình học hiển thị, không tạo collider. `Player Ground 
 
 Controller giữ bốn pha `LOW`, `RISING`, `HIGH`, `FALLING`. `Warning Seconds` chọn lúc bắt đầu báo nước dâng; `Warning Fade Duration` làm mờ vệt cảnh báo trước khi nước dâng. Nước và sóng dừng cùng game khi pause.
 
+Khi mép sóng đang dâng chạm Player, hoặc Player đi vào phần sóng đang tiến, sóng đẩy Player theo hướng dòng nước một lần mỗi đợt dâng. `Wave Knockback Speed` mặc định là 14 m/s và `Wave Knockback Duration` là 0,65 giây; cả hai chỉnh được trên `FlatTideController`. Lực đẩy được áp dụng sau vận tốc của trạng thái Player, nên đi hoặc dash ngược chiều không triệt tiêu được lực trong thời gian tác dụng. Va chạm với tường và vật cản vẫn giới hạn chuyển động.
+
 `WaterFootsteps` tạo dấu khi Foxy di chuyển trên nền ngập. Các dấu đi theo cao độ mặt sóng và được ẩn nếu nước rút khỏi vị trí đó. `Footprint Size`, `Surface Clearance`, `Step Distance`, `Step Width`, `Mark Lifetime`, `Minimum Speed`, `Max Marks` và `Max Step Displacement` có thể chỉnh trong Inspector.
 
 ## Enemy khi nước rút

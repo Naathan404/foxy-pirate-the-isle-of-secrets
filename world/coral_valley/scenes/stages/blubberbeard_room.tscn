@@ -1,0 +1,126 @@
+[gd_scene format=3 uid="uid://b1d0ym8sw5u0s"]
+
+[ext_resource type="PackedScene" uid="uid://bbauj40amsqe3" path="res://world/biomes/coral_valley/base_scenes/boss_room.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://c60eka7xvsqh8" path="res://gameplay/bosses/blubberbeard/blubberbeard.tscn" id="2"]
+[ext_resource type="Script" uid="uid://t35p4modmvrv" path="res://gameplay/bosses/boss_encounter.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://bo7ce6vvl81jr" path="res://world/hub/objects/sea_water.tscn" id="4"]
+[ext_resource type="Script" uid="uid://dbmrckgtbsa05" path="res://world/coral_valley/scenes/stages/blubberbeard_arena.gd" id="5"]
+
+[sub_resource type="Environment" id="SeaEnvironment"]
+background_mode = 1
+background_color = Color(0.025, 0.12, 0.16, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.54, 0.8, 0.79, 1)
+ambient_light_energy = 0.8
+
+[sub_resource type="StandardMaterial3D" id="WarningMaterial"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.35, 0.08, 0.75)
+
+[sub_resource type="TorusMesh" id="WarningRing"]
+material = SubResource("WarningMaterial")
+inner_radius = 1.5
+outer_radius = 1.7
+
+[node name="BlubberbeardRoom" unique_id=60789925 instance=ExtResource("1")]
+open_exits = 8
+left_destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
+left_destination_trigger_id = &"stage5_boss"
+
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
+environment = SubResource("SeaEnvironment")
+
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+visible = false
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
+destination_trigger_id = &"stage5_boss"
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2.1, 0)
+
+[node name="CaptainBlubberbeard" parent="." index="5" unique_id=1542146759 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.4, 0)
+hits_before_evade = 1
+
+[node name="BossEncounter" type="Node" parent="." index="6" unique_id=375695329 node_paths=PackedStringArray("boss")]
+script = ExtResource("3")
+encounter_id = &"captain_blubberbeard"
+boss = NodePath("../CaptainBlubberbeard")
+
+[node name="SeaWater" parent="." index="7" unique_id=1974606811 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.5, 0)
+
+[node name="ArenaWarning" type="Node" parent="." index="8" unique_id=569615339 node_paths=PackedStringArray("boss")]
+script = ExtResource("5")
+boss = NodePath("../CaptainBlubberbeard")
+
+[node name="WarningBuoys" type="Node3D" parent="." index="9" unique_id=1794235395]
+
+[node name="Port" type="MeshInstance3D" parent="WarningBuoys" index="0" unique_id=436264667]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.25, -18)
+mesh = SubResource("WarningRing")
+
+[node name="Starboard" type="MeshInstance3D" parent="WarningBuoys" index="1" unique_id=642007598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.25, -18)
+mesh = SubResource("WarningRing")
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

@@ -30,8 +30,8 @@ enum State { LOW, RISING, HIGH, FALLING }
 ## Khoảng cách từ gốc nhân vật xuống chân để kiểm tra Foxy có đứng trong nước không.
 @export_range(0.0, 2.0, 0.01) var player_ground_offset: float = 0.75
 ## Horizontal speed applied when an advancing wave reaches the player; 0 disables it.
-@export_range(0.0, 15.0, 0.1, "suffix:m/s") var wave_knockback_speed: float = 4.0
-@export_range(0.05, 1.0, 0.05, "suffix:s") var wave_knockback_duration: float = 0.3
+@export_range(0.0, 25.0, 0.1, "suffix:m/s") var wave_knockback_speed: float = 11.0
+@export_range(0.05, 2.0, 0.05, "suffix:s") var wave_knockback_duration: float = 0.65
 
 var state: State = State.LOW
 var coverage: float = 0.0
@@ -39,6 +39,7 @@ var _elapsed: float = 0.0
 var _warned: bool = false
 var _visual_time: float = 0.0
 var _wave_hit_player: bool = false
+var _wave_previous_wet: Dictionary[int, bool] = {}
 
 
 func _ready() -> void:
@@ -98,6 +99,7 @@ func _enter_state(next_state: State) -> void:
 		_warned = false
 	if state == State.RISING:
 		_wave_hit_player = false
+		_wave_previous_wet.clear()
 	state_changed.emit(state)
 
 
@@ -129,11 +131,19 @@ func _apply_coverage() -> void:
 				coverage, warning, _visual_time, warning_strength,
 				state == State.RISING, state == State.FALLING
 			)
-			if check_wave and not was_wet and zone.is_point_in_advancing_wave(ground_point):
-				_wave_hit_player = true
-				player.apply_environment_knockback(
-					zone.get_flow_direction(), wave_knockback_speed, wave_knockback_duration
-				)
+			if check_wave:
+				var wet_now := zone.is_point_in_advancing_wave(ground_point)
+				var previously_wet: bool = _wave_previous_wet.get(zone.get_instance_id(), false)
+				_wave_previous_wet[zone.get_instance_id()] = wet_now
+				if wet_now and (not was_wet or not previously_wet):
+					_wave_hit_player = true
+					player.apply_environment_knockback(
+						zone.get_flow_direction(), wave_knockback_speed, wave_knockback_duration
+					)
+					if wave_knockback_speed > 0.0:
+						get_node("/root/ShockwaveController").request_world(
+							player.global_position + Vector3.UP, 0.38, 0.01, Color("78dfff")
+						)
 	coverage_changed.emit(coverage)
 
 

@@ -12,6 +12,9 @@ func _ready() -> void:
 
 
 func _drop_rewards() -> void:
+	get_node("/root/ShockwaveController").request_world(
+		global_position + Vector3.UP, 0.45, 0.016, Color("ffe3a0")
+	)
 	for index in rewards.size():
 		if rewards[index] == null:
 			continue

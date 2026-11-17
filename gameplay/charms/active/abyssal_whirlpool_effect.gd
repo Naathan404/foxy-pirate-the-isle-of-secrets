@@ -68,6 +68,9 @@ func _explode() -> void:
 	var damage := _get_base_damage() * definition.get_param_float(&"damage_multiplier", 1.0)
 	CharmVfx.spawn(actor.get_parent(), _zone.global_position, CharmVfx.TIDE, radius * 1.2, 0.4)
 	get_node("/root/ScreenShakeController").request(7.0, 0.22)
+	get_node("/root/ShockwaveController").request_world(
+		_zone.global_position, 0.65, 0.032, Color("68caff")
+	)
 	var hit_confirmed := false
 	for node in actor.get_tree().get_nodes_in_group("enemy"):
 		if not node is Node3D or node.is_in_group("boss"):

@@ -164,6 +164,10 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 		_vfx.impact(at, context.direction, heavy, impact_scale)
 	if not _impact_played:
 		_impact_played = true
+		if heavy:
+			get_node("/root/ShockwaveController").request_world(
+				at, 0.3, 0.007 * impact_scale, Color("f8e7bd")
+			)
 		get_node("/root/HitstopController").request_local(
 			null, target as Node3D, step.hitstop_seconds * impact_scale
 		)

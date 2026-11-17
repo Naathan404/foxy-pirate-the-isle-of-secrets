@@ -48,6 +48,10 @@ vị trí Vector3, hoặc `request_screen(position, duration, strength, tint)` v
 tọa độ pixel trong viewport. Tham số sau vị trí đều tùy chọn; `cancel()` dừng
 hiệu ứng. Mỗi request mới thay thế wave đang chạy; controller dùng thời gian thực
 và vẫn hoạt động trong pause/hitstop. Chuỗi Charm gọi wave lúc hấp thụ thành công.
+Các điểm gọi khác gồm Blubberbeard va tường hoặc bị hạ, meteor chạm đất,
+Abyssal Whirlpool phát nổ, rương boss mở, đòn dagger có `heavy_impact` trúng
+và sóng triều chạm Player. Các sự kiện nhỏ dùng lực thấp hơn; những lần gọi
+gần nhau vẫn thay thế wave trước theo chính sách chung của controller.
 
 Ownership dùng CharmRegistry và cơ chế chuyển scene hiện có. Save lâu dài chưa
 thuộc phạm vi hệ thống Charm hiện tại. Kiểm tra bằng
