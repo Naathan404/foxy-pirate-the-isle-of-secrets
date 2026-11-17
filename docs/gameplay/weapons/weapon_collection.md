@@ -28,7 +28,9 @@ Setters reject unknown weapon IDs. To configure another weapon, add a WeaponColl
 `data/items/blueprints/` contains item resources for Storm Bow, Harpoon and Meteor Staff.
 Each uses `BaseItem.weapon_blueprint` to reference the corresponding `WeaponData` and
 can be assigned to an existing item pickup or chest drop. On collection, the pickup
-unlocks that weapon's registered blueprint, emits normal pickup feedback and takes no
+plays the [blueprint discovery presentation](../economy/blueprint_unlock_presentation.md)
+for a locked recipe: pause, camera focus, golden drafting VFX, Space confirmation
+and absorption. The blueprint is unlocked when the paper reaches the player and takes no
 inventory space. It does not grant or equip the weapon; Master Tortuga's Craft tab
 then shows the recipe. Repeated pickups are consumed safely and do not grant weapons.
 An unknown or unavailable weapon controller leaves the pickup uncollected. Blueprint
