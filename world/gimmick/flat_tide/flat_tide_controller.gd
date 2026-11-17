@@ -35,7 +35,7 @@ const SHOCKWAVE_RADIUS_PIXELS := 110.0
 ## Khoảng cách từ gốc nhân vật xuống chân để kiểm tra Foxy có đứng trong nước không.
 @export_range(0.0, 2.0, 0.01) var player_ground_offset: float = 0.75
 ## Horizontal speed applied when an advancing wave reaches the player; 0 disables it.
-@export_range(0.0, 25.0, 0.1, "suffix:m/s") var wave_knockback_speed: float = 11.0
+@export_range(0.0, 25.0, 0.1, "suffix:m/s") var wave_knockback_speed: float = 10.0
 @export_range(0.05, 2.0, 0.05, "suffix:s") var wave_knockback_duration: float = 0.65
 
 var state: State = State.LOW

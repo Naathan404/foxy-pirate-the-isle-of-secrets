@@ -140,6 +140,10 @@ func _can_attract(target: Node3D) -> bool:
 			call_deferred("queue_free")
 			return false
 		return definition != null and definition.is_playable() and definition.effect_scene != null
+	if item.weapon_blueprint != null:
+		var weapons := player.weapon_controller
+		var weapon_id := item.weapon_blueprint.weapon_id
+		return is_instance_valid(weapons) and weapons.has_weapon_definition(weapon_id)
 	# A generic note without an entry cannot grant anything and must not enter inventory.
 	if item.opens_note or item.item_id == NOTE_ITEM.item_id or item.item_id == BOSS_DIARY_ITEM.item_id:
 		return false
@@ -184,6 +188,17 @@ func _collect(target: Node3D) -> void:
 		# Charm pickups use the presentation started before attraction moves them.
 		_collecting = false
 		_attraction.retry()
+		return
+	if item.weapon_blueprint != null:
+		var player := target as Player
+		if not player.weapon_controller.set_blueprint_unlocked(item.weapon_blueprint.weapon_id, true):
+			_collecting = false
+			_attraction.retry()
+			return
+		quantity = 0
+		inventory.notify_item_picked_up(item, 1)
+		_can_be_picked_up = false
+		_attraction.complete()
 		return
 	var requested_quantity := quantity
 	quantity = inventory.add_item(item, quantity)

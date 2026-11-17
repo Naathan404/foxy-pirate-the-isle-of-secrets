@@ -11,3 +11,5 @@ extends Resource
 @export var opens_note: bool = false
 ## If set, collecting this item grants the registered playable Charm instead of inventory.
 @export var charm: CharmData
+## Blueprint pickups unlock crafting permission without occupying inventory.
+@export var weapon_blueprint: WeaponData
