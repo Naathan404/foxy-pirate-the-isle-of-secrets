@@ -13,7 +13,7 @@ var pickup: ItemPickup
 var player: Player
 var camera: Camera3D
 var charm: CharmData
-var phase := 0 # intro, waiting, outro
+var phase := 0  # intro, waiting, outro
 var elapsed := 0.0
 var clock := 0.0
 var committed := false
@@ -57,10 +57,16 @@ func begin(source: ItemPickup, actor: Player) -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 100
 	if is_instance_valid(camera):
-		base_zoom = camera.size if camera.projection == Camera3D.PROJECTION_ORTHOGONAL else camera.fov
+		base_zoom = (
+			camera.size if camera.projection == Camera3D.PROJECTION_ORTHOGONAL else camera.fov
+		)
 		base_position = camera.global_position
 		var local_target := camera.to_local(player.global_position + Vector3.UP)
-		focus_position = base_position + camera.global_basis.x * local_target.x + camera.global_basis.y * local_target.y
+		focus_position = (
+			base_position
+			+ camera.global_basis.x * local_target.x
+			+ camera.global_basis.y * local_target.y
+		)
 		base_h = camera.h_offset
 		base_v = camera.v_offset
 	player.clear_gameplay_input()
@@ -94,9 +100,9 @@ func _build_ui() -> void:
 	shader.code = """shader_type canvas_item;
 	uniform float strength = 0.0;
 	void fragment() {
-	 vec2 p = (UV - vec2(0.5)) * vec2(1.15, 1.0);
-	 float edge = smoothstep(0.12, 0.78, length(p));
-	 COLOR = vec4(0.008, 0.025, 0.065, strength * (0.26 + edge * 0.70));
+		vec2 p = (UV - vec2(0.5)) * vec2(1.15, 1.0);
+		float edge = smoothstep(0.12, 0.78, length(p));
+		COLOR = vec4(0.008, 0.025, 0.065, strength * (0.26 + edge * 0.70));
 	}"""
 	var material := ShaderMaterial.new()
 	material.shader = shader
@@ -146,12 +152,17 @@ func _process(delta: float) -> void:
 		elapsed = 0.0
 		_play_tone(660.0, 0.35)
 	if phase == 2 and not committed and elapsed >= CHARGE + FLIGHT:
-		if not is_instance_valid(player.charm_registry) or not player.charm_registry.set_owned(charm.charm_id, true):
+		if (
+			not is_instance_valid(player.charm_registry)
+			or not player.charm_registry.set_owned(charm.charm_id, true)
+		):
 			_finish(false)
 			return
 		committed = true
 		_play_tone(220.0, 0.8)
-		get_node("/root/ShockwaveController").request_world(player.global_position + Vector3.UP, 0.9, 0.06)
+		get_node("/root/ShockwaveController").request_world(
+			player.global_position + Vector3.UP, 0.9, 0.06
+		)
 	if phase == 2 and elapsed >= CHARGE + FLIGHT + BURST + RETURN:
 		_finish(true)
 		return
@@ -160,7 +171,9 @@ func _process(delta: float) -> void:
 	if phase == 2:
 		fade *= 1.0 - smoothstep(CHARGE + FLIGHT + BURST, CHARGE + FLIGHT + BURST + RETURN, elapsed)
 	(_vignette.material as ShaderMaterial).set_shader_parameter("strength", fade)
-	var text_alpha := smoothstep(2.6, INTRO, clock) if phase < 2 else 1.0 - smoothstep(0.0, 0.35, elapsed)
+	var text_alpha := (
+		smoothstep(2.6, INTRO, clock) if phase < 2 else 1.0 - smoothstep(0.0, 0.35, elapsed)
+	)
 	_info_frame.modulate.a = text_alpha
 	_heading.modulate.a = text_alpha
 	_prompt.modulate.a = 0.7 + 0.3 * sin(clock * 3.0)
@@ -184,7 +197,9 @@ func _update_camera() -> void:
 		return
 	var weight := smoothstep(0.0, 0.8, clock)
 	if phase == 2:
-		weight *= 1.0 - smoothstep(CHARGE + FLIGHT + BURST, CHARGE + FLIGHT + BURST + RETURN, elapsed)
+		weight *= (
+			1.0 - smoothstep(CHARGE + FLIGHT + BURST, CHARGE + FLIGHT + BURST + RETURN, elapsed)
+		)
 	camera.global_position = base_position.lerp(focus_position, weight)
 	var zoom := lerpf(base_zoom, base_zoom * 0.77, weight)
 	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
@@ -222,7 +237,16 @@ func _draw_effects() -> void:
 	_icon_pulse = pulse
 	if alpha > 0.0:
 		if phase < 2 or elapsed < CHARGE:
-			_surface.draw_arc(origin + Vector2(0, 18), 44.0 * rising, 0.0, TAU, 64, Color(accent, alpha * 0.5), 2.0, true)
+			_surface.draw_arc(
+				origin + Vector2(0, 18),
+				44.0 * rising,
+				0.0,
+				TAU,
+				64,
+				Color(accent, alpha * 0.5),
+				2.0,
+				true
+			)
 		if phase == 2 and elapsed >= CHARGE:
 			_draw_flight_trails(high, destination, alpha)
 		for i in range(5, 0, -1):
@@ -237,22 +261,40 @@ func _draw_effects() -> void:
 		_draw_impact_streaks(destination, t, strength)
 		for i in range(36):
 			var angle := float(i) * TAU / 36.0
-			var distance := (25.0 + t * (110.0 + (i % 4) * 35.0))
-			_surface.draw_circle(destination + Vector2(cos(angle), sin(angle)) * distance, 2.5 * strength, Color("ffe0a3", strength))
+			var distance := 25.0 + t * (110.0 + (i % 4) * 35.0)
+			_surface.draw_circle(
+				destination + Vector2(cos(angle), sin(angle)) * distance,
+				2.5 * strength,
+				Color("ffe0a3", strength)
+			)
 
 
 func _draw_icon() -> void:
-	if _restored or not is_instance_valid(pickup) or pickup.item == null or pickup.item.icon == null:
+	if (
+		_restored
+		or not is_instance_valid(pickup)
+		or pickup.item == null
+		or pickup.item.icon == null
+	):
 		return
 	if _icon_alpha > 0.0:
 		var icon_size := Vector2(68, 68) * _icon_pulse
-		_icon_surface.draw_texture_rect(pickup.item.icon, Rect2(_icon_center - icon_size / 2.0, icon_size), false, Color(1, 1, 1, _icon_alpha))
+		_icon_surface.draw_texture_rect(
+			pickup.item.icon,
+			Rect2(_icon_center - icon_size / 2.0, icon_size),
+			false,
+			Color(1, 1, 1, _icon_alpha)
+		)
 
 
 func _get_high_target(destination: Vector2, screen_size: Vector2) -> Vector2:
 	return Vector2(
 		destination.x,
-		clampf(destination.y - minf(screen_size.y * 0.22, 180.0), screen_size.y * 0.26, screen_size.y * 0.50)
+		clampf(
+			destination.y - minf(screen_size.y * 0.22, 180.0),
+			screen_size.y * 0.26,
+			screen_size.y * 0.50
+		)
 	)
 
 
@@ -287,7 +329,13 @@ func _draw_energy_streams(center: Vector2, alpha: float) -> void:
 		var outward := Vector2(-tangent.y, tangent.x)
 		if outward.dot(tip - center) < 0.0:
 			outward = -outward
-		var spike := PackedVector2Array([tip - tangent * 6.0, tip + outward * (17.0 + 4.0 * sin(clock * 2.0 + stream)), tip + tangent * 7.0])
+		var spike := PackedVector2Array(
+			[
+				tip - tangent * 6.0,
+				tip + outward * (17.0 + 4.0 * sin(clock * 2.0 + stream)),
+				tip + tangent * 7.0
+			]
+		)
 		_surface.draw_colored_polygon(spike, Color(jade, alpha * 0.72))
 
 
@@ -369,7 +417,20 @@ func _play_tone(frequency: float, duration: float) -> void:
 	for i in range(int(rate * duration)):
 		var t := float(i) / rate
 		var envelope := minf(t * 20.0, 1.0) * exp(-t * 5.0)
-		var sample := int(clampf((sin(TAU * frequency * t) + 0.3 * sin(TAU * frequency * 2.01 * t)) * envelope * 0.16, -1.0, 1.0) * 32767.0)
+		var sample := int(
+			(
+				clampf(
+					(
+						(sin(TAU * frequency * t) + 0.3 * sin(TAU * frequency * 2.01 * t))
+						* envelope
+						* 0.16
+					),
+					-1.0,
+					1.0
+				)
+				* 32767.0
+			)
+		)
 		data.encode_s16(i * 2, sample)
 	var stream := AudioStreamWAV.new()
 	stream.format = AudioStreamWAV.FORMAT_16_BITS

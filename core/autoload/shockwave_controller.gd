@@ -1,4 +1,4 @@
-﻿extends CanvasLayer
+extends CanvasLayer
 ## Reusable screen-space refraction wave. Works during pause and hitstop.
 
 @export_range(0.05, 3.0, 0.05) var maximum_duration := 2.0
@@ -22,16 +22,16 @@ func _ready() -> void:
 	uniform float max_radius = 1.3;
 	uniform vec4 tint : source_color = vec4(0.34, 1.0, 0.8, 1.0);
 	void fragment() {
-	 vec2 diff = (SCREEN_UV - center) * vec2(aspect, 1.0);
-	 float dist = length(diff);
-	 float radius = mix(0.01, max_radius, progress);
-	 float band = exp(-pow((dist - radius) / 0.065, 2.0));
-	 float fade = pow(1.0 - progress, 0.55) * smoothstep(0.0, 0.05, progress);
-	 vec2 dir = diff / max(dist, 0.0001);
-	 vec2 offset = dir / vec2(aspect, 1.0) * band * strength * fade;
-	 vec3 scene = texture(screen_texture, clamp(SCREEN_UV - offset, vec2(0.001), vec2(0.999))).rgb;
-	 vec3 light = tint.rgb * band * fade * 0.26;
-	 COLOR = vec4(scene + light, 1.0);
+		vec2 diff = (SCREEN_UV - center) * vec2(aspect, 1.0);
+		float dist = length(diff);
+		float radius = mix(0.01, max_radius, progress);
+		float band = exp(-pow((dist - radius) / 0.065, 2.0));
+		float fade = pow(1.0 - progress, 0.55) * smoothstep(0.0, 0.05, progress);
+		vec2 dir = diff / max(dist, 0.0001);
+		vec2 offset = dir / vec2(aspect, 1.0) * band * strength * fade;
+		vec3 scene = texture(screen_texture, clamp(SCREEN_UV - offset, vec2(0.001), vec2(0.999))).rgb;
+		vec3 light = tint.rgb * band * fade * 0.26;
+		COLOR = vec4(scene + light, 1.0);
 	}"""
 	_material = ShaderMaterial.new()
 	_material.shader = shader
@@ -45,7 +45,12 @@ func _ready() -> void:
 
 
 ## Coordinates are viewport pixels. A new request replaces the active wave.
-func request_screen(position: Vector2, duration: float = 0.65, strength: float = 0.022, tint: Color = Color("5dffd1")) -> void:
+func request_screen(
+	position: Vector2,
+	duration: float = 0.65,
+	strength: float = 0.022,
+	tint: Color = Color("5dffd1")
+) -> void:
 	if duration <= 0.0 or strength <= 0.0 or not is_instance_valid(_rect):
 		return
 	var size := get_viewport().get_visible_rect().size
@@ -56,7 +61,10 @@ func request_screen(position: Vector2, duration: float = 0.65, strength: float =
 	_material.set_shader_parameter("center", position / size)
 	_material.set_shader_parameter("aspect", size.x / size.y)
 	var center := position / size
-	var corner_offset := Vector2(maxf(absf(center.x), absf(1.0 - center.x)) * size.x / size.y, maxf(absf(center.y), absf(1.0 - center.y)))
+	var corner_offset := Vector2(
+		maxf(absf(center.x), absf(1.0 - center.x)) * size.x / size.y,
+		maxf(absf(center.y), absf(1.0 - center.y))
+	)
 	_material.set_shader_parameter("max_radius", corner_offset.length() * 1.12)
 	_material.set_shader_parameter("strength", minf(strength, maximum_strength))
 	_material.set_shader_parameter("tint", tint)
@@ -66,7 +74,12 @@ func request_screen(position: Vector2, duration: float = 0.65, strength: float =
 
 
 ## Project any visible world position through the active camera.
-func request_world(position: Vector3, duration: float = 0.65, strength: float = 0.022, tint: Color = Color("5dffd1")) -> void:
+func request_world(
+	position: Vector3,
+	duration: float = 0.65,
+	strength: float = 0.022,
+	tint: Color = Color("5dffd1")
+) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if not is_instance_valid(camera) or camera.is_position_behind(position):
 		return

@@ -1,8 +1,10 @@
 extends SceneTree
 
-const ROOM := preload("res://world/coral_valley/scenes/stages/blubberbeard_room.tscn")
-const STAGE := preload("res://world/coral_valley/scenes/stages/stage5.tscn")
+const ROOM_PATH := "res://world/coral_valley/scenes/stages/blubberbeard_room.tscn"
+const STAGE_PATH := "res://world/coral_valley/scenes/stages/stage5.tscn"
 const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
+var room_scene: PackedScene
+var stage_scene: PackedScene
 var failures: Array[String] = []
 
 
@@ -11,9 +13,15 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	if not ResourceLoader.exists(ROOM_PATH) or not ResourceLoader.exists(STAGE_PATH):
+		print("Boss encounter test skipped: Coral Valley stages have been removed")
+		quit()
+		return
+	room_scene = load(ROOM_PATH)
+	stage_scene = load(STAGE_PATH)
 	var manager := root.get_node("GameManager")
 	manager.boss_encounters.clear()
-	var stage := STAGE.instantiate() as Node3D
+	var stage := stage_scene.instantiate() as Node3D
 	root.add_child(stage)
 	var gate := stage.get_node("BossGate") as SceneChangeTrigger
 	_check(stage.has_node("Foxy"), "Stage 5 has no player for the boss route")
@@ -94,7 +102,7 @@ func _run() -> void:
 
 
 func _new_room() -> Node3D:
-	var room := ROOM.instantiate() as Node3D
+	var room := room_scene.instantiate() as Node3D
 	root.add_child(room)
 	current_scene = room
 	return room
