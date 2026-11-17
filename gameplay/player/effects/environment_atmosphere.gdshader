@@ -5,6 +5,7 @@ uniform vec4 water_tint : source_color = vec4(0.07, 0.53, 0.70, 1.0);
 uniform float ambient_strength : hint_range(0.0, 0.3) = 0.035;
 uniform float mote_strength : hint_range(0.0, 0.3) = 0.05;
 uniform float water_amount : hint_range(0.0, 1.0) = 0.0;
+uniform float water_pressure : hint_range(0.0, 1.0) = 0.0;
 uniform float water_tint_strength : hint_range(0.0, 0.5) = 0.08;
 uniform float water_edge_strength : hint_range(0.0, 0.7) = 0.22;
 uniform float water_shimmer_strength : hint_range(0.0, 0.5) = 0.13;
@@ -36,7 +37,10 @@ void fragment() {
 		float glints = pow(max(0.0, wave_a * wave_b), 5.0);
 		water = water_amount * (water_tint_strength + edge * water_edge_strength + glints * water_shimmer_strength);
 	}
-	float total = clamp(ambient + water, 0.0, 0.65);
-	vec3 color = mix(ambient_tint.rgb, water_tint.rgb, water / max(total, 0.0001));
+	float pressure = smoothstep(0.0, 1.0, water_pressure);
+	float obscuration = pressure * mix(0.91, 0.98, edge);
+	float total = clamp(max(ambient + water, obscuration), 0.0, 0.98);
+	vec3 color = mix(ambient_tint.rgb, water_tint.rgb, water / max(ambient + water, 0.0001));
+	color = mix(color, vec3(0.01, 0.07, 0.10), pressure * 0.9);
 	COLOR = vec4(color, total);
 }

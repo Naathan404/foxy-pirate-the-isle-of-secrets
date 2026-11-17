@@ -20,8 +20,12 @@ const ATMOSPHERE_SHADER: Shader = preload(
 @export_range(0.0, 0.5, 0.01) var water_shimmer_strength: float = 0.13
 @export_range(0.01, 3.0, 0.05, "suffix:s") var water_fade_in: float = 0.4
 @export_range(0.01, 3.0, 0.05, "suffix:s") var water_fade_out: float = 0.65
+## Time continuously in water before visibility reaches its minimum.
+@export_range(0.1, 12.0, 0.1, "suffix:s") var water_full_obscuration_time: float = 12.0
 
 var _water_amount := 0.0
+var _water_elapsed := 0.0
+var _water_pressure := 0.0
 var _material: ShaderMaterial
 var _overlay: ColorRect
 
@@ -52,7 +56,16 @@ func _process(delta: float) -> void:
 	var target := 1.0 if wet else 0.0
 	var duration := water_fade_in if wet else water_fade_out
 	_water_amount = move_toward(_water_amount, target, maxf(delta, 0.0) / maxf(duration, 0.01))
+	if wet:
+		_water_elapsed = minf(_water_elapsed + maxf(delta, 0.0), water_full_obscuration_time)
+		_water_pressure = _water_elapsed / maxf(water_full_obscuration_time, 0.1)
+	else:
+		_water_elapsed = 0.0
+		_water_pressure = move_toward(
+			_water_pressure, 0.0, maxf(delta, 0.0) / maxf(water_fade_out, 0.01)
+		)
 	_material.set_shader_parameter("water_amount", _water_amount)
+	_material.set_shader_parameter("water_pressure", _water_pressure)
 
 
 ## Call after changing exported settings at runtime.

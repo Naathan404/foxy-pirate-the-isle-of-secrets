@@ -60,6 +60,10 @@ var environment_move_speed_multiplier: float = 1.0
 var environment_dash_distance_multiplier: float = 1.0
 var environment_is_water: bool = false
 var potion_selection_active: bool = false
+var _environment_push_direction := Vector3.ZERO
+var _environment_push_speed := 0.0
+var _environment_push_remaining := 0.0
+var _environment_push_duration := 0.0
 var _charm_grapple_tween: Tween
 var _dash_pushed_crates: Dictionary[int, bool] = {}
 var _post_hit_invulnerability_remaining: float = 0.0
@@ -306,6 +310,7 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
+	_apply_environment_push(delta)
 	move_and_slide()
 	_push_collided_crates()
 
@@ -631,15 +636,34 @@ func play_directional_animation(action: String, restart: bool = false) -> void:
 # Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
 ## Reuse hit recovery without applying damage when an environmental wave hits.
 func apply_environment_knockback(direction: Vector3, speed: float, duration: float) -> void:
-	if dead or speed <= 0.0 or direction.length_squared() < 0.0001:
+	var horizontal := Vector3(direction.x, 0.0, direction.z)
+	if dead or speed <= 0.0 or duration <= 0.0 or horizontal.length_squared() < 0.0001:
 		return
-	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
-		return
-	pending_hit_direction = Vector3(direction.x, 0.0, direction.z).normalized()
+	_environment_push_direction = horizontal.normalized()
+	_environment_push_speed = speed
+	_environment_push_duration = duration
+	_environment_push_remaining = duration
+	pending_hit_direction = _environment_push_direction
 	pending_hit_knockback_multiplier = speed / 8.0
 	notify_hit(duration)
-	# A second hit in the hit state refreshes its timer without re-entering it.
-	set_horizontal_velocity(pending_hit_direction * speed)
+
+
+func _apply_environment_push(delta: float) -> void:
+	if dead:
+		_environment_push_remaining = 0.0
+		return
+	if _environment_push_remaining <= 0.0:
+		return
+	# Locomotion, attacks and dash may set velocity, but cannot cancel the wave's
+	# minimum forward component. Wall collisions still constrain actual movement.
+	var strength := _environment_push_remaining / _environment_push_duration
+	var minimum_speed := _environment_push_speed * lerpf(0.35, 1.0, strength)
+	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
+	var forward_speed := horizontal.dot(_environment_push_direction)
+	if forward_speed < minimum_speed:
+		horizontal += _environment_push_direction * (minimum_speed - forward_speed)
+		set_horizontal_velocity(horizontal)
+	_environment_push_remaining = maxf(0.0, _environment_push_remaining - maxf(delta, 0.0))
 
 
 func notify_hit(duration: float = -1.0) -> void:

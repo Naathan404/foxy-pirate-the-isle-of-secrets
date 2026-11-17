@@ -12,6 +12,16 @@ const BOOM = preload("res://gameplay/bosses/blubberbeard/boss_explosion.wav")
 const CHARGE = preload("res://gameplay/bosses/blubberbeard/boss_charge.wav")
 const ROAR = preload("res://gameplay/bosses/blubberbeard/boss_roar.wav")
 
+const WALL_SHOCKWAVE_DURATION := 0.4
+const WALL_SHOCKWAVE_STRENGTH := 0.016
+const WALL_SHOCKWAVE_COLOR := Color("ff9c46")
+const WALL_SHOCKWAVE_RADIUS_PIXELS := 190.0
+const DEATH_SHOCKWAVE_DURATION := 0.6
+const DEATH_SHOCKWAVE_STRENGTH := 0.022
+const DEATH_SHOCKWAVE_COLOR := Color("ffb25f")
+const DEATH_SHOCKWAVE_RADIUS_PIXELS := 240.0
+const DEATH_SHOCKWAVE_HEIGHT := 2.0
+
 @export_range(0.0, 2.0, 0.1) var intensity: float = 1.0
 @export_range(30.0, 75.0, 1.0, "degrees") var fight_camera_fov: float = 45.0
 
@@ -73,6 +83,14 @@ func charge_tick(delta: float) -> void:
 
 func charge_end(wall_impact: bool) -> void:
 	_shake(11.0 if wall_impact else 8.0, 0.24)
+	if wall_impact:
+		get_node("/root/ShockwaveController").request_world(
+			boss.global_position + Vector3.UP,
+			WALL_SHOCKWAVE_DURATION,
+			WALL_SHOCKWAVE_STRENGTH * intensity,
+			WALL_SHOCKWAVE_COLOR,
+			WALL_SHOCKWAVE_RADIUS_PIXELS
+		)
 	_play(BOOM, boss.global_position, -12.0, 1.25)
 	for index in 3:
 		var angle := (index - 1) * 0.55
@@ -150,6 +168,13 @@ func death() -> void:
 	_play(BOOM, boss.global_position, -5.0, 0.7)
 	_shake(14.0, 0.3)
 	_screen_flash(Color(1.0, 0.35, 0.08), 0.18, 0.3)
+	get_node("/root/ShockwaveController").request_world(
+		boss.global_position + Vector3.UP * DEATH_SHOCKWAVE_HEIGHT,
+		DEATH_SHOCKWAVE_DURATION,
+		DEATH_SHOCKWAVE_STRENGTH * intensity,
+		DEATH_SHOCKWAVE_COLOR,
+		DEATH_SHOCKWAVE_RADIUS_PIXELS
+	)
 	_spawn_explosion(boss.global_position, 1.5)
 	EFFECTS.shockwave(boss.get_parent(), boss.global_position, 7.0, Color(1.0, 0.55, 0.12, 0.95))
 	EFFECTS.burst(

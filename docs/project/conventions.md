@@ -1,4 +1,70 @@
-# GDScript Convention
+# Quy tắc code và thiết kế
+
+Tài liệu này là nguồn quy tắc chung khi viết hoặc sửa code của dự án. Trước khi
+thay đổi code, đọc tài liệu này và chỉ đọc thêm scene, script, resource, tài liệu
+liên quan trực tiếp đến công việc. Các quy tắc Godot và định dạng bên dưới áp dụng
+chủ yếu cho GDScript; các nguyên tắc thiết kế cũng áp dụng cho shader và code khác.
+
+Ưu tiên yêu cầu cụ thể của người dùng và các ràng buộc hệ thống khi có xung đột.
+Giữ tương thích với kiến trúc và hành vi hiện tại, trừ khi thay đổi đó thuộc phạm
+vi yêu cầu. Không sửa hàng loạt phần không liên quan chỉ để áp dụng quy tắc mới.
+
+## Clean Code
+
+- Một hàm hoặc class nên có trách nhiệm rõ ràng và tên thể hiện mục đích. Tách khi
+  có trách nhiệm độc lập thực sự, không chia nhỏ máy móc hoặc tạo lớp chỉ để thêm lớp.
+- Ưu tiên luồng điều khiển dễ theo dõi, điều kiện bảo vệ sớm và mức lồng hợp lý.
+  Tránh lặp lại logic nghiệp vụ; chỉ trừu tượng hóa khi làm rõ hành vi hoặc có nhu cầu thực tế.
+- Dùng kiểu dữ liệu phù hợp cho API, tham số, giá trị trả về và node reference.
+  Xác thực dữ liệu ở ranh giới hệ thống; không che lỗi bằng fallback im lặng.
+- Mỗi trạng thái quan trọng cần có một nguồn dữ liệu chính. Không tự ý nhân bản
+  state giữa các node, Resource hoặc autoload mà không có quy tắc đồng bộ rõ ràng.
+- Chú thích lý do, ràng buộc và hành vi không hiển nhiên; không lặp lại điều code
+  đã thể hiện. Xóa code chết và log debug tạm do thay đổi tạo ra.
+
+## Không dùng magic number hoặc magic string
+
+- Giá trị có ý nghĩa nghiệp vụ hoặc cần cân chỉnh phải có tên thể hiện ý nghĩa và
+  đơn vị. Dùng `@export` cho tham số thiết kế cần chỉnh trong Inspector, `Resource`
+  cho bộ cấu hình dùng lại, và `const` cho giá trị cố định thuộc implementation.
+- Định nghĩa hằng số gần nơi sở hữu hành vi; không tạo hằng toàn cục hoặc wrapper
+  dùng chung chỉ vì hai con số tình cờ giống nhau. Dùng enum hoặc hằng số cho ID,
+  trạng thái và key có hợp đồng chung; tái sử dụng định nghĩa đã có.
+- Không cần đặt tên cho mọi literal hiển nhiên: `0` trong so sánh rỗng, `1` khi
+  đếm, `true`/`false` và các toán tử cơ bản vẫn có thể dùng trực tiếp. Một giá trị
+  như `0.35` giây, `150` pixel hoặc `0.8` hệ số gameplay cần tên hoặc cấu hình.
+- Không trộn các đơn vị trong một tham số mơ hồ; ghi rõ `duration_seconds`,
+  `radius_pixels`, `speed_units_per_second` hoặc tên tương đương.
+
+~~~gdscript
+const IMPACT_RADIUS_PIXELS := 150.0
+@export_range(0.0, 3.0, 0.05, "suffix:s") var cooldown_seconds := 0.5
+~~~
+
+## SOLID thực dụng cho Godot
+
+| Nguyên tắc | Áp dụng |
+| --- | --- |
+| Single Responsibility | Một component sở hữu một trách nhiệm mạch lạc; tách khi các lý do thay đổi thực sự khác nhau. |
+| Open/Closed | Mở rộng bằng scene, component hoặc Resource khi hợp lý, thay vì liên tục thêm nhánh đặc biệt vào hệ thống chung. |
+| Liskov Substitution | Class con phải giữ hợp đồng, lifecycle và hành vi mà caller của class cha dựa vào. |
+| Interface Segregation | Caller chỉ phụ thuộc API hoặc signal cần thiết, không cần một manager tổng hợp cho mọi việc. |
+| Dependency Inversion | Truyền dependency qua scene, export hoặc setup và giao tiếp qua API ổn định; tránh truy cập chi tiết nội bộ của module khác. |
+
+Ưu tiên composition và các component sẵn có. Dùng pattern khi giải quyết vấn đề
+thực tế, không tạo interface, factory, autoload hoặc tầng trừu tượng chỉ để tuân
+theo tên một nguyên tắc. Không thay đổi API chung, save data hoặc scene contract
+mà không rà soát và cập nhật các nơi sử dụng trong phạm vi công việc.
+
+## Quy trình khi thay đổi
+
+1. Xác định hành vi cần đạt và đọc phần code, scene, tài liệu liên quan trực tiếp.
+2. Tái sử dụng cấu trúc hiện có; bảo toàn thay đổi của người khác và tránh sửa file ngoài phạm vi.
+3. Xử lý lifecycle, signal, pause, physics, tài nguyên dùng chung và các trường hợp biên liên quan.
+4. Chạy lint và kiểm tra phù hợp theo [testing.md](testing.md); không tạo test hoặc
+   mở rộng CI trừ khi người dùng yêu cầu. Tôn trọng các test đã được chủ ý xóa.
+5. Cập nhật tài liệu khi thay đổi hợp đồng hoặc cách cấu hình. Báo rõ kiểm tra đã
+   chạy, kết quả và phần chưa xác minh; không khẳng định đã test khi chưa thực hiện.
 
 ## Định dạng
 

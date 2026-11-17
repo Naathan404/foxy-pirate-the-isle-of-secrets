@@ -1,0 +1,32 @@
+shader_type canvas_item;
+const float INITIAL_RADIUS = 0.01;
+const float LOCAL_FADE_START = 0.8;
+const float FADE_EXPONENT = 0.55;
+const float APPEAR_DURATION = 0.05;
+const float MIN_DIRECTION_LENGTH = 0.0001;
+const float SCREEN_EDGE_MARGIN = 0.001;
+uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear;
+uniform vec2 center = vec2(0.5);
+uniform float progress = 0.0;
+uniform float strength = 0.02;
+uniform float aspect = 1.777;
+uniform float max_radius = 1.3;
+uniform float band_width = 0.065;
+uniform float local_wave = 0.0;
+uniform float light_strength = 0.26;
+uniform vec4 tint : source_color = vec4(0.34, 1.0, 0.8, 1.0);
+void fragment() {
+	vec2 diff = (SCREEN_UV - center) * vec2(aspect, 1.0);
+	float dist = length(diff);
+	float radius = mix(INITIAL_RADIUS, max_radius, progress);
+	float band = exp(-pow((dist - radius) / band_width, 2.0));
+	float local_fade = 1.0 - smoothstep(max_radius * LOCAL_FADE_START, max_radius, dist);
+	band *= mix(1.0, local_fade, local_wave);
+	float fade = pow(1.0 - progress, FADE_EXPONENT) * smoothstep(0.0, APPEAR_DURATION, progress);
+	vec2 dir = diff / max(dist, MIN_DIRECTION_LENGTH);
+	vec2 offset = dir / vec2(aspect, 1.0) * band * strength * fade;
+	vec2 uv = clamp(SCREEN_UV - offset, vec2(SCREEN_EDGE_MARGIN), vec2(1.0 - SCREEN_EDGE_MARGIN));
+	vec3 scene = texture(screen_texture, uv).rgb;
+	vec3 light = tint.rgb * band * fade * light_strength;
+	COLOR = vec4(scene + light, 1.0);
+}

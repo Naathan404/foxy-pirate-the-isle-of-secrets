@@ -43,11 +43,19 @@ không chạy lại chuỗi và được xóa khi phát hiện.
 ## Shockwave dùng chung
 
 `ShockwaveController` là autoload tại `core/autoload/shockwave_controller.gd`.
-Gọi `ShockwaveController.request_world(position, duration, strength, tint)` với
+Gọi `ShockwaveController.request_world(position, duration, strength, tint, radius_pixels)` với
 vị trí Vector3, hoặc `request_screen(position, duration, strength, tint)` với
-tọa độ pixel trong viewport. Tham số sau vị trí đều tùy chọn; `cancel()` dừng
+tọa độ pixel trong viewport. Tham số sau vị trí đều tùy chọn; `radius_pixels`
+giới hạn bán kính ở quanh điểm tác động, còn 0 dùng phạm vi toàn màn hình.
+`cancel()` dừng
 hiệu ứng. Mỗi request mới thay thế wave đang chạy; controller dùng thời gian thực
 và vẫn hoạt động trong pause/hitstop. Chuỗi Charm gọi wave lúc hấp thụ thành công.
+Các điểm gọi khác gồm Blubberbeard va tường hoặc bị hạ, meteor chạm đất,
+Abyssal Whirlpool phát nổ, rương boss mở, đòn dagger có `heavy_impact` trúng
+và sóng triều chạm Player. Các sự kiện nhỏ dùng lực thấp hơn; những lần gọi
+gần nhau vẫn thay thế wave trước theo chính sách chung của controller. Các sự kiện
+chiến đấu và môi trường dùng bán kính cục bộ và lực nhẹ; mở khóa Charm vẫn dùng
+phạm vi toàn màn hình.
 
 Ownership dùng CharmRegistry và cơ chế chuyển scene hiện có. Save lâu dài chưa
 thuộc phạm vi hệ thống Charm hiện tại. Kiểm tra bằng
