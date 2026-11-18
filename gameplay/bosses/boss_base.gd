@@ -117,6 +117,16 @@ func debug_trigger_phase_two() -> bool:
 	return phase_index >= 1
 
 
+## Defeat an active boss through the normal health and death signals in debug builds.
+func debug_defeat() -> bool:
+	if not OS.is_debug_build() or dead or not fighting or not is_instance_valid(hp):
+		return false
+	if not hp.is_alive():
+		return false
+	hp.take_damage(hp.current_hp)
+	return dead
+
+
 func apply_charm_grapple(
 	source: Node3D, stop_distance: float, pull_speed: float, _stun_seconds: float
 ) -> StringName:
