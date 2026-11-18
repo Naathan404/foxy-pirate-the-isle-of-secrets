@@ -6,15 +6,19 @@ extends Node
 var _overlay: ColorRect
 var _message: Label
 var _tween: Tween
+var _world_env: WorldEnvironment
+var _calm_env: Environment
 
 
 func _ready() -> void:
 	if not is_instance_valid(boss) or boss.is_queued_for_deletion() or boss.dead:
 		return
 	_create_warning_ui()
+	_cache_world_environment()
 	boss.fight_started.connect(_on_fight_started)
 	boss.phase_changed.connect(_on_phase_changed)
 	boss.fight_finished.connect(_on_fight_finished)
+	_connect_room_signals()
 	_show_warning("DANGER AHEAD  •  BLUBBERBEARD'S WATERS", Color(0.1, 0.65, 0.7), 3.5)
 	_rumble(4.0)
 
@@ -26,13 +30,65 @@ func _on_fight_started() -> void:
 
 func _on_phase_changed(_index: int) -> void:
 	_show_warning("DANGER  •  THE CAPTAIN IS ENRAGED!", Color(1.0, 0.12, 0.06), 2.5)
+	_apply_storm_environment(true)
 
 
 func _on_fight_finished() -> void:
+	_apply_storm_environment(false)
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 	_overlay.color.a = 0.0
 	_message.modulate.a = 0.0
+
+
+func _on_exit_locked() -> void:
+	_show_warning(
+		"THE EXIT BRIDGE COLLAPSED! DEFEAT BLUBBERBEARD TO ESCAPE!", Color(0.95, 0.38, 0.1), 3.4
+	)
+
+
+func _on_exit_blocked_attempted() -> void:
+	_show_warning(
+		"THE BRIDGE IS BROKEN  •  DEFEAT THE CAPTAIN TO ESCAPE!", Color(0.95, 0.45, 0.12), 2.2
+	)
+
+
+func _on_exit_unlocked() -> void:
+	_show_warning("THE BRIDGE IS RESTORED  •  EXIT UNLOCKED!", Color(0.25, 0.85, 0.55), 3.2)
+
+
+func _connect_room_signals() -> void:
+	var room := get_parent()
+	if not is_instance_valid(room):
+		return
+	if room.has_signal("exit_locked"):
+		room.connect("exit_locked", _on_exit_locked)
+	if room.has_signal("exit_unlocked"):
+		room.connect("exit_unlocked", _on_exit_unlocked)
+	if room.has_signal("exit_blocked_attempted"):
+		room.connect("exit_blocked_attempted", _on_exit_blocked_attempted)
+
+
+func _cache_world_environment() -> void:
+	var room := get_parent()
+	if not is_instance_valid(room):
+		return
+	_world_env = room.get_node_or_null("General/WorldEnvironment") as WorldEnvironment
+	if is_instance_valid(_world_env) and _world_env.environment != null:
+		_calm_env = _world_env.environment
+
+
+func _apply_storm_environment(stormy: bool) -> void:
+	if not is_instance_valid(_world_env) or _calm_env == null:
+		return
+	if not stormy:
+		_world_env.environment = _calm_env
+		return
+	var storm_env := _calm_env.duplicate() as Environment
+	storm_env.background_color = Color(0.015, 0.04, 0.07, 1.0)
+	storm_env.ambient_light_color = Color(0.75, 0.42, 0.42, 1.0)
+	storm_env.ambient_light_energy = 0.55
+	_world_env.environment = storm_env
 
 
 func _rumble(strength: float) -> void:

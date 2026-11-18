@@ -102,6 +102,21 @@ func is_defeated() -> bool:
 	return dead
 
 
+func debug_trigger_phase_two() -> bool:
+	if not OS.is_debug_build() or dead or boss_data == null or boss_data.phases.size() < 2:
+		return false
+	if not fighting:
+		var player := get_tree().get_first_node_in_group("player") as Node3D
+		if is_instance_valid(player):
+			start_fight(player)
+	if phase_index >= 1:
+		return false
+	var threshold_hp := boss_data.max_hp * boss_data.phases[1].hp_threshold
+	if hp.current_hp > threshold_hp:
+		hp.take_damage(hp.current_hp - threshold_hp)
+	return phase_index >= 1
+
+
 func apply_charm_grapple(
 	source: Node3D, stop_distance: float, pull_speed: float, _stun_seconds: float
 ) -> StringName:

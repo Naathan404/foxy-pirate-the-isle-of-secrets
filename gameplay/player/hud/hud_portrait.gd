@@ -11,6 +11,7 @@ const LOW_HP_ANIMATION: StringName = &"low_hp"
 @export_range(1.0, 120.0, 1.0) var hit_shake_frequency := 40.0
 @export var dead_tint := Color(0.45, 0.45, 0.45)
 @export var hit_tint := Color(1.0, 0.35, 0.35)
+@export var poison_tint := Color(0.68, 0.96, 0.56)
 @export var healthy_texture: Texture2D
 @export var low_health_texture: Texture2D
 @export var hit_texture: Texture2D
@@ -18,6 +19,7 @@ const LOW_HP_ANIMATION: StringName = &"low_hp"
 
 var _health_ratio: float = 1.0
 var _dead: bool = false
+var _poisoned: bool = false
 var _hit_remaining: float = 0.0
 var _rest_position: Vector2
 
@@ -65,9 +67,17 @@ func play_hit_feedback(_amount: float) -> void:
 
 func show_death() -> void:
 	_dead = true
+	_poisoned = false
 	_hit_remaining = 0.0
 	position = _rest_position
 	set_process(false)
+	_update_portrait()
+
+
+func set_poisoned(active: bool) -> void:
+	if _poisoned == active:
+		return
+	_poisoned = active
 	_update_portrait()
 
 
@@ -83,6 +93,8 @@ func _update_portrait() -> void:
 		modulate = hit_tint
 	elif _health_ratio <= low_health_ratio:
 		texture = low_health_texture if low_health_texture != null else healthy_texture
+	if _poisoned and not _dead and _hit_remaining <= 0.0:
+		modulate = poison_tint
 	_update_low_health_animation()
 
 

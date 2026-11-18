@@ -7,56 +7,114 @@
 
 [sub_resource type="Resource" id="barrel1"]
 script = ExtResource("4")
+radius = 2.2
+barrel_final_burst_min = 3
+barrel_final_burst_max = 3
+barrel_throw_duration = 0.56
+barrel_throw_gap_min = 0.32
+barrel_throw_gap_max = 0.48
 damage = 2.0
-windup = 1.6
-recovery = 0.5
+windup = 1.25
+recovery = 0.65
 
-[sub_resource type="Resource" id="charge1"]
+[sub_resource type="Resource" id="skydive1"]
 script = ExtResource("4")
 kind = 1
-speed = 9.0
-duration = 0.8
-damage = 4.0
-windup = 1.2
-recovery = 2.0
+radius = 2.5
+skydive_peak_height = 4.2
+skydive_leap_duration = 0.88
+skydive_max_range = 13.5
+damage = 3.0
+windup = 0.55
+recovery = 0.72
+
+[sub_resource type="Resource" id="spikes1"]
+script = ExtResource("4")
+kind = 2
+radius = 3.0
+spiky_hold_duration = 1.2
+damage = 2.5
+windup = 0.78
+recovery = 0.6
 
 [sub_resource type="Resource" id="phase1"]
 script = ExtResource("2")
-skills = Array[ExtResource("3")]([SubResource("barrel1"), SubResource("charge1")])
+skill_interval = 1.85
+skills = Array[ExtResource("3")]([SubResource("barrel1"), SubResource("skydive1"), SubResource("spikes1")])
 
 [sub_resource type="Resource" id="barrel2"]
 script = ExtResource("4")
-radius = 3.5
-damage = 4.0
-windup = 1.2
-recovery = 0.3
+radius = 2.6
+barrel_final_burst_min = 3
+barrel_final_burst_max = 5
+barrel_throw_count = 5
+barrel_throw_min = 3
+barrel_throw_max = 5
+barrel_throw_duration = 0.48
+barrel_throw_gap_min = 0.24
+barrel_throw_gap_max = 0.38
+damage = 3.0
+windup = 1.0
+recovery = 0.55
 
-[sub_resource type="Resource" id="charge2"]
+[sub_resource type="Resource" id="skydive2"]
 script = ExtResource("4")
 kind = 1
-speed = 14.0
-duration = 0.8
-damage = 6.0
-windup = 0.9
-recovery = 0.8
+radius = 2.9
+skydive_peak_height = 4.6
+skydive_leap_duration = 0.72
+skydive_max_range = 15.0
+damage = 4.0
+windup = 0.45
+recovery = 0.65
 
-[sub_resource type="Resource" id="spikes"]
+[sub_resource type="Resource" id="spikes2"]
 script = ExtResource("4")
 kind = 2
-speed = 9.0
-duration = 2.2
-damage = 6.0
-windup = 1.1
-recovery = 0.5
+radius = 3.4
+spiky_hold_duration = 1.35
+damage = 3.5
+windup = 0.7
+recovery = 0.55
+
+[sub_resource type="Resource" id="whirlwind2"]
+script = ExtResource("4")
+kind = 4
+radius = 5.8
+speed = 1.5
+duration = 2.0
+whirlwind_rotations_min = 1
+whirlwind_rotations_max = 2
+whirlwind_reach_radius = 5.8
+whirlwind_angular_speed = 6.8
+damage = 3.5
+windup = 0.8
+recovery = 0.9
+
+[sub_resource type="Resource" id="venom2"]
+script = ExtResource("4")
+kind = 5
+radius = 2.1
+speed = 14.0
+duration = 1.1
+venom_shot_count = 3
+venom_spread_angle_deg = 42.0
+venom_pool_radius = 2.0
+venom_pool_duration = 4.2
+venom_tick_damage = 0.5
+venom_tick_interval = 0.85
+damage = 2.5
+windup = 0.72
+recovery = 0.55
 
 [sub_resource type="Resource" id="phase2"]
 script = ExtResource("2")
 hp_threshold = 0.5
-skill_interval = 0.6
-skills = Array[ExtResource("3")]([SubResource("barrel2"), SubResource("charge2"), SubResource("spikes")])
+skill_interval = 1.25
+skills = Array[ExtResource("3")]([SubResource("barrel2"), SubResource("skydive2"), SubResource("spikes2"), SubResource("whirlwind2"), SubResource("venom2")])
 
 [resource]
 script = ExtResource("1")
 display_name = "Captain Blubberbeard"
-max_hp = 10.0
+max_hp = 68.0
 phases = Array[ExtResource("2")]([SubResource("phase1"), SubResource("phase2")])
