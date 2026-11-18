@@ -104,15 +104,6 @@ var _ground_y: float = 0.0
 var _size_rig: BlubberbeardSizeRig
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not OS.is_debug_build() or dead or not (event is InputEventKey):
-		return
-	var key_event := event as InputEventKey
-	if key_event.pressed and not key_event.echo and key_event.keycode == KEY_F8:
-		if debug_trigger_phase_two() and get_viewport() != null:
-			get_viewport().set_input_as_handled()
-
-
 func _on_boss_setup() -> void:
 	visual = get_node("Sprite3D") as BlubberbeardVisual
 	feedback = get_node("Feedback") as BlubberbeardFeedback
