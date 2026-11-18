@@ -36,3 +36,11 @@ Numbering follows the reference diagram: middle row left to right, then top row,
 00 -> 00, 01 -> 01, 02 -> 02, 03 -> 03, 04 -> 04, 05 -> 05, 06 -> 09, 07 -> 10, 08 -> 11, 09 -> 12, 10 -> 17, 11 -> 18, 12 -> 19, 13 -> 20, 14 -> 21
 
 The 15 existing scenes keep their authored contents and scene UIDs. New materials, mobs, empty and two-island quiz rooms reuse their existing counterparts. Raid, Boss and Farm instantiate their Medium/Large room templates; their gameplay encounters are not authored by this layout change. Ground artwork is unchanged.
+
+## Random destructible props
+
+Coral becomes available at Checkpoint 2 (`room_05`) and its forward branches: `room_06`–`room_08`, `room_13`–`room_16`, and `room_22`–`room_25`. This follows map connectivity rather than numeric room order.
+
+`RandomProps.include_coral` defaults to false. Before Checkpoint 2 the pool contains shell, stone and octopus. Enabled rooms also include orange, pink and turquoise coral. Each of the six types has an equal 1/6 chance per spawned prop (50% coral in total). A room can roll no coral; three refers to the available coral types, not a guaranteed count. Existing spawn counts remain unchanged.
+
+Materials rooms now use random props at their former coral placement positions; the pre-checkpoint Materials room (`room_10`) has no coral, while the later Materials room (`room_14`) includes all three coral types. They use the standard 3–6 props per room.

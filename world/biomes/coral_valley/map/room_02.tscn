@@ -5,16 +5,17 @@
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="4_8k8c3"]
 [ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="5_8k8c3"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed.tscn" id="7_bsm6o"]
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
-[sub_resource type="Environment" id="Environment_jl2ph"]
+[sub_resource type="Environment" id="Environment_bsm6o"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.012, 0.009, 0.02, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.7, 0.68, 0.72, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_bsm6o"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aqbfk"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("5_void")
@@ -23,56 +24,56 @@ shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
 shader_parameter/smoke_strength = 0.48
 shader_parameter/rise_speed = 0.150000007125
 
-[sub_resource type="QuadMesh" id="QuadMesh_aqbfk"]
+[sub_resource type="QuadMesh" id="QuadMesh_qje2f"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_bsm6o")
+material = SubResource("ShaderMaterial_aqbfk")
 size = Vector2(400, 400)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_qje2f"]
-resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cbdvd"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vphl5"]
 resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
+size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5ic1t"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_70a5f"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_spjh6"]
 resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
+size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_avom7"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1s8xf"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_um2gv"]
 resource_local_to_scene = true
-size = Vector3(0.5, 2, 4)
+size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bhbww"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(0.5, 2, 4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_a3o3a"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nsij6"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wihqu"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
@@ -88,32 +89,32 @@ down_destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_jl2ph")
+environment = SubResource("Environment_bsm6o")
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
-mesh = SubResource("QuadMesh_aqbfk")
+mesh = SubResource("QuadMesh_qje2f")
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_qje2f")
+shape = SubResource("BoxShape3D_cbdvd")
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_cbdvd")
+shape = SubResource("BoxShape3D_vphl5")
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 
 [node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_vphl5")
+shape = SubResource("BoxShape3D_5ic1t")
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_5ic1t")
+shape = SubResource("BoxShape3D_70a5f")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_70a5f")
+shape = SubResource("BoxShape3D_spjh6")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
@@ -121,32 +122,32 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_spjh6")
+shape = SubResource("BoxShape3D_avom7")
 disabled = true
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_avom7")
+shape = SubResource("BoxShape3D_1s8xf")
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_1s8xf")
+shape = SubResource("BoxShape3D_um2gv")
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
 
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_um2gv")
-
-[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_bhbww")
 
-[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+[node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_a3o3a")
+
+[node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
+shape = SubResource("BoxShape3D_nsij6")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_nsij6")
+shape = SubResource("BoxShape3D_wihqu")
 
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.0626488, 0)
@@ -175,6 +176,76 @@ elite_chance = 0.0
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-8, 0, -10, -9, 0, -2, -6, 0, 9, 8, 0, -9, 11, 0, -4, 8, 0, 8)
 fixed_spawn_count = 3
+
+[node name="SeaweedPatches" type="Node3D" parent="." index="7" unique_id=1940625935]
+
+[node name="NorthWest" type="Node3D" parent="SeaweedPatches" index="0" unique_id=1499079752]
+
+[node name="Seaweed01" parent="SeaweedPatches/NorthWest" index="0" unique_id=386491503 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -7)
+
+[node name="Seaweed02" parent="SeaweedPatches/NorthWest" index="1" unique_id=1584509123 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.8, 0, -7.4)
+
+[node name="Seaweed03" parent="SeaweedPatches/NorthWest" index="2" unique_id=692019245 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0, -6.1)
+
+[node name="Seaweed04" parent="SeaweedPatches/NorthWest" index="3" unique_id=919032134 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 0, -6.4)
+
+[node name="Seaweed05" parent="SeaweedPatches/NorthWest" index="4" unique_id=1502625187 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 0, -8.3)
+
+[node name="EastEntry" type="Node3D" parent="SeaweedPatches" index="1" unique_id=1433194541]
+
+[node name="Seaweed01" parent="SeaweedPatches/EastEntry" index="0" unique_id=986684580 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -3)
+
+[node name="Seaweed02" parent="SeaweedPatches/EastEntry" index="1" unique_id=1339769165 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.4, 0, -3.4)
+
+[node name="Seaweed03" parent="SeaweedPatches/EastEntry" index="2" unique_id=1061243201 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6, 0, -2.6)
+
+[node name="Seaweed04" parent="SeaweedPatches/EastEntry" index="3" unique_id=724770755 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 0, -2.1)
+
+[node name="Seaweed05" parent="SeaweedPatches/EastEntry" index="4" unique_id=203872262 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -1.6)
+
+[node name="SouthWest" type="Node3D" parent="SeaweedPatches" index="2" unique_id=1296798878]
+
+[node name="Seaweed01" parent="SeaweedPatches/SouthWest" index="0" unique_id=1710775344 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 6)
+
+[node name="Seaweed02" parent="SeaweedPatches/SouthWest" index="1" unique_id=878848888 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7, 0, 6.4)
+
+[node name="Seaweed03" parent="SeaweedPatches/SouthWest" index="2" unique_id=827491930 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, 7.4)
+
+[node name="Seaweed04" parent="SeaweedPatches/SouthWest" index="3" unique_id=824301525 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, 7.7)
+
+[node name="Seaweed05" parent="SeaweedPatches/SouthWest" index="4" unique_id=1657875698 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0, 5.3)
+
+[node name="SouthEast" type="Node3D" parent="SeaweedPatches" index="3" unique_id=1631326011]
+
+[node name="Seaweed01" parent="SeaweedPatches/SouthEast" index="0" unique_id=54349245 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 5)
+
+[node name="Seaweed02" parent="SeaweedPatches/SouthEast" index="1" unique_id=1119794365 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0, 5.4)
+
+[node name="Seaweed03" parent="SeaweedPatches/SouthEast" index="2" unique_id=98128185 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7, 0, 4.8)
+
+[node name="Seaweed04" parent="SeaweedPatches/SouthEast" index="3" unique_id=733894073 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6.7)
+
+[node name="Seaweed05" parent="SeaweedPatches/SouthEast" index="4" unique_id=2104123764 instance=ExtResource("7_bsm6o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, 6.3)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

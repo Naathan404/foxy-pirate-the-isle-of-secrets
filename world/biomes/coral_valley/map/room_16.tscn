@@ -184,6 +184,7 @@ elite_chance = 0.0
 
 [node name="RandomProps" type="Node3D" parent="." index="6" unique_id=1785726482]
 script = ExtResource("random_props")
+include_coral = true
 spawn_positions = PackedVector3Array(-8, 0, -11, -9, 0, -3, -6, 0, 9, 8, 0, -8, 11, 0, 4, 6, 0, 11)
 fixed_spawn_count = 3
 
