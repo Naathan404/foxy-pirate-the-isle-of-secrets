@@ -5,9 +5,7 @@ extends Node
 const EFFECTS = preload("res://gameplay/bosses/boss_effects.gd")
 const EXPLOSION = preload("res://gameplay/bosses/blubberbeard/powder_explosion_vfx.tscn")
 const MOVE_DUST_SHEET = preload("res://assets/sprites/bosses/blubberbeard/boss_move_dust.png")
-const ASH_SCORCH_TEXTURE = preload(
-	"res://assets/sprites/bosses/blubberbeard/barrel_ash_scorch.png"
-)
+const ASH_SCORCH_TEXTURE = preload("res://assets/sprites/bosses/blubberbeard/barrel_ash_scorch.png")
 const BOOM = preload("res://gameplay/bosses/blubberbeard/boss_explosion.wav")
 const CHARGE = preload("res://gameplay/bosses/blubberbeard/boss_charge.wav")
 const ROAR = preload("res://gameplay/bosses/blubberbeard/boss_roar.wav")
@@ -117,6 +115,15 @@ func charge_hit(target: Node) -> void:
 	get_node("/root/HitstopController").request_local(boss, target as Node3D, 0.055)
 
 
+func aoe_hit(target: Node) -> void:
+	if not is_instance_valid(target) or not target is Node3D:
+		return
+	var impact := (target as Node3D).global_position + Vector3.UP
+	EFFECTS.burst(boss.get_parent(), impact, Color(1, 0.65, 0.18), 28, 0.4, 6.5)
+	_shake(8.5, 0.18)
+	_screen_flash(Color(1.0, 0.26, 0.05), 0.07, 0.14)
+
+
 func barrel_explosion(at: Vector3, radius: float) -> void:
 	_spawn_explosion(at, radius / 2.5)
 	spawn_barrel_ash(at, radius)
@@ -144,6 +151,25 @@ func spikes_release() -> void:
 		2.0,
 		7.0
 	)
+
+
+func anchor_slam(at: Vector3, radius: float) -> void:
+	_play(BOOM, at, -6.0, 0.78)
+	_shake(11.0, 0.25)
+	_screen_flash(Color(1.0, 0.35, 0.08), 0.09, 0.18)
+	get_node("/root/ShockwaveController").request_world(
+		at + Vector3.UP * 0.4,
+		WALL_SHOCKWAVE_DURATION,
+		WALL_SHOCKWAVE_STRENGTH * intensity,
+		WALL_SHOCKWAVE_COLOR,
+		WALL_SHOCKWAVE_RADIUS_PIXELS
+	)
+	for index in 4:
+		var angle := TAU * float(index) / 4.0 + 0.35
+		var dir := Vector3(cos(angle), 0.0, sin(angle))
+		spawn_move_dust(at + dir * 0.6, dir, true)
+	EFFECTS.shockwave(boss.get_parent(), at, radius * 1.15, Color(1.0, 0.48, 0.12, 0.92))
+	EFFECTS.burst(boss.get_parent(), at + Vector3.UP * 0.5, Color(1.0, 0.55, 0.18), 44, 1.4, 7.5)
 
 
 func phase_changed() -> void:
@@ -245,14 +271,16 @@ func spawn_move_dust(at: Vector3, heading: Vector3, heavy: bool = false) -> void
 	puff.global_position = at + jitter + Vector3.UP * (0.95 if heavy else 0.85)
 	puff.scale = Vector3.ONE * (1.05 if heavy else 0.95)
 	var life := 0.55 if heavy else 0.48
-	var target_pos := puff.global_position - drift_dir * (2.0 if heavy else 1.2) + Vector3.UP * (
-		1.25 if heavy else 0.95
+	var target_pos := (
+		puff.global_position
+		- drift_dir * (2.0 if heavy else 1.2)
+		+ Vector3.UP * (1.25 if heavy else 0.95)
 	)
 	var tween := puff.create_tween().set_parallel(true)
 	tween.tween_property(puff, "global_position", target_pos, life).set_ease(Tween.EASE_OUT)
-	tween.tween_property(
-		puff, "scale", Vector3.ONE * (1.75 if heavy else 1.55), life
-	).set_ease(Tween.EASE_OUT)
+	tween.tween_property(puff, "scale", Vector3.ONE * (1.75 if heavy else 1.55), life).set_ease(
+		Tween.EASE_OUT
+	)
 	tween.tween_property(puff, "modulate:a", 0.0, life).set_ease(Tween.EASE_IN)
 	tween.tween_method(
 		func(step: float) -> void:

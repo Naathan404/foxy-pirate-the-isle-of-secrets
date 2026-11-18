@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://t35p4modmvrv" path="res://gameplay/bosses/boss_encounter.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://bo7ce6vvl81jr" path="res://world/hub/objects/sea_water.tscn" id="4"]
 [ext_resource type="Script" uid="uid://dbmrckgtbsa05" path="res://world/coral_valley/scenes/stages/blubberbeard_arena.gd" id="5"]
+[ext_resource type="Script" uid="uid://cx8b53w53j0ko" path="res://world/coral_valley/scenes/stages/blubberbeard_room.gd" id="6"]
 
 [sub_resource type="Environment" id="SeaEnvironment"]
 background_mode = 1
@@ -24,6 +25,7 @@ inner_radius = 1.5
 outer_radius = 1.7
 
 [node name="BlubberbeardRoom" unique_id=60789925 instance=ExtResource("1")]
+script = ExtResource("6")
 open_exits = 8
 left_destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
 left_destination_trigger_id = &"stage5_boss"
@@ -86,12 +88,16 @@ disabled = true
 destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
 destination_trigger_id = &"stage5_boss"
 
+[node name="ExitPosition" parent="Exits/LeftPath/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.6731589, -5.3314714)
+
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2.1, 0)
 
 [node name="CaptainBlubberbeard" parent="." index="5" unique_id=1542146759 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.4, 0)
-hits_before_evade = 1
+evade_cooldown = 5.0
+hits_before_evade = 5
 
 [node name="BossEncounter" type="Node" parent="." index="6" unique_id=375695329 node_paths=PackedStringArray("boss")]
 script = ExtResource("3")

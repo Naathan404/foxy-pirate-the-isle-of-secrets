@@ -3,9 +3,7 @@ extends Node3D
 
 signal detonated
 
-const BARREL_SHEET := preload(
-	"res://assets/sprites/bosses/blubberbeard/powder_barrel_sheet.png"
-)
+const BARREL_SHEET := preload("res://assets/sprites/bosses/blubberbeard/powder_barrel_sheet.png")
 const BARREL_PIXEL_SIZE := 0.0095
 const BARREL_GROUND_Y := 1.45
 const SPIKE_TEXTURE := preload("res://assets/sprites/bosses/blubberbeard/enraged_spike.png")
@@ -54,7 +52,9 @@ func _ready() -> void:
 		var spike_sprite := Sprite3D.new()
 		spike_sprite.name = "SpikeSprite"
 		spike_sprite.texture = SPIKE_TEXTURE
-		spike_sprite.pixel_size = 2.4 / float(maxi(SPIKE_TEXTURE.get_width(), SPIKE_TEXTURE.get_height()))
+		spike_sprite.pixel_size = (
+			2.4 / float(maxi(SPIKE_TEXTURE.get_width(), SPIKE_TEXTURE.get_height()))
+		)
 		spike_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		spike_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 		spike_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -114,7 +114,7 @@ func release_barrel_from(world_origin: Vector3) -> void:
 	barrel_visual.position = _flight_start
 	barrel_visual.frame = 0
 	_flight_time = 0.0
-	_flight_duration = clampf(remaining * 0.65, 0.22, 1.0)
+	_flight_duration = clampf(remaining * 0.58, 0.2, 0.85)
 	_fuse_duration = maxf(0.1, remaining - _flight_duration)
 	_landed_elapsed = 0.0
 
@@ -135,7 +135,10 @@ func _physics_process(delta: float) -> void:
 	if not spike and not exploded:
 		_update_barrel_animation(delta)
 		var progress := 1.0 - clampf(remaining / _warning_duration, 0.0, 1.0)
-		_warning_material.albedo_color.a = 0.12 + progress * 0.18
+		var pulse := 0.0
+		if remaining < 0.45:
+			pulse = (sin(_landed_elapsed * 28.0) * 0.5 + 0.5) * 0.18
+		_warning_material.albedo_color.a = 0.14 + progress * 0.24 + pulse
 	if spike:
 		# Sweep each step to avoid tunnelling through small hurtboxes.
 		var shape := SphereShape3D.new()

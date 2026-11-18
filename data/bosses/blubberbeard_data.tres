@@ -7,56 +7,66 @@
 
 [sub_resource type="Resource" id="barrel1"]
 script = ExtResource("4")
-damage = 2.0
-windup = 1.6
-recovery = 0.5
+radius = 2.8
+barrel_throw_duration = 0.56
+barrel_throw_gap_min = 0.22
+barrel_throw_gap_max = 0.38
+damage = 3.0
+windup = 1.25
+recovery = 0.35
 
 [sub_resource type="Resource" id="charge1"]
 script = ExtResource("4")
 kind = 1
-speed = 9.0
-duration = 0.8
-damage = 4.0
-windup = 1.2
-recovery = 2.0
+speed = 13.5
+duration = 0.95
+damage = 4.5
+windup = 0.9
 
 [sub_resource type="Resource" id="phase1"]
 script = ExtResource("2")
+skill_interval = 0.85
 skills = Array[ExtResource("3")]([SubResource("barrel1"), SubResource("charge1")])
 
 [sub_resource type="Resource" id="barrel2"]
 script = ExtResource("4")
-radius = 3.5
-damage = 4.0
-windup = 1.2
-recovery = 0.3
+radius = 3.8
+barrel_throw_count = 4
+barrel_throw_min = 2
+barrel_throw_max = 4
+barrel_throw_duration = 0.45
+barrel_throw_gap_min = 0.16
+barrel_throw_gap_max = 0.28
+damage = 4.5
+windup = 0.95
+recovery = 0.2
 
 [sub_resource type="Resource" id="charge2"]
 script = ExtResource("4")
 kind = 1
-speed = 14.0
-duration = 0.8
+speed = 18.0
+duration = 1.05
 damage = 6.0
-windup = 0.9
-recovery = 0.8
+windup = 0.7
+recovery = 0.45
 
 [sub_resource type="Resource" id="spikes"]
 script = ExtResource("4")
 kind = 2
-speed = 9.0
+speed = 12.5
 duration = 2.2
-damage = 6.0
-windup = 1.1
-recovery = 0.5
+damage = 5.5
+windup = 0.85
+recovery = 0.35
 
 [sub_resource type="Resource" id="phase2"]
 script = ExtResource("2")
 hp_threshold = 0.5
-skill_interval = 0.6
+skill_interval = 0.4
 skills = Array[ExtResource("3")]([SubResource("barrel2"), SubResource("charge2"), SubResource("spikes")])
 
 [resource]
 script = ExtResource("1")
 display_name = "Captain Blubberbeard"
-max_hp = 10.0
+max_hp = 120.0
 phases = Array[ExtResource("2")]([SubResource("phase1"), SubResource("phase2")])

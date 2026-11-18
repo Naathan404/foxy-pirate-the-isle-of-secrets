@@ -74,3 +74,12 @@ no text, no watermark." The sprite, light and particles are presentation only; d
 radius and attack timing remain owned by the hazard and skill resources.
 
 See `res://gameplay/bosses/README.md` for the shared boss and behavior extension contract.
+
+## Combat Upgrades & Collapsed Exit Bridge
+
+- **Stats & Combat (`blubberbeard_data.tres`, `blubberbeard.gd`):** `max_hp` is tuned to `120.0` with faster movement (`move_speed = 5.2`), quicker charges (`13.5` Phase 1 / `18.0` Phase 2) with early-windup aim tracking and wall-impact AoE shockwaves, distance-weighted `smart_skill_selection`, lead-aimed `POWDER_BARREL` volleys, a close-range AoE burst + Phase 2 staggered second wave on `SPIKY_INFLATION`, a close-range `Anchor Slam` attack (`anchor_slam_*` exports) with ground telegraph, and `evade_drops_barrels` counter-traps. In `blubberbeard_room.tscn`, `hits_before_evade` is set to `5` (`evade_cooldown = 5.0`).
+- **Locked Room & Collapsing Bridge (`blubberbeard_room.gd`, `blubberbeard_arena.gd`):** Entering `blubberbeard_room.tscn` while Blubberbeard is alive immediately locks `Exits/LeftPath/SceneChangeTrigger`, raises a collapse barrier (`ExitBridge/ExitCollapseBarrier`), and drops the wooden exit bridge (`ExitBridge`) into the sea. Defeating Blubberbeard (`fight_finished`) unlocks the exit and restores the bridge; re-entering the room after defeat keeps the bridge intact. Phase 2 also shifts the room `WorldEnvironment` to a darker storm tone.
+
+## Development Roadmap
+
+For remaining combat/presentation gaps (Boss BGM, replacing synthesized placeholder SFX, and dedicated Phase 2/anchor sprite art) and the full roadmap, see `res://docs/plans/blubberbeard_development_plan.md`.

@@ -12,6 +12,8 @@ enum Clip {
 	BELLY_CHARGE_RECOVERY,
 	INFLATE_WINDUP,
 	INFLATE_BURST,
+	ANCHOR_WINDUP,
+	ANCHOR_SLAM,
 	HIT,
 	DEATH,
 }
@@ -38,9 +40,7 @@ const CHARGE_RUN_SIDE_SHEET := preload(
 const CHARGE_RUN_UP_SHEET := preload(
 	"res://assets/sprites/bosses/blubberbeard/blubberbeard_charge_run_up.png"
 )
-const ATTACKS_SHEET := preload(
-	"res://assets/sprites/bosses/blubberbeard/blubberbeard_attacks.png"
-)
+const ATTACKS_SHEET := preload("res://assets/sprites/bosses/blubberbeard/blubberbeard_attacks.png")
 const HIT_DEATH_SHEET := preload(
 	"res://assets/sprites/bosses/blubberbeard/blubberbeard_hit_death.png"
 )
@@ -153,7 +153,10 @@ func _process(delta: float) -> void:
 			var anticipation := sin(windup_progress * PI * 0.5)
 			desired_scale *= Vector3(1.0 + 0.08 * anticipation, 1.0 - 0.07 * anticipation, 1.0)
 			desired_rotation = -0.06 * anticipation * _lean
-			if _kind != BlubberbeardSkillData.Kind.POWDER_BARREL or windup_progress < THROW_RELEASE_PROGRESS:
+			if (
+				_kind != BlubberbeardSkillData.Kind.POWDER_BARREL
+				or windup_progress < THROW_RELEASE_PROGRESS
+			):
 				desired_position.x += sin(_clock * 32.0) * 0.05 * anticipation
 		Pose.CHARGE:
 			desired_scale *= Vector3(1.06, 0.94, 1.0)
@@ -187,6 +190,8 @@ func begin_windup(kind: int) -> void:
 			_set_clip(Clip.BELLY_CHARGE_WINDUP)
 		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
 			_set_clip(Clip.INFLATE_WINDUP)
+		BlubberbeardSkillData.Kind.ANCHOR_SLAM:
+			_set_clip(Clip.ANCHOR_WINDUP)
 		_:
 			_set_clip(Clip.IDLE)
 	_update_active_frame()
@@ -221,6 +226,9 @@ func begin_recovery(kind: int) -> void:
 		_set_clip(Clip.BELLY_CHARGE_RECOVERY)
 	elif kind == BlubberbeardSkillData.Kind.SPIKY_INFLATION:
 		begin_spike_burst()
+	elif kind == BlubberbeardSkillData.Kind.ANCHOR_SLAM:
+		pose = Pose.RECOVERY
+		_set_clip(Clip.ANCHOR_SLAM)
 	else:
 		pose = Pose.IDLE
 		_set_clip(Clip.MOVE if moving else Clip.IDLE)
@@ -236,7 +244,9 @@ func set_enraged(value: bool) -> void:
 func flash_hit() -> void:
 	_hit_flash = HURT_FLASH_DURATION
 	impact(0.16, 0.35)
-	_hit_clip_duration = HURT_FLASH_DURATION if pose in [Pose.WINDUP, Pose.CHARGE] else HURT_DURATION
+	_hit_clip_duration = (
+		HURT_FLASH_DURATION if pose in [Pose.WINDUP, Pose.CHARGE] else HURT_DURATION
+	)
 	_hit_clip_left = _hit_clip_duration
 	_update_active_frame()
 
@@ -271,9 +281,7 @@ func play_death(finished: Callable) -> void:
 func get_barrel_release_world_position() -> Vector3:
 	var dir_x := -1.0 if flip_h else 1.0
 	var local_offset := Vector3(
-		BARREL_HAND_OFFSET_PX.x * dir_x * pixel_size,
-		BARREL_HAND_OFFSET_PX.y * pixel_size,
-		0.0
+		BARREL_HAND_OFFSET_PX.x * dir_x * pixel_size, BARREL_HAND_OFFSET_PX.y * pixel_size, 0.0
 	)
 	return to_global(local_offset)
 
@@ -353,6 +361,13 @@ func _apply_clip_frame(active_clip: Clip, time_in_clip: float) -> void:
 		Clip.INFLATE_BURST:
 			_set_sheet(INFLATE_4DIR_SHEET, 4, 3)
 			frame = dir_row * 4 + (2 if time_in_clip < 0.22 else 3)
+		Clip.ANCHOR_WINDUP:
+			_set_sheet(CHARGE_PREP_4DIR_SHEET, 4, 3)
+			var anchor_col := 0 if windup_progress < 0.45 else 1
+			frame = dir_row * 4 + anchor_col
+		Clip.ANCHOR_SLAM:
+			_set_sheet(CHARGE_PREP_4DIR_SHEET, 4, 3)
+			frame = dir_row * 4 + (2 if time_in_clip < 0.14 else 3)
 		Clip.HIT:
 			_set_sheet(HIT_DEATH_SHEET, 4, 2)
 			frame = mini(3, int(time_in_clip / HURT_DURATION * 4.0))
@@ -390,9 +405,7 @@ func _get_screen_direction() -> Vector3:
 	if camera_right.is_zero_approx() or camera_back.is_zero_approx():
 		return _facing
 	return Vector3(
-		_facing.dot(camera_right.normalized()),
-		0.0,
-		_facing.dot(camera_back.normalized())
+		_facing.dot(camera_right.normalized()), 0.0, _facing.dot(camera_back.normalized())
 	)
 
 
@@ -406,4 +419,4 @@ func _set_sheet(sheet: Texture2D, cols: int, rows: int) -> void:
 
 
 func _phase_color() -> Color:
-	return Color(1.0, 0.72, 0.65) if enraged else Color.WHITE
+	return Color(1.0, 0.58, 0.52) if enraged else Color.WHITE

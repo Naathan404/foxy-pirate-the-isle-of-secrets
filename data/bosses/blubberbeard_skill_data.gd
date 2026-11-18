@@ -1,7 +1,7 @@
 class_name BlubberbeardSkillData
 extends BossSkillData
 
-enum Kind { POWDER_BARREL, BELLY_CHARGE, SPIKY_INFLATION }
+enum Kind { POWDER_BARREL, BELLY_CHARGE, SPIKY_INFLATION, ANCHOR_SLAM }
 
 @export var kind: Kind = Kind.POWDER_BARREL
 @export_range(0.1, 20.0, 0.1) var radius: float = 2.5

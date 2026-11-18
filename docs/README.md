@@ -34,6 +34,6 @@ Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn 
 
 ## Kế hoạch · `plans/`
 
-[Kế hoạch Charm System](plans/charm-system-development-plan.md)
+[Kế hoạch Charm System](plans/charm-system-development-plan.md) · [Kế hoạch phát triển Captain Blubberbeard](plans/blubberbeard_development_plan.md)
 
 Sổ quái: [Monster Notes](gameplay/economy/monster_notes.md).

@@ -18,16 +18,38 @@ const EVADE_WALL_RESTITUTION := 0.3
 const EVADE_GROUND_RESTITUTION := 0.15
 
 @export_group("Movement & Charge")
-@export_range(1.0, 100.0, 1.0) var charge_acceleration: float = 50.0
+@export_range(1.0, 100.0, 1.0) var charge_acceleration: float = 70.0
 @export_range(1.0, 100.0, 1.0) var recovery_deceleration: float = 80.0
-@export_range(0.0, 12.0, 0.1) var move_speed: float = 3.2
-@export_range(1.0, 20.0, 0.5) var preferred_distance: float = 3.5
+@export_range(0.0, 12.0, 0.1) var move_speed: float = 5.2
+@export_range(1.0, 20.0, 0.5) var preferred_distance: float = 2.6
 
 @export_group("Evasion")
 @export_range(0.0, 30.0, 0.5) var evade_speed: float = 18.5
 @export_range(0.5, 10.0, 0.1) var evade_cooldown: float = 2.5
 ## Number of damaging hits that show hurt before the next hit triggers an evade.
 @export_range(0, 20, 1) var hits_before_evade: int = 2
+@export var evade_drops_barrels: bool = true
+
+@export_group("Anchor Slam")
+@export var anchor_slam_enabled: bool = true
+@export_range(1.0, 12.0, 0.1, "suffix:m") var anchor_slam_trigger_range: float = 4.0
+@export_range(1.0, 10.0, 0.1, "suffix:m") var anchor_slam_radius: float = 4.2
+@export_range(0.0, 5.0, 0.1, "suffix:m") var anchor_slam_forward_offset: float = 1.8
+@export_range(0.5, 20.0, 0.5) var anchor_slam_damage: float = 3.5
+@export_range(0.5, 20.0, 0.5) var anchor_slam_enraged_damage: float = 5.0
+@export_range(0.2, 3.0, 0.05, "suffix:s") var anchor_slam_windup: float = 0.65
+@export_range(0.2, 3.0, 0.05, "suffix:s") var anchor_slam_enraged_windup: float = 0.5
+@export_range(0.1, 3.0, 0.05, "suffix:s") var anchor_slam_recovery: float = 0.45
+@export_range(0.5, 15.0, 0.1, "suffix:s") var anchor_slam_cooldown: float = 3.6
+
+@export_group("Combat Escalation")
+@export var smart_skill_selection: bool = true
+@export_range(0.0, 1.0, 0.05) var charge_aim_track_fraction: float = 0.65
+@export_range(0.0, 12.0, 0.1) var charge_aim_turn_speed: float = 4.5
+@export_range(0.0, 10.0, 0.1, "suffix:m") var charge_wall_slam_radius: float = 4.0
+@export_range(0.0, 10.0, 0.1, "suffix:m") var spiky_close_burst_radius: float = 4.8
+@export_range(0.05, 1.5, 0.01, "suffix:s") var spiky_second_wave_delay: float = 0.28
+@export_range(0.0, 1.0, 0.05) var phase2_chain_chance: float = 0.55
 
 var state: State = State.WAIT
 var timer: float = 1.0
@@ -60,6 +82,19 @@ var _hits_since_evade := 0
 var _hurt_remaining: float = 0.0
 var _walk_dust_timer: float = 0.0
 var _walk_dust_side: float = 1.0
+var _aoe_hitbox: HitBox
+var _aoe_shape: SphereShape3D
+var _slam_warning: Node3D
+var _slam_warning_material: StandardMaterial3D
+var _slam_impact_position := Vector3.ZERO
+var _anchor_slam_active: bool = false
+var _anchor_slam_cooldown_left: float = 0.0
+var _pending_second_spike_wave: float = -1.0
+var _pending_second_spike_damage: float = 0.0
+var _pending_second_spike_speed: float = 0.0
+var _pending_second_spike_duration: float = 0.0
+var _last_skill_kind: int = -1
+var _same_skill_streak: int = 0
 
 
 func _on_boss_setup() -> void:
@@ -74,6 +109,8 @@ func _on_boss_setup() -> void:
 	charge_hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
 	charge_hitbox.damage_applied.connect(_on_charge_damage)
 	damaged.connect(_hit_feedback)
+	_create_aoe_hitbox()
+	_create_slam_warning()
 	_create_dust()
 	_create_evade_steam()
 
@@ -92,8 +129,12 @@ func _on_fight_tick(delta: float) -> void:
 
 func fight_tick(delta: float) -> void:
 	_evade_cooldown_left = maxf(0.0, _evade_cooldown_left - delta)
+	_anchor_slam_cooldown_left = maxf(0.0, _anchor_slam_cooldown_left - delta)
+	_tick_second_spike_wave(delta)
 	if not is_on_floor():
-		var gravity_scale := EVADE_GRAVITY_SCALE if _evade_remaining > 0.0 and _evade_launched else 1.0
+		var gravity_scale := (
+			EVADE_GRAVITY_SCALE if _evade_remaining > 0.0 and _evade_launched else 1.0
+		)
 		velocity += get_gravity() * delta * gravity_scale
 	elif _evade_remaining <= 0.0:
 		velocity.y = 0.0
@@ -121,6 +162,9 @@ func fight_tick(delta: float) -> void:
 	else:
 		_update_patrol_movement(delta)
 	move_and_slide()
+	if state == State.WINDUP and _anchor_slam_active:
+		_update_anchor_slam_windup()
+		return
 	if (
 		state == State.WINDUP
 		and skill != null
@@ -129,12 +173,18 @@ func fight_tick(delta: float) -> void:
 		_update_barrel_barrage(delta)
 		return
 	if timer > 0.0:
-		if state == State.WINDUP:
-			visual.windup_progress = 1.0 - clampf(timer / skill.windup, 0.0, 1.0)
+		if state == State.WINDUP and skill != null:
+			var progress := 1.0 - clampf(timer / skill.windup, 0.0, 1.0)
+			visual.windup_progress = progress
+			if skill.kind == BlubberbeardSkillData.Kind.BELLY_CHARGE:
+				_steer_charge_windup(delta, progress)
 		return
 	match state:
 		State.WAIT, State.RECOVERY:
-			_choose_skill()
+			if _should_trigger_anchor_slam():
+				_begin_anchor_slam()
+			else:
+				_choose_skill()
 		State.WINDUP:
 			_execute_skill()
 
@@ -151,9 +201,7 @@ func _update_evade(delta: float) -> void:
 		velocity.y = EVADE_JUMP_SPEED
 		_evade_horizontal_velocity = _evade_direction * evade_speed
 	if flying:
-		var drag := (
-			EVADE_GROUND_FRICTION if is_on_floor() and velocity.y <= 0.0 else EVADE_AIR_DRAG
-		)
+		var drag := EVADE_GROUND_FRICTION if is_on_floor() and velocity.y <= 0.0 else EVADE_AIR_DRAG
 		_evade_horizontal_velocity *= exp(-drag * delta)
 	elif _evade_launched:
 		_evade_horizontal_velocity = _evade_horizontal_velocity.move_toward(
@@ -200,6 +248,10 @@ func _update_charge(delta: float) -> void:
 		visual.impact(0.2, 0.24)
 		if wall_impact:
 			charge_speed = 0.0
+			if charge_wall_slam_radius > 0.0 and skill != null:
+				_trigger_aoe_hit(
+					global_position, charge_wall_slam_radius, skill.damage * 0.6, &"boss_wall_slam"
+				)
 		_enter_recovery()
 
 
@@ -248,11 +300,22 @@ func _choose_skill() -> void:
 		timer = 1.0
 		return
 	skill = phase.skills[next_skill % phase.skills.size()] as BlubberbeardSkillData
-	next_skill += 1
 	if skill == null:
+		next_skill += 1
 		push_warning("Captain Blubberbeard requires BlubberbeardSkillData")
 		timer = 1.0
 		return
+	if skill.kind == _last_skill_kind:
+		_same_skill_streak += 1
+	else:
+		_last_skill_kind = skill.kind
+		_same_skill_streak = 1
+	if smart_skill_selection:
+		next_skill = _pick_next_skill_index(phase)
+	else:
+		next_skill += 1
+	_anchor_slam_active = false
+	_hide_slam_warning()
 	state = State.WINDUP
 	timer = skill.windup
 	visual.moving = false
@@ -312,7 +375,12 @@ func _start_next_barrel_throw() -> void:
 func _pick_barrel_landing_spot() -> Vector3:
 	if _barrel_throws_done == 0:
 		return target.global_position
-	var anchor := _barrel_anchor.lerp(target.global_position, 0.5)
+	var lead_offset := Vector3.ZERO
+	if target is CharacterBody3D:
+		var vel := (target as CharacterBody3D).velocity
+		vel.y = 0.0
+		lead_offset = (vel * 0.42).limit_length(4.5)
+	var anchor := _barrel_anchor.lerp(target.global_position + lead_offset, 0.65)
 	var r_min := maxf(0.5, skill.barrel_spread_min_radius)
 	var r_max := maxf(r_min + 0.2, skill.barrel_spread_max_radius)
 	var best := anchor + Vector3(r_min, 0.0, 0.0)
@@ -341,7 +409,9 @@ func _update_barrel_barrage(delta: float) -> void:
 			_start_next_barrel_throw()
 		return
 	_barrel_step_elapsed += step
-	visual.windup_progress = clampf(_barrel_step_elapsed / maxf(0.05, _barrel_step_duration), 0.0, 1.0)
+	visual.windup_progress = clampf(
+		_barrel_step_elapsed / maxf(0.05, _barrel_step_duration), 0.0, 1.0
+	)
 	if not _barrel_released and visual.windup_progress >= visual.THROW_RELEASE_PROGRESS:
 		_release_pending_barrel()
 	if _barrel_step_elapsed >= _barrel_step_duration:
@@ -373,13 +443,22 @@ func _execute_skill() -> void:
 		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
 			feedback.spikes_release()
 			visual.impact(0.22, 0.25)
-			EFFECTS.shockwave(
-				get_parent(), global_position, 2.0, Color(1.0, 0.55, 0.12, 0.8)
-			)
+			EFFECTS.shockwave(get_parent(), global_position, 2.0, Color(1.0, 0.55, 0.12, 0.8))
+			if spiky_close_burst_radius > 0.0:
+				_trigger_aoe_hit(
+					global_position, spiky_close_burst_radius, skill.damage, &"boss_spike_burst"
+				)
 			for index in 8:
 				_spawn_spike(Vector3(cos(TAU * index / 8.0), 0.0, sin(TAU * index / 8.0)))
+			if phase_index > 0:
+				_pending_second_spike_wave = spiky_second_wave_delay
+				_pending_second_spike_damage = skill.damage
+				_pending_second_spike_speed = skill.speed
+				_pending_second_spike_duration = skill.duration
 			_play_sound(1.6)
 			_enter_recovery()
+		BlubberbeardSkillData.Kind.ANCHOR_SLAM:
+			_execute_anchor_slam()
 		_:
 			_enter_recovery()
 
@@ -422,9 +501,20 @@ func _spawn_spike(spike_dir: Vector3) -> void:
 
 func _enter_recovery() -> void:
 	state = State.RECOVERY
-	timer = skill.recovery + boss_data.phases[phase_index].skill_interval
+	var was_slam := _anchor_slam_active
+	_anchor_slam_active = false
+	_hide_slam_warning()
+	var recovery_time := anchor_slam_recovery if was_slam else skill.recovery
+	var wait_time := recovery_time + boss_data.phases[phase_index].skill_interval
+	var chain_ready := (
+		was_slam or (skill != null and skill.kind == BlubberbeardSkillData.Kind.BELLY_CHARGE)
+	)
+	if phase_index > 0 and chain_ready and randf() < phase2_chain_chance:
+		wait_time = 0.25
+	timer = wait_time
 	dust.emitting = false
-	visual.begin_recovery(skill.kind)
+	var recovery_kind := BlubberbeardSkillData.Kind.ANCHOR_SLAM if was_slam else skill.kind
+	visual.begin_recovery(recovery_kind)
 
 
 func _on_phase_entered(index: int) -> void:
@@ -437,6 +527,11 @@ func _on_phase_entered(index: int) -> void:
 
 func _on_fight_ended() -> void:
 	charge_hitbox.end_attack()
+	if is_instance_valid(_aoe_hitbox):
+		_aoe_hitbox.end_attack()
+	_anchor_slam_active = false
+	_pending_second_spike_wave = -1.0
+	_hide_slam_warning()
 	dust.emitting = false
 	_evade_steam.emitting = false
 	feedback.death()
@@ -471,14 +566,18 @@ func _begin_evade() -> void:
 		if not test_move(global_transform, candidate * 1.5):
 			_hits_since_evade = 0
 			_hurt_remaining = 0.0
+			_anchor_slam_active = false
+			_hide_slam_warning()
 			if state == State.WINDUP and is_instance_valid(_barrel_hazard) and not _barrel_released:
 				_barrel_hazard.queue_free()
 				_barrel_hazard = null
 			charge_hitbox.end_attack()
+			if evade_drops_barrels and fighting and is_instance_valid(get_parent()):
+				_spawn_evade_barrel(global_position)
 			if skill != null:
 				visual.begin_recovery(skill.kind)
 			state = State.RECOVERY
-			timer = 0.6
+			timer = 0.35
 			_evade_direction = candidate
 			_evade_remaining = EVADE_DURATION
 			_evade_cooldown_left = evade_cooldown
@@ -532,6 +631,10 @@ func _on_charge_damage(_damage: DamageContext, hit_target: Node, _amount: float)
 	feedback.charge_hit(hit_target)
 
 
+func _on_aoe_damage(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
+	feedback.aoe_hit(hit_target)
+
+
 func _play_sound(pitch: float) -> void:
 	if is_instance_valid(sound):
 		sound.pitch_scale = pitch
@@ -574,3 +677,218 @@ func _create_dust() -> void:
 	dust.mesh = mesh
 	add_child(dust)
 	dust.position.y = 0.75
+
+
+func _should_trigger_anchor_slam() -> bool:
+	if not anchor_slam_enabled or _anchor_slam_cooldown_left > 0.0:
+		return false
+	if not is_instance_valid(target):
+		return false
+	var delta := target.global_position - global_position
+	delta.y = 0.0
+	return delta.length() <= anchor_slam_trigger_range
+
+
+func _begin_anchor_slam() -> void:
+	_anchor_slam_active = true
+	state = State.WINDUP
+	timer = _current_slam_windup()
+	visual.moving = false
+	var dir := target.global_position - global_position
+	dir.y = 0.0
+	charge_direction = dir.normalized() if not dir.is_zero_approx() else Vector3.BACK
+	visual.face_direction(charge_direction)
+	visual.begin_windup(BlubberbeardSkillData.Kind.ANCHOR_SLAM)
+	_slam_impact_position = global_position + charge_direction * anchor_slam_forward_offset
+	_slam_impact_position.y = global_position.y + 0.05
+	if is_instance_valid(_slam_warning):
+		_slam_warning.global_position = _slam_impact_position
+		_slam_warning.visible = true
+	_play_sound(0.95)
+
+
+func _update_anchor_slam_windup() -> void:
+	var windup := maxf(0.05, _current_slam_windup())
+	var progress := 1.0 - clampf(timer / windup, 0.0, 1.0)
+	visual.windup_progress = progress
+	if is_instance_valid(_slam_warning_material):
+		_slam_warning_material.albedo_color.a = 0.16 + progress * 0.32
+	if timer <= 0.0:
+		_execute_anchor_slam()
+
+
+func _execute_anchor_slam() -> void:
+	_hide_slam_warning()
+	_anchor_slam_cooldown_left = anchor_slam_cooldown
+	var dmg := anchor_slam_enraged_damage if phase_index > 0 else anchor_slam_damage
+	_trigger_aoe_hit(_slam_impact_position, anchor_slam_radius, dmg, &"boss_anchor_slam")
+	visual.impact(0.3, 0.3)
+	if is_instance_valid(feedback):
+		feedback.anchor_slam(_slam_impact_position, anchor_slam_radius)
+	_enter_recovery()
+
+
+func _current_slam_windup() -> float:
+	return anchor_slam_enraged_windup if phase_index > 0 else anchor_slam_windup
+
+
+func _steer_charge_windup(delta: float, progress: float) -> void:
+	if progress >= charge_aim_track_fraction or not is_instance_valid(target):
+		return
+	var desired := target.global_position - global_position
+	desired.y = 0.0
+	if desired.is_zero_approx():
+		return
+	desired = desired.normalized()
+	var angle_diff := charge_direction.signed_angle_to(desired, Vector3.UP)
+	var max_step := charge_aim_turn_speed * maxf(0.0, delta)
+	var step := clampf(angle_diff, -max_step, max_step)
+	charge_direction = charge_direction.rotated(Vector3.UP, step)
+	visual.face_direction(charge_direction)
+
+
+func _pick_next_skill_index(phase: BossPhaseData) -> int:
+	if phase.skills.size() <= 1 or not is_instance_valid(target):
+		return next_skill + 1
+	var flat := target.global_position - global_position
+	flat.y = 0.0
+	var dist := flat.length()
+	var weights: Array[float] = []
+	var total := 0.0
+	for index in phase.skills.size():
+		var candidate := phase.skills[index] as BlubberbeardSkillData
+		var weight := 1.0
+		if candidate != null:
+			weight = _score_skill_weight(candidate.kind, dist)
+			if candidate.kind == _last_skill_kind:
+				weight *= 0.0 if _same_skill_streak >= 2 else 0.3
+		weights.append(weight)
+		total += weight
+	if total <= 0.0:
+		return (next_skill + 1) % phase.skills.size()
+	var roll := randf() * total
+	var accum := 0.0
+	for index in weights.size():
+		accum += weights[index]
+		if roll <= accum:
+			return index
+	return phase.skills.size() - 1
+
+
+func _score_skill_weight(kind: int, dist: float) -> float:
+	match kind:
+		BlubberbeardSkillData.Kind.POWDER_BARREL:
+			if dist >= 9.0:
+				return 3.0
+			return 1.2 if dist >= 5.0 else 0.45
+		BlubberbeardSkillData.Kind.BELLY_CHARGE:
+			if dist >= 4.5 and dist <= 11.5:
+				return 3.0
+			return 1.5 if dist > 11.5 else 0.8
+		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+			return 3.2 if dist <= 7.0 else 0.5
+		BlubberbeardSkillData.Kind.ANCHOR_SLAM:
+			return 3.2 if dist <= anchor_slam_trigger_range + 1.0 else 0.25
+		_:
+			return 1.0
+
+
+func _tick_second_spike_wave(delta: float) -> void:
+	if _pending_second_spike_wave < 0.0:
+		return
+	_pending_second_spike_wave -= maxf(0.0, delta)
+	if _pending_second_spike_wave > 0.0:
+		return
+	_pending_second_spike_wave = -1.0
+	if dead or not is_instance_valid(get_parent()):
+		return
+	for index in 8:
+		var angle := TAU * (float(index) + 0.5) / 8.0
+		var dir := Vector3(cos(angle), 0.0, sin(angle))
+		var hazard := HAZARD.new()
+		hazard.source = self
+		hazard.spike = true
+		hazard.direction = dir
+		hazard.damage = _pending_second_spike_damage
+		hazard.speed = _pending_second_spike_speed
+		hazard.remaining = _pending_second_spike_duration
+		get_parent().add_child(hazard)
+		hazard.global_position = global_position + Vector3.UP * 1.2 + dir * 2.5
+	_play_sound(1.85)
+
+
+func _spawn_evade_barrel(at: Vector3) -> void:
+	var hazard := HAZARD.new()
+	hazard.source = self
+	hazard.damage = 4.5 if phase_index > 0 else 3.0
+	hazard.radius = 2.6
+	hazard.remaining = 0.95
+	hazard.detonated.connect(_on_barrel_detonated.bind(hazard, hazard.radius))
+	get_parent().add_child(hazard)
+	hazard.global_position = Vector3(at.x, global_position.y + 0.08, at.z)
+	hazard.animate_barrel(global_position + Vector3.UP * 0.6)
+
+
+func _trigger_aoe_hit(at: Vector3, radius: float, amount: float, tag: StringName) -> void:
+	if not is_instance_valid(_aoe_hitbox) or _aoe_shape == null or amount <= 0.0:
+		return
+	_aoe_hitbox.global_position = at
+	_aoe_shape.radius = maxf(0.1, radius)
+	_aoe_hitbox.begin_attack(amount, 0, tag)
+	_aoe_hitbox.sample_shape()
+	_aoe_hitbox.end_attack()
+
+
+func _create_aoe_hitbox() -> void:
+	_aoe_hitbox = HitBox.new()
+	_aoe_hitbox.name = "AoeHitBox"
+	_aoe_hitbox.top_level = true
+	_aoe_hitbox.actor = self
+	_aoe_hitbox.team = CombatTeams.ENEMY
+	_aoe_hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
+	_aoe_hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
+	_aoe_hitbox.damage_applied.connect(_on_aoe_damage)
+	var collider := CollisionShape3D.new()
+	_aoe_shape = SphereShape3D.new()
+	_aoe_shape.radius = anchor_slam_radius
+	collider.shape = _aoe_shape
+	_aoe_hitbox.add_child(collider)
+	add_child(_aoe_hitbox)
+
+
+func _create_slam_warning() -> void:
+	_slam_warning = Node3D.new()
+	_slam_warning.name = "AnchorSlamWarning"
+	_slam_warning.top_level = true
+	_slam_warning.visible = false
+	var disc := MeshInstance3D.new()
+	var disc_mesh := CylinderMesh.new()
+	disc_mesh.top_radius = anchor_slam_radius
+	disc_mesh.bottom_radius = anchor_slam_radius
+	disc_mesh.height = 0.02
+	disc.mesh = disc_mesh
+	_slam_warning_material = StandardMaterial3D.new()
+	_slam_warning_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_slam_warning_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_slam_warning_material.albedo_color = Color(1.0, 0.2, 0.04, 0.16)
+	disc.material_override = _slam_warning_material
+	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_slam_warning.add_child(disc)
+	var ring := MeshInstance3D.new()
+	var ring_mesh := TorusMesh.new()
+	ring_mesh.inner_radius = maxf(0.05, anchor_slam_radius - 0.12)
+	ring_mesh.outer_radius = anchor_slam_radius
+	ring.mesh = ring_mesh
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ring_mat.albedo_color = Color(1.0, 0.28, 0.05)
+	ring.material_override = ring_mat
+	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ring.position.y = 0.02
+	_slam_warning.add_child(ring)
+	add_child(_slam_warning)
+
+
+func _hide_slam_warning() -> void:
+	if is_instance_valid(_slam_warning):
+		_slam_warning.visible = false
