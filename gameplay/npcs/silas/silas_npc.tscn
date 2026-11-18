@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://cncgbdimr7r6x" path="res://data/npcs/silas_npc_data.tres" id="3_data"]
 [ext_resource type="Resource" uid="uid://l07gfc1sabb7" path="res://data/merchants/silas_catalog.tres" id="4_catalog"]
 [ext_resource type="Texture2D" uid="uid://8n16ih7xarfv" path="res://assets/sprites/npcs/silas/Silas.png" id="5_mxma3"]
-[ext_resource type="Texture2D" uid="uid://boygebnjr0o5t" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_1.png" id="5_texture"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/shared_placeholder/idle.png" id="5_texture"]
 [ext_resource type="AnimationLibrary" uid="uid://brpsylflg2vk7" path="res://gameplay/npcs/silas/silas_npc_anims.tres" id="6_anims"]
 [ext_resource type="Script" uid="uid://bl01533qto3ma" path="res://gameplay/npcs/base/states/npc_talk.gd" id="7_talk"]
 

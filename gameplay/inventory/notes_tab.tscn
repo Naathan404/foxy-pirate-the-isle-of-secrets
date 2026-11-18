@@ -13,10 +13,9 @@
 [ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="note_type"]
 [ext_resource type="Script" uid="uid://e1whya78g8bs" path="res://gameplay/inventory/notes_tab.gd" id="script"]
 [ext_resource type="Resource" uid="uid://c8p2d5sfb87ah" path="res://data/notes/starfish.tres" id="starfish"]
-[ext_resource type="Resource" uid="uid://bx72y4y0s622a" path="res://data/notes/war_lord_turtle.tres" id="war_lord_turtle"]
 
 [node name="Notes" type="Control" unique_id=1900962950]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("script")
-notes = Array[ExtResource("note_type")]([ExtResource("starfish"), ExtResource("crab"), ExtResource("barrel"), ExtResource("coral_skeleton"), ExtResource("elite_starfish"), ExtResource("elite_crab"), ExtResource("elite_barrel"), ExtResource("war_lord_turtle"), ExtResource("diary_ember"), ExtResource("diary_tide"), ExtResource("diary_flora"), ExtResource("diary_gale")])
+notes = Array[ExtResource("note_type")]([ExtResource("starfish"), ExtResource("crab"), ExtResource("barrel"), ExtResource("coral_skeleton"), ExtResource("elite_starfish"), ExtResource("elite_crab"), ExtResource("elite_barrel"), ExtResource("diary_ember"), ExtResource("diary_tide"), ExtResource("diary_flora"), ExtResource("diary_gale")])

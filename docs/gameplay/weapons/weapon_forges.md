@@ -60,7 +60,7 @@ Shared pool: 22 Universal + 6 Wildcard. All weapon categories can roll any entry
 
 - WeaponData: `chaos_per_hit` (default 5 for both existing weapons), `stagger_damage` (Dagger 20, Bow 35).
 - AttackData and MeleeComboStep: `stagger_multiplier`. Dagger finisher is x1.75, returning dagger x1.25, volley arrows x0.5 each.
-- EnemyData: `stagger_threshold` (normal 60, elite 120, War Lord Turtle 240), `stagger_decay_delay` (1.25s), `stagger_decay_per_second` (30), `stagger_immunity_duration` (1s after recovery).
+- EnemyData: `stagger_threshold` (normal 60, elite 120), `stagger_decay_delay` (1.25s), `stagger_decay_per_second` (30), `stagger_immunity_duration` (1s after recovery).
 - WeaponForge: `chaos_gain_multiplier`, `stagger_multiplier`, `critical_damage_multiplier`, `critical_damage_bonus`, `skill_damage_multiplier`, plus the existing rate, timing, range and knockback fields.
 
 ## Integration
