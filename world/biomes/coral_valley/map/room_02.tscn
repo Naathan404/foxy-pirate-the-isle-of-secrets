@@ -84,7 +84,7 @@ metadata/_custom_type_script = "uid://juar8i43t1me"
 [node name="room_02" unique_id=1362667654 instance=ExtResource("1_base")]
 open_exits = 14
 right_destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
-down_destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
+down_destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
@@ -100,7 +100,7 @@ shape = SubResource("BoxShape3D_qje2f")
 shape = SubResource("BoxShape3D_cbdvd")
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
+destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 
 [node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_vphl5")

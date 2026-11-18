@@ -7,7 +7,7 @@
 
 [node name="room_01" unique_id=1826943073 instance=ExtResource("1_base")]
 open_exits = 11
-up_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+up_destination_scene = "res://world/biomes/coral_valley/map/room_09.tscn"
 right_destination_scene = "res://world/biomes/coral_valley/map/room_02.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
 
@@ -28,7 +28,7 @@ enabled = false
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+destination_scene = "res://world/biomes/coral_valley/map/room_09.tscn"
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_02.tscn"

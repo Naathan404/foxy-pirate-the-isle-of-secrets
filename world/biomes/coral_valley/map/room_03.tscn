@@ -76,7 +76,7 @@ size = Vector3(0.5, 2, 4)
 
 [node name="room_03" unique_id=455104233 instance=ExtResource("1_base")]
 open_exits = 11
-up_destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+up_destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
 right_destination_scene = "res://world/biomes/coral_valley/map/room_04.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_02.tscn"
 
@@ -112,7 +112,7 @@ shape = SubResource("BoxShape3D_cnqep")
 shape = SubResource("BoxShape3D_xdfqs")
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
 
 [node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_uuxc4")

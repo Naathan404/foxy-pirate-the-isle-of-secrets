@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://uexrx1p2ci64" path="res://assets/sprites/biomes/coral_valley/harbor_path_left_warm_sand.png" id="5_fftls"]
 [ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://assets/sprites/biomes/coral_valley/coral_valley_ground.png" id="6_n48ku"]
 [ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="7_ground_shape"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="8_boat"]
+[ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="8_boat"]
 
 [node name="BaseLargeRoom" unique_id=1672893012 instance=ExtResource("1_5rjr3")]
 
@@ -15,7 +15,7 @@
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -0.53301895, 0.06355, 30.356865)
 
 [node name="Sprite3D" parent="Exits/DownPath" index="0" unique_id=1887481611]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 4.371139e-08, -1)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 6.6839185e-08, -1.5291023)
 pixel_size = 0.0093
 texture = ExtResource("2_xrntv")
 
@@ -32,7 +32,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -7.6359596)
 [node name="ExitPosition" parent="Exits/DownPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6731589, -6.5109596)
 
-[node name="HarborBoat" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="3" instance=ExtResource("8_boat")]
+[node name="HarborBoat" parent="Exits/DownPath" index="3" unique_id=1761625350 instance=ExtResource("8_boat")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, -0.18, 1.15)
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
@@ -56,8 +56,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4.987198)
 [node name="ExitPosition" parent="Exits/UpPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6731589, -6.112198)
 
-[node name="HarborBoat" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="3" instance=ExtResource("8_boat")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.25, -0.18, -5.0)
+[node name="HarborBoat" parent="Exits/UpPath" index="3" unique_id=414811085 instance=ExtResource("8_boat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.25, -0.18, -5)
 
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 34.071114, 0.03122998, 0)
@@ -83,7 +83,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4334259, 1, -4.5629807)
 [node name="ExitPosition" parent="Exits/RightPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6915741, 0.6731589, -4.89767)
 
-[node name="HarborBoat" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="3" instance=ExtResource("8_boat")]
+[node name="HarborBoat" parent="Exits/RightPath" index="3" unique_id=97239588 instance=ExtResource("8_boat")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.62, -0.18, 3.45)
 
 [node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
@@ -110,7 +110,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0011101, 1.1086969, -5.132
 [node name="ExitPosition" parent="Exits/LeftPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1238899, 0.6731589, -5.3314714)
 
-[node name="HarborBoat" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="3" instance=ExtResource("8_boat")]
+[node name="HarborBoat" parent="Exits/LeftPath" index="3" unique_id=558134331 instance=ExtResource("8_boat")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.21, -0.18, 2.8)
 
 [node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
