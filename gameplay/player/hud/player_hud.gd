@@ -10,6 +10,8 @@ extends CanvasLayer
 @export var ammo: AmmoComponent
 
 var _displayed_ammo_id: StringName = &""
+var _player: Player
+var _poison_displayed: bool = false
 
 @onready var health_arc: HudStatArc = $Stats/HealthArc
 @onready var stamina_arc: HudStatArc = $Stats/StaminaArc
@@ -22,6 +24,7 @@ var _displayed_ammo_id: StringName = &""
 
 
 func _ready() -> void:
+	_player = get_parent() as Player
 	if is_instance_valid(ammo):
 		if is_instance_valid(ammo.inventory):
 			# Inventory changes cover every ammo ID, including items not in ammo_items yet.
@@ -34,13 +37,13 @@ func _ready() -> void:
 		_sync_weapon.call_deferred()
 	if is_instance_valid(health):
 		health.hp_changed.connect(_on_hp_changed)
-		health.damaged.connect(portrait.play_hit_feedback)
+		health.damaged.connect(_on_health_damaged)
 		health.died.connect(portrait.show_death)
 	if is_instance_valid(stamina):
 		stamina.stamina_changed.connect(stamina_arc.set_stat)
 	if is_instance_valid(chaos):
 		chaos.chaos_changed.connect(chaos_arc.set_stat)
-	chaos_indicator.bind_components(chaos, weapon_controller, get_parent() as Player)
+	chaos_indicator.bind_components(chaos, weapon_controller, _player)
 	# Player khởi tạo chỉ số sau khi các node con ready, nên sync ở cuối frame.
 	_sync_stats.call_deferred()
 	equipment.bind_manager.call_deferred(charm_socket_manager)
@@ -126,6 +129,21 @@ func _sync_stats() -> void:
 	else:
 		chaos_arc.sync_preview()
 		chaos_indicator.set_stat(chaos_arc.fill.value, chaos_arc.fill.max_value)
+
+
+func _process(_delta: float) -> void:
+	var poisoned := is_instance_valid(_player) and _player.is_poisoned()
+	if poisoned != _poison_displayed:
+		_poison_displayed = poisoned
+		portrait.set_poisoned(poisoned)
+		if is_instance_valid(health_arc.fill):
+			health_arc.fill.modulate = Color(0.58, 0.94, 0.46) if poisoned else Color.WHITE
+
+
+func _on_health_damaged(amount: float) -> void:
+	if is_instance_valid(_player) and _player.is_suppressing_hit_reaction():
+		return
+	portrait.play_hit_feedback(amount)
 
 
 func _on_hp_changed(current: float, maximum: float) -> void:

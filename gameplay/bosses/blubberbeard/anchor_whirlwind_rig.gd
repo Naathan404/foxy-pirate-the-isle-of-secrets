@@ -231,6 +231,7 @@ func _build_hitbox() -> void:
 	hitbox.team = CombatTeams.ENEMY
 	hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
 	hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
+	hitbox.damage_prepared.connect(_on_damage_prepared)
 	hitbox.damage_applied.connect(_on_damage_applied)
 
 	_hitbox_collider = CollisionShape3D.new()
@@ -287,6 +288,24 @@ func _begin_lap_hitbox() -> void:
 	context.tag = &"boss_whirlwind"
 	context.knockback_multiplier = 1.55
 	_spinning = hitbox.begin_attack_with_context(context, HitBox.RehitPolicy.ONCE_PER_ATTACK)
+
+
+func _on_damage_prepared(damage: DamageContext, hit_target: Node) -> void:
+	if damage == null or not is_instance_valid(_boss):
+		return
+	damage.origin = _boss.global_position
+	var radial := Vector3.RIGHT
+	if hit_target is Node3D:
+		radial = (hit_target as Node3D).global_position - _boss.global_position
+	elif is_instance_valid(_arm_pivot):
+		radial = _arm_pivot.global_basis.x
+	radial.y = 0.0
+	if radial.is_zero_approx():
+		radial = Vector3.RIGHT
+	radial = radial.normalized()
+	damage.direction = Vector3.UP.cross(radial).normalized()
+	damage.tag = &"boss_whirlwind"
+	damage.knockback_multiplier = 1.55
 
 
 func _on_damage_applied(_damage: DamageContext, hit_target: Node, _applied: float) -> void:

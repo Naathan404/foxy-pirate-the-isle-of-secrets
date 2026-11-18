@@ -19,8 +19,7 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 - **Khóa lối ra bằng cơ chế sập cầu**: [blubberbeard_room.gd](../../world/coral_valley/scenes/stages/blubberbeard_room.gd) tự động khóa `LeftPath/SceneChangeTrigger`, bật rào chắn và làm sập cây cầu gỗ nối lối ra khi bước vào map mà boss còn sống; cầu và lối ra tự khôi phục ngay khi hạ boss (`fight_finished`), cho phép Player đi bộ thông suốt qua cầu ra lại cửa thoát.
 - **Tối ưu tạm cho bộ chiêu cũ**: [blubberbeard.gd](../../gameplay/bosses/blubberbeard/blubberbeard.gd) đã có chọn chiêu theo khoảng cách (`smart_skill_selection`), đòn `Anchor Slam` cận chiến cơ bản, ném thùng đón đầu, phản công thả thùng khi xì hơi và làm tối môi trường Phase 2 trong [blubberbeard_arena.gd](../../world/coral_valley/scenes/stages/blubberbeard_arena.gd).
 
-### Những giới hạn còn lại (Thuộc Giai đoạn C, D, E)
-- **Trạng thái Player cho bộ chiêu mới (Giai đoạn C)**: Đạn/vũng độc đã gắn `tag = &"poison"` và Xoay Mỏ Neo đã gắn `tag = &"boss_whirlwind"`, nhưng `Player` vẫn cần xử lý trạng thái nhiễm độc DoT (không kích hoạt `Hit`/i-frame), tích hợp `InkOverlay` màu độc và đẩy xoáy trôn ốc + chóng mặt trên `PlayerHit`.
+### Những giới hạn còn lại (Thuộc Giai đoạn D, E)
 - **Tấn công môi trường & Boss Intro (Giai đoạn D)**: Chưa có chiêu rung chuyển mặt đất, `FlatTideZone` thủy triều đa hướng và đoạn intro lia camera đầu trận.
 - **Audio chưa thực hiện (Giai đoạn E)**: [audio_manager.md](../systems/audio_manager.md) chưa có trình phát nhạc nền (BGM) cho bus `Music`, các SFX của Blubberbeard vẫn đang là file tổng hợp placeholder.
 
@@ -99,9 +98,9 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 2. **Giai đoạn B — Rework Bộ Chiêu Thức & AI của Captain Blubberbeard *(Hoàn thành)***:
    - Đã gỡ bỏ `BELLY_CHARGE` và cơ chế xì hơi bỏ chạy cũ; thay bằng **Sky Dive** (`blubberbeard_skydive.gd` + `blubberbeard_skydive.png`), **Phình Gai cận chiến + phản đòn `COUNTER_SHOCK -> Spiky Burst`** (`hits_before_counter`), **Ném thùng `1 -> 2 -> [3..5]`**, **Xoay Mỏ Neo dây xích** (`anchor_whirlwind_rig.gd` + `blubberbeard_anchor_whirlwind.png` + `anchor_whirlwind_props.png`) và **Phun Xì Hơi Độc** (`blubberbeard_venom_hazard.gd` + `blubberbeard_venom_spit_4dir.png` + `venom_glob_and_puddle.png`).
    - Đã tách hệ thống AI trọng số theo cự ly + cooldown + khóa chiêu theo Phase tại `blubberbeard_ai.gd` và cập nhật lại `blubberbeard_boss_test.gd`, `blubberbeard_animation_test.gd`, `blubberbeard_evade_test.gd`.
-3. **Giai đoạn C — Trạng thái Player & Hiệu ứng Độc / Choáng**:
-   - Thêm trạng thái **nhiễm độc cá nóc** (DoT `tag = &"poison"`, không kích hoạt `Hit` stun/i-frame) và tích hợp `InkOverlay` màu độc khi trúng chiêu phun độc.
-   - Mở rộng `PlayerHit` hỗ trợ **đẩy xoáy trôn ốc + chóng mặt** khi trúng vòng xoay mỏ neo.
+3. **Giai đoạn C — Trạng thái Player & Hiệu ứng Độc / Choáng *(Hoàn thành)***:
+   - Đã thêm trạng thái **nhiễm độc cá nóc** trong `player.gd` (`tag = &"poison"` xuyên qua i-frame vật lý, không kích hoạt `PlayerHit` stun / `post_hit_invulnerability`), tích hợp `InkOverlay` màu độc khi trúng đòn phun độc (`tag = &"boss_venom_hit"`) và hiệu ứng viền tím/nháy xanh tím trên `LowHealthVignette`, `PlayerHitEffect`, `HudPortrait` và `PlayerHUD`.
+   - Đã mở rộng `PlayerHit` (`player_hit.gd`), `AnchorWhirlwindRig` và `PlayerHitEffect` hỗ trợ **đẩy xoáy trôn ốc** (kết hợp tiếp tuyến + hướng tâm) kèm hiệu ứng **chóng mặt** (`DizzyStarsHalo`) khi trúng vòng xoay mỏ neo (`tag = &"boss_whirlwind"`).
 4. **Giai đoạn D — Tấn công bằng Môi trường & Boss Intro**:
    - Thêm chiêu **Rung chuyển mặt đất** và tích hợp **Thủy triều theo hướng** (tái sử dụng `FlatTideZone` với chế độ gọi sóng theo đợt cho Phase 2).
    - Bổ sung Boss Intro ngắn khi kích hoạt trận đánh.
