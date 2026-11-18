@@ -630,13 +630,13 @@ func _enter_recovery() -> void:
 	if is_instance_valid(_aoe_hitbox):
 		_aoe_hitbox.end_attack()
 	var prev_kind := skill.kind if skill != null else BlubberbeardSkillData.Kind.POWDER_BARREL
-	visual.begin_recovery(prev_kind)
 	_sync_colliders_to_size()
 	state = State.RECOVERY
 	if prev_kind == BlubberbeardSkillData.Kind.ANCHOR_SLAM:
 		timer = anchor_slam_recovery
-		return
-	timer = skill.recovery if skill != null else 0.55
+	else:
+		timer = skill.recovery if skill != null else 0.55
+	visual.begin_recovery(prev_kind, timer)
 
 
 func _enter_wait() -> void:

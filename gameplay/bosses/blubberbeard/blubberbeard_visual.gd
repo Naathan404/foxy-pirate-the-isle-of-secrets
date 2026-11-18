@@ -94,6 +94,7 @@ var _hit_flash: float = 0.0
 var _hit_clip_left: float = 0.0
 var _hit_clip_duration: float = HURT_DURATION
 var _burst_left: float = 0.0
+var _recovery_duration: float = RECOVERY_ANIMATION_TIME
 var _spiky_hold_total: float = 1.25
 var _facing: Vector3 = Vector3.BACK
 var _lean: float = 1.0
@@ -147,7 +148,7 @@ func _process(delta: float) -> void:
 	_hit_flash = maxf(0.0, _hit_flash - step)
 	_hit_clip_left = maxf(0.0, _hit_clip_left - step)
 	_impact_left = maxf(0.0, _impact_left - step)
-	if pose == Pose.RECOVERY and _clip_time >= RECOVERY_ANIMATION_TIME:
+	if pose == Pose.RECOVERY and _clip_time >= _recovery_duration:
 		pose = Pose.IDLE
 		_set_clip(Clip.MOVE if moving else Clip.IDLE)
 	if _burst_left > 0.0:
@@ -194,8 +195,13 @@ func _process(delta: float) -> void:
 				desired_scale *= Vector3(1.04, 0.96, 1.0)
 				desired_position.y += sin(_clock * 8.0) * 0.14
 		Pose.RECOVERY:
-			desired_scale *= Vector3(1.05, 0.94, 1.0)
-			desired_rotation = -0.05 * _lean
+			if clip == Clip.WHIRLWIND_BRAKE:
+				var pant := sin(_clock * 9.0)
+				desired_scale *= Vector3(1.06 + pant * 0.035, 0.92 - pant * 0.04, 1.0)
+				desired_rotation = (-0.06 + pant * 0.04) * _lean
+			else:
+				desired_scale *= Vector3(1.05, 0.94, 1.0)
+				desired_rotation = -0.05 * _lean
 	if _impact_left > 0.0 and _impact_duration > 0.0:
 		var weight := _impact_left / _impact_duration
 		desired_scale *= Vector3(1.0 + _impact_power * weight, 1.0 - _impact_power * weight, 1.0)
@@ -296,10 +302,11 @@ func face_direction(direction: Vector3) -> void:
 	_update_active_frame()
 
 
-func begin_recovery(kind: int) -> void:
+func begin_recovery(kind: int, duration: float = RECOVERY_ANIMATION_TIME) -> void:
 	airborne_height = 0.0
 	_hit_clip_left = 0.0
 	_burst_left = 0.0
+	_recovery_duration = maxf(RECOVERY_ANIMATION_TIME, duration)
 	if kind == BlubberbeardSkillData.Kind.SKY_DIVE:
 		pose = Pose.RECOVERY
 		_set_clip(Clip.SKYDIVE_IMPACT)
