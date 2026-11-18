@@ -49,6 +49,7 @@ const WHIRLWIND_SPIRAL_STRENGTH: float = 1.0
 @export_range(0.01, 2.0, 0.01, "suffix:s") var venom_ink_spread_seconds: float = 0.14
 @export_range(0.0, 3.0, 0.05, "suffix:s") var venom_ink_hold_seconds: float = 0.55
 @export_range(0.05, 4.0, 0.05, "suffix:s") var venom_ink_fade_seconds: float = 1.15
+@export_range(0.2, 1.0, 0.05) var poison_move_speed_multiplier: float = 0.72
 
 var move_direction: Vector3 = Vector3.ZERO
 # Đứng yên vẫn nhớ hướng để đánh và dash
@@ -306,11 +307,14 @@ func receive_damage(damage: DamageContext) -> float:
 
 func _apply_poison_damage_tick(damage: DamageContext, amount: float) -> float:
 	# Sát thương độc theo chu kỳ không kích hoạt PlayerHit stun hay i-frame miễn nhiễm.
+	var was_poisoned := is_poisoned()
 	_suppress_next_hit_reaction = true
 	var applied_hp := hp.take_damage(amount)
 	_suppress_next_hit_reaction = false
 	if applied_hp > 0.0:
 		poison_remaining = maxf(poison_remaining, POISON_STATUS_HOLD_SECONDS)
+		if not was_poisoned:
+			_trigger_venom_ink_splash()
 		poison_ticked.emit(applied_hp)
 		if is_instance_valid(charm_socket_manager):
 			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
@@ -818,6 +822,7 @@ func _get_move_speed() -> float:
 	}
 	if is_instance_valid(charm_socket_manager):
 		charm_socket_manager.modify_stats(stats)
+	var poison_mult := poison_move_speed_multiplier if is_poisoned() else 1.0
 	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
 	return maxf(
 		0.0,
@@ -825,5 +830,6 @@ func _get_move_speed() -> float:
 			(data.move_speed + stats[&"move_speed_flat"])
 			* stats[&"move_speed_multiplier"]
 			* environment_move_speed_multiplier
+			* poison_mult
 		)
 	)
