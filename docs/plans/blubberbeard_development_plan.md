@@ -19,12 +19,10 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 - **Khóa lối ra bằng cơ chế sập cầu**: [blubberbeard_room.gd](../../world/coral_valley/scenes/stages/blubberbeard_room.gd) tự động khóa `LeftPath/SceneChangeTrigger`, bật rào chắn và làm sập cây cầu gỗ nối lối ra khi bước vào map mà boss còn sống; cầu và lối ra tự khôi phục ngay khi hạ boss (`fight_finished`), cho phép Player đi bộ thông suốt qua cầu ra lại cửa thoát.
 - **Tối ưu tạm cho bộ chiêu cũ**: [blubberbeard.gd](../../gameplay/bosses/blubberbeard/blubberbeard.gd) đã có chọn chiêu theo khoảng cách (`smart_skill_selection`), đòn `Anchor Slam` cận chiến cơ bản, ném thùng đón đầu, phản công thả thùng khi xì hơi và làm tối môi trường Phase 2 trong [blubberbeard_arena.gd](../../world/coral_valley/scenes/stages/blubberbeard_arena.gd).
 
-### Những giới hạn còn lại cần xử lý ở bản rework tiếp theo
-- Vẫn còn dùng lại hai cơ chế cũ làm giảm tính đe dọa là **húc thẳng (`BELLY_CHARGE`)** và **xì hơi bay đi trốn (`_begin_evade`)** khi trúng đủ số hit.
-- Đòn mỏ neo mới là cú nện thẳng đơn giản (`Anchor Slam`), chưa phải chiêu **xoay mỏ neo kèm dây xích theo hình tròn** gây áp lực vùng và hiệu ứng trúng đòn đặc trưng.
-- Chưa có **chủ đề độc tố cá nóc** (phun xì hơi độc, vũng độc, hiệu ứng loang màn hình, trạng thái nhiễm độc cho Player).
-- Chưa có **tấn công môi trường** (rung chuyển mặt đất, gọi thủy triều đa hướng).
-- **Audio chưa thực hiện**: [audio_manager.md](../systems/audio_manager.md) chưa có trình phát nhạc nền (BGM) cho bus `Music`, các SFX của Blubberbeard vẫn đang là file tổng hợp placeholder.
+### Những giới hạn còn lại (Thuộc Giai đoạn C, D, E)
+- **Trạng thái Player cho bộ chiêu mới (Giai đoạn C)**: Đạn/vũng độc đã gắn `tag = &"poison"` và Xoay Mỏ Neo đã gắn `tag = &"boss_whirlwind"`, nhưng `Player` vẫn cần xử lý trạng thái nhiễm độc DoT (không kích hoạt `Hit`/i-frame), tích hợp `InkOverlay` màu độc và đẩy xoáy trôn ốc + chóng mặt trên `PlayerHit`.
+- **Tấn công môi trường & Boss Intro (Giai đoạn D)**: Chưa có chiêu rung chuyển mặt đất, `FlatTideZone` thủy triều đa hướng và đoạn intro lia camera đầu trận.
+- **Audio chưa thực hiện (Giai đoạn E)**: [audio_manager.md](../systems/audio_manager.md) chưa có trình phát nhạc nền (BGM) cho bus `Music`, các SFX của Blubberbeard vẫn đang là file tổng hợp placeholder.
 
 ## 3. Đánh giá tính khả thi & ràng buộc kỹ thuật cho các đề xuất mới
 
@@ -32,8 +30,8 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 | --- | --- | --- |
 | **Xoay người & mỏ neo dây xích theo hình tròn (1–2 lần) + Player trúng đòn bị chóng mặt xoáy trôn ốc** | **Ổn & Khả thi cao** | Có thể dựng dây xích + mỏ neo 3D quay quanh trục Y với `HitBox` quét vòng và vòng cảnh báo bán kính. Trạng thái xoáy trôn ốc mở rộng [player_hit.gd](../../gameplay/player/states/player_hit.gd) bằng vector tiếp tuyến + hướng ra ngoài; cần giữ thời gian stun ngắn (`~0.4–0.6s`) để tránh mất điều khiển quá lâu. |
 | **Phun xì hơi độc + trail giọt nọc + vũng độc mặt đất + hiệu ứng loang màn hình** | **Rất tốt & Khả thi rất cao** | Tái sử dụng trực tiếp [ink_overlay.gd](../../gameplay/player/effects/ink_overlay.gd) (đang dùng ở [octopus_ink.md](../gameplay/octopus_ink.md)) đổi màu xanh/tím độc, và tái sử dụng pattern vũng độc từ [coral_poison_cloud.gd](../../gameplay/enemies/coral_skeleton/coral_poison_cloud.gd). **Lưu ý**: Chỉ nên kích hoạt vết loang màn hình khi trúng đòn/vùng phun (tránh gây mù màn hình liên tục dù né được), và sát thương độc theo thời gian (`tag = &"poison"`) **không** được kích hoạt `PlayerHit` hay cấp `post_hit_invulnerability`. |
-| **Phình gai trở thành chiêu cận chiến & phản công khi bị đánh dồn (thay cho xì hơi bỏ chạy)** | **Rất tốt & Khả thi cao** | Tận dụng `INFLATE_4DIR_SHEET` sẵn có; dùng làm đòn tự vệ khi Player đứng gần hoặc đánh dồn nhiều hit (boss giật ngược + hiệu ứng sốc rồi phình gai phản công). Cần cập nhật lại [blubberbeard_evade_test.gd](../../test/blubberbeard_evade_test.gd) khi gỡ cơ chế chạy trốn cũ. |
-| **Bỏ `BELLY_CHARGE` + bỏ chạy, gộp thành Không Kích Bay Lượn & Đáp Đất (`Sky Dive`)** | **Hay & Khả thi** | Tận dụng bộ 4 hướng `deflate_*.png` sẵn có để xì hơi bay vọt lên, lượn quỹ đạo bất ngờ rồi chốt cứng vị trí đáp (hiện vòng cảnh báo cố định) và lao thẳng xuống không đổi hướng. **Lưu ý**: Camera góc trên xuống (`fov = 30..45°`) dễ bị khuất nếu bay quá cao; cần giữ độ cao `~5–7m` và luôn hiển thị bóng tròn rõ trên mặt đất bên dưới. Cần cập nhật [blubberbeard_boss_test.gd](../../test/blubberbeard_boss_test.gd) và [blubberbeard_animation_test.gd](../../test/blubberbeard_animation_test.gd) khi bỏ `BELLY_CHARGE`. |
+| **Phình gai trở thành chiêu cận chiến & phản công khi bị đánh dồn (thay cho xì hơi bỏ chạy, không phóng gai rời)** | **Rất tốt & Khả thi cao** | Tận dụng `INFLATE_4DIR_SHEET` sẵn có; boss phình to giữ trạng thái cá nóc gai lâu (`1.25–1.45s`) kèm đẩy lùi & hitbox thân gai thay vì phóng gai như nhím. Đã cập nhật [blubberbeard_evade_test.gd](../../test/blubberbeard_evade_test.gd). |
+| **Bỏ `BELLY_CHARGE` + bỏ chạy, thay bằng Nhảy Parabol đập thẳng xuống vị trí Player (`Sky Dive`)** | **Hợp lý & Khả thi** | Dùng sheet `blubberbeard_skydive.png` cho cú nhảy parabol nặng nề bay thẳng tới vị trí khóa của Player (thay cho bay lượn tự do, tránh cảm giác vô lý với boss to béo). |
 | **Ném thùng nổ theo nhịp `1 -> 2 -> [3, 4, 5]` (lượt cuối ném nhiều quả cùng lúc)** | **Ổn & Khả thi rất cao** | Mở rộng trực tiếp `_begin_barrel_barrage()` trong `blubberbeard.gd` để hỗ trợ danh sách số thùng theo từng nhịp (`[1, 2, 3..5]`), tách khoảng cách điểm rơi tối thiểu để người chơi vẫn còn khe né. |
 | **AI không theo quy luật cố định (Random + Khoảng cách + Khóa skill theo Phase)** | **Rất tốt & Khả thi cao** | Dùng bộ chọn trọng số động theo cự ly (gần / trung / xa), phản ứng khi bị áp sát và cooldown từng skill; một số chiêu áp lực cao chỉ mở từ Phase 2. |
 | **Tấn công môi trường: Rung chuyển mặt đất** | **Khả thi cao** | Dự án đã có `ScreenShakeController` và `ShockwaveController`. Để trở thành đòn tấn công thực sự, cần thêm pha rung báo trước (`~1.0s`) rồi tạo các điểm đá trồi/vùng chấn động gây sát thương + knockback nhẹ (có vòng cảnh báo trên sàn). |
@@ -48,17 +46,15 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 ## 4. Các hướng phát triển (Đã sắp xếp lại)
 
 ### Hướng 1: Cân bằng chỉ số & Cơ chế nhận đòn mới (Chống bị ngắt chiêu, Phản công)
-- **Giữ nền chỉ số đã nâng**: Duy trì `max_hp >= 120.0` (tinh chỉnh thêm khi test cùng các vũ khí rèn/Charm).
+- **Cân bằng máu, sát thương & nhịp đánh**: Điều chỉnh `max_hp = 68.0`, sát thương chiêu (`2.0–4.0` trên nền `8.0` HP của Foxy) để phù hợp bộ vũ khí hiện tại (`1.0–2.0` damage/đòn); sửa vòng lặp `RECOVERY -> WAIT` giúp boss thực sự giữ khoảng nghỉ (`1.85s` Phase 1 / `1.25s` Phase 2) và **đi bộ vòng vòng quan sát** quanh Player giữa các đợt tấn công.
 - **Loại bỏ cơ chế xì hơi bỏ chạy (`_begin_evade`)**:
   - Khi đang gồng hoặc tung chiêu nặng: giữ Super Armor (chỉ nháy hit flash, không bị hủy đòn).
   - Khi nhận đòn ở trạng thái thường hoặc tích đủ ngưỡng đánh dồn: chỉ **giật ngược nhẹ theo hướng đánh + hiệu ứng sốc** (`HIT_DEATH_SHEET`), sau đó **phản công trực diện bằng chiêu Phình Gai cận chiến** thay vì thu nhỏ bỏ chạy.
 
 ### Hướng 2: Rework Bộ Chiêu Thức Đặc Trưng của Captain Blubberbeard
-1. **Phình Gai Cận Chiến (`Spiky Burst`)**: Khi Player đứng gần hoặc đánh dồn liên tục, boss hít hơi phình to (cảnh báo rõ vòng AoE quanh thân) rồi bung gai gây sát thương + đẩy lùi mạnh nếu Player không kịp chạy khỏi tầm.
-2. **Ném Thùng Thuốc Nổ Leo Thang (`Barrel Barrage 1 -> 2 -> [3..5]`)**: Giữ cách ném đón đầu nhưng đổi nhịp mỗi lượt ném thành `1` quả → `2` quả → đợt cuối ném **cùng lúc `3–5` quả** phủ rộng vùng thoát.
-3. **Không Kích Bay Lượn & Đáp Đất (`Sky Dive` — thay `BELLY_CHARGE`)**:
-   - Boss xì hơi (`deflate_*.png`) phóng lên không trung và bay lượn theo quỹ đạo biến thiên khó đoán trong `~1.2–1.6s` (có bóng đen theo dõi trên sàn).
-   - Chốt vị trí hiện tại của Player, khóa vòng cảnh báo cố định trên mặt đất rồi lao thẳng xuống đất gây sát thương vùng + sóng chấn động (không đổi hướng khi đang lao xuống).
+1. **Phình To Mọc Gai (`Spiky Hold`, không phóng gai rời)**: Khi Player đứng gần hoặc đánh dồn liên tục, boss hít hơi phình to vượt trội (~`1.32x`) bung toàn bộ gai quanh thân (cảnh báo vòng AoE trước) gây nổ đẩy lùi rồi **giữ nguyên trạng thái cá nóc gai khổng lồ trong `1.25–1.45s`** (chạm vào thân gai vẫn bị sát thương/đẩy lùi) trước khi xì hơi trở lại, phù hợp sinh học cá nóc.
+2. **Ném Thùng Thuốc Nổ Leo Thang (`Barrel Barrage 1 -> 2 -> [3..5]`)**: Các đợt/quả đầu nhắm theo vị trí hiện tại của Player; những quả sau và loạt cuối (`3–5` quả) tung ngẫu nhiên quanh khu vực gần đó của Player.
+3. **Nhảy Parabol Đập Thân (`Sky Dive` — thay `BELLY_CHARGE`)**: Thay vì bay lượn trên không, boss nhún người bật nhảy theo **quỹ đạo parabol nặng nề bay thẳng tới vị trí của Player** (hiện tâm khóa cố định + bóng đen theo quỹ đạo trên sàn) rồi nện sập tạo hố nứt & sóng chấn động.
 4. **Xoay Mỏ Neo Dây Xích (`Anchor Whirlwind` — ưu tiên Phase 2 / tầm gần)**: Boss vung dây xích xoay mỏ neo thành vòng tròn quanh người `1–2` vòng tùy quyết định của AI.
 5. **Phun Xì Hơi Độc (`Venom Spit` — ưu tiên Phase 2)**: Bắn ra luồng giọt nọc độc có trail particle; khi chạm đất hoặc chạm Player tạo **vũng nọc độc loang trên mặt đất** gây sát thương theo thời gian.
 
@@ -69,8 +65,13 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 - **Chóng mặt & Đẩy xoáy trôn ốc (`Spiral Knockback`)**:
   - Tái sử dụng state `PlayerHit` trong [player_hit.gd](../../gameplay/player/states/player_hit.gd), bổ sung chế độ đẩy kết hợp **lực tiếp tuyến theo chiều xoay mỏ neo + lực hướng tâm ra ngoài** và hiệu ứng hoa mắt/chóng mặt ngắn khi trúng `Anchor Whirlwind`.
 
-### Hướng 4: Hệ thống AI động theo khoảng cách & Giai đoạn (Phase Gating)
-- **Không dùng vòng lặp thứ tự cố định**: Mỗi lần chọn chiêu sẽ lọc theo Phase hiện tại, cooldown riêng của từng kỹ năng và trọng số theo khoảng cách tới Player (cận chiến → `Spiky Burst` / `Anchor Whirlwind`; tầm trung → `Barrel Barrage` / `Venom Spit`; tầm xa hoặc bị kéo giãn → `Sky Dive`).
+### Hướng 4: Hệ thống AI động theo vị trí Player & Giai đoạn (Phase Gating)
+- **Quy tắc theo cự ly & vùng biên (`POSITION_RULES` trong `blubberbeard_ai.gd`)**:
+  - *Gần sát (`<= 4.5m`)*: Ưu tiên **Phình to mọc gai (`Spiky Hold`)** để đẩy lùi, xen kẽ `Anchor Whirlwind` (Phase 2) hoặc `Anchor Slam` khi ở vùng mở; không tung thùng hay nhảy xa.
+  - *Tầm trung (`4.5–9.5m`)*: Vùng mở trộn ngẫu nhiên `Venom Spit`, `Sky Dive`, `Barrel Barrage`, `Anchor Whirlwind`; sát biên thì ưu tiên `Barrel Barrage`.
+  - *Xa & KHÔNG ở gần biên (`> 9.5m`)*: Chọn ngẫu nhiên có trọng số giữa **Nhảy Parabol (`Sky Dive`)**, **Ném thùng (`Barrel Barrage`)** và **Phun độc (`Venom Spit` ở Phase 2)**; khóa chiêu cận chiến (`weight = 0.0`).
+  - *Xa & Player ở gần biên (`GroundBoundaries` / mép vực trong `3.6m`)*: **Chỉ ném thùng (`POWDER_BARREL`)** và lọc điểm rơi trong ranh giới đi được, tránh nhảy tạo hố nứt hoặc vũng độc lơ lửng ngoài mép đảo/tường.
+  - Ngoài ra luôn tính cooldown riêng từng kỹ năng, giảm lặp chiêu và có độ ngẫu nhiên để không theo vòng lặp cứng.
 - **Tăng độ khó theo giai đoạn**:
   - *Phase 1 (100% → >50% HP)*: Dùng bộ chiêu nền tảng (`Barrel Barrage` tối đa 3 quả cuối, `Spiky Burst`, `Sky Dive` tốc độ vừa) để người chơi đọc nhịp.
   - *Phase 2 (<= 50% HP)*: Mở khóa `Anchor Whirlwind` (có thể xoay 2 vòng), `Venom Spit`, loạt thùng nổ cuối lên `4–5` quả, tốc độ đáp `Sky Dive` nhanh hơn và mở khóa **Tấn công Môi trường**.
@@ -95,10 +96,9 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 
 1. **Giai đoạn A — Nền tảng & Khóa phòng *(Hoàn thành)***:
    - Nâng chỉ số trong `blubberbeard_data.tres`, bổ sung `Anchor Slam` tạm thời, bật `super_armor_during_attacks` chống ngắt chiêu ở `blubberbeard_room.tscn`, khóa lối ra và sập/phục hồi cầu đi bộ qua được tại `blubberbeard_room.gd`, làm tối ánh sáng Phase 2 tại `blubberbeard_arena.gd`.
-2. **Giai đoạn B — Rework Bộ Chiêu Thức & AI của Captain Blubberbeard**:
-   - Gỡ bỏ `BELLY_CHARGE` và cơ chế xì hơi bỏ chạy cũ; thay bằng **Sky Dive (bay lượn & đáp)**, **Phình Gai cận chiến + phản đòn khi bị đánh dồn**, **Ném thùng `1 -> 2 -> [3..5]`**, **Xoay Mỏ Neo dây xích** và **Phun Xì Hơi Độc**.
-   - Xây dựng hệ thống chọn chiêu ngẫu nhiên theo trọng số khoảng cách + cooldown + khóa kỹ năng theo Phase.
-   - Cập nhật lại các test cũ bị thay đổi hợp đồng (`blubberbeard_boss_test.gd`, `blubberbeard_animation_test.gd`, `blubberbeard_evade_test.gd`).
+2. **Giai đoạn B — Rework Bộ Chiêu Thức & AI của Captain Blubberbeard *(Hoàn thành)***:
+   - Đã gỡ bỏ `BELLY_CHARGE` và cơ chế xì hơi bỏ chạy cũ; thay bằng **Sky Dive** (`blubberbeard_skydive.gd` + `blubberbeard_skydive.png`), **Phình Gai cận chiến + phản đòn `COUNTER_SHOCK -> Spiky Burst`** (`hits_before_counter`), **Ném thùng `1 -> 2 -> [3..5]`**, **Xoay Mỏ Neo dây xích** (`anchor_whirlwind_rig.gd` + `blubberbeard_anchor_whirlwind.png` + `anchor_whirlwind_props.png`) và **Phun Xì Hơi Độc** (`blubberbeard_venom_hazard.gd` + `blubberbeard_venom_spit_4dir.png` + `venom_glob_and_puddle.png`).
+   - Đã tách hệ thống AI trọng số theo cự ly + cooldown + khóa chiêu theo Phase tại `blubberbeard_ai.gd` và cập nhật lại `blubberbeard_boss_test.gd`, `blubberbeard_animation_test.gd`, `blubberbeard_evade_test.gd`.
 3. **Giai đoạn C — Trạng thái Player & Hiệu ứng Độc / Choáng**:
    - Thêm trạng thái **nhiễm độc cá nóc** (DoT `tag = &"poison"`, không kích hoạt `Hit` stun/i-frame) và tích hợp `InkOverlay` màu độc khi trúng chiêu phun độc.
    - Mở rộng `PlayerHit` hỗ trợ **đẩy xoáy trôn ốc + chóng mặt** khi trúng vòng xoay mỏ neo.

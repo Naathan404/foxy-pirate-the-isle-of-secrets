@@ -1,101 +1,116 @@
 class_name BlubberbeardBoss
 extends BossBase
+## Điều khiển hành vi chiến đấu, bộ kỹ năng và AI động của Captain Blubberbeard.
 
-enum State { WAIT, WINDUP, CHARGE, RECOVERY }
+enum State {
+	WAIT,
+	WINDUP,
+	SKYDIVE_LEAP,
+	SPIKY_HOLD,
+	WHIRLWIND,
+	COUNTER_SHOCK,
+	RECOVERY,
+}
 
+const AI_CLASS = preload("res://gameplay/bosses/blubberbeard/blubberbeard_ai.gd")
+const SKYDIVE_CTRL = preload("res://gameplay/bosses/blubberbeard/blubberbeard_skydive.gd")
+const SIZE_RIG = preload("res://gameplay/bosses/blubberbeard/blubberbeard_size_rig.gd")
 const HAZARD = preload("res://gameplay/bosses/blubberbeard/boss_hazard.gd")
+const VENOM_HAZARD = preload("res://gameplay/bosses/blubberbeard/blubberbeard_venom_hazard.gd")
+const WHIRLWIND_RIG = preload("res://gameplay/bosses/blubberbeard/anchor_whirlwind_rig.gd")
 const EFFECTS = preload("res://gameplay/bosses/boss_effects.gd")
-const MOVE_DUST_SHEET = preload("res://assets/sprites/bosses/blubberbeard/boss_move_dust.png")
 
-const EVADE_DURATION := 1.9
-const EVADE_DEFLATE_TIME := 0.3
-const EVADE_REINFLATE_TIME := 0.35
-const EVADE_JUMP_SPEED := 5.2
-const EVADE_GRAVITY_SCALE := 2.2
-const EVADE_AIR_DRAG := 1.2
-const EVADE_GROUND_FRICTION := 8.5
-const EVADE_WALL_RESTITUTION := 0.3
-const EVADE_GROUND_RESTITUTION := 0.15
+const BARREL_BURST_SPREAD_SEPARATION := 2.2
+const COUNTER_SHOCK_DURATION := 0.22
+const COUNTER_SHOCK_RECOIL_SPEED := 4.2
+const COUNTER_PUFF_WINDUP := 0.36
+const SPIKY_THORN_BODY_RADIUS := 2.15
 
-@export_group("Movement & Charge")
-@export_range(1.0, 100.0, 1.0) var charge_acceleration: float = 70.0
+@export_group("Movement & AI")
+@export_range(0.5, 2.0, 0.05) var boss_size_scale: float = 1.0:
+	set(value):
+		boss_size_scale = clampf(value, 0.5, 2.0)
+		if is_inside_tree():
+			_apply_boss_size_scale()
 @export_range(1.0, 100.0, 1.0) var recovery_deceleration: float = 80.0
-@export_range(0.0, 12.0, 0.1) var move_speed: float = 5.2
-@export_range(1.0, 20.0, 0.5) var preferred_distance: float = 2.6
+@export_range(0.0, 12.0, 0.1, "suffix:m/s") var move_speed: float = 4.6
+@export_range(1.0, 20.0, 0.5, "suffix:m") var preferred_distance: float = 2.8
+@export_range(3.0, 20.0, 0.5, "suffix:m") var circle_outer_distance: float = 7.4
+@export_range(0.0, 0.5, 0.02) var wait_jitter: float = 0.22
+@export var smart_skill_selection: bool = true
+@export_range(0.0, 1.0, 0.05) var phase2_chain_chance: float = 0.22
+@export_range(2.0, 8.0, 0.1, "suffix:m") var ai_close_range: float = 4.5
+@export_range(5.0, 15.0, 0.5, "suffix:m") var ai_mid_range: float = 9.5
+@export_range(1.0, 8.0, 0.2, "suffix:m") var ai_boundary_margin: float = 3.6
 
-@export_group("Evasion")
-@export_range(0.0, 30.0, 0.5) var evade_speed: float = 18.5
-@export_range(0.5, 10.0, 0.1) var evade_cooldown: float = 2.5
-## Number of damaging hits that show hurt before the next hit triggers an evade.
-@export_range(0, 20, 1) var hits_before_evade: int = 2
-@export var evade_drops_barrels: bool = true
-@export var super_armor_during_attacks: bool = false
+@export_group("Spiky Counter & Armor")
+@export var super_armor_during_attacks: bool = true
+## Số hit trúng ở trạng thái hở đòn trước khi đòn tiếp theo kích hoạt Phình Gai phản công.
+@export_range(0, 20, 1) var hits_before_counter: int = 5
+@export_range(0.5, 15.0, 0.1, "suffix:s") var counter_cooldown: float = 6.5
+@export_range(0.0, 10.0, 0.1, "suffix:m") var spiky_close_burst_radius: float = 3.1
+@export_range(0.3, 3.0, 0.05, "suffix:s") var spiky_hold_duration: float = 1.25
 
 @export_group("Anchor Slam")
 @export var anchor_slam_enabled: bool = true
-@export_range(1.0, 12.0, 0.1, "suffix:m") var anchor_slam_trigger_range: float = 4.0
-@export_range(1.0, 10.0, 0.1, "suffix:m") var anchor_slam_radius: float = 4.2
-@export_range(0.0, 5.0, 0.1, "suffix:m") var anchor_slam_forward_offset: float = 1.8
-@export_range(0.5, 20.0, 0.5) var anchor_slam_damage: float = 3.5
-@export_range(0.5, 20.0, 0.5) var anchor_slam_enraged_damage: float = 5.0
+@export_range(1.0, 12.0, 0.1, "suffix:m") var anchor_slam_trigger_range: float = 2.8
+@export_range(1.0, 10.0, 0.1, "suffix:m") var anchor_slam_radius: float = 2.6
+@export_range(0.0, 5.0, 0.1, "suffix:m") var anchor_slam_forward_offset: float = 1.25
+@export_range(0.5, 20.0, 0.5) var anchor_slam_damage: float = 2.5
+@export_range(0.5, 20.0, 0.5) var anchor_slam_enraged_damage: float = 3.5
 @export_range(0.2, 3.0, 0.05, "suffix:s") var anchor_slam_windup: float = 0.65
-@export_range(0.2, 3.0, 0.05, "suffix:s") var anchor_slam_enraged_windup: float = 0.5
-@export_range(0.1, 3.0, 0.05, "suffix:s") var anchor_slam_recovery: float = 0.45
-@export_range(0.5, 15.0, 0.1, "suffix:s") var anchor_slam_cooldown: float = 3.6
-
-@export_group("Combat Escalation")
-@export var smart_skill_selection: bool = true
-@export_range(0.0, 1.0, 0.05) var charge_aim_track_fraction: float = 0.65
-@export_range(0.0, 12.0, 0.1) var charge_aim_turn_speed: float = 4.5
-@export_range(0.0, 10.0, 0.1, "suffix:m") var charge_wall_slam_radius: float = 4.0
-@export_range(0.0, 10.0, 0.1, "suffix:m") var spiky_close_burst_radius: float = 4.8
-@export_range(0.05, 1.5, 0.01, "suffix:s") var spiky_second_wave_delay: float = 0.28
-@export_range(0.0, 1.0, 0.05) var phase2_chain_chance: float = 0.55
+@export_range(0.2, 3.0, 0.05, "suffix:s") var anchor_slam_enraged_windup: float = 0.52
+@export_range(0.1, 3.0, 0.05, "suffix:s") var anchor_slam_recovery: float = 0.55
+@export_range(0.5, 15.0, 0.1, "suffix:s") var anchor_slam_cooldown: float = 7.5
 
 var state: State = State.WAIT
-var timer: float = 1.0
+var timer: float = 0.85
 var skill: BlubberbeardSkillData
 var next_skill: int = 0
-var charge_direction := Vector3.ZERO
-var charge_speed: float = 0.0
+var forced_skill_index: int = -1
+var aim_direction: Vector3 = Vector3.BACK
 var visual: BlubberbeardVisual
 var feedback: BlubberbeardFeedback
 var charge_hitbox: HitBox
 var sound: AudioStreamPlayer3D
 var dust: CPUParticles3D
-var _evade_steam: CPUParticles3D
-var _barrel_hazard: Node3D
+
+var _ai: BlubberbeardAI
+var _skydive: BlubberbeardSkydiveController
+var _whirlwind_rig: BlubberbeardWhirlwindRig
+var _barrel_pending_hazards: Array[Node3D] = []
+var _barrel_wave_queue: Array[int] = []
+var _barrel_wave_index: int = 0
 var _barrel_released: bool = false
-var _barrel_throws_total: int = 0
-var _barrel_throws_done: int = 0
-var _barrel_step_duration: float = 0.72
+var _barrel_step_duration: float = 0.56
 var _barrel_step_elapsed: float = 0.0
 var _barrel_gap_remaining: float = 0.0
 var _barrel_used_spots: Array[Vector3] = []
-var _barrel_anchor := Vector3.ZERO
-var _evade_remaining: float = 0.0
-var _evade_cooldown_left: float = 0.0
-var _evade_direction := Vector3.ZERO
-var _evade_horizontal_velocity := Vector3.ZERO
-var _evade_bounced := false
-var _evade_launched := false
-var _hits_since_evade := 0
+var _hits_since_counter: int = 0
+var _counter_cooldown_left: float = 0.0
+var _counter_shock_velocity: Vector3 = Vector3.ZERO
+var _pending_counter_burst: bool = false
 var _hurt_remaining: float = 0.0
 var _walk_dust_timer: float = 0.0
 var _walk_dust_side: float = 1.0
+var _strafe_sign: float = 1.0
+var _strafe_flip_timer: float = 1.4
 var _aoe_hitbox: HitBox
 var _aoe_shape: SphereShape3D
-var _slam_warning: Node3D
-var _slam_warning_material: StandardMaterial3D
-var _slam_impact_position := Vector3.ZERO
+var _slam_impact_position: Vector3 = Vector3.ZERO
 var _anchor_slam_active: bool = false
 var _anchor_slam_cooldown_left: float = 0.0
-var _pending_second_spike_wave: float = -1.0
-var _pending_second_spike_damage: float = 0.0
-var _pending_second_spike_speed: float = 0.0
-var _pending_second_spike_duration: float = 0.0
-var _last_skill_kind: int = -1
-var _same_skill_streak: int = 0
+var _ground_y: float = 0.0
+var _size_rig: BlubberbeardSizeRig
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not OS.is_debug_build() or dead or not (event is InputEventKey):
+		return
+	var key_event := event as InputEventKey
+	if key_event.pressed and not key_event.echo and key_event.keycode == KEY_F8:
+		if debug_trigger_phase_two() and get_viewport() != null:
+			get_viewport().set_input_as_handled()
 
 
 func _on_boss_setup() -> void:
@@ -108,20 +123,33 @@ func _on_boss_setup() -> void:
 	charge_hitbox.team = CombatTeams.ENEMY
 	charge_hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
 	charge_hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
-	charge_hitbox.damage_applied.connect(_on_charge_damage)
+	charge_hitbox.damage_applied.connect(_on_direct_attack_damage)
 	damaged.connect(_hit_feedback)
+	_ground_y = global_position.y
+	_ai = AI_CLASS.new()
+	_ai.close_range_meters = ai_close_range
+	_ai.mid_range_meters = ai_mid_range
+	_skydive = SKYDIVE_CTRL.new()
+	_skydive.name = "SkydiveController"
+	add_child(_skydive)
+	_skydive.setup(self, visual)
 	_create_aoe_hitbox()
-	_create_slam_warning()
-	_create_dust()
-	_create_evade_steam()
+	feedback.create_slam_warning(anchor_slam_radius)
+	_create_whirlwind_rig()
+	dust = feedback.create_dust_emitter()
+	_size_rig = SIZE_RIG.new()
+	_size_rig.setup(self, visual)
+	_apply_boss_size_scale()
 
 
 func _on_fight_started() -> void:
+	_ground_y = global_position.y
+	_ai.reset()
 	feedback.fight_started()
 
 
 func _on_can_receive_damage(_damage: DamageContext) -> bool:
-	return _evade_remaining <= 0.0
+	return not (state == State.SKYDIVE_LEAP and _skydive.is_high_airborne)
 
 
 func _on_fight_tick(delta: float) -> void:
@@ -129,397 +157,545 @@ func _on_fight_tick(delta: float) -> void:
 
 
 func fight_tick(delta: float) -> void:
-	_evade_cooldown_left = maxf(0.0, _evade_cooldown_left - delta)
-	_anchor_slam_cooldown_left = maxf(0.0, _anchor_slam_cooldown_left - delta)
-	_tick_second_spike_wave(delta)
-	if not is_on_floor():
-		var gravity_scale := (
-			EVADE_GRAVITY_SCALE if _evade_remaining > 0.0 and _evade_launched else 1.0
-		)
-		velocity += get_gravity() * delta * gravity_scale
-	elif _evade_remaining <= 0.0:
-		velocity.y = 0.0
-	if _evade_remaining > 0.0:
-		_update_evade(delta)
+	var step := maxf(0.0, delta)
+	_ai.tick(step)
+	_counter_cooldown_left = maxf(0.0, _counter_cooldown_left - step)
+	_anchor_slam_cooldown_left = maxf(0.0, _anchor_slam_cooldown_left - step)
+	_apply_gravity_to_floor(step)
+	if state == State.COUNTER_SHOCK:
+		_update_counter_shock(step)
 		return
 	if _hurt_remaining > 0.0:
-		_hurt_remaining = maxf(0.0, _hurt_remaining - delta)
-		visual.moving = false
-		dust.emitting = false
-		charge_speed = 0.0
-		_set_horizontal_velocity(Vector3.ZERO)
+		_hurt_remaining = maxf(0.0, _hurt_remaining - step)
+		_halt_locomotion()
 		move_and_slide()
 		return
-	timer -= delta
-	if state == State.CHARGE:
-		_update_charge(delta)
-		return
-	charge_speed = move_toward(charge_speed, 0.0, recovery_deceleration * delta)
-	if charge_speed > 0.1 or state == State.WINDUP:
-		visual.moving = false
-		dust.emitting = false
-		_walk_dust_timer = 0.0
-		_set_horizontal_velocity(charge_direction * charge_speed)
-	else:
-		_update_patrol_movement(delta)
-	move_and_slide()
-	if state == State.WINDUP and _anchor_slam_active:
-		_update_anchor_slam_windup()
-		return
-	if (
-		state == State.WINDUP
-		and skill != null
-		and skill.kind == BlubberbeardSkillData.Kind.POWDER_BARREL
-	):
-		_update_barrel_barrage(delta)
+	timer -= step
+	match state:
+		State.SKYDIVE_LEAP:
+			_update_skydive_leap(step)
+			return
+		State.SPIKY_HOLD:
+			_update_spiky_hold()
+			return
+		State.WHIRLWIND:
+			_update_whirlwind_spin(step)
+			return
+	if state == State.WINDUP:
+		_halt_locomotion()
+		move_and_slide()
+		if _anchor_slam_active:
+			_update_anchor_slam_windup()
+		elif skill != null and skill.kind == BlubberbeardSkillData.Kind.POWDER_BARREL:
+			_update_barrel_barrage(step)
+		else:
+			_update_standard_windup()
 		return
 	if timer > 0.0:
-		if state == State.WINDUP and skill != null:
-			var progress := 1.0 - clampf(timer / skill.windup, 0.0, 1.0)
-			visual.windup_progress = progress
-			if skill.kind == BlubberbeardSkillData.Kind.BELLY_CHARGE:
-				_steer_charge_windup(delta, progress)
+		if state == State.WAIT:
+			_update_patrol_movement(step)
+		else:
+			_halt_locomotion()
+		move_and_slide()
+		if state == State.WAIT and is_on_wall():
+			_strafe_sign = -_strafe_sign
 		return
-	match state:
-		State.WAIT, State.RECOVERY:
-			if _should_trigger_anchor_slam():
-				_begin_anchor_slam()
-			else:
-				_choose_skill()
-		State.WINDUP:
-			_execute_skill()
-
-
-func _update_evade(delta: float) -> void:
-	_evade_remaining = maxf(0.0, _evade_remaining - delta)
-	visual.moving = false
-	dust.emitting = false
-	charge_speed = 0.0
-	var elapsed := EVADE_DURATION - _evade_remaining
-	var flying := elapsed >= EVADE_DEFLATE_TIME and _evade_remaining > EVADE_REINFLATE_TIME
-	if flying and not _evade_launched:
-		_evade_launched = true
-		velocity.y = EVADE_JUMP_SPEED
-		_evade_horizontal_velocity = _evade_direction * evade_speed
-	if flying:
-		var drag := EVADE_GROUND_FRICTION if is_on_floor() and velocity.y <= 0.0 else EVADE_AIR_DRAG
-		_evade_horizontal_velocity *= exp(-drag * delta)
-	elif _evade_launched:
-		_evade_horizontal_velocity = _evade_horizontal_velocity.move_toward(
-			Vector3.ZERO, 20.0 * delta
-		)
-	else:
-		_evade_horizontal_velocity = Vector3.ZERO
-	_set_horizontal_velocity(_evade_horizontal_velocity)
-	if not flying and _evade_launched:
-		_evade_steam.emitting = false
-	var vertical_before_move := velocity.y
-	move_and_slide()
-	if flying and is_on_wall():
-		for index in get_slide_collision_count():
-			var normal := get_slide_collision(index).get_normal()
-			normal.y = 0.0
-			if not normal.is_zero_approx() and _evade_horizontal_velocity.dot(normal) < -0.05:
-				_evade_horizontal_velocity = (
-					_evade_horizontal_velocity.bounce(normal.normalized()) * EVADE_WALL_RESTITUTION
-				)
-				_evade_direction = _evade_horizontal_velocity.normalized()
-				_evade_steam.direction = (-_evade_direction + Vector3.UP * 0.3).normalized()
-				break
-	if flying and is_on_floor() and not _evade_bounced and vertical_before_move < -0.2:
-		_evade_bounced = true
-		velocity.y = -vertical_before_move * EVADE_GROUND_RESTITUTION
-		_evade_horizontal_velocity *= 0.65
-		feedback.spawn_move_dust(global_position, -_evade_direction, true)
-		feedback.evade_land()
-	if _evade_remaining <= 0.0:
-		_set_horizontal_velocity(Vector3.ZERO)
-		_evade_steam.emitting = false
-
-
-func _update_charge(delta: float) -> void:
-	charge_speed = move_toward(charge_speed, skill.speed, charge_acceleration * delta)
-	_set_horizontal_velocity(charge_direction * charge_speed)
-	move_and_slide()
-	feedback.charge_tick(delta)
-	if timer <= 0.0 or is_on_wall():
-		charge_hitbox.end_attack()
-		var wall_impact := is_on_wall()
-		feedback.charge_end(wall_impact)
-		visual.impact(0.2, 0.24)
-		if wall_impact:
-			charge_speed = 0.0
-			if charge_wall_slam_radius > 0.0 and skill != null:
-				_trigger_aoe_hit(
-					global_position, charge_wall_slam_radius, skill.damage * 0.6, &"boss_wall_slam"
-				)
-		_enter_recovery()
-
-
-func _update_patrol_movement(delta: float) -> void:
-	if not is_instance_valid(target):
-		visual.moving = false
-		dust.emitting = false
-		_walk_dust_timer = 0.0
-		_set_horizontal_velocity(Vector3.ZERO)
+	if state == State.RECOVERY:
+		_enter_wait()
 		return
-	var to_target := target.global_position - global_position
-	to_target.y = 0.0
-	var distance := to_target.length()
-	if distance <= preferred_distance or move_speed <= 0.0:
-		visual.moving = false
-		dust.emitting = false
-		_walk_dust_timer = 0.0
-		_set_horizontal_velocity(Vector3.ZERO)
-		return
-	var step_dir := to_target.normalized()
-	visual.face_direction(step_dir)
-	visual.moving = true
-	if dust.amount != 19:
-		dust.amount = 19
-	dust.emitting = true
-	_set_horizontal_velocity(step_dir * move_speed)
-	_walk_dust_timer -= maxf(0.0, delta)
-	if _walk_dust_timer <= 0.0:
-		_walk_dust_timer = 0.22
-		var side_offset := step_dir.cross(Vector3.UP).normalized() * 1.45 * _walk_dust_side
-		_walk_dust_side = -_walk_dust_side
-		if is_instance_valid(feedback):
-			feedback.spawn_move_dust(
-				global_position + side_offset - step_dir * 0.4, step_dir, false
-			)
+	_choose_next_action()
 
 
-func _set_horizontal_velocity(horizontal: Vector3) -> void:
-	velocity.x = horizontal.x
-	velocity.z = horizontal.z
-
-
-func _choose_skill() -> void:
-	var phase := boss_data.phases[phase_index]
-	if phase.skills.is_empty():
-		timer = 1.0
-		return
-	skill = phase.skills[next_skill % phase.skills.size()] as BlubberbeardSkillData
-	if skill == null:
-		next_skill += 1
-		push_warning("Captain Blubberbeard requires BlubberbeardSkillData")
-		timer = 1.0
-		return
-	if skill.kind == _last_skill_kind:
-		_same_skill_streak += 1
-	else:
-		_last_skill_kind = skill.kind
-		_same_skill_streak = 1
-	if smart_skill_selection:
-		next_skill = _pick_next_skill_index(phase)
-	else:
-		next_skill += 1
-	_anchor_slam_active = false
-	_hide_slam_warning()
-	state = State.WINDUP
-	timer = skill.windup
-	visual.moving = false
-	_barrel_hazard = null
-	_barrel_released = false
-	charge_direction = target.global_position - global_position
-	charge_direction.y = 0.0
-	charge_direction = charge_direction.normalized()
-	if charge_direction.is_zero_approx():
-		charge_direction = Vector3.FORWARD
-	if skill.kind == BlubberbeardSkillData.Kind.POWDER_BARREL:
-		_begin_barrel_barrage()
-		return
-	visual.face_direction(charge_direction)
-	visual.begin_windup(skill.kind)
-	_play_sound(1.2)
+func current_phase() -> BossPhaseData:
+	if boss_data == null or boss_data.phases.is_empty():
+		return null
+	return boss_data.phases[mini(phase_index, boss_data.phases.size() - 1)]
 
 
 func roll_barrel_throw_count() -> int:
 	if skill == null:
-		return 3
+		return 1
 	if not skill.randomize_barrel_throws:
-		return maxi(1, skill.barrel_throw_count)
-	var lo := maxi(1, mini(skill.barrel_throw_min, skill.barrel_throw_max))
-	var hi := maxi(lo, maxi(skill.barrel_throw_min, skill.barrel_throw_max))
-	return randi_range(lo, hi)
+		return clampi(skill.barrel_throw_count, 1, 8)
+	var low := mini(skill.barrel_throw_min, skill.barrel_throw_max)
+	var high := maxi(skill.barrel_throw_min, skill.barrel_throw_max)
+	return randi_range(clampi(low, 1, 8), clampi(high, 1, 8))
+
+
+func _choose_next_action() -> void:
+	if _should_trigger_anchor_slam():
+		_begin_anchor_slam()
+		return
+	_choose_skill()
+
+
+func _choose_skill() -> void:
+	_hurt_remaining = 0.0
+	var phase := current_phase()
+	if phase == null or phase.skills.is_empty() or not is_instance_valid(target):
+		state = State.WAIT
+		timer = 0.25
+		return
+	var chosen_idx := _pick_skill_slot(phase)
+	next_skill = (chosen_idx + 1) % phase.skills.size()
+	skill = phase.skills[chosen_idx] as BlubberbeardSkillData
+	if skill == null:
+		state = State.WAIT
+		timer = 0.25
+		return
+	_ai.mark_used(skill.kind)
+	_anchor_slam_active = false
+	_pending_counter_burst = false
+	_hide_slam_warning()
+	state = State.WINDUP
+	timer = skill.windup
+	aim_direction = _flat_direction_to(target.global_position)
+	visual.face_direction(aim_direction)
+	visual.begin_windup(skill.kind)
+	match skill.kind:
+		BlubberbeardSkillData.Kind.POWDER_BARREL:
+			_begin_barrel_barrage()
+		BlubberbeardSkillData.Kind.SKY_DIVE:
+			_skydive.begin_windup(_ground_y)
+			_play_sound(1.0)
+		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+			_show_aoe_warning(
+				global_position, _current_spike_burst_radius(), Color(1.0, 0.25, 0.08)
+			)
+			_play_sound(1.1)
+		BlubberbeardSkillData.Kind.ANCHOR_SLAM:
+			_begin_anchor_slam()
+		BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND:
+			var reach := maxf(2.0, skill.whirlwind_reach_radius * _current_damage_size_scale())
+			_whirlwind_rig.begin_windup(
+				reach, atan2(aim_direction.z, aim_direction.x), phase_index > 0
+			)
+			feedback.emit_skill_cue(&"whirlwind_windup", global_position)
+		BlubberbeardSkillData.Kind.VENOM_SPIT:
+			_play_sound(1.25)
+
+
+func _pick_skill_slot(phase: BossPhaseData) -> int:
+	if forced_skill_index >= 0 and forced_skill_index < phase.skills.size():
+		var idx := forced_skill_index
+		forced_skill_index = -1
+		return idx
+	if not smart_skill_selection:
+		return next_skill % phase.skills.size()
+	_ai.close_range_meters = ai_close_range
+	_ai.mid_range_meters = ai_mid_range
+	var near_boundary := (
+		_is_position_near_boundary(target.global_position, ai_boundary_margin)
+		if is_instance_valid(target)
+		else false
+	)
+	return _ai.select_skill_index(
+		phase, phase_index, _flat_distance_to_target(), next_skill, near_boundary
+	)
+
+
+func _execute_skill() -> void:
+	_hurt_remaining = 0.0
+	if skill == null:
+		_enter_recovery()
+		return
+	match skill.kind:
+		BlubberbeardSkillData.Kind.SKY_DIVE:
+			_enter_skydive_leap()
+		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+			_execute_spiky_burst()
+		BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND:
+			_enter_whirlwind_spin()
+		BlubberbeardSkillData.Kind.VENOM_SPIT:
+			_execute_venom_spit()
+		_:
+			_enter_recovery()
 
 
 func _begin_barrel_barrage() -> void:
-	_barrel_throws_total = roll_barrel_throw_count()
-	_barrel_throws_done = 0
+	_clear_pending_barrels()
 	_barrel_used_spots.clear()
 	_barrel_gap_remaining = 0.0
-	_barrel_anchor = target.global_position
-	_start_next_barrel_throw()
+	_barrel_wave_index = 0
+	_barrel_wave_queue = _build_barrel_wave_queue()
+	_start_next_barrel_wave()
 
 
-func _start_next_barrel_throw() -> void:
-	if not is_instance_valid(target):
+func _build_barrel_wave_queue() -> Array[int]:
+	if skill != null and skill.barrel_escalating_burst:
+		var fmin := clampi(mini(skill.barrel_final_burst_min, skill.barrel_final_burst_max), 1, 8)
+		var fmax := clampi(maxi(skill.barrel_final_burst_min, skill.barrel_final_burst_max), 1, 8)
+		return [1, 2, randi_range(fmin, fmax)]
+	var count := roll_barrel_throw_count()
+	var queue: Array[int] = []
+	for _i in count:
+		queue.append(1)
+	return queue
+
+
+func _start_next_barrel_wave() -> void:
+	if not is_instance_valid(target) or _barrel_wave_index >= _barrel_wave_queue.size():
 		_enter_recovery()
 		return
-	var landing := _pick_barrel_landing_spot()
-	_barrel_used_spots.append(landing)
-	var to_spot := landing - global_position
-	to_spot.y = 0.0
-	if not to_spot.is_zero_approx():
-		charge_direction = to_spot.normalized()
-	visual.face_direction(charge_direction)
+	_clear_pending_barrels()
+	var spots := _pick_barrel_wave_spots(_barrel_wave_queue[_barrel_wave_index])
+	for spot in spots:
+		_barrel_used_spots.append(spot)
+	aim_direction = _flat_direction_to(spots[0])
+	visual.face_direction(aim_direction)
 	_barrel_released = false
 	_barrel_step_elapsed = 0.0
-	_barrel_step_duration = maxf(0.25, skill.barrel_throw_duration)
+	_barrel_step_duration = maxf(0.25, skill.barrel_throw_duration if skill != null else 0.56)
 	visual.begin_windup(BlubberbeardSkillData.Kind.POWDER_BARREL)
-	_play_sound(1.2)
-	_spawn_barrel(landing, true)
+	_play_sound(1.15 + float(_barrel_wave_index) * 0.08)
+	for spot in spots:
+		var barrel := _spawn_barrel(spot, true)
+		if is_instance_valid(barrel):
+			_barrel_pending_hazards.append(barrel)
 
 
-func _pick_barrel_landing_spot() -> Vector3:
-	if _barrel_throws_done == 0:
-		return target.global_position
-	var lead_offset := Vector3.ZERO
-	if target is CharacterBody3D:
-		var vel := (target as CharacterBody3D).velocity
-		vel.y = 0.0
-		lead_offset = (vel * 0.42).limit_length(4.5)
-	var anchor := _barrel_anchor.lerp(target.global_position + lead_offset, 0.65)
-	var r_min := maxf(0.5, skill.barrel_spread_min_radius)
-	var r_max := maxf(r_min + 0.2, skill.barrel_spread_max_radius)
-	var best := anchor + Vector3(r_min, 0.0, 0.0)
-	var best_clearance := -1.0
-	for _attempt in 10:
-		var angle := randf() * TAU
-		var radius := randf_range(r_min, r_max)
-		var candidate := anchor + Vector3(cos(angle), 0.0, sin(angle)) * radius
-		var clearance := INF
-		for prev in _barrel_used_spots:
-			var flat_delta := Vector2(candidate.x - prev.x, candidate.z - prev.z)
-			clearance = minf(clearance, flat_delta.length())
-		if clearance > best_clearance:
-			best_clearance = clearance
+func _pick_barrel_wave_spots(count: int) -> Array[Vector3]:
+	if not is_instance_valid(target):
+		return [global_position]
+	var spots: Array[Vector3] = []
+	var player_now := target.global_position
+	var r_min := maxf(0.8, skill.barrel_spread_min_radius if skill != null else 2.0)
+	var r_max := maxf(r_min + 0.4, skill.barrel_spread_max_radius if skill != null else 4.6)
+	# First waves/throws follow the player directly; subsequent barrels scatter randomly nearby.
+	var track_player_directly := (
+		_barrel_wave_index <= 1
+		if (skill == null or skill.barrel_escalating_burst)
+		else _barrel_wave_index == 0
+	)
+	for idx in count:
+		if idx == 0 and track_player_directly:
+			spots.append(player_now)
+		else:
+			spots.append(_pick_spaced_spot(player_now, r_min, r_max, spots, idx, count))
+	return spots
+
+
+func _pick_spaced_spot(
+	anchor: Vector3,
+	r_min: float,
+	r_max: float,
+	existing: Array[Vector3],
+	slot_idx: int,
+	slot_count: int
+) -> Vector3:
+	var fallback_angle := TAU * float(slot_idx) / float(maxi(1, slot_count))
+	var best := anchor + Vector3.RIGHT.rotated(Vector3.UP, fallback_angle) * r_min
+	var best_dist := -1.0
+	for _attempt in 14:
+		var ang := randf() * TAU
+		var rad := randf_range(r_min, r_max)
+		var candidate := anchor + Vector3(cos(ang), 0.0, sin(ang)) * rad
+		if _spot_crosses_boundary(anchor, candidate):
+			continue
+		var min_sep := INF
+		for prev in existing:
+			min_sep = minf(min_sep, Vector2(candidate.x - prev.x, candidate.z - prev.z).length())
+		if min_sep > best_dist:
+			best_dist = min_sep
 			best = candidate
-		if clearance >= 2.0:
-			return candidate
+		if min_sep >= BARREL_BURST_SPREAD_SEPARATION:
+			break
 	return best
 
 
 func _update_barrel_barrage(delta: float) -> void:
-	var step := maxf(0.0, delta)
 	if _barrel_gap_remaining > 0.0:
-		_barrel_gap_remaining = maxf(0.0, _barrel_gap_remaining - step)
+		_barrel_gap_remaining = maxf(0.0, _barrel_gap_remaining - delta)
 		if _barrel_gap_remaining <= 0.0:
-			_start_next_barrel_throw()
+			_start_next_barrel_wave()
 		return
-	_barrel_step_elapsed += step
+	_barrel_step_elapsed += delta
 	visual.windup_progress = clampf(
 		_barrel_step_elapsed / maxf(0.05, _barrel_step_duration), 0.0, 1.0
 	)
 	if not _barrel_released and visual.windup_progress >= visual.THROW_RELEASE_PROGRESS:
-		_release_pending_barrel()
+		_release_pending_barrels()
 	if _barrel_step_elapsed >= _barrel_step_duration:
-		_barrel_throws_done += 1
-		if _barrel_throws_done < _barrel_throws_total:
+		_barrel_wave_index += 1
+		if _barrel_wave_index < _barrel_wave_queue.size():
 			var g_min := minf(skill.barrel_throw_gap_min, skill.barrel_throw_gap_max)
 			var g_max := maxf(skill.barrel_throw_gap_min, skill.barrel_throw_gap_max)
 			_barrel_gap_remaining = randf_range(g_min, g_max)
 			visual.begin_recovery(BlubberbeardSkillData.Kind.POWDER_BARREL)
 			if _barrel_gap_remaining <= 0.0:
-				_start_next_barrel_throw()
+				_start_next_barrel_wave()
 		else:
 			_enter_recovery()
 
 
-func _execute_skill() -> void:
-	match skill.kind:
-		BlubberbeardSkillData.Kind.BELLY_CHARGE:
-			state = State.CHARGE
-			timer = skill.duration
-			charge_hitbox.begin_attack(skill.damage, 0, &"boss_charge")
-			visual.begin_charge(charge_direction)
-			visual.impact(0.15, 0.15)
-			if dust.amount != 48:
-				dust.amount = 48
-			dust.emitting = true
-			feedback.charge_start()
-			_play_sound(0.7)
-		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
-			feedback.spikes_release()
-			visual.impact(0.22, 0.25)
-			EFFECTS.shockwave(get_parent(), global_position, 2.0, Color(1.0, 0.55, 0.12, 0.8))
-			if spiky_close_burst_radius > 0.0:
-				_trigger_aoe_hit(
-					global_position, spiky_close_burst_radius, skill.damage, &"boss_spike_burst"
-				)
-			for index in 8:
-				_spawn_spike(Vector3(cos(TAU * index / 8.0), 0.0, sin(TAU * index / 8.0)))
-			if phase_index > 0:
-				_pending_second_spike_wave = spiky_second_wave_delay
-				_pending_second_spike_damage = skill.damage
-				_pending_second_spike_speed = skill.speed
-				_pending_second_spike_duration = skill.duration
-			_play_sound(1.6)
-			_enter_recovery()
-		BlubberbeardSkillData.Kind.ANCHOR_SLAM:
-			_execute_anchor_slam()
-		_:
-			_enter_recovery()
-
-
-func _spawn_barrel(where: Vector3, hold_until_release: bool = false) -> void:
+func _spawn_barrel(at: Vector3, hold_until_release: bool = false) -> Node3D:
+	if not is_instance_valid(get_parent()) or skill == null:
+		return null
 	var hazard := HAZARD.new()
 	hazard.source = self
 	hazard.damage = skill.damage
-	hazard.radius = skill.radius
-	hazard.remaining = skill.windup
-	hazard.detonated.connect(_on_barrel_detonated.bind(hazard, skill.radius))
+	hazard.radius = skill.radius * boss_size_scale
+	hazard.remaining = maxf(0.55, skill.windup)
+	hazard.detonated.connect(_on_barrel_detonated.bind(hazard, hazard.radius))
 	get_parent().add_child(hazard)
-	hazard.global_position = Vector3(where.x, global_position.y + 0.08, where.z)
+	hazard.global_position = Vector3(at.x, _ground_y + 0.08, at.z)
 	if hold_until_release:
 		hazard.hold_barrel_for_throw()
-		_barrel_hazard = hazard
 	else:
-		hazard.animate_barrel(global_position)
+		hazard.animate_barrel(global_position + Vector3.UP * 0.6)
+	return hazard
 
 
-func _release_pending_barrel() -> void:
+func _release_pending_barrels() -> void:
 	_barrel_released = true
-	if is_instance_valid(_barrel_hazard) and _barrel_hazard.has_method("release_barrel_from"):
-		_barrel_hazard.release_barrel_from(visual.get_barrel_release_world_position())
-		visual.impact(0.12, 0.14)
-		_play_sound(1.35)
+	var hand_pos := visual.get_barrel_release_world_position()
+	for barrel in _barrel_pending_hazards:
+		if is_instance_valid(barrel):
+			barrel.release_barrel_from(hand_pos)
+	_barrel_pending_hazards.clear()
+	visual.impact(0.14, 0.14)
+	_play_sound(1.38)
 
 
-func _spawn_spike(spike_dir: Vector3) -> void:
-	var hazard := HAZARD.new()
-	hazard.source = self
-	hazard.spike = true
-	hazard.direction = spike_dir
-	hazard.damage = skill.damage
-	hazard.speed = skill.speed
-	hazard.remaining = skill.duration
-	get_parent().add_child(hazard)
-	hazard.global_position = global_position + Vector3.UP * 1.2 + spike_dir * 2.5
+func _clear_pending_barrels() -> void:
+	for barrel in _barrel_pending_hazards:
+		if is_instance_valid(barrel):
+			barrel.queue_free()
+	_barrel_pending_hazards.clear()
+
+
+func _update_standard_windup() -> void:
+	if timer > 0.0:
+		if skill == null:
+			return
+		var progress := 1.0 - clampf(timer / maxf(0.05, skill.windup), 0.0, 1.0)
+		visual.windup_progress = progress
+		match skill.kind:
+			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND:
+				_whirlwind_rig.update_windup(progress)
+			BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+				_update_slam_warning_alpha(0.14 + progress * 0.34)
+		return
+	_execute_skill()
+
+
+func _enter_skydive_leap() -> void:
+	state = State.SKYDIVE_LEAP
+	var rad := (skill.radius if skill != null else 2.5) * _current_damage_size_scale()
+	var leap_pos := _skydive.begin_leap(
+		target,
+		skill.skydive_max_range if skill != null else 13.5,
+		skill.skydive_peak_height if skill != null else 4.2,
+		skill.skydive_leap_duration if skill != null else 0.88,
+		rad,
+		_current_damage_size_scale()
+	)
+	aim_direction = _flat_direction_to(leap_pos)
+	visual.face_direction(aim_direction)
+	_show_aoe_warning(leap_pos, rad, Color(1.0, 0.14, 0.04))
+	feedback.emit_skill_cue(&"skydive_launch", global_position)
+
+
+func _update_skydive_leap(delta: float) -> void:
+	feedback.skydive_flight_tick(delta, visual.airborne_height, aim_direction)
+	if _skydive.tick_leap(delta):
+		_hide_slam_warning()
+		var dmg := skill.damage if skill != null else 3.0
+		var rad := (skill.radius if skill != null else 2.5) * _current_damage_size_scale()
+		var impact_pos := _skydive.target_position
+		_trigger_aoe_hit(impact_pos, rad, dmg, &"boss_skydive", 1.75)
+		visual.impact(0.34, 0.34)
+		feedback.emit_skill_cue(&"skydive_slam", impact_pos, rad)
+		_enter_recovery()
+
+
+func _enter_whirlwind_spin() -> void:
+	state = State.WHIRLWIND
+	var r_min := mini(skill.whirlwind_rotations_min, skill.whirlwind_rotations_max)
+	var r_max := maxi(skill.whirlwind_rotations_min, skill.whirlwind_rotations_max)
+	var rotations := randi_range(maxi(1, r_min), maxi(1, r_max))
+	var reach := maxf(2.0, skill.whirlwind_reach_radius * _current_damage_size_scale())
+	var ang_speed := maxf(2.0, skill.whirlwind_angular_speed)
+	_whirlwind_rig.begin_spin(
+		reach,
+		atan2(aim_direction.z, aim_direction.x),
+		ang_speed,
+		rotations,
+		skill.damage,
+		phase_index > 0
+	)
+	visual.begin_whirlwind_spin(aim_direction)
+
+
+func _update_whirlwind_spin(delta: float) -> void:
+	if is_instance_valid(target):
+		var step_dir := _flat_direction_to(target.global_position)
+		_set_horizontal_velocity(step_dir * move_speed * 0.42)
+		visual.face_direction(step_dir)
+	else:
+		_halt_locomotion()
+	move_and_slide()
+	feedback.whirlwind_spin_tick(delta, global_position)
+	if not _whirlwind_rig.tick_spin(delta):
+		_whirlwind_rig.hide_all()
+		visual.impact(0.22, 0.24)
+		_enter_recovery()
+
+
+func _execute_spiky_burst() -> void:
+	feedback.spikes_release()
+	visual.impact(0.28, 0.30)
+	_play_sound(1.55)
+	var dmg := skill.damage if skill != null else (3.5 if phase_index > 0 else 2.5)
+	var rad := _current_spike_burst_radius()
+	var hold_dur := _current_spiky_hold_duration()
+	var thorn_rad := _current_spiky_thorn_radius()
+	_trigger_aoe_hit(global_position, rad, dmg, &"boss_spiky_burst", 1.8)
+	_begin_spiky_thorn_hitbox(dmg, thorn_rad)
+	state = State.SPIKY_HOLD
+	timer = hold_dur
+	visual.begin_spike_burst(hold_dur)
+	_sync_colliders_to_size()
+	_show_aoe_warning(global_position, thorn_rad, Color(1.0, 0.25, 0.08))
+	_update_slam_warning_alpha(0.24)
+	_pending_counter_burst = false
+
+
+func _update_spiky_hold() -> void:
+	_halt_locomotion()
+	move_and_slide()
+	var hold_dur := maxf(0.1, _current_spiky_hold_duration())
+	var pulse := 0.18 + absf(sin((1.0 - clampf(timer / hold_dur, 0.0, 1.0)) * TAU)) * 0.14
+	_update_slam_warning_alpha(pulse)
+	if timer <= 0.0:
+		if is_instance_valid(_aoe_hitbox):
+			_aoe_hitbox.end_attack()
+		_hide_slam_warning()
+		_enter_recovery()
+
+
+func _begin_spiky_thorn_hitbox(dmg: float, thorn_rad: float) -> void:
+	if not is_instance_valid(_aoe_hitbox) or _aoe_shape == null:
+		return
+	_aoe_hitbox.global_position = global_position
+	_aoe_shape.radius = thorn_rad
+	var context := DamageContext.new()
+	context.source = self
+	context.source_team = CombatTeams.ENEMY
+	context.base_amount_hp = dmg * 0.65
+	context.amount_hp = dmg * 0.65
+	context.tag = &"boss_spiky_burst"
+	context.origin = global_position
+	context.knockback_multiplier = 1.6
+	_aoe_hitbox.begin_attack_with_context(context, HitBox.RehitPolicy.ONCE_PER_CONTACT)
+
+
+func _execute_venom_spit() -> void:
+	if not is_instance_valid(get_parent()) or skill == null:
+		_enter_recovery()
+		return
+	var origin := visual.get_venom_release_world_position()
+	aim_direction = VENOM_HAZARD.fire_fan_volley(
+		self, target, origin, _ground_y, skill, boss_size_scale, _on_venom_splashed
+	)
+	visual.face_direction(aim_direction)
+	feedback.emit_skill_cue(&"venom_spit", global_position)
+	_enter_recovery()
+
+
+func _begin_spiky_counter() -> void:
+	_hits_since_counter = 0
+	_hurt_remaining = 0.0
+	_counter_cooldown_left = counter_cooldown
+	_pending_counter_burst = true
+	_counter_shock_velocity = (
+		-_flat_direction_to(target.global_position) * COUNTER_SHOCK_RECOIL_SPEED
+	)
+	state = State.COUNTER_SHOCK
+	timer = COUNTER_SHOCK_DURATION
+	visual.begin_counter_shock()
+	feedback.emit_skill_cue(&"spiky_counter_shock", global_position)
+
+
+func _update_counter_shock(delta: float) -> void:
+	_counter_shock_velocity = _counter_shock_velocity.move_toward(Vector3.ZERO, 24.0 * delta)
+	_set_horizontal_velocity(_counter_shock_velocity)
+	move_and_slide()
+	timer -= delta
+	if timer <= 0.0:
+		_halt_locomotion()
+		skill = _find_spike_skill()
+		state = State.WINDUP
+		timer = COUNTER_PUFF_WINDUP
+		visual.begin_windup(BlubberbeardSkillData.Kind.SPIKY_INFLATION)
+		_show_aoe_warning(global_position, _current_spike_burst_radius(), Color(1.0, 0.25, 0.08))
 
 
 func _enter_recovery() -> void:
-	state = State.RECOVERY
-	var was_slam := _anchor_slam_active
 	_anchor_slam_active = false
 	_hide_slam_warning()
-	var recovery_time := anchor_slam_recovery if was_slam else skill.recovery
-	var wait_time := recovery_time + boss_data.phases[phase_index].skill_interval
-	var chain_ready := (
-		was_slam or (skill != null and skill.kind == BlubberbeardSkillData.Kind.BELLY_CHARGE)
+	_skydive.hide_all()
+	_whirlwind_rig.hide_all()
+	if is_instance_valid(_aoe_hitbox):
+		_aoe_hitbox.end_attack()
+	var prev_kind := skill.kind if skill != null else BlubberbeardSkillData.Kind.POWDER_BARREL
+	visual.begin_recovery(prev_kind)
+	_sync_colliders_to_size()
+	state = State.RECOVERY
+	if prev_kind == BlubberbeardSkillData.Kind.ANCHOR_SLAM:
+		timer = anchor_slam_recovery
+		return
+	timer = skill.recovery if skill != null else 0.55
+
+
+func _enter_wait() -> void:
+	state = State.WAIT
+	var phase := current_phase()
+	var base_wait := phase.skill_interval if phase != null else 1.5
+	var wait_time := randf_range(base_wait * (1.0 - wait_jitter), base_wait * (1.0 + wait_jitter))
+	if phase_index > 0 and randf() < phase2_chain_chance:
+		wait_time *= 0.5
+	timer = maxf(0.55, wait_time)
+	_strafe_sign = -1.0 if randf() < 0.5 else 1.0
+	_strafe_flip_timer = randf_range(1.1, 2.0)
+
+
+func _has_super_armor() -> bool:
+	if not super_armor_during_attacks:
+		return false
+	return (
+		state
+		in [
+			State.WINDUP,
+			State.SKYDIVE_LEAP,
+			State.SPIKY_HOLD,
+			State.WHIRLWIND,
+			State.COUNTER_SHOCK,
+		]
 	)
-	if phase_index > 0 and chain_ready and randf() < phase2_chain_chance:
-		wait_time = 0.25
-	timer = wait_time
-	dust.emitting = false
-	var recovery_kind := BlubberbeardSkillData.Kind.ANCHOR_SLAM if was_slam else skill.kind
-	visual.begin_recovery(recovery_kind)
+
+
+func _hit_feedback(_amount: float) -> void:
+	if dead:
+		return
+	visual.flash_hit()
+	var armored := _has_super_armor()
+	if _hits_since_counter < hits_before_counter:
+		_hits_since_counter += 1
+		if not armored and (state == State.WAIT or state == State.RECOVERY):
+			_hurt_remaining = visual.HURT_DURATION
+		return
+	if armored:
+		return
+	if _counter_cooldown_left <= 0.0 and is_instance_valid(target):
+		_begin_spiky_counter()
+	elif state == State.WAIT or state == State.RECOVERY:
+		_hurt_remaining = visual.HURT_DURATION
 
 
 func _on_phase_entered(index: int) -> void:
 	visual.set_enraged(index > 0)
+	_sync_colliders_to_size()
 	feedback.phase_changed()
 	visual.impact(0.32, 0.45)
 	EFFECTS.shockwave(get_parent(), global_position, 3.0, Color(0.9, 0.2, 0.4, 0.8))
@@ -530,107 +706,232 @@ func _on_fight_ended() -> void:
 	charge_hitbox.end_attack()
 	if is_instance_valid(_aoe_hitbox):
 		_aoe_hitbox.end_attack()
+	if is_instance_valid(_whirlwind_rig):
+		_whirlwind_rig.hide_all()
+	if is_instance_valid(_skydive):
+		_skydive.hide_all()
+	_clear_pending_barrels()
 	_anchor_slam_active = false
-	_pending_second_spike_wave = -1.0
 	_hide_slam_warning()
 	dust.emitting = false
-	_evade_steam.emitting = false
+	if is_inside_tree():
+		get_tree().call_group(VENOM_HAZARD.HAZARD_GROUP, "queue_free")
 	feedback.death()
 	EFFECTS.shockwave(get_parent(), global_position, 3.0, Color(1.0, 0.65, 0.2, 0.8))
 	_play_sound(0.4)
 	visual.play_death(queue_free)
 
 
-func _has_super_armor() -> bool:
-	if not super_armor_during_attacks:
+func _apply_gravity_to_floor(delta: float) -> void:
+	if state == State.SKYDIVE_LEAP:
+		velocity.y = 0.0
+		return
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+	elif velocity.y < 0.0:
+		velocity.y = 0.0
+
+
+func _set_horizontal_velocity(horizontal: Vector3) -> void:
+	velocity.x = horizontal.x
+	velocity.z = horizontal.z
+
+
+func _halt_locomotion() -> void:
+	visual.moving = false
+	dust.emitting = false
+	_walk_dust_timer = 0.0
+	_set_horizontal_velocity(Vector3.ZERO)
+
+
+func _update_patrol_movement(delta: float) -> void:
+	if not is_instance_valid(target):
+		_halt_locomotion()
+		return
+	_strafe_flip_timer -= delta
+	if _strafe_flip_timer <= 0.0:
+		_strafe_flip_timer = randf_range(1.2, 2.2)
+		_strafe_sign = -_strafe_sign
+	var delta_pos := target.global_position - global_position
+	delta_pos.y = 0.0
+	var dist := delta_pos.length()
+	if delta_pos.is_zero_approx():
+		_halt_locomotion()
+		return
+	var to_target := delta_pos / dist
+	var tangent := Vector3(-to_target.z, 0.0, to_target.x) * _strafe_sign
+	var move_dir := to_target
+	var speed_scale := 0.85
+	if dist > circle_outer_distance:
+		move_dir = (to_target * 0.9 + tangent * 0.35).normalized()
+		speed_scale = 1.0
+	elif dist >= preferred_distance:
+		# Trong tầm trung/gần: đi bộ vòng vòng quanh Player để giữ nhịp đấu và mở góc ra chiêu.
+		move_dir = (tangent * 0.9 + to_target * 0.2).normalized()
+		speed_scale = 0.72
+	else:
+		# Quá sát người chơi: lách ngang và lùi nhẹ ra rìa cận chiến.
+		move_dir = (tangent * 0.85 - to_target * 0.35).normalized()
+		speed_scale = 0.65
+	_set_horizontal_velocity(move_dir * move_speed * speed_scale)
+	visual.moving = true
+	visual.face_direction(to_target)
+	dust.emitting = true
+	_walk_dust_timer -= delta
+	if _walk_dust_timer <= 0.0:
+		_walk_dust_timer = 0.28
+		_walk_dust_side = -_walk_dust_side
+		var perp := Vector3(-move_dir.z, 0.0, move_dir.x) * (_walk_dust_side * 0.55)
+		feedback.spawn_move_dust(global_position + perp, move_dir, false)
+
+
+func _should_trigger_anchor_slam() -> bool:
+	if not anchor_slam_enabled or _anchor_slam_cooldown_left > 0.0:
 		return false
-	return state == State.WINDUP or state == State.CHARGE
+	if not is_instance_valid(target):
+		return false
+	if _is_position_near_boundary(target.global_position, ai_boundary_margin):
+		return false
+	return _flat_distance_to_target() <= anchor_slam_trigger_range and randf() < 0.22
 
 
-func _hit_feedback(_amount: float) -> void:
-	if dead:
+func _begin_anchor_slam() -> void:
+	_anchor_slam_active = true
+	state = State.WINDUP
+	timer = anchor_slam_enraged_windup if phase_index > 0 else anchor_slam_windup
+	visual.moving = false
+	aim_direction = _flat_direction_to(
+		target.global_position if is_instance_valid(target) else global_position + Vector3.BACK
+	)
+	visual.face_direction(aim_direction)
+	visual.begin_windup(BlubberbeardSkillData.Kind.ANCHOR_SLAM)
+	var forward_dist := anchor_slam_forward_offset * _current_damage_size_scale()
+	var slam_rad := _current_anchor_slam_radius()
+	_slam_impact_position = global_position + aim_direction * forward_dist
+	_slam_impact_position.y = _ground_y + 0.05
+	_show_aoe_warning(_slam_impact_position, slam_rad, Color(1.0, 0.22, 0.04))
+	_play_sound(0.95)
+
+
+func _update_anchor_slam_windup() -> void:
+	var windup := maxf(0.05, anchor_slam_enraged_windup if phase_index > 0 else anchor_slam_windup)
+	var progress := 1.0 - clampf(timer / windup, 0.0, 1.0)
+	visual.windup_progress = progress
+	_update_slam_warning_alpha(0.16 + progress * 0.34)
+	if timer <= 0.0:
+		_hide_slam_warning()
+		_anchor_slam_cooldown_left = anchor_slam_cooldown
+		var dmg := anchor_slam_enraged_damage if phase_index > 0 else anchor_slam_damage
+		var slam_rad := _current_anchor_slam_radius()
+		_trigger_aoe_hit(_slam_impact_position, slam_rad, dmg, &"boss_anchor_slam", 1.35)
+		visual.impact(0.3, 0.3)
+		feedback.anchor_slam(_slam_impact_position, slam_rad)
+		_enter_recovery()
+
+
+func _find_spike_skill() -> BlubberbeardSkillData:
+	var phase := current_phase()
+	if phase != null:
+		for candidate in phase.skills:
+			var data := candidate as BlubberbeardSkillData
+			if data != null and data.kind == BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+				return data
+	var fallback := BlubberbeardSkillData.new()
+	fallback.kind = BlubberbeardSkillData.Kind.SPIKY_INFLATION
+	fallback.damage = 3.5 if phase_index > 0 else 2.5
+	fallback.radius = spiky_close_burst_radius
+	fallback.spiky_hold_duration = spiky_hold_duration
+	return fallback
+
+
+func _current_damage_size_scale() -> float:
+	return (
+		_size_rig.get_damage_scale(boss_size_scale, phase_index)
+		if _size_rig != null
+		else boss_size_scale
+	)
+
+
+func _current_spike_burst_radius() -> float:
+	var base := spiky_close_burst_radius
+	if skill != null and skill.kind == BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+		base = maxf(spiky_close_burst_radius, skill.radius)
+	return base * boss_size_scale
+
+
+func _current_spiky_thorn_radius() -> float:
+	return SPIKY_THORN_BODY_RADIUS * _current_damage_size_scale()
+
+
+func _current_anchor_slam_radius() -> float:
+	return anchor_slam_radius * _current_damage_size_scale()
+
+
+func _current_spiky_hold_duration() -> float:
+	if skill != null and skill.kind == BlubberbeardSkillData.Kind.SPIKY_INFLATION:
+		return maxf(0.4, skill.spiky_hold_duration)
+	return spiky_hold_duration
+
+
+func _apply_boss_size_scale() -> void:
+	if _size_rig != null:
+		_size_rig.apply_base_scale(boss_size_scale)
+
+
+func _sync_colliders_to_size() -> void:
+	if _size_rig != null:
+		_size_rig.sync(boss_size_scale)
+
+
+func _trigger_aoe_hit(
+	at: Vector3, radius: float, amount: float, tag: StringName, knockback: float = 1.4
+) -> void:
+	if not is_instance_valid(_aoe_hitbox) or _aoe_shape == null or amount <= 0.0:
 		return
-	visual.flash_hit()
-	var armored := _has_super_armor()
-	if _hits_since_evade < hits_before_evade:
-		_hits_since_evade += 1
-		if not armored and (state == State.WAIT or state == State.RECOVERY):
-			_hurt_remaining = visual.HURT_DURATION
-		return
-	if armored:
-		return
-	if _evade_cooldown_left <= 0.0 and is_instance_valid(target):
-		_begin_evade()
-	elif state == State.WAIT or state == State.RECOVERY:
-		_hurt_remaining = visual.HURT_DURATION
+	_aoe_hitbox.global_position = at
+	_aoe_shape.radius = maxf(0.1, radius)
+	var context := DamageContext.new()
+	context.source = self
+	context.source_team = CombatTeams.ENEMY
+	context.base_amount_hp = amount
+	context.amount_hp = amount
+	context.tag = tag
+	context.origin = at
+	context.knockback_multiplier = knockback
+	_aoe_hitbox.begin_attack_with_context(context, HitBox.RehitPolicy.ONCE_PER_ATTACK)
+	_aoe_hitbox.sample_shape()
+	_aoe_hitbox.end_attack()
 
 
-func _begin_evade() -> void:
-	var away := global_position - target.global_position
-	away.y = 0.0
-	if away.is_zero_approx():
-		away = Vector3.BACK
-	away = away.normalized()
-	# Find space to start; the character body still collides with arena boundaries.
-	for angle in [0.55, -0.55, 1.2, -1.2, 0.0]:
-		var candidate := away.rotated(Vector3.UP, angle)
-		if not test_move(global_transform, candidate * 1.5):
-			_hits_since_evade = 0
-			_hurt_remaining = 0.0
-			_anchor_slam_active = false
-			_hide_slam_warning()
-			if state == State.WINDUP and is_instance_valid(_barrel_hazard) and not _barrel_released:
-				_barrel_hazard.queue_free()
-				_barrel_hazard = null
-			charge_hitbox.end_attack()
-			if evade_drops_barrels and fighting and is_instance_valid(get_parent()):
-				_spawn_evade_barrel(global_position)
-			if skill != null:
-				visual.begin_recovery(skill.kind)
-			state = State.RECOVERY
-			timer = 0.35
-			_evade_direction = candidate
-			_evade_remaining = EVADE_DURATION
-			_evade_cooldown_left = evade_cooldown
-			_evade_bounced = false
-			_evade_launched = false
-			_evade_horizontal_velocity = Vector3.ZERO
-			visual.begin_deflate_evade(EVADE_DURATION)
-			_evade_steam.direction = (-candidate + Vector3.UP * 0.3).normalized()
-			_evade_steam.restart()
-			_evade_steam.emitting = true
-			feedback.spawn_move_dust(global_position, -candidate, true)
-			return
+func _flat_distance_to_target() -> float:
+	if not is_instance_valid(target):
+		return 0.0
+	var flat := target.global_position - global_position
+	flat.y = 0.0
+	return flat.length()
 
 
-func _create_evade_steam() -> void:
-	_evade_steam = CPUParticles3D.new()
-	_evade_steam.name = "DeflateSteam"
-	_evade_steam.emitting = false
-	_evade_steam.amount = 24
-	_evade_steam.lifetime = 0.5
-	_evade_steam.local_coords = false
-	_evade_steam.spread = 30.0
-	_evade_steam.initial_velocity_min = 1.2
-	_evade_steam.initial_velocity_max = 2.8
-	_evade_steam.gravity = Vector3(0, 0.7, 0)
-	_evade_steam.scale_amount_min = 0.45
-	_evade_steam.scale_amount_max = 0.85
-	var colors := Gradient.new()
-	colors.set_color(0, Color(0.9, 0.98, 1.0, 0.7))
-	colors.set_color(1, Color(0.9, 0.98, 1.0, 0.0))
-	_evade_steam.color_ramp = colors
-	var mesh := SphereMesh.new()
-	mesh.radius = 0.28
-	mesh.height = 0.56
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.vertex_color_use_as_albedo = true
-	mesh.material = material
-	_evade_steam.mesh = mesh
-	add_child(_evade_steam)
-	_evade_steam.position.y = 3.5
+func _flat_direction_to(world_pos: Vector3) -> Vector3:
+	var flat := world_pos - global_position
+	flat.y = 0.0
+	return flat.normalized() if not flat.is_zero_approx() else aim_direction
+
+
+func _is_position_near_boundary(pos: Vector3, margin_meters: float) -> bool:
+	var space := get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() else null
+	return AI_CLASS.is_position_near_boundary(space, pos, _ground_y, margin_meters, _ray_excludes())
+
+
+func _spot_crosses_boundary(from_pos: Vector3, candidate: Vector3) -> bool:
+	var space := get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() else null
+	return AI_CLASS.spot_crosses_boundary(space, from_pos, candidate, _ground_y, _ray_excludes())
+
+
+func _ray_excludes() -> Array[RID]:
+	var excluded: Array[RID] = [get_rid()]
+	if is_instance_valid(target) and target is CollisionObject3D:
+		excluded.append((target as CollisionObject3D).get_rid())
+	return excluded
 
 
 func _on_barrel_detonated(hazard: Node3D, radius: float) -> void:
@@ -638,12 +939,21 @@ func _on_barrel_detonated(hazard: Node3D, radius: float) -> void:
 		feedback.barrel_explosion(hazard.global_position, radius)
 
 
-func _on_charge_damage(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
-	feedback.charge_hit(hit_target)
+func _on_venom_splashed(at: Vector3, pool_radius: float) -> void:
+	if not dead:
+		feedback.emit_skill_cue(&"venom_splash", at, pool_radius)
+
+
+func _on_direct_attack_damage(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
+	feedback.aoe_hit(hit_target)
 
 
 func _on_aoe_damage(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
 	feedback.aoe_hit(hit_target)
+
+
+func _on_whirlwind_hit(hit_target: Node) -> void:
+	feedback.emit_skill_cue(&"whirlwind_hit", global_position, 0.0, hit_target)
 
 
 func _play_sound(pitch: float) -> void:
@@ -652,206 +962,12 @@ func _play_sound(pitch: float) -> void:
 		sound.play()
 
 
-func _create_dust() -> void:
-	dust = CPUParticles3D.new()
-	dust.name = "ChargeDust"
-	dust.emitting = false
-	dust.amount = 48
-	dust.lifetime = 0.5
-	dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
-	dust.emission_box_extents = Vector3(1.8, 0.18, 1.8)
-	dust.local_coords = false
-	dust.direction = Vector3.UP
-	dust.spread = 75.0
-	dust.initial_velocity_min = 0.8
-	dust.initial_velocity_max = 3.2
-	dust.gravity = Vector3(0, -1.6, 0)
-	dust.scale_amount_min = 1.0
-	dust.scale_amount_max = 1.75
-	dust.color = Color(1.0, 0.96, 0.88, 0.92)
-	dust.anim_speed_min = 1.0
-	dust.anim_speed_max = 1.2
-	dust.sorting_offset = 1.0
-	var mesh := QuadMesh.new()
-	mesh.size = Vector2(1.75, 1.75)
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.vertex_color_use_as_albedo = true
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.render_priority = 1
-	material.albedo_texture = MOVE_DUST_SHEET
-	material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	material.particles_anim_h_frames = 4
-	material.particles_anim_v_frames = 1
-	material.particles_anim_loop = false
-	mesh.material = material
-	dust.mesh = mesh
-	add_child(dust)
-	dust.position.y = 0.75
-
-
-func _should_trigger_anchor_slam() -> bool:
-	if not anchor_slam_enabled or _anchor_slam_cooldown_left > 0.0:
-		return false
-	if not is_instance_valid(target):
-		return false
-	var delta := target.global_position - global_position
-	delta.y = 0.0
-	return delta.length() <= anchor_slam_trigger_range
-
-
-func _begin_anchor_slam() -> void:
-	_anchor_slam_active = true
-	state = State.WINDUP
-	timer = _current_slam_windup()
-	visual.moving = false
-	var dir := charge_direction if not charge_direction.is_zero_approx() else Vector3.BACK
-	if is_instance_valid(target):
-		var delta := target.global_position - global_position
-		delta.y = 0.0
-		if not delta.is_zero_approx():
-			dir = delta.normalized()
-	charge_direction = dir
-	visual.face_direction(charge_direction)
-	visual.begin_windup(BlubberbeardSkillData.Kind.ANCHOR_SLAM)
-	_slam_impact_position = global_position + charge_direction * anchor_slam_forward_offset
-	_slam_impact_position.y = global_position.y + 0.05
-	if is_instance_valid(_slam_warning):
-		_slam_warning.global_position = _slam_impact_position
-		_slam_warning.visible = true
-	_play_sound(0.95)
-
-
-func _update_anchor_slam_windup() -> void:
-	var windup := maxf(0.05, _current_slam_windup())
-	var progress := 1.0 - clampf(timer / windup, 0.0, 1.0)
-	visual.windup_progress = progress
-	if is_instance_valid(_slam_warning_material):
-		_slam_warning_material.albedo_color.a = 0.16 + progress * 0.32
-	if timer <= 0.0:
-		_execute_anchor_slam()
-
-
-func _execute_anchor_slam() -> void:
-	_hide_slam_warning()
-	_anchor_slam_cooldown_left = anchor_slam_cooldown
-	var dmg := anchor_slam_enraged_damage if phase_index > 0 else anchor_slam_damage
-	_trigger_aoe_hit(_slam_impact_position, anchor_slam_radius, dmg, &"boss_anchor_slam")
-	visual.impact(0.3, 0.3)
-	if is_instance_valid(feedback):
-		feedback.anchor_slam(_slam_impact_position, anchor_slam_radius)
-	_enter_recovery()
-
-
-func _current_slam_windup() -> float:
-	return anchor_slam_enraged_windup if phase_index > 0 else anchor_slam_windup
-
-
-func _steer_charge_windup(delta: float, progress: float) -> void:
-	if progress >= charge_aim_track_fraction or not is_instance_valid(target):
-		return
-	var desired := target.global_position - global_position
-	desired.y = 0.0
-	if desired.is_zero_approx():
-		return
-	desired = desired.normalized()
-	var angle_diff := charge_direction.signed_angle_to(desired, Vector3.UP)
-	var max_step := charge_aim_turn_speed * maxf(0.0, delta)
-	var step := clampf(angle_diff, -max_step, max_step)
-	charge_direction = charge_direction.rotated(Vector3.UP, step)
-	visual.face_direction(charge_direction)
-
-
-func _pick_next_skill_index(phase: BossPhaseData) -> int:
-	if phase.skills.size() <= 1 or not is_instance_valid(target):
-		return next_skill + 1
-	var flat := target.global_position - global_position
-	flat.y = 0.0
-	var dist := flat.length()
-	var weights: Array[float] = []
-	var total := 0.0
-	for index in phase.skills.size():
-		var candidate := phase.skills[index] as BlubberbeardSkillData
-		var weight := 1.0
-		if candidate != null:
-			weight = _score_skill_weight(candidate.kind, dist)
-			if candidate.kind == _last_skill_kind:
-				weight *= 0.0 if _same_skill_streak >= 2 else 0.3
-		weights.append(weight)
-		total += weight
-	if total <= 0.0:
-		return (next_skill + 1) % phase.skills.size()
-	var roll := randf() * total
-	var accum := 0.0
-	for index in weights.size():
-		accum += weights[index]
-		if roll <= accum:
-			return index
-	return phase.skills.size() - 1
-
-
-func _score_skill_weight(kind: int, dist: float) -> float:
-	match kind:
-		BlubberbeardSkillData.Kind.POWDER_BARREL:
-			if dist >= 9.0:
-				return 3.0
-			return 1.2 if dist >= 5.0 else 0.45
-		BlubberbeardSkillData.Kind.BELLY_CHARGE:
-			if dist >= 4.5 and dist <= 11.5:
-				return 3.0
-			return 1.5 if dist > 11.5 else 0.8
-		BlubberbeardSkillData.Kind.SPIKY_INFLATION:
-			return 3.2 if dist <= 7.0 else 0.5
-		BlubberbeardSkillData.Kind.ANCHOR_SLAM:
-			return 3.2 if dist <= anchor_slam_trigger_range + 1.0 else 0.25
-		_:
-			return 1.0
-
-
-func _tick_second_spike_wave(delta: float) -> void:
-	if _pending_second_spike_wave < 0.0:
-		return
-	_pending_second_spike_wave -= maxf(0.0, delta)
-	if _pending_second_spike_wave > 0.0:
-		return
-	_pending_second_spike_wave = -1.0
-	if dead or not is_instance_valid(get_parent()):
-		return
-	for index in 8:
-		var angle := TAU * (float(index) + 0.5) / 8.0
-		var dir := Vector3(cos(angle), 0.0, sin(angle))
-		var hazard := HAZARD.new()
-		hazard.source = self
-		hazard.spike = true
-		hazard.direction = dir
-		hazard.damage = _pending_second_spike_damage
-		hazard.speed = _pending_second_spike_speed
-		hazard.remaining = _pending_second_spike_duration
-		get_parent().add_child(hazard)
-		hazard.global_position = global_position + Vector3.UP * 1.2 + dir * 2.5
-	_play_sound(1.85)
-
-
-func _spawn_evade_barrel(at: Vector3) -> void:
-	var hazard := HAZARD.new()
-	hazard.source = self
-	hazard.damage = 4.5 if phase_index > 0 else 3.0
-	hazard.radius = 2.6
-	hazard.remaining = 0.95
-	hazard.detonated.connect(_on_barrel_detonated.bind(hazard, hazard.radius))
-	get_parent().add_child(hazard)
-	hazard.global_position = Vector3(at.x, global_position.y + 0.08, at.z)
-	hazard.animate_barrel(global_position + Vector3.UP * 0.6)
-
-
-func _trigger_aoe_hit(at: Vector3, radius: float, amount: float, tag: StringName) -> void:
-	if not is_instance_valid(_aoe_hitbox) or _aoe_shape == null or amount <= 0.0:
-		return
-	_aoe_hitbox.global_position = at
-	_aoe_shape.radius = maxf(0.1, radius)
-	_aoe_hitbox.begin_attack(amount, 0, tag)
-	_aoe_hitbox.sample_shape()
-	_aoe_hitbox.end_attack()
+func _create_whirlwind_rig() -> void:
+	_whirlwind_rig = WHIRLWIND_RIG.new()
+	_whirlwind_rig.name = "WhirlwindRig"
+	add_child(_whirlwind_rig)
+	_whirlwind_rig.setup(self)
+	_whirlwind_rig.whirlwind_hit.connect(_on_whirlwind_hit)
 
 
 func _create_aoe_hitbox() -> void:
@@ -871,39 +987,13 @@ func _create_aoe_hitbox() -> void:
 	add_child(_aoe_hitbox)
 
 
-func _create_slam_warning() -> void:
-	_slam_warning = Node3D.new()
-	_slam_warning.name = "AnchorSlamWarning"
-	_slam_warning.top_level = true
-	_slam_warning.visible = false
-	var disc := MeshInstance3D.new()
-	var disc_mesh := CylinderMesh.new()
-	disc_mesh.top_radius = anchor_slam_radius
-	disc_mesh.bottom_radius = anchor_slam_radius
-	disc_mesh.height = 0.02
-	disc.mesh = disc_mesh
-	_slam_warning_material = StandardMaterial3D.new()
-	_slam_warning_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_slam_warning_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_slam_warning_material.albedo_color = Color(1.0, 0.2, 0.04, 0.16)
-	disc.material_override = _slam_warning_material
-	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_slam_warning.add_child(disc)
-	var ring := MeshInstance3D.new()
-	var ring_mesh := TorusMesh.new()
-	ring_mesh.inner_radius = maxf(0.05, anchor_slam_radius - 0.12)
-	ring_mesh.outer_radius = anchor_slam_radius
-	ring.mesh = ring_mesh
-	var ring_mat := StandardMaterial3D.new()
-	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	ring_mat.albedo_color = Color(1.0, 0.28, 0.05)
-	ring.material_override = ring_mat
-	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	ring.position.y = 0.02
-	_slam_warning.add_child(ring)
-	add_child(_slam_warning)
+func _show_aoe_warning(at: Vector3, radius: float, ring_color: Color) -> void:
+	feedback.show_slam_warning(at, _ground_y, radius, anchor_slam_radius, ring_color)
+
+
+func _update_slam_warning_alpha(alpha_val: float) -> void:
+	feedback.update_slam_warning_alpha(alpha_val)
 
 
 func _hide_slam_warning() -> void:
-	if is_instance_valid(_slam_warning):
-		_slam_warning.visible = false
+	feedback.hide_slam_warning()

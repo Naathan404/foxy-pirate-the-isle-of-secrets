@@ -74,32 +74,29 @@ func _run() -> void:
 		"Left-facing move did not select Side row with flip_h"
 	)
 
-	# 2. Barrel barrage: sequential throws (1st straight at player, rest around) + ash scorch.
+	# 2. Barrel barrage: escalating 1 -> 2 -> 3 waves + barrel hand-release sync + ash scorch.
 	var barrel_skill := boss.boss_data.phases[0].skills[0] as BlubberbeardSkillData
-	var rolled_counts: Dictionary = {}
-	behavior.skill = barrel_skill
-	for _i in 32:
-		var rolled := behavior.roll_barrel_throw_count()
-		_check(
-			rolled >= 1 and rolled <= 3,
-			"Randomized barrel throw count fell outside 1..3"
-		)
-		rolled_counts[rolled] = true
-	_check(
-		rolled_counts.size() >= 3,
-		"Randomized barrel throw count did not vary across 1..3"
-	)
-
-	barrel_skill.randomize_barrel_throws = false
-	barrel_skill.barrel_throw_count = 3
+	var prev_escalating := barrel_skill.barrel_escalating_burst
+	var prev_fmin := barrel_skill.barrel_final_burst_min
+	var prev_fmax := barrel_skill.barrel_final_burst_max
+	var prev_dur := barrel_skill.barrel_throw_duration
+	var prev_gmin := barrel_skill.barrel_throw_gap_min
+	var prev_gmax := barrel_skill.barrel_throw_gap_max
+	barrel_skill.barrel_escalating_burst = true
+	barrel_skill.barrel_final_burst_min = 3
+	barrel_skill.barrel_final_burst_max = 3
 	barrel_skill.barrel_throw_duration = 0.40
 	barrel_skill.barrel_throw_gap_min = 0.12
 	barrel_skill.barrel_throw_gap_max = 0.22
 	player.position = Vector3(5, 0, 0)
-	behavior.next_skill = 0
+	behavior.forced_skill_index = 0
 	behavior._choose_skill()
-	var hazard := behavior._barrel_hazard
-	_check(is_instance_valid(hazard), "Barrel windup did not allocate barrel hazard")
+	var hazard: Node3D = (
+		behavior._barrel_pending_hazards[0]
+		if not behavior._barrel_pending_hazards.is_empty()
+		else null
+	)
+	_check(is_instance_valid(hazard), "Barrel windup did not allocate wave 1 barrel hazard")
 	var warning_disc := hazard.warning.get_child(0) as MeshInstance3D
 	_check(hazard.warning.visible, "Barrel landing warning was not visible")
 	_check(
@@ -107,23 +104,31 @@ func _run() -> void:
 		"Barrel warning does not match damage radius"
 	)
 	_check(
-		behavior._barrel_throws_total == 3 and behavior._barrel_used_spots.size() == 1,
-		"Barrage did not start with first throw queued instead of all barrels at once"
+		behavior._barrel_wave_queue == [1, 2, 3] and behavior._barrel_used_spots.size() == 1,
+		"Escalating barrage did not start wave 1 with 1 barrel queued"
 	)
 	_check(
-		Vector2(
-			hazard.global_position.x - player.global_position.x,
-			hazard.global_position.z - player.global_position.z
-		).length() < 0.05,
-		"First throw in barrage did not aim straight at player"
+		(
+			(
+				Vector2(
+					hazard.global_position.x - player.global_position.x,
+					hazard.global_position.z - player.global_position.z
+				)
+				. length()
+			)
+			< 0.05
+		),
+		"First wave throw did not aim straight at player"
 	)
 	_check(
-		visual.texture == visual.ATTACKS_SHEET and visual.clip == BlubberbeardVisual.Clip.BARREL_THROW,
+		(
+			visual.texture == visual.ATTACKS_SHEET
+			and visual.clip == BlubberbeardVisual.Clip.BARREL_THROW
+		),
 		"Barrel windup did not switch to attacks sheet"
 	)
 	_check(
-		visual.frame == 0 or visual.frame == 1,
-		"Barrel windup must start on barrel-in-hand frame"
+		visual.frame == 0 or visual.frame == 1, "Barrel windup must start on barrel-in-hand frame"
 	)
 	_check(
 		hazard != null and hazard.get("_held_for_throw") and not hazard.barrel_visual.visible,
@@ -179,78 +184,120 @@ func _run() -> void:
 	if is_instance_valid(hazard):
 		hazard.queue_free()
 
-	# Continue stepping barrage until throws #2 and #3 finish and transition cleanly into RECOVERY.
+	# Continue stepping barrage through wave 2 (2 barrels tracking moved player) & wave 3.
+	player.position = Vector3(9, 0, -2)
 	for _tick in 40:
 		if behavior.state == BlubberbeardBoss.State.RECOVERY:
 			break
 		behavior.fight_tick(0.1)
 	_check(
-		behavior.state == BlubberbeardBoss.State.RECOVERY and behavior._barrel_throws_done == 3,
-		"Barrel barrage did not complete all 3 sequential throws into recovery"
+		(
+			behavior.state == BlubberbeardBoss.State.RECOVERY
+			and behavior._barrel_used_spots.size() == 6
+		),
+		"Escalating 1->2->3 barrel barrage did not place 6 total spots into recovery"
 	)
-	var spots := behavior._barrel_used_spots
-	_check(spots.size() == 3, "Barrel barrage did not record 3 landing spots")
-	if spots.size() == 3:
-		var d01 := Vector2(spots[0].x - spots[1].x, spots[0].z - spots[1].z).length()
-		var d02 := Vector2(spots[0].x - spots[2].x, spots[0].z - spots[2].z).length()
-		var d12 := Vector2(spots[1].x - spots[2].x, spots[1].z - spots[2].z).length()
+	if behavior._barrel_used_spots.size() >= 2:
+		var wave2_lead := behavior._barrel_used_spots[1]
 		_check(
-			d01 >= 1.5 and d02 >= 1.5 and d12 >= 1.0,
-			"Subsequent throws in barrage were not spread around different positions"
+			(
+				Vector2(wave2_lead.x - player.position.x, wave2_lead.z - player.position.z).length()
+				< 0.05
+			),
+			"Wave 2 barrel did not follow moved player position"
 		)
 	for child in arena.get_children():
 		if child.get_script() == HAZARD_SCRIPT:
 			child.queue_free()
-	barrel_skill.randomize_barrel_throws = true
-	barrel_skill.barrel_throw_duration = 0.72
+	barrel_skill.barrel_escalating_burst = prev_escalating
+	barrel_skill.barrel_final_burst_min = prev_fmin
+	barrel_skill.barrel_final_burst_max = prev_fmax
+	barrel_skill.barrel_throw_duration = prev_dur
+	barrel_skill.barrel_throw_gap_min = prev_gmin
+	barrel_skill.barrel_throw_gap_max = prev_gmax
 
-	# 3. 8-frame Belly Charge (Down/Side/Up) & 4-dir Spiky Inflation animations.
-	behavior.next_skill = 1
+	# 3. Parabolic Sky Dive, Anchor Whirlwind, 4-dir Venom Spit & Longer Spiky Inflation hold.
+	behavior.forced_skill_index = 1
 	behavior._choose_skill()
 	_check(
-		visual.clip == BlubberbeardVisual.Clip.BELLY_CHARGE_WINDUP
-		and visual.texture == visual.CHARGE_PREP_4DIR_SHEET
-		and (visual.frame == 4 or visual.frame == 5),
-		"Belly Charge Side windup frame mismatch"
+		(
+			visual.clip == BlubberbeardVisual.Clip.SKYDIVE_LAUNCH
+			and visual.texture == visual.SKYDIVE_SHEET
+		),
+		"Parabolic leap did not select skydive launch sheet"
+	)
+	behavior._execute_skill()
+	behavior.fight_tick(behavior.skill.skydive_leap_duration * 0.42)
+	_check(
+		visual.clip == BlubberbeardVisual.Clip.SKYDIVE_GLIDE,
+		"Parabolic leap apex did not enter glide frame"
+	)
+	behavior.fight_tick(behavior.skill.skydive_leap_duration * 0.25)
+	_check(
+		visual.clip == BlubberbeardVisual.Clip.SKYDIVE_LOCK and visual.frame == 4,
+		"Parabolic leap crest did not show anchor lock frame 4"
+	)
+	behavior.fight_tick(behavior.skill.skydive_leap_duration * 0.20)
+	_check(
+		visual.clip == BlubberbeardVisual.Clip.SKYDIVE_DIVE and visual.frame == 5,
+		"Parabolic leap plunge did not select frame 5"
+	)
+	for _i in 20:
+		if behavior.state == BlubberbeardBoss.State.RECOVERY:
+			break
+		behavior.fight_tick(0.05)
+	_check(
+		visual.clip == BlubberbeardVisual.Clip.SKYDIVE_IMPACT and visual.frame == 6,
+		"Parabolic leap impact did not show crater frame 6"
+	)
+
+	var phase2 := boss.boss_data.phases[1]
+	boss.take_damage(boss.boss_data.max_hp * 0.5)
+	behavior.forced_skill_index = 3
+	behavior._choose_skill()
+	_check(
+		(
+			visual.clip == BlubberbeardVisual.Clip.WHIRLWIND_WINDUP
+			and visual.texture == visual.WHIRLWIND_SHEET
+			and visual.frame == 0
+		),
+		"Anchor Whirlwind windup did not select frame 0"
 	)
 	behavior._execute_skill()
 	_check(
-		visual.clip == BlubberbeardVisual.Clip.BELLY_CHARGE
-		and visual.texture == visual.CHARGE_RUN_SIDE_SHEET
-		and visual.hframes == 4
-		and visual.vframes == 2,
-		"Belly Charge Side did not select 8-frame charge_run_side sheet"
+		(
+			visual.clip == BlubberbeardVisual.Clip.WHIRLWIND_SPIN
+			and visual.texture == visual.WHIRLWIND_SHEET
+		),
+		"Anchor Whirlwind spin did not select whirlwind sheet"
 	)
-	var seen_charge_frames: Dictionary = {}
-	for _i in 10:
-		visual._process(0.07)
-		seen_charge_frames[visual.frame] = true
-	_check(
-		seen_charge_frames.size() >= 6,
-		"8-frame Belly Charge run did not cycle across distinct stride frames"
-	)
+	behavior._whirlwind_rig.hide_all()
+
+	behavior.forced_skill_index = 4
+	behavior._choose_skill()
 	visual.face_direction(Vector3.FORWARD)
 	_check(
-		visual.texture == visual.CHARGE_RUN_UP_SHEET and not visual.flip_h,
-		"Belly Charge Up did not switch to charge_run_up sheet"
+		(
+			visual.clip == BlubberbeardVisual.Clip.VENOM_SPIT
+			and visual.texture == visual.VENOM_SPIT_4DIR_SHEET
+			and visual.frame == 8
+		),
+		"Venom Spit Up windup frame mismatch"
 	)
-	visual.face_direction(Vector3.BACK)
-	_check(
-		visual.texture == visual.CHARGE_RUN_DOWN_SHEET and not visual.flip_h,
-		"Belly Charge Down did not switch to charge_run_down sheet"
-	)
-	behavior.charge_hitbox.end_attack()
+	visual.face_direction(Vector3.RIGHT)
+	_check(visual.frame == 4, "Venom Spit Side row mismatch")
 
-	var phase2 := boss.boss_data.phases[1]
 	behavior.skill = phase2.skills[2] as BlubberbeardSkillData
 	behavior.state = BlubberbeardBoss.State.WINDUP
 	behavior.timer = behavior.skill.windup
 	visual.begin_windup(BlubberbeardSkillData.Kind.SPIKY_INFLATION)
 	visual.face_direction(Vector3.FORWARD)
 	_check(
-		visual.clip == BlubberbeardVisual.Clip.INFLATE_WINDUP
-		and visual.texture == visual.INFLATE_4DIR_SHEET
-		and visual.frame == 8,
+		(
+			visual.clip == BlubberbeardVisual.Clip.INFLATE_WINDUP
+			and visual.texture == visual.INFLATE_4DIR_SHEET
+			and visual.frame == 8
+		),
 		"Spiky Inflation Up windup frame mismatch"
 	)
 	behavior._execute_skill()

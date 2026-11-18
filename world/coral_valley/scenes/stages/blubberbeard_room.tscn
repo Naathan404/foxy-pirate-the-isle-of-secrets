@@ -96,8 +96,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2.1, 0)
 
 [node name="CaptainBlubberbeard" parent="." index="5" unique_id=1542146759 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.4, 0)
-evade_cooldown = 5.0
-hits_before_evade = 5
+hits_before_counter = 6
+counter_cooldown = 7.5
 super_armor_during_attacks = true
 
 [node name="BossEncounter" type="Node" parent="." index="6" unique_id=375695329 node_paths=PackedStringArray("boss")]

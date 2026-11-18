@@ -51,50 +51,54 @@ func _run() -> void:
 	for phase_data: BossPhaseData in boss.boss_data.phases:
 		for move: BossSkillData in phase_data.skills:
 			_check(move.damage < player_data.max_hp, "A boss attack would one-shot Foxy")
-	behavior.next_skill = 1
+	behavior.forced_skill_index = 1
 	behavior._choose_skill()
-	var direction := behavior.charge_direction
-	target.position = Vector3(0, 0, 5)
-	behavior._execute_skill()
 	_check(
 		(
-			behavior.state == BlubberbeardBoss.State.CHARGE
-			and behavior.charge_direction == direction
+			behavior.skill.kind == BlubberbeardSkillData.Kind.SKY_DIVE
+			and behavior.state == BlubberbeardBoss.State.WINDUP
 		),
-		"Charge did not lock its direction"
+		"Parabolic leap windup did not start"
 	)
-	behavior.fight_tick(0.05)
-	var initial_speed := behavior.charge_speed
-	behavior.fight_tick(0.05)
+	behavior.fight_tick(behavior.skill.windup + 0.05)
 	_check(
-		(
-			initial_speed > 0.0
-			and initial_speed < behavior.skill.speed
-			and behavior.charge_speed > initial_speed
-		),
-		"Charge should accelerate smoothly toward its configured speed"
+		behavior.state == BlubberbeardBoss.State.SKYDIVE_LEAP,
+		"Parabolic leap did not launch boss into SKYDIVE_LEAP"
 	)
-	behavior.timer = 0.0
-	behavior.fight_tick(0.01)
-	var speed_before_recovery := behavior.charge_speed
-	behavior.fight_tick(0.05)
+	var locked_pos := behavior._skydive.target_position
+	behavior.fight_tick(behavior.skill.skydive_leap_duration * 0.45)
+	_check(
+		behavior.visual.airborne_height > 2.5 and behavior._skydive.target_position == locked_pos,
+		"Parabolic leap did not arc high toward locked target destination"
+	)
+	target.position = Vector3(20, 0, 20)
+	await physics_frame
+	for _tick in 25:
+		if behavior.state == BlubberbeardBoss.State.RECOVERY:
+			break
+		behavior.fight_tick(0.05)
 	_check(
 		(
 			behavior.state == BlubberbeardBoss.State.RECOVERY
-			and behavior.charge_speed < speed_before_recovery
+			and is_zero_approx(behavior.visual.airborne_height)
+			and (
+				(
+					Vector2(
+						boss.global_position.x - locked_pos.x, boss.global_position.z - locked_pos.z
+					)
+					. length()
+				)
+				< 0.8
+			)
 		),
-		"Charge should decelerate during recovery"
+		"Parabolic leap did not land straight onto locked target coordinates"
 	)
-	behavior.charge_speed = 14.0
-	behavior.fight_tick(0.18)
-	_check(behavior.charge_speed == 0.0, "Charge should stop within 0.18 seconds")
-	behavior.visual.begin_recovery(BlubberbeardSkillData.Kind.BELLY_CHARGE)
-	behavior.visual._process(0.31)
+	behavior.visual.begin_recovery(BlubberbeardSkillData.Kind.SKY_DIVE)
+	behavior.visual._process(0.5)
 	_check(
 		behavior.visual.pose == BlubberbeardVisual.Pose.IDLE,
-		"Charge recovery animation should return to idle or movement"
+		"Sky Dive recovery animation should return to idle or movement"
 	)
-	behavior.charge_hitbox.end_attack()
 	var barrel := HAZARD_SCRIPT.new()
 	barrel.source = boss
 	barrel.damage = 12.0
@@ -112,40 +116,52 @@ func _run() -> void:
 		"Phase 2 did not retain shared HP at 50%"
 	)
 	var phase := boss.boss_data.phases[1]
-	_check(phase.skills.size() == 3, "Phase 2 should contain three skills")
+	_check(phase.skills.size() == 5, "Phase 2 should contain five skills")
+	target.damage_received = 0.0
+	target.position = boss.global_position + Vector3(2.2, 0.0, 0.0)
+	await physics_frame
 	behavior.skill = phase.skills[2] as BlubberbeardSkillData
 	behavior._execute_skill()
-	var hazards: Array[Node] = []
+	var projectile_spikes := 0
 	for child in arena.get_children():
-		if child.get_script() == HAZARD_SCRIPT:
-			hazards.append(child)
-	_check(hazards.size() == 8, "Spiky Inflation did not spawn eight spikes")
-	if hazards.size() == 8:
-		_check(
-			hazards[0].direction.dot(hazards[1].direction) < 0.8,
-			"Spike directions are not separated"
-		)
-		var spike = hazards[0]
-		spike.set_physics_process(false)
-		var start: Vector3 = spike.global_position
-		spike._physics_process(0.8)
-		var rising: Vector3 = spike.global_position
-		spike._physics_process(1.4)
-		var landing: Vector3 = spike.global_position
-		_check(rising.y > start.y and landing.y < rising.y, "Spike did not follow an arc")
-		_check(
-			Vector2(landing.x - start.x, landing.z - start.z).length() > 1.0,
-			"Spike did not move outward while arcing"
-		)
-		spike.set_physics_process(true)
-	behavior.next_skill = 1
+		if child.get_script() == HAZARD_SCRIPT and bool(child.get("spike")):
+			projectile_spikes += 1
+	_check(
+		projectile_spikes == 0, "Spiky Inflation should no longer shoot flying spike projectiles"
+	)
+	_check(
+		behavior.state == BlubberbeardBoss.State.SPIKY_HOLD and behavior.timer >= 1.0,
+		"Spiky Inflation did not hold enlarged spiked puffer state cleanly"
+	)
+	_check(
+		(
+			behavior.visual.clip == BlubberbeardVisual.Clip.INFLATE_BURST
+			and behavior.visual.pose == BlubberbeardVisual.Pose.ACTIVE
+		),
+		"Spiky Inflation hold did not activate enlarged spiky visual"
+	)
+	_check(
+		target.damage_received >= behavior.skill.damage,
+		"Spiky Inflation close burst did not hit nearby target"
+	)
+	behavior.fight_tick(0.6)
+	_check(
+		behavior.state == BlubberbeardBoss.State.SPIKY_HOLD,
+		"Spiky Inflation exited hold state too quickly"
+	)
+	behavior.fight_tick(behavior.skill.spiky_hold_duration)
+	_check(
+		behavior.state == BlubberbeardBoss.State.RECOVERY,
+		"Spiky Inflation did not transition cleanly into recovery after holding"
+	)
+	behavior.forced_skill_index = 3
 	behavior._choose_skill()
+	behavior._execute_skill()
 	var death_position := boss.global_position
 	boss.take_damage(maximum_hp * 0.5)
 	boss.take_damage(10.0)
 	_check(
-		not behavior.charge_hitbox.is_active(),
-		"Death did not cancel the charge hitbox"
+		not behavior._whirlwind_rig.hitbox.is_active(), "Death did not cancel the whirlwind hitbox"
 	)
 	await physics_frame
 	await process_frame

@@ -38,15 +38,13 @@ diagonal and pointing upper right, ivory tip, turquoise base, orange accents, bo
 outline, pixel art, isolated on a transparent background; no text or characters."
 The sprite and swept collision follow the same arc in `boss_hazard.gd`.
 
-The first `hits_before_evade` damaging hits show the hurt animation; the next hit makes
-Blubberbeard exhale at the starting position, fly away in a small wrinkled balloon-like
-form with a steam trail, and then stop and inhale to reinflate. The triggering hit deals
-damage; he is immune through the entire defense. The counter resets when an evade starts.
-Hits during the cooldown count toward the next evade, which can start on a subsequent hit
-after the cooldown. `hits_before_evade` (default 2), `evade_speed` and `evade_cooldown`
-are exposed on the `CaptainBlubberbeard` root node (`BlubberbeardBoss`). `evade_speed` is the initial horizontal launch speed;
-air drag slows the boss, ground contact causes a small bounce and friction, and wall
-collisions reflect the motion with reduced speed.
+The first `hits_before_counter` damaging hits outside super-armored attack windows show the
+hurt reaction; the next vulnerable hit triggers `COUNTER_SHOCK` recoil followed immediately by
+a close-range `SPIKY_INFLATION` burst and prolonged giant spiky hold (`spiky_hold_duration`,
+no projectile needles). During active windups, parabolic leap, spiky hold, and
+Anchor Whirlwind, `super_armor_during_attacks` keeps attacks uninterruptible while still taking
+full damage and hit flash. `hits_before_counter`, `counter_cooldown`, `spiky_hold_duration`, and
+`super_armor_during_attacks` are exposed on `CaptainBlubberbeard` (`BlubberbeardBoss`).
 
 Powder barrels show their damage radius on the ground as soon as the throw is prepared;
 the indicator intensifies until detonation. The barrels travel more slowly, and the
@@ -75,9 +73,19 @@ radius and attack timing remain owned by the hazard and skill resources.
 
 See `res://gameplay/bosses/README.md` for the shared boss and behavior extension contract.
 
-## Combat Upgrades & Collapsed Exit Bridge
+## Stage B Combat Kit & AI Rework
 
-- **Stats & Combat (`blubberbeard_data.tres`, `blubberbeard.gd`):** `max_hp` is tuned to `120.0` with faster movement (`move_speed = 5.2`), quicker charges (`13.5` Phase 1 / `18.0` Phase 2) with early-windup aim tracking and wall-impact AoE shockwaves, distance-weighted `smart_skill_selection`, lead-aimed `POWDER_BARREL` volleys, a close-range AoE burst + Phase 2 staggered second wave on `SPIKY_INFLATION`, a close-range `Anchor Slam` attack (`anchor_slam_*` exports) with ground telegraph, and `evade_drops_barrels` counter-traps. In `blubberbeard_room.tscn`, `hits_before_evade` is set to `5` (`evade_cooldown = 5.0`) and `super_armor_during_attacks` is enabled (`true`) so player hits during `WINDUP`/`CHARGE` do not interrupt active attacks (`false` by default on `blubberbeard.tscn` for standalone evade tests).
+- **Position-Aware Dynamic AI & Circling Pacing (`blubberbeard_ai.gd`, `blubberbeard.gd`):** Chooses skills using structured distance + arena-boundary rules (`POSITION_RULES`), per-skill cooldowns, repeat penalties, and weighted randomness:
+  - *Close (`<= 4.5m`):* heavily favors `SPIKY_INFLATION` (plus `ANCHOR_WHIRLWIND` / `ANCHOR_SLAM` in open space), never jumps away.
+  - *Mid (`4.5–9.5m`):* open space mixes `VENOM_SPIT`, `SKY_DIVE`, `POWDER_BARREL`, and `ANCHOR_WHIRLWIND`; near cliff/wall edges strongly prefers `POWDER_BARREL`.
+  - *Far (`> 9.5m`):* open space randomizes across `SKY_DIVE` (parabolic leap), `POWDER_BARREL`, and Phase 2 `VENOM_SPIT`; when the player is near an arena boundary (`ai_boundary_margin = 3.6m`), strictly chooses `POWDER_BARREL` (and keeps barrel spread inside walkable ground) so ground craters and poison puddles do not spawn awkwardly off edges.
+  - After each `RECOVERY`, the boss enters a `WAIT` circling stalk window (`1.85s` Phase 1 / `1.25s` Phase 2 with jitter). `max_hp` is balanced to `68.0` (`2.0–4.0` skill damage).
+- **Parabolic Leap / Sky Dive (`blubberbeard_skydive.gd`, `blubberbeard_skydive.png`):** Replaces `BELLY_CHARGE`. Blubberbeard squats and launches on a heavy parabolic arc straight onto the player's locked spot (`anchor_whirlwind_props.png` frame `7`), casting a ground shadow below and emitting mid-air afterimages + movement dust puffs along the flight arc (without an initial takeoff smoke burst) before slamming down with a shattered seabed crater AoE (`frame 6`).
+- **Proportional Scale, Colliders & Debug Phase 2 (`blubberbeard_size_rig.gd`, `blubberbeard.tscn`, `boss_health_ui.tscn`):** Boss sprite (`pixel_size = 0.017`), `Body` cylinder collider (`1.25m`), contact `ChargeHitBox` (`1.0m`), and AoE damage zones scale dynamically via `boss_size_scale`, Phase 2 enrage (`1.1x`), and `SPIKY_HOLD` (`1.32x`), while `HurtBox` (`1.85m+`) always extends beyond `Body` and `ChargeHitBox` so melee players can fight close safely. In debug builds (`OS.is_debug_build()`), click `Debug: Phase 2 [F8]` in `BossHealthUI` or press `F8` to test Phase 2 directly without dealing attack damage.
+- **Spiky Hold & Counter (`blubberbeard.gd`):** Replaces the old balloon flee evade and spike projectiles. Blubberbeard inflates huge (`1.32x`) bristling spines around his body for `spiky_hold_duration` (`~1.2s–1.35s`), dealing an initial radial burst AoE and punishing melee contact while puffed before exhaling. After `hits_before_counter` (`6` in `blubberbeard_room.tscn`, `counter_cooldown = 7.5`), vulnerable hits trigger `COUNTER_SHOCK` followed by an immediate Spiky Hold counter; `super_armor_during_attacks = true` keeps active attacks uninterruptible.
+- **Escalating Barrel Barrage (`POWDER_BARREL`):** Throws escalating waves (`1 -> 2 -> 3` in Phase 1, `1 -> 2 -> [3..5]` simultaneous salvo in Phase 2). Initial waves follow the player's current position directly while subsequent/final barrels scatter randomly nearby.
+- **Anchor Chain Whirlwind (`anchor_whirlwind_rig.gd`, `blubberbeard_anchor_whirlwind.png`, `anchor_whirlwind_props.png`):** Phase 2 attack telegraphing a cursed compass warning seal before swinging an iron chain + skull anchor + cleave arc `1–2` rotations around Blubberbeard (`tag = &"boss_whirlwind"`).
+- **Venom Spit (`blubberbeard_venom_hazard.gd`, `blubberbeard_venom_spit_4dir.png`, `venom_glob_and_puddle.png`):** Phase 2 4-directional venom volley spitting glowing globs that splash into animated bubbling poison puddles (`tag = &"poison"` periodic damage).
 - **Locked Room & Collapsing Bridge (`blubberbeard_room.gd`, `blubberbeard_arena.gd`):** Entering `blubberbeard_room.tscn` while Blubberbeard is alive immediately locks `Exits/LeftPath/SceneChangeTrigger`, raises a collapse barrier (`ExitBridge/ExitCollapseBarrier`), and drops the wooden exit bridge (`ExitBridge`) into the sea. Defeating Blubberbeard (`fight_finished`) unlocks the exit and restores the bridge; re-entering the room after defeat keeps the bridge intact. Phase 2 also shifts the room `WorldEnvironment` to a darker storm tone.
 
 ## Development Roadmap

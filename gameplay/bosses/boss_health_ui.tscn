@@ -22,7 +22,7 @@ script = ExtResource("1")
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 14.0
-offset_bottom = 70.0
+offset_bottom = 90.0
 mouse_filter = 2
 
 [node name="Title" type="Label" parent="Root"]
@@ -42,3 +42,18 @@ offset_top = 29.0
 offset_bottom = 50.0
 theme_override_styles/background = SubResource("Background")
 show_percentage = false
+
+[node name="DebugPhase2Button" type="Button" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -95.0
+offset_top = 56.0
+offset_right = 95.0
+offset_bottom = 82.0
+grow_horizontal = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+text = "Debug: Phase 2 [F8]"
