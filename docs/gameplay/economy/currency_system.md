@@ -19,8 +19,7 @@ potion and 26–27 fund a large one; 3 elite kills guarantee a small potion and
 `EnemyData` exposes `Gold Drop / Min Gold Amount`, `Max Gold Amount` and
 `Gold Drop Chance`. A successful drop samples a uniform integer including both
 endpoints. Invalid ranges are rejected; max zero disables Gold. Elite data
-resources override the regular defaults. War Lord Turtle has min/max set to zero
-until a separate boss reward is specified.
+resources override the regular defaults.
 
 Gold and the existing material drop roll independently. Gold rolls once per death:
 a successful roll requests exactly the sampled amount of separate coins, each

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c3xa7fx4nfjx2" path="res://gameplay/npcs/base/npc_visual.gd" id="2_l8274"]
 [ext_resource type="Texture2D" uid="uid://cs78ha0hbmq2w" path="res://assets/sprites/npcs/master_tortuga/Master_Tortuga_Idle.png" id="3_gnmsh"]
-[ext_resource type="Texture2D" uid="uid://boygebnjr0o5t" path="res://assets/sprites/enemies/war_lord_turtle/war_lord_turtle_idle_1.png" id="4_kchqp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/shared_placeholder/idle.png" id="4_kchqp"]
 [ext_resource type="Texture2D" uid="uid://cosmx2jjbfa1y" path="res://assets/sprites/npcs/master_tortuga/Master_Tortuga_Talking.png" id="5_4f57c"]
 [ext_resource type="AnimationLibrary" uid="uid://brpsylflg2vk7" path="res://gameplay/npcs/silas/silas_npc_anims.tres" id="5_gd6i5"]
 [ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="6_4f57c"]
