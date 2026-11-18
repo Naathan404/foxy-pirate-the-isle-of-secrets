@@ -15,8 +15,8 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 ## 2. Hiện trạng & những phần đã triển khai bước đầu
 
 ### Đã hoàn thành ở bước nâng cấp cơ bản (Giai đoạn A)
-- **Chỉ số nền tảng**: `max_hp` trong [blubberbeard_data.tres](../../data/bosses/blubberbeard_data.tres) đã nâng từ `10.0` lên `120.0`, tăng tốc độ di chuyển (`move_speed = 5.2`), giảm `recovery`/`skill_interval` và nâng `hits_before_evade = 5` trong [blubberbeard_room.tscn](../../world/coral_valley/scenes/stages/blubberbeard_room.tscn).
-- **Khóa lối ra bằng cơ chế sập cầu**: [blubberbeard_room.gd](../../world/coral_valley/scenes/stages/blubberbeard_room.gd) tự động khóa `LeftPath/SceneChangeTrigger`, bật rào chắn và làm sập cây cầu gỗ nối lối ra khi bước vào map mà boss còn sống; cầu và lối ra tự khôi phục ngay khi hạ boss (`fight_finished`).
+- **Chỉ số nền tảng & Super Armor**: `max_hp` trong [blubberbeard_data.tres](../../data/bosses/blubberbeard_data.tres) đã nâng từ `10.0` lên `120.0`, tăng tốc độ di chuyển (`move_speed = 5.2`), giảm `recovery`/`skill_interval`, nâng `hits_before_evade = 5` (`evade_cooldown = 5.0`) và bật `super_armor_during_attacks = true` trong [blubberbeard_room.tscn](../../world/coral_valley/scenes/stages/blubberbeard_room.tscn) để boss không bị ngắt chiêu (`WINDUP`/`CHARGE`) khi bị đánh dồn.
+- **Khóa lối ra bằng cơ chế sập cầu**: [blubberbeard_room.gd](../../world/coral_valley/scenes/stages/blubberbeard_room.gd) tự động khóa `LeftPath/SceneChangeTrigger`, bật rào chắn và làm sập cây cầu gỗ nối lối ra khi bước vào map mà boss còn sống; cầu và lối ra tự khôi phục ngay khi hạ boss (`fight_finished`), cho phép Player đi bộ thông suốt qua cầu ra lại cửa thoát.
 - **Tối ưu tạm cho bộ chiêu cũ**: [blubberbeard.gd](../../gameplay/bosses/blubberbeard/blubberbeard.gd) đã có chọn chiêu theo khoảng cách (`smart_skill_selection`), đòn `Anchor Slam` cận chiến cơ bản, ném thùng đón đầu, phản công thả thùng khi xì hơi và làm tối môi trường Phase 2 trong [blubberbeard_arena.gd](../../world/coral_valley/scenes/stages/blubberbeard_arena.gd).
 
 ### Những giới hạn còn lại cần xử lý ở bản rework tiếp theo
@@ -93,8 +93,8 @@ Biến trận đấu với Captain Blubberbeard thành một màn đối đầu 
 
 ## 5. Trình tự triển khai đề xuất
 
-1. **Giai đoạn A — Nền tảng & Khóa phòng *(Đã hoàn thành bước cơ bản)***:
-   - Nâng chỉ số trong `blubberbeard_data.tres`, bổ sung `Anchor Slam` tạm thời, khóa lối ra và sập/phục hồi cầu tại `blubberbeard_room.gd`, làm tối ánh sáng Phase 2 tại `blubberbeard_arena.gd`.
+1. **Giai đoạn A — Nền tảng & Khóa phòng *(Hoàn thành)***:
+   - Nâng chỉ số trong `blubberbeard_data.tres`, bổ sung `Anchor Slam` tạm thời, bật `super_armor_during_attacks` chống ngắt chiêu ở `blubberbeard_room.tscn`, khóa lối ra và sập/phục hồi cầu đi bộ qua được tại `blubberbeard_room.gd`, làm tối ánh sáng Phase 2 tại `blubberbeard_arena.gd`.
 2. **Giai đoạn B — Rework Bộ Chiêu Thức & AI của Captain Blubberbeard**:
    - Gỡ bỏ `BELLY_CHARGE` và cơ chế xì hơi bỏ chạy cũ; thay bằng **Sky Dive (bay lượn & đáp)**, **Phình Gai cận chiến + phản đòn khi bị đánh dồn**, **Ném thùng `1 -> 2 -> [3..5]`**, **Xoay Mỏ Neo dây xích** và **Phun Xì Hơi Độc**.
    - Xây dựng hệ thống chọn chiêu ngẫu nhiên theo trọng số khoảng cách + cooldown + khóa kỹ năng theo Phase.

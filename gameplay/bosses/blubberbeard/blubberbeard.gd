@@ -29,6 +29,7 @@ const EVADE_GROUND_RESTITUTION := 0.15
 ## Number of damaging hits that show hurt before the next hit triggers an evade.
 @export_range(0, 20, 1) var hits_before_evade: int = 2
 @export var evade_drops_barrels: bool = true
+@export var super_armor_during_attacks: bool = false
 
 @export_group("Anchor Slam")
 @export var anchor_slam_enabled: bool = true
@@ -540,18 +541,28 @@ func _on_fight_ended() -> void:
 	visual.play_death(queue_free)
 
 
+func _has_super_armor() -> bool:
+	if not super_armor_during_attacks:
+		return false
+	return state == State.WINDUP or state == State.CHARGE
+
+
 func _hit_feedback(_amount: float) -> void:
-	if not dead:
-		visual.flash_hit()
-		if _hits_since_evade < hits_before_evade:
-			_hits_since_evade += 1
-			if state == State.WAIT or state == State.RECOVERY:
-				_hurt_remaining = visual.HURT_DURATION
-			return
-		if _evade_cooldown_left <= 0.0 and is_instance_valid(target):
-			_begin_evade()
-		elif state == State.WAIT or state == State.RECOVERY:
+	if dead:
+		return
+	visual.flash_hit()
+	var armored := _has_super_armor()
+	if _hits_since_evade < hits_before_evade:
+		_hits_since_evade += 1
+		if not armored and (state == State.WAIT or state == State.RECOVERY):
 			_hurt_remaining = visual.HURT_DURATION
+		return
+	if armored:
+		return
+	if _evade_cooldown_left <= 0.0 and is_instance_valid(target):
+		_begin_evade()
+	elif state == State.WAIT or state == State.RECOVERY:
+		_hurt_remaining = visual.HURT_DURATION
 
 
 func _begin_evade() -> void:
@@ -694,9 +705,13 @@ func _begin_anchor_slam() -> void:
 	state = State.WINDUP
 	timer = _current_slam_windup()
 	visual.moving = false
-	var dir := target.global_position - global_position
-	dir.y = 0.0
-	charge_direction = dir.normalized() if not dir.is_zero_approx() else Vector3.BACK
+	var dir := charge_direction if not charge_direction.is_zero_approx() else Vector3.BACK
+	if is_instance_valid(target):
+		var delta := target.global_position - global_position
+		delta.y = 0.0
+		if not delta.is_zero_approx():
+			dir = delta.normalized()
+	charge_direction = dir
 	visual.face_direction(charge_direction)
 	visual.begin_windup(BlubberbeardSkillData.Kind.ANCHOR_SLAM)
 	_slam_impact_position = global_position + charge_direction * anchor_slam_forward_offset
