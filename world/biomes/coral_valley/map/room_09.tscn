@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c548sl61x5ea6"]
 
-[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ground"]
 [ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://assets/sprites/biomes/coral_valley/Whimsical Square Beach Island Tile.png" id="3_ground_texture"]
 [ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="4_platform"]
@@ -114,7 +114,7 @@ shape = SubResource("BoxShape3D_68fjj")
 shape = SubResource("BoxShape3D_ucece")
 
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 80.86298, -0.01078605, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 70.654852, -0.05280208, 0)
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_16o5g")
@@ -135,7 +135,7 @@ shape = SubResource("BoxShape3D_mebl1")
 shape = SubResource("BoxShape3D_4ngaf")
 
 [node name="BaseGround2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1946064963 instance=ExtResource("2_ground")]
-transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 49, 0, -0.19104576)
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 43, 0, -0.19104576)
 
 [node name="Sprite3D" parent="Environment/BaseGround2" index="0" unique_id=516185212]
 texture = ExtResource("3_ground_texture")
@@ -145,26 +145,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, -0.13125)
 shape = SubResource("BoxShape3D_d5863")
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 87.74702, 0, -37.27992)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78.538887, 0, -34.597424)
 
 [node name="MovingPlatform" parent="." index="5" unique_id=628028005 instance=ExtResource("4_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.04, 0.00209618, -0.19104576)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, -0.03991985, -0.19104576)
 
 [node name="CollisionShape3D" parent="MovingPlatform/Platform" parent_id_path=PackedInt32Array(628028005, 1191972229) index="2" unique_id=395830429]
 shape = SubResource("BoxShape3D_1e0qy")
 
 [node name="End" parent="MovingPlatform" index="2" unique_id=1910727390]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.95, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.425, 0, 0)
 
 [node name="StartDock" parent="MovingPlatform" index="3" unique_id=1539520790]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4, 0.77503157, -4)
 
 [node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 18.95, 0.77503157, -4)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 18.425, 0.77503157, -4)
 
 [node name="RandomProps" type="Node3D" parent="."]
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-9, 0, -7, 8, 0, -9, -8, 0, 9, 41, 0, 6, 48, 0, -9, 56, 0, 5)
+spawn_positions = PackedVector3Array(-8, 0, -7, 8, 0, -8, -7, 0, 8, 36, 0, 6, 42, 0, -8, 49, 0, 5)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

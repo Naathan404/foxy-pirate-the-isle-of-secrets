@@ -217,7 +217,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.506, 0, -15.831)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.802, 0, -14.859)
 
 [node name="Seaweed12" parent="SeaweedPatches/NorthRim" index="11" unique_id=1286573371 instance=ExtResource("7_seaweed_3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.356, 0, -13.320)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.356, 0, -13.32)
 
 [node name="Seaweed13" parent="SeaweedPatches/NorthRim" index="12" unique_id=13472818 instance=ExtResource("7_seaweed_1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.156, 0, -12.021)
@@ -234,10 +234,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.064, 0, -15.708)
 [node name="EastRim" type="Node3D" parent="SeaweedPatches" index="1" unique_id=259200665]
 
 [node name="Seaweed14" parent="SeaweedPatches/EastRim" index="0" unique_id=2045221744 instance=ExtResource("7_seaweed_2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.084, 0, -10.420)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.084, 0, -10.42)
 
 [node name="Seaweed15" parent="SeaweedPatches/EastRim" index="1" unique_id=604268251 instance=ExtResource("7_seaweed_3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.550, 0, -9.015)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.55, 0, -9.015)
 
 [node name="Seaweed16" parent="SeaweedPatches/EastRim" index="2" unique_id=1983290825 instance=ExtResource("7_seaweed_1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.122, 0, -7.599)
@@ -275,10 +275,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.977, 0, 14.318)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.789, 0, 15.229)
 
 [node name="Seaweed27" parent="SeaweedPatches/SouthRim" index="2" unique_id=669759474 instance=ExtResource("7_seaweed_3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.962, 0, 16.540)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.962, 0, 16.54)
 
 [node name="Seaweed28" parent="SeaweedPatches/SouthRim" index="3" unique_id=640762831 instance=ExtResource("7_seaweed_1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.563, 0, 16.490)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.563, 0, 16.49)
 
 [node name="Seaweed29" parent="SeaweedPatches/SouthRim" index="4" unique_id=863548977 instance=ExtResource("7_seaweed_2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.083, 0, 16.727)
@@ -296,7 +296,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.717, 0, 16.672)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.814, 0, 16.439)
 
 [node name="Seaweed34" parent="SeaweedPatches/SouthRim" index="9" unique_id=532603175 instance=ExtResource("7_seaweed_1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.851, 0, 15.550)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.851, 0, 15.55)
 
 [node name="Seaweed35" parent="SeaweedPatches/SouthRim" index="10" unique_id=27974612 instance=ExtResource("7_seaweed_2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.782, 0, 13.866)
@@ -304,7 +304,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.782, 0, 13.866)
 [node name="WestRim" type="Node3D" parent="SeaweedPatches" index="3" unique_id=1284906652]
 
 [node name="Seaweed36" parent="SeaweedPatches/WestRim" index="0" unique_id=339835014 instance=ExtResource("7_seaweed_3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.391, 0, 12.670)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.391, 0, 12.67)
 
 [node name="Seaweed37" parent="SeaweedPatches/WestRim" index="1" unique_id=327814924 instance=ExtResource("7_seaweed_1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.888, 0, 11.639)

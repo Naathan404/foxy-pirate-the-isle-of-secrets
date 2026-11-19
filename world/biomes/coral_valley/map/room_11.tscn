@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
@@ -123,7 +123,7 @@ shape = SubResource("BoxShape3D_left_trigger")
 
 [node name="RandomProps" type="Node3D" parent="."]
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-9, 0, -8, -7, 0, 7, 6, 0, -9, 10, 0, 5, -4, 0, -11, 5, 0, 11)
+spawn_positions = PackedVector3Array(-7.5, 0, -6.458, -5.833, 0, 6.042, 5, 0, -7.291, 8.333, 0, 4.376, -3.333, 0, -8.958, 4.167, 0, 9.376)
 
 [editable path="Environment/BaseGround"]
 [editable path="Exits/DownPath"]
