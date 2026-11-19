@@ -27,6 +27,7 @@ var _bob_weight: float = 0.0
 var _dash_follow_active := false
 var _dash_hold_remaining := 0.0
 var _dash_camera_position := Vector3.ZERO
+var _cinematic_tween: Tween
 
 
 func _ready() -> void:
@@ -142,6 +143,63 @@ func end_dialogue_override() -> void:
 	_bob_weight = 0.0
 	position = _follow_offset
 	set_bounded_global_position(global_position)
+
+
+func play_focus_cinematic(
+	world_target: Vector3,
+	target_fov: float,
+	restore_fov: float,
+	in_seconds: float,
+	hold_seconds: float,
+	out_seconds: float
+) -> void:
+	if _cinematic_tween != null and _cinematic_tween.is_valid():
+		_cinematic_tween.kill()
+	begin_dialogue_override()
+	_cinematic_tween = create_tween()
+	_cinematic_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_cinematic_tween.tween_property(self, "fov", target_fov, maxf(0.05, in_seconds))
+	_cinematic_tween.parallel().tween_method(
+		set_bounded_global_position,
+		global_position,
+		get_target_follow_position(world_target),
+		maxf(0.05, in_seconds)
+	)
+	_cinematic_tween.tween_interval(maxf(0.0, hold_seconds))
+	_cinematic_tween.tween_callback(restore_cinematic.bind(restore_fov, out_seconds))
+
+
+func restore_cinematic(restore_fov: float, duration_seconds: float = 0.0) -> void:
+	if _cinematic_tween != null and _cinematic_tween.is_valid():
+		_cinematic_tween.kill()
+	if duration_seconds <= 0.0 or not is_inside_tree():
+		fov = restore_fov
+		end_dialogue_override()
+		return
+	var return_from := global_position
+	_cinematic_tween = create_tween().set_parallel(true)
+	_cinematic_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_cinematic_tween.tween_property(self, "fov", restore_fov, duration_seconds)
+	_cinematic_tween.tween_method(
+		func(progress: float) -> void:
+			var dest := get_follow_world_position()
+			set_bounded_global_position(return_from.lerp(dest, progress)),
+		0.0,
+		1.0,
+		duration_seconds
+	)
+	_cinematic_tween.set_parallel(false)
+	_cinematic_tween.tween_callback(end_dialogue_override)
+
+
+func get_follow_world_position() -> Vector3:
+	if is_instance_valid(_player):
+		return _player.global_position + _follow_offset
+	return global_position
+
+
+func get_target_follow_position(world_target: Vector3) -> Vector3:
+	return world_target + _follow_offset
 
 
 func set_bounded_global_position(desired_position: Vector3) -> void:

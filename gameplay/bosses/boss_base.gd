@@ -260,7 +260,8 @@ func _on_death() -> void:
 	if is_instance_valid(behavior):
 		behavior.fight_ended()
 	fight_finished.emit()
-	_spawn_reward.call_deferred()
+	if _should_spawn_reward_on_death():
+		_spawn_reward.call_deferred()
 
 
 func _on_boss_setup() -> void:
@@ -335,10 +336,15 @@ func _on_fight_ended() -> void:
 	pass
 
 
-func _spawn_reward() -> void:
+func _should_spawn_reward_on_death() -> bool:
+	return true
+
+
+func _spawn_reward() -> Node3D:
 	if reward_chest == null or not is_inside_tree():
-		return
+		return null
 	var chest := reward_chest.instantiate() as Node3D
 	get_parent().add_child(chest)
 	chest.global_position = global_position
 	reward_spawned.emit(chest)
+	return chest
