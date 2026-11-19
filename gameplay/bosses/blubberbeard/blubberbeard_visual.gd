@@ -2,7 +2,7 @@ class_name BlubberbeardVisual
 extends Sprite3D
 ## Điều khiển sprite 4 hướng và toàn bộ animation chiến đấu của Captain Blubberbeard.
 
-enum Pose { IDLE, WINDUP, ACTIVE, RECOVERY }
+enum Pose { IDLE, WINDUP, ACTIVE, STAGGERED, RECOVERY }
 enum Clip {
 	IDLE,
 	MOVE,
@@ -21,6 +21,7 @@ enum Clip {
 	WHIRLWIND_BRAKE,
 	VENOM_SPIT,
 	COUNTER_SHOCK,
+	STAGGERED,
 	HIT,
 	DEATH,
 }
@@ -94,6 +95,8 @@ var _hit_flash: float = 0.0
 var _hit_clip_left: float = 0.0
 var _hit_clip_duration: float = HURT_DURATION
 var _burst_left: float = 0.0
+var _recovery_duration: float = RECOVERY_ANIMATION_TIME
+var _stagger_duration: float = 1.25
 var _spiky_hold_total: float = 1.25
 var _facing: Vector3 = Vector3.BACK
 var _lean: float = 1.0
@@ -147,7 +150,10 @@ func _process(delta: float) -> void:
 	_hit_flash = maxf(0.0, _hit_flash - step)
 	_hit_clip_left = maxf(0.0, _hit_clip_left - step)
 	_impact_left = maxf(0.0, _impact_left - step)
-	if pose == Pose.RECOVERY and _clip_time >= RECOVERY_ANIMATION_TIME:
+	if pose == Pose.RECOVERY and _clip_time >= _recovery_duration:
+		pose = Pose.IDLE
+		_set_clip(Clip.MOVE if moving else Clip.IDLE)
+	elif pose == Pose.STAGGERED and _clip_time >= _stagger_duration:
 		pose = Pose.IDLE
 		_set_clip(Clip.MOVE if moving else Clip.IDLE)
 	if _burst_left > 0.0:
@@ -193,9 +199,14 @@ func _process(delta: float) -> void:
 			else:
 				desired_scale *= Vector3(1.04, 0.96, 1.0)
 				desired_position.y += sin(_clock * 8.0) * 0.14
-		Pose.RECOVERY:
-			desired_scale *= Vector3(1.05, 0.94, 1.0)
-			desired_rotation = -0.05 * _lean
+		Pose.STAGGERED, Pose.RECOVERY:
+			if pose == Pose.STAGGERED or clip == Clip.WHIRLWIND_BRAKE:
+				var pant := sin(_clock * 9.0)
+				desired_scale *= Vector3(1.06 + pant * 0.035, 0.92 - pant * 0.04, 1.0)
+				desired_rotation = (-0.06 + pant * 0.04) * _lean
+			else:
+				desired_scale *= Vector3(1.05, 0.94, 1.0)
+				desired_rotation = -0.05 * _lean
 	if _impact_left > 0.0 and _impact_duration > 0.0:
 		var weight := _impact_left / _impact_duration
 		desired_scale *= Vector3(1.0 + _impact_power * weight, 1.0 - _impact_power * weight, 1.0)
@@ -296,10 +307,11 @@ func face_direction(direction: Vector3) -> void:
 	_update_active_frame()
 
 
-func begin_recovery(kind: int) -> void:
+func begin_recovery(kind: int, duration: float = RECOVERY_ANIMATION_TIME) -> void:
 	airborne_height = 0.0
 	_hit_clip_left = 0.0
 	_burst_left = 0.0
+	_recovery_duration = maxf(RECOVERY_ANIMATION_TIME, duration)
 	if kind == BlubberbeardSkillData.Kind.SKY_DIVE:
 		pose = Pose.RECOVERY
 		_set_clip(Clip.SKYDIVE_IMPACT)
@@ -330,6 +342,17 @@ func flash_hit() -> void:
 		HURT_FLASH_DURATION if pose in [Pose.WINDUP, Pose.ACTIVE] else HURT_DURATION
 	)
 	_hit_clip_left = _hit_clip_duration
+	_update_active_frame()
+
+
+func begin_staggered(duration_seconds: float) -> void:
+	airborne_height = 0.0
+	_hit_clip_left = 0.0
+	_burst_left = 0.0
+	_stagger_duration = maxf(0.2, duration_seconds)
+	pose = Pose.STAGGERED
+	_set_clip(Clip.STAGGERED)
+	impact(0.28, 0.32)
 	_update_active_frame()
 
 
@@ -448,7 +471,7 @@ func _apply_clip_frame(active_clip: Clip, time_in_clip: float) -> void:
 			_set_sheet(WHIRLWIND_SHEET, 4, 2)
 			var idx := int(time_in_clip * whirlwind_fps) % WHIRLWIND_SPIN_FRAMES.size()
 			frame = WHIRLWIND_SPIN_FRAMES[idx]
-		Clip.WHIRLWIND_BRAKE:
+		Clip.WHIRLWIND_BRAKE, Clip.STAGGERED:
 			_set_sheet(WHIRLWIND_SHEET, 4, 2)
 			frame = 6 if time_in_clip < 0.22 else 7
 		Clip.VENOM_SPIT:
@@ -486,6 +509,7 @@ func _resolve_facing_row(active_clip: Clip) -> int:
 		Clip.WHIRLWIND_SPIN,
 		Clip.WHIRLWIND_BRAKE,
 		Clip.COUNTER_SHOCK,
+		Clip.STAGGERED,
 		Clip.HIT,
 		Clip.DEATH,
 	]

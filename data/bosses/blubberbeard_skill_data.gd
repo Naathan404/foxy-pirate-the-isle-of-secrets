@@ -39,7 +39,7 @@ enum Kind {
 @export_range(0.3, 3.0, 0.05, "suffix:s") var spiky_hold_duration: float = 1.25
 
 @export_group("Anchor Whirlwind")
-@export_range(1, 4, 1) var whirlwind_rotations_min: int = 1
+@export_range(1, 4, 1) var whirlwind_rotations_min: int = 2
 @export_range(1, 4, 1) var whirlwind_rotations_max: int = 2
 @export_range(2.0, 10.0, 0.2, "suffix:m") var whirlwind_reach_radius: float = 6.0
 @export_range(1.0, 15.0, 0.2, "suffix:rad/s") var whirlwind_angular_speed: float = 7.2
