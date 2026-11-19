@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ctrd66n0ok652"
-path.s3tc="res://.godot/imported/seaweed.png-a41ff8112ebf9f05580a8c4335f270f7.s3tc.ctex"
+uid="uid://c6po88g8iovlp"
+path.s3tc="res://.godot/imported/seaweed_3.png-5ce943648039ba6a6d73e354d4f25923.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sprites/biomes/coral_valley/seaweed.png"
-dest_files=["res://.godot/imported/seaweed.png-a41ff8112ebf9f05580a8c4335f270f7.s3tc.ctex"]
+source_file="res://assets/sprites/biomes/coral_valley/seaweed_3.png"
+dest_files=["res://.godot/imported/seaweed_3.png-5ce943648039ba6a6d73e354d4f25923.s3tc.ctex"]
 
 [params]
 

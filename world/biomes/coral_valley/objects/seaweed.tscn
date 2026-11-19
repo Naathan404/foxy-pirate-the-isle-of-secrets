@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://bk6eo2lho5r40"]
+[gd_scene format=3 uid="uid://imw31yqwmatq"]
 
 [ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
-[ext_resource type="Texture2D" uid="uid://ctrd66n0ok652" path="res://assets/sprites/biomes/coral_valley/seaweed.png" id="2_texture"]
+[ext_resource type="Texture2D" path="res://assets/sprites/biomes/coral_valley/seaweed.png" id="2_texture"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1tmf2"]
 size = Vector3(3.1, 2, 0.9)

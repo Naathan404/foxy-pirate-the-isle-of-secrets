@@ -123,7 +123,6 @@ shape = SubResource("BoxShape3D_left_trigger")
 
 [node name="RandomProps" type="Node3D" parent="."]
 script = ExtResource("random_props")
-include_coral = true
 spawn_positions = PackedVector3Array(-9, 0, -8, -7, 0, 7, 6, 0, -9, 10, 0, 5, -4, 0, -11, 5, 0, 11)
 
 [editable path="Environment/BaseGround"]

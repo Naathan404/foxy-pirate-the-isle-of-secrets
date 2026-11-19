@@ -3,6 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/beach/beach_palm_01.tscn" id="palm_leaning"]
+[ext_resource type="PackedScene" path="res://world/biomes/beach/beach_palm_02.tscn" id="palm_short"]
+[ext_resource type="PackedScene" path="res://world/biomes/beach/beach_palm_03.tscn" id="palm_tall"]
 
 [sub_resource type="Environment" id="Environment_tbjtc"]
 resource_local_to_scene = true
@@ -148,7 +151,9 @@ shape = SubResource("BoxShape3D_41kbq")
 
 [node name="RandomProps" type="Node3D" parent="."]
 script = ExtResource("random_props")
-include_coral = true
+prop_scenes = Array[PackedScene]([ExtResource("palm_leaning"), ExtResource("palm_short"), ExtResource("palm_tall")])
+min_spawn_count = 5
+max_spawn_count = 10
 spawn_positions = PackedVector3Array(11.78, 0, -3.63, -8.58, 0, 7.69, -3.43, 0, -13.04, 4.4, 0, 11.16, -5.24, 0, -5.78, -11.6, 0, 12.8, 0.62, 0, -4.6, -7.09, 0, 15.27, 6.29, 0, -6.5, 10.41, 0, 13.51, -9.99, 0, -3.75, 6.84, 0, -15.18, 0.45, 0, -11.21, 10.96, 0, 4.07, 9.16, 0, 9.46, 6.72, 0, -0.46, -7.27, 0, -15.62, -9.35, 0, -10.09, 13.01, 0, -8.22, 2.97, 0, 4.05)
 
 [editable path="Exits/DownPath"]

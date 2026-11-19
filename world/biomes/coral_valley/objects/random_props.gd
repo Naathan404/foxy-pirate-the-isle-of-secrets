@@ -16,6 +16,7 @@ const CORAL_SCENES: Array[PackedScene] = [
 @export var fixed_spawn_count := 0
 @export var prop_scenes: Array[PackedScene] = PROP_SCENES.duplicate()
 @export var include_coral: bool = false
+@export_range(3, 64, 1) var min_spawn_count := 3
 @export_range(3, 64, 1) var max_spawn_count := 6
 
 
@@ -27,7 +28,11 @@ func _ready() -> void:
 		return
 	var positions := Array(spawn_positions)
 	positions.shuffle()
-	var count := fixed_spawn_count if fixed_spawn_count > 0 else randi_range(3, max_spawn_count)
+	var count := (
+		fixed_spawn_count
+		if fixed_spawn_count > 0
+		else randi_range(min_spawn_count, maxi(min_spawn_count, max_spawn_count))
+	)
 	for index in mini(count, positions.size()):
 		var prop := scenes.pick_random().instantiate() as Node3D
 		prop.position = positions[index]

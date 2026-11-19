@@ -39,8 +39,11 @@ The 15 existing scenes keep their authored contents and scene UIDs. New material
 
 ## Random destructible props
 
-Coral becomes available at Checkpoint 2 (`room_05`) and its forward branches: `room_06`–`room_08`, `room_13`–`room_16`, and `room_22`–`room_25`. This follows map connectivity rather than numeric room order.
+The two Materials rooms have separate resource pools:
 
-`RandomProps.include_coral` defaults to false. Before Checkpoint 2 the pool contains shell, stone and octopus. Enabled rooms also include orange, pink and turquoise coral. Each of the six types has an equal 1/6 chance per spawned prop (50% coral in total). A room can roll no coral; three refers to the available coral types, not a guaranteed count. Existing spawn counts remain unchanged.
+- The left Materials room (`room_10`) spawns only orange, pink and turquoise coral.
+- The right Materials room (`room_14`) spawns only leaning, short and tall coconut palms.
 
-Materials rooms now use random props at their former coral placement positions; the pre-checkpoint Materials room (`room_10`) has no coral, while the later Materials room (`room_14`) includes all three coral types. They use the standard 3–6 props per room.
+Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
+
+Coral and coconut palms do not appear in any other Coral Valley room. Other rooms keep their existing spawn counts and shell, stone and octopus pools. `RandomProps.include_coral` stays false; the Materials rooms specify their own `prop_scenes` arrays.
