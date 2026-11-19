@@ -2,7 +2,7 @@ class_name BlubberbeardVisual
 extends Sprite3D
 ## Điều khiển sprite 4 hướng và toàn bộ animation chiến đấu của Captain Blubberbeard.
 
-enum Pose { IDLE, WINDUP, ACTIVE, RECOVERY }
+enum Pose { IDLE, WINDUP, ACTIVE, STAGGERED, RECOVERY }
 enum Clip {
 	IDLE,
 	MOVE,
@@ -21,6 +21,7 @@ enum Clip {
 	WHIRLWIND_BRAKE,
 	VENOM_SPIT,
 	COUNTER_SHOCK,
+	STAGGERED,
 	HIT,
 	DEATH,
 }
@@ -95,6 +96,7 @@ var _hit_clip_left: float = 0.0
 var _hit_clip_duration: float = HURT_DURATION
 var _burst_left: float = 0.0
 var _recovery_duration: float = RECOVERY_ANIMATION_TIME
+var _stagger_duration: float = 1.25
 var _spiky_hold_total: float = 1.25
 var _facing: Vector3 = Vector3.BACK
 var _lean: float = 1.0
@@ -151,6 +153,9 @@ func _process(delta: float) -> void:
 	if pose == Pose.RECOVERY and _clip_time >= _recovery_duration:
 		pose = Pose.IDLE
 		_set_clip(Clip.MOVE if moving else Clip.IDLE)
+	elif pose == Pose.STAGGERED and _clip_time >= _stagger_duration:
+		pose = Pose.IDLE
+		_set_clip(Clip.MOVE if moving else Clip.IDLE)
 	if _burst_left > 0.0:
 		_burst_left = maxf(0.0, _burst_left - step)
 		if _burst_left <= 0.0 and (pose == Pose.IDLE or clip == Clip.INFLATE_BURST):
@@ -194,8 +199,8 @@ func _process(delta: float) -> void:
 			else:
 				desired_scale *= Vector3(1.04, 0.96, 1.0)
 				desired_position.y += sin(_clock * 8.0) * 0.14
-		Pose.RECOVERY:
-			if clip == Clip.WHIRLWIND_BRAKE:
+		Pose.STAGGERED, Pose.RECOVERY:
+			if pose == Pose.STAGGERED or clip == Clip.WHIRLWIND_BRAKE:
 				var pant := sin(_clock * 9.0)
 				desired_scale *= Vector3(1.06 + pant * 0.035, 0.92 - pant * 0.04, 1.0)
 				desired_rotation = (-0.06 + pant * 0.04) * _lean
@@ -340,6 +345,17 @@ func flash_hit() -> void:
 	_update_active_frame()
 
 
+func begin_staggered(duration_seconds: float) -> void:
+	airborne_height = 0.0
+	_hit_clip_left = 0.0
+	_burst_left = 0.0
+	_stagger_duration = maxf(0.2, duration_seconds)
+	pose = Pose.STAGGERED
+	_set_clip(Clip.STAGGERED)
+	impact(0.28, 0.32)
+	_update_active_frame()
+
+
 func impact(power: float, duration: float) -> void:
 	_impact_power = clampf(power, 0.0, 0.5)
 	_impact_duration = maxf(duration, 0.01)
@@ -455,7 +471,7 @@ func _apply_clip_frame(active_clip: Clip, time_in_clip: float) -> void:
 			_set_sheet(WHIRLWIND_SHEET, 4, 2)
 			var idx := int(time_in_clip * whirlwind_fps) % WHIRLWIND_SPIN_FRAMES.size()
 			frame = WHIRLWIND_SPIN_FRAMES[idx]
-		Clip.WHIRLWIND_BRAKE:
+		Clip.WHIRLWIND_BRAKE, Clip.STAGGERED:
 			_set_sheet(WHIRLWIND_SHEET, 4, 2)
 			frame = 6 if time_in_clip < 0.22 else 7
 		Clip.VENOM_SPIT:
@@ -493,6 +509,7 @@ func _resolve_facing_row(active_clip: Clip) -> int:
 		Clip.WHIRLWIND_SPIN,
 		Clip.WHIRLWIND_BRAKE,
 		Clip.COUNTER_SHOCK,
+		Clip.STAGGERED,
 		Clip.HIT,
 		Clip.DEATH,
 	]

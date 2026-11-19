@@ -13,7 +13,7 @@ barrel_throw_gap_min = 0.32
 barrel_throw_gap_max = 0.48
 damage = 2.0
 windup = 1.25
-recovery = 0.9
+recovery = 0.8
 
 [sub_resource type="Resource" id="skydive1"]
 script = ExtResource("4")
@@ -23,7 +23,7 @@ skydive_leap_duration = 0.88
 skydive_max_range = 13.5
 damage = 3.0
 windup = 0.55
-recovery = 1.05
+recovery = 0.85
 
 [sub_resource type="Resource" id="spikes1"]
 script = ExtResource("4")
@@ -32,7 +32,7 @@ radius = 3.0
 spiky_hold_duration = 1.2
 damage = 2.5
 windup = 0.78
-recovery = 0.9
+recovery = 0.75
 
 [sub_resource type="Resource" id="phase1"]
 script = ExtResource("2")
@@ -49,7 +49,7 @@ barrel_throw_max = 5
 barrel_throw_duration = 0.48
 barrel_throw_gap_max = 0.38
 damage = 3.0
-recovery = 0.85
+recovery = 0.75
 
 [sub_resource type="Resource" id="skydive2"]
 script = ExtResource("4")
@@ -60,7 +60,7 @@ skydive_leap_duration = 0.72
 skydive_max_range = 15.0
 damage = 4.0
 windup = 0.45
-recovery = 1.0
+recovery = 0.8
 
 [sub_resource type="Resource" id="spikes2"]
 script = ExtResource("4")
@@ -69,7 +69,7 @@ radius = 3.4
 spiky_hold_duration = 1.35
 damage = 3.5
 windup = 0.7
-recovery = 0.85
+recovery = 0.7
 
 [sub_resource type="Resource" id="whirlwind2"]
 script = ExtResource("4")
@@ -77,8 +77,6 @@ kind = 4
 radius = 5.8
 speed = 1.5
 duration = 2.0
-whirlwind_rotations_min = 2
-whirlwind_rotations_max = 2
 whirlwind_reach_radius = 5.8
 whirlwind_angular_speed = 6.8
 damage = 3.5
@@ -97,7 +95,7 @@ venom_pool_duration = 4.2
 venom_tick_interval = 0.85
 damage = 2.5
 windup = 0.72
-recovery = 0.9
+recovery = 0.75
 
 [sub_resource type="Resource" id="phase2"]
 script = ExtResource("2")
@@ -108,5 +106,5 @@ skills = Array[ExtResource("3")]([SubResource("barrel2"), SubResource("skydive2"
 [resource]
 script = ExtResource("1")
 display_name = "Captain Blubberbeard"
-max_hp = 68.0
+max_hp = 115.0
 phases = Array[ExtResource("2")]([SubResource("phase1"), SubResource("phase2")])
