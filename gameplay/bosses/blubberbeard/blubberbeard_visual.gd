@@ -371,8 +371,8 @@ func play_death(finished: Callable) -> void:
 	pixel_size = _rest_pixel_size
 	_apply_clip_frame(Clip.DEATH, 0.0)
 	var tween := create_tween()
-	tween.tween_interval(0.95)
-	tween.tween_property(self, "modulate:a", 0.0, 0.45).set_ease(Tween.EASE_IN)
+	tween.tween_interval(2.05)
+	tween.tween_property(self, "modulate", Color(2.4, 2.0, 0.85, 0.0), 0.45).set_ease(Tween.EASE_IN)
 	tween.tween_callback(finished)
 
 
@@ -492,7 +492,7 @@ func _apply_clip_frame(active_clip: Clip, time_in_clip: float) -> void:
 			frame = mini(3, int(time_in_clip / HURT_DURATION * 4.0))
 		Clip.DEATH:
 			_set_sheet(HIT_DEATH_SHEET, 4, 2)
-			frame = 4 + mini(3, int(time_in_clip / 0.85 * 4.0))
+			frame = 4 + mini(3, int(time_in_clip / 1.65 * 4.0))
 
 
 func _resolve_facing_row(active_clip: Clip) -> int:

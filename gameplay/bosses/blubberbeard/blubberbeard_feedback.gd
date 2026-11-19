@@ -34,6 +34,7 @@ var _stomp_timer: float = 0.0
 var _camera: Camera3D
 var _camera_fov: float = 0.0
 var _camera_tween: Tween
+var _death_camera_active: bool = false
 var _slam_warning: Node3D
 var _slam_warning_material: StandardMaterial3D
 
@@ -155,6 +156,8 @@ func emit_skill_cue(
 			_cue_counter_shock(at)
 		&"stagger_broken":
 			_cue_stagger_broken(at)
+		&"death_transform":
+			_cue_death_transform(at)
 
 
 func whirlwind_spin_tick(delta: float, at: Vector3) -> void:
@@ -197,28 +200,21 @@ func phase_changed() -> void:
 	)
 
 
-func death() -> void:
+func death(cinematic_duration: float = 0.0) -> void:
 	aura.emitting = false
-	_restore_camera(true)
-	_play(BOOM, boss.global_position, -5.0, 0.7)
-	_shake(14.0, 0.3)
-	_screen_flash(Color(1.0, 0.35, 0.08), 0.18, 0.3)
+	if cinematic_duration > 0.0:
+		_begin_death_camera(cinematic_duration)
+		_schedule_death_explosions()
+	else:
+		_restore_camera(true)
+	_spawn_death_blast(boss.global_position, 1.65, 0.7, 14.0, 0.35, 72)
+	_screen_flash(Color(1.0, 0.35, 0.08), 0.18, 0.35)
 	get_node("/root/ShockwaveController").request_world(
 		boss.global_position + Vector3.UP * DEATH_SHOCKWAVE_HEIGHT,
-		DEATH_SHOCKWAVE_DURATION,
+		0.75,
 		DEATH_SHOCKWAVE_STRENGTH * intensity,
 		DEATH_SHOCKWAVE_COLOR,
 		DEATH_SHOCKWAVE_RADIUS_PIXELS
-	)
-	_spawn_explosion(boss.global_position, 1.5)
-	EFFECTS.shockwave(boss.get_parent(), boss.global_position, 7.0, Color(1.0, 0.55, 0.12, 0.95))
-	EFFECTS.burst(
-		boss.get_parent(),
-		boss.global_position + Vector3.UP * 2.0,
-		Color(1.0, 0.48, 0.1),
-		72,
-		2.0,
-		9.0
 	)
 
 
@@ -435,6 +431,53 @@ func _cue_stagger_broken(at: Vector3) -> void:
 	EFFECTS.burst(boss.get_parent(), at + Vector3.UP * 1.8, Color(1.0, 0.88, 0.28), 36, 1.2, 6.5)
 
 
+func _spawn_death_blast(
+	at: Vector3, size: float, pitch: float, shake_strength: float, shake_dur: float, sparks: int
+) -> void:
+	if not is_instance_valid(boss) or not is_instance_valid(boss.get_parent()):
+		return
+	_play(BOOM, at, -5.0, pitch)
+	_shake(shake_strength, shake_dur)
+	_spawn_explosion(at, size)
+	EFFECTS.shockwave(boss.get_parent(), at, 4.2 * size, Color(1.0, 0.55, 0.12, 0.95))
+	EFFECTS.burst(boss.get_parent(), at + Vector3.UP * 1.6, Color(1.0, 0.48, 0.1), sparks, 1.8, 8.0)
+
+
+func _schedule_death_explosions() -> void:
+	var bursts := [
+		[0.42, Vector3(-1.1, 0.4, 0.5), 1.25, 0.92, 7.5],
+		[0.48, Vector3(1.0, 0.3, -0.7), 1.35, 0.84, 8.5],
+		[0.48, Vector3(0.0, 0.4, 0.2), 1.60, 0.68, 11.0],
+	]
+	var seq := create_tween()
+	for entry in bursts:
+		seq.tween_interval(float(entry[0]))
+		seq.tween_callback(_trigger_chain_death_blast.bind(entry))
+
+
+func _trigger_chain_death_blast(entry: Array) -> void:
+	if not is_instance_valid(boss):
+		return
+	_spawn_death_blast(
+		boss.global_position + (entry[1] as Vector3),
+		float(entry[2]),
+		float(entry[3]),
+		float(entry[4]),
+		0.24,
+		34
+	)
+
+
+func _cue_death_transform(at: Vector3) -> void:
+	if not is_instance_valid(boss) or not is_instance_valid(boss.get_parent()):
+		return
+	_play(ROAR, at, -7.0, 1.35)
+	_shake(7.0, 0.22)
+	_screen_flash(Color(1.0, 0.92, 0.45), 0.14, 0.28)
+	EFFECTS.shockwave(boss.get_parent(), at, 5.5, Color(1.0, 0.9, 0.35, 0.95))
+	EFFECTS.burst(boss.get_parent(), at + Vector3.UP * 1.4, Color(1.0, 0.92, 0.38), 54, 1.4, 7.0)
+
+
 func _spawn_ground_decal(
 	node_name: String,
 	tex: Texture2D,
@@ -530,16 +573,50 @@ func _begin_camera() -> void:
 func _restore_camera(animated: bool) -> void:
 	if not is_instance_valid(_camera):
 		return
+	_death_camera_active = false
 	if _camera_tween != null and _camera_tween.is_valid():
 		_camera_tween.kill()
-	if animated and _camera.is_inside_tree():
+	if _camera is BoundedFollowCamera3D:
+		(_camera as BoundedFollowCamera3D).restore_cinematic(_camera_fov, 0.45 if animated else 0.0)
+	elif animated and _camera.is_inside_tree():
 		_camera_tween = _camera.create_tween()
 		_camera_tween.tween_property(_camera, "fov", _camera_fov, 0.45).set_trans(Tween.TRANS_SINE)
 	else:
 		_camera.fov = _camera_fov
 
 
+func _begin_death_camera(hold_seconds: float) -> void:
+	var cam := _camera
+	if not is_instance_valid(cam) and is_instance_valid(boss) and boss.is_inside_tree():
+		cam = boss.get_viewport().get_camera_3d()
+		if is_instance_valid(cam):
+			_camera = cam
+			_camera_fov = cam.fov
+	if not is_instance_valid(cam) or cam.projection != Camera3D.PROJECTION_PERSPECTIVE:
+		return
+	if _camera_fov <= 0.0:
+		_camera_fov = cam.fov
+	if _camera_tween != null and _camera_tween.is_valid():
+		_camera_tween.kill()
+	_death_camera_active = true
+	var zoom_fov := clampf(_camera_fov * 0.68, 18.0, 26.0)
+	var focus_pos := boss.global_position if is_instance_valid(boss) else cam.global_position
+	if cam is BoundedFollowCamera3D:
+		(cam as BoundedFollowCamera3D).play_focus_cinematic(
+			focus_pos, zoom_fov, _camera_fov, 0.55, maxf(0.2, hold_seconds), 0.65
+		)
+		return
+	_camera_tween = cam.create_tween()
+	_camera_tween.tween_property(cam, "fov", zoom_fov, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(
+		Tween.EASE_OUT
+	)
+	_camera_tween.tween_interval(maxf(0.2, hold_seconds))
+	_camera_tween.tween_property(cam, "fov", _camera_fov, 0.65).set_trans(Tween.TRANS_SINE)
+
+
 func _exit_tree() -> void:
+	if _death_camera_active and is_instance_valid(_camera) and _camera.is_inside_tree():
+		return
 	_restore_camera(false)
 
 

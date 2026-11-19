@@ -3,6 +3,7 @@ extends Node3D
 
 signal detonated
 
+const BARREL_GROUP := &"blubberbeard_barrel_hazards"
 const BARREL_SHEET := preload("res://assets/sprites/bosses/blubberbeard/powder_barrel_sheet.png")
 const BARREL_PIXEL_SIZE := 0.0095
 const BARREL_GROUND_Y := 1.45
@@ -35,6 +36,229 @@ var _spike_elapsed := 0.0
 var _spike_duration := 1.0
 
 
+static func pick_wave_spots(
+	boss: Node3D,
+	anchor: Vector3,
+	ground_y: float,
+	count: int,
+	barrel_radius: float,
+	r_min_cfg: float,
+	r_max_cfg: float,
+	min_boss_distance: float,
+	track_player_directly: bool
+) -> Array[Vector3]:
+	var spots: Array[Vector3] = []
+	if count <= 0:
+		return spots
+	var radius_eff := maxf(0.5, barrel_radius)
+	var min_sep := radius_eff * 2.08
+	var min_boss_dist := maxf(0.0, min_boss_distance)
+	var occupied := _collect_active_barrel_spots(boss)
+	var space := (
+		boss.get_world_3d().direct_space_state
+		if boss.is_inside_tree() and boss.get_world_3d() != null
+		else null
+	)
+	var check_bounds := _has_walkable_floor(boss, space, ground_y)
+	var excluded := _collect_ray_excludes(boss)
+	var from_pos := Vector3(boss.global_position.x, ground_y, boss.global_position.z)
+	var side_count := count - 1 if track_player_directly else count
+	if track_player_directly:
+		var away := Vector2(anchor.x - from_pos.x, anchor.z - from_pos.z)
+		var lead_angle := atan2(away.y, away.x) if not away.is_zero_approx() else 0.0
+		var lead_spot := _resolve_barrel_spot(
+			anchor,
+			ground_y,
+			from_pos,
+			lead_angle,
+			radius_eff,
+			min_boss_dist,
+			occupied,
+			space,
+			check_bounds,
+			excluded
+		)
+		spots.append(lead_spot)
+		occupied.append({"pos": lead_spot, "radius": radius_eff})
+	if side_count <= 0:
+		return spots
+	var chord_floor := (
+		min_sep / maxf(2.0 * sin(PI / float(side_count)), 0.2) if side_count > 1 else min_sep
+	)
+	var base_floor := maxf(r_min_cfg, min_sep if track_player_directly else 0.8)
+	var ring_min := maxf(base_floor, chord_floor)
+	var ring_max := maxf(ring_min + 1.4, r_max_cfg)
+	var spin_offset := randf() * TAU
+	for k in side_count:
+		var base_angle := spin_offset + TAU * float(k) / float(side_count)
+		var ring_r := randf_range(ring_min, ring_max)
+		var angle := base_angle + randf_range(-0.18, 0.18)
+		var candidate := anchor + Vector3(cos(angle), 0.0, sin(angle)) * ring_r
+		candidate.y = ground_y
+		if _is_barrel_spot_valid(
+			candidate,
+			radius_eff,
+			occupied,
+			from_pos,
+			min_boss_dist,
+			space,
+			ground_y,
+			check_bounds,
+			excluded
+		):
+			spots.append(candidate)
+			occupied.append({"pos": candidate, "radius": radius_eff})
+			continue
+		var resolved := _resolve_barrel_spot(
+			anchor,
+			ground_y,
+			from_pos,
+			base_angle,
+			radius_eff,
+			min_boss_dist,
+			occupied,
+			space,
+			check_bounds,
+			excluded,
+			ring_min
+		)
+		spots.append(resolved)
+		occupied.append({"pos": resolved, "radius": radius_eff})
+	return spots
+
+
+static func _collect_active_barrel_spots(boss: Node3D) -> Array[Dictionary]:
+	var spots: Array[Dictionary] = []
+	if not is_instance_valid(boss) or not boss.is_inside_tree():
+		return spots
+	for node in boss.get_tree().get_nodes_in_group(BARREL_GROUP):
+		if not is_instance_valid(node) or node.is_queued_for_deletion():
+			continue
+		if not (node is Node3D) or bool(node.get("exploded")):
+			continue
+		var rad := float(node.get("radius"))
+		if rad > 0.0:
+			spots.append({"pos": (node as Node3D).global_position, "radius": rad})
+	return spots
+
+
+static func _collect_ray_excludes(boss: Node3D) -> Array[RID]:
+	var excluded: Array[RID] = []
+	if is_instance_valid(boss) and boss is CollisionObject3D:
+		excluded.append((boss as CollisionObject3D).get_rid())
+	return excluded
+
+
+static func _has_walkable_floor(
+	boss: Node3D, space: PhysicsDirectSpaceState3D, ground_y: float
+) -> bool:
+	if space == null or not is_instance_valid(boss):
+		return false
+	var center := Vector3(boss.global_position.x, ground_y, boss.global_position.z)
+	return not BlubberbeardAI.spot_crosses_boundary(
+		space, center, center, ground_y, _collect_ray_excludes(boss)
+	)
+
+
+static func _is_barrel_spot_valid(
+	candidate: Vector3,
+	radius_eff: float,
+	occupied: Array[Dictionary],
+	from_pos: Vector3,
+	min_boss_dist: float,
+	space: PhysicsDirectSpaceState3D,
+	ground_y: float,
+	check_bounds: bool,
+	excluded: Array[RID]
+) -> bool:
+	if (
+		check_bounds
+		and BlubberbeardAI.spot_crosses_boundary(space, from_pos, candidate, ground_y, excluded)
+	):
+		return false
+	if _flat_dist(candidate, from_pos) < min_boss_dist:
+		return false
+	return _min_barrel_clearance(candidate, radius_eff, occupied) >= 0.0
+
+
+static func _resolve_barrel_spot(
+	anchor: Vector3,
+	ground_y: float,
+	from_pos: Vector3,
+	base_angle: float,
+	radius_eff: float,
+	min_boss_dist: float,
+	occupied: Array[Dictionary],
+	space: PhysicsDirectSpaceState3D,
+	check_bounds: bool,
+	excluded: Array[RID],
+	min_ring_dist: float = 0.0
+) -> Vector3:
+	var fallback := anchor
+	fallback.y = ground_y
+	if min_ring_dist > 0.0:
+		fallback += Vector3(cos(base_angle), 0.0, sin(base_angle)) * min_ring_dist
+	var best_score := _spot_clearance_score(fallback, radius_eff, occupied, from_pos, min_boss_dist)
+	var dists: Array[float] = []
+	if min_ring_dist <= 0.0:
+		dists.append(0.0)
+		var boss_gap := maxf(0.0, min_boss_dist - _flat_dist(anchor, from_pos))
+		if boss_gap > 0.01:
+			dists.append(boss_gap)
+		for mult in [2.08, 2.9, 3.8, 4.7]:
+			dists.append(maxf(boss_gap, float(mult) * radius_eff))
+	else:
+		for mult in [0.0, 0.85, 1.7, 2.55, 3.4]:
+			dists.append(min_ring_dist + float(mult) * radius_eff)
+	for ang_m in [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6]:
+		var angle := base_angle + float(ang_m) * deg_to_rad(20.0)
+		for dist in dists:
+			var cand := anchor + Vector3(cos(angle), 0.0, sin(angle)) * dist
+			cand.y = ground_y
+			if (
+				check_bounds
+				and BlubberbeardAI.spot_crosses_boundary(space, from_pos, cand, ground_y, excluded)
+			):
+				continue
+			var score := _spot_clearance_score(cand, radius_eff, occupied, from_pos, min_boss_dist)
+			if score >= 0.0:
+				return cand
+			if score > best_score:
+				best_score = score
+				fallback = cand
+	return fallback
+
+
+static func _spot_clearance_score(
+	candidate: Vector3,
+	radius_eff: float,
+	occupied: Array[Dictionary],
+	from_pos: Vector3,
+	min_boss_dist: float
+) -> float:
+	var boss_clearance := _flat_dist(candidate, from_pos) - min_boss_dist
+	return minf(boss_clearance, _min_barrel_clearance(candidate, radius_eff, occupied))
+
+
+static func _min_barrel_clearance(
+	candidate: Vector3, radius_eff: float, occupied: Array[Dictionary]
+) -> float:
+	var min_clear := INF
+	for spot in occupied:
+		var other := spot["pos"] as Vector3
+		var other_rad := float(spot["radius"])
+		var clearance := _flat_dist(candidate, other) - (radius_eff + other_rad + 0.14)
+		if clearance < min_clear:
+			min_clear = clearance
+	return min_clear
+
+
+static func _flat_dist(a: Vector3, b: Vector3) -> float:
+	var dx := a.x - b.x
+	var dz := a.z - b.z
+	return sqrt(dx * dx + dz * dz)
+
+
 func _ready() -> void:
 	hitbox = HitBox.new()
 	hitbox.actor = source
@@ -60,6 +284,7 @@ func _ready() -> void:
 		spike_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(spike_sprite)
 	else:
+		add_to_group(BARREL_GROUP)
 		_create_barrel_warning()
 		barrel_visual = Sprite3D.new()
 		barrel_visual.name = "BarrelSprite"

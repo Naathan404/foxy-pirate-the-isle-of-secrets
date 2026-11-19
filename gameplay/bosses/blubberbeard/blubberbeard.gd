@@ -21,10 +21,10 @@ const VENOM_HAZARD = preload("res://gameplay/bosses/blubberbeard/blubberbeard_ve
 const WHIRLWIND_RIG = preload("res://gameplay/bosses/blubberbeard/anchor_whirlwind_rig.gd")
 const EFFECTS = preload("res://gameplay/bosses/boss_effects.gd")
 
-const BARREL_BURST_SPREAD_SEPARATION := 2.2
 const COUNTER_SHOCK_DURATION := 0.22
+const DEATH_CINEMATIC_CAMERA_HOLD := 2.75
 const COUNTER_SHOCK_RECOIL_SPEED := 4.2
-const COUNTER_PUFF_WINDUP := 0.36
+const COUNTER_PUFF_WINDUP := 0.68
 const SPIKY_THORN_BODY_RADIUS := 2.15
 
 @export_group("Movement & AI")
@@ -363,52 +363,26 @@ func _start_next_barrel_wave() -> void:
 func _pick_barrel_wave_spots(count: int) -> Array[Vector3]:
 	if not is_instance_valid(target):
 		return [global_position]
-	var spots: Array[Vector3] = []
-	var player_now := target.global_position
-	var r_min := maxf(0.8, skill.barrel_spread_min_radius if skill != null else 2.0)
-	var r_max := maxf(r_min + 0.4, skill.barrel_spread_max_radius if skill != null else 4.6)
-	# First waves/throws follow the player directly; subsequent barrels scatter randomly nearby.
 	var track_player_directly := (
 		_barrel_wave_index <= 1
 		if (skill == null or skill.barrel_escalating_burst)
 		else _barrel_wave_index == 0
 	)
-	for idx in count:
-		if idx == 0 and track_player_directly:
-			spots.append(player_now)
-		else:
-			spots.append(_pick_spaced_spot(player_now, r_min, r_max, spots, idx, count))
-	return spots
-
-
-func _pick_spaced_spot(
-	anchor: Vector3,
-	r_min: float,
-	r_max: float,
-	existing: Array[Vector3],
-	slot_idx: int,
-	slot_count: int
-) -> Vector3:
-	var fallback_angle := TAU * float(slot_idx) / float(maxi(1, slot_count))
-	var best := anchor + Vector3.RIGHT.rotated(Vector3.UP, fallback_angle) * r_min
-	var best_dist := -1.0
-	var space := get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() else null
-	var excluded := _ray_excludes()
-	for _attempt in 14:
-		var ang := randf() * TAU
-		var rad := randf_range(r_min, r_max)
-		var candidate := anchor + Vector3(cos(ang), 0.0, sin(ang)) * rad
-		if AI_CLASS.spot_crosses_boundary(space, anchor, candidate, _ground_y, excluded):
-			continue
-		var min_sep := INF
-		for prev in existing:
-			min_sep = minf(min_sep, Vector2(candidate.x - prev.x, candidate.z - prev.z).length())
-		if min_sep > best_dist:
-			best_dist = min_sep
-			best = candidate
-		if min_sep >= BARREL_BURST_SPREAD_SEPARATION:
-			break
-	return best
+	var barrel_rad := (skill.radius if skill != null else 2.5) * boss_size_scale
+	var r_min := maxf(0.8, skill.barrel_spread_min_radius if skill != null else 2.0)
+	var r_max := maxf(r_min + 0.4, skill.barrel_spread_max_radius if skill != null else 4.6)
+	var min_boss_dist := maxf(0.0, skill.barrel_min_boss_distance if skill != null else 4.0)
+	return HAZARD.pick_wave_spots(
+		self,
+		target.global_position,
+		_ground_y,
+		count,
+		barrel_rad,
+		r_min,
+		r_max,
+		min_boss_dist,
+		track_player_directly
+	)
 
 
 func _update_barrel_barrage(delta: float) -> void:
@@ -682,7 +656,7 @@ func _on_can_stagger_break() -> bool:
 
 func _on_stagger_broken(duration_seconds: float) -> void:
 	_cancel_active_attacks_for_interrupt()
-	_hits_since_counter = mini(_hits_since_counter, maxi(0, hits_before_counter - 2))
+	_hits_since_counter = 0
 	_hurt_remaining = 0.0
 	_pending_counter_burst = false
 	state = State.STAGGERED
@@ -724,7 +698,9 @@ func _hit_feedback(_amount: float) -> void:
 	if dead:
 		return
 	visual.flash_hit()
-	var can_counter := not (_has_super_armor() or state == State.STAGGERED)
+	if state == State.STAGGERED:
+		return
+	var can_counter := not _has_super_armor()
 	if _hits_since_counter < hits_before_counter:
 		_hits_since_counter += 1
 	elif can_counter and _counter_cooldown_left <= 0.0 and is_instance_valid(target):
@@ -745,14 +721,34 @@ func _on_phase_entered(index: int) -> void:
 	_play_sound(0.55)
 
 
+func _should_spawn_reward_on_death() -> bool:
+	return false
+
+
 func _on_fight_ended() -> void:
 	_cancel_active_attacks_for_interrupt()
 	if is_inside_tree():
 		get_tree().call_group(VENOM_HAZARD.HAZARD_GROUP, "queue_free")
-	feedback.death()
+	feedback.death(DEATH_CINEMATIC_CAMERA_HOLD)
 	EFFECTS.shockwave(get_parent(), global_position, 3.0, Color(1.0, 0.65, 0.2, 0.8))
 	_play_sound(0.4)
-	visual.play_death(queue_free)
+	visual.play_death(_finish_death_sequence)
+
+
+func _finish_death_sequence() -> void:
+	if is_instance_valid(feedback):
+		feedback.emit_skill_cue(&"death_transform", global_position)
+	var chest := _spawn_reward()
+	if is_instance_valid(chest):
+		chest.scale = Vector3(0.25, 0.25, 0.25)
+		var tween := chest.create_tween()
+		(
+			tween
+			. tween_property(chest, "scale", Vector3.ONE, 0.42)
+			. set_trans(Tween.TRANS_BACK)
+			. set_ease(Tween.EASE_OUT)
+		)
+	queue_free()
 
 
 func _apply_gravity_to_floor(delta: float) -> void:
