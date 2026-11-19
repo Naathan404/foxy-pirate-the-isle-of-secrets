@@ -11,6 +11,7 @@ radius = 2.2
 barrel_throw_duration = 0.56
 barrel_throw_gap_min = 0.32
 barrel_throw_gap_max = 0.48
+barrel_min_boss_distance = 4.2
 damage = 2.0
 windup = 1.25
 recovery = 0.8
@@ -31,7 +32,7 @@ kind = 2
 radius = 3.0
 spiky_hold_duration = 1.2
 damage = 2.5
-windup = 0.78
+windup = 1.05
 recovery = 0.75
 
 [sub_resource type="Resource" id="phase1"]
@@ -48,6 +49,7 @@ barrel_throw_min = 3
 barrel_throw_max = 5
 barrel_throw_duration = 0.48
 barrel_throw_gap_max = 0.38
+barrel_min_boss_distance = 4.6
 damage = 3.0
 recovery = 0.75
 
@@ -68,7 +70,7 @@ kind = 2
 radius = 3.4
 spiky_hold_duration = 1.35
 damage = 3.5
-windup = 0.7
+windup = 0.95
 recovery = 0.7
 
 [sub_resource type="Resource" id="whirlwind2"]

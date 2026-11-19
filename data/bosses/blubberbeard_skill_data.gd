@@ -29,6 +29,7 @@ enum Kind {
 @export_range(0.05, 2.0, 0.05, "suffix:s") var barrel_throw_gap_max: float = 0.42
 @export_range(0.5, 8.0, 0.1, "suffix:m") var barrel_spread_min_radius: float = 2.0
 @export_range(1.0, 12.0, 0.1, "suffix:m") var barrel_spread_max_radius: float = 4.6
+@export_range(0.0, 12.0, 0.2, "suffix:m") var barrel_min_boss_distance: float = 4.0
 
 @export_group("Parabolic Leap (Sky Dive)")
 @export_range(2.0, 12.0, 0.2, "suffix:m") var skydive_peak_height: float = 5.4
