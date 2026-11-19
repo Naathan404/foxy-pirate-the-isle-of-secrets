@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="3_vbg61"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 
 [sub_resource type="Environment" id="Environment_hiiy2"]
 resource_local_to_scene = true
@@ -159,6 +162,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
 [node name="RandomProps" type="Node3D" parent="." index="6" unique_id=1924344486]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-8, 0, -6, -6, 0, 8, 5, 0, -8, 9, 0, 5, -4, 0, -10, 4, 0, 10)
+
+[node name="RandomSeaweed" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-12.761, 0, -5.486, -10.758, 0, -8.456, -9.455, 0, -10.093, -7.862, 0, -12.646, -7.298, 0, -14.614, -5.224, 0, -14.252, -3.084, 0, -14.032, -0.348, 0, -14.303, 2.244, 0, -14.441, 5.507, 0, -13.842, 7.408, 0, -12.885, 9.941, 0, -8.944, 12.708, 0, -7.327, 12.875, 0, -5.147, 12.15, 0, -2.932, 13.386, 0, -0.62, 12.527, 0, 2.174, 12.031, 0, 5.755, 12.004, 0, 8.226, 12.453, 0, 10.788, 9.958, 0, 13.109, 6.726, 0, 15.229, 4.412, 0, 15.14, -0.156, 0, 15.557, -2.704, 0, 14.925, -6.184, 0, 15.616, -9.581, 0, 14.551, -10.44, 0, 11.782, -12.724, 0, 10.577, -12.642, 0, 7.067)
+fixed_spawn_count = 20
+prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

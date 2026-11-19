@@ -3,6 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 
 
 [sub_resource type="Environment" id="Environment_void"]
@@ -124,6 +127,12 @@ shape = SubResource("BoxShape3D_left_trigger")
 [node name="RandomProps" type="Node3D" parent="."]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-7.5, 0, -6.458, -5.833, 0, 6.042, 5, 0, -7.291, 8.333, 0, 4.376, -3.333, 0, -8.958, 4.167, 0, 9.376)
+
+[node name="RandomSeaweed" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-10.544, 0, -1.642, -9.626, 0, -3.421, -10.284, 0, -5.698, -7.004, 0, -9.499, -4.632, 0, -11.498, -1.649, 0, -11.708, 0.374, 0, -10.58, 2.639, 0, -11.523, 4.688, 0, -11.031, 6.637, 0, -10.541, 7.537, 0, -8.597, 8.903, 0, -6.96, 10.214, 0, -5.41, 10.546, 0, 6.114, 10.51, 0, 8.189, 8.396, 0, 10.093, 6.791, 0, 11.383, 5.542, 0, 13.064, -6.136, 0, 12.324, -8.194, 0, 10.297, -9.897, 0, 9.077, -10.364, 0, 7.093, -9.889, 0, 3.603, -10.536, 0, 1.547)
+fixed_spawn_count = 15
+prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
 [editable path="Environment/BaseGround"]
 [editable path="Exits/DownPath"]

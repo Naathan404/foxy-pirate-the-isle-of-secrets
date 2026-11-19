@@ -50,6 +50,14 @@ Each Materials room uses its existing spawn positions and randomly spawns 5–10
 
 Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
 
-Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) also spawn exactly 20 seaweed props per room per visit, selected without replacement from 30 rim positions in each room. Positions are inset 3–4.5 world units from the ground collision outline, with gaps at the left, right and bottom entrances and clearance from each room's stone/wood spawn positions. Each prop independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
+All non-Materials rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
+
+| Layout | Rooms | Seaweed per visit |
+| --- | --- | --- |
+| Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_19`, `room_21`, `room_23`, `room_25` | 20 per room |
+| Small, one island | `room_01`, `room_03`, `room_06`, `room_11`, `room_15`, `room_17`, `room_18`, `room_20`, `room_22` | 15 per room |
+| Small, two islands | `room_04`, `room_09`, `room_24` | 15 on each island, 30 per room |
+
+Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and moving-platform docks and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
 Coral and coconut palms do not appear in any other Coral Valley room. Remaining rooms keep their existing spawn counts and shell, stone and octopus pools. `RandomProps.include_coral` stays false; the Materials and Mobs 1–3 rooms specify their own `prop_scenes` arrays.
