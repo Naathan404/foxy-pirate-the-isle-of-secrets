@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://gameplay/enemies/mushroom/mushroom.gd" id="2_script"]
+[ext_resource type="Resource" path="res://data/enemies/mushroom_data.tres" id="3_data"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/mushroom/mushroom_footless_4dir.png" id="4_sprite"]
+[ext_resource type="AnimationLibrary" path="res://gameplay/enemies/mushroom/mushroom_anims.tres" id="5_anims"]
+[ext_resource type="Script" path="res://gameplay/enemies/mushroom/mushroom_patrol.gd" id="6_patrol"]
+
+[sub_resource type="CylinderShape3D" id="detector"]
+radius = 6.0
+height = 3.0
+
+[node name="Mushroom" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+data = ExtResource("3_data")
+initial_state_name = &"Patrol"
+destroy_on_death = true
+
+[node name="Sprite3D" parent="Visual" index="0"]
+position = Vector3(0, 1.14, 0)
+pixel_size = 0.007
+shaded = false
+alpha_cut = 0
+texture_filter = 1
+texture = ExtResource("4_sprite")
+hframes = 4
+vframes = 3
+
+[node name="AnimationPlayer" parent="Visual" index="1"]
+libraries/ = ExtResource("5_anims")
+
+[node name="FrontRayCast3D" parent="Direction" index="0"]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" index="1"]
+enabled = true
+
+[node name="Patrol" type="Node" parent="States" index="3"]
+script = ExtResource("6_patrol")
+
+[node name="TargetDetector" type="Area3D" parent="." index="7"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector"]
+position = Vector3(0, 1, 0)
+shape = SubResource("detector")
