@@ -2,9 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
-[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="coral_orange"]
-[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="coral_pink"]
-[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="coral_turquoise"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="palm_leaning"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="palm_short"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="palm_tall"]
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 
 [sub_resource type="Environment" id="Environment_ickrl"]
@@ -152,7 +152,7 @@ shape = SubResource("BoxShape3D_giv23")
 [node name="RandomProps" type="Node3D" parent="." index="5" unique_id=1023793143]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(9.188, 0, -2.598, -6.692, 0, 6.231, -2.675, 0, -9.938, 3.432, 0, 8.938, -4.087, 0, -4.275, -9.048, 0, 10.217, 0.484, 0, -3.355, -5.53, 0, 12.144, 4.906, 0, -4.837, 8.12, 0, 10.771, -7.792, 0, -2.692, 5.335, 0, -11.607, 0.351, 0, -8.511, 8.549, 0, 3.408, 7.145, 0, 7.612, 5.242, 0, -0.126, -5.671, 0, -11.95, -7.293, 0, -7.637, 10.148, 0, -6.178, 2.317, 0, 3.392)
-prop_scenes = Array[PackedScene]([ExtResource("coral_orange"), ExtResource("coral_pink"), ExtResource("coral_turquoise")])
+prop_scenes = Array[PackedScene]([ExtResource("palm_leaning"), ExtResource("palm_short"), ExtResource("palm_tall")])
 min_spawn_count = 5
 max_spawn_count = 10
 
