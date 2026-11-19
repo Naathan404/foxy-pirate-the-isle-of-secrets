@@ -8,7 +8,7 @@ const SPREAD_ANGLE: float = 2.39996323
 @export_range(0, 256, 1) var prewarm_count: int = 64
 @export_range(1, 1024, 1) var max_pickups: int = 256
 @export_range(1, 16, 1) var create_per_frame: int = 4
-@export_range(1, 32, 1) var activate_per_frame: int = 8
+@export_range(1, 32, 1) var activate_per_frame: int = 4
 
 var _available: Array[GoldPickup] = []
 var _active: Array[GoldPickup] = []
