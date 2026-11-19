@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://d2oxcw05p057w"]
+[gd_scene format=3 uid="uid://imw31yqwmatq"]
 
 [ext_resource type="PackedScene" uid="uid://c0y1euj63gk4x" path="res://world/objects/destructible_prop.tscn" id="1_base"]
 

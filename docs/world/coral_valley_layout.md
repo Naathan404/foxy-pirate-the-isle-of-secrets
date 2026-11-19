@@ -48,4 +48,8 @@ The two Materials rooms use the Small room template, with spawn positions pulled
 
 Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
 
-Coral and coconut palms do not appear in any other Coral Valley room. Other rooms keep their existing spawn counts and shell, stone and octopus pools. `RandomProps.include_coral` stays false; the Materials rooms specify their own `prop_scenes` arrays.
+Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
+
+Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) also spawn exactly 20 seaweed props per room per visit, selected without replacement from 30 rim positions in each room. Positions are inset 3–4.5 world units from the ground collision outline, with gaps at the left, right and bottom entrances and clearance from each room's stone/wood spawn positions. Each prop independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
+
+Coral and coconut palms do not appear in any other Coral Valley room. Remaining rooms keep their existing spawn counts and shell, stone and octopus pools. `RandomProps.include_coral` stays false; the Materials and Mobs 1–3 rooms specify their own `prop_scenes` arrays.
