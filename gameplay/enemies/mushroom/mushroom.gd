@@ -43,11 +43,14 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.5, 0.25]
 @export_range(0.0, 2.0, 0.05, "suffix:m") var evade_hop_height: float = 0.4
 
 @export_group("Poison Cloud")
-## Maximum distance to start charging after Foxy has been detected.
+## Foxy triggers an immediate charge within this distance when the attack is ready.
 @export_range(0.1, 10.0, 0.1, "suffix:m") var attack_range: float = 2.5
 @export_range(1.0, 2.0, 0.1, "suffix:s") var windup_seconds: float = 1.6
 @export_range(0.1, 3.0, 0.1, "suffix:s") var recovery_seconds: float = 0.5
 @export_range(0.1, 20.0, 0.1, "suffix:s") var cooldown_seconds: float = 4.0
+## While chasing a detected Foxy, randomly charge even outside the close attack range.
+@export_range(0.1, 60.0, 0.1, "suffix:s") var chase_spore_min_seconds: float = 6.0
+@export_range(0.1, 60.0, 0.1, "suffix:s") var chase_spore_max_seconds: float = 12.0
 @export_range(0.4, 10.0, 0.1, "suffix:m") var cloud_radius: float = 2.6
 @export_range(0.2, 20.0, 0.1, "suffix:s") var cloud_duration_seconds: float = 3.5
 @export_range(0.1, 3.0, 0.1, "suffix:s") var spore_ramp_seconds: float = 0.8

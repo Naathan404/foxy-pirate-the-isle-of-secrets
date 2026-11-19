@@ -19,10 +19,12 @@ var _last_seen: Vector3
 var _wander_direction: Vector3 = Vector3.ZERO
 var _strafe_sign: float = 1.0
 var _has_awakened: bool = false
+var _chase_spore_remaining: float = 0.0
 
 
 func _enter() -> void:
 	_random.randomize()
+	_schedule_chase_spores()
 	if not enemy.damaged.is_connected(_on_damaged):
 		enemy.damaged.connect(_on_damaged)
 	if _has_awakened:
@@ -50,7 +52,10 @@ func _update(delta: float) -> void:
 	if _target_is_detected(mushroom):
 		_last_seen = mushroom.target.global_position
 		_has_awakened = true
+		if _phase == Phase.CHASE:
+			_chase_spore_remaining = maxf(0.0, _chase_spore_remaining - step)
 	elif _phase in [Phase.OBSERVE, Phase.CHASE, Phase.RETREAT]:
+		_schedule_chase_spores()
 		_set_phase(Phase.SEARCH, SEARCH_SECONDS)
 	match _phase:
 		Phase.DISGUISE:
@@ -121,7 +126,10 @@ func _chase(mushroom: MushroomEnemy, delta: float) -> void:
 		return
 	var offset := _horizontal(mushroom.target.global_position - mushroom.global_position)
 	var distance := offset.length()
-	if distance <= mushroom.attack_range and mushroom.attack_cooldown_remaining <= 0.0:
+	if (
+		mushroom.attack_cooldown_remaining <= 0.0
+		and (distance <= mushroom.attack_range or _chase_spore_remaining <= 0.0)
+	):
 		mushroom.face_target()
 		_begin_charge(mushroom, delta)
 		return
@@ -140,6 +148,7 @@ func _charge(mushroom: MushroomEnemy, delta: float) -> void:
 	mushroom.stop_movement(delta)
 	if not _target_is_detected(mushroom):
 		_reset_charge()
+		_schedule_chase_spores()
 		_set_phase(Phase.SEARCH, SEARCH_SECONDS)
 		return
 	var progress := 1.0 - _remaining / mushroom.windup_seconds
@@ -202,6 +211,15 @@ func _begin_charge(mushroom: MushroomEnemy, delta: float) -> void:
 	mushroom.stop_movement(delta)
 	_set_phase(Phase.CHARGE, mushroom.windup_seconds)
 	mushroom.begin_charge_animation()
+	_schedule_chase_spores()
+
+
+func _schedule_chase_spores() -> void:
+	var mushroom := enemy as MushroomEnemy
+	_chase_spore_remaining = _random.randf_range(
+		minf(mushroom.chase_spore_min_seconds, mushroom.chase_spore_max_seconds),
+		maxf(mushroom.chase_spore_min_seconds, mushroom.chase_spore_max_seconds)
+	)
 
 
 func _reset_charge() -> void:
