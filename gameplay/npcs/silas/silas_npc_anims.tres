@@ -1,8 +1,8 @@
 [gd_resource type="AnimationLibrary" format=3 uid="uid://brpsylflg2vk7"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/npcs/shared_placeholder/idle.png" id="1_idle_1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/npcs/shared_placeholder/walk_1.png" id="5_walk_1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/npcs/shared_placeholder/walk_2.png" id="6_walk_2"]
+[ext_resource type="Texture2D" uid="uid://boygebnjr0o5t" path="res://assets/sprites/npcs/shared_placeholder/idle.png" id="1_idle_1"]
+[ext_resource type="Texture2D" uid="uid://lgort084r3my" path="res://assets/sprites/npcs/shared_placeholder/walk_1.png" id="5_walk_1"]
+[ext_resource type="Texture2D" uid="uid://bnrkrs8rreipv" path="res://assets/sprites/npcs/shared_placeholder/walk_2.png" id="6_walk_2"]
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"

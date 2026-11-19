@@ -2,7 +2,6 @@
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_xe0fx"]
 [ext_resource type="Texture2D" uid="uid://c5m0ixi74avo3" path="res://assets/sprites/biomes/ruins/ruins.png" id="2_qg0qs"]
-[ext_resource type="Texture2D" uid="uid://c7a1d7qm2k8po" path="res://assets/sprites/biomes/ruins/ruins_down.png" id="2_qgx3g"]
 [ext_resource type="Texture2D" uid="uid://bvx7mdo72hxgg" path="res://assets/sprites/biomes/ruins/ruins_up.png" id="3_o57l1"]
 [ext_resource type="Texture2D" uid="uid://48uoarpveakc" path="res://assets/sprites/biomes/ruins/ruins_right.png" id="4_el1ol"]
 [ext_resource type="Texture2D" uid="uid://b6yyim36l77k3" path="res://assets/sprites/biomes/ruins/ruins_left.png" id="5_52os3"]
@@ -16,18 +15,9 @@
 size = Vector3(11.51355, 1, 10.686737)
 
 [node name="Ruins_02" unique_id=823545398 instance=ExtResource("1_xe0fx")]
-open_exits = 14
+open_exits = 10
 right_destination_scene = "res://world/biomes/ruins/ruins_01.tscn"
-down_destination_scene = "uid://bni628jtpmd0r"
 left_destination_scene = "res://world/biomes/ruins/ruins_03.tscn"
-
-[node name="Sprite3D" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="0" unique_id=1887481611]
-texture = ExtResource("2_qgx3g")
-
-[node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
-trigger_id = &"down"
-destination_scene = "uid://bni628jtpmd0r"
-destination_trigger_id = &"up"
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false

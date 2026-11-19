@@ -8,8 +8,6 @@
 [sub_resource type="Resource" id="barrel1"]
 script = ExtResource("4")
 radius = 2.2
-barrel_final_burst_min = 3
-barrel_final_burst_max = 3
 barrel_throw_duration = 0.56
 barrel_throw_gap_min = 0.32
 barrel_throw_gap_max = 0.48
@@ -20,7 +18,6 @@ recovery = 0.65
 [sub_resource type="Resource" id="skydive1"]
 script = ExtResource("4")
 kind = 1
-radius = 2.5
 skydive_peak_height = 4.2
 skydive_leap_duration = 0.88
 skydive_max_range = 13.5
@@ -45,16 +42,13 @@ skills = Array[ExtResource("3")]([SubResource("barrel1"), SubResource("skydive1"
 [sub_resource type="Resource" id="barrel2"]
 script = ExtResource("4")
 radius = 2.6
-barrel_final_burst_min = 3
 barrel_final_burst_max = 5
 barrel_throw_count = 5
 barrel_throw_min = 3
 barrel_throw_max = 5
 barrel_throw_duration = 0.48
-barrel_throw_gap_min = 0.24
 barrel_throw_gap_max = 0.38
 damage = 3.0
-windup = 1.0
 recovery = 0.55
 
 [sub_resource type="Resource" id="skydive2"]
@@ -83,8 +77,6 @@ kind = 4
 radius = 5.8
 speed = 1.5
 duration = 2.0
-whirlwind_rotations_min = 1
-whirlwind_rotations_max = 2
 whirlwind_reach_radius = 5.8
 whirlwind_angular_speed = 6.8
 damage = 3.5
@@ -97,11 +89,9 @@ kind = 5
 radius = 2.1
 speed = 14.0
 duration = 1.1
-venom_shot_count = 3
 venom_spread_angle_deg = 42.0
 venom_pool_radius = 2.0
 venom_pool_duration = 4.2
-venom_tick_damage = 0.5
 venom_tick_interval = 0.85
 damage = 2.5
 windup = 0.72
