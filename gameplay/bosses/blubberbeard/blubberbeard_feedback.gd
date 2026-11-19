@@ -153,6 +153,8 @@ func emit_skill_cue(
 			_cue_venom_splash(at, radius)
 		&"spiky_counter_shock":
 			_cue_counter_shock(at)
+		&"stagger_broken":
+			_cue_stagger_broken(at)
 
 
 func whirlwind_spin_tick(delta: float, at: Vector3) -> void:
@@ -423,6 +425,14 @@ func _cue_counter_shock(at: Vector3) -> void:
 	_shake(6.5, 0.16)
 	EFFECTS.shockwave(boss.get_parent(), at, 3.4, Color(1.0, 0.42, 0.12, 0.85))
 	EFFECTS.burst(boss.get_parent(), at + Vector3.UP * 1.5, Color(1.0, 0.58, 0.18), 32, 1.1, 6.0)
+
+
+func _cue_stagger_broken(at: Vector3) -> void:
+	_play(ROAR, at, -5.0, 0.72)
+	_shake(8.5, 0.24)
+	_screen_flash(Color(1.0, 0.85, 0.25), 0.08, 0.16)
+	EFFECTS.shockwave(boss.get_parent(), at, 4.2, Color(1.0, 0.84, 0.22, 0.9))
+	EFFECTS.burst(boss.get_parent(), at + Vector3.UP * 1.8, Color(1.0, 0.88, 0.28), 36, 1.2, 6.5)
 
 
 func _spawn_ground_decal(

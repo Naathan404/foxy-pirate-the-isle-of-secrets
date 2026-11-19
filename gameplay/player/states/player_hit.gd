@@ -36,8 +36,7 @@ func _enter() -> void:
 			* clampf(knockback * spiral_strength, 0.5, 2.0)
 		)
 		player.set_horizontal_velocity(push)
-		player.dizzy_remaining = maxf(player.dizzy_remaining, timer)
-		player.dizzy_started.emit(timer)
+		player.apply_dizzy(player.WHIRLWIND_DIZZY_SECONDS)
 	else:
 		player.set_horizontal_velocity(player.pending_hit_direction * knockback_speed * knockback)
 

@@ -12,10 +12,10 @@ const REPEAT_PENALTY := 0.24
 const DEFAULT_COOLDOWNS_SECONDS := {
 	BlubberbeardSkillData.Kind.POWDER_BARREL: 4.8,
 	BlubberbeardSkillData.Kind.SKY_DIVE: 5.2,
-	BlubberbeardSkillData.Kind.SPIKY_INFLATION: 5.5,
-	BlubberbeardSkillData.Kind.ANCHOR_SLAM: 5.0,
-	BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 7.0,
-	BlubberbeardSkillData.Kind.VENOM_SPIT: 6.0,
+	BlubberbeardSkillData.Kind.SPIKY_INFLATION: 2.5,
+	BlubberbeardSkillData.Kind.ANCHOR_SLAM: 3.2,
+	BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 3.5,
+	BlubberbeardSkillData.Kind.VENOM_SPIT: 5.5,
 }
 
 ## Bảng quy tắc trọng số theo [DistanceZone, player_near_boundary].
@@ -24,19 +24,19 @@ const POSITION_RULES := {
 	{
 		"open":
 		{
-			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 5.0,
-			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 2.8,
-			BlubberbeardSkillData.Kind.ANCHOR_SLAM: 1.8,
-			BlubberbeardSkillData.Kind.VENOM_SPIT: 0.5,
+			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 6.0,
+			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 4.5,
+			BlubberbeardSkillData.Kind.ANCHOR_SLAM: 2.2,
+			BlubberbeardSkillData.Kind.VENOM_SPIT: 0.4,
 			BlubberbeardSkillData.Kind.POWDER_BARREL: 0.0,
 			BlubberbeardSkillData.Kind.SKY_DIVE: 0.0,
 		},
 		"boundary":
 		{
-			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 5.2,
-			BlubberbeardSkillData.Kind.POWDER_BARREL: 1.6,
-			BlubberbeardSkillData.Kind.ANCHOR_SLAM: 0.9,
-			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 0.0,
+			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 5.8,
+			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 2.6,
+			BlubberbeardSkillData.Kind.ANCHOR_SLAM: 1.2,
+			BlubberbeardSkillData.Kind.POWDER_BARREL: 1.2,
 			BlubberbeardSkillData.Kind.VENOM_SPIT: 0.0,
 			BlubberbeardSkillData.Kind.SKY_DIVE: 0.0,
 		},
@@ -45,20 +45,20 @@ const POSITION_RULES := {
 	{
 		"open":
 		{
-			BlubberbeardSkillData.Kind.VENOM_SPIT: 3.4,
-			BlubberbeardSkillData.Kind.SKY_DIVE: 2.9,
-			BlubberbeardSkillData.Kind.POWDER_BARREL: 2.6,
-			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 2.4,
-			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 0.65,
+			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 3.6,
+			BlubberbeardSkillData.Kind.VENOM_SPIT: 3.2,
+			BlubberbeardSkillData.Kind.SKY_DIVE: 2.8,
+			BlubberbeardSkillData.Kind.POWDER_BARREL: 2.4,
+			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 1.6,
 			BlubberbeardSkillData.Kind.ANCHOR_SLAM: 0.0,
 		},
 		"boundary":
 		{
-			BlubberbeardSkillData.Kind.POWDER_BARREL: 4.8,
-			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 1.0,
+			BlubberbeardSkillData.Kind.POWDER_BARREL: 4.4,
+			BlubberbeardSkillData.Kind.SPIKY_INFLATION: 2.2,
+			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 1.4,
 			BlubberbeardSkillData.Kind.SKY_DIVE: 0.0,
 			BlubberbeardSkillData.Kind.VENOM_SPIT: 0.0,
-			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND: 0.0,
 			BlubberbeardSkillData.Kind.ANCHOR_SLAM: 0.0,
 		},
 	},

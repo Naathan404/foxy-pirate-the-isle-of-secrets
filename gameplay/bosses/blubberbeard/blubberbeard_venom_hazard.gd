@@ -34,6 +34,7 @@ var _direct_hitbox: HitBox
 var _pool_area: Area3D
 var _trail_particles: CPUParticles3D
 var _fume_particles: CPUParticles3D
+var _last_hit_time_by_actor: Dictionary[int, float] = {}
 
 
 static func fire_fan_volley(
@@ -59,21 +60,42 @@ static func fire_fan_volley(
 	)
 	var base_vec := target_pos - boss.global_position
 	base_vec.y = 0.0
+	var pool_rad := maxf(0.5, skill.venom_pool_radius * pool_scale)
+	var min_sep := pool_rad * 2.08
 	var dist := clampf(base_vec.length(), 3.2, 13.5)
 	var aim_dir := base_vec.normalized() if not base_vec.is_zero_approx() else Vector3.BACK
 	var shots := maxi(1, skill.venom_shot_count)
-	var half_arc := deg_to_rad(skill.venom_spread_angle_deg) * 0.5
-	for i in shots:
-		var angle := lerpf(-half_arc, half_arc, 0.5 if shots == 1 else float(i) / float(shots - 1))
-		var land := boss.global_position + aim_dir.rotated(Vector3.UP, angle) * dist
-		land.y = ground_y
+	var base_step := (
+		deg_to_rad(skill.venom_spread_angle_deg) / float(shots - 1) if shots > 1 else 0.0
+	)
+	var eff_step := base_step
+	if shots > 1 and 2.0 * dist * sin(eff_step * 0.5) < min_sep:
+		var needed_sin := clampf(min_sep / (2.0 * maxf(dist, 0.5)), 0.0, 0.99)
+		eff_step = minf(deg_to_rad(38.0), maxf(base_step, 2.0 * asin(needed_sin)))
+	var side_min_dist := min_sep / maxf(2.0 * sin(eff_step * 0.5), 0.15) if shots > 1 else dist
+	var occupied := _collect_active_pool_spots(boss)
+	var space := (
+		boss.get_world_3d().direct_space_state
+		if boss.is_inside_tree() and boss.get_world_3d() != null
+		else null
+	)
+	var check_bounds := _has_walkable_floor(boss, space, ground_y)
+	var shot_order := _center_first_order(shots)
+	for idx in shot_order:
+		var offset_idx := float(idx) - float(shots - 1) * 0.5
+		var angle := offset_idx * eff_step
+		var desired_dist := dist if is_zero_approx(offset_idx) else maxf(dist, side_min_dist)
+		var land := _resolve_non_overlapping_spot(
+			boss, aim_dir, angle, desired_dist, ground_y, pool_rad, occupied, space, check_bounds
+		)
+		occupied.append({"pos": land, "radius": pool_rad})
 		var hazard := BlubberbeardVenomHazard.new()
 		hazard.setup_shot(
 			boss,
 			origin,
 			land,
 			skill.damage,
-			skill.venom_pool_radius * pool_scale,
+			pool_rad,
 			skill.venom_pool_duration,
 			skill.venom_tick_damage,
 			skill.venom_tick_interval
@@ -82,6 +104,113 @@ static func fire_fan_volley(
 			hazard.splashed.connect(on_splashed)
 		container.add_child(hazard)
 	return aim_dir
+
+
+static func _center_first_order(shots: int) -> Array[int]:
+	var order: Array[int] = []
+	for i in shots:
+		order.append(i)
+	var half := float(shots - 1) * 0.5
+	order.sort_custom(
+		func(a: int, b: int) -> bool:
+			var da := absf(float(a) - half)
+			var db := absf(float(b) - half)
+			if not is_equal_approx(da, db):
+				return da < db
+			return a < b
+	)
+	return order
+
+
+static func _collect_active_pool_spots(boss: Node3D) -> Array[Dictionary]:
+	var spots: Array[Dictionary] = []
+	if not boss.is_inside_tree():
+		return spots
+	for node in boss.get_tree().get_nodes_in_group(HAZARD_GROUP):
+		if not is_instance_valid(node) or node.is_queued_for_deletion():
+			continue
+		if not (node is Node3D):
+			continue
+		var hazard_node := node as Node3D
+		var pos := hazard_node.global_position
+		if int(hazard_node.get("_stage")) == Stage.FLIGHT:
+			var landing: Variant = hazard_node.get("_landing_pos")
+			if landing is Vector3:
+				pos = landing as Vector3
+		var radius := float(hazard_node.get("pool_radius"))
+		if radius > 0.0:
+			spots.append({"pos": pos, "radius": radius})
+	return spots
+
+
+static func _has_walkable_floor(
+	boss: Node3D, space: PhysicsDirectSpaceState3D, ground_y: float
+) -> bool:
+	if space == null:
+		return false
+	var excluded: Array[RID] = []
+	if boss is CollisionObject3D:
+		excluded.append((boss as CollisionObject3D).get_rid())
+	var center := Vector3(boss.global_position.x, ground_y, boss.global_position.z)
+	return not BlubberbeardAI.spot_crosses_boundary(space, center, center, ground_y, excluded)
+
+
+static func _resolve_non_overlapping_spot(
+	boss: Node3D,
+	aim_dir: Vector3,
+	target_angle: float,
+	desired_dist: float,
+	ground_y: float,
+	pool_rad: float,
+	occupied: Array[Dictionary],
+	space: PhysicsDirectSpaceState3D,
+	check_bounds: bool
+) -> Vector3:
+	var excluded: Array[RID] = []
+	if boss is CollisionObject3D:
+		excluded.append((boss as CollisionObject3D).get_rid())
+	var from_pos := Vector3(boss.global_position.x, ground_y, boss.global_position.z)
+	var fallback_spot := (
+		boss.global_position
+		+ aim_dir.rotated(Vector3.UP, target_angle) * clampf(desired_dist, 2.4, 18.0)
+	)
+	fallback_spot.y = ground_y
+	var best_clearance := _min_spot_clearance(fallback_spot, pool_rad, occupied)
+	for ang_m in [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6]:
+		var cand_angle := target_angle + float(ang_m) * deg_to_rad(20.0)
+		var radial_mults := [0.0, 1.1, 2.2, 3.3, 4.4] if ang_m == 0 else [0.0, 1.1, 2.2, 3.3, -0.75]
+		for r_mult in radial_mults:
+			var cand_dist := clampf(desired_dist + float(r_mult) * pool_rad, 2.4, 18.0)
+			var cand := boss.global_position + aim_dir.rotated(Vector3.UP, cand_angle) * cand_dist
+			cand.y = ground_y
+			if (
+				check_bounds
+				and BlubberbeardAI.spot_crosses_boundary(space, from_pos, cand, ground_y, excluded)
+			):
+				continue
+			var clearance := _min_spot_clearance(cand, pool_rad, occupied)
+			if clearance >= 0.0:
+				return cand
+			if clearance > best_clearance:
+				best_clearance = clearance
+				fallback_spot = cand
+	return fallback_spot
+
+
+static func _min_spot_clearance(
+	candidate: Vector3, pool_rad: float, occupied: Array[Dictionary]
+) -> float:
+	var min_clear := INF
+	for spot in occupied:
+		var other := spot["pos"] as Vector3
+		var other_rad := float(spot["radius"])
+		var dx := candidate.x - other.x
+		var dz := candidate.z - other.z
+		var dist := sqrt(dx * dx + dz * dz)
+		var clearance := dist - (pool_rad + other_rad + 0.16)
+		if clearance < min_clear:
+			min_clear = clearance
+	return min_clear
 
 
 func setup_shot(
@@ -189,24 +318,44 @@ func _enter_pool() -> void:
 	_fume_particles.emitting = true
 	splashed.emit(_landing_pos, pool_radius)
 	_spawn_splash_burst()
+	_apply_poison_tick.call_deferred()
 
 
 func _apply_poison_tick() -> void:
 	if not is_instance_valid(_pool_area):
 		return
 	for area in _pool_area.get_overlapping_areas():
-		var hurtbox := area as HurtBox
-		if hurtbox == null:
-			continue
-		var ctx := DamageContext.new()
-		ctx.source = source if is_instance_valid(source) else self
-		ctx.source_team = CombatTeams.ENEMY
-		ctx.base_amount_hp = tick_damage
-		ctx.amount_hp = tick_damage
-		ctx.tag = &"poison"
-		ctx.origin = _landing_pos
-		ctx.knockback_multiplier = 0.0
-		hurtbox.take_damage(ctx)
+		_apply_poison_to_hurtbox(area as HurtBox)
+
+
+func _on_pool_area_entered(area: Area3D) -> void:
+	if _stage == Stage.POOL:
+		_apply_poison_to_hurtbox(area as HurtBox)
+
+
+func _apply_poison_to_hurtbox(hurtbox: HurtBox) -> void:
+	if hurtbox == null:
+		return
+	var actor_id := (
+		hurtbox.actor.get_instance_id()
+		if is_instance_valid(hurtbox.actor)
+		else hurtbox.get_instance_id()
+	)
+	if (
+		_last_hit_time_by_actor.has(actor_id)
+		and _clock - _last_hit_time_by_actor[actor_id] < tick_interval - 0.02
+	):
+		return
+	_last_hit_time_by_actor[actor_id] = _clock
+	var ctx := DamageContext.new()
+	ctx.source = source if is_instance_valid(source) else self
+	ctx.source_team = CombatTeams.ENEMY
+	ctx.base_amount_hp = tick_damage
+	ctx.amount_hp = tick_damage
+	ctx.tag = &"poison"
+	ctx.origin = _landing_pos
+	ctx.knockback_multiplier = 0.0
+	hurtbox.take_damage(ctx)
 
 
 func _on_direct_hit(_damage: DamageContext, _target: Node, _applied: float) -> void:
@@ -344,6 +493,7 @@ func _build_pool_area() -> void:
 	col.shape = cyl
 	col.position = Vector3(0.0, 0.8, 0.0)
 	_pool_area.add_child(col)
+	_pool_area.area_entered.connect(_on_pool_area_entered)
 	add_child(_pool_area)
 
 

@@ -6,6 +6,8 @@ signal fight_started
 signal fight_finished
 signal damaged(applied_hp: float)
 signal reward_spawned(chest: Node3D)
+signal stagger_changed(current_stagger: float, threshold: float, immunity_remaining: float)
+signal stagger_broken(duration_seconds: float)
 
 @export var boss_data: BossData
 @export_range(1.0, 100.0, 1.0) var activation_range: float = 20.0
@@ -19,6 +21,11 @@ var phase_index: int = 0
 var dead: bool = false
 var fighting: bool = false
 var target: Node3D
+var stagger_amount: float = 0.0
+
+var _stagger_decay_remaining: float = 0.0
+var _stagger_immunity_remaining: float = 0.0
+var _stagger_active_remaining: float = 0.0
 
 @onready var hp: HealthComponent = $HealthComponent
 @onready var hurtbox: HurtBox = $HurtBox
@@ -83,6 +90,8 @@ func receive_damage(damage: DamageContext) -> float:
 	if applied > 0.0:
 		if is_instance_valid(damage.source) and damage.source.has_signal("combat_activity"):
 			damage.source.emit_signal("combat_activity")
+		if not dead and hp.is_alive():
+			_accumulate_stagger(damage.stagger_damage)
 		damaged.emit(applied)
 	return applied
 
@@ -100,6 +109,74 @@ func start_fight(player: Node3D) -> void:
 
 func is_defeated() -> bool:
 	return dead
+
+
+func is_staggered() -> bool:
+	return not dead and _stagger_active_remaining > 0.0
+
+
+func is_stagger_immune() -> bool:
+	return not dead and _stagger_immunity_remaining > 0.0
+
+
+func get_stagger_threshold() -> float:
+	if boss_data == null:
+		return 340.0
+	return maxf(1.0, boss_data.stagger_threshold)
+
+
+func get_stagger_decay_delay_remaining() -> float:
+	return _stagger_decay_remaining
+
+
+func get_stagger_active_remaining() -> float:
+	return _stagger_active_remaining
+
+
+func get_stagger_immunity_remaining() -> float:
+	return _stagger_immunity_remaining
+
+
+func get_debug_combat_summary() -> String:
+	return ""
+
+
+## Trigger an immediate stagger break in debug builds for verification.
+func debug_trigger_stagger() -> bool:
+	if not OS.is_debug_build() or dead or not fighting or boss_data == null:
+		return false
+	if not _on_can_stagger_break():
+		return false
+	_stagger_immunity_remaining = 0.0
+	stagger_amount = get_stagger_threshold()
+	_trigger_stagger_break()
+	return true
+
+
+func update_stagger(delta: float) -> void:
+	if dead or boss_data == null:
+		return
+	var elapsed := maxf(0.0, delta)
+	var prev_active := _stagger_active_remaining
+	var prev_imm := _stagger_immunity_remaining
+	var prev_stagger := stagger_amount
+	if _stagger_active_remaining > 0.0:
+		_stagger_active_remaining = maxf(0.0, _stagger_active_remaining - elapsed)
+		if _stagger_active_remaining <= 0.0:
+			_stagger_immunity_remaining = boss_data.stagger_immunity_duration_seconds
+			_on_stagger_ended()
+	elif _stagger_immunity_remaining > 0.0:
+		_stagger_immunity_remaining = maxf(0.0, _stagger_immunity_remaining - elapsed)
+	elif stagger_amount > 0.0:
+		var decay_time := maxf(0.0, elapsed - _stagger_decay_remaining)
+		_stagger_decay_remaining = maxf(0.0, _stagger_decay_remaining - elapsed)
+		stagger_amount = maxf(0.0, stagger_amount - boss_data.stagger_decay_per_second * decay_time)
+	if (
+		not is_equal_approx(prev_stagger, stagger_amount)
+		or not is_equal_approx(prev_active, _stagger_active_remaining)
+		or not is_equal_approx(prev_imm, _stagger_immunity_remaining)
+	):
+		_emit_stagger_changed()
 
 
 func debug_trigger_phase_two() -> bool:
@@ -169,6 +246,11 @@ func _on_death() -> void:
 		return
 	dead = true
 	fighting = false
+	stagger_amount = 0.0
+	_stagger_decay_remaining = 0.0
+	_stagger_immunity_remaining = 0.0
+	_stagger_active_remaining = 0.0
+	_emit_stagger_changed()
 	velocity = Vector3.ZERO
 	hurtbox.enabled = false
 	hurtbox.set_deferred("monitorable", false)
@@ -193,8 +275,56 @@ func _on_can_receive_damage(_damage: DamageContext) -> bool:
 	return true
 
 
-func _on_fight_tick(_delta: float) -> void:
+func _on_fight_tick(delta: float) -> void:
+	update_stagger(delta)
+
+
+func _on_can_accumulate_stagger(_amount: float) -> bool:
+	return true
+
+
+func _on_can_stagger_break() -> bool:
+	return true
+
+
+func _on_stagger_broken(_duration_seconds: float) -> void:
 	pass
+
+
+func _on_stagger_ended() -> void:
+	pass
+
+
+func _accumulate_stagger(amount: float) -> void:
+	if dead or boss_data == null or not is_finite(amount) or amount <= 0.0:
+		return
+	if _stagger_immunity_remaining > 0.0 or _stagger_active_remaining > 0.0:
+		return
+	if not _on_can_accumulate_stagger(amount):
+		return
+	var threshold := get_stagger_threshold()
+	stagger_amount = minf(threshold, stagger_amount + amount)
+	_stagger_decay_remaining = boss_data.stagger_decay_delay_seconds
+	if stagger_amount >= threshold:
+		if _on_can_stagger_break():
+			_trigger_stagger_break()
+			return
+		stagger_amount = maxf(0.0, threshold - 0.01)
+	_emit_stagger_changed()
+
+
+func _trigger_stagger_break() -> void:
+	stagger_amount = 0.0
+	_stagger_decay_remaining = 0.0
+	var duration := maxf(0.2, boss_data.stagger_duration_seconds)
+	_stagger_active_remaining = duration
+	_emit_stagger_changed()
+	_on_stagger_broken(duration)
+	stagger_broken.emit(duration)
+
+
+func _emit_stagger_changed() -> void:
+	stagger_changed.emit(stagger_amount, get_stagger_threshold(), _stagger_immunity_remaining)
 
 
 func _on_phase_entered(_index: int) -> void:

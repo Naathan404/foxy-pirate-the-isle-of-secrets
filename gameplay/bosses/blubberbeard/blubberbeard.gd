@@ -9,6 +9,7 @@ enum State {
 	SPIKY_HOLD,
 	WHIRLWIND,
 	COUNTER_SHOCK,
+	STAGGERED,
 	RECOVERY,
 }
 
@@ -30,8 +31,8 @@ const SPIKY_THORN_BODY_RADIUS := 2.15
 @export_range(0.5, 2.0, 0.05) var boss_size_scale: float = 1.0:
 	set(value):
 		boss_size_scale = clampf(value, 0.5, 2.0)
-		if is_inside_tree():
-			_apply_boss_size_scale()
+		if is_instance_valid(_size_rig):
+			_size_rig.apply_base_scale(boss_size_scale)
 @export_range(1.0, 100.0, 1.0) var recovery_deceleration: float = 80.0
 @export_range(0.0, 12.0, 0.1, "suffix:m/s") var move_speed: float = 4.6
 @export_range(1.0, 20.0, 0.5, "suffix:m") var preferred_distance: float = 2.8
@@ -91,6 +92,7 @@ var _counter_cooldown_left: float = 0.0
 var _counter_shock_velocity: Vector3 = Vector3.ZERO
 var _pending_counter_burst: bool = false
 var _hurt_remaining: float = 0.0
+var _hurt_flinch_cooldown_left: float = 0.0
 var _walk_dust_timer: float = 0.0
 var _walk_dust_side: float = 1.0
 var _strafe_sign: float = 1.0
@@ -114,7 +116,7 @@ func _on_boss_setup() -> void:
 	charge_hitbox.team = CombatTeams.ENEMY
 	charge_hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
 	charge_hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
-	charge_hitbox.damage_applied.connect(_on_direct_attack_damage)
+	charge_hitbox.damage_applied.connect(_on_attack_damage_applied)
 	damaged.connect(_hit_feedback)
 	_ground_y = global_position.y
 	_ai = AI_CLASS.new()
@@ -130,7 +132,7 @@ func _on_boss_setup() -> void:
 	dust = feedback.create_dust_emitter()
 	_size_rig = SIZE_RIG.new()
 	_size_rig.setup(self, visual)
-	_apply_boss_size_scale()
+	_size_rig.apply_base_scale(boss_size_scale)
 
 
 func _on_fight_started() -> void:
@@ -149,10 +151,15 @@ func _on_fight_tick(delta: float) -> void:
 
 func fight_tick(delta: float) -> void:
 	var step := maxf(0.0, delta)
+	update_stagger(step)
 	_ai.tick(step)
+	_hurt_flinch_cooldown_left = maxf(0.0, _hurt_flinch_cooldown_left - step)
 	_counter_cooldown_left = maxf(0.0, _counter_cooldown_left - step)
 	_anchor_slam_cooldown_left = maxf(0.0, _anchor_slam_cooldown_left - step)
 	_apply_gravity_to_floor(step)
+	if state == State.STAGGERED:
+		_update_staggered(step)
+		return
 	if state == State.COUNTER_SHOCK:
 		_update_counter_shock(step)
 		return
@@ -203,6 +210,14 @@ func current_phase() -> BossPhaseData:
 	return boss_data.phases[mini(phase_index, boss_data.phases.size() - 1)]
 
 
+func get_debug_combat_summary() -> String:
+	var armor := "ON" if _has_super_armor() else "OFF"
+	return (
+		"%s | Armor: %s | Counter: %d/%d"
+		% [State.keys()[state], armor, _hits_since_counter, hits_before_counter]
+	)
+
+
 func roll_barrel_throw_count() -> int:
 	if skill == null:
 		return 1
@@ -237,7 +252,7 @@ func _choose_skill() -> void:
 	_ai.mark_used(skill.kind)
 	_anchor_slam_active = false
 	_pending_counter_burst = false
-	_hide_slam_warning()
+	feedback.hide_slam_warning()
 	state = State.WINDUP
 	timer = skill.windup
 	aim_direction = _flat_direction_to(target.global_position)
@@ -377,11 +392,13 @@ func _pick_spaced_spot(
 	var fallback_angle := TAU * float(slot_idx) / float(maxi(1, slot_count))
 	var best := anchor + Vector3.RIGHT.rotated(Vector3.UP, fallback_angle) * r_min
 	var best_dist := -1.0
+	var space := get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() else null
+	var excluded := _ray_excludes()
 	for _attempt in 14:
 		var ang := randf() * TAU
 		var rad := randf_range(r_min, r_max)
 		var candidate := anchor + Vector3(cos(ang), 0.0, sin(ang)) * rad
-		if _spot_crosses_boundary(anchor, candidate):
+		if AI_CLASS.spot_crosses_boundary(space, anchor, candidate, _ground_y, excluded):
 			continue
 		var min_sep := INF
 		for prev in existing:
@@ -465,7 +482,7 @@ func _update_standard_windup() -> void:
 			BlubberbeardSkillData.Kind.ANCHOR_WHIRLWIND:
 				_whirlwind_rig.update_windup(progress)
 			BlubberbeardSkillData.Kind.SPIKY_INFLATION:
-				_update_slam_warning_alpha(0.14 + progress * 0.34)
+				feedback.update_slam_warning_alpha(0.14 + progress * 0.34)
 		return
 	_execute_skill()
 
@@ -490,7 +507,7 @@ func _enter_skydive_leap() -> void:
 func _update_skydive_leap(delta: float) -> void:
 	feedback.skydive_flight_tick(delta, visual.airborne_height, aim_direction)
 	if _skydive.tick_leap(delta):
-		_hide_slam_warning()
+		feedback.hide_slam_warning()
 		var dmg := skill.damage if skill != null else 3.0
 		var rad := (skill.radius if skill != null else 2.5) * _current_damage_size_scale()
 		var impact_pos := _skydive.target_position
@@ -540,15 +557,15 @@ func _execute_spiky_burst() -> void:
 	var dmg := skill.damage if skill != null else (3.5 if phase_index > 0 else 2.5)
 	var rad := _current_spike_burst_radius()
 	var hold_dur := _current_spiky_hold_duration()
-	var thorn_rad := _current_spiky_thorn_radius()
+	var thorn_rad := SPIKY_THORN_BODY_RADIUS * _current_damage_size_scale()
 	_trigger_aoe_hit(global_position, rad, dmg, &"boss_spiky_burst", 1.8)
 	_begin_spiky_thorn_hitbox(dmg, thorn_rad)
 	state = State.SPIKY_HOLD
 	timer = hold_dur
 	visual.begin_spike_burst(hold_dur)
-	_sync_colliders_to_size()
+	_size_rig.sync(boss_size_scale)
 	_show_aoe_warning(global_position, thorn_rad, Color(1.0, 0.25, 0.08))
-	_update_slam_warning_alpha(0.24)
+	feedback.update_slam_warning_alpha(0.24)
 	_pending_counter_burst = false
 
 
@@ -557,11 +574,11 @@ func _update_spiky_hold() -> void:
 	move_and_slide()
 	var hold_dur := maxf(0.1, _current_spiky_hold_duration())
 	var pulse := 0.18 + absf(sin((1.0 - clampf(timer / hold_dur, 0.0, 1.0)) * TAU)) * 0.14
-	_update_slam_warning_alpha(pulse)
+	feedback.update_slam_warning_alpha(pulse)
 	if timer <= 0.0:
 		if is_instance_valid(_aoe_hitbox):
 			_aoe_hitbox.end_attack()
-		_hide_slam_warning()
+		feedback.hide_slam_warning()
 		_enter_recovery()
 
 
@@ -623,20 +640,13 @@ func _update_counter_shock(delta: float) -> void:
 
 
 func _enter_recovery() -> void:
-	_anchor_slam_active = false
-	_hide_slam_warning()
-	_skydive.hide_all()
-	_whirlwind_rig.hide_all()
-	if is_instance_valid(_aoe_hitbox):
-		_aoe_hitbox.end_attack()
+	_cancel_active_attacks_for_interrupt(false)
 	var prev_kind := skill.kind if skill != null else BlubberbeardSkillData.Kind.POWDER_BARREL
-	visual.begin_recovery(prev_kind)
-	_sync_colliders_to_size()
+	_size_rig.sync(boss_size_scale)
 	state = State.RECOVERY
-	if prev_kind == BlubberbeardSkillData.Kind.ANCHOR_SLAM:
-		timer = anchor_slam_recovery
-		return
-	timer = skill.recovery if skill != null else 0.55
+	var is_slam := prev_kind == BlubberbeardSkillData.Kind.ANCHOR_SLAM
+	timer = anchor_slam_recovery if is_slam else (skill.recovery if skill != null else 0.55)
+	visual.begin_recovery(prev_kind, timer)
 
 
 func _enter_wait() -> void:
@@ -666,34 +676,36 @@ func _has_super_armor() -> bool:
 	)
 
 
-func _hit_feedback(_amount: float) -> void:
-	if dead:
-		return
-	visual.flash_hit()
-	var armored := _has_super_armor()
-	if _hits_since_counter < hits_before_counter:
-		_hits_since_counter += 1
-		if not armored and (state == State.WAIT or state == State.RECOVERY):
-			_hurt_remaining = visual.HURT_DURATION
-		return
-	if armored:
-		return
-	if _counter_cooldown_left <= 0.0 and is_instance_valid(target):
-		_begin_spiky_counter()
-	elif state == State.WAIT or state == State.RECOVERY:
-		_hurt_remaining = visual.HURT_DURATION
+func _on_can_stagger_break() -> bool:
+	return not (state == State.SKYDIVE_LEAP and position.y > _ground_y + 0.35)
 
 
-func _on_phase_entered(index: int) -> void:
-	visual.set_enraged(index > 0)
-	_sync_colliders_to_size()
-	feedback.phase_changed()
-	visual.impact(0.32, 0.45)
-	EFFECTS.shockwave(get_parent(), global_position, 3.0, Color(0.9, 0.2, 0.4, 0.8))
-	_play_sound(0.55)
+func _on_stagger_broken(duration_seconds: float) -> void:
+	_cancel_active_attacks_for_interrupt()
+	_hits_since_counter = mini(_hits_since_counter, maxi(0, hits_before_counter - 2))
+	_hurt_remaining = 0.0
+	_pending_counter_burst = false
+	state = State.STAGGERED
+	timer = duration_seconds
+	_halt_locomotion()
+	if is_instance_valid(visual):
+		visual.begin_staggered(duration_seconds)
+	if is_instance_valid(feedback):
+		feedback.emit_skill_cue(&"stagger_broken", global_position)
 
 
-func _on_fight_ended() -> void:
+func _update_staggered(delta: float) -> void:
+	var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(
+		Vector3.ZERO, recovery_deceleration * delta
+	)
+	_set_horizontal_velocity(horizontal)
+	move_and_slide()
+	timer -= delta
+	if timer <= 0.0:
+		_enter_wait()
+
+
+func _cancel_active_attacks_for_interrupt(clear_barrels: bool = true) -> void:
 	charge_hitbox.end_attack()
 	if is_instance_valid(_aoe_hitbox):
 		_aoe_hitbox.end_attack()
@@ -701,10 +713,40 @@ func _on_fight_ended() -> void:
 		_whirlwind_rig.hide_all()
 	if is_instance_valid(_skydive):
 		_skydive.hide_all()
-	_clear_pending_barrels()
+	if clear_barrels:
+		_clear_pending_barrels()
 	_anchor_slam_active = false
-	_hide_slam_warning()
+	feedback.hide_slam_warning()
 	dust.emitting = false
+
+
+func _hit_feedback(_amount: float) -> void:
+	if dead:
+		return
+	visual.flash_hit()
+	var can_counter := not (_has_super_armor() or state == State.STAGGERED)
+	if _hits_since_counter < hits_before_counter:
+		_hits_since_counter += 1
+	elif can_counter and _counter_cooldown_left <= 0.0 and is_instance_valid(target):
+		_begin_spiky_counter()
+		return
+	var in_open_state := state == State.WAIT or state == State.RECOVERY
+	if can_counter and _hurt_flinch_cooldown_left <= 0.0 and in_open_state:
+		_hurt_remaining = visual.HURT_DURATION
+		_hurt_flinch_cooldown_left = 2.4
+
+
+func _on_phase_entered(index: int) -> void:
+	visual.set_enraged(index > 0)
+	_size_rig.sync(boss_size_scale)
+	feedback.phase_changed()
+	visual.impact(0.32, 0.45)
+	EFFECTS.shockwave(get_parent(), global_position, 3.0, Color(0.9, 0.2, 0.4, 0.8))
+	_play_sound(0.55)
+
+
+func _on_fight_ended() -> void:
+	_cancel_active_attacks_for_interrupt()
 	if is_inside_tree():
 		get_tree().call_group(VENOM_HAZARD.HAZARD_GROUP, "queue_free")
 	feedback.death()
@@ -808,9 +850,9 @@ func _update_anchor_slam_windup() -> void:
 	var windup := maxf(0.05, anchor_slam_enraged_windup if phase_index > 0 else anchor_slam_windup)
 	var progress := 1.0 - clampf(timer / windup, 0.0, 1.0)
 	visual.windup_progress = progress
-	_update_slam_warning_alpha(0.16 + progress * 0.34)
+	feedback.update_slam_warning_alpha(0.16 + progress * 0.34)
 	if timer <= 0.0:
-		_hide_slam_warning()
+		feedback.hide_slam_warning()
 		_anchor_slam_cooldown_left = anchor_slam_cooldown
 		var dmg := anchor_slam_enraged_damage if phase_index > 0 else anchor_slam_damage
 		var slam_rad := _current_anchor_slam_radius()
@@ -836,11 +878,9 @@ func _find_spike_skill() -> BlubberbeardSkillData:
 
 
 func _current_damage_size_scale() -> float:
-	return (
-		_size_rig.get_damage_scale(boss_size_scale, phase_index)
-		if _size_rig != null
-		else boss_size_scale
-	)
+	if _size_rig == null:
+		return boss_size_scale
+	return _size_rig.get_damage_scale(boss_size_scale, phase_index)
 
 
 func _current_spike_burst_radius() -> float:
@@ -850,28 +890,13 @@ func _current_spike_burst_radius() -> float:
 	return base * boss_size_scale
 
 
-func _current_spiky_thorn_radius() -> float:
-	return SPIKY_THORN_BODY_RADIUS * _current_damage_size_scale()
-
-
 func _current_anchor_slam_radius() -> float:
 	return anchor_slam_radius * _current_damage_size_scale()
 
 
 func _current_spiky_hold_duration() -> float:
-	if skill != null and skill.kind == BlubberbeardSkillData.Kind.SPIKY_INFLATION:
-		return maxf(0.4, skill.spiky_hold_duration)
-	return spiky_hold_duration
-
-
-func _apply_boss_size_scale() -> void:
-	if _size_rig != null:
-		_size_rig.apply_base_scale(boss_size_scale)
-
-
-func _sync_colliders_to_size() -> void:
-	if _size_rig != null:
-		_size_rig.sync(boss_size_scale)
+	var is_spiky := skill != null and skill.kind == BlubberbeardSkillData.Kind.SPIKY_INFLATION
+	return maxf(0.4, skill.spiky_hold_duration) if is_spiky else spiky_hold_duration
 
 
 func _trigger_aoe_hit(
@@ -913,11 +938,6 @@ func _is_position_near_boundary(pos: Vector3, margin_meters: float) -> bool:
 	return AI_CLASS.is_position_near_boundary(space, pos, _ground_y, margin_meters, _ray_excludes())
 
 
-func _spot_crosses_boundary(from_pos: Vector3, candidate: Vector3) -> bool:
-	var space := get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() else null
-	return AI_CLASS.spot_crosses_boundary(space, from_pos, candidate, _ground_y, _ray_excludes())
-
-
 func _ray_excludes() -> Array[RID]:
 	var excluded: Array[RID] = [get_rid()]
 	if is_instance_valid(target) and target is CollisionObject3D:
@@ -935,11 +955,7 @@ func _on_venom_splashed(at: Vector3, pool_radius: float) -> void:
 		feedback.emit_skill_cue(&"venom_splash", at, pool_radius)
 
 
-func _on_direct_attack_damage(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
-	feedback.aoe_hit(hit_target)
-
-
-func _on_aoe_damage(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
+func _on_attack_damage_applied(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
 	feedback.aoe_hit(hit_target)
 
 
@@ -969,7 +985,7 @@ func _create_aoe_hitbox() -> void:
 	_aoe_hitbox.team = CombatTeams.ENEMY
 	_aoe_hitbox.collision_layer = CombatLayers.ENEMY_ATTACK
 	_aoe_hitbox.collision_mask = CombatLayers.PLAYER_HURTBOX
-	_aoe_hitbox.damage_applied.connect(_on_aoe_damage)
+	_aoe_hitbox.damage_applied.connect(_on_attack_damage_applied)
 	var collider := CollisionShape3D.new()
 	_aoe_shape = SphereShape3D.new()
 	_aoe_shape.radius = anchor_slam_radius
@@ -980,11 +996,3 @@ func _create_aoe_hitbox() -> void:
 
 func _show_aoe_warning(at: Vector3, radius: float, ring_color: Color) -> void:
 	feedback.show_slam_warning(at, _ground_y, radius, anchor_slam_radius, ring_color)
-
-
-func _update_slam_warning_alpha(alpha_val: float) -> void:
-	feedback.update_slam_warning_alpha(alpha_val)
-
-
-func _hide_slam_warning() -> void:
-	feedback.hide_slam_warning()
