@@ -12,7 +12,6 @@ const SHOCKWAVE_RADIUS_PIXELS := 80.0
 
 @export var hitbox: HitBox
 @export var forward_offset: float = 0.8
-@export_range(0.0, 3.0, 0.05) var heavy_crate_knockback_distance: float = 0.9
 @export_range(1.0, 2.0, 0.05) var destructible_shake_multiplier: float = 1.15
 
 @export_group("Combo Hitbox")
@@ -55,10 +54,6 @@ func activate() -> void:
 	_impact_played = false
 	if context.combo_step != null:
 		_configure_swing()
-	context.crate_knockback_distance = (
-		heavy_crate_knockback_distance
-		if context.combo_step != null and context.combo_step.heavy_impact else 0.0
-	)
 
 	hitbox.begin_attack_with_context(context.create_damage_context())
 	if context.combo_step != null:
