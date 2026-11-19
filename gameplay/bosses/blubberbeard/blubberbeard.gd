@@ -22,6 +22,7 @@ const WHIRLWIND_RIG = preload("res://gameplay/bosses/blubberbeard/anchor_whirlwi
 const EFFECTS = preload("res://gameplay/bosses/boss_effects.gd")
 
 const COUNTER_SHOCK_DURATION := 0.22
+const DEATH_CINEMATIC_CAMERA_HOLD := 2.75
 const COUNTER_SHOCK_RECOIL_SPEED := 4.2
 const COUNTER_PUFF_WINDUP := 0.68
 const SPIKY_THORN_BODY_RADIUS := 2.15
@@ -720,14 +721,34 @@ func _on_phase_entered(index: int) -> void:
 	_play_sound(0.55)
 
 
+func _should_spawn_reward_on_death() -> bool:
+	return false
+
+
 func _on_fight_ended() -> void:
 	_cancel_active_attacks_for_interrupt()
 	if is_inside_tree():
 		get_tree().call_group(VENOM_HAZARD.HAZARD_GROUP, "queue_free")
-	feedback.death()
+	feedback.death(DEATH_CINEMATIC_CAMERA_HOLD)
 	EFFECTS.shockwave(get_parent(), global_position, 3.0, Color(1.0, 0.65, 0.2, 0.8))
 	_play_sound(0.4)
-	visual.play_death(queue_free)
+	visual.play_death(_finish_death_sequence)
+
+
+func _finish_death_sequence() -> void:
+	if is_instance_valid(feedback):
+		feedback.emit_skill_cue(&"death_transform", global_position)
+	var chest := _spawn_reward()
+	if is_instance_valid(chest):
+		chest.scale = Vector3(0.25, 0.25, 0.25)
+		var tween := chest.create_tween()
+		(
+			tween
+			. tween_property(chest, "scale", Vector3.ONE, 0.42)
+			. set_trans(Tween.TRANS_BACK)
+			. set_ease(Tween.EASE_OUT)
+		)
+	queue_free()
 
 
 func _apply_gravity_to_floor(delta: float) -> void:
