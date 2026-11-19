@@ -655,7 +655,7 @@ func _on_can_stagger_break() -> bool:
 
 func _on_stagger_broken(duration_seconds: float) -> void:
 	_cancel_active_attacks_for_interrupt()
-	_hits_since_counter = mini(_hits_since_counter, maxi(0, hits_before_counter - 2))
+	_hits_since_counter = 0
 	_hurt_remaining = 0.0
 	_pending_counter_burst = false
 	state = State.STAGGERED
@@ -697,7 +697,9 @@ func _hit_feedback(_amount: float) -> void:
 	if dead:
 		return
 	visual.flash_hit()
-	var can_counter := not (_has_super_armor() or state == State.STAGGERED)
+	if state == State.STAGGERED:
+		return
+	var can_counter := not _has_super_armor()
 	if _hits_since_counter < hits_before_counter:
 		_hits_since_counter += 1
 	elif can_counter and _counter_cooldown_left <= 0.0 and is_instance_valid(target):
