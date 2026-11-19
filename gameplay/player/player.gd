@@ -17,8 +17,9 @@ signal dizzy_started(duration_seconds: float)
 const DIALOGUE_STATE_PRIORITY: int = 20
 const INK_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/ink_overlay.gd")
 const VENOM_INK_OVERLAY_NAME := &"BlubberbeardVenomOverlay"
-const POISON_STATUS_HOLD_SECONDS: float = 1.4
-const WHIRLWIND_DIZZY_SECONDS: float = 0.52
+const POISON_STATUS_HOLD_SECONDS: float = 1.6
+const WHIRLWIND_HIT_STUN_SECONDS: float = 0.52
+const WHIRLWIND_DIZZY_SECONDS: float = 2.2
 const WHIRLWIND_SPIRAL_STRENGTH: float = 1.0
 
 @export var data: PlayerData
@@ -49,7 +50,8 @@ const WHIRLWIND_SPIRAL_STRENGTH: float = 1.0
 @export_range(0.01, 2.0, 0.01, "suffix:s") var venom_ink_spread_seconds: float = 0.14
 @export_range(0.0, 3.0, 0.05, "suffix:s") var venom_ink_hold_seconds: float = 0.55
 @export_range(0.05, 4.0, 0.05, "suffix:s") var venom_ink_fade_seconds: float = 1.15
-@export_range(0.2, 1.0, 0.05) var poison_move_speed_multiplier: float = 0.72
+@export_range(0.15, 1.0, 0.05) var poison_move_speed_multiplier: float = 0.45
+@export_range(0.15, 1.0, 0.05) var dizzy_move_speed_multiplier: float = 0.45
 
 var move_direction: Vector3 = Vector3.ZERO
 # Đứng yên vẫn nhớ hướng để đánh và dash
@@ -243,7 +245,9 @@ func _on_damaged(_applied_hp: float) -> void:
 		return
 	# Đòn chí mạng để state Death xử lý, không vào Hit nữa
 	if hp.is_alive():
-		var hit_duration := WHIRLWIND_DIZZY_SECONDS if pending_hit_spiral_strength > 0.0 else -1.0
+		var hit_duration := (
+			WHIRLWIND_HIT_STUN_SECONDS if pending_hit_spiral_strength > 0.0 else -1.0
+		)
 		notify_hit(hit_duration)
 
 
@@ -253,6 +257,13 @@ func is_poisoned() -> bool:
 
 func is_dizzy() -> bool:
 	return not dead and dizzy_remaining > 0.0
+
+
+func apply_dizzy(duration_seconds: float) -> void:
+	if dead or duration_seconds <= 0.0:
+		return
+	dizzy_remaining = maxf(dizzy_remaining, duration_seconds)
+	dizzy_started.emit(dizzy_remaining)
 
 
 func is_suppressing_hit_reaction() -> bool:
@@ -298,8 +309,7 @@ func receive_damage(damage: DamageContext) -> float:
 		_post_hit_invulnerability_remaining = 0.0
 	if applied_hp > 0:
 		if damage.tag == &"boss_venom_hit":
-			poison_remaining = maxf(poison_remaining, POISON_STATUS_HOLD_SECONDS)
-			_trigger_venom_ink_splash()
+			_apply_poison_status(true)
 		if is_instance_valid(charm_socket_manager):
 			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
 	return applied_hp
@@ -312,13 +322,18 @@ func _apply_poison_damage_tick(damage: DamageContext, amount: float) -> float:
 	var applied_hp := hp.take_damage(amount)
 	_suppress_next_hit_reaction = false
 	if applied_hp > 0.0:
-		poison_remaining = maxf(poison_remaining, POISON_STATUS_HOLD_SECONDS)
-		if not was_poisoned:
-			_trigger_venom_ink_splash()
+		_apply_poison_status(not was_poisoned)
 		poison_ticked.emit(applied_hp)
 		if is_instance_valid(charm_socket_manager):
 			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
 	return applied_hp
+
+
+func _apply_poison_status(show_ink_splash: bool) -> void:
+	poison_remaining = maxf(poison_remaining, POISON_STATUS_HOLD_SECONDS)
+	apply_dizzy(POISON_STATUS_HOLD_SECONDS)
+	if show_ink_splash:
+		_trigger_venom_ink_splash()
 
 
 func _prepare_incoming_hit_motion(damage: DamageContext) -> void:
@@ -822,7 +837,7 @@ func _get_move_speed() -> float:
 	}
 	if is_instance_valid(charm_socket_manager):
 		charm_socket_manager.modify_stats(stats)
-	var poison_mult := poison_move_speed_multiplier if is_poisoned() else 1.0
+	var status_speed_mult := _get_status_move_speed_multiplier()
 	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
 	return maxf(
 		0.0,
@@ -830,6 +845,15 @@ func _get_move_speed() -> float:
 			(data.move_speed + stats[&"move_speed_flat"])
 			* stats[&"move_speed_multiplier"]
 			* environment_move_speed_multiplier
-			* poison_mult
+			* status_speed_mult
 		)
 	)
+
+
+func _get_status_move_speed_multiplier() -> float:
+	var mult := 1.0
+	if is_poisoned():
+		mult = minf(mult, poison_move_speed_multiplier)
+	if is_dizzy():
+		mult = minf(mult, dizzy_move_speed_multiplier)
+	return mult

@@ -94,8 +94,9 @@ func _process(delta: float) -> void:
 	_dizzy_clock += maxf(0.0, delta)
 	if is_instance_valid(_dizzy_ring):
 		_dizzy_ring.rotation.y = _dizzy_clock * 9.5
+		_dizzy_ring.position.y = 2.22 + sin(_dizzy_clock * 7.0) * 0.05
 	if is_instance_valid(visual):
-		visual.rotation.z = sin(_dizzy_clock * 24.0) * 0.12
+		visual.rotation.z = sin(_dizzy_clock * 20.0) * 0.11
 
 
 func _create_sparks() -> void:
@@ -239,21 +240,29 @@ func _create_vignette() -> void:
 func _create_dizzy_stars() -> void:
 	_dizzy_ring = Node3D.new()
 	_dizzy_ring.name = "DizzyStarsHalo"
-	_dizzy_ring.position = Vector3(0.0, 2.05, 0.0)
+	_dizzy_ring.position = Vector3(0.0, 2.22, 0.0)
 	_dizzy_ring.visible = false
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 0.88, 0.25)
+	mat.albedo_color = Color(1.0, 0.9, 0.22)
+	var star_axes := [
+		Vector3(0.24, 0.07, 0.07),
+		Vector3(0.07, 0.24, 0.07),
+		Vector3(0.07, 0.07, 0.24),
+	]
 	for idx in 3:
 		var angle := TAU * float(idx) / 3.0
-		var star := MeshInstance3D.new()
-		var box := BoxMesh.new()
-		box.size = Vector3(0.14, 0.14, 0.14)
-		star.mesh = box
-		star.material_override = mat
-		star.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		star.position = Vector3(cos(angle) * 0.45, 0.0, sin(angle) * 0.45)
-		star.rotation = Vector3(0.7, angle, 0.7)
+		var star := Node3D.new()
+		star.position = Vector3(cos(angle) * 0.5, 0.0, sin(angle) * 0.5)
+		star.rotation = Vector3(0.35, angle, 0.35)
+		for bar_size in star_axes:
+			var arm := MeshInstance3D.new()
+			var box := BoxMesh.new()
+			box.size = bar_size
+			arm.mesh = box
+			arm.material_override = mat
+			arm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			star.add_child(arm)
 		_dizzy_ring.add_child(star)
 	visual.add_child(_dizzy_ring)
 
@@ -261,8 +270,10 @@ func _create_dizzy_stars() -> void:
 func _on_dizzy_started(_duration: float) -> void:
 	if _dying:
 		return
+	var was_active := _dizzy_active
 	_dizzy_active = true
-	_dizzy_clock = 0.0
+	if not was_active:
+		_dizzy_clock = 0.0
 	if is_instance_valid(_dizzy_ring):
 		_dizzy_ring.visible = true
 	set_process(true)
