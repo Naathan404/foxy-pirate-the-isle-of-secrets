@@ -1,8 +1,8 @@
 extends SceneTree
-## Kiểm thử toàn diện cho VenomVine, VenomVineAI, VenomPoolProjectile, VenomAcidPool và ForestTest.
+## Kiểm thử VenomVine, VenomVineAI, VenomPoolProjectile, VenomAcidPool và ForestVenomVineTest.
 
 const VINE_SCENE := preload("res://gameplay/enemies/venom_vine/venom_vine.tscn")
-const FOREST_TEST_SCENE := preload("res://world/tests/forest_test.tscn")
+const FOREST_VENOM_VINE_TEST_SCENE := preload("res://world/tests/forest_venom_vine_test.tscn")
 const AI_CLASS := preload("res://gameplay/enemies/venom_vine/venom_vine_ai.gd")
 const POOL_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_acid_pool.gd")
 const PROJECTILE_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_pool_projectile.gd")
@@ -336,7 +336,7 @@ func _test_hit_reaction_and_counterattack() -> void:
 
 
 func _test_forest_test_real_foxy_integration() -> void:
-	var forest := FOREST_TEST_SCENE.instantiate()
+	var forest := FOREST_VENOM_VINE_TEST_SCENE.instantiate()
 	root.add_child(forest)
 	await _step_frames(20)
 
