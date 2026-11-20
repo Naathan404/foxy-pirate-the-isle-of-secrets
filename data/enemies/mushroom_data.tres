@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://mu0xlahsnnuj"]
+
+[ext_resource type="Script" uid="uid://bh64oflsqtaty" path="res://data/enemies/enemy_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://bh3m6d50c6isl" path="res://data/items/materials/mushroom_cap.tres" id="2_drop"]
+
+[resource]
+script = ExtResource("1_data")
+max_hp = 5.0
+move_speed = 1.1
+acceleration = 30.0
+deceleration = 30.0
+drop_item = ExtResource("2_drop")

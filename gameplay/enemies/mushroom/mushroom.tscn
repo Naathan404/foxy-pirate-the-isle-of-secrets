@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://b5kdbd2ynvi15"]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://cmiq0axuvnqil" path="res://gameplay/enemies/mushroom/mushroom.gd" id="2_script"]
+[ext_resource type="Resource" uid="uid://mu0xlahsnnuj" path="res://data/enemies/mushroom_data.tres" id="3_data"]
+[ext_resource type="Texture2D" uid="uid://d3jaram5x131o" path="res://assets/sprites/enemies/mushroom/mushroom_footless_4dir.png" id="4_sprite"]
+[ext_resource type="AnimationLibrary" uid="uid://w4rvji1tcuqg" path="res://gameplay/enemies/mushroom/mushroom_anims.tres" id="5_anims"]
+[ext_resource type="Script" uid="uid://fcbgcng11mgk" path="res://gameplay/enemies/mushroom/mushroom_patrol.gd" id="6_patrol"]
+
+[sub_resource type="CylinderShape3D" id="detector"]
+height = 3.0
+radius = 6.0
+
+[node name="Mushroom" unique_id=2089905783 instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+data = ExtResource("3_data")
+initial_state_name = &"Patrol"
+destroy_on_death = true
+
+[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14, 0)
+pixel_size = 0.007
+shaded = false
+alpha_cut = 0
+texture_filter = 1
+texture = ExtResource("4_sprite")
+hframes = 4
+vframes = 3
+
+[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
+libraries/ = ExtResource("5_anims")
+
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
+enabled = true
+
+[node name="Patrol" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=1027344009]
+script = ExtResource("6_patrol")
+
+[node name="TargetDetector" type="Area3D" parent="." index="7" unique_id=647423309]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector" index="0" unique_id=1190772148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("detector")
