@@ -175,8 +175,8 @@ gameplay/enemies/firefly/
 2. **Giai đoạn 2 — Hệ thống AI, Shader/VFX & FSM (`Firefly`):**
    - Tạo `firefly_data.tres`, `firefly_glow.gdshader`, `firefly_ai.gd`, `firefly.gd`, 6 state FSM và lắp ghép hoàn chỉnh vào `firefly.tscn` + `firefly_anims.tres`.
    - Đảm bảo luật *"trên trời không thể tiêu diệt — hạ cánh kiệt sức mới giết được"* hoạt động chính xác với cả Dao, Cung và Charm.
-3. **Giai đoạn 3 — Tích hợp `ForestTest` & Kiểm thử:**
-   - Đặt `Firefly` vào [forest_test.tscn](../../world/tests/forest_test.tscn) tại vị trí hợp lý để không tự kích hoạt ngay khi Foxy vừa spawn.
+3. **Giai đoạn 3 — Tích hợp `ForestFireflyTest` & Kiểm thử:**
+   - Đặt `Firefly` vào [forest_firefly_test.tscn](../../world/tests/forest_firefly_test.tscn) tại vị trí hợp lý để không tự kích hoạt ngay khi Foxy vừa spawn.
    - Viết & chạy kiểm thử headless (`test/firefly_test.gd` hoặc kịch bản kiểm tra tương tự `venom_vine_test.gd`) và chạy `gdlint` / `gdformat --check`.
 4. **Giai đoạn 4 — Biến thể Elite (`EliteFirefly`) *(Đợt sau)*:**
    - Kế thừa `firefly.tscn`, bật `EliteFeedback`, gắn `elite_firefly_data.tres` và kích hoạt Triple Bombing Run, Solar Flashbang, Swarm Beacon và Evasive Landing.
