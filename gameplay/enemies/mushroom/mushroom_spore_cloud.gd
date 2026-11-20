@@ -15,7 +15,7 @@ const POISON_AREA_HEIGHT := 1.8
 const DEFAULT_GROUND_MIST_OPACITY := 0.26
 const DEFAULT_GROUND_MIST_SCALE := 2.45
 const DEFAULT_VISUAL_SPREAD_SCALE := 1.15
-const FADE_OUT_SECONDS := 0.45
+const FADE_OUT_SECONDS := 0.75
 
 var _source: Node3D
 var _radius: float = 2.6
@@ -25,8 +25,8 @@ var _elapsed: float = 0.0
 var _fading: bool = false
 var _fade_remaining: float = 0.0
 var _damage_enabled: bool = false
-var _tick_interval: float = 1.0
-var _tick_damage: float = 0.5
+var _tick_interval: float = 0.85
+var _tick_damage: float = 1.0
 var _tick_remaining: float = 0.0
 var _spore_count: int = DEFAULT_SPORE_COUNT
 var _mist_count: int = DEFAULT_MIST_COUNT
@@ -131,9 +131,6 @@ func finish() -> void:
 	_fade_remaining = FADE_OUT_SECONDS
 	_particles.emitting = false
 	_spores.emitting = false
-	get_tree().create_timer(maxf(_mist_lifetime, _spore_lifetime) + 0.15, false).timeout.connect(
-		queue_free
-	)
 
 
 func _build_query_shape() -> void:
@@ -160,13 +157,25 @@ func _build_ground_mist() -> void:
 
 
 func _update_fade_out(step: float) -> void:
-	if _fade_remaining <= 0.0:
-		return
 	_fade_remaining = maxf(0.0, _fade_remaining - step)
+	var ratio := clampf(_fade_remaining / FADE_OUT_SECONDS, 0.0, 1.0)
 	if is_instance_valid(_ground_mist_material):
-		_ground_mist_material.set_shader_parameter(
-			"opacity", _ground_mist_opacity * (_fade_remaining / FADE_OUT_SECONDS)
-		)
+		_ground_mist_material.set_shader_parameter("opacity", _ground_mist_opacity * ratio)
+	_set_particles_fade_alpha(_particles, ratio)
+	_set_particles_fade_alpha(_spores, ratio)
+	if _fade_remaining <= 0.0:
+		queue_free()
+
+
+func _set_particles_fade_alpha(particles: GPUParticles3D, alpha_value: float) -> void:
+	if not is_instance_valid(particles):
+		return
+	var quad := particles.draw_pass_1 as QuadMesh
+	if quad == null:
+		return
+	var mat := quad.material as StandardMaterial3D
+	if mat != null:
+		mat.albedo_color.a = alpha_value
 
 
 func _apply_poison_tick() -> void:
@@ -244,7 +253,7 @@ func _create_particles(
 	particles.emitting = false
 	particles.amount = count
 	particles.lifetime = lifetime
-	particles.local_coords = false
+	particles.local_coords = true
 	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var visual_radius := get_visual_radius()
 	particles.visibility_aabb = AABB(

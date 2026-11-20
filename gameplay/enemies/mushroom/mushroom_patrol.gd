@@ -16,6 +16,7 @@ var _strafe_sign: float = 1.0
 var _has_awakened: bool = false
 var _chase_spore_check_remaining: float = 0.0
 var _ambush_hold_remaining: float = -1.0
+var _active_charge_duration: float = 1.6
 
 
 func _enter() -> void:
@@ -55,19 +56,21 @@ func _update(delta: float) -> void:
 	_remaining = maxf(0.0, _remaining - step)
 	var detected := _target_is_detected(mushroom)
 	var has_kb_charge := mushroom.consume_knockback_charge()
+	if has_kb_charge and not mushroom.is_inside_poison_cloud():
+		_has_awakened = true
+		if detected:
+			_last_seen = mushroom.target.global_position
+			mushroom.face_target()
+		_begin_charge(mushroom, step, mushroom.knockback_charge_duration_seconds)
+		return
 	if detected:
 		_last_seen = mushroom.target.global_position
-		if has_kb_charge and not mushroom.is_inside_poison_cloud():
-			_has_awakened = true
-			mushroom.face_target()
-			_begin_charge(mushroom, step)
-			return
 		if _phase == Phase.CHASE:
 			_has_awakened = true
 			_chase_spore_check_remaining = maxf(0.0, _chase_spore_check_remaining - step)
 	else:
 		_ambush_reset()
-		if _phase in [Phase.OBSERVE, Phase.CHASE, Phase.CHARGE, Phase.RECOVER]:
+		if _phase in [Phase.OBSERVE, Phase.CHASE]:
 			_abort_to_search(mushroom)
 			return
 	_update_phase(mushroom, step, detected)
@@ -95,6 +98,8 @@ func _update_phase(mushroom: MushroomEnemy, step: float, detected: bool) -> void
 			if _remaining <= 0.0:
 				if detected:
 					_set_phase(Phase.CHASE, 0.0)
+				elif _has_awakened:
+					_set_phase(Phase.SEARCH, mushroom.search_seconds)
 				else:
 					_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
 		Phase.SEARCH:
@@ -183,12 +188,9 @@ func _chase(mushroom: MushroomEnemy, delta: float) -> void:
 	_move_safely(mushroom, offset.normalized(), delta, mushroom.chase_speed_scale)
 
 
-func _charge(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
+func _charge(mushroom: MushroomEnemy, delta: float, _detected: bool) -> void:
 	mushroom.stop_movement(delta)
-	if not detected:
-		_abort_to_search(mushroom)
-		return
-	var duration := maxf(0.05, mushroom.charge_duration_seconds)
+	var duration := maxf(0.05, _active_charge_duration)
 	var progress := 1.0 - _remaining / duration
 	mushroom.update_charge_feedback(clampf(progress, 0.0, 1.0))
 	if _remaining > 0.0:
@@ -198,8 +200,10 @@ func _charge(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
 	if released:
 		mushroom.play_directional_animation(&"spore_release", true)
 		_set_phase(Phase.RECOVER, mushroom.recovery_seconds)
-	else:
+	elif _detected:
 		_set_phase(Phase.CHASE, 0.0)
+	else:
+		_set_phase(Phase.SEARCH, mushroom.search_seconds)
 
 
 func _search(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
@@ -253,17 +257,23 @@ func _try_roll_random_chase_charge(mushroom: MushroomEnemy, delta: float) -> boo
 		return false
 	if mushroom.is_point_in_poison_cloud(mushroom.target.global_position):
 		return false
-	if mushroom.ai != null and mushroom.ai.roll_chase_spore(mushroom.chase_spore_chance):
+	var cadence := mushroom.get_attack_cadence()
+	var effective_chance := float(cadence.get("chase_chance", mushroom.chase_spore_chance))
+	if mushroom.ai != null and mushroom.ai.roll_chase_spore(effective_chance):
 		mushroom.face_target()
 		_begin_charge(mushroom, delta)
 		return true
 	return false
 
 
-func _begin_charge(mushroom: MushroomEnemy, delta: float) -> void:
+func _begin_charge(mushroom: MushroomEnemy, delta: float, duration_override: float = -1.0) -> void:
 	mushroom.stop_movement(delta)
-	_set_phase(Phase.CHARGE, mushroom.charge_duration_seconds)
-	mushroom.begin_charge_animation()
+	var base_charge := float(
+		mushroom.get_attack_cadence().get("charge", mushroom.charge_duration_seconds)
+	)
+	_active_charge_duration = duration_override if duration_override > 0.0 else base_charge
+	_set_phase(Phase.CHARGE, _active_charge_duration)
+	mushroom.begin_charge_animation(_active_charge_duration)
 	_reset_chase_spore_timer()
 
 
@@ -283,7 +293,9 @@ func _reset_chase_spore_timer() -> void:
 	var mushroom := enemy as MushroomEnemy
 	if mushroom == null:
 		return
-	_chase_spore_check_remaining = mushroom.chase_spore_interval_seconds
+	_chase_spore_check_remaining = float(
+		mushroom.get_attack_cadence().get("chase_interval", mushroom.chase_spore_interval_seconds)
+	)
 
 
 func _reset_charge() -> void:
