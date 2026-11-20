@@ -5,16 +5,26 @@ extends EnemyBase
 const AI_CLASS := preload("res://gameplay/enemies/venom_vine/venom_vine_ai.gd")
 const PROJECTILE_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_pool_projectile.gd")
 const ACID_POOL_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_acid_pool.gd")
+const GLOW_SHADER := preload("res://gameplay/enemies/venom_vine/venom_vine_glow.gdshader")
+const PARTICLE_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_acid_particles.png")
 const DORMANT_TEXTURE := preload("res://assets/sprites/enemies/venom_vine/venom_vine_dormant.png")
 const ACTIVE_TEXTURE := preload(
 	"res://assets/sprites/enemies/venom_vine/venom_vine_active_sheet.png"
 )
 
+const PARTICLE_CELL_SIZE := 256.0
 const AGITATION_DECAY_PER_SECOND := 0.12
 const AGITATION_PER_HIT := 0.35
 const AGITATION_INNER_GAIN_PER_SECOND := 0.15
 const MIN_FLIGHT_SECONDS := 0.32
 const MAX_FLIGHT_SECONDS := 0.85
+const IDLE_GLOW_AWAKE := 0.55
+const LIGHT_ENERGY_AWAKE := 0.6
+const LIGHT_ENERGY_CHARGE_BONUS := 1.15
+const MUZZLE_FLASH_DURATION := 0.18
+const MUZZLE_DROPLET_LIFETIME := 0.28
+const NORMAL_GLOW_COLOR := Color(0.55, 1.0, 0.25)
+const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 
 @export_group("Detection & Ambush")
 ## Bán kính nhận diện ngoài (m): vào vòng này cây bắt đầu xét phục kích và tỉnh dậy.
@@ -99,6 +109,11 @@ var _hits_toward_counter: int = 0
 var _counter_cooldown_remaining_seconds: float = 0.0
 var _pending_counter: bool = false
 var _flinch_remaining_seconds: float = 0.0
+var _glow_material: ShaderMaterial
+var _ambient_spores: CPUParticles3D
+var _venom_light: OmniLight3D
+var _charge_glow_strength: float = 0.0
+var _charge_counter_mix: float = 0.0
 
 @onready var bullet_spawn: Marker3D = $Direction/BulletSpawn
 
@@ -108,7 +123,12 @@ func _ready() -> void:
 	_apply_detection_radius()
 	super()
 	set_sprite_sheet_mode(true)
+	_setup_luminous_vfx()
 	damaged.connect(_on_vine_damaged)
+
+
+func _process(_delta: float) -> void:
+	_sync_glow_vfx()
 
 
 func _physics_process(delta: float) -> void:
@@ -375,6 +395,87 @@ func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) 
 	)
 	proj.impacted.connect(_on_projectile_impacted)
 	parent.add_child(proj)
+	spawn_muzzle_flash()
+
+
+func set_charge_glow(strength: float, is_counter: bool = false) -> void:
+	_charge_glow_strength = clampf(strength, 0.0, 2.0)
+	_charge_counter_mix = 1.0 if is_counter else 0.0
+	_sync_glow_vfx()
+
+
+func spawn_muzzle_flash() -> void:
+	var parent := get_parent()
+	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
+		return
+	var spawn_pos := (
+		bullet_spawn.global_position
+		if is_instance_valid(bullet_spawn)
+		else global_position + Vector3.UP * 1.35
+	)
+
+	var orb_atlas := AtlasTexture.new()
+	orb_atlas.atlas = PARTICLE_SHEET
+	orb_atlas.region = Rect2(0.0, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
+	var flash_mat := StandardMaterial3D.new()
+	flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	flash_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	flash_mat.vertex_color_use_as_albedo = true
+	flash_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	flash_mat.albedo_texture = orb_atlas
+	flash_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	flash_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+
+	var flash := Sprite3D.new()
+	flash.name = "VenomMuzzleFlash"
+	flash.texture = orb_atlas
+	flash.pixel_size = 0.0062
+	flash.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	flash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	flash.modulate = (
+		COUNTER_GLOW_COLOR.lerp(Color.WHITE, 0.35)
+		if _charge_counter_mix > 0.5
+		else NORMAL_GLOW_COLOR.lerp(Color.WHITE, 0.35)
+	)
+	flash.scale = Vector3.ONE * 0.45
+	flash.material_override = flash_mat
+	parent.add_child(flash)
+	flash.global_position = spawn_pos
+
+	var tween := flash.create_tween().set_parallel(true)
+	tween.tween_property(flash, "scale", Vector3.ONE * 1.25, MUZZLE_FLASH_DURATION)
+	tween.tween_property(flash, "modulate:a", 0.0, MUZZLE_FLASH_DURATION)
+	tween.chain().tween_callback(flash.queue_free)
+
+	var spray := CPUParticles3D.new()
+	spray.name = "MuzzleAcidSpray"
+	spray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	spray.amount = 10
+	spray.lifetime = MUZZLE_DROPLET_LIFETIME
+	spray.one_shot = true
+	spray.explosiveness = 1.0
+	spray.local_coords = false
+	spray.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	spray.emission_sphere_radius = 0.12
+	var shoot_dir := (last_facing_direction * 0.8 + Vector3.UP * 0.55).normalized()
+	spray.direction = shoot_dir
+	spray.spread = 36.0
+	spray.initial_velocity_min = 2.0
+	spray.initial_velocity_max = 3.8
+	spray.gravity = Vector3(0.0, -7.5, 0.0)
+	spray.scale_amount_min = 0.18
+	spray.scale_amount_max = 0.34
+	spray.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
+		Color(0.85, 1.0, 0.48, 0.95), Color(0.3, 0.95, 0.22, 0.0)
+	)
+	spray.mesh = ACID_POOL_SCRIPT.create_particle_quad(2, Vector2(0.42, 0.42), true)
+	parent.add_child(spray)
+	spray.global_position = spawn_pos
+	spray.emitting = true
+	var cleanup := spray.create_tween()
+	cleanup.tween_interval(MUZZLE_DROPLET_LIFETIME + 0.18)
+	cleanup.tween_callback(spray.queue_free)
 
 
 func _on_projectile_impacted(_landing_pos: Vector3, pool: VenomAcidPool) -> void:
@@ -446,3 +547,86 @@ func _apply_detection_radius() -> void:
 			anger_radius_bonus_meters if _anger_detect_remaining_seconds > 0.0 else 0.0
 		)
 		shape.radius = outer_detection_radius_meters + extra + anger_extra
+
+
+func _setup_luminous_vfx() -> void:
+	_glow_material = ShaderMaterial.new()
+	_glow_material.shader = GLOW_SHADER
+	if is_instance_valid(visual) and is_instance_valid(visual.sprite):
+		visual.sprite.material_overlay = _glow_material
+
+	var vfx_anchor: Node3D = bullet_spawn if is_instance_valid(bullet_spawn) else self
+	var offset := Vector3.ZERO if is_instance_valid(bullet_spawn) else Vector3(0.0, 2.0, 0.25)
+
+	_venom_light = OmniLight3D.new()
+	_venom_light.name = "VenomBudLight"
+	_venom_light.light_color = NORMAL_GLOW_COLOR
+	_venom_light.light_energy = 0.0
+	_venom_light.omni_range = 3.2
+	_venom_light.shadow_enabled = false
+	_venom_light.position = offset
+	vfx_anchor.add_child(_venom_light)
+
+	_ambient_spores = CPUParticles3D.new()
+	_ambient_spores.name = "AmbientVenomSpores"
+	_ambient_spores.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_ambient_spores.amount = 10
+	_ambient_spores.lifetime = 1.6
+	_ambient_spores.emitting = false
+	_ambient_spores.local_coords = false
+	_ambient_spores.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	_ambient_spores.emission_sphere_radius = 0.48
+	_ambient_spores.direction = Vector3.UP
+	_ambient_spores.spread = 45.0
+	_ambient_spores.initial_velocity_min = 0.18
+	_ambient_spores.initial_velocity_max = 0.45
+	_ambient_spores.gravity = Vector3(0.0, 0.28, 0.0)
+	_ambient_spores.scale_amount_min = 0.14
+	_ambient_spores.scale_amount_max = 0.28
+	_ambient_spores.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
+		Color(0.65, 1.0, 0.4, 0.72), Color(0.25, 0.9, 0.2, 0.0)
+	)
+	_ambient_spores.mesh = ACID_POOL_SCRIPT.create_particle_quad(0, Vector2(0.42, 0.42), true)
+	_ambient_spores.position = offset
+	vfx_anchor.add_child(_ambient_spores)
+	_sync_glow_vfx()
+
+
+func _sync_glow_vfx() -> void:
+	var active_awake := is_awake and not dead
+	if is_instance_valid(_ambient_spores):
+		_ambient_spores.emitting = active_awake
+	if is_instance_valid(_venom_light):
+		_venom_light.light_color = NORMAL_GLOW_COLOR.lerp(COUNTER_GLOW_COLOR, _charge_counter_mix)
+		_venom_light.light_energy = (
+			LIGHT_ENERGY_AWAKE + _charge_glow_strength * LIGHT_ENERGY_CHARGE_BONUS
+			if active_awake
+			else 0.0
+		)
+	if (
+		_glow_material == null
+		or not is_instance_valid(visual)
+		or not is_instance_valid(visual.sprite)
+		or visual.sprite.texture == null
+	):
+		return
+	var sprite := visual.sprite
+	var cols := maxi(1, sprite.hframes)
+	var rows := maxi(1, sprite.vframes)
+	var frame_idx := clampi(sprite.frame, 0, cols * rows - 1)
+	var col := frame_idx % cols
+	var row := frame_idx / cols
+	var uv_size := Vector2(1.0 / float(cols), 1.0 / float(rows))
+	var uv_offset := Vector2(float(col) * uv_size.x, float(row) * uv_size.y)
+	var tex_size := sprite.texture.get_size()
+	var cell_w := tex_size.x * uv_size.x
+	var cell_h := maxf(1.0, tex_size.y * uv_size.y)
+	_glow_material.set_shader_parameter(&"sprite_texture", sprite.texture)
+	_glow_material.set_shader_parameter(&"frame_uv_offset", uv_offset)
+	_glow_material.set_shader_parameter(&"frame_uv_size", uv_size)
+	_glow_material.set_shader_parameter(&"frame_aspect", cell_w / cell_h)
+	_glow_material.set_shader_parameter(
+		&"idle_pulse_strength", IDLE_GLOW_AWAKE if active_awake else 0.0
+	)
+	_glow_material.set_shader_parameter(&"charge_strength", _charge_glow_strength)
+	_glow_material.set_shader_parameter(&"counter_mix", _charge_counter_mix)

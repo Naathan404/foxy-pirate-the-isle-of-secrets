@@ -17,12 +17,16 @@ const MIN_FLIGHT_SECONDS := 0.15
 const MIN_ARC_HEIGHT_METERS := 0.4
 const DIRECT_HIT_RADIUS_METERS := 0.42
 const SHADOW_GROUND_OFFSET_METERS := 0.025
+const FILL_GROUND_OFFSET_METERS := 0.032
 const RING_GROUND_OFFSET_METERS := 0.04
 const SPLASH_GROUND_OFFSET_METERS := 0.55
 const RING_PIXEL_DIVISOR := 200.0
 const GROUND_RAY_UP_METERS := 1.5
 const GROUND_RAY_DOWN_METERS := 4.0
 const POOL_SEPARATION_BUFFER_METERS := 0.15
+const IMPACT_DROPLET_LIFETIME := 0.36
+const DROPLET_BURST_SPEED_MIN := 1.8
+const DROPLET_BURST_SPEED_MAX := 3.6
 const SPOT_SEARCH_ANGLES_DEG := [0.0, 24.0, -24.0, 48.0, -48.0, 72.0, -72.0, 100.0, -100.0]
 const SPOT_RADIAL_OFFSETS := [0.0, 1.1, 2.2, -0.75]
 
@@ -38,7 +42,10 @@ var _elapsed_seconds: float = 0.0
 var _detonated: bool = false
 
 var _glob_sprite: Sprite3D
+var _comet_glow: Sprite3D
+var _flight_light: OmniLight3D
 var _shadow_mesh: MeshInstance3D
+var _landing_fill: MeshInstance3D
 var _landing_ring: Sprite3D
 var _trail_particles: CPUParticles3D
 var _direct_hitbox: HitBox
@@ -197,12 +204,69 @@ func _build_flight_visuals() -> void:
 	_glob_sprite.hframes = 4
 	_glob_sprite.vframes = 2
 	_glob_sprite.frame = FRAME_THORNY_POD if use_thorny else FRAME_ORB
-	_glob_sprite.pixel_size = 0.0036
+	_glob_sprite.pixel_size = 0.0038
 	_glob_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	_glob_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_glob_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_glob_sprite)
 
+	_build_comet_aura()
+	_build_ground_telegraph(pool_radius)
+
+	_trail_particles = CPUParticles3D.new()
+	_trail_particles.name = "TrailParticles"
+	_trail_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_trail_particles.amount = 22
+	_trail_particles.lifetime = 0.38
+	_trail_particles.local_coords = false
+	_trail_particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	_trail_particles.emission_sphere_radius = 0.16
+	_trail_particles.gravity = Vector3(0.0, -2.4, 0.0)
+	_trail_particles.scale_amount_min = 0.24
+	_trail_particles.scale_amount_max = 0.44
+	_trail_particles.scale_amount_curve = ACID_POOL_SCRIPT.create_scale_curve(1.0, 0.1)
+	_trail_particles.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
+		Color(0.85, 1.0, 0.45, 0.92), Color(0.25, 0.9, 0.2, 0.0)
+	)
+	_trail_particles.mesh = ACID_POOL_SCRIPT.create_particle_quad(0, Vector2(0.45, 0.45), true)
+	add_child(_trail_particles)
+	_trail_particles.emitting = true
+
+
+func _build_comet_aura() -> void:
+	var glow_atlas := AtlasTexture.new()
+	glow_atlas.atlas = PARTICLE_SHEET
+	glow_atlas.region = Rect2(0.0, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
+	var glow_mat := StandardMaterial3D.new()
+	glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glow_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	glow_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	glow_mat.albedo_texture = glow_atlas
+	glow_mat.albedo_color = Color(0.65, 1.0, 0.35, 0.72)
+	glow_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	glow_mat.no_depth_test = false
+	glow_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+
+	_comet_glow = Sprite3D.new()
+	_comet_glow.name = "CometGlow"
+	_comet_glow.texture = glow_atlas
+	_comet_glow.pixel_size = 0.0068
+	_comet_glow.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_comet_glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_comet_glow.material_override = glow_mat
+	add_child(_comet_glow)
+
+	_flight_light = OmniLight3D.new()
+	_flight_light.name = "FlightLight"
+	_flight_light.light_color = Color(0.52, 1.0, 0.28)
+	_flight_light.light_energy = 0.75
+	_flight_light.omni_range = 2.6
+	_flight_light.shadow_enabled = false
+	add_child(_flight_light)
+
+
+func _build_ground_telegraph(pool_radius: float) -> void:
 	var shadow_mat := StandardMaterial3D.new()
 	shadow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	shadow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -220,6 +284,25 @@ func _build_flight_visuals() -> void:
 	_shadow_mesh.top_level = true
 	add_child(_shadow_mesh)
 
+	var fill_mat := StandardMaterial3D.new()
+	fill_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fill_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	fill_mat.albedo_color = Color(0.45, 1.0, 0.22, 0.16)
+	fill_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	fill_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	var fill_cyl := CylinderMesh.new()
+	fill_cyl.top_radius = pool_radius
+	fill_cyl.bottom_radius = pool_radius
+	fill_cyl.height = 0.01
+	fill_cyl.material = fill_mat
+	_landing_fill = MeshInstance3D.new()
+	_landing_fill.name = "LandingWarningFill"
+	_landing_fill.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_landing_fill.mesh = fill_cyl
+	_landing_fill.top_level = true
+	add_child(_landing_fill)
+	_landing_fill.global_position = _landing_position + Vector3.UP * FILL_GROUND_OFFSET_METERS
+
 	var ring_atlas := AtlasTexture.new()
 	ring_atlas.atlas = PARTICLE_SHEET
 	ring_atlas.region = Rect2(3.0 * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
@@ -233,39 +316,6 @@ func _build_flight_visuals() -> void:
 	_landing_ring.top_level = true
 	add_child(_landing_ring)
 	_landing_ring.global_position = _landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS
-
-	_trail_particles = CPUParticles3D.new()
-	_trail_particles.name = "TrailParticles"
-	_trail_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_trail_particles.amount = 14
-	_trail_particles.lifetime = 0.32
-	_trail_particles.local_coords = false
-	_trail_particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	_trail_particles.emission_sphere_radius = 0.14
-	_trail_particles.gravity = Vector3(0.0, -3.5, 0.0)
-	_trail_particles.scale_amount_min = 0.16
-	_trail_particles.scale_amount_max = 0.32
-	_trail_particles.color = Color(0.8, 1.0, 0.55, 0.85)
-	_trail_particles.mesh = _create_droplet_quad()
-	add_child(_trail_particles)
-	_trail_particles.emitting = true
-
-
-func _create_droplet_quad() -> QuadMesh:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = PARTICLE_SHEET
-	atlas.region = Rect2(2.0 * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.vertex_color_use_as_albedo = true
-	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	mat.albedo_texture = atlas
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	var quad := QuadMesh.new()
-	quad.size = Vector2(0.45, 0.45)
-	quad.material = mat
-	return quad
 
 
 func _build_direct_hitbox() -> void:
@@ -299,6 +349,9 @@ func _build_direct_hitbox() -> void:
 func _update_flight_visuals(progress: float) -> void:
 	if is_instance_valid(_glob_sprite):
 		_glob_sprite.rotation.z = sin(_elapsed_seconds * 12.0) * 0.18
+	if is_instance_valid(_comet_glow):
+		var glow_pulse := 0.86 + 0.22 * sin(_elapsed_seconds * 18.0)
+		_comet_glow.scale = Vector3.ONE * glow_pulse
 	if is_instance_valid(_shadow_mesh):
 		var height := maxf(0.0, global_position.y - _landing_position.y)
 		var shadow_scale := clampf(1.0 - height * 0.12, 0.35, 1.0)
@@ -306,11 +359,16 @@ func _update_flight_visuals(progress: float) -> void:
 			global_position.x, _landing_position.y + SHADOW_GROUND_OFFSET_METERS, global_position.z
 		)
 		_shadow_mesh.scale = Vector3(shadow_scale, 1.0, shadow_scale)
+	if is_instance_valid(_landing_fill):
+		var fill_scale := lerpf(0.22, 1.0, progress)
+		_landing_fill.global_position = (_landing_position + Vector3.UP * FILL_GROUND_OFFSET_METERS)
+		_landing_fill.scale = Vector3(fill_scale, 1.0, fill_scale)
 	if is_instance_valid(_landing_ring):
 		var ring_scale := lerpf(0.5, 1.0, progress)
 		_landing_ring.global_position = (_landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS)
 		_landing_ring.scale = Vector3.ONE * ring_scale
-		_landing_ring.modulate.a = lerpf(0.35, 0.9, progress)
+		_landing_ring.rotation.y = _elapsed_seconds * 1.8
+		_landing_ring.modulate.a = lerpf(0.35, 0.92, progress)
 
 
 func _on_direct_hit(_damage: DamageContext, _target: Node, _applied: float) -> void:
@@ -363,16 +421,80 @@ func _spawn_splash_burst() -> void:
 	burst.hframes = 4
 	burst.vframes = 2
 	burst.frame = FRAME_SPLASH_BURST
-	burst.pixel_size = 0.0052
+	burst.pixel_size = 0.0056
 	burst.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	burst.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	parent.add_child(burst)
 	burst.global_position = _landing_position + Vector3.UP * SPLASH_GROUND_OFFSET_METERS
 	var tween := burst.create_tween().set_parallel(true)
-	tween.tween_property(burst, "scale", Vector3.ONE * 1.4, 0.28)
+	tween.tween_property(burst, "scale", Vector3.ONE * 1.45, 0.28)
 	tween.tween_property(burst, "modulate:a", 0.0, 0.28)
 	tween.chain().tween_callback(burst.queue_free)
+
+	_spawn_impact_ring(parent)
+	_spawn_impact_droplets(parent)
+
+
+func _spawn_impact_ring(parent: Node) -> void:
+	var pool_radius := maxf(0.4, float(_pool_config.get("pool_radius", 1.6)))
+	var ring_atlas := AtlasTexture.new()
+	ring_atlas.atlas = PARTICLE_SHEET
+	ring_atlas.region = Rect2(3.0 * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	ring_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ring_mat.vertex_color_use_as_albedo = true
+	ring_mat.albedo_texture = ring_atlas
+	ring_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	ring_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	var wave := Sprite3D.new()
+	wave.name = "AcidImpactWave"
+	wave.texture = ring_atlas
+	wave.pixel_size = (pool_radius * 2.0) / RING_PIXEL_DIVISOR
+	wave.rotation.x = -PI * 0.5
+	wave.modulate = Color(0.65, 1.0, 0.35, 0.9)
+	wave.scale = Vector3.ONE * 0.45
+	wave.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	wave.material_override = ring_mat
+	parent.add_child(wave)
+	wave.global_position = _landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS
+	var wave_tween := wave.create_tween().set_parallel(true)
+	wave_tween.tween_property(wave, "scale", Vector3.ONE * 1.55, 0.32)
+	wave_tween.tween_property(wave, "modulate:a", 0.0, 0.32)
+	wave_tween.chain().tween_callback(wave.queue_free)
+
+
+func _spawn_impact_droplets(parent: Node) -> void:
+	var particles := CPUParticles3D.new()
+	particles.name = "ImpactDroplets"
+	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	particles.amount = 18
+	particles.lifetime = IMPACT_DROPLET_LIFETIME
+	particles.one_shot = true
+	particles.explosiveness = 1.0
+	particles.local_coords = false
+	particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	particles.emission_sphere_radius = 0.22
+	particles.direction = Vector3.UP
+	particles.spread = 58.0
+	particles.initial_velocity_min = DROPLET_BURST_SPEED_MIN
+	particles.initial_velocity_max = DROPLET_BURST_SPEED_MAX
+	particles.gravity = Vector3(0.0, -9.8, 0.0)
+	particles.scale_amount_min = 0.22
+	particles.scale_amount_max = 0.42
+	particles.scale_amount_curve = ACID_POOL_SCRIPT.create_scale_curve(1.0, 0.15)
+	particles.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
+		Color(0.85, 1.0, 0.45, 0.95), Color(0.3, 0.95, 0.2, 0.0)
+	)
+	particles.mesh = ACID_POOL_SCRIPT.create_particle_quad(2, Vector2(0.45, 0.45), true)
+	parent.add_child(particles)
+	particles.global_position = _landing_position + Vector3.UP * 0.15
+	particles.emitting = true
+	var cleanup := particles.create_tween()
+	cleanup.tween_interval(IMPACT_DROPLET_LIFETIME + 0.2)
+	cleanup.tween_callback(particles.queue_free)
 
 
 func _spawn_split_pods_if_enabled() -> void:

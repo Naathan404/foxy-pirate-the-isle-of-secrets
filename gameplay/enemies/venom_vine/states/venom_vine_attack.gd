@@ -167,11 +167,13 @@ func _apply_charge_feedback(vine: VenomVine, progress: float) -> void:
 	var tint := COUNTER_TINT if is_counter else CHARGE_TINT
 	var pulse := 0.5 + 0.5 * sin(progress * TAU * freq)
 	vine.visual.sprite.modulate = _base_sprite_modulate.lerp(tint, progress * pulse)
+	vine.set_charge_glow(lerpf(0.3, 1.4, progress), is_counter)
 
 
 func _restore_visual_feedback() -> void:
 	var vine := enemy as VenomVine
 	if vine == null or not is_instance_valid(vine.visual):
 		return
+	vine.set_charge_glow(0.0, false)
 	if is_instance_valid(vine.visual.sprite):
 		vine.visual.sprite.modulate = _base_sprite_modulate

@@ -53,6 +53,44 @@ var _ground_aura: MeshInstance3D
 var _ground_aura_material: ShaderMaterial
 var _bubbles: CPUParticles3D
 var _fumes: CPUParticles3D
+var _sparkles: CPUParticles3D
+var _pool_light: OmniLight3D
+
+
+static func create_particle_quad(
+	cell_column: int, quad_size: Vector2, additive: bool = false
+) -> QuadMesh:
+	var atlas := AtlasTexture.new()
+	atlas.atlas = PARTICLE_SHEET
+	atlas.region = Rect2(
+		float(cell_column) * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE
+	)
+	var mat := StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD if additive else BaseMaterial3D.BLEND_MODE_MIX
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.vertex_color_use_as_albedo = true
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	mat.albedo_texture = atlas
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var quad := QuadMesh.new()
+	quad.size = quad_size
+	quad.material = mat
+	return quad
+
+
+static func create_fade_ramp(start_color: Color, end_color: Color) -> Gradient:
+	var grad := Gradient.new()
+	grad.colors = PackedColorArray([start_color, end_color])
+	grad.offsets = PackedFloat32Array([0.0, 1.0])
+	return grad
+
+
+static func create_scale_curve(start_scale: float, end_scale: float) -> Curve:
+	var curve := Curve.new()
+	curve.add_point(Vector2(0.0, start_scale))
+	curve.add_point(Vector2(1.0, end_scale))
+	return curve
 
 
 func setup(
@@ -95,6 +133,8 @@ func _ready() -> void:
 	_build_puddle_sprite()
 	_build_bubble_particles()
 	_build_fume_particles()
+	_build_sparkle_particles()
+	_build_pool_light()
 	_update_spread_visuals(0.0)
 
 
@@ -157,6 +197,8 @@ func begin_fade_out() -> void:
 		_bubbles.emitting = false
 	if is_instance_valid(_fumes):
 		_fumes.emitting = false
+	if is_instance_valid(_sparkles):
+		_sparkles.emitting = false
 
 
 func _tick_fade_out(step: float) -> void:
@@ -167,6 +209,8 @@ func _tick_fade_out(step: float) -> void:
 		_puddle_sprite.scale = Vector3.ONE * lerpf(0.84, 1.0, ratio)
 	if is_instance_valid(_ground_aura_material):
 		_ground_aura_material.set_shader_parameter("fade_progress", ratio)
+	if is_instance_valid(_pool_light):
+		_pool_light.light_energy = 0.55 * ratio
 	if _fade_remaining_seconds <= 0.0:
 		queue_free()
 
@@ -181,6 +225,8 @@ func _update_spread_visuals(progress: float) -> void:
 		)
 	if is_instance_valid(_ground_aura_material):
 		_ground_aura_material.set_shader_parameter("fade_progress", eased)
+	if is_instance_valid(_pool_light):
+		_pool_light.light_energy = 0.55 * eased
 
 
 func _update_puddle_frame() -> void:
@@ -258,7 +304,7 @@ func _build_bubble_particles() -> void:
 	_bubbles.scale_amount_min = 0.16
 	_bubbles.scale_amount_max = 0.34
 	_bubbles.color = Color(0.85, 1.0, 0.65, 0.9) * _visual_tint
-	_bubbles.mesh = _create_particle_quad(0, Vector2(0.45, 0.45))
+	_bubbles.mesh = create_particle_quad(0, Vector2(0.45, 0.45))
 	_bubbles.position = Vector3(0.0, 0.08, 0.0)
 	add_child(_bubbles)
 	_bubbles.emitting = true
@@ -281,29 +327,53 @@ func _build_fume_particles() -> void:
 	_fumes.scale_amount_min = 0.35
 	_fumes.scale_amount_max = 0.7
 	_fumes.color = Color(0.75, 1.0, 0.65, 0.58) * _visual_tint
-	_fumes.mesh = _create_particle_quad(1, Vector2(0.8, 0.8))
+	_fumes.mesh = create_particle_quad(1, Vector2(0.8, 0.8))
 	_fumes.position = Vector3(0.0, 0.14, 0.0)
 	add_child(_fumes)
 	_fumes.emitting = true
 
 
-func _create_particle_quad(cell_column: int, quad_size: Vector2) -> QuadMesh:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = PARTICLE_SHEET
-	atlas.region = Rect2(
-		float(cell_column) * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE
-	)
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.vertex_color_use_as_albedo = true
-	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	mat.albedo_texture = atlas
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	var quad := QuadMesh.new()
-	quad.size = quad_size
-	quad.material = mat
-	return quad
+func _build_sparkle_particles() -> void:
+	_sparkles = CPUParticles3D.new()
+	_sparkles.name = "AcidSparkles"
+	_sparkles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_sparkles.amount = maxi(8, int(roundf(_radius_meters * 8.0)))
+	_sparkles.lifetime = 0.85
+	_sparkles.local_coords = false
+	_sparkles.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	_sparkles.emission_box_extents = Vector3(_radius_meters * 0.65, 0.08, _radius_meters * 0.65)
+	_sparkles.direction = Vector3.UP
+	_sparkles.spread = 32.0
+	_sparkles.initial_velocity_min = 0.2
+	_sparkles.initial_velocity_max = 0.55
+	_sparkles.gravity = Vector3(0.0, 0.15, 0.0)
+	_sparkles.scale_amount_min = 0.08
+	_sparkles.scale_amount_max = 0.18
+	_sparkles.scale_amount_curve = _make_fade_curve()
+	_sparkles.color = Color(0.68, 1.0, 0.42, 0.9) * _visual_tint
+	_sparkles.mesh = create_particle_quad(0, Vector2(0.4, 0.4), true)
+	_sparkles.position = Vector3(0.0, 0.1, 0.0)
+	add_child(_sparkles)
+	_sparkles.emitting = true
+
+
+func _build_pool_light() -> void:
+	_pool_light = OmniLight3D.new()
+	_pool_light.name = "PoolLight"
+	_pool_light.light_color = Color(0.48, 1.0, 0.25)
+	_pool_light.light_energy = 0.0
+	_pool_light.omni_range = _radius_meters * 1.85
+	_pool_light.shadow_enabled = false
+	_pool_light.position = Vector3(0.0, 0.45, 0.0)
+	add_child(_pool_light)
+
+
+func _make_fade_curve() -> Curve:
+	var curve := Curve.new()
+	curve.add_point(Vector2(0.0, 0.2))
+	curve.add_point(Vector2(0.35, 1.0))
+	curve.add_point(Vector2(1.0, 0.0))
+	return curve
 
 
 func _on_area_entered(other_area: Area3D) -> void:
