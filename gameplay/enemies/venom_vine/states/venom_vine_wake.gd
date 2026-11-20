@@ -16,11 +16,13 @@ func _enter() -> void:
 	vine.set_sprite_sheet_mode(true)
 	vine.face_target()
 	_remaining_seconds = vine.wake_duration_seconds
-	if vine.ambushed_wake:
+	if vine.ambushed_wake or vine.has_pending_counter():
 		vine.ambushed_wake = false
-		_remaining_seconds = minf(_remaining_seconds, 0.2)
-		vine.attack_cooldown_remaining = minf(
-			vine.attack_cooldown_remaining, AMBUSHED_ATTACK_DELAY_SECONDS
+		_remaining_seconds = minf(_remaining_seconds, 0.18)
+		vine.attack_cooldown_remaining = (
+			0.0
+			if vine.has_pending_counter()
+			else minf(vine.attack_cooldown_remaining, AMBUSHED_ATTACK_DELAY_SECONDS)
 		)
 	else:
 		vine.attack_cooldown_remaining = maxf(

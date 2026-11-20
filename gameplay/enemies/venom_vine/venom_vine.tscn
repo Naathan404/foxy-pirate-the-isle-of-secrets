@@ -12,16 +12,16 @@
 [ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_vigilant.gd" id="10_vigilant"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_hurtbox"]
-height = 1.7
-radius = 0.85
+height = 2.5
+radius = 1.1
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
 height = 3.0
-radius = 8.5
+radius = 6.5
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
-height = 1.4
-radius = 0.65
+height = 2.0
+radius = 0.85
 
 [node name="VenomVine" instance=ExtResource("1_base")]
 script = ExtResource("2_vine")
@@ -31,9 +31,13 @@ destroy_on_death = true
 charm_grapple_large = true
 show_debug_health = true
 
+[node name="Visual" parent="." index="0"]
+hit_pulse_scale = 1.0
+hit_squash_scale = 1.0
+
 [node name="Sprite3D" parent="Visual" index="0"]
-offset = Vector2(0, 204)
-pixel_size = 0.0048
+offset = Vector2(0, 220)
+pixel_size = 0.0072
 shaded = false
 alpha_cut = 0
 texture_filter = 3
@@ -46,11 +50,11 @@ frame = 1
 libraries/ = ExtResource("5_anims")
 
 [node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 shape = SubResource("CylinderShape3D_hurtbox")
 
 [node name="BulletSpawn" type="Marker3D" parent="Direction" index="3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15, 0.4)
 
 [node name="Dormant" type="Node" parent="States"]
 script = ExtResource("6_dormant")
@@ -68,8 +72,11 @@ script = ExtResource("9_attack")
 script = ExtResource("10_vigilant")
 
 [node name="CollisionShape3D" parent="." index="4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_body")
+
+[node name="DebugHealthLabel" parent="." index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
 
 [node name="TargetDetector" type="Area3D" parent="."]
 

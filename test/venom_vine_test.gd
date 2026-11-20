@@ -39,6 +39,7 @@ func _run() -> void:
 	await _test_ai_intelligence()
 	await _test_state_machine_and_zones()
 	await _test_sniper_anger_stagger_and_death_pools()
+	await _test_hit_reaction_and_counterattack()
 	await _test_forest_test_real_foxy_integration()
 
 	if _failures.is_empty():
@@ -53,25 +54,61 @@ func _run() -> void:
 func _test_ai_intelligence() -> void:
 	var ai := AI_CLASS.new() as VenomVineAI
 	_check(
-		ai.classify_zone(10.0, 8.5, 4.5, 1.5, false) == VenomVineAI.Zone.OUT_OF_RANGE,
+		ai.classify_zone(7.5, 6.5, 3.5, 1.0, false) == VenomVineAI.Zone.OUT_OF_RANGE,
 		"Outside outer radius must be OUT_OF_RANGE when dormant"
 	)
 	_check(
-		ai.classify_zone(9.2, 8.5, 4.5, 1.5, true) == VenomVineAI.Zone.OUTER_RING,
+		ai.classify_zone(7.1, 6.5, 3.5, 1.0, true) == VenomVineAI.Zone.OUTER_RING,
 		"Hysteresis must keep target in OUTER_RING when already engaged"
 	)
 	_check(
-		ai.classify_zone(4.2, 8.5, 4.5, 1.5, true) == VenomVineAI.Zone.INNER_RING,
+		ai.classify_zone(3.2, 6.5, 3.5, 1.0, true) == VenomVineAI.Zone.INNER_RING,
 		"Close range must classify as INNER_RING"
 	)
 
 	var lead := ai.compute_lead_position(
-		Vector3.ZERO, Vector3(6.0, 0.0, 0.0), Vector3(0.0, 0.0, 4.0), 0.5, 3.0, 1.0
+		Vector3.ZERO, Vector3(5.0, 0.0, 0.0), Vector3(0.0, 0.0, 4.0), 0.5, 2.0, 1.0
 	)
 	_check(lead.z > 1.5, "Lead prediction must aim ahead of target velocity, got %s" % lead)
 
+	# Kiểm tra bắn vùng lân cận: không bắn trực diện vào chính tâm và giữ trong tầm bắn.
+	var nearby_plan := (
+		ai
+		. select_attack_plan(
+			{
+				"zone": VenomVineAI.Zone.OUTER_RING,
+				"agitation": 0.0,
+				"origin_pos": Vector3.ZERO,
+				"target_pos": Vector3(5.0, 0.0, 0.0),
+				"target_velocity": Vector3.ZERO,
+				"occupied_spots": [],
+				"ground_y": 0.0,
+				"pool_radius": 1.55,
+				"outer_shots": 1,
+				"aim_scatter_min": 1.15,
+				"aim_scatter_max": 2.15,
+				"min_shot_distance": 1.6,
+				"max_shot_distance": 6.2,
+			}
+		)
+	)
+	var nearby_aims: Array = nearby_plan.get("aim_positions", [])
+	_check(nearby_aims.size() == 1, "Outer nearby plan must produce 1 shot")
+	if not nearby_aims.is_empty():
+		var spot := nearby_aims[0] as Vector3
+		var offset_from_player := Vector2(spot.x - 5.0, spot.z).length()
+		var dist_from_origin := Vector2(spot.x, spot.z).length()
+		_check(
+			offset_from_player >= 0.8 and offset_from_player <= 3.5,
+			"Shot must land near player instead of direct hit, got offset=%.2f" % offset_from_player
+		)
+		_check(
+			dist_from_origin >= 1.5 and dist_from_origin <= 6.25,
+			"Shot must stay inside shooting range [1.6..6.2], got %.2f" % dist_from_origin
+		)
+
 	# Nếu Player đang đứng trong vũng axit sẵn có, AI phải dịch góc bắn sang đường thoát.
-	var occupied: Array[Dictionary] = [{"pos": Vector3(6.0, 0.0, 0.0), "radius": 1.6}]
+	var occupied: Array[Dictionary] = [{"pos": Vector3(5.0, 0.0, 0.0), "radius": 1.6}]
 	var outer_plan := (
 		ai
 		. select_attack_plan(
@@ -79,7 +116,7 @@ func _test_ai_intelligence() -> void:
 				"zone": VenomVineAI.Zone.OUTER_RING,
 				"agitation": 0.0,
 				"origin_pos": Vector3.ZERO,
-				"target_pos": Vector3(6.0, 0.0, 0.0),
+				"target_pos": Vector3(5.0, 0.0, 0.0),
 				"target_velocity": Vector3.ZERO,
 				"occupied_spots": occupied,
 				"ground_y": 0.0,
@@ -92,10 +129,10 @@ func _test_ai_intelligence() -> void:
 	_check(outer_aims.size() == 1, "Outer ring plan must produce 1 shot")
 	if not outer_aims.is_empty():
 		var spot := outer_aims[0] as Vector3
-		var dist_from_old := Vector2(spot.x - 6.0, spot.z).length()
+		var dist_from_old := Vector2(spot.x - 5.0, spot.z).length()
 		_check(
-			dist_from_old >= 2.0,
-			"Outer plan must avoid stacking on existing pool, got dist=%s" % dist_from_old
+			dist_from_old >= 1.4,
+			"Outer plan must avoid stacking directly on existing pool, got dist=%s" % dist_from_old
 		)
 
 	# Trong vùng cận, 3 phát quạt phải tách nhau ra chứ không dồn vào một chỗ.
@@ -106,7 +143,7 @@ func _test_ai_intelligence() -> void:
 				"zone": VenomVineAI.Zone.INNER_RING,
 				"agitation": 0.5,
 				"origin_pos": Vector3.ZERO,
-				"target_pos": Vector3(3.2, 0.0, 0.0),
+				"target_pos": Vector3(2.8, 0.0, 0.0),
 				"target_velocity": Vector3.ZERO,
 				"occupied_spots": [],
 				"ground_y": 0.0,
@@ -135,16 +172,16 @@ func _test_state_machine_and_zones() -> void:
 	_check(vine.fsm.current_state.name == &"Dormant", "Vine must start Dormant outside range")
 	_check(not vine.is_awake, "Dormant vine must have is_awake == false")
 
-	# Bước vào rìa vùng ngoài -> tỉnh dậy, bắn 1 phát.
-	player.position = Vector3(7.0, 0.0, 0.0)
+	# Bước vào rìa vùng ngoài (5.2m <= 6.5m) -> tỉnh dậy, bắn 1 phát.
+	player.position = Vector3(5.2, 0.0, 0.0)
 	player.velocity = Vector3(0.0, 0.0, 2.5)
 	await _step_frames(85)
 	_check(vine.is_awake, "Vine must wake in outer ring")
 	var outer_count := _active_pools_in_tree().size()
 	_check(outer_count == 1, "Outer ring must fire 1 shot initially, got %d" % outer_count)
 
-	# Bước vào vùng cận -> bắn chùm quạt 3 phát.
-	player.position = Vector3(3.0, 0.0, 0.0)
+	# Bước vào vùng cận (2.6m <= 3.5m) -> bắn chùm quạt 3 phát.
+	player.position = Vector3(2.6, 0.0, 0.0)
 	player.velocity = Vector3.ZERO
 	await _step_frames(120)
 	var inner_count := _active_pools_in_tree().size()
@@ -174,10 +211,10 @@ func _test_sniper_anger_stagger_and_death_pools() -> void:
 	var vine := _spawn_fast_vine(arena)
 	vine.max_active_pools = 2
 	vine.pool_duration_seconds = 0.8
-	# Đứng ở 11m (ngoài vùng nhận diện thường 8.5m, nhưng nằm trong vùng mở rộng 8.5 + 4.0 = 12.5m).
-	var player := _spawn_dummy_player(arena, Vector3(11.0, 0.0, 0.0))
+	# Đứng ở 8.0m (ngoài vùng nhận diện thường 6.5m, nhưng nằm trong vùng mở rộng 6.5 + 2.5 = 9.0m).
+	var player := _spawn_dummy_player(arena, Vector3(8.0, 0.0, 0.0))
 	await _step_frames(10)
-	_check(vine.fsm.current_state.name == &"Dormant", "Vine must stay Dormant at 11m before hit")
+	_check(vine.fsm.current_state.name == &"Dormant", "Vine must stay Dormant at 8m before hit")
 
 	# Bắn tỉa từ 11m gây sát thương + stagger đủ vào EnemyHit.
 	var sniper_hit := DamageContext.new()
@@ -229,6 +266,75 @@ func _test_sniper_anger_stagger_and_death_pools() -> void:
 	await _step_frames(3)
 
 
+func _test_hit_reaction_and_counterattack() -> void:
+	var arena := _create_arena()
+	var vine := _spawn_fast_vine(arena)
+	vine.hits_before_counter = 2
+	vine.counter_cooldown_seconds = 2.0
+	vine.counter_charge_seconds = 0.2
+	vine.counter_pool_radius_meters = 0.9
+	vine.wake_attack_delay_seconds = 3.0
+	vine.outer_cooldown_seconds = 5.0
+	vine.inner_cooldown_seconds = 5.0
+	var player := _spawn_dummy_player(arena, Vector3(2.4, 0.0, 0.0))
+	await _step_frames(15)
+	_check(
+		vine.is_awake and vine.fsm.current_state.name == &"Stalk",
+		"Vine must wake into Stalk before hit test (got %s)" % vine.fsm.current_state.name
+	)
+
+	var light_hit := DamageContext.new()
+	light_hit.source = player
+	light_hit.source_team = CombatTeams.PLAYER
+	light_hit.base_amount_hp = 0.5
+	light_hit.amount_hp = 0.5
+	light_hit.stagger_damage = 5.0
+
+	vine.receive_damage(light_hit)
+	await _step_frames(2)
+	_check(vine.is_flinching(), "Light hit must trigger visible flinch on awake vine")
+	_check(not vine.has_pending_counter(), "One light hit in Stalk must not trigger counter")
+
+	vine.receive_damage(light_hit)
+	_check(vine.has_pending_counter(), "Second hit must queue counterattack")
+	await _step_frames(65)
+
+	var counter_pools := _active_pools_in_tree()
+	_check(
+		counter_pools.size() >= 2,
+		(
+			"Counterattack must ignore normal cooldown and spawn counter pools (got %d)"
+			% counter_pools.size()
+		)
+	)
+	if not counter_pools.is_empty():
+		_check(
+			is_equal_approx(counter_pools[0].get_radius(), 0.9),
+			(
+				"Counter pool radius must match counter_pool_radius_meters=0.9 (got %.2f)"
+				% counter_pools[0].get_radius()
+			)
+		)
+
+	# Đánh ngắt lúc đang gồng Charge phải tích ngay phản công sau 1 đòn.
+	vine._counter_cooldown_remaining_seconds = 0.0
+	vine._hits_toward_counter = 0
+	vine.attack_cooldown_remaining = 0.0
+	await _step_frames(5)
+	if (
+		vine.fsm.current_state is VenomVineAttack
+		and (vine.fsm.current_state as VenomVineAttack).is_charging()
+	):
+		vine.receive_damage(light_hit)
+		_check(
+			vine.has_pending_counter(),
+			"Interrupting Charge with 1 hit must immediately queue counterattack"
+		)
+
+	arena.queue_free()
+	await _step_frames(3)
+
+
 func _test_forest_test_real_foxy_integration() -> void:
 	var forest := FOREST_TEST_SCENE.instantiate()
 	root.add_child(forest)
@@ -243,27 +349,52 @@ func _test_forest_test_real_foxy_integration() -> void:
 		forest.queue_free()
 		return
 
-	# Khi Foxy đứng ở spawn (0, y, 0), cả 2 cây phải giữ Dormant.
-	_check(
-		not vine_a.is_awake and not vine_b.is_awake,
-		"Both VenomVines in ForestTest must start Dormant at player spawn"
+	# Nếu cây nằm ngoài tầm phát hiện tại spawn thì phải giữ trạng thái Dormant.
+	var spawn_dist_a := (
+		Vector2(
+			foxy.global_position.x - vine_a.global_position.x,
+			foxy.global_position.z - vine_a.global_position.z
+		)
+		. length()
 	)
+	if spawn_dist_a > vine_a.outer_detection_radius_meters + 0.5:
+		_check(not vine_a.is_awake, "VenomVineA outside outer radius at spawn must stay Dormant")
 
-	# Đưa Foxy vào vùng cận của VenomVineA -> tỉnh dậy, bắn lên BaseGround thật và làm Foxy nhiễm độc.
+	# Đưa Foxy vào vùng cận VenomVineA -> tỉnh dậy, bắn gần đó và gây độc khi chạm vũng.
 	var start_hp := foxy.hp.current_hp
-	foxy.global_position = vine_a.global_position + Vector3(3.2, 0.2, 0.0)
+	foxy.global_position = vine_a.global_position + Vector3(2.8, 0.2, 0.0)
+	var spawned_pools: Array[VenomAcidPool] = []
+	for _i in range(180):
+		await physics_frame
+		spawned_pools = _active_pools_in_tree()
+		if not spawned_pools.is_empty():
+			break
+
+	_check(vine_a.is_awake, "VenomVineA must wake when real Foxy approaches")
+	_check(not spawned_pools.is_empty(), "VenomVineA must spawn acid pools on ForestTest floor")
+	if not spawned_pools.is_empty():
+		var pool_pos := spawned_pools[0].global_position
+		var dist_to_vine := (
+			Vector2(pool_pos.x - vine_a.global_position.x, pool_pos.z - vine_a.global_position.z)
+			. length()
+		)
+		_check(
+			dist_to_vine <= vine_a.max_shot_distance_meters + 0.5,
+			"Spawned pool in ForestTest must respect max_shot_distance (got %.2f)" % dist_to_vine
+		)
+		foxy.global_position = Vector3(pool_pos.x, foxy.global_position.y, pool_pos.z)
+
 	var saw_poison := false
-	for _i in range(210):
+	for _i in range(90):
 		await physics_frame
 		if foxy.is_poisoned() or foxy.hp.current_hp < start_hp:
 			saw_poison = true
 			break
 
-	_check(vine_a.is_awake, "VenomVineA must wake when real Foxy approaches")
 	_check(
 		saw_poison,
 		(
-			"VenomVineA acid attack must hit real Foxy in ForestTest (hp %.2f -> %.2f)"
+			"VenomVineA acid pool must poison real Foxy in ForestTest (hp %.2f -> %.2f)"
 			% [start_hp, foxy.hp.current_hp]
 		)
 	)

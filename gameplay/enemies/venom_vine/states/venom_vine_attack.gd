@@ -9,7 +9,7 @@ enum Phase {
 }
 
 const CHARGE_TINT := Color(1.18, 1.35, 0.85, 1.0)
-const CHARGE_SCALE_BOOST := 1.1
+const COUNTER_TINT := Color(1.45, 0.72, 0.52, 1.0)
 const AIM_LOCK_WINDOW_SECONDS := 0.24
 
 var _pending_plan: Dictionary = {}
@@ -21,12 +21,15 @@ var _shot_cooldown_seconds: float = 0.0
 var _shots_fired: int = 0
 var _aim_positions: Array[Vector3] = []
 var _aim_locked: bool = false
-var _base_visual_scale: Vector3 = Vector3.ONE
 var _base_sprite_modulate: Color = Color.WHITE
 
 
 func set_pending_plan(plan: Dictionary) -> void:
 	_pending_plan = plan.duplicate(true)
+
+
+func is_charging() -> bool:
+	return _phase == Phase.CHARGE
 
 
 func _enter() -> void:
@@ -35,10 +38,8 @@ func _enter() -> void:
 		return
 	enemy._set_horizontal_velocity(Vector3.ZERO)
 	vine.set_sprite_sheet_mode(false)
-	if is_instance_valid(vine.visual):
-		_base_visual_scale = vine.visual.scale
-		if is_instance_valid(vine.visual.sprite):
-			_base_sprite_modulate = vine.visual.sprite.modulate
+	if is_instance_valid(vine.visual) and is_instance_valid(vine.visual.sprite):
+		_base_sprite_modulate = vine.visual.sprite.modulate
 
 	if _pending_plan.is_empty():
 		_pending_plan = vine.build_attack_plan()
@@ -106,14 +107,6 @@ func _update_charge(vine: VenomVine, step: float) -> void:
 		_aim_locked = true
 	elif not _aim_locked and vine.has_target():
 		vine.face_target()
-		# Cập nhật lại kế hoạch ngắm trước khi bước vào cửa sổ khóa góc để bám mục tiêu mượt.
-		var refreshed := vine.build_attack_plan()
-		var refreshed_aims: Array = refreshed.get("aim_positions", [])
-		if not refreshed_aims.is_empty():
-			_aim_positions.clear()
-			for pos in refreshed_aims:
-				if pos is Vector3:
-					_aim_positions.append(pos as Vector3)
 
 	if _phase_remaining_seconds <= 0.0:
 		_begin_fire(vine)
@@ -136,11 +129,13 @@ func _update_fire(vine: VenomVine, step: float) -> void:
 
 func _fire_pending_shots(vine: VenomVine, step: float) -> void:
 	_shot_cooldown_seconds -= step
+	var raw_cfg: Variant = _pending_plan.get("pool_config", {})
+	var custom_cfg: Dictionary = raw_cfg if raw_cfg is Dictionary else {}
 	while _shot_cooldown_seconds <= 0.0 and _shots_fired < _aim_positions.size():
 		var target_spot := _aim_positions[_shots_fired]
 		vine.face_direction(target_spot - vine.global_position)
 		vine.play_directional_animation(&"shoot", true)
-		vine.fire_shot_at(target_spot)
+		vine.fire_shot_at(target_spot, custom_cfg)
 		_shots_fired += 1
 		_shot_cooldown_seconds += _shot_interval_seconds
 
@@ -165,21 +160,18 @@ func _update_recover(vine: VenomVine, step: float) -> void:
 
 
 func _apply_charge_feedback(vine: VenomVine, progress: float) -> void:
-	if not is_instance_valid(vine.visual):
+	if not is_instance_valid(vine.visual) or not is_instance_valid(vine.visual.sprite):
 		return
-	var pulse := 0.5 + 0.5 * sin(progress * TAU * 3.0)
-	var scale_mult := lerpf(1.0, CHARGE_SCALE_BOOST, progress)
-	vine.visual.scale = (
-		_base_visual_scale * Vector3(scale_mult, 1.0 + (scale_mult - 1.0) * 0.6, 1.0)
-	)
-	if is_instance_valid(vine.visual.sprite):
-		vine.visual.sprite.modulate = _base_sprite_modulate.lerp(CHARGE_TINT, progress * pulse)
+	var is_counter := bool(_pending_plan.get("is_counter", false))
+	var freq := 5.0 if is_counter else 3.0
+	var tint := COUNTER_TINT if is_counter else CHARGE_TINT
+	var pulse := 0.5 + 0.5 * sin(progress * TAU * freq)
+	vine.visual.sprite.modulate = _base_sprite_modulate.lerp(tint, progress * pulse)
 
 
 func _restore_visual_feedback() -> void:
 	var vine := enemy as VenomVine
 	if vine == null or not is_instance_valid(vine.visual):
 		return
-	vine.visual.scale = _base_visual_scale
 	if is_instance_valid(vine.visual.sprite):
 		vine.visual.sprite.modulate = _base_sprite_modulate

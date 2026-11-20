@@ -1,4 +1,4 @@
-[gd_resource type="AnimationLibrary" format=3]
+[gd_resource type="AnimationLibrary" format=3 uid="uid://dy2p4e7p58nu7"]
 
 [sub_resource type="Animation" id="charge_down"]
 resource_name = "charge_down"

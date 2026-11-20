@@ -18,16 +18,16 @@ const MAX_FLIGHT_SECONDS := 0.85
 
 @export_group("Detection & Ambush")
 ## Bán kính nhận diện ngoài (m): vào vòng này cây bắt đầu xét phục kích và tỉnh dậy.
-@export_range(1.0, 30.0, 0.1, "suffix:m") var outer_detection_radius_meters: float = 8.5:
+@export_range(1.0, 30.0, 0.1, "suffix:m") var outer_detection_radius_meters: float = 6.5:
 	set(value):
 		outer_detection_radius_meters = maxf(1.0, value)
 		_queue_detection_update()
 ## Bán kính vùng cận (m): vào vòng này cây chuyển sang bắn nhiều đạn & nhịp nhanh hơn.
-@export_range(0.5, 20.0, 0.1, "suffix:m") var inner_attack_radius_meters: float = 4.5
+@export_range(0.5, 20.0, 0.1, "suffix:m") var inner_attack_radius_meters: float = 3.5
 ## Cự ly tỉnh ngay lập tức (m) bỏ qua thời gian giả vờ ngụy trang.
-@export_range(0.5, 20.0, 0.1, "suffix:m") var ambush_wake_distance_meters: float = 5.5
+@export_range(0.5, 20.0, 0.1, "suffix:m") var ambush_wake_distance_meters: float = 4.0
 ## Độ mở trễ (m) khi đã thức để tránh nhấp nháy state ở mép vòng nhận diện.
-@export_range(0.0, 6.0, 0.1, "suffix:m") var detection_hysteresis_meters: float = 1.5:
+@export_range(0.0, 6.0, 0.1, "suffix:m") var detection_hysteresis_meters: float = 1.0:
 	set(value):
 		detection_hysteresis_meters = maxf(0.0, value)
 		_queue_detection_update()
@@ -39,7 +39,7 @@ const MAX_FLIGHT_SECONDS := 0.85
 @export_range(0.2, 15.0, 0.1, "suffix:s") var vigilant_duration_seconds: float = 3.5
 @export_range(0.1, 2.0, 0.05, "suffix:s") var retract_duration_seconds: float = 0.35
 ## Độ mở rộng bán kính nhận diện tạm thời (m) khi bị đánh tầm xa.
-@export_range(0.0, 15.0, 0.5, "suffix:m") var anger_radius_bonus_meters: float = 4.0
+@export_range(0.0, 15.0, 0.5, "suffix:m") var anger_radius_bonus_meters: float = 2.5
 @export_range(0.5, 20.0, 0.5, "suffix:s") var anger_detect_duration_seconds: float = 6.0
 
 @export_group("Outer Ring Attack")
@@ -56,16 +56,32 @@ const MAX_FLIGHT_SECONDS := 0.85
 @export_group("Charge & Prediction")
 @export_range(0.2, 3.0, 0.05, "suffix:s") var charge_duration_seconds: float = 0.75
 @export_range(0.1, 3.0, 0.05, "suffix:s") var recover_duration_seconds: float = 0.45
-@export_range(0.0, 1.2, 0.05) var lead_accuracy: float = 0.8
-@export_range(0.0, 6.0, 0.1, "suffix:m") var max_lead_meters: float = 2.6
+@export_range(0.0, 1.2, 0.05) var lead_accuracy: float = 0.75
+@export_range(0.0, 6.0, 0.1, "suffix:m") var max_lead_meters: float = 2.0
+## Khoảng lệch tối thiểu/tối đa quanh Player (m) để bắn vùng lân cận thay vì bắn trực diện.
+@export_range(0.3, 5.0, 0.05, "suffix:m") var aim_scatter_min_meters: float = 1.15
+@export_range(0.5, 6.0, 0.05, "suffix:m") var aim_scatter_max_meters: float = 2.15
+## Giới hạn khoảng cách rơi đạn tính từ gốc cây (m).
+@export_range(0.5, 10.0, 0.1, "suffix:m") var min_shot_distance_meters: float = 1.6
+@export_range(1.0, 20.0, 0.1, "suffix:m") var max_shot_distance_meters: float = 6.2
 
 @export_group("Acid Projectile & Pool")
 @export_range(0.5, 6.0, 0.1, "suffix:m") var projectile_arc_height_meters: float = 2.4
-@export_range(0.4, 5.0, 0.1, "suffix:m") var pool_radius_meters: float = 1.55
+@export_range(0.4, 5.0, 0.05, "suffix:m") var pool_radius_meters: float = 1.05
 @export_range(0.5, 15.0, 0.1, "suffix:s") var pool_duration_seconds: float = 4.2
 @export_range(0.1, 4.0, 0.05, "suffix:s") var pool_tick_interval_seconds: float = 0.85
 @export_range(0.1, 20.0, 0.1) var pool_tick_damage_hp: float = 0.5
 @export_range(1, 12, 1) var max_active_pools: int = 4
+
+@export_group("Hit Reaction & Counter")
+## Số đòn trúng từ Player để kích hoạt phản công (đánh trúng lúc đang gồng tính gấp đôi).
+@export_range(1, 10, 1) var hits_before_counter: int = 2
+@export_range(0.5, 15.0, 0.1, "suffix:s") var counter_cooldown_seconds: float = 3.0
+@export_range(0.15, 2.0, 0.05, "suffix:s") var counter_charge_seconds: float = 0.35
+@export_range(1, 8, 1) var counter_inner_shots: int = 3
+@export_range(1, 6, 1) var counter_outer_shots: int = 2
+@export_range(0.4, 3.0, 0.05, "suffix:m") var counter_pool_radius_meters: float = 0.9
+@export_range(0.05, 1.0, 0.01, "suffix:s") var hit_flinch_seconds: float = 0.22
 
 var ai: VenomVineAI
 var is_awake: bool = false
@@ -79,6 +95,10 @@ var _has_tracked_target_pos: bool = false
 var _estimated_target_velocity: Vector3 = Vector3.ZERO
 var _is_dormant_sheet: bool = true
 var _anger_detect_remaining_seconds: float = 0.0
+var _hits_toward_counter: int = 0
+var _counter_cooldown_remaining_seconds: float = 0.0
+var _pending_counter: bool = false
+var _flinch_remaining_seconds: float = 0.0
 
 @onready var bullet_spawn: Marker3D = $Direction/BulletSpawn
 
@@ -94,6 +114,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	var step := maxf(0.0, delta)
 	attack_cooldown_remaining = maxf(0.0, attack_cooldown_remaining - step)
+	_counter_cooldown_remaining_seconds = maxf(0.0, _counter_cooldown_remaining_seconds - step)
+	_flinch_remaining_seconds = maxf(0.0, _flinch_remaining_seconds - step)
 	agitation = maxf(0.0, agitation - AGITATION_DECAY_PER_SECOND * step)
 	if _anger_detect_remaining_seconds > 0.0:
 		_anger_detect_remaining_seconds = maxf(0.0, _anger_detect_remaining_seconds - step)
@@ -101,6 +123,44 @@ func _physics_process(delta: float) -> void:
 			_queue_detection_update()
 	_update_target_velocity_estimate(step)
 	super(delta)
+
+
+func receive_damage(damage: DamageContext) -> float:
+	var attack_state := (
+		fsm.current_state as VenomVineAttack
+		if is_instance_valid(fsm) and fsm.current_state is VenomVineAttack
+		else null
+	)
+	var was_charging := attack_state != null and attack_state.is_charging()
+	var applied := super(damage)
+	if (
+		applied <= 0.0
+		or dead
+		or not hp.is_alive()
+		or damage == null
+		or damage.source_team != CombatTeams.PLAYER
+	):
+		return applied
+
+	_hits_toward_counter += 2 if was_charging else 1
+	if (
+		not _pending_counter
+		and _counter_cooldown_remaining_seconds <= 0.0
+		and _hits_toward_counter >= maxi(1, hits_before_counter)
+	):
+		_pending_counter = true
+		_hits_toward_counter = 0
+		_counter_cooldown_remaining_seconds = counter_cooldown_seconds
+
+	var in_hit_or_attack := (
+		is_instance_valid(fsm)
+		and is_instance_valid(fsm.current_state)
+		and fsm.current_state.name in [&"Hit", &"Attack"]
+	)
+	if is_awake and not in_hit_or_attack:
+		_flinch_remaining_seconds = hit_flinch_seconds
+		play_directional_animation(&"hit", true)
+	return applied
 
 
 func set_awake(awake: bool) -> void:
@@ -202,9 +262,60 @@ func build_attack_plan() -> Dictionary:
 		"recover_seconds": recover_duration_seconds,
 		"lead_accuracy": lead_accuracy,
 		"max_lead_meters": max_lead_meters,
+		"aim_scatter_min": aim_scatter_min_meters,
+		"aim_scatter_max": aim_scatter_max_meters,
+		"min_shot_distance": min_shot_distance_meters,
+		"max_shot_distance": max_shot_distance_meters,
 		"pool_radius": pool_radius_meters,
 	}
 	return ai.select_attack_plan(context)
+
+
+func has_pending_counter() -> bool:
+	return _pending_counter and not dead and hp.is_alive()
+
+
+func consume_pending_counter() -> bool:
+	if not has_pending_counter():
+		return false
+	_pending_counter = false
+	_flinch_remaining_seconds = 0.0
+	return true
+
+
+func is_flinching() -> bool:
+	return _flinch_remaining_seconds > 0.0 and not dead
+
+
+func build_counter_plan() -> Dictionary:
+	if ai == null:
+		return {"mode": VenomVineAI.AttackMode.NONE, "aim_positions": [] as Array[Vector3]}
+	var target_pos := target.global_position if has_target() else last_known_target_position
+	if target_pos.is_zero_approx():
+		target_pos = global_position + last_facing_direction * 2.2
+	var space := (
+		get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() != null else null
+	)
+	var context := {
+		"origin_pos": global_position,
+		"target_pos": target_pos,
+		"target_velocity": get_target_velocity(),
+		"ground_y": global_position.y,
+		"inner_radius": inner_attack_radius_meters,
+		"counter_pool_radius": counter_pool_radius_meters,
+		"counter_inner_shots": counter_inner_shots,
+		"counter_outer_shots": counter_outer_shots,
+		"counter_charge_seconds": counter_charge_seconds,
+		"max_shot_distance": max_shot_distance_meters,
+		"occupied_spots": PROJECTILE_SCRIPT.collect_active_pool_spots(self),
+		"space": space,
+		"excluded_rids": [get_rid()],
+	}
+	var plan := ai.build_counter_plan(context)
+	var pool_cfg := build_pool_config()
+	pool_cfg["pool_radius"] = counter_pool_radius_meters
+	plan["pool_config"] = pool_cfg
+	return plan
 
 
 ## Hook mở rộng cho EliteVenomVine override khi có chiêu đặc biệt.

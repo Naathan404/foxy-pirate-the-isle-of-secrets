@@ -15,7 +15,7 @@ const FRAME_THORNY_POD := 2
 const FRAME_SPLASH_BURST := 3
 const MIN_FLIGHT_SECONDS := 0.15
 const MIN_ARC_HEIGHT_METERS := 0.4
-const DIRECT_HIT_RADIUS_METERS := 0.55
+const DIRECT_HIT_RADIUS_METERS := 0.42
 const SHADOW_GROUND_OFFSET_METERS := 0.025
 const RING_GROUND_OFFSET_METERS := 0.04
 const SPLASH_GROUND_OFFSET_METERS := 0.55
@@ -63,13 +63,18 @@ static func resolve_landing_spot(
 	pool_radius_meters: float,
 	occupied_spots: Array[Dictionary],
 	space: PhysicsDirectSpaceState3D,
-	excluded_rids: Array[RID] = []
+	excluded_rids: Array[RID] = [],
+	min_distance_meters: float = 1.2,
+	max_distance_meters: float = INF
 ) -> Vector3:
 	var to_desired := desired_position - origin_position
 	to_desired.y = 0.0
-	var base_dist := maxf(1.2, to_desired.length())
+	var min_d := maxf(0.8, min_distance_meters)
+	var max_d := maxf(min_d, max_distance_meters)
+	var base_dist := clampf(to_desired.length(), min_d, max_d)
 	var base_dir := to_desired.normalized() if not to_desired.is_zero_approx() else Vector3.BACK
-	var fallback := Vector3(desired_position.x, ground_y, desired_position.z)
+	var fallback := origin_position + base_dir * base_dist
+	fallback.y = ground_y
 	var snapped := _snap_to_walkable_ground(space, fallback, ground_y, excluded_rids)
 	if snapped.has("pos"):
 		fallback = snapped["pos"] as Vector3
@@ -84,7 +89,7 @@ static func resolve_landing_spot(
 	for angle_deg in SPOT_SEARCH_ANGLES_DEG:
 		var cand_dir := base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg))
 		for r_mult in SPOT_RADIAL_OFFSETS:
-			var cand_dist := maxf(1.2, base_dist + float(r_mult) * pool_radius_meters)
+			var cand_dist := clampf(base_dist + float(r_mult) * pool_radius_meters, min_d, max_d)
 			var candidate := origin_position + cand_dir * cand_dist
 			candidate.y = ground_y
 			var cand_y := ground_y
@@ -192,7 +197,7 @@ func _build_flight_visuals() -> void:
 	_glob_sprite.hframes = 4
 	_glob_sprite.vframes = 2
 	_glob_sprite.frame = FRAME_THORNY_POD if use_thorny else FRAME_ORB
-	_glob_sprite.pixel_size = 0.0026
+	_glob_sprite.pixel_size = 0.0036
 	_glob_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	_glob_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_glob_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -293,8 +298,6 @@ func _build_direct_hitbox() -> void:
 
 func _update_flight_visuals(progress: float) -> void:
 	if is_instance_valid(_glob_sprite):
-		if not bool(_pool_config.get("use_thorny_pod", false)):
-			_glob_sprite.frame = FRAME_ORB if progress < 0.2 else FRAME_STREAK
 		_glob_sprite.rotation.z = sin(_elapsed_seconds * 12.0) * 0.18
 	if is_instance_valid(_shadow_mesh):
 		var height := maxf(0.0, global_position.y - _landing_position.y)

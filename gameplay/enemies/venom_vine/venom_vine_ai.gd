@@ -22,6 +22,10 @@ const POOL_COVER_BLOCK_FACTOR := 0.85
 const MIN_FLIGHT_SECONDS := 0.35
 const MAX_FLIGHT_SECONDS := 0.78
 const MAX_AGITATION_COOLDOWN_REDUCTION := 0.32
+const DEFAULT_AIM_SCATTER_MIN_METERS := 1.15
+const DEFAULT_AIM_SCATTER_MAX_METERS := 2.15
+const DEFAULT_MIN_SHOT_DISTANCE_METERS := 1.6
+const DEFAULT_MAX_SHOT_DISTANCE_METERS := 6.2
 
 var _rng := RandomNumberGenerator.new()
 
@@ -144,6 +148,88 @@ func select_attack_plan(context: Dictionary) -> Dictionary:
 	return _build_inner_plan(shared, context)
 
 
+func build_counter_plan(context: Dictionary) -> Dictionary:
+	var origin_pos := context.get("origin_pos", Vector3.ZERO) as Vector3
+	var target_pos := context.get("target_pos", Vector3.ZERO) as Vector3
+	var target_vel := context.get("target_velocity", Vector3.ZERO) as Vector3
+	var ground_y := float(context.get("ground_y", origin_pos.y))
+	var inner_radius := float(context.get("inner_radius", 3.5))
+	var pool_radius := maxf(0.4, float(context.get("counter_pool_radius", 0.9)))
+	var space: PhysicsDirectSpaceState3D = context.get("space", null)
+	var excluded_raw: Array = context.get("excluded_rids", [])
+	var excluded_rids: Array[RID] = []
+	for rid_item in excluded_raw:
+		if rid_item is RID:
+			excluded_rids.append(rid_item as RID)
+	var occupied_raw: Array = context.get("occupied_spots", [])
+	var planned_occupied: Array[Dictionary] = []
+	for item in occupied_raw:
+		if item is Dictionary:
+			planned_occupied.append(item as Dictionary)
+
+	var to_target := target_pos - origin_pos
+	to_target.y = 0.0
+	var dist := to_target.length()
+	var base_dir := to_target.normalized() if dist > 0.001 else Vector3.BACK
+	var aim_positions: Array[Vector3] = []
+
+	if dist <= inner_radius:
+		var count := maxi(2, int(context.get("counter_inner_shots", 3)))
+		var spread_rad := deg_to_rad(140.0)
+		var step := spread_rad / float(count - 1) if count > 1 else 0.0
+		var start_angle := -spread_rad * 0.5
+		var ring_dist := clampf(dist * 0.85, 1.5, 2.35)
+		for idx in range(count):
+			var angle := start_angle + step * float(idx)
+			var desired := origin_pos + base_dir.rotated(Vector3.UP, angle) * ring_dist
+			desired.y = ground_y
+			var resolved := VenomPoolProjectile.resolve_landing_spot(
+				origin_pos,
+				desired,
+				ground_y,
+				pool_radius,
+				planned_occupied,
+				space,
+				excluded_rids,
+				1.35,
+				2.8
+			)
+			aim_positions.append(resolved)
+			planned_occupied.append({"pos": resolved, "radius": pool_radius})
+	else:
+		var count := maxi(1, int(context.get("counter_outer_shots", 2)))
+		var max_dist := float(context.get("max_shot_distance", 6.2))
+		var predicted := compute_lead_position(origin_pos, target_pos, target_vel, 0.45, 1.8, 0.8)
+		for idx in range(count):
+			var offset := _pick_nearby_offset(
+				origin_pos, predicted, Vector3(target_vel.x, 0.0, target_vel.z), 0.9, 1.75, idx
+			)
+			var desired := predicted + offset
+			var resolved := VenomPoolProjectile.resolve_landing_spot(
+				origin_pos,
+				desired,
+				ground_y,
+				pool_radius,
+				planned_occupied,
+				space,
+				excluded_rids,
+				1.5,
+				max_dist
+			)
+			aim_positions.append(resolved)
+			planned_occupied.append({"pos": resolved, "radius": pool_radius})
+
+	return {
+		"mode": AttackMode.ACID_FAN if aim_positions.size() > 1 else AttackMode.ACID_SINGLE,
+		"is_counter": true,
+		"aim_positions": aim_positions,
+		"cooldown_seconds": float(context.get("post_counter_cooldown", 1.25)),
+		"charge_seconds": maxf(0.18, float(context.get("counter_charge_seconds", 0.35))),
+		"shot_interval_seconds": 0.12,
+		"recover_seconds": 0.32,
+	}
+
+
 func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var origin_pos := shared["origin_pos"] as Vector3
 	var target_pos := shared["target_pos"] as Vector3
@@ -157,7 +243,11 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var cooldown_scale := float(shared["cooldown_scale"])
 	var outer_shots := maxi(1, int(context.get("outer_shots", 1)))
 	var lead_accuracy := float(context.get("lead_accuracy", 0.7))
-	var max_lead := float(context.get("max_lead_meters", 2.8))
+	var max_lead := float(context.get("max_lead_meters", 2.0))
+	var scatter_min := float(context.get("aim_scatter_min", DEFAULT_AIM_SCATTER_MIN_METERS))
+	var scatter_max := float(context.get("aim_scatter_max", DEFAULT_AIM_SCATTER_MAX_METERS))
+	var min_shot_dist := float(context.get("min_shot_distance", DEFAULT_MIN_SHOT_DISTANCE_METERS))
+	var max_shot_dist := float(context.get("max_shot_distance", DEFAULT_MAX_SHOT_DISTANCE_METERS))
 	var outer_cd := float(context.get("outer_cooldown", 3.2)) * cooldown_scale
 	var base_charge := float(context.get("charge_seconds", 0.75))
 
@@ -176,12 +266,23 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var already_covered := is_position_covered_by_pool(target_pos, planned_occupied)
 
 	for shot_idx in range(outer_shots):
-		var desired := predicted
-		if already_covered or shot_idx > 0:
-			var lateral := _pick_cutoff_offset(origin_pos, target_pos, flat_vel, shot_idx)
-			desired = predicted + lateral
+		var nearby_offset := _pick_nearby_offset(
+			origin_pos, predicted, flat_vel, scatter_min, scatter_max, shot_idx
+		)
+		var desired := predicted + nearby_offset
+		if already_covered and shot_idx == 0:
+			desired += _pick_cutoff_offset(origin_pos, target_pos, flat_vel, shot_idx) * 0.5
+		desired = _clamp_shot_distance(origin_pos, desired, min_shot_dist, max_shot_dist, ground_y)
 		var resolved := VenomPoolProjectile.resolve_landing_spot(
-			origin_pos, desired, ground_y, pool_radius, planned_occupied, space, excluded_rids
+			origin_pos,
+			desired,
+			ground_y,
+			pool_radius,
+			planned_occupied,
+			space,
+			excluded_rids,
+			min_shot_dist,
+			max_shot_dist
 		)
 		aim_positions.append(resolved)
 		planned_occupied.append({"pos": resolved, "radius": pool_radius})
@@ -210,16 +311,27 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var inner_shots := maxi(2, int(context.get("inner_shots", 3)))
 	var fan_degrees := maxf(10.0, float(context.get("inner_fan_degrees", 64.0)))
 	var lead_accuracy := float(context.get("lead_accuracy", 0.85))
-	var max_lead := float(context.get("max_lead_meters", 2.2))
+	var max_lead := float(context.get("max_lead_meters", 1.8))
+	var scatter_min := float(context.get("aim_scatter_min", DEFAULT_AIM_SCATTER_MIN_METERS))
+	var scatter_max := float(context.get("aim_scatter_max", DEFAULT_AIM_SCATTER_MAX_METERS))
+	var min_shot_dist := float(context.get("min_shot_distance", DEFAULT_MIN_SHOT_DISTANCE_METERS))
+	var max_shot_dist := float(context.get("max_shot_distance", DEFAULT_MAX_SHOT_DISTANCE_METERS))
 	var inner_cd := float(context.get("inner_cooldown", 1.75)) * cooldown_scale
 	var base_charge := float(context.get("charge_seconds", 0.75)) * 0.82
 
 	var predicted := compute_lead_position(
 		origin_pos, target_pos, target_vel, est_flight, max_lead, lead_accuracy
 	)
-	var base_vec := predicted - origin_pos
+	var flat_vel := Vector3(target_vel.x, 0.0, target_vel.z)
+	var nearby_anchor := (
+		predicted
+		+ _pick_nearby_offset(
+			origin_pos, predicted, flat_vel, scatter_min * 0.85, scatter_max * 0.9, 0
+		)
+	)
+	var base_vec := nearby_anchor - origin_pos
 	base_vec.y = 0.0
-	var base_dist := clampf(base_vec.length(), 1.8, 5.2)
+	var base_dist := clampf(base_vec.length(), min_shot_dist, minf(max_shot_dist, 4.6))
 	var base_dir := base_vec.normalized() if not base_vec.is_zero_approx() else Vector3.BACK
 
 	var aim_positions: Array[Vector3] = []
@@ -228,15 +340,25 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var step := arc_rad / float(inner_shots - 1) if inner_shots > 1 else 0.0
 	var start_angle := -arc_rad * 0.5
 
-	# Bắn tâm trước rồi tỏa ra hai cánh để ép hướng né cân đối.
+	# Bắn tâm lệch về vùng lân cận trước rồi tỏa ra hai cánh để ép hướng né.
 	var order: Array[int] = _center_first_indices(inner_shots)
 	for idx in order:
 		var angle := start_angle + step * float(idx)
-		var ring_dist := base_dist + (0.45 if idx % 2 == 1 else 0.0)
+		var ring_dist := clampf(
+			base_dist + (0.45 if idx % 2 == 1 else 0.0), min_shot_dist, max_shot_dist
+		)
 		var desired := origin_pos + base_dir.rotated(Vector3.UP, angle) * ring_dist
 		desired.y = ground_y
 		var resolved := VenomPoolProjectile.resolve_landing_spot(
-			origin_pos, desired, ground_y, pool_radius, planned_occupied, space, excluded_rids
+			origin_pos,
+			desired,
+			ground_y,
+			pool_radius,
+			planned_occupied,
+			space,
+			excluded_rids,
+			min_shot_dist,
+			max_shot_dist
 		)
 		aim_positions.append(resolved)
 		planned_occupied.append({"pos": resolved, "radius": pool_radius})
@@ -249,6 +371,43 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 		"shot_interval_seconds": float(context.get("inner_shot_interval", 0.16)),
 		"recover_seconds": float(context.get("recover_seconds", 0.45)) * 0.85,
 	}
+
+
+func _pick_nearby_offset(
+	origin_pos: Vector3,
+	anchor_pos: Vector3,
+	flat_vel: Vector3,
+	min_scatter: float,
+	max_scatter: float,
+	shot_index: int
+) -> Vector3:
+	var low := maxf(0.4, minf(min_scatter, max_scatter))
+	var high := maxf(low, max_scatter)
+	var radius := _rng.randf_range(low, high)
+	var to_anchor := anchor_pos - origin_pos
+	to_anchor.y = 0.0
+	var forward := to_anchor.normalized() if not to_anchor.is_zero_approx() else Vector3.BACK
+	var base_dir := (
+		flat_vel.normalized() if flat_vel.length() >= LEAD_VELOCITY_THRESHOLD else forward
+	)
+	var side_sign := 1.0 if (_rng.randi() % 2 == 0) else -1.0
+	if shot_index % 2 == 1:
+		side_sign *= -1.0
+	var angle_deg := _rng.randf_range(35.0, 115.0) * side_sign
+	return base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg)) * radius
+
+
+func _clamp_shot_distance(
+	origin_pos: Vector3, spot: Vector3, min_dist: float, max_dist: float, target_y: float
+) -> Vector3:
+	var offset := spot - origin_pos
+	offset.y = 0.0
+	var dist := offset.length()
+	var dir := offset.normalized() if dist > 0.001 else Vector3.BACK
+	var clamped_dist := clampf(dist, maxf(0.8, min_dist), maxf(min_dist + 0.5, max_dist))
+	var result := origin_pos + dir * clamped_dist
+	result.y = target_y
+	return result
 
 
 func _pick_cutoff_offset(

@@ -117,11 +117,13 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 ## Độ cao vòng cung (m) nhấc sprite lên khi thực hiện cú nhảy bật lùi.
 @export_range(0.0, 2.0, 0.05, "suffix:m") var evade_hop_height: float = 0.4
 ## Xác suất (0.0 - 1.0) sau khi đáp đất knockback sẽ vào pha Charge phun độc.
-@export_range(0.0, 1.0, 0.05) var knockback_spore_chance: float = 0.5
+@export_range(0.0, 1.0, 0.05) var knockback_spore_chance: float = 0.85
 ## Tỉ lệ cộng thêm (0.0 - 1.0) vào xác suất phản công nếu nấm bị đánh ngắt lúc đang gồng Charge.
 @export_range(0.0, 1.0, 0.05) var interrupted_charge_counter_bonus: float = 0.25
 ## Thời gian hồi (s) cho phép kích hoạt phản công Charge phun độc sau knockback.
-@export_range(0.1, 10.0, 0.1, "suffix:s") var knockback_spore_cooldown_seconds: float = 2.5
+@export_range(0.1, 10.0, 0.1, "suffix:s") var knockback_spore_cooldown_seconds: float = 0.8
+## Thời gian gồng Charge (s) khi phản công sau knockback (ngắn hơn gồng thường).
+@export_range(0.1, 4.0, 0.05, "suffix:s") var knockback_charge_duration_seconds: float = 0.7
 
 var home_position: Vector3
 var attack_cooldown_remaining: float = 0.0
@@ -268,12 +270,13 @@ func play_directional_animation(action: StringName, restart: bool = false) -> bo
 	return super(action, restart)
 
 
-func begin_charge_animation() -> void:
+func begin_charge_animation(duration_seconds: float = -1.0) -> void:
+	var target_duration := duration_seconds if duration_seconds > 0.0 else charge_duration_seconds
 	if is_instance_valid(visual) and is_instance_valid(visual.sprite):
 		if not _charge_feedback_active:
 			_charge_base_modulate = visual.sprite.modulate
 		_charge_feedback_active = true
-		var scale_denom := maxf(0.1, charge_duration_seconds)
+		var scale_denom := maxf(0.1, target_duration)
 		visual.animation_player.speed_scale = CHARGE_ANIMATION_SECONDS / scale_denom
 	play_directional_animation(&"spore_windup", true)
 
