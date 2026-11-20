@@ -23,13 +23,6 @@ func _update(delta: float) -> void:
 		return
 	enemy._set_horizontal_velocity(Vector3.ZERO)
 
-	if vine.is_flinching():
-		_was_flinching = true
-		return
-	if _was_flinching:
-		_was_flinching = false
-		vine.play_directional_animation(&"idle")
-
 	if vine.consume_pending_counter():
 		var counter_plan := vine.build_counter_plan()
 		var counter_mode := int(counter_plan.get("mode", VenomVineAI.AttackMode.NONE))
@@ -39,6 +32,13 @@ func _update(delta: float) -> void:
 				attack_state.set_pending_plan(counter_plan)
 			request_state(&"attack")
 			return
+
+	if vine.is_flinching():
+		_was_flinching = true
+		return
+	if _was_flinching:
+		_was_flinching = false
+		vine.play_directional_animation(&"idle")
 
 	var zone := vine.get_current_zone()
 	if zone == VenomVineAI.Zone.OUT_OF_RANGE:

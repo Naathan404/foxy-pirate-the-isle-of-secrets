@@ -30,6 +30,18 @@ func _update(delta: float) -> void:
 		return
 	enemy._set_horizontal_velocity(Vector3.ZERO)
 
+	if vine.consume_pending_counter():
+		var counter_plan := vine.build_counter_plan()
+		if (
+			int(counter_plan.get("mode", VenomVineAI.AttackMode.NONE))
+			!= VenomVineAI.AttackMode.NONE
+		):
+			var attack_state := fsm.states.get("attack") as VenomVineAttack
+			if attack_state != null:
+				attack_state.set_pending_plan(counter_plan)
+			request_state(&"attack")
+			return
+
 	if vine.get_current_zone() != VenomVineAI.Zone.OUT_OF_RANGE:
 		request_state(&"stalk")
 		return

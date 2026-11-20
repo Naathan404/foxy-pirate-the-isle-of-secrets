@@ -47,7 +47,7 @@ var _flight_light: OmniLight3D
 var _shadow_mesh: MeshInstance3D
 var _landing_fill: MeshInstance3D
 var _landing_ring: Sprite3D
-var _trail_particles: CPUParticles3D
+var _trail_particles: GPUParticles3D
 var _direct_hitbox: HitBox
 
 
@@ -213,22 +213,27 @@ func _build_flight_visuals() -> void:
 	_build_comet_aura()
 	_build_ground_telegraph(pool_radius)
 
-	_trail_particles = CPUParticles3D.new()
-	_trail_particles.name = "TrailParticles"
-	_trail_particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_trail_particles.amount = 22
-	_trail_particles.lifetime = 0.38
-	_trail_particles.local_coords = false
-	_trail_particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	_trail_particles.emission_sphere_radius = 0.16
-	_trail_particles.gravity = Vector3(0.0, -2.4, 0.0)
-	_trail_particles.scale_amount_min = 0.24
-	_trail_particles.scale_amount_max = 0.44
-	_trail_particles.scale_amount_curve = ACID_POOL_SCRIPT.create_scale_curve(1.0, 0.1)
-	_trail_particles.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
-		Color(0.85, 1.0, 0.45, 0.92), Color(0.25, 0.9, 0.2, 0.0)
+	_trail_particles = ACID_POOL_SCRIPT.create_gpu_particles(
+		"TrailParticles",
+		ACID_POOL_SCRIPT.SPORE_TEXTURE,
+		56,
+		0.34,
+		0.14,
+		Vector2(0.34, 0.34),
+		true,
+		true,
+		false
 	)
-	_trail_particles.mesh = ACID_POOL_SCRIPT.create_particle_quad(0, Vector2(0.45, 0.45), true)
+	var trail_process := _trail_particles.process_material as ParticleProcessMaterial
+	trail_process.spread = 180.0
+	trail_process.initial_velocity_min = 0.05
+	trail_process.initial_velocity_max = 0.25
+	trail_process.gravity = Vector3(0.0, -0.35, 0.0)
+	trail_process.scale_min = 0.4
+	trail_process.scale_max = 1.0
+	trail_process.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp_texture(
+		Color(0.88, 1.0, 0.48, 0.96), Color(0.28, 0.95, 0.35, 0.0)
+	)
 	add_child(_trail_particles)
 	_trail_particles.emitting = true
 
@@ -243,7 +248,7 @@ func _build_comet_aura() -> void:
 	glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	glow_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	glow_mat.albedo_texture = glow_atlas
-	glow_mat.albedo_color = Color(0.65, 1.0, 0.35, 0.72)
+	glow_mat.albedo_color = Color(0.65, 1.0, 0.35, 0.48)
 	glow_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	glow_mat.no_depth_test = false
 	glow_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
@@ -251,7 +256,7 @@ func _build_comet_aura() -> void:
 	_comet_glow = Sprite3D.new()
 	_comet_glow.name = "CometGlow"
 	_comet_glow.texture = glow_atlas
-	_comet_glow.pixel_size = 0.0068
+	_comet_glow.pixel_size = 0.0032
 	_comet_glow.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	_comet_glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_comet_glow.material_override = glow_mat
@@ -406,6 +411,10 @@ func _spawn_acid_pool() -> VenomAcidPool:
 	pool.setup(
 		_source, _source_team, pool_radius, pool_duration, tick_interval, tick_damage, _pool_config
 	)
+	if parent is Node3D:
+		pool.position = (parent as Node3D).to_local(_landing_position)
+	else:
+		pool.position = _landing_position
 	parent.add_child(pool)
 	pool.global_position = _landing_position
 	return pool
@@ -425,8 +434,10 @@ func _spawn_splash_burst() -> void:
 	burst.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	burst.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var splash_pos := _landing_position + Vector3.UP * SPLASH_GROUND_OFFSET_METERS
+	burst.position = (parent as Node3D).to_local(splash_pos) if parent is Node3D else splash_pos
 	parent.add_child(burst)
-	burst.global_position = _landing_position + Vector3.UP * SPLASH_GROUND_OFFSET_METERS
+	burst.global_position = splash_pos
 	var tween := burst.create_tween().set_parallel(true)
 	tween.tween_property(burst, "scale", Vector3.ONE * 1.45, 0.28)
 	tween.tween_property(burst, "modulate:a", 0.0, 0.28)
@@ -458,8 +469,10 @@ func _spawn_impact_ring(parent: Node) -> void:
 	wave.scale = Vector3.ONE * 0.45
 	wave.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	wave.material_override = ring_mat
+	var wave_pos := _landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS
+	wave.position = (parent as Node3D).to_local(wave_pos) if parent is Node3D else wave_pos
 	parent.add_child(wave)
-	wave.global_position = _landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS
+	wave.global_position = wave_pos
 	var wave_tween := wave.create_tween().set_parallel(true)
 	wave_tween.tween_property(wave, "scale", Vector3.ONE * 1.55, 0.32)
 	wave_tween.tween_property(wave, "modulate:a", 0.0, 0.32)
@@ -474,6 +487,7 @@ func _spawn_impact_droplets(parent: Node) -> void:
 	particles.lifetime = IMPACT_DROPLET_LIFETIME
 	particles.one_shot = true
 	particles.explosiveness = 1.0
+	particles.emitting = false
 	particles.local_coords = false
 	particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
 	particles.emission_sphere_radius = 0.22
@@ -489,8 +503,10 @@ func _spawn_impact_droplets(parent: Node) -> void:
 		Color(0.85, 1.0, 0.45, 0.95), Color(0.3, 0.95, 0.2, 0.0)
 	)
 	particles.mesh = ACID_POOL_SCRIPT.create_particle_quad(2, Vector2(0.45, 0.45), true)
+	var drop_pos := _landing_position + Vector3.UP * 0.15
+	particles.position = (parent as Node3D).to_local(drop_pos) if parent is Node3D else drop_pos
 	parent.add_child(particles)
-	particles.global_position = _landing_position + Vector3.UP * 0.15
+	particles.global_position = drop_pos
 	particles.emitting = true
 	var cleanup := particles.create_tween()
 	cleanup.tween_interval(IMPACT_DROPLET_LIFETIME + 0.2)

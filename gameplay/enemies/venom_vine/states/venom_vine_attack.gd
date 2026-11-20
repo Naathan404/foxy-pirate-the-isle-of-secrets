@@ -41,9 +41,14 @@ func _enter() -> void:
 	if is_instance_valid(vine.visual) and is_instance_valid(vine.visual.sprite):
 		_base_sprite_modulate = vine.visual.sprite.modulate
 
-	if _pending_plan.is_empty():
-		_pending_plan = vine.build_attack_plan()
+	var plan := _pending_plan
+	if plan.is_empty():
+		plan = vine.build_attack_plan()
+	_apply_plan(vine, plan)
 
+
+func _apply_plan(vine: VenomVine, plan: Dictionary) -> void:
+	_pending_plan = plan
 	var mode := int(_pending_plan.get("mode", VenomVineAI.AttackMode.NONE))
 	if mode == VenomVineAI.AttackMode.NONE:
 		request_state(&"stalk")
@@ -99,6 +104,14 @@ func _update(delta: float) -> void:
 
 
 func _update_charge(vine: VenomVine, step: float) -> void:
+	if not bool(_pending_plan.get("is_counter", false)) and vine.consume_pending_counter():
+		var counter_plan := vine.build_counter_plan()
+		if (
+			int(counter_plan.get("mode", VenomVineAI.AttackMode.NONE))
+			!= VenomVineAI.AttackMode.NONE
+		):
+			_apply_plan(vine, counter_plan)
+			return
 	_phase_remaining_seconds = maxf(0.0, _phase_remaining_seconds - step)
 	var progress := 1.0 - (_phase_remaining_seconds / maxf(0.01, _charge_total_seconds))
 	_apply_charge_feedback(vine, progress)
@@ -150,6 +163,9 @@ func _begin_recover(vine: VenomVine) -> void:
 
 
 func _update_recover(vine: VenomVine, step: float) -> void:
+	if vine.has_pending_counter():
+		request_state(&"stalk")
+		return
 	_phase_remaining_seconds = maxf(0.0, _phase_remaining_seconds - step)
 	if _phase_remaining_seconds > 0.0:
 		return

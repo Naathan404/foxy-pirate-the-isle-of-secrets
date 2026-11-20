@@ -23,6 +23,14 @@ const LIGHT_ENERGY_AWAKE := 0.6
 const LIGHT_ENERGY_CHARGE_BONUS := 1.15
 const MUZZLE_FLASH_DURATION := 0.18
 const MUZZLE_DROPLET_LIFETIME := 0.28
+const AMBIENT_SPORE_COUNT := 56
+const AMBIENT_SPORE_LIFETIME_SECONDS := 1.45
+const HIT_EFFECT_HEIGHT_METERS := 1.25
+const HIT_DROPLET_LIFETIME := 0.32
+const HIT_GLOW_BOOST := 1.1
+const HIT_COUNTER_GLOW_BOOST := 1.65
+const HIT_GLOW_DECAY_PER_SECOND := 3.2
+const HIT_RECOIL_TILT_RADIANS := 0.16
 const NORMAL_GLOW_COLOR := Color(0.55, 1.0, 0.25)
 const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 
@@ -45,7 +53,7 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 @export_range(0.0, 3.0, 0.05, "suffix:s") var ambush_delay_max_seconds: float = 0.65
 @export_range(0.1, 3.0, 0.05, "suffix:s") var wake_duration_seconds: float = 0.45
 ## Thời gian tối thiểu sau khi mở nụ trước phát bắn đầu tiên (trừ khi bị đánh lén).
-@export_range(0.0, 5.0, 0.05, "suffix:s") var wake_attack_delay_seconds: float = 0.55
+@export_range(0.0, 5.0, 0.05, "suffix:s") var wake_attack_delay_seconds: float = 0.42
 @export_range(0.2, 15.0, 0.1, "suffix:s") var vigilant_duration_seconds: float = 3.5
 @export_range(0.1, 2.0, 0.05, "suffix:s") var retract_duration_seconds: float = 0.35
 ## Độ mở rộng bán kính nhận diện tạm thời (m) khi bị đánh tầm xa.
@@ -54,13 +62,13 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 
 @export_group("Outer Ring Attack")
 @export_range(1, 5, 1) var outer_shots_per_volley: int = 1
-@export_range(0.5, 10.0, 0.1, "suffix:s") var outer_cooldown_seconds: float = 3.2
+@export_range(0.5, 10.0, 0.1, "suffix:s") var outer_cooldown_seconds: float = 2.6
 @export_range(0.05, 2.0, 0.05, "suffix:s") var outer_shot_interval_seconds: float = 0.28
 
 @export_group("Inner Ring Attack")
 @export_range(2, 10, 1) var inner_shots_per_volley: int = 3
 @export_range(10.0, 180.0, 2.0, "suffix:deg") var inner_fan_degrees: float = 64.0
-@export_range(0.5, 10.0, 0.1, "suffix:s") var inner_cooldown_seconds: float = 1.75
+@export_range(0.5, 10.0, 0.1, "suffix:s") var inner_cooldown_seconds: float = 1.6
 @export_range(0.05, 2.0, 0.05, "suffix:s") var inner_shot_interval_seconds: float = 0.16
 
 @export_group("Charge & Prediction")
@@ -86,11 +94,11 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 @export_group("Hit Reaction & Counter")
 ## Số đòn trúng từ Player để kích hoạt phản công (đánh trúng lúc đang gồng tính gấp đôi).
 @export_range(1, 10, 1) var hits_before_counter: int = 2
-@export_range(0.5, 15.0, 0.1, "suffix:s") var counter_cooldown_seconds: float = 3.0
-@export_range(0.15, 2.0, 0.05, "suffix:s") var counter_charge_seconds: float = 0.35
+@export_range(0.5, 15.0, 0.1, "suffix:s") var counter_cooldown_seconds: float = 1.65
+@export_range(0.15, 2.0, 0.05, "suffix:s") var counter_charge_seconds: float = 0.28
 @export_range(1, 8, 1) var counter_inner_shots: int = 3
 @export_range(1, 6, 1) var counter_outer_shots: int = 2
-@export_range(0.4, 3.0, 0.05, "suffix:m") var counter_pool_radius_meters: float = 0.9
+@export_range(0.4, 3.0, 0.05, "suffix:m") var counter_pool_radius_meters: float = 0.95
 @export_range(0.05, 1.0, 0.01, "suffix:s") var hit_flinch_seconds: float = 0.22
 
 var ai: VenomVineAI
@@ -110,10 +118,12 @@ var _counter_cooldown_remaining_seconds: float = 0.0
 var _pending_counter: bool = false
 var _flinch_remaining_seconds: float = 0.0
 var _glow_material: ShaderMaterial
-var _ambient_spores: CPUParticles3D
+var _ambient_spores: GPUParticles3D
 var _venom_light: OmniLight3D
 var _charge_glow_strength: float = 0.0
 var _charge_counter_mix: float = 0.0
+var _hit_glow_boost: float = 0.0
+var _hit_recoil_tween: Tween
 
 @onready var bullet_spawn: Marker3D = $Direction/BulletSpawn
 
@@ -127,7 +137,9 @@ func _ready() -> void:
 	damaged.connect(_on_vine_damaged)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if _hit_glow_boost > 0.0:
+		_hit_glow_boost = maxf(0.0, _hit_glow_boost - maxf(0.0, delta) * HIT_GLOW_DECAY_PER_SECOND)
 	_sync_glow_vfx()
 
 
@@ -153,33 +165,39 @@ func receive_damage(damage: DamageContext) -> float:
 	)
 	var was_charging := attack_state != null and attack_state.is_charging()
 	var applied := super(damage)
-	if (
-		applied <= 0.0
-		or dead
-		or not hp.is_alive()
-		or damage == null
-		or damage.source_team != CombatTeams.PLAYER
-	):
+	if applied <= 0.0 or damage == null or damage.source_team != CombatTeams.PLAYER:
 		return applied
 
-	_hits_toward_counter += 2 if was_charging else 1
-	if (
-		not _pending_counter
-		and _counter_cooldown_remaining_seconds <= 0.0
-		and _hits_toward_counter >= maxi(1, hits_before_counter)
-	):
-		_pending_counter = true
-		_hits_toward_counter = 0
-		_counter_cooldown_remaining_seconds = counter_cooldown_seconds
+	var counter_triggered := false
+	if not dead and hp.is_alive():
+		_hits_toward_counter += 2 if was_charging else 1
+		if (
+			not _pending_counter
+			and _counter_cooldown_remaining_seconds <= 0.0
+			and _hits_toward_counter >= maxi(1, hits_before_counter)
+		):
+			_pending_counter = true
+			counter_triggered = true
+			_hits_toward_counter = 0
+			_counter_cooldown_remaining_seconds = counter_cooldown_seconds
 
-	var in_hit_or_attack := (
-		is_instance_valid(fsm)
-		and is_instance_valid(fsm.current_state)
-		and fsm.current_state.name in [&"Hit", &"Attack"]
-	)
-	if is_awake and not in_hit_or_attack:
-		_flinch_remaining_seconds = hit_flinch_seconds
-		play_directional_animation(&"hit", true)
+		if counter_triggered or _pending_counter:
+			_flinch_remaining_seconds = 0.0
+		else:
+			var in_hit_or_attack := (
+				is_instance_valid(fsm)
+				and is_instance_valid(fsm.current_state)
+				and fsm.current_state.name in [&"Hit", &"Attack"]
+			)
+			if is_awake and not in_hit_or_attack:
+				_flinch_remaining_seconds = hit_flinch_seconds
+				play_directional_animation(&"hit", true)
+		_trigger_hit_recoil()
+	elif is_instance_valid(visual):
+		visual.rotation = Vector3.ZERO
+
+	_hit_glow_boost = HIT_COUNTER_GLOW_BOOST if counter_triggered else HIT_GLOW_BOOST
+	_spawn_hit_impact_vfx(counter_triggered)
 	return applied
 
 
@@ -245,6 +263,12 @@ func add_inner_agitation(delta: float) -> void:
 	agitation = minf(1.0, agitation + AGITATION_INNER_GAIN_PER_SECOND * maxf(0.0, delta))
 
 
+func get_hp_ratio() -> float:
+	if not is_instance_valid(hp):
+		return 1.0
+	return clampf(hp.get_current_hp() / maxf(0.01, hp.get_max_hp()), 0.0, 1.0)
+
+
 func build_attack_plan() -> Dictionary:
 	if not has_target() or ai == null:
 		return {"mode": VenomVineAI.AttackMode.NONE, "aim_positions": [] as Array[Vector3]}
@@ -264,6 +288,7 @@ func build_attack_plan() -> Dictionary:
 	var context := {
 		"zone": zone,
 		"agitation": agitation,
+		"hp_ratio": get_hp_ratio(),
 		"origin_pos": global_position,
 		"target_pos": target.global_position,
 		"target_velocity": get_target_velocity(),
@@ -317,6 +342,7 @@ func build_counter_plan() -> Dictionary:
 		get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() != null else null
 	)
 	var context := {
+		"hp_ratio": get_hp_ratio(),
 		"origin_pos": global_position,
 		"target_pos": target_pos,
 		"target_velocity": get_target_velocity(),
@@ -334,6 +360,8 @@ func build_counter_plan() -> Dictionary:
 	var plan := ai.build_counter_plan(context)
 	var pool_cfg := build_pool_config()
 	pool_cfg["pool_radius"] = counter_pool_radius_meters
+	pool_cfg["flight_seconds_scale"] = 0.65
+	pool_cfg["arc_height_scale"] = 0.55
 	plan["pool_config"] = pool_cfg
 	return plan
 
@@ -380,8 +408,13 @@ func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) 
 	var flat_dist := (
 		Vector2(landing_target.x - spawn_pos.x, landing_target.z - spawn_pos.z).length()
 	)
-	var flight_seconds := clampf(0.28 + flat_dist * 0.045, MIN_FLIGHT_SECONDS, MAX_FLIGHT_SECONDS)
 	var config := build_pool_config() if custom_pool_config.is_empty() else custom_pool_config
+	var flight_scale := clampf(float(config.get("flight_seconds_scale", 1.0)), 0.45, 2.0)
+	var arc_scale := clampf(float(config.get("arc_height_scale", 1.0)), 0.35, 2.0)
+	var flight_seconds := maxf(
+		0.18,
+		clampf(0.28 + flat_dist * 0.045, MIN_FLIGHT_SECONDS, MAX_FLIGHT_SECONDS) * flight_scale
+	)
 	var proj := PROJECTILE_SCRIPT.new() as VenomPoolProjectile
 	proj.setup(
 		self,
@@ -389,7 +422,7 @@ func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) 
 		spawn_pos,
 		landing_target,
 		flight_seconds,
-		projectile_arc_height_meters,
+		projectile_arc_height_meters * arc_scale,
 		data.attack_damage,
 		config
 	)
@@ -413,69 +446,243 @@ func spawn_muzzle_flash() -> void:
 		if is_instance_valid(bullet_spawn)
 		else global_position + Vector3.UP * 1.35
 	)
-
-	var orb_atlas := AtlasTexture.new()
-	orb_atlas.atlas = PARTICLE_SHEET
-	orb_atlas.region = Rect2(0.0, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
-	var flash_mat := StandardMaterial3D.new()
-	flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	flash_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	flash_mat.vertex_color_use_as_albedo = true
-	flash_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-	flash_mat.albedo_texture = orb_atlas
-	flash_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	flash_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
-
-	var flash := Sprite3D.new()
-	flash.name = "VenomMuzzleFlash"
-	flash.texture = orb_atlas
-	flash.pixel_size = 0.0062
-	flash.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	flash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	flash.modulate = (
+	var flash_color := (
 		COUNTER_GLOW_COLOR.lerp(Color.WHITE, 0.35)
 		if _charge_counter_mix > 0.5
 		else NORMAL_GLOW_COLOR.lerp(Color.WHITE, 0.35)
 	)
-	flash.scale = Vector3.ONE * 0.45
-	flash.material_override = flash_mat
-	parent.add_child(flash)
-	flash.global_position = spawn_pos
+	_spawn_additive_atlas_burst(
+		parent,
+		"VenomMuzzleFlash",
+		spawn_pos,
+		{
+			"col": 0,
+			"pixel_size": 0.0062,
+			"tint": flash_color,
+			"start_scale": 0.45,
+			"end_scale": 1.25,
+			"duration": MUZZLE_FLASH_DURATION,
+			"billboard": true,
+		}
+	)
 
-	var tween := flash.create_tween().set_parallel(true)
-	tween.tween_property(flash, "scale", Vector3.ONE * 1.25, MUZZLE_FLASH_DURATION)
-	tween.tween_property(flash, "modulate:a", 0.0, MUZZLE_FLASH_DURATION)
-	tween.chain().tween_callback(flash.queue_free)
+	var shoot_dir := (last_facing_direction * 0.8 + Vector3.UP * 0.55).normalized()
+	_spawn_one_shot_spray(
+		parent,
+		"MuzzleAcidSpray",
+		spawn_pos,
+		shoot_dir,
+		{
+			"spread": 36.0,
+			"vel_min": 2.0,
+			"vel_max": 3.8,
+			"gravity_y": -7.5,
+			"count": 10,
+			"lifetime": MUZZLE_DROPLET_LIFETIME,
+			"start_color": Color(0.85, 1.0, 0.48, 0.95),
+			"end_color": Color(0.3, 0.95, 0.22, 0.0),
+			"col": 2,
+		}
+	)
 
+
+func _spawn_additive_atlas_burst(
+	parent: Node, node_name: String, world_pos: Vector3, config: Dictionary = {}
+) -> void:
+	var particle_col := int(config.get("col", 0))
+	var billboard := bool(config.get("billboard", true))
+	var pixel_size_value := float(config.get("pixel_size", 0.0056))
+	var start_scale := float(config.get("start_scale", 0.45))
+	var end_scale := float(config.get("end_scale", 1.2))
+	var duration_seconds := float(config.get("duration", 0.2))
+	var tint: Color = config.get("tint", NORMAL_GLOW_COLOR) as Color
+
+	var atlas := AtlasTexture.new()
+	atlas.atlas = PARTICLE_SHEET
+	atlas.region = Rect2(
+		float(particle_col) * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE
+	)
+	var mat := StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.vertex_color_use_as_albedo = true
+	if billboard:
+		mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	else:
+		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.albedo_texture = atlas
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+
+	var burst := Sprite3D.new()
+	burst.name = node_name
+	burst.texture = atlas
+	burst.pixel_size = pixel_size_value
+	burst.billboard = (
+		BaseMaterial3D.BILLBOARD_ENABLED if billboard else BaseMaterial3D.BILLBOARD_DISABLED
+	)
+	if not billboard:
+		burst.rotation.x = -PI * 0.5
+	burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	burst.modulate = tint
+	burst.scale = Vector3.ONE * start_scale
+	burst.material_override = mat
+	burst.position = (parent as Node3D).to_local(world_pos) if parent is Node3D else world_pos
+	parent.add_child(burst)
+	burst.global_position = world_pos
+
+	var tween := burst.create_tween().set_parallel(true)
+	tween.tween_property(burst, "scale", Vector3.ONE * end_scale, duration_seconds)
+	tween.tween_property(burst, "modulate:a", 0.0, duration_seconds)
+	tween.chain().tween_callback(burst.queue_free)
+
+
+func _spawn_one_shot_spray(
+	parent: Node, node_name: String, world_pos: Vector3, spray_dir: Vector3, config: Dictionary = {}
+) -> void:
+	var lifetime_seconds := float(config.get("lifetime", 0.3))
+	var particle_col := int(config.get("col", 2))
+	var start_color: Color = config.get("start_color", Color(0.85, 1.0, 0.48, 0.95)) as Color
+	var end_color: Color = config.get("end_color", Color(0.3, 0.95, 0.22, 0.0)) as Color
 	var spray := CPUParticles3D.new()
-	spray.name = "MuzzleAcidSpray"
+	spray.name = node_name
 	spray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	spray.amount = 10
-	spray.lifetime = MUZZLE_DROPLET_LIFETIME
+	spray.amount = int(config.get("count", 10))
+	spray.lifetime = lifetime_seconds
 	spray.one_shot = true
 	spray.explosiveness = 1.0
+	spray.emitting = false
 	spray.local_coords = false
 	spray.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	spray.emission_sphere_radius = 0.12
-	var shoot_dir := (last_facing_direction * 0.8 + Vector3.UP * 0.55).normalized()
-	spray.direction = shoot_dir
-	spray.spread = 36.0
-	spray.initial_velocity_min = 2.0
-	spray.initial_velocity_max = 3.8
-	spray.gravity = Vector3(0.0, -7.5, 0.0)
-	spray.scale_amount_min = 0.18
-	spray.scale_amount_max = 0.34
-	spray.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
-		Color(0.85, 1.0, 0.48, 0.95), Color(0.3, 0.95, 0.22, 0.0)
-	)
-	spray.mesh = ACID_POOL_SCRIPT.create_particle_quad(2, Vector2(0.42, 0.42), true)
+	spray.emission_sphere_radius = 0.14
+	spray.direction = spray_dir
+	spray.spread = float(config.get("spread", 45.0))
+	spray.initial_velocity_min = float(config.get("vel_min", 2.0))
+	spray.initial_velocity_max = float(config.get("vel_max", 4.0))
+	spray.gravity = Vector3(0.0, float(config.get("gravity_y", -8.0)), 0.0)
+	spray.scale_amount_min = 0.2
+	spray.scale_amount_max = 0.38
+	spray.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(start_color, end_color)
+	spray.mesh = ACID_POOL_SCRIPT.create_particle_quad(particle_col, Vector2(0.42, 0.42), true)
+	spray.position = (parent as Node3D).to_local(world_pos) if parent is Node3D else world_pos
 	parent.add_child(spray)
-	spray.global_position = spawn_pos
+	spray.global_position = world_pos
 	spray.emitting = true
 	var cleanup := spray.create_tween()
-	cleanup.tween_interval(MUZZLE_DROPLET_LIFETIME + 0.18)
+	cleanup.tween_interval(lifetime_seconds + 0.18)
 	cleanup.tween_callback(spray.queue_free)
+
+
+func _trigger_hit_recoil() -> void:
+	if not is_instance_valid(visual):
+		return
+	if _hit_recoil_tween != null and _hit_recoil_tween.is_valid():
+		_hit_recoil_tween.kill()
+	var cam := get_viewport().get_camera_3d() if is_inside_tree() else null
+	var cam_right := cam.global_basis.x if is_instance_valid(cam) else Vector3.RIGHT
+	cam_right.y = 0.0
+	if cam_right.is_zero_approx():
+		cam_right = Vector3.RIGHT
+	else:
+		cam_right = cam_right.normalized()
+	var hit_dir := Vector3(pending_hit_direction.x, 0.0, pending_hit_direction.z)
+	var side_dot := hit_dir.normalized().dot(cam_right) if not hit_dir.is_zero_approx() else 0.0
+	var tilt_sign := -1.0 if side_dot >= 0.0 else 1.0
+	if absf(side_dot) < 0.12:
+		tilt_sign = 1.0 if int(Time.get_ticks_msec()) % 2 == 0 else -1.0
+	var target_rot := Vector3(0.0, 0.0, tilt_sign * HIT_RECOIL_TILT_RADIANS)
+	_hit_recoil_tween = create_tween()
+	(
+		_hit_recoil_tween
+		. tween_property(visual, "rotation", target_rot, 0.06)
+		. set_trans(Tween.TRANS_QUAD)
+		. set_ease(Tween.EASE_OUT)
+	)
+	(
+		_hit_recoil_tween
+		. tween_property(visual, "rotation", Vector3.ZERO, 0.22)
+		. set_trans(Tween.TRANS_BACK)
+		. set_ease(Tween.EASE_OUT)
+	)
+
+
+func _spawn_hit_impact_vfx(counter_triggered: bool) -> void:
+	var parent := get_parent()
+	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
+		return
+	var hit_pos := global_position + Vector3.UP * HIT_EFFECT_HEIGHT_METERS
+	var primary_col := (
+		COUNTER_GLOW_COLOR.lerp(Color.WHITE, 0.35)
+		if counter_triggered
+		else NORMAL_GLOW_COLOR.lerp(Color.WHITE, 0.4)
+	)
+	var end_col := Color(1.0, 0.35, 0.1, 0.0) if counter_triggered else Color(0.28, 0.95, 0.22, 0.0)
+	_spawn_additive_atlas_burst(
+		parent,
+		"VenomHitFlash",
+		hit_pos,
+		{
+			"col": 0,
+			"pixel_size": 0.0068 if counter_triggered else 0.0056,
+			"tint": primary_col,
+			"start_scale": 0.45,
+			"end_scale": 1.35 if counter_triggered else 1.1,
+			"duration": 0.18,
+			"billboard": true,
+		}
+	)
+	_spawn_additive_atlas_burst(
+		parent,
+		"VenomHitWave",
+		hit_pos,
+		{
+			"col": 3,
+			"pixel_size": 0.0066 if counter_triggered else 0.005,
+			"tint": COUNTER_GLOW_COLOR if counter_triggered else NORMAL_GLOW_COLOR,
+			"start_scale": 0.35,
+			"end_scale": 1.55 if counter_triggered else 1.2,
+			"duration": 0.24,
+			"billboard": true,
+		}
+	)
+	if counter_triggered:
+		_spawn_additive_atlas_burst(
+			parent,
+			"VenomCounterGroundRing",
+			global_position + Vector3.UP * 0.06,
+			{
+				"col": 3,
+				"pixel_size": 0.009,
+				"tint": COUNTER_GLOW_COLOR,
+				"start_scale": 0.45,
+				"end_scale": 1.75,
+				"duration": 0.34,
+				"billboard": false,
+			}
+		)
+	var away_dir := (
+		Vector3(pending_hit_direction.x, 0.65, pending_hit_direction.z).normalized()
+		if not pending_hit_direction.is_zero_approx()
+		else Vector3.UP
+	)
+	_spawn_one_shot_spray(
+		parent,
+		"VenomHitDroplets",
+		hit_pos,
+		away_dir,
+		{
+			"spread": 58.0,
+			"vel_min": 2.2,
+			"vel_max": 4.5,
+			"gravity_y": -8.5,
+			"count": 18 if counter_triggered else 12,
+			"lifetime": HIT_DROPLET_LIFETIME,
+			"start_color": primary_col,
+			"end_color": end_col,
+			"col": 2,
+		}
+	)
 
 
 func _on_projectile_impacted(_landing_pos: Vector3, pool: VenomAcidPool) -> void:
@@ -567,26 +774,26 @@ func _setup_luminous_vfx() -> void:
 	_venom_light.position = offset
 	vfx_anchor.add_child(_venom_light)
 
-	_ambient_spores = CPUParticles3D.new()
-	_ambient_spores.name = "AmbientVenomSpores"
-	_ambient_spores.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_ambient_spores.amount = 10
-	_ambient_spores.lifetime = 1.6
-	_ambient_spores.emitting = false
-	_ambient_spores.local_coords = false
-	_ambient_spores.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	_ambient_spores.emission_sphere_radius = 0.48
-	_ambient_spores.direction = Vector3.UP
-	_ambient_spores.spread = 45.0
-	_ambient_spores.initial_velocity_min = 0.18
-	_ambient_spores.initial_velocity_max = 0.45
-	_ambient_spores.gravity = Vector3(0.0, 0.28, 0.0)
-	_ambient_spores.scale_amount_min = 0.14
-	_ambient_spores.scale_amount_max = 0.28
-	_ambient_spores.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
-		Color(0.65, 1.0, 0.4, 0.72), Color(0.25, 0.9, 0.2, 0.0)
+	_ambient_spores = ACID_POOL_SCRIPT.create_gpu_particles(
+		"AmbientVenomSpores",
+		ACID_POOL_SCRIPT.SPORE_TEXTURE,
+		AMBIENT_SPORE_COUNT,
+		AMBIENT_SPORE_LIFETIME_SECONDS,
+		0.48,
+		Vector2(0.42, 0.42),
+		true,
+		true,
+		true
 	)
-	_ambient_spores.mesh = ACID_POOL_SCRIPT.create_particle_quad(0, Vector2(0.42, 0.42), true)
+	var spore_process := _ambient_spores.process_material as ParticleProcessMaterial
+	spore_process.initial_velocity_min = 0.08
+	spore_process.initial_velocity_max = 0.35
+	spore_process.gravity = Vector3(0.0, 0.14, 0.0)
+	spore_process.scale_min = 0.45
+	spore_process.scale_max = 1.15
+	spore_process.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp_texture(
+		Color(0.84, 1.0, 0.46, 0.94), Color(0.28, 0.94, 0.38, 0.0)
+	)
 	_ambient_spores.position = offset
 	vfx_anchor.add_child(_ambient_spores)
 	_sync_glow_vfx()
@@ -594,14 +801,17 @@ func _setup_luminous_vfx() -> void:
 
 func _sync_glow_vfx() -> void:
 	var active_awake := is_awake and not dead
+	var effective_charge := maxf(_charge_glow_strength, _hit_glow_boost)
+	var effective_counter := (
+		_charge_counter_mix if _charge_glow_strength > 0.01 else (1.0 if _pending_counter else 0.0)
+	)
 	if is_instance_valid(_ambient_spores):
 		_ambient_spores.emitting = active_awake
 	if is_instance_valid(_venom_light):
-		_venom_light.light_color = NORMAL_GLOW_COLOR.lerp(COUNTER_GLOW_COLOR, _charge_counter_mix)
+		_venom_light.light_color = NORMAL_GLOW_COLOR.lerp(COUNTER_GLOW_COLOR, effective_counter)
 		_venom_light.light_energy = (
-			LIGHT_ENERGY_AWAKE + _charge_glow_strength * LIGHT_ENERGY_CHARGE_BONUS
-			if active_awake
-			else 0.0
+			(LIGHT_ENERGY_AWAKE if active_awake else 0.0)
+			+ effective_charge * LIGHT_ENERGY_CHARGE_BONUS
 		)
 	if (
 		_glow_material == null
@@ -628,5 +838,5 @@ func _sync_glow_vfx() -> void:
 	_glow_material.set_shader_parameter(
 		&"idle_pulse_strength", IDLE_GLOW_AWAKE if active_awake else 0.0
 	)
-	_glow_material.set_shader_parameter(&"charge_strength", _charge_glow_strength)
-	_glow_material.set_shader_parameter(&"counter_mix", _charge_counter_mix)
+	_glow_material.set_shader_parameter(&"charge_strength", effective_charge)
+	_glow_material.set_shader_parameter(&"counter_mix", effective_counter)

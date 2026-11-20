@@ -40,9 +40,11 @@ func _update(delta: float) -> void:
 	if vine.has_target():
 		vine.face_target()
 	_remaining_seconds = maxf(0.0, _remaining_seconds - maxf(0.0, delta))
+	if vine.has_pending_counter():
+		_remaining_seconds = minf(_remaining_seconds, 0.06)
 	if _remaining_seconds <= 0.0:
 		vine.set_sprite_sheet_mode(false)
-		if vine.has_target():
+		if vine.has_target() or vine.has_pending_counter():
 			request_state(&"stalk")
 		else:
 			request_state(&"vigilant")

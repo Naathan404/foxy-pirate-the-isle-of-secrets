@@ -22,6 +22,11 @@ const POOL_COVER_BLOCK_FACTOR := 0.85
 const MIN_FLIGHT_SECONDS := 0.35
 const MAX_FLIGHT_SECONDS := 0.78
 const MAX_AGITATION_COOLDOWN_REDUCTION := 0.32
+const MAX_HP_COOLDOWN_REDUCTION := 0.34
+const MAX_HP_CHARGE_SPEEDUP := 0.22
+const MAX_HP_RECOVER_SPEEDUP := 0.25
+const OUTER_EXTRA_SHOT_HP_THRESHOLD := 0.65
+const INNER_EXTRA_SHOT_HP_THRESHOLD := 0.4
 const DEFAULT_AIM_SCATTER_MIN_METERS := 1.15
 const DEFAULT_AIM_SCATTER_MAX_METERS := 2.15
 const DEFAULT_MIN_SHOT_DISTANCE_METERS := 1.6
@@ -128,7 +133,18 @@ func select_attack_plan(context: Dictionary) -> Dictionary:
 
 	var flat_dist := Vector2(target_pos.x - origin_pos.x, target_pos.z - origin_pos.z).length()
 	var est_flight := clampf(0.28 + flat_dist * 0.045, MIN_FLIGHT_SECONDS, MAX_FLIGHT_SECONDS)
-	var cooldown_scale := 1.0 - agitation * MAX_AGITATION_COOLDOWN_REDUCTION
+	var hp_ratio := clampf(float(context.get("hp_ratio", 1.0)), 0.0, 1.0)
+	var hp_pressure := 1.0 - hp_ratio
+	var cooldown_scale := clampf(
+		(
+			(1.0 - agitation * MAX_AGITATION_COOLDOWN_REDUCTION)
+			* (1.0 - hp_pressure * MAX_HP_COOLDOWN_REDUCTION)
+		),
+		0.48,
+		1.0
+	)
+	var charge_scale := clampf(1.0 - hp_pressure * MAX_HP_CHARGE_SPEEDUP, 0.72, 1.0)
+	var recover_scale := clampf(1.0 - hp_pressure * MAX_HP_RECOVER_SPEEDUP, 0.72, 1.0)
 	var shared := {
 		"origin_pos": origin_pos,
 		"target_pos": target_pos,
@@ -140,6 +156,10 @@ func select_attack_plan(context: Dictionary) -> Dictionary:
 		"space": space,
 		"excluded_rids": excluded_rids,
 		"cooldown_scale": cooldown_scale,
+		"charge_scale": charge_scale,
+		"recover_scale": recover_scale,
+		"bonus_outer_shots": 1 if hp_ratio <= OUTER_EXTRA_SHOT_HP_THRESHOLD else 0,
+		"bonus_inner_shots": 1 if hp_ratio <= INNER_EXTRA_SHOT_HP_THRESHOLD else 0,
 	}
 
 	if zone == Zone.OUTER_RING:
@@ -178,7 +198,7 @@ func build_counter_plan(context: Dictionary) -> Dictionary:
 		var spread_rad := deg_to_rad(140.0)
 		var step := spread_rad / float(count - 1) if count > 1 else 0.0
 		var start_angle := -spread_rad * 0.5
-		var ring_dist := clampf(dist * 0.85, 1.5, 2.35)
+		var ring_dist := clampf(dist * 0.85, 0.85, 1.85)
 		for idx in range(count):
 			var angle := start_angle + step * float(idx)
 			var desired := origin_pos + base_dir.rotated(Vector3.UP, angle) * ring_dist
@@ -191,8 +211,8 @@ func build_counter_plan(context: Dictionary) -> Dictionary:
 				planned_occupied,
 				space,
 				excluded_rids,
-				1.35,
-				2.8
+				0.75,
+				2.3
 			)
 			aim_positions.append(resolved)
 			planned_occupied.append({"pos": resolved, "radius": pool_radius})
@@ -219,14 +239,17 @@ func build_counter_plan(context: Dictionary) -> Dictionary:
 			aim_positions.append(resolved)
 			planned_occupied.append({"pos": resolved, "radius": pool_radius})
 
+	var hp_ratio := clampf(float(context.get("hp_ratio", 1.0)), 0.0, 1.0)
+	var hp_pressure := 1.0 - hp_ratio
+	var base_post_counter_cd := float(context.get("post_counter_cooldown", 0.9))
 	return {
 		"mode": AttackMode.ACID_FAN if aim_positions.size() > 1 else AttackMode.ACID_SINGLE,
 		"is_counter": true,
 		"aim_positions": aim_positions,
-		"cooldown_seconds": float(context.get("post_counter_cooldown", 1.25)),
-		"charge_seconds": maxf(0.18, float(context.get("counter_charge_seconds", 0.35))),
-		"shot_interval_seconds": 0.12,
-		"recover_seconds": 0.32,
+		"cooldown_seconds": maxf(0.6, base_post_counter_cd * (1.0 - hp_pressure * 0.28)),
+		"charge_seconds": maxf(0.18, float(context.get("counter_charge_seconds", 0.28))),
+		"shot_interval_seconds": 0.09,
+		"recover_seconds": 0.24,
 	}
 
 
@@ -241,15 +264,21 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var space: PhysicsDirectSpaceState3D = shared["space"]
 	var excluded_rids: Array[RID] = shared["excluded_rids"]
 	var cooldown_scale := float(shared["cooldown_scale"])
-	var outer_shots := maxi(1, int(context.get("outer_shots", 1)))
+	var charge_scale := float(shared.get("charge_scale", 1.0))
+	var recover_scale := float(shared.get("recover_scale", 1.0))
+	var bonus_outer := int(shared.get("bonus_outer_shots", 0))
+	var outer_shots := maxi(1, int(context.get("outer_shots", 1)) + bonus_outer)
 	var lead_accuracy := float(context.get("lead_accuracy", 0.7))
 	var max_lead := float(context.get("max_lead_meters", 2.0))
 	var scatter_min := float(context.get("aim_scatter_min", DEFAULT_AIM_SCATTER_MIN_METERS))
 	var scatter_max := float(context.get("aim_scatter_max", DEFAULT_AIM_SCATTER_MAX_METERS))
 	var min_shot_dist := float(context.get("min_shot_distance", DEFAULT_MIN_SHOT_DISTANCE_METERS))
 	var max_shot_dist := float(context.get("max_shot_distance", DEFAULT_MAX_SHOT_DISTANCE_METERS))
-	var outer_cd := float(context.get("outer_cooldown", 3.2)) * cooldown_scale
-	var base_charge := float(context.get("charge_seconds", 0.75))
+	var raw_outer_cd := float(context.get("outer_cooldown", 2.6))
+	var outer_cd := maxf(0.8, raw_outer_cd * cooldown_scale)
+	var raw_charge := float(context.get("charge_seconds", 0.75))
+	var base_charge := maxf(minf(raw_charge, 0.42), raw_charge * charge_scale)
+	var raw_recover := float(context.get("recover_seconds", 0.45))
 
 	var predicted := compute_lead_position(
 		origin_pos, target_pos, target_vel, est_flight, max_lead, lead_accuracy
@@ -290,10 +319,10 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	return {
 		"mode": mode,
 		"aim_positions": aim_positions,
-		"cooldown_seconds": maxf(0.8, outer_cd),
+		"cooldown_seconds": outer_cd,
 		"charge_seconds": base_charge,
 		"shot_interval_seconds": float(context.get("outer_shot_interval", 0.28)),
-		"recover_seconds": float(context.get("recover_seconds", 0.45)),
+		"recover_seconds": maxf(minf(raw_recover, 0.28), raw_recover * recover_scale),
 	}
 
 
@@ -308,7 +337,10 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var space: PhysicsDirectSpaceState3D = shared["space"]
 	var excluded_rids: Array[RID] = shared["excluded_rids"]
 	var cooldown_scale := float(shared["cooldown_scale"])
-	var inner_shots := maxi(2, int(context.get("inner_shots", 3)))
+	var charge_scale := float(shared.get("charge_scale", 1.0))
+	var recover_scale := float(shared.get("recover_scale", 1.0))
+	var bonus_inner := int(shared.get("bonus_inner_shots", 0))
+	var inner_shots := maxi(2, int(context.get("inner_shots", 3)) + bonus_inner)
 	var fan_degrees := maxf(10.0, float(context.get("inner_fan_degrees", 64.0)))
 	var lead_accuracy := float(context.get("lead_accuracy", 0.85))
 	var max_lead := float(context.get("max_lead_meters", 1.8))
@@ -316,8 +348,11 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var scatter_max := float(context.get("aim_scatter_max", DEFAULT_AIM_SCATTER_MAX_METERS))
 	var min_shot_dist := float(context.get("min_shot_distance", DEFAULT_MIN_SHOT_DISTANCE_METERS))
 	var max_shot_dist := float(context.get("max_shot_distance", DEFAULT_MAX_SHOT_DISTANCE_METERS))
-	var inner_cd := float(context.get("inner_cooldown", 1.75)) * cooldown_scale
-	var base_charge := float(context.get("charge_seconds", 0.75)) * 0.82
+	var raw_inner_cd := float(context.get("inner_cooldown", 1.6))
+	var inner_cd := maxf(0.65, raw_inner_cd * cooldown_scale)
+	var raw_charge := float(context.get("charge_seconds", 0.75)) * 0.82
+	var base_charge := maxf(minf(raw_charge, 0.35), raw_charge * charge_scale)
+	var raw_recover := float(context.get("recover_seconds", 0.45)) * 0.85
 
 	var predicted := compute_lead_position(
 		origin_pos, target_pos, target_vel, est_flight, max_lead, lead_accuracy
@@ -366,10 +401,10 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	return {
 		"mode": AttackMode.ACID_FAN,
 		"aim_positions": aim_positions,
-		"cooldown_seconds": maxf(0.65, inner_cd),
-		"charge_seconds": maxf(0.35, base_charge),
+		"cooldown_seconds": inner_cd,
+		"charge_seconds": base_charge,
 		"shot_interval_seconds": float(context.get("inner_shot_interval", 0.16)),
-		"recover_seconds": float(context.get("recover_seconds", 0.45)) * 0.85,
+		"recover_seconds": maxf(minf(raw_recover, 0.24), raw_recover * recover_scale),
 	}
 
 
