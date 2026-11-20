@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/forest/pine_tree.tscn" id="3_pine"]
 [ext_resource type="PackedScene" uid="uid://b5kdbd2ynvi15" path="res://gameplay/enemies/mushroom/mushroom.tscn" id="4_mushroom"]
 [ext_resource type="PackedScene" path="res://gameplay/enemies/venom_vine/venom_vine.tscn" id="5_venom_vine"]
+[ext_resource type="PackedScene" uid="uid://dsdij5n1mx7mt" path="res://gameplay/enemies/firefly/firefly.tscn" id="6_firefly"]
 
 [node name="ForestTest" unique_id=340104391 instance=ExtResource("1_base")]
 open_exits = 2
@@ -170,3 +171,11 @@ counter_inner_shots = 3
 counter_outer_shots = 2
 counter_pool_radius_meters = 0.95
 hit_flinch_seconds = 0.22
+
+[node name="FireflyA" parent="." index="8" unique_id=75692701 instance=ExtResource("6_firefly")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, 2.5)
+show_debug_health = true
+
+[node name="FireflyB" parent="." index="9" unique_id=1819165227 instance=ExtResource("6_firefly")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.2, 0, 2.2)
+show_debug_health = true
