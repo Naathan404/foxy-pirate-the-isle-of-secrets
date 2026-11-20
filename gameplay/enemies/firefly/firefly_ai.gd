@@ -9,20 +9,42 @@ enum Zone {
 }
 
 const MIN_DISTANCE_METERS := 0.001
-const POOL_SEPARATION_BUFFER_METERS := 0.2
-const SPOT_SEARCH_ANGLES_DEG := [0.0, 24.0, -24.0, 48.0, -48.0, 72.0, -72.0, 100.0, -100.0]
-const SPOT_RADIAL_OFFSETS := [0.0, 1.1, 2.2, -0.75]
-const LANDING_SEARCH_ANGLES_DEG := [
+const POOL_SEPARATION_BUFFER_METERS := 0.28
+const SPOT_SEARCH_ANGLES_DEG := [
+	0.0,
+	24.0,
+	-24.0,
+	48.0,
+	-48.0,
+	72.0,
+	-72.0,
+	100.0,
+	-100.0,
+	140.0,
+	-140.0,
 	180.0,
-	135.0,
-	-135.0,
-	90.0,
-	-90.0,
+]
+const SPOT_RADIAL_OFFSETS := [0.0, 1.1, 2.2, 3.4, -0.75]
+const LANDING_SEARCH_ANGLES_DEG := [
+	0.0,
+	22.5,
+	-22.5,
 	45.0,
 	-45.0,
-	0.0,
+	67.5,
+	-67.5,
+	90.0,
+	-90.0,
+	112.5,
+	-112.5,
+	135.0,
+	-135.0,
+	157.5,
+	-157.5,
+	180.0,
 ]
-const LANDING_RADIAL_OFFSETS_METERS := [0.0, 0.7, 1.4]
+const LANDING_RADIAL_OFFSETS_METERS := [0.0, 0.35, 0.75, 1.35, 2.1, 3.0, 4.0]
+const SAFE_RING_OFFSETS_METERS := [0.65, 1.3, 2.0, 2.8, 3.7, 4.7, 5.8]
 
 
 func classify_zone(
@@ -140,34 +162,111 @@ func select_landing_spot(context: Dictionary) -> Vector3:
 		ground_y,
 		blast_center.z + base_dir.z * base_radius
 	)
-	var best_score := -INF
 	var has_floor := space != null and _has_ground(space, origin, ground_y, excluded_rids)
+	var has_clear := false
+	var best_clear_score := -INF
+	var best_clear_spot := fallback
+	var best_overlap_clearance := -INF
+	var best_overlap_spot := fallback
 
 	for angle_deg in LANDING_SEARCH_ANGLES_DEG:
 		var cand_dir := base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg))
 		for extra_r in LANDING_RADIAL_OFFSETS_METERS:
 			var dist := base_radius + float(extra_r)
-			var candidate := Vector3(
+			var raw_candidate := Vector3(
 				blast_center.x + cand_dir.x * dist, ground_y, blast_center.z + cand_dir.z * dist
 			)
-			if has_floor:
-				var snapped := _snap_ground(space, candidate, ground_y, excluded_rids)
-				if not snapped.has("pos"):
-					continue
-				candidate = snapped["pos"] as Vector3
+			var snapped_hit := _resolve_floor_candidate(
+				space, raw_candidate, ground_y, has_floor, excluded_rids
+			)
+			if not snapped_hit.has("pos"):
+				continue
+			var cand_pos: Vector3 = snapped_hit["pos"] as Vector3
+			var clearance_score := _spot_clearance(cand_pos, clearance, occupied)
+			if clearance_score >= 0.0:
+				var avoid_bonus := 0.0
+				if has_avoid:
+					var d_avoid := (
+						Vector2(cand_pos.x - avoid_pos.x, cand_pos.z - avoid_pos.z).length()
+					)
+					avoid_bonus = clampf(d_avoid - 1.5, -1.2, 1.8) * 0.65
+				var clear_score := -dist * 0.65 + avoid_bonus
+				if not has_clear or clear_score > best_clear_score:
+					has_clear = true
+					best_clear_score = clear_score
+					best_clear_spot = cand_pos
+			elif not has_clear and clearance_score > best_overlap_clearance:
+				best_overlap_clearance = clearance_score
+				best_overlap_spot = cand_pos
+	return best_clear_spot if has_clear else best_overlap_spot
 
-			var clearance_score := _spot_clearance(candidate, 0.55, occupied)
-			var avoid_bonus := 0.0
-			if has_avoid:
-				var d_avoid := (
-					Vector2(candidate.x - avoid_pos.x, candidate.z - avoid_pos.z).length()
+
+## Kiểm tra điểm đáp trên mặt đất không đè vào bất kỳ vùng độc nào.
+func is_spot_clear(point: Vector3, self_radius: float, occupied_spots: Array) -> bool:
+	return _spot_clearance(point, self_radius, occupied_spots) >= 0.0
+
+
+## Bảo đảm điểm hạ cánh nằm trên nền đất sạch ngoài mọi vũng độc hiện có và đang rơi.
+func ensure_safe_landing_spot(
+	origin_position: Vector3,
+	desired_position: Vector3,
+	ground_y: float,
+	clearance_radius: float,
+	occupied_spots: Array[Dictionary],
+	space: PhysicsDirectSpaceState3D,
+	excluded_rids: Array[RID] = [],
+	max_search_meters: float = 6.5
+) -> Vector3:
+	var has_floor := space != null and _has_ground(space, origin_position, ground_y, excluded_rids)
+	var direct := _resolve_floor_candidate(
+		space, desired_position, ground_y, has_floor, excluded_rids
+	)
+	var direct_ok := direct.has("pos")
+	var anchor: Vector3 = (direct["pos"] as Vector3) if direct_ok else origin_position
+	if direct_ok and _spot_clearance(anchor, clearance_radius, occupied_spots) >= 0.0:
+		return anchor
+
+	var to_origin := Vector3(origin_position.x - anchor.x, 0.0, origin_position.z - anchor.z)
+	var base_dir := to_origin.normalized() if not to_origin.is_zero_approx() else Vector3.BACK
+	var best_overlap_clearance := (
+		_spot_clearance(anchor, clearance_radius, occupied_spots) if direct_ok else -INF
+	)
+	var best_overlap_spot := anchor
+
+	for ring_dist in SAFE_RING_OFFSETS_METERS:
+		if float(ring_dist) > max_search_meters:
+			break
+		var has_clear_on_ring := false
+		var best_ring_dist_to_origin := INF
+		var best_ring_spot := anchor
+		for angle_deg in LANDING_SEARCH_ANGLES_DEG:
+			var cand_dir := base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg))
+			var raw_cand := Vector3(
+				anchor.x + cand_dir.x * float(ring_dist),
+				ground_y,
+				anchor.z + cand_dir.z * float(ring_dist)
+			)
+			var snapped_hit := _resolve_floor_candidate(
+				space, raw_cand, ground_y, has_floor, excluded_rids
+			)
+			if not snapped_hit.has("pos"):
+				continue
+			var cand_pos: Vector3 = snapped_hit["pos"] as Vector3
+			var clearance := _spot_clearance(cand_pos, clearance_radius, occupied_spots)
+			if clearance >= 0.0:
+				var d_origin := (
+					Vector2(cand_pos.x - origin_position.x, cand_pos.z - origin_position.z).length()
 				)
-				avoid_bonus = clampf(d_avoid - 1.5, -1.2, 1.8) * 0.65
-			var score := minf(0.0, clearance_score) * 4.0 - dist * 0.65 + avoid_bonus
-			if score > best_score:
-				best_score = score
-				fallback = candidate
-	return fallback
+				if not has_clear_on_ring or d_origin < best_ring_dist_to_origin:
+					has_clear_on_ring = true
+					best_ring_dist_to_origin = d_origin
+					best_ring_spot = cand_pos
+			elif clearance > best_overlap_clearance:
+				best_overlap_clearance = clearance
+				best_overlap_spot = cand_pos
+		if has_clear_on_ring:
+			return best_ring_spot
+	return best_overlap_spot
 
 
 func select_droplet_spots(
@@ -235,28 +334,51 @@ func resolve_ground_spot(
 		fallback = snapped["pos"] as Vector3
 	var best_clearance := _spot_clearance(fallback, spot_radius_meters, occupied_spots)
 	var has_floor := space != null and _has_ground(space, origin_position, ground_y, excluded_rids)
+	var has_clear := false
+	var best_clear_dist := INF
+	var best_clear_spot := fallback
 
 	for angle_deg in SPOT_SEARCH_ANGLES_DEG:
 		var cand_dir := base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg))
 		for r_mult in SPOT_RADIAL_OFFSETS:
 			var cand_dist := clampf(base_dist + float(r_mult) * spot_radius_meters, min_d, max_d)
-			var candidate := Vector3(
+			var raw_candidate := Vector3(
 				origin_position.x + cand_dir.x * cand_dist,
 				ground_y,
 				origin_position.z + cand_dir.z * cand_dist
 			)
-			if has_floor:
-				var hit := _snap_ground(space, candidate, ground_y, excluded_rids)
-				if not hit.has("pos"):
-					continue
-				candidate = hit["pos"] as Vector3
+			var resolved_hit := _resolve_floor_candidate(
+				space, raw_candidate, ground_y, has_floor, excluded_rids
+			)
+			if not resolved_hit.has("pos"):
+				continue
+			var candidate: Vector3 = resolved_hit["pos"] as Vector3
 			var clearance := _spot_clearance(candidate, spot_radius_meters, occupied_spots)
 			if clearance >= 0.0:
-				return candidate
-			if clearance > best_clearance:
+				var d_desired := (
+					Vector2(candidate.x - desired_position.x, candidate.z - desired_position.z)
+					. length()
+				)
+				if not has_clear or d_desired < best_clear_dist:
+					has_clear = true
+					best_clear_dist = d_desired
+					best_clear_spot = candidate
+			elif not has_clear and clearance > best_clearance:
 				best_clearance = clearance
 				fallback = candidate
-	return fallback
+	return best_clear_spot if has_clear else fallback
+
+
+func _resolve_floor_candidate(
+	space: PhysicsDirectSpaceState3D,
+	point: Vector3,
+	ground_y: float,
+	has_floor: bool,
+	excluded_rids: Array[RID]
+) -> Dictionary:
+	if not has_floor:
+		return {"pos": point}
+	return _snap_ground(space, point, ground_y, excluded_rids)
 
 
 func _has_ground(

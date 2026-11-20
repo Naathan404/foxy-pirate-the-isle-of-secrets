@@ -8,6 +8,7 @@ signal landed(landing_position: Vector3, field: FireflyPollenField)
 const FIELD_SCRIPT := preload("res://gameplay/enemies/firefly/firefly_pollen_field.gd")
 const SPARK_MOTE_TEXTURE := preload("res://assets/sprites/enemies/firefly/firefly_spark_mote.png")
 
+const MOTE_GROUP := &"firefly_ember_motes"
 const MIN_FLIGHT_SECONDS := 0.16
 
 var _source: Node
@@ -32,12 +33,45 @@ static func collect_active_field_spots(tree_owner: Node) -> Array[Dictionary]:
 	var spots: Array[Dictionary] = []
 	if not is_instance_valid(tree_owner) or not tree_owner.is_inside_tree():
 		return spots
-	for node in tree_owner.get_tree().get_nodes_in_group(FIELD_SCRIPT.FIELD_GROUP):
+	var tree := tree_owner.get_tree()
+	for node in tree.get_nodes_in_group(FIELD_SCRIPT.FIELD_GROUP):
 		var field := node as FireflyPollenField
 		if field == null or not is_instance_valid(field) or field.is_fading():
 			continue
 		spots.append({"pos": field.global_position, "radius": field.get_radius()})
+	for node in tree.get_nodes_in_group(MOTE_GROUP):
+		var mote := node as FireflyEmberMote
+		if mote == null or not is_instance_valid(mote) or mote.is_finished():
+			continue
+		spots.append({"pos": mote.get_landing_position(), "radius": mote.get_field_radius()})
 	return spots
+
+
+## Kiểm tra lại điểm hạ cánh dự kiến để bảo đảm không đáp đè lên bất kỳ vùng độc nào.
+static func resolve_safe_landing_spot(
+	owner_body: CollisionObject3D,
+	preferred_pos: Vector3,
+	ground_y: float,
+	clearance_meters: float,
+	ai_helper: FireflyAI
+) -> Vector3:
+	if not is_instance_valid(owner_body) or ai_helper == null:
+		return preferred_pos
+	var space := (
+		owner_body.get_world_3d().direct_space_state
+		if owner_body.is_inside_tree() and owner_body.get_world_3d() != null
+		else null
+	)
+	var occupied := collect_active_field_spots(owner_body)
+	return ai_helper.ensure_safe_landing_spot(
+		owner_body.global_position,
+		preferred_pos,
+		ground_y,
+		clearance_meters,
+		occupied,
+		space,
+		[owner_body.get_rid()]
+	)
 
 
 func setup(
@@ -65,6 +99,7 @@ func setup(
 
 
 func _ready() -> void:
+	add_to_group(MOTE_GROUP)
 	_build_visuals()
 	global_position = _start_position
 	_update_flight_pose(0.0)
@@ -78,6 +113,18 @@ func _physics_process(delta: float) -> void:
 	_update_flight_pose(progress)
 	if progress >= 1.0:
 		_detonate_on_ground()
+
+
+func is_finished() -> bool:
+	return _finished
+
+
+func get_landing_position() -> Vector3:
+	return _landing_position
+
+
+func get_field_radius() -> float:
+	return _field_radius_meters
 
 
 func _update_flight_pose(progress: float) -> void:
@@ -94,6 +141,8 @@ func _detonate_on_ground() -> void:
 	if _finished:
 		return
 	_finished = true
+	if is_in_group(MOTE_GROUP):
+		remove_from_group(MOTE_GROUP)
 	var parent := get_parent()
 	var spawned_field: FireflyPollenField = null
 	if is_instance_valid(parent) and not parent.is_queued_for_deletion():

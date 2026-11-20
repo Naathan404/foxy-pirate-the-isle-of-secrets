@@ -41,7 +41,13 @@ func _update(delta: float) -> void:
 	firefly.set_altitude_meters(settled_alt)
 
 	if _hover_remaining_seconds <= 0.0 and firefly.free_flight_remaining_seconds <= 0.0:
-		firefly.pending_landing_spot = _pick_gentle_landing_spot(firefly)
+		firefly.pending_landing_spot = FireflyEmberMote.resolve_safe_landing_spot(
+			firefly,
+			firefly.global_position,
+			firefly.home_position.y,
+			firefly.landing_clearance_meters,
+			firefly.ai
+		)
 		firefly.pending_gentle_land_to_rest = false
 		request_state(&"gentleland")
 		return
@@ -103,7 +109,13 @@ func _update_search_or_return(firefly: FireflyEnemy, step: float) -> void:
 	to_home.y = 0.0
 	if to_home.length() <= 1.25:
 		firefly.stop_movement(step)
-		firefly.pending_landing_spot = firefly.home_position
+		firefly.pending_landing_spot = FireflyEmberMote.resolve_safe_landing_spot(
+			firefly,
+			firefly.home_position,
+			firefly.home_position.y,
+			firefly.landing_clearance_meters,
+			firefly.ai
+		)
 		firefly.pending_gentle_land_to_rest = true
 		request_state(&"gentleland")
 		return
@@ -125,25 +137,3 @@ func _update_free_roam(firefly: FireflyEnemy, step: float) -> void:
 		dir = to_home if not to_home.is_zero_approx() else -dir
 	firefly.move_in_direction(dir, step, firefly.hover_speed_scale * 0.72)
 	firefly.play_firefly_animation(&"hover", true, false)
-
-
-func _pick_gentle_landing_spot(firefly: FireflyEnemy) -> Vector3:
-	if firefly.ai == null:
-		return firefly.global_position
-	var space := (
-		firefly.get_world_3d().direct_space_state
-		if firefly.is_inside_tree() and firefly.get_world_3d() != null
-		else null
-	)
-	var occupied := FireflyEmberMote.collect_active_field_spots(firefly)
-	return firefly.ai.resolve_ground_spot(
-		firefly.global_position,
-		firefly.global_position,
-		firefly.home_position.y,
-		0.55,
-		occupied,
-		space,
-		[firefly.get_rid()],
-		0.35,
-		2.0
-	)

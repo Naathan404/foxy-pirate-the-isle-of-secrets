@@ -31,10 +31,13 @@ func _enter() -> void:
 	_fall_elapsed = 0.0
 	_start_altitude = firefly.altitude_meters
 	_start_xz = firefly.global_position
-	_landing_xz = (
+	var desired_spot := (
 		firefly.pending_landing_spot
 		if not firefly.pending_landing_spot.is_zero_approx()
 		else firefly.global_position
+	)
+	_landing_xz = FireflyEmberMote.resolve_safe_landing_spot(
+		firefly, desired_spot, firefly.home_position.y, firefly.landing_clearance_meters, firefly.ai
 	)
 	firefly.exhausted_window_damage_taken = 0.0
 	firefly.exhausted_remaining_seconds = firefly.exhausted_duration_seconds
