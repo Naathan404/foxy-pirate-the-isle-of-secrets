@@ -4,6 +4,9 @@ extends PanelContainer
 signal clicked
 signal item_dropped(from_index: int, to_index: int)
 
+const FILLED_FRAME: Texture2D = preload("res://assets/ui/HUD_Fox/Weapons/Unpick_Slot.png")
+const EMPTY_FRAME: Texture2D = preload("res://assets/ui/HUD_Fox/Weapons/NotUnlock_Slot.png")
+
 @export_group("Interaction Feedback")
 @export_range(1.0, 1.2, 0.01) var hover_scale: float = 1.05
 @export_range(0.8, 1.0, 0.01) var pressed_scale: float = 0.94
@@ -14,8 +17,8 @@ signal item_dropped(from_index: int, to_index: int)
 @export_range(0.0, 1.0, 0.01) var dragging_alpha := 0.4
 @export_range(0.0, 1.0, 0.01) var inactive_highlight_alpha := 0.6
 @export_range(0.0, 1.0, 0.01) var drag_preview_alpha := 0.7
-@export var main_assignment_tint := Color(1.0, 0.85, 0.42)
-@export var backup_assignment_tint := Color(0.62, 0.83, 1.0)
+@export var main_assignment_tint := Color(1.0, 0.93, 0.8)
+@export var backup_assignment_tint := Color(0.85, 0.8, 0.95)
 @export var drop_target_tint := Color(0.5, 1.0, 0.6)
 
 var inventory: Inventory
@@ -35,7 +38,7 @@ var _content_scale: Vector2
 @onready var icon: TextureRect = $MarginContainer/Icon
 @onready var quantity_label: Label = $Background/QuantityLabel
 @onready var potion_assignment_label: Label = $Background/PotionAssignmentLabel
-@onready var _highlight: TextureRect = $Selection
+@onready var _highlight: TextureRect = $Background/Selection
 
 
 func _ready() -> void:
@@ -43,6 +46,8 @@ func _ready() -> void:
 	_content_scale = content.scale
 	mouse_entered.connect(_set_hovered.bind(true))
 	mouse_exited.connect(_set_hovered.bind(false))
+	focus_entered.connect(_on_focus_entered)
+	focus_exited.connect(_set_hovered.bind(false))
 	visibility_changed.connect(_on_visibility_changed)
 	resized.connect(_update_pivots.call_deferred)
 	_update_pivots.call_deferred()
@@ -54,6 +59,9 @@ func _gui_input(event: InputEvent) -> void:
 		if event.pressed:
 			clicked.emit()
 		_animate_visual()
+		accept_event()
+	elif event.is_action_pressed(&"ui_accept"):
+		clicked.emit()
 		accept_event()
 
 
@@ -76,6 +84,12 @@ func play_drop_feedback() -> void:
 	background.scale = _background_scale * drop_feedback_scale
 	content.scale = _content_scale * drop_feedback_scale
 	_animate_visual()
+
+
+# Keyboard focus selects the slot so arrow navigation updates the detail panel.
+func _on_focus_entered() -> void:
+	_set_hovered(true)
+	clicked.emit()
 
 
 func _set_hovered(hovered: bool) -> void:
@@ -114,9 +128,7 @@ func _animate_visual() -> void:
 	_highlight.modulate = (
 		drop_target_tint
 		if _drop_target
-		else Color.WHITE
-		if _selected
-		else Color(1, 1, 1, inactive_highlight_alpha)
+		else Color.WHITE if _selected else Color(1, 1, 1, inactive_highlight_alpha)
 	)
 	if not is_visible_in_tree():
 		background.scale = _background_scale
@@ -153,14 +165,13 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	preview_icon.position = -size / 2.0
 	preview_icon.size = size
-	preview_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	preview_icon.modulate.a = drag_preview_alpha
 	preview.add_child(preview_icon)
 	var label := Label.new()
 	label.label_settings = quantity_label.label_settings
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.position = Vector2(-size.x / 2.0, size.y / 2.0)
-	label.text = str(slot.quantity) if slot.item.icon != null else slot.item.display_name
+	label.text = "x%d" % slot.quantity if slot.item.icon != null else slot.item.display_name
 	preview.add_child(label)
 	set_drag_preview(preview)
 
@@ -207,32 +218,26 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 
 func refresh(slot: InventorySlot) -> void:
 	if slot == null or slot.is_empty():
+		background.texture = EMPTY_FRAME
 		icon.texture = null
 		quantity_label.hide()
 		set_potion_assignment("")
+		tooltip_text = ""
 		return
 
+	background.texture = FILLED_FRAME
 	icon.texture = slot.item.icon
-	quantity_label.text = str(slot.quantity)
+	quantity_label.text = "x%d" % slot.quantity
+	tooltip_text = slot.item.display_name
 
 	quantity_label.visible = slot.quantity >= 1
 
 
-func set_potion_assignment(assignment: String) -> void:
+## Shows the loadout tag; `is_main` picks the tint while the text itself names the slot.
+func set_potion_assignment(assignment: String, is_main: bool = true) -> void:
 	potion_assignment_label.text = assignment
 	potion_assignment_label.visible = not assignment.is_empty()
-	potion_assignment_label.modulate = (
-		main_assignment_tint if assignment == "MAIN" else backup_assignment_tint
-	)
-
-
-## Lets read-only menus render a catalog item with the same slot visual as the inventory.
-func set_preview(icon_texture: Texture2D, quantity: int = 1, show_quantity: bool = true) -> void:
-	_drag_enabled = false
-	set_potion_assignment("")
-	icon.texture = icon_texture
-	quantity_label.text = str(maxi(quantity, 1))
-	quantity_label.visible = show_quantity
+	potion_assignment_label.modulate = main_assignment_tint if is_main else backup_assignment_tint
 
 
 func set_drag_enabled(enabled: bool) -> void:

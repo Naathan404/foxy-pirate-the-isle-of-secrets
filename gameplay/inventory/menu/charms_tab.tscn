@@ -1,0 +1,587 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/menu/charms_tab.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="2_deco"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Deco_1.png" id="3_compass"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/charm_socket_button.tscn" id="4_socket"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charms_Line.png" id="5_lines"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/filter_chip.tscn" id="6_chip"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/All_Icon.png" id="7_all"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Active_Icon.png" id="8_active"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Passive_Icon.png" id="9_passive"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Backpack_Icon.png" id="10_bag"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charms_Stat.png" id="11_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/TypeCharm.png" id="12_type"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/RarityCharm.png" id="13_status"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charm_Cost_Icon.png" id="14_cost"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charm_Type_Icon.png" id="15_kind"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charm_Flame_Icon.png" id="16_socket"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charm_Cooldown_Icon.png" id="17_cooldown"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charm_Chance_Icon.png" id="18_chance"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Charms/Charm_Lock_Icon.png" id="19_lock"]
+[ext_resource type="Material" path="res://gameplay/inventory/menu/icon_glow_material.tres" id="glow_mat"]
+
+[sub_resource type="AtlasTexture" id="line_left"]
+atlas = ExtResource("5_lines")
+region = Rect2(240, 60, 40, 860)
+
+[sub_resource type="AtlasTexture" id="line_right"]
+atlas = ExtResource("5_lines")
+region = Rect2(1100, 60, 43, 860)
+
+[node name="CharmsTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Compass" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 78.0
+offset_right = 360.0
+offset_bottom = 310.0
+mouse_filter = 2
+texture = ExtResource("3_compass")
+expand_mode = 1
+
+[node name="Title" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 84.0
+offset_right = 330.0
+offset_bottom = 152.0
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Title"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Title"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "Charms"
+
+[node name="DecoRight" type="TextureRect" parent="Title"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SocketSpace" parent="." instance=ExtResource("4_socket")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 113.0
+offset_top = 182.0
+offset_right = 253.0
+offset_bottom = 327.0
+
+[node name="SocketQ" parent="." instance=ExtResource("4_socket")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 330.0
+offset_right = 152.0
+offset_bottom = 475.0
+
+[node name="SocketE" parent="." instance=ExtResource("4_socket")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 218.0
+offset_top = 330.0
+offset_right = 358.0
+offset_bottom = 475.0
+
+[node name="SafeLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 516.0
+offset_right = 356.0
+offset_bottom = 566.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SocketCountLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 568.0
+offset_right = 356.0
+offset_bottom = 592.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+
+[node name="LineLeft" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 375.0
+offset_top = 118.0
+offset_right = 395.0
+offset_bottom = 548.0
+mouse_filter = 2
+texture = SubResource("line_left")
+expand_mode = 1
+
+[node name="LineRight" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 810.0
+offset_top = 118.0
+offset_right = 831.0
+offset_bottom = 548.0
+mouse_filter = 2
+texture = SubResource("line_right")
+expand_mode = 1
+
+[node name="Filters" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 398.0
+offset_top = 114.0
+offset_right = 740.0
+offset_bottom = 158.0
+theme_override_constants/separation = 6
+
+[node name="FilterAll" parent="Filters" instance=ExtResource("6_chip")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 44)
+layout_mode = 2
+tooltip_text = "All charms"
+chip_icon = ExtResource("7_all")
+chip_text = "All"
+text_size = 19
+icon_size = Vector2(24, 24)
+content_inset = 24.0
+
+[node name="FilterActive" parent="Filters" instance=ExtResource("6_chip")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(116, 44)
+layout_mode = 2
+tooltip_text = "Active charms: triggered with their socket key"
+chip_icon = ExtResource("8_active")
+chip_text = "Active"
+text_size = 19
+icon_size = Vector2(24, 24)
+content_inset = 24.0
+
+[node name="FilterPassive" parent="Filters" instance=ExtResource("6_chip")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(124, 44)
+layout_mode = 2
+tooltip_text = "Passive charms: always on while equipped"
+chip_icon = ExtResource("9_passive")
+chip_text = "Passive"
+text_size = 19
+icon_size = Vector2(24, 24)
+content_inset = 24.0
+
+[node name="Counter" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 740.0
+offset_top = 118.0
+offset_right = 806.0
+offset_bottom = 154.0
+tooltip_text = "Charms owned / charms discovered in the catalog"
+theme_override_constants/separation = 6
+alignment = 2
+
+[node name="BagIcon" type="TextureRect" parent="Counter"]
+custom_minimum_size = Vector2(24, 26)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("10_bag")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CounterLabel" type="Label" parent="Counter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 20
+text = "0/0"
+vertical_alignment = 1
+
+[node name="GridScroll" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_left = 396.0
+offset_top = 162.0
+offset_right = 808.0
+offset_bottom = 548.0
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="GridScroll"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Grid" type="GridContainer" parent="GridScroll/GridMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="EmptyLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 410.0
+offset_top = 200.0
+offset_right = 796.0
+offset_bottom = 244.0
+theme_type_variation = &"BodyLabel"
+theme_override_colors/font_outline_color = Color(0.08, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "No charms of this kind yet."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="DetailArt" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 850.0
+offset_top = 40.0
+offset_right = 1253.0
+offset_bottom = 643.0
+mouse_filter = 2
+texture = ExtResource("11_panel")
+expand_mode = 1
+
+[node name="Glow" type="ColorRect" parent="."]
+material = ExtResource("glow_mat")
+layout_mode = 0
+offset_left = 862.0
+offset_top = 87.0
+offset_right = 1042.0
+offset_bottom = 267.0
+mouse_filter = 2
+
+[node name="BigIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 902.0
+offset_top = 127.0
+offset_right = 1002.0
+offset_bottom = 227.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharmName" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1058.0
+offset_top = 56.0
+offset_right = 1262.0
+offset_bottom = 102.0
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 27
+text = "No charm selected"
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="TypeBannerArt" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1074.0
+offset_top = 102.0
+offset_right = 1168.0
+offset_bottom = 157.0
+mouse_filter = 2
+texture = ExtResource("12_type")
+expand_mode = 1
+
+[node name="TypeBanner" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1078.0
+offset_top = 108.0
+offset_right = 1164.0
+offset_bottom = 150.0
+theme_type_variation = &"BannerLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="StatusBannerArt" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1170.0
+offset_top = 102.0
+offset_right = 1270.0
+offset_bottom = 156.0
+mouse_filter = 2
+texture = ExtResource("13_status")
+expand_mode = 1
+
+[node name="StatusBanner" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1174.0
+offset_top = 108.0
+offset_right = 1266.0
+offset_bottom = 150.0
+tooltip_text = "Ownership state from the charm registry"
+mouse_filter = 1
+theme_type_variation = &"BannerLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Stats" type="GridContainer" parent="."]
+layout_mode = 0
+offset_left = 880.0
+offset_top = 240.0
+offset_right = 1230.0
+offset_bottom = 358.0
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="CostRow" type="HBoxContainer" parent="Stats"]
+custom_minimum_size = Vector2(170, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Stamina (SP) spent per use"
+mouse_filter = 1
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Stats/CostRow"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("14_cost")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Stats/CostRow"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Cost"
+
+[node name="CostValue" type="Label" parent="Stats/CostRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="CooldownRow" type="HBoxContainer" parent="Stats"]
+custom_minimum_size = Vector2(170, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Time before the charm can be used again"
+mouse_filter = 1
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Stats/CooldownRow"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("17_cooldown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Stats/CooldownRow"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Cooldown"
+
+[node name="CooldownValue" type="Label" parent="Stats/CooldownRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="TypeRow" type="HBoxContainer" parent="Stats"]
+custom_minimum_size = Vector2(170, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Active charms trigger with their socket key; passive charms are always on"
+mouse_filter = 1
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Stats/TypeRow"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("15_kind")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Stats/TypeRow"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Type"
+
+[node name="TypeValue" type="Label" parent="Stats/TypeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="ChanceRow" type="HBoxContainer" parent="Stats"]
+custom_minimum_size = Vector2(170, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Chance for the effect to trigger"
+mouse_filter = 1
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Stats/ChanceRow"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("18_chance")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Stats/ChanceRow"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Chance"
+
+[node name="ChanceValue" type="Label" parent="Stats/ChanceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="SocketRow" type="HBoxContainer" parent="Stats"]
+custom_minimum_size = Vector2(170, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Socket this charm is equipped in"
+mouse_filter = 1
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Stats/SocketRow"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("16_socket")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Stats/SocketRow"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Socket"
+
+[node name="SocketValue" type="Label" parent="Stats/SocketRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="OwnedRow" type="HBoxContainer" parent="Stats"]
+custom_minimum_size = Vector2(170, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Whether you have acquired this charm"
+mouse_filter = 1
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Stats/OwnedRow"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("19_lock")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Stats/OwnedRow"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Status"
+
+[node name="OwnedValue" type="Label" parent="Stats/OwnedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="EffectHeading" type="Label" parent="."]
+layout_mode = 0
+offset_left = 996.0
+offset_top = 362.0
+offset_right = 1120.0
+offset_bottom = 400.0
+theme_type_variation = &"HeadingLabel"
+theme_override_colors/font_color = Color(0.77, 0.61, 0.53, 1)
+text = "Effect"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectScroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 878.0
+offset_top = 404.0
+offset_right = 1230.0
+offset_bottom = 524.0
+horizontal_scroll_mode = 0
+
+[node name="EffectText" type="Label" parent="EffectScroll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(336, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+autowrap_mode = 3
+
+[node name="ActionHint" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 540.0
+offset_right = 1232.0
+offset_bottom = 564.0
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="ActionButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 962.0
+offset_top = 568.0
+offset_right = 1146.0
+offset_bottom = 613.0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+text = "Equip"

@@ -1,0 +1,54 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/menu/filter_chip.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Inventory/Inventory_ButtonSelected.png" id="2_ribbon"]
+
+[node name="FilterChip" type="Button"]
+custom_minimum_size = Vector2(224, 50)
+offset_right = 224.0
+offset_bottom = 50.0
+mouse_default_cursor_shape = 2
+script = ExtResource("1_script")
+
+[node name="Highlight" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_ribbon")
+expand_mode = 1
+
+[node name="Content" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_right = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="ChipIcon" type="TextureRect" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ChipLabel" type="Label" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabLabel"
+vertical_alignment = 1
+text_overrun_behavior = 3

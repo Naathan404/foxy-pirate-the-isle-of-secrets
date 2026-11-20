@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://c6lni27p5k43v"]
+[gd_scene format=3 uid="uid://dgtobpbp530b3"]
 
-[ext_resource type="Script" uid="uid://cvy4vyj0b7usm" path="res://gameplay/inventory/equipment_tab.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/inventory/equipment_tab.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2"]
-[ext_resource type="PackedScene" uid="uid://cf04lpri8k1o3" path="res://gameplay/inventory/equipment_slot.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/equipment_slot.tscn" id="3"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_h6sw2"]
 [ext_resource type="Texture2D" uid="uid://d1vl8vesersl" path="res://assets/ui/player_hud/inventory/Inventory_Slot_1.png" id="5_0k2h7"]
 [ext_resource type="Script" uid="uid://bsn8narxl3gfb" path="res://gameplay/ui/button_press_feedback.gd" id="6_1e8a6"]

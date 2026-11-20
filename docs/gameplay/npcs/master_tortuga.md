@@ -6,7 +6,7 @@
 
 The Craft tab lists unlocked blueprints from `data/forge/tortuga_catalog.tres`, including weapons already crafted and the starter Dagger. Owned weapons have a darker slot. Selecting one shows its base stats and the gold and material requirements. A successful transaction checks payment, deducts it and grants the weapon without equipping it. The blueprint remains unlocked, while the Craft button becomes disabled for an owned weapon. A failed grant refunds payment.
 
-The selected weapon's detail pane follows the Inventory Equipment tab: combat stats, current Forge attributes and the weapon skill appear in a scrollable view. An uncrafted Blueprint uses base values; an owned weapon uses its active Forge. The editable layout is `gameplay/forge/tortuga_weapon_details.tscn`, with stat tiles in `tortuga_stat_tile.tscn`. Costs and the Craft/Forge action stay below the detail view.
+The selected weapon's detail pane follows the Inventory menu Weapon tab: combat stats, current Forge attributes and the weapon skill appear in a scrollable view. An uncrafted Blueprint uses base values; an owned weapon uses its active Forge. The editable layout is `gameplay/forge/tortuga_weapon_details.tscn`, with stat tiles in `tortuga_stat_tile.tscn`. Costs and the Craft/Forge action stay below the detail view.
 
 The source for the prototype recipes is the [Weapons tab of the balance sheet](https://docs.google.com/spreadsheets/d/1GFGub8L-NBznHdhdoDl4mzo-B9xavXrR2RNTXG-1DmU/edit?gid=740360440#gid=740360440):
 
