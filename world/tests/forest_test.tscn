@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://c0nu47ksokiuu" path="res://world/biomes/forest/oak_tree.tscn" id="2_oak"]
 [ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/forest/pine_tree.tscn" id="3_pine"]
 [ext_resource type="PackedScene" uid="uid://b5kdbd2ynvi15" path="res://gameplay/enemies/mushroom/mushroom.tscn" id="4_mushroom"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/venom_vine/venom_vine.tscn" id="5_venom_vine"]
 
 [node name="ForestTest" unique_id=340104391 instance=ExtResource("1_base")]
 open_exits = 2
@@ -36,4 +37,12 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -2, 0, -8)
 
 [node name="Mushroom" parent="." index="5" unique_id=1943653490 instance=ExtResource("4_mushroom")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
+show_debug_health = true
+
+[node name="VenomVineA" parent="." instance=ExtResource("5_venom_vine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, -2)
+show_debug_health = true
+
+[node name="VenomVineB" parent="." instance=ExtResource("5_venom_vine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, 2.5)
 show_debug_health = true

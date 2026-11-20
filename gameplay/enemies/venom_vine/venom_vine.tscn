@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/venom_vine.gd" id="2_vine"]
+[ext_resource type="Resource" path="res://data/enemies/venom_vine_data.tres" id="3_data"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/venom_vine/venom_vine_dormant.png" id="4_dormant_tex"]
+[ext_resource type="AnimationLibrary" path="res://gameplay/enemies/venom_vine/venom_vine_anims.tres" id="5_anims"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_dormant.gd" id="6_dormant"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_wake.gd" id="7_wake"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_stalk.gd" id="8_stalk"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_attack.gd" id="9_attack"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_vigilant.gd" id="10_vigilant"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hurtbox"]
+height = 1.7
+radius = 0.85
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
+height = 3.0
+radius = 8.5
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+height = 1.4
+radius = 0.65
+
+[node name="VenomVine" instance=ExtResource("1_base")]
+script = ExtResource("2_vine")
+data = ExtResource("3_data")
+initial_state_name = &"Dormant"
+destroy_on_death = true
+charm_grapple_large = true
+show_debug_health = true
+
+[node name="Sprite3D" parent="Visual" index="0"]
+offset = Vector2(0, 204)
+pixel_size = 0.0048
+shaded = false
+alpha_cut = 0
+texture_filter = 3
+texture = ExtResource("4_dormant_tex")
+hframes = 4
+vframes = 1
+frame = 1
+
+[node name="AnimationPlayer" parent="Visual" index="1"]
+libraries/ = ExtResource("5_anims")
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+shape = SubResource("CylinderShape3D_hurtbox")
+
+[node name="BulletSpawn" type="Marker3D" parent="Direction" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0.3)
+
+[node name="Dormant" type="Node" parent="States"]
+script = ExtResource("6_dormant")
+
+[node name="Wake" type="Node" parent="States"]
+script = ExtResource("7_wake")
+
+[node name="Stalk" type="Node" parent="States"]
+script = ExtResource("8_stalk")
+
+[node name="Attack" type="Node" parent="States"]
+script = ExtResource("9_attack")
+
+[node name="Vigilant" type="Node" parent="States"]
+script = ExtResource("10_vigilant")
+
+[node name="CollisionShape3D" parent="." index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("CylinderShape3D_body")
+
+[node name="TargetDetector" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+shape = SubResource("CylinderShape3D_detector")
