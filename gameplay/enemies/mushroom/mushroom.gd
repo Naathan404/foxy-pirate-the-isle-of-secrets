@@ -10,12 +10,16 @@ const NORMAL_TEXTURE := preload("res://assets/sprites/enemies/mushroom/mushroom_
 const CHARGE_TEXTURE := preload("res://assets/sprites/enemies/mushroom/mushroom_charge_4dir.png")
 
 const CHARGE_ANIMATION_SECONDS := 1.6
-const HOP_FREQUENCY := 0.9
-const HOP_HEIGHT := 0.16
-const HOP_MIN_SPEED_FACTOR := 0.35
+const HOP_TAKEOFF_PHASE := 0.18
+const HOP_LAND_PHASE := 0.84
+const HOP_GROUND_SPEED_FACTOR := 0.38
+const HOP_AIR_SPEED_BOOST := 1.55
+const HOP_SHADOW_RADIUS := 0.46
+const HOP_SHADOW_OFFSET_METERS := 0.025
+const HOP_STEP_DUST_AMOUNT := 10
+const HOP_STEP_DUST_LIFETIME := 0.42
 const CHARGE_TINT := Color(1.0, 1.0, 0.55, 1.0)
 const CHARGE_PULSE_COUNT := 4.0
-const HOP_VELOCITY_THRESHOLD := 0.08
 const EVADE_CHECK_UP := 1.2
 const EVADE_CHECK_DOWN := 2.4
 const EVADE_DIRECTION_ANGLES := [
@@ -40,7 +44,7 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 ## Thời gian tối đa (s) giả vờ đứng im ngụy trang khi Player mới bước vào rìa vùng nhận diện.
 @export_range(0.0, 5.0, 0.05, "suffix:s") var ambush_delay_max_seconds: float = 0.65
 ## Thời gian nhìn/cảnh giác Player (s) sau khi tỉnh dậy trước khi bắt đầu tiến lại gần.
-@export_range(0.0, 5.0, 0.05, "suffix:s") var observe_seconds: float = 0.8
+@export_range(0.0, 5.0, 0.05, "suffix:s") var observe_seconds: float = 0.55
 ## Thời gian (s) đi tới vị trí thấy Player lần cuối sau khi Player thoát khỏi vùng nhận diện.
 @export_range(0.5, 15.0, 0.1, "suffix:s") var search_seconds: float = 3.0
 
@@ -49,9 +53,13 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 @export_range(1.0, 40.0, 0.5, "suffix:m") var movement_radius: float = 12.0
 ## Hệ số tốc độ khi đuổi theo (nhân với move_speed trong mushroom_data.tres).
 ## Giữ bằng wander để vòng nhận diện chỉ điều hướng, không làm nấm chạy nhanh.
-@export_range(0.05, 5.0, 0.05) var chase_speed_scale: float = 0.55
+@export_range(0.05, 5.0, 0.05) var chase_speed_scale: float = 0.75
 ## Hệ số tốc độ khi đi lang thang quanh gốc (nhân với move_speed trong mushroom_data.tres).
-@export_range(0.05, 5.0, 0.05) var wander_speed_scale: float = 0.55
+@export_range(0.05, 5.0, 0.05) var wander_speed_scale: float = 0.7
+## Độ cao mỗi bước nhảy khi đi/đuổi (m) để nhịp nhảy tách bạch rõ khỏi mặt đất.
+@export_range(0.1, 1.2, 0.02, "suffix:m") var hop_height: float = 0.44
+## Chu kỳ 1 bước nhảy hoàn chỉnh (s), tự co tốc độ animation walk_* (0.68s) theo nhịp này.
+@export_range(0.25, 1.5, 0.02, "suffix:s") var hop_cycle_seconds: float = 0.62
 ## Thời gian tối thiểu (s) mỗi lượt đi lang thang ngẫu nhiên khi chưa thấy Player.
 @export_range(0.2, 10.0, 0.1, "suffix:s") var wander_min_seconds: float = 1.2
 ## Thời gian tối đa (s) mỗi lượt đi lang thang ngẫu nhiên khi chưa thấy Player.
@@ -70,11 +78,11 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 ## Cự ly gần (m): Player bước vào tầm này là nấm bắt buộc gồng Charge phun độc khi hết hồi chiêu.
 @export_range(0.2, 10.0, 0.1, "suffix:m") var attack_range: float = 2.5
 ## Thời gian hồi chiêu phun độc (s) áp dụng sau mỗi lần tạo mây độc thành công.
-@export_range(0.2, 20.0, 0.1, "suffix:s") var spore_cooldown_seconds: float = 4.0
+@export_range(0.2, 20.0, 0.1, "suffix:s") var spore_cooldown_seconds: float = 3.1
 ## Chu kỳ (s) tung xúc xắc phun độc ngẫu nhiên khi đang tiến tới Player trong vùng nhận diện.
-@export_range(0.2, 20.0, 0.1, "suffix:s") var chase_spore_interval_seconds: float = 2.0
+@export_range(0.2, 20.0, 0.1, "suffix:s") var chase_spore_interval_seconds: float = 1.7
 ## Xác suất (0.0 - 1.0) phun độc ngẫu nhiên mỗi chu kỳ khi đang đuổi trong vùng nhận diện.
-@export_range(0.0, 1.0, 0.05) var chase_spore_chance: float = 0.3
+@export_range(0.0, 1.0, 0.05) var chase_spore_chance: float = 0.4
 ## Bán kính gây sát thương của đám mây độc (m). Nên nhỏ hơn evade_distance để Player kịp né.
 @export_range(0.4, 10.0, 0.1, "suffix:m") var cloud_radius: float = 2.6
 ## Hệ số (0.1 - 1.0) nhân với cloud_radius: nấm đứng trong vùng này sẽ không phun chồng độc mới.
@@ -84,9 +92,9 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 ## Thời gian (s) để bụi độc và sương mặt đất đậm dần lên mức tối đa khi vừa bung ra.
 @export_range(0.05, 3.0, 0.05, "suffix:s") var spore_ramp_seconds: float = 0.8
 ## Chu kỳ gây sát thương độc (s/lần) lên Player đứng trong vùng mây độc.
-@export_range(0.1, 5.0, 0.05, "suffix:s") var poison_interval_seconds: float = 1.0
+@export_range(0.1, 5.0, 0.05, "suffix:s") var poison_interval_seconds: float = 0.85
 ## Lượng máu trừ mỗi nhịp độc (HP/tick).
-@export_range(0.1, 100.0, 0.1) var poison_damage: float = 0.5
+@export_range(0.1, 100.0, 0.1) var poison_damage: float = 1.0
 ## Số lượng đám mây độc tối đa tồn tại cùng lúc của con nấm này; vượt quá sẽ tắt đám cũ nhất.
 @export_range(1, 10, 1) var max_active_clouds: int = 3
 
@@ -125,10 +133,24 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 ## Thời gian gồng Charge (s) khi phản công sau knockback (ngắn hơn gồng thường).
 @export_range(0.1, 4.0, 0.05, "suffix:s") var knockback_charge_duration_seconds: float = 0.7
 
+@export_group("Low-HP Escalation")
+## Tỉ lệ giảm hồi chiêu tối đa khi máu nấm gần cạn (giữ cân bằng, không spam quá mức).
+@export_range(0.0, 0.6, 0.05) var low_hp_cooldown_reduction_max: float = 0.42
+## Tỉ lệ rút ngắn thời gian gồng Charge tối đa khi máu nấm gần cạn.
+@export_range(0.0, 0.4, 0.05) var low_hp_charge_speedup_max: float = 0.25
+## Xác suất cộng thêm tối đa cho đòn phun ngẫu nhiên lúc đuổi khi máu gần cạn.
+@export_range(0.0, 0.5, 0.05) var low_hp_chase_chance_bonus: float = 0.32
+
 var home_position: Vector3
 var attack_cooldown_remaining: float = 0.0
 var ai: MushroomAI
-var _hop_time: float = 0.0
+var _hop_phase: float = 0.0
+var _was_moving_hop: bool = false
+var _move_requested_this_step: bool = false
+var _last_walk_anim: String = ""
+var _shadow_mesh: MeshInstance3D
+var _shadow_material: StandardMaterial3D
+var _step_spores: CPUParticles3D
 var _charge_base_modulate: Color = Color.WHITE
 var _charge_feedback_active: bool = false
 var _evade_pending: bool = false
@@ -149,6 +171,7 @@ func _ready() -> void:
 	detector_shape.shape = detector_shape.shape.duplicate()
 	(detector_shape.shape as CylinderShape3D).radius = detection_radius
 	super()
+	_build_hop_visuals()
 
 
 func _physics_process(delta: float) -> void:
@@ -170,20 +193,16 @@ func _physics_process(delta: float) -> void:
 		_evade_remaining = 0.0
 		_evade_pending = false
 		_pending_knockback_charge = false
+		_reset_hop_visuals()
 		return
 	if _evade_remaining > 0.0:
 		if _is_in_hit_state():
 			_evade_remaining = 0.0
+			_reset_hop_visuals()
 			return
 		_update_defensive_hop(step)
 		return
-	if is_instance_valid(visual):
-		if Vector2(velocity.x, velocity.z).length() > HOP_VELOCITY_THRESHOLD:
-			_hop_time += step * HOP_FREQUENCY * TAU
-			visual.position.y = absf(sin(_hop_time)) * HOP_HEIGHT
-		else:
-			_hop_time = 0.0
-			visual.position.y = 0.0
+	_update_walk_hop(step)
 
 
 func receive_damage(damage: DamageContext) -> float:
@@ -259,7 +278,12 @@ func get_active_spore_clouds() -> Array[Node]:
 
 func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.0) -> void:
 	if not direction.is_zero_approx():
-		var hop_factor := lerpf(HOP_MIN_SPEED_FACTOR, 1.0, absf(sin(_hop_time)))
+		_move_requested_this_step = true
+		var air_factor := 0.0
+		if _hop_phase >= HOP_TAKEOFF_PHASE and _hop_phase < HOP_LAND_PHASE:
+			var air_t := (_hop_phase - HOP_TAKEOFF_PHASE) / (HOP_LAND_PHASE - HOP_TAKEOFF_PHASE)
+			air_factor = sin(air_t * PI)
+		var hop_factor := lerpf(HOP_GROUND_SPEED_FACTOR, HOP_AIR_SPEED_BOOST, air_factor)
 		speed_scale *= hop_factor
 	super(direction, delta, speed_scale)
 
@@ -281,10 +305,38 @@ func begin_charge_animation(duration_seconds: float = -1.0) -> void:
 	play_directional_animation(&"spore_windup", true)
 
 
+func get_hp_pressure() -> float:
+	if ai == null or not is_instance_valid(hp):
+		return 0.0
+	return ai.compute_hp_pressure(hp.get_current_hp(), hp.get_max_hp())
+
+
+func get_attack_cadence() -> Dictionary:
+	if ai == null:
+		return {
+			"cooldown": spore_cooldown_seconds,
+			"charge": charge_duration_seconds,
+			"chase_interval": chase_spore_interval_seconds,
+			"chase_chance": chase_spore_chance,
+		}
+	return ai.compute_attack_cadence(
+		spore_cooldown_seconds,
+		charge_duration_seconds,
+		chase_spore_interval_seconds,
+		chase_spore_chance,
+		get_hp_pressure(),
+		low_hp_cooldown_reduction_max,
+		low_hp_charge_speedup_max,
+		low_hp_chase_chance_bonus
+	)
+
+
 func release_cloud() -> bool:
 	var spawned := _spawn_cloud_at(global_position)
 	if spawned:
-		attack_cooldown_remaining = spore_cooldown_seconds
+		attack_cooldown_remaining = float(
+			get_attack_cadence().get("cooldown", spore_cooldown_seconds)
+		)
 	return spawned
 
 
@@ -327,6 +379,10 @@ func _spawn_cloud_at(world_position: Vector3) -> bool:
 		ground_mist_scale,
 		visual_spread_scale
 	)
+	if parent is Node3D:
+		cloud.position = (parent as Node3D).to_local(world_position)
+	else:
+		cloud.position = world_position
 	parent.add_child(cloud)
 	cloud.global_position = world_position
 	cloud.activate_poison()
@@ -422,7 +478,152 @@ func _update_defensive_hop(delta: float) -> void:
 	if collision != null:
 		_evade_remaining = 0.0
 	var progress := 1.0 - _evade_remaining / evade_duration_seconds
+	var height := sin(progress * PI) * evade_hop_height
 	if is_instance_valid(visual):
-		visual.position.y = sin(progress * PI) * evade_hop_height
-	if _evade_remaining <= 0.0 and is_instance_valid(visual):
+		visual.position.y = height
+	_update_shadow_for_height(height)
+	if _evade_remaining <= 0.0:
+		if is_instance_valid(visual):
+			visual.position.y = 0.0
+		_update_shadow_for_height(0.0)
+		_emit_hop_landing_vfx()
+
+
+func _build_hop_visuals() -> void:
+	_shadow_material = StandardMaterial3D.new()
+	_shadow_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_shadow_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_shadow_material.albedo_color = Color(0.04, 0.03, 0.06, 0.36)
+	_shadow_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = HOP_SHADOW_RADIUS
+	cyl.bottom_radius = HOP_SHADOW_RADIUS
+	cyl.height = 0.015
+	cyl.material = _shadow_material
+	_shadow_mesh = MeshInstance3D.new()
+	_shadow_mesh.name = "MushroomShadow"
+	_shadow_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_shadow_mesh.mesh = cyl
+	_shadow_mesh.position = Vector3(0.0, HOP_SHADOW_OFFSET_METERS, 0.0)
+	add_child(_shadow_mesh)
+
+	var grad := Gradient.new()
+	grad.colors = PackedColorArray([Color(0.82, 0.68, 1.0, 0.85), Color(0.45, 0.92, 0.45, 0.0)])
+	grad.offsets = PackedFloat32Array([0.0, 1.0])
+	var mat := StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.vertex_color_use_as_albedo = true
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	mat.albedo_texture = SPORE_CLOUD.SPORE_TEXTURE
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.32, 0.32)
+	quad.material = mat
+
+	_step_spores = CPUParticles3D.new()
+	_step_spores.name = "HopLandingSpores"
+	_step_spores.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_step_spores.amount = HOP_STEP_DUST_AMOUNT
+	_step_spores.lifetime = HOP_STEP_DUST_LIFETIME
+	_step_spores.one_shot = true
+	_step_spores.explosiveness = 1.0
+	_step_spores.emitting = false
+	_step_spores.local_coords = false
+	_step_spores.emission_shape = CPUParticles3D.EMISSION_SHAPE_RING
+	_step_spores.emission_ring_axis = Vector3.UP
+	_step_spores.emission_ring_height = 0.04
+	_step_spores.emission_ring_radius = 0.28
+	_step_spores.emission_ring_inner_radius = 0.1
+	_step_spores.direction = Vector3.UP
+	_step_spores.spread = 72.0
+	_step_spores.initial_velocity_min = 0.45
+	_step_spores.initial_velocity_max = 1.15
+	_step_spores.gravity = Vector3(0.0, -1.2, 0.0)
+	_step_spores.scale_amount_min = 0.45
+	_step_spores.scale_amount_max = 0.95
+	_step_spores.color_ramp = grad
+	_step_spores.mesh = quad
+	_step_spores.position = Vector3(0.0, 0.08, 0.0)
+	add_child(_step_spores)
+
+
+func _update_walk_hop(step: float) -> void:
+	var is_moving := _move_requested_this_step
+	_move_requested_this_step = false
+	if not is_instance_valid(visual):
+		return
+	if not is_moving:
+		if _was_moving_hop and visual.position.y > 0.04:
+			_emit_hop_landing_vfx()
+		_was_moving_hop = false
+		_hop_phase = 0.0
+		_last_walk_anim = ""
+		if not _charge_feedback_active and is_instance_valid(visual.animation_player):
+			visual.animation_player.speed_scale = 1.0
+		visual.position.y = move_toward(visual.position.y, 0.0, step * 3.8)
+		_update_shadow_for_height(visual.position.y)
+		return
+
+	var prev_phase := _hop_phase
+	var rate := 1.0 / maxf(0.1, hop_cycle_seconds)
+	_hop_phase = fposmod(_hop_phase + step * rate, 1.0)
+	_was_moving_hop = true
+
+	if prev_phase < HOP_LAND_PHASE and (_hop_phase >= HOP_LAND_PHASE or _hop_phase < prev_phase):
+		_emit_hop_landing_vfx()
+
+	var height := 0.0
+	if _hop_phase >= HOP_TAKEOFF_PHASE and _hop_phase < HOP_LAND_PHASE:
+		var air_t := (_hop_phase - HOP_TAKEOFF_PHASE) / (HOP_LAND_PHASE - HOP_TAKEOFF_PHASE)
+		height = sin(air_t * PI) * hop_height
+
+	visual.position.y = height
+	_update_shadow_for_height(height)
+	_sync_walk_animation_to_hop()
+
+
+func _sync_walk_animation_to_hop() -> void:
+	if not is_instance_valid(visual) or not is_instance_valid(visual.animation_player):
+		return
+	var anim_player := visual.animation_player
+	var anim_name := String(anim_player.current_animation)
+	if not anim_name.begins_with("walk_"):
+		_last_walk_anim = ""
+		return
+	var clip_len := maxf(0.1, anim_player.current_animation_length)
+	anim_player.speed_scale = clip_len / maxf(0.1, hop_cycle_seconds)
+	var target_pos := _hop_phase * clip_len
+	var drift := absf(anim_player.current_animation_position - target_pos)
+	if _last_walk_anim != anim_name or (drift > 0.09 and drift < clip_len - 0.09):
+		anim_player.seek(target_pos, true)
+	_last_walk_anim = anim_name
+
+
+func _update_shadow_for_height(height_meters: float) -> void:
+	if is_instance_valid(_shadow_mesh):
+		var max_h := maxf(hop_height, evade_hop_height)
+		var ratio := clampf(height_meters / maxf(0.1, max_h), 0.0, 1.0)
+		var shadow_scale := lerpf(1.0, 0.52, ratio)
+		_shadow_mesh.scale = Vector3(shadow_scale, 1.0, shadow_scale)
+		if _shadow_material != null:
+			_shadow_material.albedo_color.a = lerpf(0.36, 0.16, ratio)
+
+
+func _emit_hop_landing_vfx() -> void:
+	if is_instance_valid(_step_spores):
+		_step_spores.restart()
+		_step_spores.emitting = true
+
+
+func _reset_hop_visuals() -> void:
+	_was_moving_hop = false
+	_move_requested_this_step = false
+	_hop_phase = 0.0
+	_last_walk_anim = ""
+	if is_instance_valid(visual):
 		visual.position.y = 0.0
+		if not _charge_feedback_active and is_instance_valid(visual.animation_player):
+			visual.animation_player.speed_scale = 1.0
+	_update_shadow_for_height(0.0)
