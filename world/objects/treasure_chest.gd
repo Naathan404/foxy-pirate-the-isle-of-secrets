@@ -14,8 +14,8 @@ const CAMERA_ZOOM_BASE_META := &"treasure_chest_zoom_base"
 
 @export_group("Chest Hit Feedback")
 ## Hitstop khi trúng đòn và khi mở rương, tính bằng giây.
-@export_range(0.0, 0.3, 0.005, "suffix:s") var chest_hitstop: float = 0.045
-@export_range(0.0, 0.3, 0.005, "suffix:s") var open_hitstop: float = 0.1
+@export_range(0.0, 0.3, 0.005, "suffix:s") var chest_hitstop: float = 0.0
+@export_range(0.0, 0.3, 0.005, "suffix:s") var open_hitstop: float = 0.0
 ## Cường độ rung camera theo pixel và thời gian rung.
 @export_range(0.0, 20.0, 0.1) var chest_shake: float = 2.0
 @export_range(0.0, 20.0, 0.1) var open_shake: float = 6.0
@@ -63,6 +63,15 @@ func _ready() -> void:
 	super()
 	if is_instance_valid(visual_root):
 		_rest_rotation = visual_root.rotation
+	_prepare_loot_pools.call_deferred()
+
+
+func _prepare_loot_pools() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	LootTrailPool.for_scene(self)
+	if maxi(gold_min, gold_max) > 0:
+		GoldPickupPool.for_scene(self)
 
 
 func receive_damage(damage: DamageContext) -> float:
@@ -123,7 +132,9 @@ func _punch_camera() -> void:
 		return
 	var property := "size" if camera.projection == Camera3D.PROJECTION_ORTHOGONAL else "fov"
 	var original := float(camera.get(property))
-	var previous := camera.get_meta(CAMERA_ZOOM_TWEEN_META, null) as Tween
+	var previous: Tween
+	if camera.has_meta(CAMERA_ZOOM_TWEEN_META):
+		previous = camera.get_meta(CAMERA_ZOOM_TWEEN_META) as Tween
 	if previous != null and previous.is_valid():
 		original = float(camera.get_meta(CAMERA_ZOOM_BASE_META, original))
 		previous.kill()
@@ -145,7 +156,11 @@ func _punch_camera() -> void:
 	)
 	tween.tween_callback(
 		func():
-			if is_instance_valid(camera) and camera.get_meta(CAMERA_ZOOM_TWEEN_META, null) == tween:
+			if (
+				is_instance_valid(camera)
+				and camera.has_meta(CAMERA_ZOOM_TWEEN_META)
+				and camera.get_meta(CAMERA_ZOOM_TWEEN_META) == tween
+			):
 				camera.remove_meta(CAMERA_ZOOM_TWEEN_META)
 				camera.remove_meta(CAMERA_ZOOM_BASE_META)
 	)

@@ -180,6 +180,10 @@ func is_blueprint_unlocked(weapon_id: StringName) -> bool:
 	return entry != null and entry.blueprint_unlocked
 
 
+func has_weapon_definition(weapon_id: StringName) -> bool:
+	return _find_collection_entry(weapon_id) != null
+
+
 func is_weapon_owned(weapon_id: StringName) -> bool:
 	return _find_owned_weapon(weapon_id) != null
 

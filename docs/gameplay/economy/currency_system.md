@@ -19,8 +19,7 @@ potion and 26–27 fund a large one; 3 elite kills guarantee a small potion and
 `EnemyData` exposes `Gold Drop / Min Gold Amount`, `Max Gold Amount` and
 `Gold Drop Chance`. A successful drop samples a uniform integer including both
 endpoints. Invalid ranges are rejected; max zero disables Gold. Elite data
-resources override the regular defaults. War Lord Turtle has min/max set to zero
-until a separate boss reward is specified.
+resources override the regular defaults.
 
 Gold and the existing material drop roll independently. Gold rolls once per death:
 a successful roll requests exactly the sampled amount of separate coins, each
@@ -94,10 +93,11 @@ visual lifetime.
 
 ## Coin object pool
 
-Enemy setup schedules scene-local coin and trail pool warmup before the first
-kill. `GoldPickupPool` prewarms 64 coins, caps total allocation at 256, creates
-at most 4 per frame and activates at most 8 per frame. These exports can be
-tuned on a `GoldPickupPool` node. A fully warm 12G reward appears over 2 frames.
+Enemy and treasure chest setup schedule scene-local coin and trail pool warmup
+before the first reward. `GoldPickupPool` prewarms 64 coins, caps total allocation
+at 256, creates at most 4 per frame and activates at most 4 per frame. These
+exports can be tuned on a `GoldPickupPool` node. A fully warm 12G reward appears
+over 3 frames.
 
 Each death queues one request containing the original reward, position and
 direction, so the enemy may be destroyed before all coins activate. If the pool

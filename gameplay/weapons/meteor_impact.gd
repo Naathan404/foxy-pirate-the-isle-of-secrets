@@ -1,6 +1,11 @@
 extends Node3D
 ## Animation and a single area damage sample for one meteor.
 
+const SHOCKWAVE_DURATION := 0.38
+const SHOCKWAVE_STRENGTH := 0.012
+const SHOCKWAVE_COLOR := Color("ff9a4d")
+const SHOCKWAVE_RADIUS_PIXELS := 150.0
+
 @export var animation_name: StringName = &"meteor"
 @export_range(0, 200, 1) var impact_frame: int = 19
 @export_range(0.0, 0.12, 0.005, "suffix:s") var hitstop_seconds: float = 0.06
@@ -42,6 +47,9 @@ func _physics_process(_delta: float) -> void:
 		_hitbox.end_attack()
 	get_node("/root/HitstopController").request(hitstop_seconds)
 	get_node("/root/ScreenShakeController").request(shake_pixels, shake_seconds)
+	get_node("/root/ShockwaveController").request_world(
+		global_position, SHOCKWAVE_DURATION, SHOCKWAVE_STRENGTH, SHOCKWAVE_COLOR, SHOCKWAVE_RADIUS_PIXELS
+	)
 	if impact_sound != null:
 		get_node("/root/AudioManager").play_sfx_3d(impact_sound, global_position, impact_volume_db)
 

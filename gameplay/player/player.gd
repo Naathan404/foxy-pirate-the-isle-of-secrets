@@ -11,8 +11,16 @@ signal dash_finished(interrupted: bool)
 signal dash_started
 ## Emitted for confirmed outgoing or incoming damage, including Charm hits.
 signal combat_activity
+signal poison_ticked(applied_hp: float)
+signal dizzy_started(duration_seconds: float)
 
 const DIALOGUE_STATE_PRIORITY: int = 20
+const INK_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/ink_overlay.gd")
+const VENOM_INK_OVERLAY_NAME := &"BlubberbeardVenomOverlay"
+const POISON_STATUS_HOLD_SECONDS: float = 1.6
+const WHIRLWIND_HIT_STUN_SECONDS: float = 0.52
+const WHIRLWIND_DIZZY_SECONDS: float = 2.2
+const WHIRLWIND_SPIRAL_STRENGTH: float = 1.0
 
 @export var data: PlayerData
 
@@ -32,10 +40,16 @@ const DIALOGUE_STATE_PRIORITY: int = 20
 @export var dash_action: StringName = &"dash"
 @export var attack_action: StringName = &"normal_attack"
 @export var secondary_attack_action: StringName = &"secondary_attack"
-@export_group("Crate Interaction")
-@export_range(0.0, 3.0, 0.05) var dash_crate_knockback_distance: float = 0.9
 @export_group("Damage")
 @export_range(0.0, 3.0, 0.05, "suffix:s") var post_hit_invulnerability_duration: float = 0.8
+@export_group("Poison & Venom")
+@export var venom_ink_color: Color = Color(0.24, 0.72, 0.22, 0.92)
+@export_range(0.0, 1.0, 0.01) var venom_ink_opacity: float = 0.78
+@export_range(0.01, 2.0, 0.01, "suffix:s") var venom_ink_spread_seconds: float = 0.14
+@export_range(0.0, 3.0, 0.05, "suffix:s") var venom_ink_hold_seconds: float = 0.55
+@export_range(0.05, 4.0, 0.05, "suffix:s") var venom_ink_fade_seconds: float = 1.15
+@export_range(0.15, 1.0, 0.05) var poison_move_speed_multiplier: float = 0.45
+@export_range(0.15, 1.0, 0.05) var dizzy_move_speed_multiplier: float = 0.45
 
 var move_direction: Vector3 = Vector3.ZERO
 # Đứng yên vẫn nhớ hướng để đánh và dash
@@ -51,6 +65,10 @@ var dead: bool = false
 var pending_hit_duration: float = 0.0
 var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_hit_knockback_multiplier: float = 1.0
+var pending_hit_tangent_direction: Vector3 = Vector3.ZERO
+var pending_hit_spiral_strength: float = 0.0
+var poison_remaining: float = 0.0
+var dizzy_remaining: float = 0.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
@@ -60,9 +78,13 @@ var environment_move_speed_multiplier: float = 1.0
 var environment_dash_distance_multiplier: float = 1.0
 var environment_is_water: bool = false
 var potion_selection_active: bool = false
+var _environment_push_direction := Vector3.ZERO
+var _environment_push_speed := 0.0
+var _environment_push_remaining := 0.0
+var _environment_push_duration := 0.0
 var _charm_grapple_tween: Tween
-var _dash_pushed_crates: Dictionary[int, bool] = {}
 var _post_hit_invulnerability_remaining: float = 0.0
+var _suppress_next_hit_reaction: bool = false
 
 @onready var visual: PlayerVisual = $Visual
 @onready var fsm: Fsm = $FSM
@@ -85,7 +107,6 @@ func _ready() -> void:
 	pending_hit_duration = data.hit_duration
 	_setup_stats()
 	_setup_combat()
-	dash_started.connect(_on_dash_started_for_crates)
 	_setup_charm_system()
 	if is_instance_valid(potion_selector):
 		potion_selector.configure(self, potion)
@@ -200,7 +221,7 @@ func _on_weapon_damage_dealt(damage: DamageContext, target: Node, applied_hp: fl
 		return
 	if damage == null or damage.source != self or not is_instance_valid(target):
 		return
-	if target is EnemyBase or target.is_in_group("training_dummy"):
+	if target is EnemyBase or target is BossBase or target.is_in_group("training_dummy"):
 		chaos.gain(damage.chaos_gain)
 
 
@@ -216,9 +237,33 @@ func _on_hp_changed(amount: float, maximum: float) -> void:
 
 func _on_damaged(_applied_hp: float) -> void:
 	combat_activity.emit()
+	if _suppress_next_hit_reaction:
+		return
 	# Đòn chí mạng để state Death xử lý, không vào Hit nữa
 	if hp.is_alive():
-		notify_hit()
+		var hit_duration := (
+			WHIRLWIND_HIT_STUN_SECONDS if pending_hit_spiral_strength > 0.0 else -1.0
+		)
+		notify_hit(hit_duration)
+
+
+func is_poisoned() -> bool:
+	return not dead and poison_remaining > 0.0
+
+
+func is_dizzy() -> bool:
+	return not dead and dizzy_remaining > 0.0
+
+
+func apply_dizzy(duration_seconds: float) -> void:
+	if dead or duration_seconds <= 0.0:
+		return
+	dizzy_remaining = maxf(dizzy_remaining, duration_seconds)
+	dizzy_started.emit(dizzy_remaining)
+
+
+func is_suppressing_hit_reaction() -> bool:
+	return _suppress_next_hit_reaction
 
 
 # Dùng cho damage trực tiếp, ví dụ bẫy hoặc nút test
@@ -230,20 +275,18 @@ func take_damage(amount: float) -> float:
 
 # Đòn từ HurtBox đi qua phòng thủ trước rồi mới trừ HP
 func receive_damage(damage: DamageContext) -> float:
-	if dead or not is_instance_valid(hp):
-		return 0
-	if _post_hit_invulnerability_remaining > 0.0:
-		return 0
-	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
-		return 0
-	if damage == null or damage.amount_hp <= 0:
+	if dead or not is_instance_valid(hp) or damage == null or damage.amount_hp <= 0:
 		return 0
 	if damage.source == self:
 		return 0
 	if is_instance_valid(damage.source) and damage.source_team == team:
 		return 0
-	pending_hit_direction = _get_hit_direction(damage.source)
-	pending_hit_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
+	var is_poison_tick := damage.tag == &"poison"
+	if not is_poison_tick:
+		if _post_hit_invulnerability_remaining > 0.0:
+			return 0
+		if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
+			return 0
 	var amount := damage.amount_hp
 	if is_instance_valid(weapon_controller):
 		if weapon_controller.has_method("modify_incoming_damage"):
@@ -252,18 +295,77 @@ func receive_damage(damage: DamageContext) -> float:
 		amount = charm_socket_manager.modify_incoming_damage(amount, damage)
 	if not is_finite(amount) or amount <= 0.0 or not hp.is_alive():
 		return 0
+	if is_poison_tick:
+		return _apply_poison_damage_tick(damage, amount)
+	_prepare_incoming_hit_motion(damage)
 	# Set this before take_damage emits signals, which may trigger another hit.
 	_post_hit_invulnerability_remaining = post_hit_invulnerability_duration
 	var applied_hp := hp.take_damage(amount)
 	if applied_hp <= 0.0:
 		_post_hit_invulnerability_remaining = 0.0
-	if applied_hp > 0 and is_instance_valid(charm_socket_manager):
-		charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
+	if applied_hp > 0:
+		if damage.tag == &"boss_venom_hit":
+			_apply_poison_status(true)
+		if is_instance_valid(charm_socket_manager):
+			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
 	return applied_hp
+
+
+func _apply_poison_damage_tick(damage: DamageContext, amount: float) -> float:
+	# Sát thương độc theo chu kỳ không kích hoạt PlayerHit stun hay i-frame miễn nhiễm.
+	var was_poisoned := is_poisoned()
+	_suppress_next_hit_reaction = true
+	var applied_hp := hp.take_damage(amount)
+	_suppress_next_hit_reaction = false
+	if applied_hp > 0.0:
+		_apply_poison_status(not was_poisoned)
+		poison_ticked.emit(applied_hp)
+		if is_instance_valid(charm_socket_manager):
+			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
+	return applied_hp
+
+
+func _apply_poison_status(show_ink_splash: bool) -> void:
+	poison_remaining = maxf(poison_remaining, POISON_STATUS_HOLD_SECONDS)
+	apply_dizzy(POISON_STATUS_HOLD_SECONDS)
+	if show_ink_splash:
+		_trigger_venom_ink_splash()
+
+
+func _prepare_incoming_hit_motion(damage: DamageContext) -> void:
+	pending_hit_direction = _get_hit_direction(damage.source, damage.origin)
+	pending_hit_knockback_multiplier = maxf(0.0, damage.knockback_multiplier)
+	if damage.tag == &"boss_whirlwind":
+		pending_hit_spiral_strength = WHIRLWIND_SPIRAL_STRENGTH
+		var flat_tan := Vector3(damage.direction.x, 0.0, damage.direction.z)
+		if flat_tan.is_zero_approx():
+			flat_tan = Vector3.UP.cross(pending_hit_direction)
+		pending_hit_tangent_direction = flat_tan.normalized()
+	else:
+		pending_hit_spiral_strength = 0.0
+		pending_hit_tangent_direction = Vector3.ZERO
+
+
+func _trigger_venom_ink_splash() -> void:
+	var overlay := get_node_or_null(NodePath(VENOM_INK_OVERLAY_NAME))
+	if overlay == null:
+		overlay = INK_OVERLAY_SCRIPT.new()
+		overlay.name = VENOM_INK_OVERLAY_NAME
+		add_child(overlay)
+	overlay.splash(
+		false,
+		venom_ink_color,
+		venom_ink_spread_seconds,
+		venom_ink_hold_seconds,
+		venom_ink_fade_seconds,
+		venom_ink_opacity
+	)
 
 
 func _physics_process(delta: float) -> void:
 	_post_hit_invulnerability_remaining = maxf(0.0, _post_hit_invulnerability_remaining - delta)
+	poison_remaining = maxf(0.0, poison_remaining - delta)
+	dizzy_remaining = maxf(0.0, dizzy_remaining - delta)
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	attack_buffer_remaining = maxf(0.0, attack_buffer_remaining - delta)
 	if attack_buffer_remaining <= 0.0:
@@ -306,50 +408,8 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
+	_apply_environment_push(delta)
 	move_and_slide()
-	_push_collided_crates()
-
-
-func _push_collided_crates() -> void:
-	if dead or not is_on_floor():
-		return
-	var dashing := fsm.current_state != null and fsm.current_state.name.to_lower() == "dash"
-	if dashing and not bool(fsm.current_state.get("active")):
-		return
-	var push_direction := last_facing_direction if dashing else move_direction
-	if push_direction.is_zero_approx():
-		return
-	if not dashing:
-		# Only deliberate walking pushes; attack lunges and recoil do not.
-		for state: FsmState in [fsm.current_state, fsm.next_state]:
-			if state != null and state.name.to_lower() not in ["idle", "run"]:
-				return
-	for index in get_slide_collision_count():
-		var collision := get_slide_collision(index)
-		var crate := collision.get_collider() as PushableCrate
-		if crate == null:
-			continue
-		var normal := collision.get_normal()
-		# Standing on top and grazing a side are not pushes.
-		if absf(normal.y) > 0.4 or -push_direction.dot(normal) < 0.35:
-			continue
-		if dashing:
-			var crate_id := crate.get_instance_id()
-			if (
-				not _dash_pushed_crates.has(crate_id)
-				and crate.request_knockback(push_direction, dash_crate_knockback_distance)
-			):
-				_dash_pushed_crates[crate_id] = true
-			continue
-		var push_speed := minf(crate.push_speed, _get_move_speed())
-		if crate.request_push(push_direction, push_speed):
-			# move_and_slide clears velocity against the crate. Keep the following speed
-			# for the next tick so walking acceleration does not produce a stop/start push.
-			set_horizontal_velocity(push_direction * push_speed)
-
-
-func _on_dash_started_for_crates() -> void:
-	_dash_pushed_crates.clear()
 
 
 func _read_input() -> void:
@@ -601,7 +661,12 @@ func set_horizontal_velocity(value: Vector3) -> void:
 	velocity.z = value.z
 
 
-func _get_hit_direction(source: Node) -> Vector3:
+func _get_hit_direction(source: Node, hit_origin: Vector3 = Vector3.ZERO) -> Vector3:
+	if not hit_origin.is_zero_approx():
+		var origin_dir := global_position - hit_origin
+		origin_dir.y = 0.0
+		if not origin_dir.is_zero_approx():
+			return origin_dir.normalized()
 	if source is Node3D:
 		var direction := global_position - (source as Node3D).global_position
 		direction.y = 0.0
@@ -631,15 +696,34 @@ func play_directional_animation(action: String, restart: bool = false) -> void:
 # Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
 ## Reuse hit recovery without applying damage when an environmental wave hits.
 func apply_environment_knockback(direction: Vector3, speed: float, duration: float) -> void:
-	if dead or speed <= 0.0 or direction.length_squared() < 0.0001:
+	var horizontal := Vector3(direction.x, 0.0, direction.z)
+	if dead or speed <= 0.0 or duration <= 0.0 or horizontal.length_squared() < 0.0001:
 		return
-	if is_instance_valid(weapon_controller) and weapon_controller.is_attack_invulnerable():
-		return
-	pending_hit_direction = Vector3(direction.x, 0.0, direction.z).normalized()
+	_environment_push_direction = horizontal.normalized()
+	_environment_push_speed = speed
+	_environment_push_duration = duration
+	_environment_push_remaining = duration
+	pending_hit_direction = _environment_push_direction
 	pending_hit_knockback_multiplier = speed / 8.0
 	notify_hit(duration)
-	# A second hit in the hit state refreshes its timer without re-entering it.
-	set_horizontal_velocity(pending_hit_direction * speed)
+
+
+func _apply_environment_push(delta: float) -> void:
+	if dead:
+		_environment_push_remaining = 0.0
+		return
+	if _environment_push_remaining <= 0.0:
+		return
+	# Locomotion, attacks and dash may set velocity, but cannot cancel the wave's
+	# minimum forward component. Wall collisions still constrain actual movement.
+	var strength := _environment_push_remaining / _environment_push_duration
+	var minimum_speed := _environment_push_speed * lerpf(0.35, 1.0, strength)
+	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
+	var forward_speed := horizontal.dot(_environment_push_direction)
+	if forward_speed < minimum_speed:
+		horizontal += _environment_push_direction * (minimum_speed - forward_speed)
+		set_horizontal_velocity(horizontal)
+	_environment_push_remaining = maxf(0.0, _environment_push_remaining - maxf(delta, 0.0))
 
 
 func notify_hit(duration: float = -1.0) -> void:
@@ -665,6 +749,8 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	poison_remaining = 0.0
+	dizzy_remaining = 0.0
 	if is_instance_valid(potion_selector):
 		potion_selector.cancel_selection()
 	if is_instance_valid(inventory_ui):
@@ -704,6 +790,7 @@ func _get_move_speed() -> float:
 	}
 	if is_instance_valid(charm_socket_manager):
 		charm_socket_manager.modify_stats(stats)
+	var status_speed_mult := _get_status_move_speed_multiplier()
 	# Thứ tự stat: base -> tổng flat -> tích multiplier -> clamp.
 	return maxf(
 		0.0,
@@ -711,5 +798,15 @@ func _get_move_speed() -> float:
 			(data.move_speed + stats[&"move_speed_flat"])
 			* stats[&"move_speed_multiplier"]
 			* environment_move_speed_multiplier
+			* status_speed_mult
 		)
 	)
+
+
+func _get_status_move_speed_multiplier() -> float:
+	var mult := 1.0
+	if is_poisoned():
+		mult = minf(mult, poison_move_speed_multiplier)
+	if is_dizzy():
+		mult = minf(mult, dizzy_move_speed_multiplier)
+	return mult

@@ -9,7 +9,7 @@ Tab Notes hiển thị danh sách `MonsterNote` ở trang trái và thông tin �
 3. Tick `unlocked` nếu muốn mở sẵn mặc định. Bỏ tick để khóa mặc định.
 4. Mở `gameplay/inventory/notes_tab.tscn`, chọn node `Notes`, thêm resource vào mảng `Notes`. Thứ tự trong mảng là thứ tự hiển thị. Lưu scene.
 
-Starfish và War Lord Turtle được mở mặc định để xem mẫu hai bố cục. Các mô tả hiện tại là nội dung khởi đầu cần được designer rà soát. War Lord Turtle chưa được xác định là boss gameplay; entry của nó chỉ là ví dụ cho bố cục boss.
+Starfish được mở mặc định. Các mô tả hiện tại là nội dung khởi đầu cần được designer rà soát.
 
 ## Boss Diary và phần thưởng khi hạ boss
 
@@ -19,7 +19,7 @@ Bốn entry đã được tạo sẵn và thêm vào tab Notes: `data/notes/diar
 
 Trên scene hoặc instance của boss kế thừa `EnemyBase`, mở nhóm **Note Drop**, gán resource `MonsterNote` vào `Note Drop` và chỉnh `Note Drop Chance` từ 0 đến 1. Khi boss chết, pickup sẽ rơi cùng item và vàng thông thường; khi nhặt, diary mở entry đã chọn, hiện popup với icon riêng và không chiếm ô túi. Không gán item Boss Diary đơn lẻ vào drop thường vì pickup cần tham chiếu entry để biết phải mở khóa gì. Cơ chế này cũng hỗ trợ entry quái thường; pickup tự chọn icon theo `Layout` của entry.
 
-Các boss mới cần có scene và entry tương ứng, sau đó được gán `Note Drop` trong Inspector. Chưa có boss gameplay được cấu hình trong dự án hiện tại, nên không tự gán diary vào War Lord Turtle. Checkbox `Unlocked` trong entry nên tắt nếu muốn nó chỉ mở khi nhặt diary. Nếu note đã mở sẵn trong save, thay checkbox không xóa trạng thái đã lưu.
+Các boss mới cần có scene và entry tương ứng, sau đó được gán `Note Drop` trong Inspector. Checkbox `Unlocked` trong entry nên tắt nếu muốn nó chỉ mở khi nhặt diary. Nếu note đã mở sẵn trong save, thay checkbox không xóa trạng thái đã lưu.
 
 ## Cấu hình Treasure Chest
 

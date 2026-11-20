@@ -27,12 +27,19 @@ const FULL_CYCLE_RADIANS: float = TAU
 ## Độ đậm viền xanh khi đứng trong nước.
 @export_range(0.0, 1.0, 0.01) var water_strength: float = 0.3
 
+@export_group("Poison Vignette")
+## Màu viền xanh tím khi Foxy đang nhiễm độc cá nóc.
+@export var poison_edge_color: Color = Color(0.42, 0.16, 0.72, 1.0)
+## Độ đậm viền khi đang nhiễm độc.
+@export_range(0.0, 1.0, 0.01) var poison_strength: float = 0.34
+
 var _overlay: ColorRect
 var _material: ShaderMaterial
 var _transition: Tween
 var _visibility: float = 0.0
 var _breath_time: float = 0.0
 var _active: bool = false
+var _poison_active: bool = false
 var _water_active: bool = false
 var _alive: bool = true
 var _visible_requested: bool = false
@@ -58,32 +65,41 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	var poisoned := is_instance_valid(player) and player.is_poisoned() and _alive
 	var in_water := is_instance_valid(player) and player.environment_is_water and _alive
-	if in_water != _water_active:
+	if poisoned != _poison_active or in_water != _water_active:
+		_poison_active = poisoned
 		_water_active = in_water
 		_update_display()
 	if not _overlay.visible:
 		return
 	_breath_time += delta
 	var phase := _breath_time * FULL_CYCLE_RADIANS / breath_cycle_seconds
-	var strength := (
-		base_strength + pulse_strength * 0.5 * (1.0 - cos(phase))
-		if _active else water_strength
-	)
+	var strength := water_strength
+	if _active:
+		strength = base_strength + pulse_strength * 0.5 * (1.0 - cos(phase))
+	elif _poison_active:
+		strength = poison_strength + 0.08 * 0.5 * (1.0 - cos(phase))
 	_material.set_shader_parameter("strength", clampf(strength * _visibility, 0.0, 1.0))
 
 
 func _on_hp_changed(current_hp: float, max_hp: float) -> void:
 	_alive = max_hp > 0.0 and current_hp > 0.0
 	_active = _alive and current_hp / max_hp <= health_threshold
+	_poison_active = is_instance_valid(player) and player.is_poisoned() and _alive
 	_water_active = is_instance_valid(player) and player.environment_is_water and _alive
 	_update_display()
 
 
 func _update_display() -> void:
-	var should_show := _active or _water_active
+	var should_show := _active or _poison_active or _water_active
 	if should_show:
-		_material.set_shader_parameter("edge_color", edge_color if _active else water_edge_color)
+		var chosen := water_edge_color
+		if _active:
+			chosen = edge_color
+		elif _poison_active:
+			chosen = poison_edge_color
+		_material.set_shader_parameter("edge_color", chosen)
 	if should_show == _visible_requested:
 		return
 	_visible_requested = should_show

@@ -1,0 +1,45 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://gameplay/bosses/blubberbeard/powder_explosion_vfx.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bosses/blubberbeard/powder_explosion_placeholder.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Ignition"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 400, 724)
+
+[sub_resource type="AtlasTexture" id="Burst"]
+atlas = ExtResource("2")
+region = Rect2(400, 0, 550, 724)
+
+[sub_resource type="AtlasTexture" id="Fireball"]
+atlas = ExtResource("2")
+region = Rect2(950, 0, 675, 724)
+
+[sub_resource type="AtlasTexture" id="Smoke"]
+atlas = ExtResource("2")
+region = Rect2(1625, 0, 547, 724)
+
+[sub_resource type="SpriteFrames" id="ExplosionFrames"]
+animations = [{
+"frames": [{"duration": 0.55, "texture": SubResource("Ignition")}, {"duration": 0.65, "texture": SubResource("Burst")}, {"duration": 1.25, "texture": SubResource("Fireball")}, {"duration": 1.5, "texture": SubResource("Smoke")}],
+"loop": false,
+"name": &"explode",
+"speed": 7.0
+}]
+
+[node name="PowderExplosionVFX" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Explosion" type="AnimatedSprite3D" parent="."]
+position = Vector3(0, 3.0, 0)
+pixel_size = 0.012
+billboard = 1
+texture_filter = 0
+sprite_frames = SubResource("ExplosionFrames")
+animation = &"explode"
+
+[node name="Flash" type="OmniLight3D" parent="."]
+position = Vector3(0, 1.5, 0)
+light_color = Color(1, 0.38, 0.05, 1)
+light_energy = 5.0
+omni_range = 12.0

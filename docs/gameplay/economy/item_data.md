@@ -15,3 +15,12 @@ directly by inventories, enemy drops, weapons and merchant catalogs.
 Run `test/item_data_test.gd` after changing item, weapon, enemy-drop or Silas
 catalog data. The test intentionally does not require every item to be used:
 future content may be authored before it has a consumer.
+
+Charm pickups are authored under `data/items/charms/`, one per playable Charm.
+Each item references its `CharmData` through `BaseItem.charm` and may be used by
+existing item pickup and chest drop flows. Collecting it starts the Charm unlock presentation and grants ownership through
+the player's registry at absorption, without using an inventory slot. Already-owned
+Charm pickups are removed when encountered. Missing or unavailable Charm definitions
+leave the pickup in the world; prototype and disabled Charms cannot be granted through
+this flow. See `charm_unlock_presentation.md` for the sequence. Ownership follows the existing Charm progression
+and scene-transition mechanisms.

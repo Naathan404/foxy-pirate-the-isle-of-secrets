@@ -1,0 +1,113 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://gameplay/bosses/boss_health_ui.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="Background"]
+bg_color = Color(0.08, 0.07, 0.08, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.76, 0.65, 0.39, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="BossHealthUI" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 14.0
+offset_bottom = 126.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 25.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="Bar" type="ProgressBar" parent="Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.2
+anchor_right = 0.8
+offset_top = 29.0
+offset_bottom = 50.0
+theme_override_styles/background = SubResource("Background")
+show_percentage = false
+
+[node name="StaggerBar" type="ProgressBar" parent="Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.2
+anchor_right = 0.8
+offset_top = 53.0
+offset_bottom = 61.0
+theme_override_styles/background = SubResource("Background")
+show_percentage = false
+
+[node name="DebugPhase2Button" type="Button" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -265.0
+offset_top = 67.0
+offset_right = -95.0
+offset_bottom = 93.0
+grow_horizontal = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+text = "Debug: Phase 2"
+
+[node name="DebugStaggerButton" type="Button" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -85.0
+offset_top = 67.0
+offset_right = 85.0
+offset_bottom = 93.0
+grow_horizontal = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+text = "Debug: Stagger"
+
+[node name="DebugDefeatButton" type="Button" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 95.0
+offset_top = 67.0
+offset_right = 265.0
+offset_bottom = 93.0
+grow_horizontal = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+text = "Debug: Defeat"
+
+[node name="DebugStaggerLabel" type="Label" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 97.0
+offset_bottom = 122.0
+theme_override_colors/font_color = Color(1, 0.94, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.92)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+text = "[DEBUG] Stagger"

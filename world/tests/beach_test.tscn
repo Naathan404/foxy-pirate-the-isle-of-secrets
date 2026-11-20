@@ -5,12 +5,31 @@
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="3_cvepx"]
 [ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="4_i2uwp"]
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="5_adkab"]
+<<<<<<< HEAD
 [ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="8_8dvq8"]
 [ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="9_txy4b"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="10_ryrkc"]
+=======
+[ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/beach/beach_palm_01.tscn" id="8_8dvq8"]
+[ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/beach/beach_palm_02.tscn" id="9_txy4b"]
+[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/beach/beach_palm_03.tscn" id="10_ryrkc"]
+[ext_resource type="Script" uid="uid://bmmcdjskrqbrf" path="res://world/objects/chest_item_drop.gd" id="11_h65mx"]
+>>>>>>> 72bd32ff6cf942975073fb2e053b7aa77c1ea650
 [ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="11_ryrkc"]
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="11_txy4b"]
+[ext_resource type="Resource" path="res://data/items/blueprints/bow_blueprint.tres" id="12_h65mx"]
+[ext_resource type="Resource" path="res://data/items/charms/arrow_rain.tres" id="13_ral77"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="15_hfst8"]
+
+[sub_resource type="Resource" id="Resource_dqtxk"]
+script = ExtResource("11_h65mx")
+item = ExtResource("12_h65mx")
+metadata/_custom_type_script = "uid://bmmcdjskrqbrf"
+
+[sub_resource type="Resource" id="Resource_hfst8"]
+script = ExtResource("11_h65mx")
+item = ExtResource("13_ral77")
+metadata/_custom_type_script = "uid://bmmcdjskrqbrf"
 
 [node name="BeachTest" unique_id=1248439267 instance=ExtResource("1_mf2w3")]
 open_exits = 8
@@ -67,8 +86,6 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239
 [node name="FlatTide" parent="." index="15" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36796284, 0, 0)
 player = NodePath("../Foxy")
-wave_knockback_speed = 10.0
-wave_knockback_duration = 0.2
 
 [node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8256235, 0.08, 0.40002728)
@@ -78,30 +95,25 @@ shore_detail_length = 10.0
 player = NodePath("../../Foxy")
 
 [node name="TreasureChest" parent="." index="16" unique_id=1708090331 instance=ExtResource("15_hfst8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, -0.46411943, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.197239, -0.46411943, -2.6520233)
+item_drops = Array[ExtResource("11_h65mx")]([SubResource("Resource_dqtxk")])
 
-[node name="CoralSkeleton" parent="." index="17" unique_id=1531762066 instance=ExtResource("11_ryrkc")]
+[node name="TreasureChest2" parent="." index="17" unique_id=1962611640 instance=ExtResource("15_hfst8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.197239, -0.46411943, 2.8213458)
+item_drops = Array[ExtResource("11_h65mx")]([SubResource("Resource_hfst8")])
+
+[node name="CoralSkeleton" parent="." index="18" unique_id=1531762066 instance=ExtResource("11_ryrkc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.643255, 0.2615099, 8.780067)
-sleep_detection_radius = 3.5
-detection_radius = 8.0
-sleep_delay = 4.0
-wake_duration = 0.35
-wake_attack_delay = 1.0
-shooting_range = 4.5
-home_tolerance = 0.6
-return_segment_time = 0.8
-return_pause_time = 0.35
-return_min_turn_angle = 20.0
-return_max_turn_angle = 49.0
+can_sleep = true
+roam_when_guarding = false
+guard_roam_radius = 3.5
+guard_roam_segment_time = 1.2
+guard_roam_pause_time = 1.0
+randomize_shot_mode = true
 shot_mode = 0
-bullets_per_burst = 3
-fan_angle = 30.0
-shot_interval = 0.2
-fire_delay = 0.4
-burst_cooldown = 2.0
-shoot_recovery_time = 0.24
-bullet_speed = 10.0
 bullet_lifetime = 3.0
+aim_height_offset = 0.85
+max_aim_pitch_deg = 42.0
 
 [editable path="Environment/BaseGround"]
 [editable path="FlatTide"]

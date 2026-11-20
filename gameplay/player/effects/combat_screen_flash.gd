@@ -43,11 +43,10 @@ func _on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) ->
 		or applied_hp <= 0.0
 		or not damage.target_defeated
 		or not is_instance_valid(target)
-		or not target is EnemyBase
+		or not (target is EnemyBase or target is BossBase)
 	):
 		return
-	# The current turtle scene has no boss group; recognize it for presentation only.
-	if target.is_in_group("boss") or target is WarLordTurtle:
+	if target.is_in_group("boss"):
 		_play_flash(boss_color, boss_opacity, boss_seconds, 3)
 	elif target is EliteCrab or target is EliteStarfish or target is EliteBarrel:
 		get_node("/root/CombatMomentController").request(&"elite_defeat", player.camera)

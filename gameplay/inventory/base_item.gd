@@ -9,3 +9,7 @@ extends Resource
 @export var type: GlobalConstants.ItemType = GlobalConstants.ItemType.MATERIAL
 ## Notes and diaries must be collected through a pickup linked to a bestiary entry.
 @export var opens_note: bool = false
+## If set, collecting this item grants the registered playable Charm instead of inventory.
+@export var charm: CharmData
+## Blueprint pickups unlock crafting permission without occupying inventory.
+@export var weapon_blueprint: WeaponData

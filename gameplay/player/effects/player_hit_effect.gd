@@ -24,6 +24,7 @@ const SMOKE_COUNTS := [5, 5, 3, 3]
 @export_range(1.0, 1.3, 0.01) var squash_amount: float = 1.1
 @export_range(0.0, 0.3, 0.01) var visual_recoil: float = 0.09
 @export var flash_color: Color = Color(1.0, 0.12, 0.12)
+@export var poison_flash_color: Color = Color(0.56, 0.94, 0.42)
 @export_group("Death Feedback")
 @export_range(0.1, 1.0, 0.01) var vanish_duration: float = 0.22
 @export_range(0.5, 1.0, 0.01) var death_zoom_factor: float = 0.73
@@ -53,6 +54,9 @@ var _death_camera: Camera3D
 var _rest_camera_fov: float = 0.0
 var _dying: bool = false
 var _configured: bool = false
+var _dizzy_ring: Node3D
+var _dizzy_clock: float = 0.0
+var _dizzy_active: bool = false
 
 
 func _ready() -> void:
@@ -71,9 +75,28 @@ func _ready() -> void:
 	_create_dust()
 	_create_death_smoke()
 	_create_vignette()
+	_create_dizzy_stars()
 	health.damaged.connect(_on_damaged)
 	health.died.connect(_on_died)
+	if player.has_signal(&"dizzy_started"):
+		player.dizzy_started.connect(_on_dizzy_started)
+	set_process(false)
 	_configured = true
+
+
+func _process(delta: float) -> void:
+	if not _dizzy_active:
+		set_process(false)
+		return
+	if _dying or not is_instance_valid(player) or not player.is_dizzy():
+		_stop_dizzy_stars()
+		return
+	_dizzy_clock += maxf(0.0, delta)
+	if is_instance_valid(_dizzy_ring):
+		_dizzy_ring.rotation.y = _dizzy_clock * 9.5
+		_dizzy_ring.position.y = 2.22 + sin(_dizzy_clock * 7.0) * 0.05
+	if is_instance_valid(visual):
+		visual.rotation.z = sin(_dizzy_clock * 20.0) * 0.11
 
 
 func _create_sparks() -> void:
@@ -214,10 +237,64 @@ func _create_vignette() -> void:
 	_vignette_overlay.hide()
 
 
+func _create_dizzy_stars() -> void:
+	_dizzy_ring = Node3D.new()
+	_dizzy_ring.name = "DizzyStarsHalo"
+	_dizzy_ring.position = Vector3(0.0, 2.22, 0.0)
+	_dizzy_ring.visible = false
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1.0, 0.9, 0.22)
+	var star_axes := [
+		Vector3(0.24, 0.07, 0.07),
+		Vector3(0.07, 0.24, 0.07),
+		Vector3(0.07, 0.07, 0.24),
+	]
+	for idx in 3:
+		var angle := TAU * float(idx) / 3.0
+		var star := Node3D.new()
+		star.position = Vector3(cos(angle) * 0.5, 0.0, sin(angle) * 0.5)
+		star.rotation = Vector3(0.35, angle, 0.35)
+		for bar_size in star_axes:
+			var arm := MeshInstance3D.new()
+			var box := BoxMesh.new()
+			box.size = bar_size
+			arm.mesh = box
+			arm.material_override = mat
+			arm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			star.add_child(arm)
+		_dizzy_ring.add_child(star)
+	visual.add_child(_dizzy_ring)
+
+
+func _on_dizzy_started(_duration: float) -> void:
+	if _dying:
+		return
+	var was_active := _dizzy_active
+	_dizzy_active = true
+	if not was_active:
+		_dizzy_clock = 0.0
+	if is_instance_valid(_dizzy_ring):
+		_dizzy_ring.visible = true
+	set_process(true)
+
+
+func _stop_dizzy_stars() -> void:
+	_dizzy_active = false
+	if is_instance_valid(_dizzy_ring):
+		_dizzy_ring.visible = false
+	if is_instance_valid(visual):
+		visual.rotation.z = 0.0
+	set_process(false)
+
+
 func _on_damaged(amount: float) -> void:
 	if not _configured or _dying or amount <= 0 or not is_instance_valid(sprite):
 		return
-	_play_flash()
+	if is_instance_valid(player) and player.is_suppressing_hit_reaction():
+		_flash_sprite(poison_flash_color, Color(0.48, 0.22, 0.72), 0.06, 0.18, 0.45)
+		return
+	_flash_sprite(flash_color, Color(1, 0.28, 0.28), 0.05, 0.14, 0.75)
 	_play_recoil()
 	_play_vignette()
 	var burst: GPUParticles3D = _sparks[_next_spark]
@@ -236,28 +313,33 @@ func _on_damaged(amount: float) -> void:
 	get_node("/root/ScreenShakeController").request(shake_pixels, 0.18)
 
 
-func _play_flash() -> void:
+func _flash_sprite(
+	start_color: Color, mid_color: Color, hold: float, fade: float, spine_strength: float
+) -> void:
 	if _flash_tween != null and _flash_tween.is_valid():
 		_flash_tween.kill()
 	if _spine_flash_tween != null and _spine_flash_tween.is_valid():
 		_spine_flash_tween.kill()
 	sprite.shaded = false
-	sprite.modulate = Color(flash_color, _rest_color.a)
+	sprite.modulate = Color(start_color, _rest_color.a)
 	var spine_preview := visual.get_node_or_null("SpineIdlePreview")
 	if spine_preview != null:
-		spine_preview.set_hit_tint(0.75)
+		spine_preview.set_hit_tint(spine_strength)
 	_flash_tween = create_tween().set_ignore_time_scale(true)
-	_flash_tween.tween_property(sprite, "modulate", Color(1, 0.28, 0.28, _rest_color.a), 0.05)
-	_flash_tween.tween_property(sprite, "modulate", _rest_color, 0.14)
+	_flash_tween.tween_property(sprite, "modulate", Color(mid_color, _rest_color.a), hold)
+	_flash_tween.tween_property(sprite, "modulate", _rest_color, fade)
 	_flash_tween.tween_callback(_restore_shading)
 	if spine_preview != null:
 		_spine_flash_tween = create_tween().set_ignore_time_scale(true)
-		_spine_flash_tween.tween_method(spine_preview.set_hit_tint, 0.75, 0.0, 0.19)
+		_spine_flash_tween.tween_method(
+			spine_preview.set_hit_tint, spine_strength, 0.0, hold + fade
+		)
 
 
 func _on_died() -> void:
 	if not _configured or _dying:
 		return
+	_stop_dizzy_stars()
 	_dying = true
 	get_node("/root/CombatMomentController").cancel()
 	get_node("/root/HitstopController").request(death_hitstop_duration)
@@ -364,5 +446,6 @@ func _exit_tree() -> void:
 	if is_instance_valid(visual):
 		visual.scale = _rest_scale
 		visual.position = _rest_position
+		visual.rotation.z = 0.0
 	if is_instance_valid(_death_camera) and _rest_camera_fov > 0.0:
 		_death_camera.fov = _rest_camera_fov

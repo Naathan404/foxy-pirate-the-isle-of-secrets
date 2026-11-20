@@ -23,7 +23,6 @@ gameplay/enemies/base/enemy_base.tscn
 | **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
 | **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
 | **Coral Skeleton** | Bắt đầu ngủ; thức dậy khi player vào vùng gần, đuổi và bắn chùm hoặc liên tiếp. Mất mục tiêu thì đi quanh co về vị trí ban đầu, canh gác rồi ngủ lại. | Enemy thường; quy tắc và cấu hình chi tiết trong [business logic Coral Skeleton](./coral_skeleton_business_logic.md). |
-| **WarLordTurtle** | Archetype enemy lớn độc lập, có data và animation riêng. | Không phải biến thể Turtle elite thứ hai. Luật boss hoặc Tide Grapple chỉ được gán khi game design quy định rõ. |
 
 Các nhóm **Elite Normal Attack**, **Elite Special Attack** và **Elite Charged
 Feedback** trong Inspector của EliteBarrel cấu hình số đợt, số viên, góc bắn,
@@ -93,7 +92,6 @@ Crab thường được tạo khi khởi tạo. Starfish và Barrel đồng bộ
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
 | `barrel/elite_barrel.gd` | Thông số lượt thường, lượt 360°, tích lũy và cảnh báo. |
 | `coral_skeleton/coral_skeleton.gd` | Vùng nhận diện khi ngủ/thức, thời gian thức và ngủ, di chuyển về nhà và cấu hình đợt bắn. |
-| `war_lord_turtle/war_lord_turtle.gd` | Speed, contact damage và đổi trục patrol của WarLordTurtle. |
 
 Ví dụ, đổi vùng nhận diện EliteCrab chỉ cần sửa `player_detection_radius` trên node root
 EliteCrab; script cập nhật bán kính `CylinderShape3D` của `TargetDetector` trước khi Base quét
@@ -106,7 +104,7 @@ Player. Collider vẫn là nơi định nghĩa hình dạng và chiều cao, kh�
 charge/dash của elite sẽ hủy hoặc quay đầu theo luật state hiện có thay vì chồng lên cùng một vị trí
 của Player. `GroundRayCast3D` chỉ giữ mask `WORLD`, để enemy khác không làm sai kiểm tra mép rơi.
 
-Ví dụ sử dụng: `Crab`, `Barrel`, `Starfish` và `WarLordTurtle` trong
+Ví dụ sử dụng: `Crab`, `Barrel` và `Starfish` trong
 `gameplay/enemies/`.
 
 ## HP và cân bằng damage dạng float
@@ -120,10 +118,9 @@ hiện có damage multiplier 1.0. Chưa thay đổi damage vũ khí, tốc độ
 | Starfish | 3 | 2.6 | 3 | 2 |
 | Crab | 3 | 3.2 | 4 | 3 |
 | Barrel | 3 | 4.0 | 4 | 4 |
-| War Lord Turtle | 20 | 16.0 | 16 | 13 |
 
 Starfish là mục tiêu nhẹ, Crab chịu thêm một hit cơ bản, Barrel có HP cao hơn
-để bù vai trò đứng bắn, còn Turtle giữ vai trò enemy trâu. Đây là mốc cân bằng
+để bù vai trò đứng bắn. Đây là mốc cân bằng
 ban đầu theo số hit, cần đánh giá cảm giác chiến đấu trong game. Bảng không tính
 Charm, bỏ lỡ đòn hoặc Doomsday Edge đang gắn thử trên scene Foxy.
 
@@ -160,7 +157,6 @@ pulse trên sprite gốc, một vòng cảnh báo attack-only trên mặt đất
 telegraph, còn `EnemyBase` không biết hoặc không quyết định elite.
 
 `EliteCrab`, `EliteStarfish` và `EliteBarrel` đều có 12 HP, 2 damage và 50% kháng hất văng.
-WarLordTurtle tiếp tục là mẫu enemy lớn riêng, không phải một biến thể Turtle elite thứ hai.
 
 Không gán group `boss` hoặc bật `charm_grapple_large` chỉ vì enemy có kích thước lớn.
 Hai cơ chế đó thay đổi kết quả Tide Grapple, nên chỉ dùng khi game design quy định rõ
@@ -268,7 +264,7 @@ Mất HP không tự chuyển enemy vào `Hit`. `HealthComponent.damaged` vẫn 
 `EnemyBase.damaged` và flash/pulse xác nhận đòn trúng. `receive_damage()` chỉ tích
 `DamageContext.stagger_damage` khi thực sự mất HP và enemy còn sống.
 
-- Ngưỡng `EnemyData.stagger_threshold`: thường 60, elite 120, War Lord Turtle 240.
+- Ngưỡng `EnemyData.stagger_threshold`: thường 60, elite 120.
 - Đủ ngưỡng: reset lượng tích lũy, queue `Hit` priority 50 và áp dụng knockback.
 - Chưa đủ ngưỡng: enemy tiếp tục hành động, không bị ngắt đòn hoặc đẩy lùi qua Hit.
 - Trong Hit/recovery: không tích thêm stagger và không reset thời gian choáng.
@@ -394,8 +390,7 @@ không còn khớp với hình ảnh.
 
 Đặt scene và animation trong `gameplay/enemies/<enemy_name>/`, data trong
 `data/enemies/<enemy_name>_data.tres`, và sprite trong
-`assets/sprites/enemies/<enemy_name>/`. Ví dụ rùa: `war_lord_turtle/` và
-`war_lord_turtle_data.tres`.
+`assets/sprites/enemies/<enemy_name>/`.
 
 `EnemyData` có các nhóm thông số sau:
 
@@ -507,7 +502,7 @@ Ví dụ: `idle_down`, `run_up`, `hit_side`, `charge_left`, `death_right`.
 
 `play_directional_animation()` tự lấy hướng hiện tại của enemy. Nếu không tìm thấy
 clip theo hướng, nó tự fallback sang clip đúng tên action. Vì vậy animation không theo
-hướng có thể đặt tên `idle`, `run`, `hit`, `death`; `WarLordTurtle` dùng cách này.
+hướng có thể đặt tên `idle`, `run`, `hit`, `death`.
 `enemy.play_animation(&"spawn")` chỉ cần cho clip một lần không thuộc action của state.
 Mỗi action mà state gọi phải có ít nhất một clip hợp lệ, theo hướng hoặc exact action;
 nếu thiếu, state vẫn chạy nhưng không có clip để phát.

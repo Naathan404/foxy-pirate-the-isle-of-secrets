@@ -5,9 +5,13 @@ const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_fe
 const SWING_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_throw.wav")
 const HIT_SOUND: AudioStream = preload("res://assets/audio/combat/dagger_hit.wav")
 
+const SHOCKWAVE_DURATION := 0.24
+const SHOCKWAVE_STRENGTH := 0.003
+const SHOCKWAVE_COLOR := Color("f8e7bd")
+const SHOCKWAVE_RADIUS_PIXELS := 80.0
+
 @export var hitbox: HitBox
 @export var forward_offset: float = 0.8
-@export_range(0.0, 3.0, 0.05) var heavy_crate_knockback_distance: float = 0.9
 @export_range(1.0, 2.0, 0.05) var destructible_shake_multiplier: float = 1.15
 
 @export_group("Combo Hitbox")
@@ -50,10 +54,6 @@ func activate() -> void:
 	_impact_played = false
 	if context.combo_step != null:
 		_configure_swing()
-	context.crate_knockback_distance = (
-		heavy_crate_knockback_distance
-		if context.combo_step != null and context.combo_step.heavy_impact else 0.0
-	)
 
 	hitbox.begin_attack_with_context(context.create_damage_context())
 	if context.combo_step != null:
@@ -164,8 +164,13 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 		_vfx.impact(at, context.direction, heavy, impact_scale)
 	if not _impact_played:
 		_impact_played = true
+		if heavy:
+			get_node("/root/ShockwaveController").request_world(
+				at, SHOCKWAVE_DURATION, SHOCKWAVE_STRENGTH * impact_scale,
+				SHOCKWAVE_COLOR, SHOCKWAVE_RADIUS_PIXELS
+			)
 		get_node("/root/HitstopController").request_local(
-			context.actor, target as Node3D, step.hitstop_seconds * impact_scale
+			null, target as Node3D, step.hitstop_seconds * impact_scale
 		)
 		get_node("/root/ScreenShakeController").request(
 			step.shake_pixels * impact_scale

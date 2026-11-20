@@ -280,6 +280,14 @@ func get_reference_body_metrics() -> Vector2:
 	)
 
 
+## Dimensions of the fitted Spine artwork even while another action hides it.
+func get_fitted_body_metrics() -> Vector2:
+	return Vector2(
+		absf(transform.basis.y.y) * _reference_height * size_multiplier,
+		(transform * _reference_bottom).y
+	)
+
+
 func _mapping_key_for(animation_name: StringName, screen_facing: Vector3) -> String:
 	var key := String(animation_name)
 	if animation_name == &"idle_side":

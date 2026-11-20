@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bulcvbok8qvje"]
 
 [ext_resource type="Script" uid="uid://b33hl5mw8xdvg" path="res://gameplay/economy/gold_display.gd" id="1_display"]
-[ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/materials/Coin.png" id="2_gcxsi"]
+[ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_gcxsi"]
 [ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="3_gcxsi"]
 
 [node name="GoldDisplay" type="Control" unique_id=1723458651]

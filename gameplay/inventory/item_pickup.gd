@@ -3,6 +3,8 @@ extends Area3D
 
 const NOTE_ITEM: BaseItem = preload("res://data/items/quest/note.tres")
 const BOSS_DIARY_ITEM: BaseItem = preload("res://data/items/quest/boss_diary.tres")
+const CHARM_UNLOCK := preload("res://gameplay/charms/progression/charm_unlock_presentation.gd")
+const BLUEPRINT_UNLOCK_PATH := "res://gameplay/weapons/blueprints/blueprint_unlock.tscn"
 
 @export var item: BaseItem
 ## A note pickup unlocks this entry instead of taking an inventory slot.
@@ -118,6 +120,8 @@ func _on_body_entered(body: Node3D) -> void:
 
 
 func _can_attract(target: Node3D) -> bool:
+	if get_tree().paused:
+		return false
 	if not _can_be_picked_up or _collecting or is_queued_for_deletion():
 		return false
 	if item == null or quantity <= 0 or not target is Player:
@@ -130,19 +134,63 @@ func _can_attract(target: Node3D) -> bool:
 		return false
 	if note != null:
 		return not note.note_id.is_empty()
+	if item.charm != null:
+		var registry := player.charm_registry
+		if not is_instance_valid(registry):
+			return false
+		var definition := registry.get_definition(item.charm.charm_id)
+		if registry.is_owned(item.charm.charm_id):
+			call_deferred("queue_free")
+			return false
+		return definition != null and definition.is_playable() and definition.effect_scene != null
+	if item.weapon_blueprint != null:
+		var weapons := player.weapon_controller
+		var weapon_id := item.weapon_blueprint.weapon_id
+		return is_instance_valid(weapons) and weapons.has_weapon_definition(weapon_id)
 	# A generic note without an entry cannot grant anything and must not enter inventory.
-	if item.opens_note or item.item_id == NOTE_ITEM.item_id or item.item_id == BOSS_DIARY_ITEM.item_id:
+	if (
+		item.opens_note
+		or item.item_id == NOTE_ITEM.item_id
+		or item.item_id == BOSS_DIARY_ITEM.item_id
+	):
 		return false
 	return inventory.get_available_space(item) > 0
 
 
-func _on_attraction_started(_target: Node3D) -> void:
+func _on_attraction_started(target: Node3D) -> void:
 	if _idle_tween != null and _idle_tween.is_valid():
 		_idle_tween.kill()
 	if _drop_tween != null and _drop_tween.is_valid():
 		_drop_tween.kill()
 	sprite.position = _rest_position
 	sprite.scale = _rest_scale
+	if item != null and item.charm != null:
+		_attraction.reset()
+		_collecting = true
+		var presentation := CHARM_UNLOCK.new()
+		get_tree().root.add_child(presentation)
+		presentation.begin(self, target as Player)
+	elif item != null and item.weapon_blueprint != null:
+		var player := target as Player
+		if player.weapon_controller.is_blueprint_unlocked(item.weapon_blueprint.weapon_id):
+			return
+		_attraction.reset()
+		_collecting = true
+		# Load on demand: the presentation references ItemPickup in its public API.
+		var presentation := (load(BLUEPRINT_UNLOCK_PATH) as PackedScene).instantiate()
+		get_tree().root.add_child(presentation)
+		presentation.begin(self, player)
+
+
+## The presentation owns the reward transaction; this only releases the reserved pickup.
+func finish_blueprint_presentation(consumed: bool) -> void:
+	if consumed:
+		queue_free()
+		return
+	sprite.show()
+	_collecting = false
+	_attraction.set_enabled(true)
+	_start_idle_animation()
 
 
 func _on_attraction_cancelled() -> void:
@@ -159,6 +207,24 @@ func _collect(target: Node3D) -> void:
 	_collecting = true
 	if note != null:
 		get_node("/root/NoteProgress").set_unlocked(note.note_id, true)
+		quantity = 0
+		inventory.notify_item_picked_up(item, 1)
+		_can_be_picked_up = false
+		_attraction.complete()
+		return
+	if item.charm != null:
+		# Charm pickups use the presentation started before attraction moves them.
+		_collecting = false
+		_attraction.retry()
+		return
+	if item.weapon_blueprint != null:
+		var player := target as Player
+		if not player.weapon_controller.set_blueprint_unlocked(
+			item.weapon_blueprint.weapon_id, true
+		):
+			_collecting = false
+			_attraction.retry()
+			return
 		quantity = 0
 		inventory.notify_item_picked_up(item, 1)
 		_can_be_picked_up = false

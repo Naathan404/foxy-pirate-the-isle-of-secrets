@@ -1,12 +1,12 @@
 # Thiết kế thủy triều cho địa hình phẳng
 
-> Tài liệu đề xuất ban đầu. Bản đang chạy và thiết lập hiện tại được mô tả tại [Thủy triều cho nền phẳng](../world/flat_tide.md). Controller và thùng nổi theo độ cao của bản cũ đã được gỡ.
+> Tài liệu đề xuất ban đầu, giữ để tham khảo lịch sử. Bản đang chạy và thiết lập hiện tại được mô tả tại [Thủy triều cho nền phẳng](../world/flat_tide.md). Controller, thùng nổi theo độ cao và scene `world/biomes/beach/beach_01.tscn` của bản cũ đã được gỡ.
 
 ## Mục tiêu
 
 Chuyển cơ chế thủy triều từ **mực nước dâng theo chiều cao Y** sang **vùng nước lan và rút trên mặt nền theo mặt phẳng XZ**. Người chơi phải nhìn được ranh giới nước, biết trước vùng sắp ngập và có lựa chọn vị trí khi chiến đấu. Tài liệu này là đặc tả để triển khai; các con số bên dưới là giá trị thử nghiệm, cần chỉnh sau khi chơi thử.
 
-`forest_0x` và `ruins_0x` nghĩa là các scene có hậu tố số, chẳng hạn `forest_01`, `forest_02`, `forest_03`. Các scene tham chiếu hiện có là `world/biomes/forest/forest_01.tscn` đến `_03`, `world/biomes/ruins/ruins_01.tscn` đến `_03`, và `world/biomes/beach/beach_01.tscn`.
+`forest_0x` và `ruins_0x` nghĩa là các scene có hậu tố số, chẳng hạn `forest_01`, `forest_02`, `forest_03`. Các scene được xét trong đề xuất ban đầu là `world/biomes/forest/forest_01.tscn` đến `_03`, `world/biomes/ruins/ruins_01.tscn` đến `_03`, và `world/biomes/beach/beach_01.tscn` (đã xóa).
 
 ## Hiện trạng đã kiểm tra
 

@@ -1,0 +1,182 @@
+[gd_scene format=3 uid="uid://dtt328ithrxu3"]
+
+[ext_resource type="Script" uid="uid://bv4bbwsp0530r" path="res://gameplay/weapons/blueprints/blueprint_unlock.gd" id="1"]
+[ext_resource type="Script" uid="uid://dl2duqmofi18q" path="res://gameplay/weapons/blueprints/blueprint_unlock_vfx.gd" id="2"]
+[ext_resource type="Shader" uid="uid://c7vrdxchjw7p4" path="res://gameplay/weapons/blueprints/blueprint_veil.gdshader" id="3"]
+[ext_resource type="Shader" uid="uid://csiyvqe6pjylr" path="res://gameplay/weapons/blueprints/blueprint_paper.gdshader" id="4"]
+[ext_resource type="FontFile" uid="uid://g6ur7rv65tvy" path="res://assets/fonts/MarkoftheBeastBB.ttf" id="5"]
+[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="6"]
+[ext_resource type="AudioStream" uid="uid://bl1moinh3mfna" path="res://assets/audio/ui/blueprint_discovery.wav" id="7"]
+[ext_resource type="AudioStream" uid="uid://dnfhxd4w6i4wg" path="res://assets/audio/ui/blueprint_reveal.wav" id="8"]
+[ext_resource type="AudioStream" uid="uid://boqoqjnq2nj30" path="res://assets/audio/ui/blueprint_receive.wav" id="9"]
+
+[sub_resource type="ShaderMaterial" id="VeilMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("3")
+shader_parameter/strength = 0.0
+shader_parameter/shadow_color = Color(0.012, 0.026, 0.045, 1)
+shader_parameter/center_opacity = 0.22
+shader_parameter/edge_opacity = 0.85
+shader_parameter/inner_radius = 0.12
+shader_parameter/outer_radius = 0.65
+
+[sub_resource type="CanvasItemMaterial" id="LightBlend"]
+blend_mode = 1
+
+[sub_resource type="ShaderMaterial" id="PaperMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("4")
+shader_parameter/unfold = 0.0
+shader_parameter/sweep = 0.0
+shader_parameter/ink_light = Color(1, 0.84, 0.47, 1)
+shader_parameter/folded_width = 0.42
+shader_parameter/crease_depth = 0.13
+shader_parameter/sweep_width = 0.07
+shader_parameter/sweep_brightness = 0.8
+shader_parameter/drafting_spacing = 22.0
+shader_parameter/drafting_brightness = 0.18
+
+[sub_resource type="StyleBoxFlat" id="InfoStyle"]
+content_margin_left = 24.0
+content_margin_top = 16.0
+content_margin_right = 24.0
+content_margin_bottom = 18.0
+bg_color = Color(0.024, 0.035, 0.045, 0.94)
+border_width_top = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.58, 0.28, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 18
+
+[node name="BlueprintUnlock" type="CanvasLayer" unique_id=1888429313]
+process_mode = 3
+layer = 100
+script = ExtResource("1")
+
+[node name="Veil" type="ColorRect" parent="." unique_id=299961662]
+material = SubResource("VeilMaterial")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Effects" type="Control" parent="." unique_id=2027133533]
+material = SubResource("LightBlend")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1420587976]
+texture_filter = 2
+material = SubResource("PaperMaterial")
+offset_right = 164.0
+offset_bottom = 164.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UI" type="Control" parent="." unique_id=1840563052]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Heading" type="VBoxContainer" parent="UI" unique_id=1696301713]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.05
+anchor_right = 0.85
+anchor_bottom = 0.05
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Eyebrow" type="Label" parent="UI/Heading" unique_id=368093204]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.61, 0.39, 1)
+theme_override_fonts/font = ExtResource("6")
+theme_override_font_sizes/font_size = 16
+text = "—  A CRAFTSMAN'S LEGACY  —"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="UI/Heading" unique_id=1573413078]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.63, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 46
+text = "NEW BLUEPRINT"
+horizontal_alignment = 1
+
+[node name="Information" type="PanelContainer" parent="UI" unique_id=1799857350]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.22
+anchor_top = 0.68
+anchor_right = 0.78
+anchor_bottom = 0.68
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("InfoStyle")
+
+[node name="Rows" type="VBoxContainer" parent="UI/Information" unique_id=1532795011]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="WeaponName" type="Label" parent="UI/Information/Rows" unique_id=571135093]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.75, 1)
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 38
+text = "Storm Bow"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Description" type="Label" parent="UI/Information/Rows" unique_id=628225449]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.84, 0.79, 1)
+theme_override_fonts/font = ExtResource("6")
+theme_override_font_sizes/font_size = 20
+text = "A new design to forge at Master Tortuga.
+Gather the materials and bring this craft to life."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Prompt" type="Label" parent="UI/Information/Rows" unique_id=698607949]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.75, 0.39, 1)
+theme_override_fonts/font = ExtResource("6")
+theme_override_font_sizes/font_size = 18
+text = "[ SPACE ]"
+horizontal_alignment = 1
+
+[node name="DiscoverySound" type="AudioStreamPlayer" parent="." unique_id=1505440969]
+stream = ExtResource("7")
+volume_db = -8.0
+bus = &"UI"
+
+[node name="RevealSound" type="AudioStreamPlayer" parent="." unique_id=1108058146]
+stream = ExtResource("8")
+volume_db = -7.0
+bus = &"UI"
+
+[node name="ReceiveSound" type="AudioStreamPlayer" parent="." unique_id=1508736899]
+stream = ExtResource("9")
+volume_db = -6.0
+bus = &"UI"

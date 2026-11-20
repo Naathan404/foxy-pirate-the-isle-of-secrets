@@ -2,11 +2,13 @@
 
 Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn mở và chạy game; trang này dẫn tới tài liệu kỹ thuật và thiết kế. Tài liệu trong `plans/` là kế hoạch và có thể khác với code hiện tại.
 
+Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folders/1AwHAfRRBQpqWvLnF-SikzAA0n-ovKINQ) · [Cấu hình và cân bằng game](https://docs.google.com/spreadsheets/d/1GFGub8L-NBznHdhdoDl4mzo-B9xavXrR2RNTXG-1DmU/edit).
+
 ## Dự án · `project/`
 
 | Bắt đầu | Quy trình |
 | --- | --- |
-| [Hướng dẫn phát triển](project/development_guideline.md) · [Kiến trúc](project/architecture.md) | [Quy ước code](project/conventions.md) · [Git workflow](project/git_workflow.md) |
+| [Hướng dẫn phát triển](project/development_guideline.md) · [Kiến trúc](project/architecture.md) | [Quy tắc code và thiết kế](project/conventions.md) · [Git workflow](project/git_workflow.md) |
 | [Kiểm thử](project/testing.md) | [Agent contract](project/AGENTS_CONTRACT.md) |
 
 ## Gameplay · `gameplay/`
@@ -22,7 +24,7 @@ Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn 
 
 ## Thế giới · `world/`
 
-[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Collision layers](world/collision_layers.md) · [Trang trí MultiMesh](world/multimesh_decoration.md)
+[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Collision layers](world/collision_layers.md)
 
 ## Hệ thống · `systems/`
 
@@ -34,6 +36,6 @@ Chọn nhóm theo phần việc. [README dự án](../README.md) hướng dẫn 
 
 ## Kế hoạch · `plans/`
 
-[Kế hoạch Charm System](plans/charm-system-development-plan.md)
+[Kế hoạch Charm System](plans/charm-system-development-plan.md) · [Kế hoạch phát triển Captain Blubberbeard](plans/blubberbeard_development_plan.md)
 
 Sổ quái: [Monster Notes](gameplay/economy/monster_notes.md).
