@@ -1,29 +1,75 @@
+class_name MushroomSporeCloud
 extends Node3D
-## A gradually emitted cloud that applies poison while the player is inside it.
+## Gradually emitted spore cloud that marks its area on the ground and poisons players inside.
 
 const SPORE_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mote.png")
 const MIST_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mist.png")
-const SPORE_COUNT := 240
-const MIST_COUNT := 18
-const SPORE_LIFETIME := 2.0
-const MIST_LIFETIME := 2.2
-
+const GROUND_MIST_SHADER := preload("res://gameplay/enemies/mushroom/spore_ground_mist.gdshader")
+const POISON_CLOUD_GROUP := &"mushroom_spore_cloud"
+const DEFAULT_SPORE_COUNT := 240
+const DEFAULT_MIST_COUNT := 18
+const DEFAULT_SPORE_LIFETIME := 2.0
+const DEFAULT_MIST_LIFETIME := 2.2
 const MIN_EMISSION_RATIO := 0.05
 const POISON_AREA_HEIGHT := 1.8
+const DEFAULT_GROUND_MIST_OPACITY := 0.26
+const DEFAULT_GROUND_MIST_SCALE := 2.45
+const DEFAULT_VISUAL_SPREAD_SCALE := 1.15
+const FADE_OUT_SECONDS := 0.45
 
 var _source: Node3D
 var _radius: float = 2.6
 var _remaining: float = 0.0
-var _ramp_seconds: float = 1.6
+var _ramp_seconds: float = 0.8
 var _elapsed: float = 0.0
 var _fading: bool = false
+var _fade_remaining: float = 0.0
 var _damage_enabled: bool = false
 var _tick_interval: float = 1.0
 var _tick_damage: float = 0.5
 var _tick_remaining: float = 0.0
-var _area: Area3D
+var _spore_count: int = DEFAULT_SPORE_COUNT
+var _mist_count: int = DEFAULT_MIST_COUNT
+var _spore_lifetime: float = DEFAULT_SPORE_LIFETIME
+var _mist_lifetime: float = DEFAULT_MIST_LIFETIME
+var _ground_mist_opacity: float = DEFAULT_GROUND_MIST_OPACITY
+var _ground_mist_scale: float = DEFAULT_GROUND_MIST_SCALE
+var _visual_spread_scale: float = DEFAULT_VISUAL_SPREAD_SCALE
+var _query_shape: CylinderShape3D
 var _particles: GPUParticles3D
 var _spores: GPUParticles3D
+var _ground_mist: MeshInstance3D
+var _ground_mist_material: ShaderMaterial
+
+
+func _ready() -> void:
+	add_to_group(POISON_CLOUD_GROUP)
+	_build_query_shape()
+	_build_ground_mist()
+	_build_smoke_particles()
+
+
+func _physics_process(delta: float) -> void:
+	var step := maxf(delta, 0.0)
+	if _fading:
+		_update_fade_out(step)
+		return
+	_elapsed += step
+	_remaining -= step
+	var progress := clampf(_elapsed / _ramp_seconds, 0.0, 1.0)
+	var ratio := lerpf(MIN_EMISSION_RATIO, 1.0, progress)
+	_particles.amount_ratio = ratio
+	_spores.amount_ratio = ratio
+	if is_instance_valid(_ground_mist_material):
+		_ground_mist_material.set_shader_parameter("opacity", _ground_mist_opacity * progress)
+	if _remaining <= 0.0:
+		finish()
+		return
+	if _damage_enabled:
+		_tick_remaining -= step
+		if _tick_remaining <= 0.0:
+			_tick_remaining = _tick_interval
+			_apply_poison_tick()
 
 
 func setup(
@@ -35,35 +81,29 @@ func setup(
 	tick_damage: float
 ) -> void:
 	_source = source
-	_radius = radius
-	_remaining = duration_seconds
+	_radius = maxf(0.4, radius)
+	_remaining = maxf(0.2, duration_seconds)
 	_ramp_seconds = maxf(0.01, ramp_seconds)
 	_tick_interval = maxf(0.1, tick_interval_seconds)
 	_tick_damage = maxf(0.0, tick_damage)
 
 
-func _ready() -> void:
-	_build_area()
-	_build_smoke_particles()
-
-
-func _physics_process(delta: float) -> void:
-	if _fading:
-		return
-	_elapsed += maxf(delta, 0.0)
-	_remaining -= maxf(delta, 0.0)
-	var progress := clampf(_elapsed / _ramp_seconds, 0.0, 1.0)
-	var ratio := lerpf(MIN_EMISSION_RATIO, 1.0, progress)
-	_particles.amount_ratio = ratio
-	_spores.amount_ratio = ratio
-	if _remaining <= 0.0:
-		finish()
-		return
-	if _damage_enabled:
-		_tick_remaining -= maxf(delta, 0.0)
-		if _tick_remaining <= 0.0:
-			_tick_remaining = _tick_interval
-			_apply_poison_tick()
+func configure_visuals(
+	spore_count: int,
+	mist_count: int,
+	spore_lifetime: float,
+	mist_lifetime: float,
+	ground_mist_opacity: float,
+	ground_mist_scale: float,
+	visual_spread_scale: float = DEFAULT_VISUAL_SPREAD_SCALE
+) -> void:
+	_spore_count = maxi(1, spore_count)
+	_mist_count = maxi(1, mist_count)
+	_spore_lifetime = maxf(0.1, spore_lifetime)
+	_mist_lifetime = maxf(0.1, mist_lifetime)
+	_ground_mist_opacity = clampf(ground_mist_opacity, 0.0, 1.0)
+	_ground_mist_scale = maxf(0.5, ground_mist_scale)
+	_visual_spread_scale = maxf(0.5, visual_spread_scale)
 
 
 func activate_poison() -> void:
@@ -72,40 +112,80 @@ func activate_poison() -> void:
 		_tick_remaining = 0.0
 
 
+func is_fading() -> bool:
+	return _fading
+
+
+func get_radius() -> float:
+	return _radius
+
+
+func get_visual_radius() -> float:
+	return _radius * _visual_spread_scale
+
+
 func finish() -> void:
 	if _fading:
 		return
 	_fading = true
-	_area.set_deferred("monitoring", false)
+	_fade_remaining = FADE_OUT_SECONDS
 	_particles.emitting = false
 	_spores.emitting = false
-	get_tree().create_timer(maxf(MIST_LIFETIME, SPORE_LIFETIME) + 0.15, false).timeout.connect(
+	get_tree().create_timer(maxf(_mist_lifetime, _spore_lifetime) + 0.15, false).timeout.connect(
 		queue_free
 	)
 
 
-func _build_area() -> void:
-	_area = Area3D.new()
-	_area.name = "PoisonArea"
-	_area.collision_layer = 0
-	_area.collision_mask = CombatLayers.PLAYER_HURTBOX
-	_area.monitorable = false
-	var collision := CollisionShape3D.new()
-	var shape := CylinderShape3D.new()
-	shape.radius = _radius
-	shape.height = POISON_AREA_HEIGHT
-	collision.shape = shape
-	collision.position.y = POISON_AREA_HEIGHT * 0.5
-	_area.add_child(collision)
-	add_child(_area)
+func _build_query_shape() -> void:
+	_query_shape = CylinderShape3D.new()
+	_query_shape.radius = _radius
+	_query_shape.height = POISON_AREA_HEIGHT
+
+
+func _build_ground_mist() -> void:
+	_ground_mist_material = ShaderMaterial.new()
+	_ground_mist_material.shader = GROUND_MIST_SHADER
+	_ground_mist_material.set_shader_parameter("opacity", 0.0)
+	_ground_mist_material.set_shader_parameter("seed_offset", randf_range(0.0, 100.0))
+	var plane := PlaneMesh.new()
+	var span := get_visual_radius() * _ground_mist_scale
+	plane.size = Vector2(span, span)
+	plane.material = _ground_mist_material
+	_ground_mist = MeshInstance3D.new()
+	_ground_mist.name = "GroundMist"
+	_ground_mist.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_ground_mist.mesh = plane
+	_ground_mist.position = Vector3(0.0, 0.025, 0.0)
+	add_child(_ground_mist)
+
+
+func _update_fade_out(step: float) -> void:
+	if _fade_remaining <= 0.0:
+		return
+	_fade_remaining = maxf(0.0, _fade_remaining - step)
+	if is_instance_valid(_ground_mist_material):
+		_ground_mist_material.set_shader_parameter(
+			"opacity", _ground_mist_opacity * (_fade_remaining / FADE_OUT_SECONDS)
+		)
 
 
 func _apply_poison_tick() -> void:
-	if _tick_damage <= 0.0:
+	if _tick_damage <= 0.0 or not is_inside_tree():
+		return
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = _query_shape
+	query.transform = Transform3D(
+		Basis.IDENTITY, global_position + Vector3.UP * (POISON_AREA_HEIGHT * 0.5)
+	)
+	query.collision_mask = CombatLayers.PLAYER_HURTBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var hits := get_world_3d().direct_space_state.intersect_shape(query, 16)
+	if hits.is_empty():
 		return
 	var hit_actors: Dictionary = {}
-	for overlapping_area in _area.get_overlapping_areas():
-		var hurtbox := overlapping_area as HurtBox
+	for hit in hits:
+		var hurtbox := hit.get("collider") as HurtBox
 		if hurtbox == null or not is_instance_valid(hurtbox.actor):
 			continue
 		var actor_id := hurtbox.actor.get_instance_id()
@@ -123,7 +203,7 @@ func _apply_poison_tick() -> void:
 
 
 func _build_smoke_particles() -> void:
-	_particles = _create_particles("PoisonMist", MIST_TEXTURE, MIST_COUNT, MIST_LIFETIME)
+	_particles = _create_particles("PoisonMist", MIST_TEXTURE, _mist_count, _mist_lifetime)
 	_particles.amount_ratio = MIN_EMISSION_RATIO
 	var mist_mesh := _particles.draw_pass_1 as QuadMesh
 	mist_mesh.size = Vector2(1.6, 1.6)
@@ -139,7 +219,7 @@ func _build_smoke_particles() -> void:
 	add_child(_particles)
 	_particles.emitting = true
 
-	_spores = _create_particles("FloatingSpores", SPORE_TEXTURE, SPORE_COUNT, SPORE_LIFETIME)
+	_spores = _create_particles("FloatingSpores", SPORE_TEXTURE, _spore_count, _spore_lifetime)
 	_spores.amount_ratio = MIN_EMISSION_RATIO
 	var spore_mesh := _spores.draw_pass_1 as QuadMesh
 	spore_mesh.size = Vector2(0.65, 0.65)
@@ -166,15 +246,19 @@ func _create_particles(
 	particles.lifetime = lifetime
 	particles.local_coords = false
 	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var visual_radius := get_visual_radius()
 	particles.visibility_aabb = AABB(
-		Vector3(-_radius - 1.0, -0.5, -_radius - 1.0),
-		Vector3((_radius + 1.0) * 2.0, 4.0, (_radius + 1.0) * 2.0)
+		Vector3(-visual_radius - 1.5, -0.5, -visual_radius - 1.5),
+		Vector3((visual_radius + 1.5) * 2.0, 4.0, (visual_radius + 1.5) * 2.0)
 	)
 	var process := ParticleProcessMaterial.new()
-	process.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
-	process.emission_box_extents = Vector3(_radius * 0.65, 0.15, _radius * 0.65)
+	process.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+	process.emission_ring_axis = Vector3.UP
+	process.emission_ring_height = 0.3
+	process.emission_ring_radius = visual_radius * 0.92
+	process.emission_ring_inner_radius = 0.0
 	process.direction = Vector3.UP
-	process.spread = 35.0
+	process.spread = 45.0
 	particles.process_material = process
 	var material := StandardMaterial3D.new()
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

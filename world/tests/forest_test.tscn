@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://c0nu47ksokiuu" path="res://world/biomes/forest/oak_tree.tscn" id="2_oak"]
 [ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/forest/pine_tree.tscn" id="3_pine"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/mushroom/mushroom.tscn" id="4_mushroom"]
+[ext_resource type="PackedScene" uid="uid://b5kdbd2ynvi15" path="res://gameplay/enemies/mushroom/mushroom.tscn" id="4_mushroom"]
 
 [node name="ForestTest" unique_id=340104391 instance=ExtResource("1_base")]
 open_exits = 2
@@ -36,23 +36,4 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -2, 0, -8)
 
 [node name="Mushroom" parent="." index="5" unique_id=1943653490 instance=ExtResource("4_mushroom")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
-detection_radius = 6.0
-movement_radius = 12.0
-chase_speed_scale = 0.8
-wander_speed_scale = 0.55
-observe_seconds = 0.8
-retreat_seconds = 1.1
-retreat_speed_scale = 0.7
-evade_distance = 2.0
-evade_duration_seconds = 0.45
-evade_cooldown_seconds = 2.5
-evade_hop_height = 0.4
-attack_range = 2.5
-windup_seconds = 1.6
-recovery_seconds = 0.5
-cooldown_seconds = 4.0
-cloud_radius = 2.6
-cloud_duration_seconds = 3.5
-spore_ramp_seconds = 0.8
-poison_interval_seconds = 1.0
-poison_damage = 0.5
+show_debug_health = true

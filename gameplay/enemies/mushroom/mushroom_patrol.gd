@@ -1,14 +1,9 @@
 extends EnemyState
-## Ambush, observe, pursue and reposition between spore attacks.
+## Ambush, observe, advance steadily toward detected players, spray spores
+## randomly in detection range or mandatorily in attack range, and abort on exit.
 
-enum Phase { DISGUISE, WANDER, OBSERVE, CHASE, CHARGE, RECOVER, RETREAT, SEARCH }
+enum Phase { DISGUISE, WANDER, OBSERVE, CHASE, CHARGE, RECOVER, SEARCH }
 
-const MIN_WANDER_SECONDS := 1.2
-const MAX_WANDER_SECONDS := 2.8
-const MIN_DISGUISE_SECONDS := 2.0
-const MAX_DISGUISE_SECONDS := 4.5
-const PURSUIT_BURST_SECONDS := 2.0
-const SEARCH_SECONDS := 3.0
 const ARRIVAL_DISTANCE := 0.6
 const AVOID_ANGLE := PI / 3.0
 
@@ -19,18 +14,23 @@ var _last_seen: Vector3
 var _wander_direction: Vector3 = Vector3.ZERO
 var _strafe_sign: float = 1.0
 var _has_awakened: bool = false
-var _chase_spore_remaining: float = 0.0
+var _chase_spore_check_remaining: float = 0.0
+var _ambush_hold_remaining: float = -1.0
 
 
 func _enter() -> void:
 	_random.randomize()
-	_schedule_chase_spores()
+	_ambush_reset()
+	_reset_chase_spore_timer()
 	if not enemy.damaged.is_connected(_on_damaged):
 		enemy.damaged.connect(_on_damaged)
+	var mushroom := enemy as MushroomEnemy
+	if mushroom == null:
+		return
 	if _has_awakened:
-		_set_phase(Phase.OBSERVE, 0.5)
+		_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
 	else:
-		_set_phase(Phase.DISGUISE, _random.randf_range(MIN_DISGUISE_SECONDS, MAX_DISGUISE_SECONDS))
+		_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
 
 
 func _exit() -> void:
@@ -45,55 +45,64 @@ func _update(delta: float) -> void:
 		return
 	var step := maxf(delta, 0.0)
 	if mushroom.is_evading():
+		if _phase == Phase.CHARGE:
+			_reset_charge()
+			_reset_chase_spore_timer()
+			_set_phase(Phase.CHASE, 0.0)
 		mushroom.stop_movement(step)
 		mushroom.play_directional_animation(&"walk")
 		return
 	_remaining = maxf(0.0, _remaining - step)
-	if _target_is_detected(mushroom):
+	var detected := _target_is_detected(mushroom)
+	var has_kb_charge := mushroom.consume_knockback_charge()
+	if detected:
 		_last_seen = mushroom.target.global_position
-		_has_awakened = true
+		if has_kb_charge and not mushroom.is_inside_poison_cloud():
+			_has_awakened = true
+			mushroom.face_target()
+			_begin_charge(mushroom, step)
+			return
 		if _phase == Phase.CHASE:
-			_chase_spore_remaining = maxf(0.0, _chase_spore_remaining - step)
-	elif _phase in [Phase.OBSERVE, Phase.CHASE, Phase.RETREAT]:
-		_schedule_chase_spores()
-		_set_phase(Phase.SEARCH, SEARCH_SECONDS)
+			_has_awakened = true
+			_chase_spore_check_remaining = maxf(0.0, _chase_spore_check_remaining - step)
+	else:
+		_ambush_reset()
+		if _phase in [Phase.OBSERVE, Phase.CHASE, Phase.CHARGE, Phase.RECOVER]:
+			_abort_to_search(mushroom)
+			return
+	_update_phase(mushroom, step, detected)
+
+
+func _update_phase(mushroom: MushroomEnemy, step: float, detected: bool) -> void:
 	match _phase:
 		Phase.DISGUISE:
-			_idle(mushroom, step, &"disguise")
-			if _target_is_detected(mushroom):
-				_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
-			elif _remaining <= 0.0:
-				_begin_wander()
+			_disguise(mushroom, step, detected)
 		Phase.WANDER:
-			if _target_is_detected(mushroom):
+			if detected:
 				_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
 			elif _remaining <= 0.0:
-				_set_phase(
-					Phase.DISGUISE, _random.randf_range(MIN_DISGUISE_SECONDS, MAX_DISGUISE_SECONDS)
-				)
+				_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
 			else:
 				_wander(mushroom, step)
 		Phase.OBSERVE:
-			_idle(mushroom, step, &"idle")
-			if _target_is_detected(mushroom):
-				mushroom.face_target()
-			if _remaining <= 0.0:
-				_set_phase(Phase.CHASE, PURSUIT_BURST_SECONDS)
+			_observe(mushroom, step, detected)
 		Phase.CHASE:
 			_chase(mushroom, step)
 		Phase.CHARGE:
-			_charge(mushroom, step)
+			_charge(mushroom, step, detected)
 		Phase.RECOVER:
 			_idle(mushroom, step, &"spore_release")
 			if _remaining <= 0.0:
-				if _target_is_detected(mushroom):
-					_set_phase(Phase.RETREAT, mushroom.retreat_seconds)
+				if detected:
+					_set_phase(Phase.CHASE, 0.0)
 				else:
-					_set_phase(Phase.DISGUISE, MIN_DISGUISE_SECONDS)
-		Phase.RETREAT:
-			_retreat(mushroom, step)
+					_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
 		Phase.SEARCH:
-			_search(mushroom, step)
+			_search(mushroom, step, detected)
+
+
+func _ambush_reset() -> void:
+	_ambush_hold_remaining = -1.0
 
 
 func _set_phase(phase: Phase, duration: float) -> void:
@@ -101,10 +110,40 @@ func _set_phase(phase: Phase, duration: float) -> void:
 	_remaining = duration
 
 
-func _begin_wander() -> void:
+func _abort_to_search(mushroom: MushroomEnemy) -> void:
+	_reset_charge()
+	_reset_chase_spore_timer()
+	_set_phase(Phase.SEARCH, mushroom.search_seconds)
+
+
+func _disguise(mushroom: MushroomEnemy, step: float, detected: bool) -> void:
+	_idle(mushroom, step, &"disguise")
+	if detected:
+		var dist := _distance_to_target_xz(mushroom)
+		if _ambush_hold_remaining < 0.0 and mushroom.ai != null:
+			_ambush_hold_remaining = mushroom.ai.roll_ambush_hold(
+				dist,
+				mushroom.ambush_wake_distance,
+				mushroom.ambush_delay_min_seconds,
+				mushroom.ambush_delay_max_seconds
+			)
+		elif _ambush_hold_remaining < 0.0:
+			_ambush_hold_remaining = 0.0
+		if dist <= mushroom.ambush_wake_distance or _ambush_hold_remaining <= 0.0:
+			_ambush_reset()
+			_has_awakened = true
+			_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
+			return
+		_ambush_hold_remaining = maxf(0.0, _ambush_hold_remaining - step)
+		return
+	if _remaining <= 0.0:
+		_begin_wander(mushroom)
+
+
+func _begin_wander(mushroom: MushroomEnemy) -> void:
 	var angle := _random.randf_range(0.0, TAU)
 	_wander_direction = Vector3(cos(angle), 0.0, sin(angle))
-	_set_phase(Phase.WANDER, _random.randf_range(MIN_WANDER_SECONDS, MAX_WANDER_SECONDS))
+	_set_phase(Phase.WANDER, _random_wander_seconds(mushroom))
 
 
 func _wander(mushroom: MushroomEnemy, delta: float) -> void:
@@ -113,75 +152,64 @@ func _wander(mushroom: MushroomEnemy, delta: float) -> void:
 	if from_home.length() >= mushroom.movement_radius:
 		_wander_direction = -from_home.normalized()
 	if not _move_safely(mushroom, _wander_direction, delta, mushroom.wander_speed_scale):
-		_set_phase(Phase.DISGUISE, MIN_DISGUISE_SECONDS)
+		_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
+
+
+func _observe(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
+	_idle(mushroom, delta, &"idle")
+	if detected:
+		mushroom.face_target()
+		if _distance_to_target_xz(mushroom) <= mushroom.attack_range:
+			if _try_start_close_charge(mushroom, delta):
+				return
+	if _remaining <= 0.0:
+		_set_phase(Phase.CHASE, 0.0)
 
 
 func _chase(mushroom: MushroomEnemy, delta: float) -> void:
-	if not _target_is_detected(mushroom):
-		_set_phase(Phase.SEARCH, SEARCH_SECONDS)
+	if _try_start_close_charge(mushroom, delta):
+		return
+	if _try_roll_random_chase_charge(mushroom, delta):
 		return
 	var from_home := _horizontal(mushroom.global_position - mushroom.home_position)
 	if from_home.length() > mushroom.movement_radius:
 		_move_safely(mushroom, -from_home.normalized(), delta, mushroom.wander_speed_scale)
 		return
 	var offset := _horizontal(mushroom.target.global_position - mushroom.global_position)
-	var distance := offset.length()
-	if (
-		mushroom.attack_cooldown_remaining <= 0.0
-		and (distance <= mushroom.attack_range or _chase_spore_remaining <= 0.0)
-	):
+	if offset.length() <= mushroom.attack_range:
 		mushroom.face_target()
-		_begin_charge(mushroom, delta)
+		_idle(mushroom, delta, &"idle")
 		return
-	if _remaining <= 0.0:
-		_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
-		return
-	if distance <= mushroom.attack_range and mushroom.attack_cooldown_remaining > 0.0:
-		var sideways := Vector3(-offset.z, 0.0, offset.x).normalized() * _strafe_sign
-		if not _move_safely(mushroom, sideways, delta, mushroom.wander_speed_scale):
-			_strafe_sign *= -1.0
-	else:
-		_move_safely(mushroom, offset.normalized(), delta, mushroom.chase_speed_scale)
+	_move_safely(mushroom, offset.normalized(), delta, mushroom.chase_speed_scale)
 
 
-func _charge(mushroom: MushroomEnemy, delta: float) -> void:
+func _charge(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
 	mushroom.stop_movement(delta)
-	if not _target_is_detected(mushroom):
-		_reset_charge()
-		_schedule_chase_spores()
-		_set_phase(Phase.SEARCH, SEARCH_SECONDS)
+	if not detected:
+		_abort_to_search(mushroom)
 		return
-	var progress := 1.0 - _remaining / mushroom.windup_seconds
+	var duration := maxf(0.05, mushroom.charge_duration_seconds)
+	var progress := 1.0 - _remaining / duration
 	mushroom.update_charge_feedback(clampf(progress, 0.0, 1.0))
 	if _remaining > 0.0:
 		return
-	mushroom.release_cloud()
+	var released := mushroom.release_cloud()
 	_reset_charge()
-	mushroom.play_directional_animation(&"spore_release", true)
-	_set_phase(Phase.RECOVER, mushroom.recovery_seconds)
+	if released:
+		mushroom.play_directional_animation(&"spore_release", true)
+		_set_phase(Phase.RECOVER, mushroom.recovery_seconds)
+	else:
+		_set_phase(Phase.CHASE, 0.0)
 
 
-func _retreat(mushroom: MushroomEnemy, delta: float) -> void:
-	if _remaining <= 0.0:
-		_strafe_sign = -1.0 if _random.randi_range(0, 1) == 0 else 1.0
-		_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
-		return
-	var away := _horizontal(mushroom.global_position - _last_seen).normalized()
-	if (
-		away.is_zero_approx()
-		or not _move_safely(mushroom, away, delta, mushroom.retreat_speed_scale)
-	):
-		_idle(mushroom, delta, &"idle")
-
-
-func _search(mushroom: MushroomEnemy, delta: float) -> void:
-	if _target_is_detected(mushroom):
-		_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
+func _search(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
+	if detected:
+		_set_phase(Phase.CHASE, 0.0)
 		return
 	var offset := _horizontal(_last_seen - mushroom.global_position)
 	if _remaining <= 0.0:
 		_has_awakened = false
-		_set_phase(Phase.DISGUISE, _random.randf_range(MIN_DISGUISE_SECONDS, MAX_DISGUISE_SECONDS))
+		_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
 	elif offset.length() > ARRIVAL_DISTANCE:
 		_move_safely(mushroom, offset.normalized(), delta, mushroom.wander_speed_scale)
 	else:
@@ -198,57 +226,91 @@ func _move_safely(mushroom: MushroomEnemy, direction: Vector3, delta: float, spe
 			mushroom.play_directional_animation(&"walk")
 			return true
 	mushroom.stop_movement(delta)
-	mushroom.play_directional_animation(&"disguise")
+	mushroom.play_directional_animation(&"idle")
 	return false
 
 
 func _idle(mushroom: MushroomEnemy, delta: float, animation: StringName) -> void:
 	mushroom.stop_movement(delta)
-	mushroom.play_directional_animation(&"disguise" if animation == &"idle" else animation)
+	mushroom.play_directional_animation(animation)
+
+
+func _try_start_close_charge(mushroom: MushroomEnemy, delta: float) -> bool:
+	if mushroom.attack_cooldown_remaining > 0.0 or mushroom.is_inside_poison_cloud():
+		return false
+	if _distance_to_target_xz(mushroom) > mushroom.attack_range:
+		return false
+	mushroom.face_target()
+	_begin_charge(mushroom, delta)
+	return true
+
+
+func _try_roll_random_chase_charge(mushroom: MushroomEnemy, delta: float) -> bool:
+	if _chase_spore_check_remaining > 0.0:
+		return false
+	_reset_chase_spore_timer()
+	if mushroom.attack_cooldown_remaining > 0.0 or mushroom.is_inside_poison_cloud():
+		return false
+	if mushroom.is_point_in_poison_cloud(mushroom.target.global_position):
+		return false
+	if mushroom.ai != null and mushroom.ai.roll_chase_spore(mushroom.chase_spore_chance):
+		mushroom.face_target()
+		_begin_charge(mushroom, delta)
+		return true
+	return false
 
 
 func _begin_charge(mushroom: MushroomEnemy, delta: float) -> void:
 	mushroom.stop_movement(delta)
-	_set_phase(Phase.CHARGE, mushroom.windup_seconds)
+	_set_phase(Phase.CHARGE, mushroom.charge_duration_seconds)
 	mushroom.begin_charge_animation()
-	_schedule_chase_spores()
+	_reset_chase_spore_timer()
 
 
-func _schedule_chase_spores() -> void:
+func _random_disguise_seconds(mushroom: MushroomEnemy) -> float:
+	var low := minf(mushroom.disguise_min_seconds, mushroom.disguise_max_seconds)
+	var high := maxf(mushroom.disguise_min_seconds, mushroom.disguise_max_seconds)
+	return _random.randf_range(low, high)
+
+
+func _random_wander_seconds(mushroom: MushroomEnemy) -> float:
+	var low := minf(mushroom.wander_min_seconds, mushroom.wander_max_seconds)
+	var high := maxf(mushroom.wander_min_seconds, mushroom.wander_max_seconds)
+	return _random.randf_range(low, high)
+
+
+func _reset_chase_spore_timer() -> void:
 	var mushroom := enemy as MushroomEnemy
-	_chase_spore_remaining = _random.randf_range(
-		minf(mushroom.chase_spore_min_seconds, mushroom.chase_spore_max_seconds),
-		maxf(mushroom.chase_spore_min_seconds, mushroom.chase_spore_max_seconds)
-	)
+	if mushroom == null:
+		return
+	_chase_spore_check_remaining = mushroom.chase_spore_interval_seconds
 
 
 func _reset_charge() -> void:
 	var mushroom := enemy as MushroomEnemy
 	if mushroom != null:
-		mushroom.visual.animation_player.speed_scale = 1.0
 		mushroom.cancel_spore_charge()
 
 
 func _on_damaged(_applied_hp: float) -> void:
 	_has_awakened = true
-	if _phase == Phase.CHARGE:
-		var mushroom := enemy as MushroomEnemy
-		_reset_charge()
-		mushroom.attack_cooldown_remaining = mushroom.cooldown_seconds
-		if not mushroom.hp.is_alive():
-			return
-		mushroom.play_directional_animation(&"disguise", true)
-		if _target_is_detected(mushroom):
-			_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
-		else:
-			_set_phase(Phase.DISGUISE, MIN_DISGUISE_SECONDS)
-		return
+	_ambush_reset()
 	if _phase == Phase.DISGUISE or _phase == Phase.WANDER:
-		_set_phase(Phase.OBSERVE, 0.5)
+		var mushroom := enemy as MushroomEnemy
+		if mushroom != null and _target_is_detected(mushroom):
+			_set_phase(Phase.CHASE, 0.0)
+		elif mushroom != null:
+			_set_phase(Phase.SEARCH, mushroom.search_seconds)
 
 
 func _horizontal(value: Vector3) -> Vector3:
 	return Vector3(value.x, 0.0, value.z)
+
+
+func _distance_to_target_xz(mushroom: MushroomEnemy) -> float:
+	if not mushroom.has_target():
+		return INF
+	return _horizontal(mushroom.target.global_position - mushroom.global_position).length()
 
 
 func _target_is_detected(mushroom: MushroomEnemy) -> bool:
