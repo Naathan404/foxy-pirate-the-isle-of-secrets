@@ -27,7 +27,19 @@ const POOL_SEPARATION_BUFFER_METERS := 0.15
 const IMPACT_DROPLET_LIFETIME := 0.36
 const DROPLET_BURST_SPEED_MIN := 1.8
 const DROPLET_BURST_SPEED_MAX := 3.6
-const SPOT_SEARCH_ANGLES_DEG := [0.0, 24.0, -24.0, 48.0, -48.0, 72.0, -72.0, 100.0, -100.0]
+const SPOT_SEARCH_ANGLES_DEG := [
+	0.0,
+	24.0,
+	-24.0,
+	48.0,
+	-48.0,
+	72.0,
+	-72.0,
+	100.0,
+	-100.0,
+	135.0,
+	-135.0,
+]
 const SPOT_RADIAL_OFFSETS := [0.0, 1.1, 2.2, -0.75]
 
 var _source: Node
@@ -324,6 +336,8 @@ func _build_ground_telegraph(pool_radius: float) -> void:
 
 
 func _build_direct_hitbox() -> void:
+	if _direct_damage_hp <= 0.0:
+		return
 	_direct_hitbox = HitBox.new()
 	_direct_hitbox.name = "DirectHitBox"
 	_direct_hitbox.actor = _source if is_instance_valid(_source) else self

@@ -27,8 +27,9 @@ const MAX_HP_CHARGE_SPEEDUP := 0.22
 const MAX_HP_RECOVER_SPEEDUP := 0.25
 const OUTER_EXTRA_SHOT_HP_THRESHOLD := 0.65
 const INNER_EXTRA_SHOT_HP_THRESHOLD := 0.4
-const DEFAULT_AIM_SCATTER_MIN_METERS := 1.15
-const DEFAULT_AIM_SCATTER_MAX_METERS := 2.15
+const DEFAULT_AIM_SCATTER_MIN_METERS := 1.5
+const DEFAULT_AIM_SCATTER_MAX_METERS := 2.5
+const TARGET_DEFLECT_MARGIN_METERS := 0.45
 const DEFAULT_MIN_SHOT_DISTANCE_METERS := 1.6
 const DEFAULT_MAX_SHOT_DISTANCE_METERS := 6.2
 
@@ -192,6 +193,7 @@ func build_counter_plan(context: Dictionary) -> Dictionary:
 	var dist := to_target.length()
 	var base_dir := to_target.normalized() if dist > 0.001 else Vector3.BACK
 	var aim_positions: Array[Vector3] = []
+	planned_occupied.append(_make_target_exclusion_spot(target_pos, pool_radius, 1.35))
 
 	if dist <= inner_radius:
 		var count := maxi(2, int(context.get("counter_inner_shots", 3)))
@@ -201,6 +203,9 @@ func build_counter_plan(context: Dictionary) -> Dictionary:
 		var ring_dist := clampf(dist * 0.85, 0.85, 1.85)
 		for idx in range(count):
 			var angle := start_angle + step * float(idx)
+			# Tách phát chính giữa lệch sang sườn để phản công không ném thẳng vào người Player.
+			if count % 2 == 1 and idx == count / 2:
+				angle += deg_to_rad(28.0)
 			var desired := origin_pos + base_dir.rotated(Vector3.UP, angle) * ring_dist
 			desired.y = ground_y
 			var resolved := VenomPoolProjectile.resolve_landing_spot(
@@ -293,6 +298,7 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var aim_positions: Array[Vector3] = []
 	var planned_occupied := occupied.duplicate()
 	var already_covered := is_position_covered_by_pool(target_pos, planned_occupied)
+	planned_occupied.append(_make_target_exclusion_spot(target_pos, pool_radius, scatter_min))
 
 	for shot_idx in range(outer_shots):
 		var nearby_offset := _pick_nearby_offset(
@@ -371,6 +377,7 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 
 	var aim_positions: Array[Vector3] = []
 	var planned_occupied := occupied.duplicate()
+	planned_occupied.append(_make_target_exclusion_spot(target_pos, pool_radius, scatter_min))
 	var arc_rad := deg_to_rad(fan_degrees)
 	var step := arc_rad / float(inner_shots - 1) if inner_shots > 1 else 0.0
 	var start_angle := -arc_rad * 0.5
@@ -456,6 +463,16 @@ func _pick_cutoff_offset(
 	var side := forward.rotated(Vector3.UP, PI * 0.5)
 	var sign_val := 1.0 if shot_index % 2 == 0 else -1.0
 	return (side * sign_val + forward * 0.45).normalized() * STANDING_SPREAD_OFFSET_METERS
+
+
+func _make_target_exclusion_spot(
+	target_pos: Vector3, pool_radius: float, scatter_min_meters: float
+) -> Dictionary:
+	var deflect_dist := maxf(scatter_min_meters, pool_radius + TARGET_DEFLECT_MARGIN_METERS)
+	var exclusion_radius := maxf(
+		0.1, deflect_dist - pool_radius - VenomPoolProjectile.POOL_SEPARATION_BUFFER_METERS
+	)
+	return {"pos": target_pos, "radius": exclusion_radius}
 
 
 func _center_first_indices(count: int) -> Array[int]:

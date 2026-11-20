@@ -77,13 +77,15 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 @export_range(0.0, 1.2, 0.05) var lead_accuracy: float = 0.75
 @export_range(0.0, 6.0, 0.1, "suffix:m") var max_lead_meters: float = 2.0
 ## Khoảng lệch tối thiểu/tối đa quanh Player (m) để bắn vùng lân cận thay vì bắn trực diện.
-@export_range(0.3, 5.0, 0.05, "suffix:m") var aim_scatter_min_meters: float = 1.15
-@export_range(0.5, 6.0, 0.05, "suffix:m") var aim_scatter_max_meters: float = 2.15
+@export_range(0.3, 5.0, 0.05, "suffix:m") var aim_scatter_min_meters: float = 1.5
+@export_range(0.5, 6.0, 0.05, "suffix:m") var aim_scatter_max_meters: float = 2.5
 ## Giới hạn khoảng cách rơi đạn tính từ gốc cây (m).
 @export_range(0.5, 10.0, 0.1, "suffix:m") var min_shot_distance_meters: float = 1.6
 @export_range(1.0, 20.0, 0.1, "suffix:m") var max_shot_distance_meters: float = 6.2
 
 @export_group("Acid Projectile & Pool")
+## Sát thương va chạm trực tiếp trên không (mặc định 0 để chỉ vũng độc mặt đất gây sát thương).
+@export_range(0.0, 10.0, 0.1) var projectile_direct_damage_hp: float = 0.0
 @export_range(0.5, 6.0, 0.1, "suffix:m") var projectile_arc_height_meters: float = 2.4
 @export_range(0.4, 5.0, 0.05, "suffix:m") var pool_radius_meters: float = 1.05
 @export_range(0.5, 15.0, 0.1, "suffix:s") var pool_duration_seconds: float = 4.2
@@ -423,7 +425,7 @@ func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) 
 		landing_target,
 		flight_seconds,
 		projectile_arc_height_meters * arc_scale,
-		data.attack_damage,
+		projectile_direct_damage_hp,
 		config
 	)
 	proj.impacted.connect(_on_projectile_impacted)
