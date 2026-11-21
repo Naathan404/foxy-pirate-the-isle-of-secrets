@@ -211,6 +211,16 @@ func _physics_process(delta: float) -> void:
 		_detonate()
 
 
+func cancel() -> void:
+	if _detonated:
+		return
+	_detonated = true
+	if is_instance_valid(_direct_hitbox):
+		_direct_hitbox.end_attack()
+		_direct_hitbox.set_deferred("monitoring", false)
+	queue_free()
+
+
 func _build_flight_visuals() -> void:
 	_build_glob_particles()
 	_build_flight_light()
