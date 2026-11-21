@@ -18,6 +18,7 @@ const DIALOGUE_STATE_PRIORITY: int = 20
 const DIZZY_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/dizzy_swirl_overlay.gd")
 const VENOM_INK_OVERLAY_NAME := &"BlubberbeardVenomOverlay"
 const POISON_STATUS_HOLD_SECONDS: float = 1.6
+const MIN_SNARE_MOVE_SPEED_MULTIPLIER: float = 0.2
 const WHIRLWIND_HIT_STUN_SECONDS: float = 0.52
 const WHIRLWIND_DIZZY_SECONDS: float = 2.2
 const WHIRLWIND_SPIRAL_STRENGTH: float = 1.0
@@ -69,6 +70,7 @@ var pending_hit_tangent_direction: Vector3 = Vector3.ZERO
 var pending_hit_spiral_strength: float = 0.0
 var poison_remaining: float = 0.0
 var dizzy_remaining: float = 0.0
+var snare_remaining: float = 0.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
@@ -78,6 +80,7 @@ var environment_move_speed_multiplier: float = 1.0
 var environment_dash_distance_multiplier: float = 1.0
 var environment_is_water: bool = false
 var potion_selection_active: bool = false
+var _snare_move_speed_multiplier: float = 1.0
 var _environment_push_direction := Vector3.ZERO
 var _environment_push_speed := 0.0
 var _environment_push_remaining := 0.0
@@ -262,6 +265,21 @@ func apply_dizzy(duration_seconds: float) -> void:
 	dizzy_started.emit(dizzy_remaining)
 
 
+func is_snared() -> bool:
+	return not dead and snare_remaining > 0.0
+
+
+func apply_snare(duration_seconds: float, speed_multiplier: float = 0.75) -> void:
+	if dead or duration_seconds <= 0.0:
+		return
+	var clamped_multiplier := clampf(speed_multiplier, MIN_SNARE_MOVE_SPEED_MULTIPLIER, 1.0)
+	if snare_remaining <= 0.0:
+		_snare_move_speed_multiplier = clamped_multiplier
+	else:
+		_snare_move_speed_multiplier = minf(_snare_move_speed_multiplier, clamped_multiplier)
+	snare_remaining = maxf(snare_remaining, duration_seconds)
+
+
 func is_suppressing_hit_reaction() -> bool:
 	return _suppress_next_hit_reaction
 
@@ -370,6 +388,9 @@ func _physics_process(delta: float) -> void:
 	_post_hit_invulnerability_remaining = maxf(0.0, _post_hit_invulnerability_remaining - delta)
 	poison_remaining = maxf(0.0, poison_remaining - delta)
 	dizzy_remaining = maxf(0.0, dizzy_remaining - delta)
+	snare_remaining = maxf(0.0, snare_remaining - delta)
+	if snare_remaining <= 0.0:
+		_snare_move_speed_multiplier = 1.0
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	attack_buffer_remaining = maxf(0.0, attack_buffer_remaining - delta)
 	if attack_buffer_remaining <= 0.0:
@@ -755,6 +776,8 @@ func die() -> void:
 	dead = true
 	poison_remaining = 0.0
 	dizzy_remaining = 0.0
+	snare_remaining = 0.0
+	_snare_move_speed_multiplier = 1.0
 	if is_instance_valid(potion_selector):
 		potion_selector.cancel_selection()
 	if is_instance_valid(inventory_ui):
@@ -813,4 +836,6 @@ func _get_status_move_speed_multiplier() -> float:
 		mult = minf(mult, poison_move_speed_multiplier)
 	if is_dizzy():
 		mult = minf(mult, dizzy_move_speed_multiplier)
+	if is_snared():
+		mult = minf(mult, _snare_move_speed_multiplier)
 	return mult

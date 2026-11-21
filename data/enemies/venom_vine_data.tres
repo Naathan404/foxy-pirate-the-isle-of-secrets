@@ -9,6 +9,7 @@ max_hp = 10.0
 move_speed = 0.0
 acceleration = 0.0
 deceleration = 0.0
+attack_damage = 0.5
 hit_duration = 0.18
 hit_recovery_duration = 0.25
 hit_knockback_speed = 0.0

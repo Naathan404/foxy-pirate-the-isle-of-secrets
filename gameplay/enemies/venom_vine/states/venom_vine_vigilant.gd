@@ -41,5 +41,4 @@ func _update(delta: float) -> void:
 
 	_remaining_seconds = maxf(0.0, _remaining_seconds - maxf(0.0, delta))
 	if _remaining_seconds <= 0.0:
-		vine.ambushed_wake = false
-		vine._request_burrow(false)
+		vine._on_vigilant_timeout()

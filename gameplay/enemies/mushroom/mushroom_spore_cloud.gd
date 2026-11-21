@@ -36,7 +36,7 @@ const SPORE_GLOW_END_COLOR := Color(0.42, 0.22, 0.72, 0.0)
 static var _soft_mist_texture: ImageTexture
 static var _purple_spore_texture: ImageTexture
 
-var _source: Node3D
+var _source_ref: WeakRef
 var _radius: float = 2.6
 var _remaining: float = 0.0
 var _ramp_seconds: float = 0.8
@@ -125,14 +125,18 @@ func _physics_process(delta: float) -> void:
 
 
 func setup(
-	source: Node3D,
+	source: Variant,
 	radius: float,
 	duration_seconds: float,
 	ramp_seconds: float,
 	tick_interval_seconds: float,
 	tick_damage: float
 ) -> void:
-	_source = source
+	_source_ref = (
+		weakref(source)
+		if source != null and is_instance_valid(source) and source is Node3D
+		else null
+	)
 	_radius = maxf(0.4, radius)
 	_remaining = maxf(0.2, duration_seconds)
 	_ramp_seconds = maxf(0.01, ramp_seconds)
@@ -254,7 +258,8 @@ func _apply_poison_tick() -> void:
 			continue
 		hit_actors[actor_id] = true
 		var damage := DamageContext.new()
-		damage.source = _source if is_instance_valid(_source) else self
+		var live_source: Object = _source_ref.get_ref() if _source_ref != null else null
+		damage.source = (live_source as Node3D) if is_instance_valid(live_source) else self
 		damage.source_team = CombatTeams.ENEMY
 		damage.base_amount_hp = _tick_damage
 		damage.amount_hp = _tick_damage

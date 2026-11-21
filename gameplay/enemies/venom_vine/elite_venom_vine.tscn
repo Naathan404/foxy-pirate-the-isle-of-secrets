@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://brbwmwi1i7d8n"]
+
+[ext_resource type="PackedScene" uid="uid://cs3ghcsvlo13v" path="res://gameplay/enemies/venom_vine/venom_vine.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://08k2javsdfxf" path="res://gameplay/enemies/venom_vine/elite_venom_vine.gd" id="2_elite"]
+[ext_resource type="Resource" uid="uid://ms1witoovkv4" path="res://data/enemies/elite_venom_vine_data.tres" id="3_data"]
+[ext_resource type="Script" uid="uid://bab2xp7uqaax5" path="res://gameplay/enemies/venom_vine/states/elite_thorn_tendril.gd" id="4_tendril"]
+[ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="5_feedback"]
+[ext_resource type="Texture2D" uid="uid://cedq4fb0uqn8t" path="res://assets/sprites/enemies/venom_vine/venom_vine_tunnel_trail.png" id="6_pit_tex"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_elite_hurtbox"]
+height = 3.2
+radius = 1.15
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_elite_body"]
+height = 2.6
+radius = 0.92
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_elite_detector"]
+height = 3.2
+radius = 10.0
+
+[node name="EliteVenomVine" unique_id=1390705968 instance=ExtResource("1_base")]
+script = ExtResource("2_elite")
+snare_slow_ratio = 0.72
+snare_tick_damage_multiplier = 0.8
+split_pod_count_phase1 = 2
+split_pod_count_phase2 = 3
+split_pool_radius_meters = 0.85
+split_distance_meters = 2.0
+split_tick_damage_multiplier = 0.6
+split_cooldown_seconds = 2.8
+tendril_unlock_hp_ratio = 0.5
+tendril_segment_count = 9
+tendril_start_distance_meters = 1.35
+tendril_segment_spacing_meters = 1.25
+tendril_segment_interval_seconds = 0.14
+tendril_windup_seconds = 0.72
+tendril_segment_telegraph_seconds = 0.62
+tendril_segment_active_seconds = 0.78
+tendril_segment_retract_seconds = 0.42
+tendril_visual_radius_meters = 0.96
+tendril_hitbox_radius_meters = 0.68
+tendril_damage_multiplier = 1.6
+tendril_knockback_multiplier = 0.75
+tendril_cooldown_seconds = 6.5
+tendril_recovery_seconds = 0.48
+tendril_post_attack_delay_seconds = 1.1
+tendril_spawn_end_pool = true
+tendril_end_pool_radius_meters = 0.95
+relocate_min_distance_meters = 5.4
+relocate_max_distance_meters = 10.6
+relocate_anchor_radius_meters = 13.5
+relocate_evade_distance_meters = 2.65
+relocate_phase_hp_ratio = 0.5
+relocate_telegraph_seconds = 2.65
+outer_detection_radius_meters = 10.0
+max_shot_distance_meters = 9.2
+projectile_direct_damage_hp = 0.0
+pool_radius_meters = 1.15
+pool_tick_interval_seconds = 0.95
+max_active_pools = 8
+burrow_duration_seconds = 1.25
+burrow_cooldown_seconds = 4.5
+burrow_transition_seconds = 0.95
+post_emerge_attack_delay_seconds = 1.05
+melee_combo_window_seconds = 2.0
+counter_hit_window_seconds = 3.0
+idle_min_duration_seconds = 0.65
+idle_decision_interval_seconds = 1.0
+data = ExtResource("3_data")
+initial_state_name = &"Dormant"
+
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+transform = Transform3D(1.38, 0, 0, 0, 1.38, 0, 0, 0, 1.38, 0, 0, 0.14)
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+shape = SubResource("CylinderShape3D_elite_hurtbox")
+
+[node name="BulletSpawn" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=1962054639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.85, 0.55)
+
+[node name="ThornTendril" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="9" unique_id=1915860499]
+script = ExtResource("4_tendril")
+
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_elite_body")
+
+[node name="DebugHealthLabel" parent="." index="6" unique_id=2012842134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.95, 0)
+
+[node name="CollisionShape3D" parent="TargetDetector" parent_id_path=PackedInt32Array(721249310) index="0" unique_id=955359008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+shape = SubResource("CylinderShape3D_elite_detector")
+
+[node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=1549740925]
+script = ExtResource("5_feedback")
+show_ground_telegraph_ring = false
+telegraph_ring_radius = 1.45
+
+[node name="BurrowPit" type="Sprite3D" parent="." index="9" unique_id=354466762]
+transform = Transform3D(1.2, 0, 0, 0, 0, 1.2, 0, -1.2, 0, 0, 0.035, -0.5)
+sorting_offset = -1.5
+cast_shadow = 0
+pixel_size = 0.0092
+texture_filter = 5
+texture = ExtResource("6_pit_tex")
+hframes = 4

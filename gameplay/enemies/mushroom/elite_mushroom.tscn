@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://4sr4tplh3r8f" path="res://gameplay/enemies/mushroom/states/elite_mushroom_spore_stream.gd" id="5_stream"]
 [ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="6_feedback"]
 [ext_resource type="Script" uid="uid://ssh2qg3aeelh" path="res://gameplay/enemies/mushroom/states/elite_mushroom_great_spore.gd" id="7_great_spore"]
-[ext_resource type="AnimationLibrary" path="res://gameplay/enemies/mushroom/elite_mushroom_anims.tres" id="8_anims"]
+[ext_resource type="AnimationLibrary" uid="uid://c7ar5f5sa8cm" path="res://gameplay/enemies/mushroom/elite_mushroom_anims.tres" id="8_anims"]
 
 [sub_resource type="CapsuleShape3D" id="HurtShape"]
 radius = 0.85
@@ -56,7 +56,7 @@ great_spore_release_seconds = 0.65
 great_spore_recovery_seconds = 0.45
 great_spore_count_per_cast = 5
 great_spore_eggs_per_cast = 3
-great_spore_max_active_minions = 6
+great_spore_max_active_minions = 5
 great_spore_hover_min_seconds = 2.8
 great_spore_hover_max_seconds = 4.2
 great_spore_hover_altitude_meters = 5.6
@@ -114,4 +114,5 @@ shape = SubResource("DetectorShape")
 
 [node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=822256328]
 script = ExtResource("6_feedback")
+show_ground_telegraph_ring = false
 telegraph_ring_radius = 1.55

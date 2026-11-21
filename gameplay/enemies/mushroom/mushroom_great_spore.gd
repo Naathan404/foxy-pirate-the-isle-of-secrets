@@ -29,9 +29,9 @@ const SPARK_PARTICLE_COUNT := 28
 const TRAIL_BLINK_PARTICLE_COUNT := 190
 const TRAIL_MIST_PARTICLE_COUNT := 36
 const CLOUD_SPAWN_RAMP_CAP_SECONDS := 0.24
-const IMPACT_RING_DURATION_SECONDS := 0.55
 
-var _owner_elite: MushroomEnemy
+var _owner_ref: WeakRef
+var _fallback_parent_ref: WeakRef
 var _outcome: OutcomeKind = OutcomeKind.SPORE_CLOUD
 var _phase: FlightPhase = FlightPhase.LAUNCH
 var _start_position: Vector3 = Vector3.ZERO
@@ -62,7 +62,15 @@ var _emitters: Array[GPUParticles3D] = []
 
 
 func setup(config: Dictionary) -> void:
-	_owner_elite = config.get("owner", null) as MushroomEnemy
+	var owner_raw: Variant = config.get("owner", null)
+	_owner_ref = (
+		weakref(owner_raw)
+		if owner_raw != null and is_instance_valid(owner_raw) and owner_raw is MushroomEnemy
+		else null
+	)
+	var live_owner := _resolve_owner_elite()
+	if live_owner != null and is_instance_valid(live_owner.get_parent()):
+		_fallback_parent_ref = weakref(live_owner.get_parent())
 	_outcome = int(config.get("outcome", OutcomeKind.SPORE_CLOUD)) as OutcomeKind
 	_start_position = config.get("start_pos", Vector3.ZERO) as Vector3
 	_landing_position = config.get("landing_pos", _start_position) as Vector3
@@ -131,8 +139,9 @@ func get_flight_phase() -> FlightPhase:
 
 
 func _step_delay() -> void:
-	if is_instance_valid(_owner_elite):
-		global_position = _owner_elite.global_position + Vector3.UP * 1.65
+	var live_owner := _resolve_owner_elite()
+	if live_owner != null:
+		global_position = live_owner.global_position + Vector3.UP * 1.65
 	if _elapsed >= _launch_delay_seconds:
 		_start_position = global_position
 		var mid_lerp := _start_position.lerp(_landing_position, LAUNCH_REACH_FRACTION)
@@ -232,7 +241,7 @@ func _resolve_landing() -> void:
 	_finished = true
 	if is_in_group(GREAT_SPORE_GROUP):
 		remove_from_group(GREAT_SPORE_GROUP)
-	var parent := get_parent()
+	var parent := _resolve_spawn_parent()
 	var spawned: Node = null
 	if is_instance_valid(parent) and not parent.is_queued_for_deletion():
 		var actual_outcome := _resolve_actual_outcome()
@@ -256,11 +265,62 @@ func _resolve_landing() -> void:
 		_shadow_mesh.visible = false
 
 
+func _resolve_owner_elite() -> MushroomEnemy:
+	if _owner_ref == null:
+		return null
+	var obj: Variant = _owner_ref.get_ref()
+	if obj == null or not is_instance_valid(obj):
+		return null
+	var mushroom := obj as MushroomEnemy
+	if mushroom == null or mushroom.is_queued_for_deletion():
+		return null
+	return mushroom
+
+
+func _resolve_spawn_parent() -> Node:
+	var direct_parent := get_parent()
+	var live_owner := _resolve_owner_elite()
+	if (
+		is_instance_valid(direct_parent)
+		and not direct_parent.is_queued_for_deletion()
+		and direct_parent.is_inside_tree()
+		and direct_parent != live_owner
+	):
+		return direct_parent
+	if _fallback_parent_ref != null:
+		var cached: Variant = _fallback_parent_ref.get_ref()
+		if (
+			cached is Node
+			and is_instance_valid(cached)
+			and not (cached as Node).is_queued_for_deletion()
+			and (cached as Node).is_inside_tree()
+		):
+			return cached as Node
+	if not is_inside_tree() or get_tree() == null:
+		return null
+	var current_scene := get_tree().current_scene
+	if (
+		is_instance_valid(current_scene)
+		and not current_scene.is_queued_for_deletion()
+		and current_scene.is_inside_tree()
+	):
+		return current_scene
+	var root_node := get_tree().root
+	if is_instance_valid(root_node) and not root_node.is_queued_for_deletion():
+		return root_node
+	return null
+
+
 func _resolve_actual_outcome() -> OutcomeKind:
 	if _outcome != OutcomeKind.MUSHROOM_EGG:
 		return OutcomeKind.SPORE_CLOUD
-	if is_instance_valid(_owner_elite) and _owner_elite.has_method("can_spawn_more_minions"):
-		if not bool(_owner_elite.call("can_spawn_more_minions")):
+	var live_owner := _resolve_owner_elite()
+	if (
+		live_owner != null
+		and not live_owner.dead
+		and live_owner.has_method("can_spawn_more_minions")
+	):
+		if not bool(live_owner.call("can_spawn_more_minions")):
 			return OutcomeKind.SPORE_CLOUD
 	return OutcomeKind.MUSHROOM_EGG
 
@@ -269,13 +329,21 @@ func _spawn_egg(parent: Node) -> MushroomEgg:
 	var egg := EGG_SCENE.instantiate() as MushroomEgg
 	if egg == null:
 		return null
-	egg.setup_spawned(_owner_elite, _egg_hatch_seconds)
-	if is_instance_valid(_owner_elite):
-		egg.show_debug_health = _owner_elite.show_debug_health
+	var live_owner := _resolve_owner_elite()
+	egg.setup_spawned(live_owner, _egg_hatch_seconds)
+	if live_owner != null:
+		egg.show_debug_health = live_owner.show_debug_health
+	egg.position = (
+		(parent as Node3D).to_local(_landing_position) if parent is Node3D else _landing_position
+	)
 	parent.add_child(egg)
 	egg.global_position = _landing_position
-	if is_instance_valid(_owner_elite) and _owner_elite.has_method("register_spawned_minion"):
-		_owner_elite.call("register_spawned_minion", egg)
+	if (
+		live_owner != null
+		and not live_owner.dead
+		and live_owner.has_method("register_spawned_minion")
+	):
+		live_owner.call("register_spawned_minion", egg)
 	return egg
 
 
@@ -287,18 +355,17 @@ func _spawn_poison_cloud(parent: Node) -> MushroomSporeCloud:
 	# on the ground alongside the 5.5s MushroomEgg incubation window.
 	var quick_ramp := minf(_cloud_ramp, CLOUD_SPAWN_RAMP_CAP_SECONDS)
 	var cloud_life := maxf(_cloud_duration, 5.2)
-	cloud.setup(
-		_owner_elite, _cloud_radius, cloud_life, quick_ramp, _poison_interval, _poison_damage
-	)
-	if is_instance_valid(_owner_elite):
+	var live_owner := _resolve_owner_elite()
+	cloud.setup(live_owner, _cloud_radius, cloud_life, quick_ramp, _poison_interval, _poison_damage)
+	if live_owner != null:
 		cloud.configure_visuals(
-			_owner_elite.spore_particle_count,
-			_owner_elite.mist_particle_count,
-			_owner_elite.spore_particle_lifetime,
-			_owner_elite.mist_particle_lifetime,
-			maxf(_owner_elite.ground_mist_opacity, 0.36),
-			_owner_elite.ground_mist_scale,
-			_owner_elite.visual_spread_scale
+			live_owner.spore_particle_count,
+			live_owner.mist_particle_count,
+			live_owner.spore_particle_lifetime,
+			live_owner.mist_particle_lifetime,
+			maxf(live_owner.ground_mist_opacity, 0.36),
+			live_owner.ground_mist_scale,
+			live_owner.visual_spread_scale
 		)
 	if parent is Node3D:
 		cloud.position = (parent as Node3D).to_local(_landing_position)
@@ -624,51 +691,3 @@ func _spawn_landing_burst(parent: Node, is_egg: bool) -> void:
 	var cleanup := burst.create_tween()
 	cleanup.tween_interval(0.95)
 	cleanup.tween_callback(burst.queue_free)
-	if not is_egg:
-		_spawn_cloud_touchdown_ring(parent)
-
-
-func _spawn_cloud_touchdown_ring(parent: Node) -> void:
-	# Expanding ground ring & flash so non-egg spore landings telegraph clearly on terrain.
-	var ring_mesh := TorusMesh.new()
-	ring_mesh.inner_radius = 0.82
-	ring_mesh.outer_radius = 1.0
-	ring_mesh.rings = 24
-	ring_mesh.ring_segments = 12
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(0.84, 0.44, 1.0, 0.9)
-	ring_mesh.material = mat
-
-	var ring := MeshInstance3D.new()
-	ring.name = "GreatSporeImpactRing"
-	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	ring.mesh = ring_mesh
-	parent.add_child(ring)
-	ring.global_position = _landing_position + Vector3.UP * 0.06
-	ring.scale = Vector3(0.35, 0.12, 0.35)
-
-	var flash := OmniLight3D.new()
-	flash.name = "GreatSporeImpactFlash"
-	flash.light_color = Color(0.84, 0.42, 1.0)
-	flash.light_energy = 2.4
-	flash.omni_range = _cloud_radius * 1.65
-	flash.shadow_enabled = false
-	ring.add_child(flash)
-
-	var target_rad := maxf(1.2, _cloud_radius * 1.12)
-	var tween := ring.create_tween()
-	tween.set_parallel(true)
-	(
-		tween
-		. tween_property(
-			ring, "scale", Vector3(target_rad, 0.12, target_rad), IMPACT_RING_DURATION_SECONDS
-		)
-		. set_trans(Tween.TRANS_QUAD)
-		. set_ease(Tween.EASE_OUT)
-	)
-	tween.tween_property(mat, "albedo_color:a", 0.0, IMPACT_RING_DURATION_SECONDS)
-	tween.tween_property(flash, "light_energy", 0.0, IMPACT_RING_DURATION_SECONDS * 0.85)
-	tween.chain().tween_callback(ring.queue_free)
