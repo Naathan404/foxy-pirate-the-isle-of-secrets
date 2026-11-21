@@ -1,18 +1,36 @@
 @tool
 class_name FlatTideZone
 extends MeshInstance3D
+## One area of a flat tide. The waterline (`_shore_x`) is the single source of truth: gameplay
+## checks it on the CPU and the shader places the water's ground contact on the same line.
+## The water is a single sheet hugging the ground, with a travelling crest while it rises.
 
 enum FlowDirection { NEGATIVE_X, POSITIVE_X, NEGATIVE_Z, POSITIVE_Z }
 
 const DEFAULT_MATERIAL := preload("res://world/gimmick/flat_tide/flat_tide_volume_material.tres")
-const VOLUME_MESH := preload("res://world/gimmick/flat_tide/flat_tide_volume_mesh.gd")
+const SURFACE_MESH := preload("res://world/gimmick/flat_tide/flat_tide_surface_mesh.gd")
 const DEBUG_MESH := preload("res://world/gimmick/flat_tide/flat_tide_debug_mesh.gd")
 const MIN_SIZE := 0.1
 const MIN_DEPTH := 0.02
 const MIN_SEGMENTS := 2
 const MIN_COVERAGE_SPAN := 0.001
 const MIN_WAVE_LENGTH := 0.1
+const MIN_LENGTH := 0.001
 const DEBUG_HEIGHT_OFFSET := 0.03
+## Matches GROUND_LIFT in the shader: dry rows sit just above the ground.
+const GROUND_LIFT := 0.02
+## Coverage ramps that fade the travelling crest in after the wave starts and out near full.
+const SURGE_IN_END := 0.06
+const SURGE_OUT_START := 0.85
+## Coverage after which the shoreline settles inside the zone (see `_shore_x`).
+const SETTLE_START := 0.85
+## Margin added around the sheet bounds so culling never clips animated vertices.
+const CULL_MARGIN := 1.0
+## Largest spacing between sheet columns across the flow, so the crest height follows the
+## per-pixel waterline closely even on maps that set few `surface_segments_z`.
+const MAX_ACROSS_SPACING := 0.5
+## Sampling step of the debug shoreline drawn with `debug_in_game`.
+const DEBUG_SHORE_STEP := 0.25
 
 @export_group("Area")
 ## Hướng nước tiến vào, theo trục cục bộ của vùng.
@@ -31,31 +49,36 @@ const DEBUG_HEIGHT_OFFSET := 0.03
 	set(value):
 		start_coverage = value
 		_update_editor_preview()
+		update_configuration_warnings()
 ## Mức triều chung mà vùng ngập hết phạm vi; đặt lớn hơn Start Coverage.
 @export_range(0.0, 1.0, 0.01) var full_coverage: float = 1.0:
 	set(value):
 		full_coverage = value
 		_update_editor_preview()
+		update_configuration_warnings()
 ## Chênh lệch độ cao cho phép với đáy vùng nước khi xác định một điểm có bị ngập.
 @export_range(0.0, 2.0, 0.01) var floor_tolerance: float = 0.6
 
 @export_group("Water volume")
-## Độ dày khối nước từ đáy đến mặt nước; tăng lên sẽ làm các mặt bên cao hơn.
+## Trần chiều cao hiển thị của nước tính từ nền. Rest Height và Crest Height bị giới hạn bởi
+## giá trị này; các map cũ đặt 2-2.75 m vẫn dùng được mà không cần sửa.
 @export_range(0.02, 3.0, 0.01, "suffix:m") var volume_depth: float = 2.75:
 	set(value):
 		volume_depth = maxf(value, MIN_DEPTH)
 		_request_rebuild()
-## Số đoạn chia mesh theo X; tăng để mặt sóng mịn hơn nhưng tốn thêm xử lý.
+		update_configuration_warnings()
+## Số hàng của tấm nước theo hướng dòng chảy; hàng dồn về phía mép nước để đỉnh sóng mịn.
 @export_range(2, 80, 1) var surface_segments_x: int = 24:
 	set(value):
 		surface_segments_x = maxi(value, MIN_SEGMENTS)
 		_request_rebuild()
-## Số đoạn chia mesh theo Z; tăng để mép sóng cong mượt hơn nhưng tốn thêm xử lý.
+## Số đoạn chia ngang dòng chảy (tối thiểu mỗi 0,5 m một đoạn). Mép nước luôn được cắt mượt theo
+## từng pixel; giá trị này chỉ ảnh hưởng độ mịn của đỉnh sóng.
 @export_range(2, 80, 1) var surface_segments_z: int = 24:
 	set(value):
 		surface_segments_z = maxi(value, MIN_SEGMENTS)
 		_request_rebuild()
-## Material chỉnh màu, độ đục, bọt và vân sáng; tạo bản sao nếu muốn vùng có màu riêng.
+## Material chỉnh màu, độ đục, bọt và vân nước; tạo bản sao nếu muốn vùng có màu riêng.
 @export var water_material: ShaderMaterial = DEFAULT_MATERIAL:
 	set(value):
 		water_material = value
@@ -66,15 +89,34 @@ const DEBUG_HEIGHT_OFFSET := 0.03
 		water_render_priority = value
 		_request_rebuild()
 
+@export_group("Tide shape")
+## Độ cao mặt nước nông phía sau mép sóng khi triều đã phủ.
+@export_range(0.02, 1.0, 0.01, "suffix:m") var rest_height: float = 0.16
+## Độ cao đỉnh sóng di chuyển cùng mép nước khi đang dâng; 0 để tắt đỉnh sóng.
+@export_range(0.0, 2.0, 0.01, "suffix:m") var crest_height: float = 0.55:
+	set(value):
+		crest_height = value
+		update_configuration_warnings()
+## Khoảng từ mép nước chạm đất đến đỉnh sóng; nhỏ hơn làm mặt sóng dốc hơn.
+@export_range(0.1, 4.0, 0.05, "suffix:m") var crest_rise_length: float = 0.9
+## Độ dài phần sóng hạ dần phía sau đỉnh về mực nước nông.
+@export_range(0.1, 10.0, 0.1, "suffix:m") var crest_tail_length: float = 3.2
+## Khoảng nước từ mép (chạm đất) dâng lên tới Rest Height.
+@export_range(0.05, 5.0, 0.05, "suffix:m") var rest_ramp_length: float = 1.2
+## Độ dài làm mờ ở phía biển; nước như đến từ ngoài khung thay vì bắt đầu ở cạnh thẳng.
+@export_range(0.0, 10.0, 0.1, "suffix:m") var source_fade_length: float = 2.5
+## Độ dài làm mờ và hạ thấp ở hai cạnh bên vùng, để không thấy thành hộp.
+@export_range(0.0, 10.0, 0.1, "suffix:m") var side_fade_length: float = 1.5
+
 @export_group("Waves")
 ## Biên độ lớp sóng chính làm mép nước tiến lùi theo phương ngang.
-@export_range(0.0, 2.0, 0.01, "suffix:m") var shore_wave_amplitude: float = 0.3
+@export_range(0.0, 2.0, 0.01, "suffix:m") var shore_wave_amplitude: float = 0.55
 ## Bước sóng của lớp sóng chính dọc theo mép nước; lớn hơn tạo các đường cong rộng hơn.
 @export_range(0.1, 30.0, 0.1, "suffix:m") var shore_wave_length: float = 5.0
 ## Tốc độ chuyển động của lớp sóng chính ở mép nước.
 @export_range(0.0, 5.0, 0.05) var shore_wave_speed: float = 1.1
 ## Biên độ lớp sóng phụ thêm chi tiết cho mép nước.
-@export_range(0.0, 1.0, 0.01, "suffix:m") var shore_detail_amplitude: float = 0.08
+@export_range(0.0, 1.0, 0.01, "suffix:m") var shore_detail_amplitude: float = 0.18
 ## Bước sóng của lớp chi tiết ở mép nước; nhỏ hơn tạo nhiều gợn hơn.
 @export_range(0.1, 30.0, 0.1, "suffix:m") var shore_detail_length: float = 2.4
 ## Tốc độ chuyển động của lớp chi tiết ở mép nước.
@@ -91,8 +133,6 @@ const DEBUG_HEIGHT_OFFSET := 0.03
 @export_range(0.1, 30.0, 0.1, "suffix:m") var surface_detail_length: float = 2.5
 ## Tốc độ chuyển động của lớp chi tiết trên mặt nước.
 @export_range(0.0, 5.0, 0.05) var surface_detail_speed: float = 0.8
-## Chiều rộng vệt cảnh báo ở mép biển trước khi nước dâng; không làm vùng đó bị ngập.
-@export_range(0.0, 4.0, 0.05, "suffix:m") var warning_width: float = 1.0
 
 @export_group("Debug area")
 ## Hiện khung toàn bộ phạm vi có thể ngập trong editor; tắt để ẩn mọi đường debug.
@@ -117,7 +157,7 @@ const DEBUG_HEIGHT_OFFSET := 0.03
 		_request_rebuild()
 
 @export_group("Editor preview")
-## Hiện trực tiếp khối nước trong viewport khi chỉnh scene; không ảnh hưởng lúc chơi.
+## Hiện trực tiếp mặt nước trong viewport khi chỉnh scene; không ảnh hưởng lúc chơi.
 @export var show_editor_preview: bool = true:
 	set(value):
 		show_editor_preview = value
@@ -135,6 +175,7 @@ var _fill: float = 0.0
 var _visual_time: float = 0.0
 var _rising: bool = false
 var _falling: bool = false
+var _surge: float = 0.0
 var _debug_mesh: MeshInstance3D
 var _preview_mesh: MeshInstance3D
 
@@ -153,6 +194,17 @@ func _process(_delta: float) -> void:
 			_update_editor_preview()
 		return
 	set_process(false)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if full_coverage <= start_coverage:
+		warnings.append("Full Coverage phải lớn hơn Start Coverage, nếu không vùng ngập tức thì.")
+	if crest_height > volume_depth:
+		warnings.append(
+			"Crest Height lớn hơn Volume Depth; đỉnh sóng sẽ bị giới hạn ở Volume Depth."
+		)
+	return warnings
 
 
 func _ensure_debug() -> void:
@@ -205,39 +257,31 @@ func _rebuild() -> void:
 		return
 	_material = water_material.duplicate() as ShaderMaterial
 	_material.render_priority = water_render_priority
-	var volume := VOLUME_MESH.build(
-		_flow_size(), volume_depth, surface_segments_x, surface_segments_z
-	)
+	var sheet := SURFACE_MESH.build(_flow_size().y, surface_segments_x, _across_segments())
+	# Sheet rows are placed by the shader, so the bounds cover the whole zone.
 	var bounds := AABB(
-		Vector3(-size.x * 0.5, 0.0, -size.y * 0.5), Vector3(size.x, volume_depth, size.y)
+		Vector3(-size.x * 0.5, 0.0, -size.y * 0.5), Vector3(size.x, _max_visual_height(), size.y)
 	)
+	var target := _preview_mesh if editor_preview else self as MeshInstance3D
+	target.mesh = sheet
+	target.custom_aabb = bounds
+	target.material_override = _material
+	target.extra_cull_margin = CULL_MARGIN
+	target.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if editor_preview:
-		_preview_mesh.mesh = volume
-		_preview_mesh.custom_aabb = bounds
-		_preview_mesh.material_override = _material
-		_preview_mesh.extra_cull_margin = 2.0 + surface_wave_height + surface_detail_height
 		_update_editor_preview()
 		return
-	mesh = volume
-	custom_aabb = bounds
-	material_override = _material
-	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	extra_cull_margin = 2.0 + surface_wave_height + surface_detail_height
-	_sync_material(false)
+	_sync_material()
 
 
 func _update_editor_preview() -> void:
 	if Engine.is_editor_hint() and is_node_ready() and show_editor_preview and _material != null:
-		set_coverage(editor_preview_coverage, false, _visual_time)
+		set_coverage(editor_preview_coverage, _visual_time)
 
 
+## The rising warning is a screen overlay owned by FlatTideController, not part of the water.
 func set_coverage(
-	coverage: float,
-	warning: bool,
-	animation_time: float = 0.0,
-	warning_strength: float = 1.0,
-	rising: bool = false,
-	falling: bool = false
+	coverage: float, animation_time: float = 0.0, rising: bool = false, falling: bool = false
 ) -> void:
 	_fill = clampf(
 		(coverage - start_coverage) / maxf(MIN_COVERAGE_SPAN, full_coverage - start_coverage),
@@ -247,42 +291,65 @@ func set_coverage(
 	_visual_time = animation_time
 	_rising = rising
 	_falling = falling
-	_sync_material(warning, warning_strength)
+	_surge = 0.0
+	if _rising:
+		_surge = (
+			smoothstep(0.0, SURGE_IN_END, _fill) * (1.0 - smoothstep(SURGE_OUT_START, 1.0, _fill))
+		)
+	_sync_material()
 	if debug_in_game and show_debug_area and not Engine.is_editor_hint():
 		_rebuild_debug()
 
 
-func _sync_material(warning: bool, warning_strength: float = 1.0) -> void:
+func _sync_material() -> void:
 	if _material == null:
 		return
-	_material.set_shader_parameter("zone_size", _flow_size())
-	_material.set_shader_parameter("flow_direction", flow_direction)
-	_material.set_shader_parameter("fill", _fill)
-	_material.set_shader_parameter(
-		"warning", clampf(warning_strength, 0.0, 1.0) if warning else 0.0
-	)
-	_material.set_shader_parameter("warning_width", warning_width)
-	_material.set_shader_parameter("tide_time", _visual_time)
-	_material.set_shader_parameter("tide_rising", 1.0 if _rising else 0.0)
-	_material.set_shader_parameter("tide_falling", 1.0 if _falling else 0.0)
-	_material.set_shader_parameter("shore_wave_amplitude", shore_wave_amplitude)
-	_material.set_shader_parameter("shore_wave_length", maxf(MIN_WAVE_LENGTH, shore_wave_length))
-	_material.set_shader_parameter("shore_wave_speed", shore_wave_speed)
-	_material.set_shader_parameter("shore_detail_amplitude", shore_detail_amplitude)
-	_material.set_shader_parameter(
-		"shore_detail_length", maxf(MIN_WAVE_LENGTH, shore_detail_length)
-	)
-	_material.set_shader_parameter("shore_detail_speed", shore_detail_speed)
-	_material.set_shader_parameter("surface_wave_height", surface_wave_height)
-	_material.set_shader_parameter(
-		"surface_wave_length", maxf(MIN_WAVE_LENGTH, surface_wave_length)
-	)
-	_material.set_shader_parameter("surface_wave_speed", surface_wave_speed)
-	_material.set_shader_parameter("surface_detail_height", surface_detail_height)
-	_material.set_shader_parameter(
-		"surface_detail_length", maxf(MIN_WAVE_LENGTH, surface_detail_length)
-	)
-	_material.set_shader_parameter("surface_detail_speed", surface_detail_speed)
+	var flow_size := _flow_size()
+	var heights := _visual_heights()
+	var values := {
+		"zone_size": flow_size,
+		"flow_direction": flow_direction,
+		"fill": _fill,
+		"tide_time": _visual_time,
+		"tide_rising": 1.0 if _rising else 0.0,
+		"tide_falling": 1.0 if _falling else 0.0,
+		"surge": _surge,
+		"rest_height": heights.x,
+		"crest_height": heights.y,
+		"crest_rise_length": crest_rise_length,
+		"crest_tail_length": crest_tail_length,
+		"rest_ramp_length": rest_ramp_length,
+		"side_fade_length": side_fade_length,
+		"source_fade_length": source_fade_length,
+		"shore_wave_amplitude": shore_wave_amplitude,
+		"shore_wave_length": maxf(MIN_WAVE_LENGTH, shore_wave_length),
+		"shore_wave_speed": shore_wave_speed,
+		"shore_detail_amplitude": shore_detail_amplitude,
+		"shore_detail_length": maxf(MIN_WAVE_LENGTH, shore_detail_length),
+		"shore_detail_speed": shore_detail_speed,
+		"surface_wave_height": surface_wave_height,
+		"surface_wave_length": maxf(MIN_WAVE_LENGTH, surface_wave_length),
+		"surface_wave_speed": surface_wave_speed,
+		"surface_detail_height": surface_detail_height,
+		"surface_detail_length": maxf(MIN_WAVE_LENGTH, surface_detail_length),
+		"surface_detail_speed": surface_detail_speed,
+	}
+	for key: String in values:
+		_material.set_shader_parameter(key, values[key])
+
+
+func _across_segments() -> int:
+	return maxi(surface_segments_z, ceili(_flow_size().y / MAX_ACROSS_SPACING))
+
+
+## x = rest height, y = crest height, both capped by the legacy Volume Depth.
+func _visual_heights() -> Vector2:
+	return Vector2(minf(rest_height, volume_depth), minf(crest_height, volume_depth))
+
+
+func _max_visual_height() -> float:
+	var heights := _visual_heights()
+	return heights.x + heights.y + surface_wave_height + surface_detail_height
 
 
 func contains_flooded_point(point: Vector3) -> bool:
@@ -297,64 +364,46 @@ func contains_flooded_point(point: Vector3) -> bool:
 	return local.x >= _shore_x(local.z)
 
 
-## Ground-level leading edge of the advancing visual wave, including its sloping foot.
+## True while the tide is rising and this point is already behind the advancing waterline.
+## The visible contact line is drawn exactly on `_shore_x`, so the push matches the visual.
 func is_point_in_advancing_wave(point: Vector3) -> bool:
-	if not _rising or _fill <= 0.0:
-		return false
-	var local := _to_flow(to_local(point))
-	var flow_size := _flow_size()
-	if absf(local.y) > floor_tolerance or absf(local.z) > flow_size.y * 0.5:
-		return false
-	if local.x < -flow_size.x * 0.5 - 2.0 or local.x > flow_size.x * 0.5:
-		return false
-	var segment := (local.z / flow_size.y + 0.5) * surface_segments_z
-	var first := clampi(floori(segment), 0, surface_segments_z - 1)
-	var z0 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first) / surface_segments_z)
-	var z1 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first + 1) / surface_segments_z)
-	var front := lerpf(
-		_wave_foot_at_vertex(z0), _wave_foot_at_vertex(z1), clampf(segment - first, 0.0, 1.0)
+	return _rising and contains_flooded_point(point)
+
+
+## Horizontal distance from a world point to this zone's full floodable area; 0 when inside.
+func get_distance_to_area(point: Vector3) -> float:
+	var local := to_local(point)
+	var outside := Vector2(
+		maxf(0.0, absf(local.x) - size.x * 0.5), maxf(0.0, absf(local.z) - size.y * 0.5)
 	)
-	return local.x >= front
+	return outside.length()
 
 
-func _wave_foot_at_vertex(z: float) -> float:
-	var flow_size := _flow_size()
-	var front := _shore_at_vertex(z)
-	var width := maxf(0.0, flow_size.x * 0.5 - front)
-	var motion := smoothstep(0.0, 0.08, _fill) * (1.0 - smoothstep(0.88, 1.0, _fill))
-	var slope := 4.2
-	var resting := 0.55
-	if _material:
-		var slope_override: Variant = _material.get_shader_parameter("shore_slope")
-		var resting_override: Variant = _material.get_shader_parameter("resting_slope")
-		if slope_override != null:
-			slope = float(slope_override)
-		if resting_override != null:
-			resting = float(resting_override)
-	var surge := minf(lerpf(resting, slope, motion), width * 0.9)
-	return maxf(-flow_size.x * 0.5 - resting * (1.0 - motion), front - surge)
+## Travelling crest strength in [0, 1]; 0 while the water is calm or receding.
+func get_surge_strength() -> float:
+	return _surge
 
 
+## Waterline in canonical flow space. The shader cuts the visible edge per pixel on this exact
+## curve, so gameplay and the drawn contact line match everywhere along the shore.
 func _shore_x(local_z: float) -> float:
-	# Match the straight segments joining the shader-displaced mesh vertices.
-	var flow_size := _flow_size()
-	var segment := (local_z / flow_size.y + 0.5) * surface_segments_z
-	var first := clampi(floori(segment), 0, surface_segments_z - 1)
-	var z0 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first) / surface_segments_z)
-	var z1 := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(first + 1) / surface_segments_z)
-	return lerpf(_shore_at_vertex(z0), _shore_at_vertex(z1), clampf(segment - first, 0.0, 1.0))
-
-
-func _shore_at_vertex(local_z: float) -> float:
 	var flow_size := _flow_size()
 	var half_width := flow_size.x * 0.5
-	var wave := shore_wave_amplitude * sin(PI * _fill)
-	wave *= sin(
-		TAU * local_z / maxf(MIN_WAVE_LENGTH, shore_wave_length) + _visual_time * shore_wave_speed
+	# Near full coverage the line pulls inside the zone by the wave reach so it stays wavy
+	# instead of flattening against the zone edge. Mirrored by shore_position() in the shader.
+	var settle := smoothstep(SETTLE_START, 1.0, _fill)
+	var envelope := maxf(sin(PI * _fill), settle)
+	var wave := (
+		shore_wave_amplitude
+		* sin(
+			(
+				TAU * local_z / maxf(MIN_WAVE_LENGTH, shore_wave_length)
+				+ _visual_time * shore_wave_speed
+			)
+		)
 	)
 	wave += (
 		shore_detail_amplitude
-		* sin(PI * _fill)
 		* sin(
 			(
 				TAU * local_z / maxf(MIN_WAVE_LENGTH, shore_detail_length)
@@ -362,25 +411,51 @@ func _shore_at_vertex(local_z: float) -> float:
 			)
 		)
 	)
-	return clampf(half_width - flow_size.x * _fill + wave, -half_width, half_width)
+	var line := half_width - flow_size.x * _fill + _shore_reach() * settle + envelope * wave
+	return clampf(line, -half_width, half_width)
 
 
-## Height of the animated water surface at this horizontal world position.
-func get_surface_height_at(point: Vector3) -> float:
-	var local := _to_flow(to_local(point))
+func _shore_reach() -> float:
+	return absf(shore_wave_amplitude) + absf(shore_detail_amplitude)
+
+
+## Height above the zone floor of the visible water at a canonical point; mirrors the shader.
+func _sheet_height(x: float, z: float) -> float:
+	if _fill <= 0.0:
+		return GROUND_LIFT
+	var d := x - _shore_x(z)
+	if d <= 0.0:
+		return GROUND_LIFT
+	var heights := _visual_heights()
+	var body := smoothstep(0.0, maxf(rest_ramp_length, MIN_LENGTH), d)
+	var rise := smoothstep(0.0, maxf(crest_rise_length, MIN_LENGTH), d)
+	var tail := (
+		1.0
+		- smoothstep(crest_rise_length, crest_rise_length + maxf(crest_tail_length, MIN_LENGTH), d)
+	)
+	var height := heights.x * body + heights.y * _surge * rise * tail
 	var wave := sin(
 		(
-			TAU * (local.x + local.z) / maxf(MIN_WAVE_LENGTH, surface_wave_length)
+			TAU * (x + z) / maxf(MIN_WAVE_LENGTH, surface_wave_length)
 			+ _visual_time * surface_wave_speed
 		)
 	)
 	var detail := sin(
 		(
-			TAU * (local.x - local.z) / maxf(MIN_WAVE_LENGTH, surface_detail_length)
+			TAU * (x - z) / maxf(MIN_WAVE_LENGTH, surface_detail_length)
 			- _visual_time * surface_detail_speed
 		)
 	)
-	local.y = volume_depth + surface_wave_height * wave + surface_detail_height * detail
+	height += (surface_wave_height * wave + surface_detail_height * detail) * body
+	var side_distance := _flow_size().y * 0.5 - absf(z)
+	height *= smoothstep(0.0, maxf(side_fade_length, MIN_LENGTH), side_distance)
+	return maxf(GROUND_LIFT, height)
+
+
+## Height of the animated water surface at this horizontal world position.
+func get_surface_height_at(point: Vector3) -> float:
+	var local := _to_flow(to_local(point))
+	local.y = _sheet_height(local.x, local.z)
 	return to_global(_from_flow(local)).y
 
 
@@ -424,14 +499,13 @@ func _rebuild_debug() -> void:
 		var shoreline := PackedVector3Array()
 		if not Engine.is_editor_hint() and _fill > 0.0:
 			var flow_size := _flow_size()
-			for index in range(surface_segments_z + 1):
-				var z := lerpf(
-					-flow_size.y * 0.5, flow_size.y * 0.5, float(index) / surface_segments_z
-				)
-				shoreline.append(_from_flow(Vector3(_shore_at_vertex(z), DEBUG_HEIGHT_OFFSET, z)))
+			var samples := maxi(MIN_SEGMENTS, ceili(flow_size.y / DEBUG_SHORE_STEP))
+			for index in range(samples + 1):
+				var z := lerpf(-flow_size.y * 0.5, flow_size.y * 0.5, float(index) / samples)
+				shoreline.append(_from_flow(Vector3(_shore_x(z), DEBUG_HEIGHT_OFFSET, z)))
 		_debug_mesh.mesh = DEBUG_MESH.build(
 			size,
-			volume_depth,
+			_max_visual_height(),
 			debug_color,
 			DEBUG_HEIGHT_OFFSET,
 			active_debug_color,
