@@ -12,7 +12,7 @@ const POOL_GROUP := &"venom_acid_pools"
 const PUDDLE_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_glob_and_pool.png")
 const PARTICLE_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_acid_particles.png")
 const SPORE_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mote.png")
-const MIST_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mist.png")
+const SPARK_TEXTURE := preload("res://assets/sprites/enemies/firefly/firefly_spark_mote.png")
 const POOL_SHADER := preload("res://gameplay/enemies/venom_vine/venom_acid_pool.gdshader")
 
 const PARTICLE_CELL_SIZE := 256.0
@@ -31,14 +31,14 @@ const GROUND_AURA_SCALE_FACTOR := 2.35
 const DECAL_GROUND_OFFSET_METERS := 0.035
 const AURA_GROUND_OFFSET_METERS := 0.025
 const REHIT_TOLERANCE_SECONDS := 0.02
-const SPORE_DENSITY_PER_METER := 140.0
-const MIN_SPORE_COUNT := 96
-const MAX_SPORE_COUNT := 260
-const SPORE_LIFETIME_SECONDS := 1.7
-const MIST_DENSITY_PER_METER := 4.0
-const MIN_MIST_COUNT := 3
-const MAX_MIST_COUNT := 7
-const MIST_LIFETIME_SECONDS := 1.1
+const SPARK_DENSITY_PER_METER := 70.0
+const MIN_SPARK_COUNT := 48
+const MAX_SPARK_COUNT := 140
+const SPARK_LIFETIME_SECONDS := 1.45
+const GLINT_DENSITY_PER_METER := 24.0
+const MIN_GLINT_COUNT := 16
+const MAX_GLINT_COUNT := 48
+const GLINT_LIFETIME_SECONDS := 0.65
 const MIN_EMISSION_RATIO := 0.2
 const LIQUID_DROP_RADIUS_METERS := 0.065
 const LIQUID_DROP_HEIGHT_METERS := 0.13
@@ -66,9 +66,8 @@ var _area: Area3D
 var _puddle_sprite: Sprite3D
 var _ground_aura: MeshInstance3D
 var _ground_aura_material: ShaderMaterial
-var _bubbles: CPUParticles3D
-var _mist: GPUParticles3D
-var _spores: GPUParticles3D
+var _rising_sparks: GPUParticles3D
+var _surface_glints: GPUParticles3D
 var _pool_light: OmniLight3D
 
 
@@ -233,8 +232,7 @@ func _ready() -> void:
 	_build_area()
 	_build_ground_aura()
 	_build_puddle_sprite()
-	_build_bubble_particles()
-	_build_mist_and_spore_particles()
+	_build_light_particles()
 	_build_pool_light()
 	_update_spread_visuals(0.0)
 
@@ -294,12 +292,10 @@ func begin_fade_out() -> void:
 		remove_from_group(POOL_GROUP)
 	if is_instance_valid(_area):
 		_area.set_deferred("monitoring", false)
-	if is_instance_valid(_bubbles):
-		_bubbles.emitting = false
-	if is_instance_valid(_mist):
-		_mist.emitting = false
-	if is_instance_valid(_spores):
-		_spores.emitting = false
+	if is_instance_valid(_rising_sparks):
+		_rising_sparks.emitting = false
+	if is_instance_valid(_surface_glints):
+		_surface_glints.emitting = false
 
 
 func _tick_fade_out(step: float) -> void:
@@ -312,12 +308,8 @@ func _tick_fade_out(step: float) -> void:
 		_ground_aura_material.set_shader_parameter("fade_progress", ratio)
 	if is_instance_valid(_pool_light):
 		_pool_light.light_energy = 0.55 * ratio
-	_set_gpu_particles_alpha(_mist, ratio)
-	_set_gpu_particles_alpha(_spores, ratio)
-	if is_instance_valid(_bubbles):
-		var bubble_quad := _bubbles.mesh as QuadMesh
-		if bubble_quad != null and bubble_quad.material is StandardMaterial3D:
-			(bubble_quad.material as StandardMaterial3D).albedo_color.a = ratio
+	_set_gpu_particles_alpha(_rising_sparks, ratio)
+	_set_gpu_particles_alpha(_surface_glints, ratio)
 	if _fade_remaining_seconds <= 0.0:
 		queue_free()
 
@@ -343,10 +335,10 @@ func _update_spread_visuals(progress: float) -> void:
 		_ground_aura_material.set_shader_parameter("fade_progress", eased)
 	if is_instance_valid(_pool_light):
 		_pool_light.light_energy = 0.55 * eased
-	if is_instance_valid(_mist):
-		_mist.amount_ratio = particle_ratio
-	if is_instance_valid(_spores):
-		_spores.amount_ratio = particle_ratio
+	if is_instance_valid(_rising_sparks):
+		_rising_sparks.amount_ratio = particle_ratio
+	if is_instance_valid(_surface_glints):
+		_surface_glints.amount_ratio = particle_ratio
 
 
 func _update_puddle_frame() -> void:
@@ -407,79 +399,60 @@ func _build_puddle_sprite() -> void:
 	add_child(_puddle_sprite)
 
 
-func _build_bubble_particles() -> void:
-	_bubbles = CPUParticles3D.new()
-	_bubbles.name = "AcidBubbles"
-	_bubbles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_bubbles.amount = maxi(6, int(roundf(_radius_meters * 6.0)))
-	_bubbles.lifetime = 0.65
-	_bubbles.local_coords = true
-	_bubbles.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
-	_bubbles.emission_box_extents = Vector3(_radius_meters * 0.55, 0.05, _radius_meters * 0.55)
-	_bubbles.direction = Vector3.UP
-	_bubbles.spread = 18.0
-	_bubbles.initial_velocity_min = 0.35
-	_bubbles.initial_velocity_max = 0.85
-	_bubbles.gravity = Vector3(0.0, 0.4, 0.0)
-	_bubbles.scale_amount_min = 0.16
-	_bubbles.scale_amount_max = 0.34
-	_bubbles.color = Color(0.85, 1.0, 0.65, 0.9) * _visual_tint
-	_bubbles.mesh = create_particle_quad(0, Vector2(0.45, 0.45))
-	_bubbles.position = Vector3(0.0, 0.08, 0.0)
-	add_child(_bubbles)
-	_bubbles.emitting = true
-
-
-func _build_mist_and_spore_particles() -> void:
-	var mist_count := clampi(
-		int(roundf(_radius_meters * MIST_DENSITY_PER_METER)), MIN_MIST_COUNT, MAX_MIST_COUNT
+func _build_light_particles() -> void:
+	var spark_count := clampi(
+		int(roundf(_radius_meters * SPARK_DENSITY_PER_METER)), MIN_SPARK_COUNT, MAX_SPARK_COUNT
 	)
-	_mist = create_gpu_particles(
-		"GreenAcidMist",
-		MIST_TEXTURE,
-		mist_count,
-		MIST_LIFETIME_SECONDS,
-		_radius_meters * 0.85,
-		Vector2(1.05, 1.05),
-		false
-	)
-	_mist.amount_ratio = MIN_EMISSION_RATIO
-	var mist_process := _mist.process_material as ParticleProcessMaterial
-	mist_process.initial_velocity_min = 0.04
-	mist_process.initial_velocity_max = 0.14
-	mist_process.gravity = Vector3(0.0, 0.04, 0.0)
-	mist_process.scale_min = 0.45
-	mist_process.scale_max = 0.85
-	mist_process.color_ramp = create_fade_ramp_texture(
-		Color(0.32, 0.85, 0.35, 0.16) * _visual_tint, Color(0.14, 0.45, 0.2, 0.0) * _visual_tint
-	)
-	add_child(_mist)
-	_mist.emitting = true
-
-	var spore_count := clampi(
-		int(roundf(_radius_meters * SPORE_DENSITY_PER_METER)), MIN_SPORE_COUNT, MAX_SPORE_COUNT
-	)
-	_spores = create_gpu_particles(
-		"FloatingAcidSpores",
-		SPORE_TEXTURE,
-		spore_count,
-		SPORE_LIFETIME_SECONDS,
-		_radius_meters * 0.95,
-		Vector2(0.55, 0.55),
+	_rising_sparks = create_gpu_particles(
+		"AcidRisingLights",
+		SPARK_TEXTURE,
+		spark_count,
+		SPARK_LIFETIME_SECONDS,
+		_radius_meters * 0.88,
+		Vector2(0.24, 0.24),
 		true
 	)
-	_spores.amount_ratio = MIN_EMISSION_RATIO
-	var spore_process := _spores.process_material as ParticleProcessMaterial
-	spore_process.initial_velocity_min = 0.12
-	spore_process.initial_velocity_max = 0.58
-	spore_process.gravity = Vector3(0.0, 0.2, 0.0)
-	spore_process.scale_min = 0.55
-	spore_process.scale_max = 1.35
-	spore_process.color_ramp = create_fade_ramp_texture(
-		Color(0.84, 1.0, 0.46, 0.96) * _visual_tint, Color(0.3, 0.95, 0.4, 0.0) * _visual_tint
+	_rising_sparks.amount_ratio = MIN_EMISSION_RATIO
+	var spark_process := _rising_sparks.process_material as ParticleProcessMaterial
+	spark_process.spread = 70.0
+	spark_process.initial_velocity_min = 0.2
+	spark_process.initial_velocity_max = 0.6
+	spark_process.gravity = Vector3(0.0, 0.15, 0.0)
+	spark_process.orbit_velocity_min = 0.16
+	spark_process.orbit_velocity_max = 0.45
+	spark_process.scale_min = 0.35
+	spark_process.scale_max = 0.9
+	spark_process.color_ramp = create_fade_ramp_texture(
+		Color(0.9, 1.0, 0.5, 0.9) * _visual_tint, Color(0.35, 0.95, 0.2, 0.0) * _visual_tint
 	)
-	add_child(_spores)
-	_spores.emitting = true
+	add_child(_rising_sparks)
+	_rising_sparks.emitting = true
+
+	var glint_count := clampi(
+		int(roundf(_radius_meters * GLINT_DENSITY_PER_METER)), MIN_GLINT_COUNT, MAX_GLINT_COUNT
+	)
+	_surface_glints = create_gpu_particles(
+		"AcidSurfaceLights",
+		SPARK_TEXTURE,
+		glint_count,
+		GLINT_LIFETIME_SECONDS,
+		_radius_meters * 0.78,
+		Vector2(0.16, 0.16),
+		true
+	)
+	_surface_glints.amount_ratio = MIN_EMISSION_RATIO
+	var glint_process := _surface_glints.process_material as ParticleProcessMaterial
+	glint_process.spread = 75.0
+	glint_process.initial_velocity_min = 0.15
+	glint_process.initial_velocity_max = 0.4
+	glint_process.gravity = Vector3(0.0, -0.35, 0.0)
+	glint_process.scale_min = 0.4
+	glint_process.scale_max = 0.9
+	glint_process.color_ramp = create_fade_ramp_texture(
+		Color(1.0, 1.0, 0.68, 0.9) * _visual_tint, Color(0.55, 1.0, 0.25, 0.0) * _visual_tint
+	)
+	add_child(_surface_glints)
+	_surface_glints.emitting = true
 
 
 func _build_pool_light() -> void:

@@ -1,0 +1,50 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://gameplay/enemies/mushroom/mushroom_egg.gd" id="2_script"]
+[ext_resource type="Resource" path="res://data/enemies/mushroom_egg_data.tres" id="3_data"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/mushroom/mushroom_egg_sheet.png" id="4_tex"]
+[ext_resource type="AnimationLibrary" path="res://gameplay/enemies/mushroom/mushroom_egg_anims.tres" id="5_anims"]
+[ext_resource type="Script" path="res://gameplay/enemies/mushroom/states/mushroom_egg_incubate.gd" id="6_incubate"]
+
+[sub_resource type="CylinderShape3D" id="HurtShape"]
+height = 1.15
+radius = 0.56
+
+[sub_resource type="CylinderShape3D" id="BodyShape"]
+height = 1.05
+radius = 0.44
+
+[node name="MushroomEgg" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+data = ExtResource("3_data")
+initial_state_name = &"Incubate"
+destroy_on_death = true
+damage_popup_min_height = 0.9
+
+[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.73, 0)
+pixel_size = 0.0046
+shaded = false
+alpha_cut = 0
+texture_filter = 1
+texture = ExtResource("4_tex")
+hframes = 4
+vframes = 1
+
+[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
+libraries/ = ExtResource("5_anims")
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58, 0)
+shape = SubResource("HurtShape")
+
+[node name="Incubate" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3"]
+script = ExtResource("6_incubate")
+
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.53, 0)
+shape = SubResource("BodyShape")
+
+[node name="DebugHealthLabel" parent="." index="6" unique_id=2012842134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)

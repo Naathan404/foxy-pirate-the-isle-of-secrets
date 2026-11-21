@@ -1,3 +1,4 @@
+class_name MushroomPatrol
 extends EnemyState
 ## Ambush, observe, leap toward distant detected players, spray spores in range,
 ## and return to searching when players leave detection range.
@@ -21,6 +22,11 @@ var _chase_leap_cooldown_remaining: float = 0.0
 var _chase_leap_retry_remaining: float = 0.0
 var _ambush_hold_remaining: float = -1.0
 var _active_charge_duration: float = 1.6
+var _skip_next_observe: bool = false
+
+
+func mark_skip_next_observe() -> void:
+	_skip_next_observe = true
 
 
 func _enter() -> void:
@@ -33,7 +39,14 @@ func _enter() -> void:
 	if mushroom == null:
 		return
 	if _has_awakened:
-		_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
+		if _skip_next_observe:
+			_skip_next_observe = false
+			if _target_is_detected(mushroom):
+				_set_phase(Phase.CHASE, 0.0)
+			else:
+				_set_phase(Phase.SEARCH, mushroom.search_seconds)
+		else:
+			_set_phase(Phase.OBSERVE, mushroom.observe_seconds)
 	else:
 		_set_phase(Phase.DISGUISE, _random_disguise_seconds(mushroom))
 
@@ -192,11 +205,19 @@ func _chase(mushroom: MushroomEnemy, delta: float) -> void:
 		mushroom.face_target()
 		_idle(mushroom, delta, &"idle")
 		return
+	if _try_start_elite_attack(mushroom, delta, offset):
+		return
 	if _try_start_approach_leap(mushroom, offset):
 		return
 	if _try_roll_random_chase_charge(mushroom, delta):
 		return
 	_move_safely(mushroom, offset.normalized(), delta, mushroom.chase_speed_scale)
+
+
+func _try_start_elite_attack(
+	_mushroom: MushroomEnemy, _delta: float, _target_offset: Vector3
+) -> bool:
+	return false
 
 
 func _chase_leap(mushroom: MushroomEnemy, delta: float) -> void:

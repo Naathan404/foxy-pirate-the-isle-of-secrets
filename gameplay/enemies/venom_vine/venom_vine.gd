@@ -11,6 +11,7 @@ const DORMANT_TEXTURE := preload("res://assets/sprites/enemies/venom_vine/venom_
 const ACTIVE_TEXTURE := preload(
 	"res://assets/sprites/enemies/venom_vine/venom_vine_active_sheet.png"
 )
+const BURROW_TEXTURE := preload("res://assets/sprites/enemies/venom_vine/venom_vine_burrow.png")
 
 const PARTICLE_CELL_SIZE := 256.0
 const AGITATION_DECAY_PER_SECOND := 0.12
@@ -31,6 +32,8 @@ const HIT_GLOW_BOOST := 1.1
 const HIT_COUNTER_GLOW_BOOST := 1.65
 const HIT_GLOW_DECAY_PER_SECOND := 3.2
 const HIT_RECOIL_TILT_RADIANS := 0.16
+const BURROW_PRIORITY := 70
+const MELEE_COMBO_HIT_LIMIT := 2
 const NORMAL_GLOW_COLOR := Color(0.55, 1.0, 0.25)
 const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 
@@ -103,13 +106,38 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 @export_range(0.4, 3.0, 0.05, "suffix:m") var counter_pool_radius_meters: float = 0.95
 @export_range(0.05, 1.0, 0.01, "suffix:s") var hit_flinch_seconds: float = 0.22
 
+@export_group("Burrow Defense")
+@export_range(0.2, 3.0, 0.05, "suffix:s") var burrow_duration_seconds: float = 1.1
+@export_range(1.0, 15.0, 0.25, "suffix:s") var burrow_cooldown_seconds: float = 4.5
+@export_range(0.1, 2.0, 0.05, "suffix:s") var burrow_transition_seconds: float = 0.4
+## Khoảng cách thời gian tối đa giữa hai đòn cận chiến liên tiếp.
+@export_range(0.3, 5.0, 0.1, "suffix:s") var melee_combo_window_seconds: float = 2.0
+## Quên các đòn cũ sau khoảng nghỉ để phản công dựa trên áp lực gần đây.
+@export_range(0.5, 8.0, 0.1, "suffix:s") var counter_hit_window_seconds: float = 3.0
+
+@export_group("Tactical Idle")
+## Thời gian tối thiểu quan sát sau khi phun hoặc trồi lên, trừ khi phản công.
+@export_range(0.1, 3.0, 0.05, "suffix:s") var idle_min_duration_seconds: float = 0.65
+## Khoảng cách giữa các lần cân nhắc chui trong lúc đang đứng quan sát.
+@export_range(0.2, 4.0, 0.1, "suffix:s") var idle_decision_interval_seconds: float = 1.0
+
 var ai: VenomVineAI
 var is_awake: bool = false
 var ambushed_wake: bool = false
 var agitation: float = 0.0
 var attack_cooldown_remaining: float = 0.0
 var last_known_target_position: Vector3 = Vector3.ZERO
+var is_burrowed: bool = false
 var _active_pools: Array[VenomAcidPool] = []
+var _active_projectiles: Array[VenomPoolProjectile] = []
+var _burrow_cooldown_remaining: float = 0.0
+var _melee_combo_hits: int = 0
+var _melee_combo_remaining_seconds: float = 0.0
+var _counter_hit_remaining_seconds: float = 0.0
+var _counter_after_burrow: bool = false
+var _burrow_saved_hurtbox_enabled: bool = true
+var _burrow_saved_hurtbox_layer: int = 0
+var _burrow_saved_hurtbox_mask: int = 0
 var _last_tracked_target_pos: Vector3 = Vector3.ZERO
 var _has_tracked_target_pos: bool = false
 var _estimated_target_velocity: Vector3 = Vector3.ZERO
@@ -137,6 +165,8 @@ func _ready() -> void:
 	set_sprite_sheet_mode(true)
 	_setup_luminous_vfx()
 	damaged.connect(_on_vine_damaged)
+	_begin_burrow()
+	_show_burrow_frame(3)
 
 
 func _process(delta: float) -> void:
@@ -148,7 +178,14 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	var step := maxf(0.0, delta)
 	attack_cooldown_remaining = maxf(0.0, attack_cooldown_remaining - step)
+	_burrow_cooldown_remaining = maxf(0.0, _burrow_cooldown_remaining - step)
+	_melee_combo_remaining_seconds = maxf(0.0, _melee_combo_remaining_seconds - step)
+	if _melee_combo_remaining_seconds <= 0.0:
+		_melee_combo_hits = 0
 	_counter_cooldown_remaining_seconds = maxf(0.0, _counter_cooldown_remaining_seconds - step)
+	_counter_hit_remaining_seconds = maxf(0.0, _counter_hit_remaining_seconds - step)
+	if _counter_hit_remaining_seconds <= 0.0:
+		_hits_toward_counter = 0
 	_flinch_remaining_seconds = maxf(0.0, _flinch_remaining_seconds - step)
 	agitation = maxf(0.0, agitation - AGITATION_DECAY_PER_SECOND * step)
 	if _anger_detect_remaining_seconds > 0.0:
@@ -160,6 +197,8 @@ func _physics_process(delta: float) -> void:
 
 
 func receive_damage(damage: DamageContext) -> float:
+	if is_burrowed:
+		return 0.0
 	var attack_state := (
 		fsm.current_state as VenomVineAttack
 		if is_instance_valid(fsm) and fsm.current_state is VenomVineAttack
@@ -172,15 +211,37 @@ func receive_damage(damage: DamageContext) -> float:
 
 	var counter_triggered := false
 	if not dead and hp.is_alive():
+		var force_hide := _record_melee_hit(damage)
 		_hits_toward_counter += 2 if was_charging else 1
-		if (
-			not _pending_counter
-			and _counter_cooldown_remaining_seconds <= 0.0
-			and _hits_toward_counter >= maxi(1, hits_before_counter)
-		):
+		_counter_hit_remaining_seconds = counter_hit_window_seconds
+		var reaction := (
+			ai
+			. choose_hit_reaction(
+				{
+					"melee_combo_limit_reached": force_hide,
+					"counter_pending": _pending_counter,
+					"counter_ready":
+					(
+						_counter_cooldown_remaining_seconds <= 0.0
+						and _hits_toward_counter >= maxi(1, hits_before_counter)
+					),
+					"burrow_ready": _burrow_cooldown_remaining <= 0.0,
+					"distance_meters": _distance_to_target(),
+					"inner_radius_meters": inner_attack_radius_meters,
+					"hp_ratio": get_hp_ratio(),
+					"agitation": agitation,
+					"was_charging": was_charging,
+				}
+			)
+		)
+		if reaction == VenomVineAI.HitReaction.BURROW and _request_burrow(force_hide):
+			_spawn_hit_impact_vfx(false)
+			return applied
+		if reaction == VenomVineAI.HitReaction.COUNTER:
 			_pending_counter = true
 			counter_triggered = true
 			_hits_toward_counter = 0
+			_counter_hit_remaining_seconds = 0.0
 			_counter_cooldown_remaining_seconds = counter_cooldown_seconds
 
 		if counter_triggered or _pending_counter:
@@ -210,6 +271,93 @@ func set_awake(awake: bool) -> void:
 	_queue_detection_update()
 
 
+func _record_melee_hit(damage: DamageContext) -> bool:
+	if not damage.is_melee_normal_attack():
+		_melee_combo_hits = 0
+		_melee_combo_remaining_seconds = 0.0
+		return false
+	_melee_combo_hits += 1
+	_melee_combo_remaining_seconds = melee_combo_window_seconds
+	return _melee_combo_hits >= MELEE_COMBO_HIT_LIMIT
+
+
+func _request_burrow(counter_after_emerge: bool) -> bool:
+	if not request_state(&"burrow", BURROW_PRIORITY):
+		return false
+	_counter_after_burrow = counter_after_emerge
+	_begin_burrow()
+	return true
+
+
+func _has_active_venom() -> bool:
+	for projectile in _active_projectiles:
+		if is_instance_valid(projectile) and not projectile.is_queued_for_deletion():
+			return true
+	for pool in _active_pools:
+		if is_instance_valid(pool) and not pool.is_fading():
+			return true
+	return false
+
+
+func _begin_burrow() -> void:
+	if is_burrowed:
+		return
+	is_burrowed = true
+	_burrow_saved_hurtbox_enabled = hurtbox.enabled
+	_burrow_saved_hurtbox_layer = hurtbox.collision_layer
+	_burrow_saved_hurtbox_mask = hurtbox.collision_mask
+	hurtbox.enabled = false
+	hurtbox.collision_layer = 0
+	hurtbox.collision_mask = 0
+	end_active_attack()
+	_stop_contact_damage()
+	for projectile in _active_projectiles:
+		if is_instance_valid(projectile):
+			projectile.cancel()
+	_active_projectiles.clear()
+	for pool in _active_pools:
+		if is_instance_valid(pool):
+			pool.begin_fade_out()
+	_active_pools.clear()
+	_hits_toward_counter = 0
+	_counter_hit_remaining_seconds = 0.0
+	_pending_counter = false
+	_melee_combo_hits = 0
+	_melee_combo_remaining_seconds = 0.0
+	_flinch_remaining_seconds = 0.0
+
+
+func _end_burrow() -> void:
+	if not is_burrowed:
+		return
+	is_burrowed = false
+	if not dead:
+		hurtbox.collision_layer = _burrow_saved_hurtbox_layer
+		hurtbox.collision_mask = _burrow_saved_hurtbox_mask
+		hurtbox.enabled = _burrow_saved_hurtbox_enabled
+		_burrow_cooldown_remaining = burrow_cooldown_seconds
+		if _counter_after_burrow and get_current_zone() == VenomVineAI.Zone.INNER_RING:
+			_pending_counter = true
+			_counter_cooldown_remaining_seconds = counter_cooldown_seconds
+	_counter_after_burrow = false
+
+
+func _show_burrow_frame(frame_index: int) -> void:
+	if not is_instance_valid(visual) or not is_instance_valid(visual.sprite):
+		return
+	if visual.sprite.texture != BURROW_TEXTURE:
+		visual.play_animation(&"RESET")
+		if is_instance_valid(visual.animation_player):
+			visual.animation_player.stop(true)
+		_is_dormant_sheet = false
+		visual.sprite.frame = 0
+		visual.sprite.texture = BURROW_TEXTURE
+		visual.sprite.hframes = 2
+		visual.sprite.vframes = 2
+	visual.sprite.frame = clampi(frame_index, 0, 3)
+	visual.sprite.flip_h = false
+
+
 func play_directional_animation(action: StringName, restart: bool = false) -> bool:
 	if action in [&"idle", &"charge", &"shoot", &"hit", &"death"]:
 		set_sprite_sheet_mode(false)
@@ -219,11 +367,12 @@ func play_directional_animation(action: StringName, restart: bool = false) -> bo
 func set_sprite_sheet_mode(dormant: bool) -> void:
 	if not is_instance_valid(visual) or not is_instance_valid(visual.sprite):
 		return
-	if _is_dormant_sheet == dormant and visual.sprite.texture != null:
+	var expected_texture := DORMANT_TEXTURE if dormant else ACTIVE_TEXTURE
+	if _is_dormant_sheet == dormant and visual.sprite.texture == expected_texture:
 		return
 	_is_dormant_sheet = dormant
 	if is_instance_valid(visual.animation_player):
-		visual.animation_player.stop()
+		visual.animation_player.stop(true)
 	if dormant:
 		visual.sprite.frame = 1
 		visual.sprite.texture = DORMANT_TEXTURE
@@ -397,7 +546,7 @@ func build_pool_config() -> Dictionary:
 
 
 func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) -> void:
-	if dead or data == null:
+	if dead or is_burrowed or data == null:
 		return
 	var parent := get_parent()
 	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
@@ -429,6 +578,8 @@ func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) 
 		config
 	)
 	proj.impacted.connect(_on_projectile_impacted)
+	_active_projectiles = _active_projectiles.filter(func(p): return is_instance_valid(p))
+	_active_projectiles.append(proj)
 	parent.add_child(proj)
 	spawn_muzzle_flash()
 
@@ -802,8 +953,8 @@ func _setup_luminous_vfx() -> void:
 
 
 func _sync_glow_vfx() -> void:
-	var active_awake := is_awake and not dead
-	var effective_charge := maxf(_charge_glow_strength, _hit_glow_boost)
+	var active_awake := is_awake and not dead and not is_burrowed
+	var effective_charge := 0.0 if is_burrowed else maxf(_charge_glow_strength, _hit_glow_boost)
 	var effective_counter := (
 		_charge_counter_mix if _charge_glow_strength > 0.01 else (1.0 if _pending_counter else 0.0)
 	)

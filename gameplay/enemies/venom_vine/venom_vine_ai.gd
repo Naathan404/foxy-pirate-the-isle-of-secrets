@@ -16,6 +16,17 @@ enum AttackMode {
 	SPECIAL,
 }
 
+enum HitReaction {
+	HOLD,
+	BURROW,
+	COUNTER,
+}
+
+enum IdleDecision {
+	WAIT,
+	BURROW,
+}
+
 const LEAD_VELOCITY_THRESHOLD := 0.75
 const STANDING_SPREAD_OFFSET_METERS := 1.55
 const POOL_COVER_BLOCK_FACTOR := 0.85
@@ -32,6 +43,24 @@ const DEFAULT_AIM_SCATTER_MAX_METERS := 2.5
 const TARGET_DEFLECT_MARGIN_METERS := 0.45
 const DEFAULT_MIN_SHOT_DISTANCE_METERS := 1.6
 const DEFAULT_MAX_SHOT_DISTANCE_METERS := 6.2
+const HIDE_BASE_CHANCE := 0.2
+const HIDE_CLOSE_BONUS := 0.2
+const HIDE_LOW_HP_BONUS := 0.12
+const HIDE_AGITATION_BONUS := 0.12
+const HIDE_CHARGING_BONUS := 0.1
+const HIDE_MAX_CHANCE := 0.7
+const AIM_LOCK_WINDOW_SECONDS := 0.24
+const OUTER_PRESSURE_MIN_OFFSET_METERS := 0.85
+const OUTER_PRESSURE_POOL_FACTOR := 0.86
+const IDLE_HIDE_BASE_CHANCE := 0.08
+const IDLE_HIDE_CLOSE_BONUS := 0.2
+const IDLE_HIDE_APPROACH_BONUS := 0.2
+const IDLE_HIDE_LOW_HP_BONUS := 0.12
+const IDLE_HIDE_AGITATION_BONUS := 0.1
+const IDLE_HIDE_MAX_CHANCE := 0.65
+const IDLE_HIDE_HAZARD_CHANCE_FACTOR := 0.3
+const APPROACH_SPEED_THRESHOLD_METERS_PER_SECOND := 0.5
+const LOW_HP_RATIO := 0.4
 
 var _rng := RandomNumberGenerator.new()
 
@@ -72,6 +101,53 @@ func roll_ambush_hold(
 	if target_speed < 2.0:
 		return _rng.randf_range(lerpf(low, high, 0.4), high)
 	return _rng.randf_range(low, lerpf(low, high, 0.7))
+
+
+func choose_hit_reaction(context: Dictionary) -> HitReaction:
+	# A rapid melee combo always ends in immediate protection, even during a counter.
+	if bool(context.get("melee_combo_limit_reached", false)):
+		return HitReaction.BURROW
+	if bool(context.get("counter_pending", false)):
+		return HitReaction.HOLD
+	if bool(context.get("counter_ready", false)):
+		return HitReaction.COUNTER
+	if not bool(context.get("burrow_ready", false)):
+		return HitReaction.HOLD
+	var distance_meters := float(context.get("distance_meters", INF))
+	var inner_radius_meters := float(context.get("inner_radius_meters", 0.0))
+	var hp_ratio := float(context.get("hp_ratio", 1.0))
+	var agitation := float(context.get("agitation", 0.0))
+	var was_charging := bool(context.get("was_charging", false))
+	var chance := HIDE_BASE_CHANCE
+	if distance_meters <= inner_radius_meters:
+		chance += HIDE_CLOSE_BONUS
+	if hp_ratio < 0.4:
+		chance += HIDE_LOW_HP_BONUS
+	chance += clampf(agitation, 0.0, 1.0) * HIDE_AGITATION_BONUS
+	if was_charging:
+		chance += HIDE_CHARGING_BONUS
+	return HitReaction.BURROW if _rng.randf() < minf(chance, HIDE_MAX_CHANCE) else HitReaction.HOLD
+
+
+func choose_idle_decision(context: Dictionary) -> IdleDecision:
+	if not bool(context.get("burrow_ready", false)):
+		return IdleDecision.WAIT
+	var chance := IDLE_HIDE_BASE_CHANCE
+	var distance_meters := float(context.get("distance_meters", INF))
+	if distance_meters <= float(context.get("inner_radius_meters", 0.0)):
+		chance += IDLE_HIDE_CLOSE_BONUS
+	if float(context.get("approach_speed", 0.0)) >= APPROACH_SPEED_THRESHOLD_METERS_PER_SECOND:
+		chance += IDLE_HIDE_APPROACH_BONUS
+	if float(context.get("hp_ratio", 1.0)) <= LOW_HP_RATIO:
+		chance += IDLE_HIDE_LOW_HP_BONUS
+	chance += clampf(float(context.get("agitation", 0.0)), 0.0, 1.0) * IDLE_HIDE_AGITATION_BONUS
+	if bool(context.get("active_venom", false)):
+		chance *= IDLE_HIDE_HAZARD_CHANCE_FACTOR
+	return (
+		IdleDecision.BURROW
+		if _rng.randf() < minf(chance, IDLE_HIDE_MAX_CHANCE)
+		else IdleDecision.WAIT
+	)
 
 
 func compute_lead_position(
@@ -134,6 +210,8 @@ func select_attack_plan(context: Dictionary) -> Dictionary:
 
 	var flat_dist := Vector2(target_pos.x - origin_pos.x, target_pos.z - origin_pos.z).length()
 	var est_flight := clampf(0.28 + flat_dist * 0.045, MIN_FLIGHT_SECONDS, MAX_FLIGHT_SECONDS)
+	# The aim is locked during the charge, so lead includes that time as well as the flight.
+	est_flight += maxf(0.0, float(context.get("charge_seconds", 0.75)) - AIM_LOCK_WINDOW_SECONDS)
 	var hp_ratio := clampf(float(context.get("hp_ratio", 1.0)), 0.0, 1.0)
 	var hp_pressure := 1.0 - hp_ratio
 	var cooldown_scale := clampf(
@@ -298,11 +376,16 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var aim_positions: Array[Vector3] = []
 	var planned_occupied := occupied.duplicate()
 	var already_covered := is_position_covered_by_pool(target_pos, planned_occupied)
-	planned_occupied.append(_make_target_exclusion_spot(target_pos, pool_radius, scatter_min))
+	# Land near enough that an idle target must react, while keeping the impact off its center.
+	var pressure_max := maxf(
+		OUTER_PRESSURE_MIN_OFFSET_METERS,
+		minf(scatter_max, pool_radius * OUTER_PRESSURE_POOL_FACTOR)
+	)
+	var pressure_min := clampf(scatter_min, OUTER_PRESSURE_MIN_OFFSET_METERS, pressure_max)
 
 	for shot_idx in range(outer_shots):
 		var nearby_offset := _pick_nearby_offset(
-			origin_pos, predicted, flat_vel, scatter_min, scatter_max, shot_idx
+			origin_pos, predicted, flat_vel, pressure_min, pressure_max, shot_idx
 		)
 		var desired := predicted + nearby_offset
 		if already_covered and shot_idx == 0:
