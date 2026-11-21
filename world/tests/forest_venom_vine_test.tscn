@@ -46,9 +46,3 @@ idle_decision_interval_seconds = 1.0
 
 [node name="EliteVenomVine" parent="." index="6" unique_id=295374047 instance=ExtResource("5_elite_vine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0, -3.2)
-tendril_segment_spacing_meters = 1.15
-outer_detection_radius_meters = 6.5
-max_shot_distance_meters = 6.2
-burrow_duration_seconds = 0.35
-burrow_transition_seconds = 0.9
-post_emerge_attack_delay_seconds = 0.7
