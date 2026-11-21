@@ -27,7 +27,7 @@ const SETTLE_SPEED_THRESHOLD := 4.2
 const MAX_MIST_PATCHES := 5
 const MIST_MAX_OPACITY := 0.25
 
-var _owner_mushroom: MushroomEnemy
+var _owner_ref: WeakRef
 var _origin: Vector3 = Vector3.ZERO
 var _has_origin: bool = false
 var _direction: Vector3 = Vector3.BACK
@@ -63,7 +63,12 @@ var _query_sphere: SphereShape3D
 
 func setup(config: Dictionary) -> void:
 	_rng.randomize()
-	_owner_mushroom = config.get("owner", null) as MushroomEnemy
+	var owner_raw: Variant = config.get("owner", null)
+	_owner_ref = (
+		weakref(owner_raw)
+		if owner_raw != null and is_instance_valid(owner_raw) and owner_raw is MushroomEnemy
+		else null
+	)
 	if config.has("origin"):
 		_origin = config.get("origin", Vector3.ZERO) as Vector3
 		_has_origin = true
@@ -307,8 +312,9 @@ func _step_puffs(step: float) -> void:
 			var ray_from := Vector3(pos.x, _ground_y + WALL_CHECK_HEIGHT_METERS, pos.z)
 			var ray_to := Vector3(next_pos.x, _ground_y + WALL_CHECK_HEIGHT_METERS, next_pos.z)
 			var query := PhysicsRayQueryParameters3D.create(ray_from, ray_to, CombatLayers.WORLD)
-			if is_instance_valid(_owner_mushroom):
-				query.exclude = [_owner_mushroom.get_rid()]
+			var live_owner := _resolve_owner_mushroom()
+			if live_owner != null:
+				query.exclude = [live_owner.get_rid()]
 			var hit := space.intersect_ray(query)
 			if not hit.is_empty():
 				var hit_pos := hit["position"] as Vector3
@@ -647,17 +653,27 @@ func _query_poison_sphere(
 		_try_apply_poison_to_hit(hit.get("collider") as HurtBox, hit_actors)
 
 
+func _resolve_owner_mushroom() -> MushroomEnemy:
+	if _owner_ref == null:
+		return null
+	var obj: Variant = _owner_ref.get_ref()
+	if obj == null or not is_instance_valid(obj):
+		return null
+	return obj as MushroomEnemy
+
+
 func _try_apply_poison_to_hit(hurtbox: HurtBox, hit_actors: Dictionary) -> void:
 	if hurtbox == null or not is_instance_valid(hurtbox.actor):
 		return
-	if hurtbox.actor == _owner_mushroom:
+	var live_owner := _resolve_owner_mushroom()
+	if live_owner != null and hurtbox.actor == live_owner:
 		return
 	var actor_id := hurtbox.actor.get_instance_id()
 	if hit_actors.has(actor_id):
 		return
 	hit_actors[actor_id] = true
 	var damage := DamageContext.new()
-	damage.source = _owner_mushroom if is_instance_valid(_owner_mushroom) else self
+	damage.source = live_owner if live_owner != null else self
 	damage.source_team = CombatTeams.ENEMY
 	damage.base_amount_hp = _tick_damage
 	damage.amount_hp = _tick_damage
@@ -677,8 +693,9 @@ func _sample_floor(at_pos: Vector3) -> Dictionary:
 		Vector3(at_pos.x, _ground_y - 3.0, at_pos.z),
 		CombatLayers.WORLD
 	)
-	if is_instance_valid(_owner_mushroom):
-		query.exclude = [_owner_mushroom.get_rid()]
+	var live_owner := _resolve_owner_mushroom()
+	if live_owner != null:
+		query.exclude = [live_owner.get_rid()]
 	return space.intersect_ray(query)
 
 

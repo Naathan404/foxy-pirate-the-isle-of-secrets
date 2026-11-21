@@ -17,7 +17,8 @@ const SHADOW_OFFSET_Y := 0.02
 ## Biên độ phồng nhịp tim khi Trứng Nấm đang ủ mầm.
 @export_range(0.0, 0.3, 0.01) var wobble_scale_amplitude: float = 0.08
 
-var _source_elite: MushroomEnemy
+var _source_elite_ref: WeakRef
+var _fallback_hatch_parent_ref: WeakRef
 var _hatch_remaining: float = 5.5
 var _incubation_elapsed: float = 0.0
 var _hatched: bool = false
@@ -36,8 +37,19 @@ func _ready() -> void:
 	_build_egg_accents()
 
 
-func setup_spawned(source_elite: MushroomEnemy, hatch_seconds: float) -> void:
-	_source_elite = source_elite
+func setup_spawned(source_elite: Variant, hatch_seconds: float) -> void:
+	_source_elite_ref = (
+		weakref(source_elite)
+		if (
+			source_elite != null
+			and is_instance_valid(source_elite)
+			and source_elite is MushroomEnemy
+		)
+		else null
+	)
+	var valid_elite := _resolve_source_elite()
+	if valid_elite != null and is_instance_valid(valid_elite.get_parent()):
+		_fallback_hatch_parent_ref = weakref(valid_elite.get_parent())
 	hatch_duration_seconds = maxf(1.0, hatch_seconds)
 	_hatch_remaining = hatch_duration_seconds
 	_initialized_timer = true
@@ -71,24 +83,76 @@ func hatch_into_mushroom() -> MushroomEnemy:
 	if dead or _hatched or not is_inside_tree():
 		return null
 	_hatched = true
-	var parent := get_parent()
-	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
+	var parent := _resolve_spawn_parent()
+	if not is_instance_valid(parent):
 		queue_free()
 		return null
 	var hatched := ADULT_MUSHROOM_SCENE.instantiate() as MushroomEnemy
 	if hatched == null:
 		queue_free()
 		return null
-	hatched.position = position
+	var spawn_world := global_position
+	hatched.position = (parent as Node3D).to_local(spawn_world) if parent is Node3D else spawn_world
 	hatched.show_debug_health = show_debug_health
 	parent.add_child(hatched)
-	hatched.global_position = global_position
-	hatched.home_position = global_position
-	if is_instance_valid(_source_elite) and _source_elite.has_method("register_spawned_minion"):
-		_source_elite.call("register_spawned_minion", hatched)
+	hatched.global_position = spawn_world
+	hatched.home_position = spawn_world
+	var source_elite := _resolve_source_elite()
+	if (
+		source_elite != null
+		and not source_elite.dead
+		and source_elite.has_method("register_spawned_minion")
+	):
+		source_elite.call("register_spawned_minion", hatched)
 	_spawn_burst_vfx(true)
 	queue_free()
 	return hatched
+
+
+func _resolve_source_elite() -> MushroomEnemy:
+	if _source_elite_ref == null:
+		return null
+	var obj: Variant = _source_elite_ref.get_ref()
+	if obj == null or not is_instance_valid(obj):
+		return null
+	var mushroom := obj as MushroomEnemy
+	if mushroom == null or mushroom.is_queued_for_deletion():
+		return null
+	return mushroom
+
+
+func _resolve_spawn_parent() -> Node:
+	var direct_parent := get_parent()
+	var source_elite := _resolve_source_elite()
+	if (
+		is_instance_valid(direct_parent)
+		and not direct_parent.is_queued_for_deletion()
+		and direct_parent.is_inside_tree()
+		and direct_parent != source_elite
+	):
+		return direct_parent
+	if _fallback_hatch_parent_ref != null:
+		var cached: Variant = _fallback_hatch_parent_ref.get_ref()
+		if (
+			cached is Node
+			and is_instance_valid(cached)
+			and not (cached as Node).is_queued_for_deletion()
+			and (cached as Node).is_inside_tree()
+		):
+			return cached as Node
+	if not is_inside_tree() or get_tree() == null:
+		return null
+	var current_scene := get_tree().current_scene
+	if (
+		is_instance_valid(current_scene)
+		and not current_scene.is_queued_for_deletion()
+		and current_scene.is_inside_tree()
+	):
+		return current_scene
+	var root_node := get_tree().root
+	if is_instance_valid(root_node) and not root_node.is_queued_for_deletion():
+		return root_node
+	return null
 
 
 func die() -> void:
@@ -149,7 +213,7 @@ func _build_egg_accents() -> void:
 func _spawn_burst_vfx(is_hatch: bool) -> void:
 	if not is_inside_tree():
 		return
-	var parent := get_parent()
+	var parent := _resolve_spawn_parent()
 	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
 		return
 	var burst := CPUParticles3D.new()

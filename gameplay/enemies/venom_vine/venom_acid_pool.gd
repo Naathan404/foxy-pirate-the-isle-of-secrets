@@ -14,6 +14,12 @@ const PARTICLE_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_a
 const SPORE_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mote.png")
 const SPARK_TEXTURE := preload("res://assets/sprites/enemies/firefly/firefly_spark_mote.png")
 const POOL_SHADER := preload("res://gameplay/enemies/venom_vine/venom_acid_pool.gdshader")
+const ELITE_PUDDLE_SHADER := preload(
+	"res://gameplay/enemies/venom_vine/venom_elite_puddle.gdshader"
+)
+const ELITE_PARTICLE_SHADER := preload(
+	"res://gameplay/enemies/venom_vine/venom_elite_particle.gdshader"
+)
 
 const PARTICLE_CELL_SIZE := 256.0
 const PUDDLE_BASE_FRAME := 4
@@ -31,6 +37,7 @@ const GROUND_AURA_SCALE_FACTOR := 2.35
 const DECAL_GROUND_OFFSET_METERS := 0.035
 const AURA_GROUND_OFFSET_METERS := 0.025
 const REHIT_TOLERANCE_SECONDS := 0.02
+const SNARE_REFRESH_SECONDS := 0.28
 const SPARK_DENSITY_PER_METER := 70.0
 const MIN_SPARK_COUNT := 48
 const MAX_SPARK_COUNT := 140
@@ -44,6 +51,8 @@ const LIQUID_DROP_RADIUS_METERS := 0.065
 const LIQUID_DROP_HEIGHT_METERS := 0.13
 const LIQUID_DROP_BASE_COLOR := Color(0.72, 1.0, 0.38, 0.8)
 const LIQUID_DROP_EMISSION_COLOR := Color(0.35, 0.82, 0.1)
+const PURPLE_DROP_BASE_COLOR := Color(0.86, 0.44, 1.0, 0.86)
+const PURPLE_DROP_EMISSION_COLOR := Color(0.62, 0.18, 0.96)
 
 var _source: Node
 var _source_team: int = CombatTeams.ENEMY
@@ -64,6 +73,7 @@ var _last_hit_time_by_actor: Dictionary[int, float] = {}
 
 var _area: Area3D
 var _puddle_sprite: Sprite3D
+var _puddle_material: ShaderMaterial
 var _ground_aura: MeshInstance3D
 var _ground_aura_material: ShaderMaterial
 var _rising_sparks: GPUParticles3D
@@ -72,25 +82,42 @@ var _pool_light: OmniLight3D
 
 
 static func create_particle_quad(
-	cell_column: int, quad_size: Vector2, additive: bool = false
+	cell_column: int, quad_size: Vector2, additive: bool = false, is_purple: bool = false
 ) -> QuadMesh:
 	var atlas := AtlasTexture.new()
 	atlas.atlas = PARTICLE_SHEET
 	atlas.region = Rect2(
 		float(cell_column) * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE
 	)
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD if additive else BaseMaterial3D.BLEND_MODE_MIX
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.vertex_color_use_as_albedo = true
-	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	mat.albedo_texture = atlas
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var mat: Material = null
+	if is_purple:
+		mat = create_purple_particle_material(atlas, 1.25)
+	else:
+		var std_mat := StandardMaterial3D.new()
+		std_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		std_mat.blend_mode = (
+			BaseMaterial3D.BLEND_MODE_ADD if additive else BaseMaterial3D.BLEND_MODE_MIX
+		)
+		std_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		std_mat.vertex_color_use_as_albedo = true
+		std_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+		std_mat.albedo_texture = atlas
+		std_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		mat = std_mat
 	var quad := QuadMesh.new()
 	quad.size = quad_size
 	quad.material = mat
 	return quad
+
+
+static func create_purple_particle_material(
+	texture: Texture2D, intensity_value: float = 1.25
+) -> ShaderMaterial:
+	var shader_mat := ShaderMaterial.new()
+	shader_mat.shader = ELITE_PARTICLE_SHADER
+	shader_mat.set_shader_parameter(&"particle_texture", texture)
+	shader_mat.set_shader_parameter(&"intensity", intensity_value)
+	return shader_mat
 
 
 static func create_fade_ramp(start_color: Color, end_color: Color) -> Gradient:
@@ -106,18 +133,18 @@ static func create_fade_ramp_texture(start_color: Color, end_color: Color) -> Gr
 	return ramp
 
 
-static func create_liquid_drop_mesh() -> SphereMesh:
+static func create_liquid_drop_mesh(is_purple: bool = false) -> SphereMesh:
 	var material := StandardMaterial3D.new()
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
 	material.vertex_color_use_as_albedo = true
-	material.albedo_color = LIQUID_DROP_BASE_COLOR
+	material.albedo_color = PURPLE_DROP_BASE_COLOR if is_purple else LIQUID_DROP_BASE_COLOR
 	material.metallic = 0.08
 	material.roughness = 0.2
 	material.emission_enabled = true
-	material.emission = LIQUID_DROP_EMISSION_COLOR
-	material.emission_energy_multiplier = 0.55
+	material.emission = PURPLE_DROP_EMISSION_COLOR if is_purple else LIQUID_DROP_EMISSION_COLOR
+	material.emission_energy_multiplier = 0.72 if is_purple else 0.55
 	material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
 
 	var mesh := SphereMesh.new()
@@ -225,6 +252,8 @@ func setup(
 	var tint_value: Variant = options.get("visual_tint", Color.WHITE)
 	if tint_value is Color:
 		_visual_tint = tint_value as Color
+	if _snare_slow_ratio > 0.0 and _visual_tint == Color.WHITE:
+		_visual_tint = Color(0.92, 0.48, 1.35, 1.0)
 
 
 func _ready() -> void:
@@ -262,6 +291,8 @@ func _physics_process(delta: float) -> void:
 	if _tick_cooldown_seconds <= 0.0:
 		_tick_cooldown_seconds += _tick_interval_seconds
 		_apply_poison_tick()
+	if _snare_slow_ratio > 0.0:
+		_apply_snare_to_overlapping_hurtboxes()
 
 	if _remaining_seconds <= 0.0:
 		begin_fade_out()
@@ -304,6 +335,8 @@ func _tick_fade_out(step: float) -> void:
 	if is_instance_valid(_puddle_sprite):
 		_puddle_sprite.modulate.a = 0.94 * ratio
 		_puddle_sprite.scale = Vector3.ONE * lerpf(0.84, 1.0, ratio)
+	if _puddle_material != null:
+		_puddle_material.set_shader_parameter(&"pool_alpha", 0.94 * ratio)
 	if is_instance_valid(_ground_aura_material):
 		_ground_aura_material.set_shader_parameter("fade_progress", ratio)
 	if is_instance_valid(_pool_light):
@@ -320,6 +353,8 @@ func _set_gpu_particles_alpha(particles: GPUParticles3D, alpha_value: float) -> 
 	var quad := particles.draw_pass_1 as QuadMesh
 	if quad != null and quad.material is StandardMaterial3D:
 		(quad.material as StandardMaterial3D).albedo_color.a = alpha_value
+	elif quad != null and quad.material is ShaderMaterial:
+		(quad.material as ShaderMaterial).set_shader_parameter(&"intensity", 1.25 * alpha_value)
 
 
 func _update_spread_visuals(progress: float) -> void:
@@ -331,6 +366,8 @@ func _update_spread_visuals(progress: float) -> void:
 		_puddle_sprite.modulate = Color(
 			_visual_tint.r, _visual_tint.g, _visual_tint.b, lerpf(0.45, 0.94, eased)
 		)
+	if _puddle_material != null:
+		_puddle_material.set_shader_parameter(&"pool_alpha", lerpf(0.45, 0.94, eased))
 	if is_instance_valid(_ground_aura_material):
 		_ground_aura_material.set_shader_parameter("fade_progress", eased)
 	if is_instance_valid(_pool_light):
@@ -371,6 +408,10 @@ func _build_ground_aura() -> void:
 	_ground_aura_material.shader = POOL_SHADER
 	_ground_aura_material.set_shader_parameter("seed_offset", randf_range(0.0, 50.0))
 	_ground_aura_material.set_shader_parameter("fade_progress", 0.0)
+	if _snare_slow_ratio > 0.0:
+		_ground_aura_material.set_shader_parameter("outer_acid_color", Color(0.24, 0.04, 0.38, 1.0))
+		_ground_aura_material.set_shader_parameter("core_acid_color", Color(0.56, 0.18, 0.86, 1.0))
+		_ground_aura_material.set_shader_parameter("rim_neon_color", Color(0.88, 0.36, 1.0, 1.0))
 	var plane := PlaneMesh.new()
 	var span := _radius_meters * GROUND_AURA_SCALE_FACTOR
 	plane.size = Vector2(span, span)
@@ -396,10 +437,27 @@ func _build_puddle_sprite() -> void:
 	_puddle_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_puddle_sprite.position = Vector3(0.0, DECAL_GROUND_OFFSET_METERS, 0.0)
 	_puddle_sprite.modulate = _visual_tint
+	if _snare_slow_ratio > 0.0:
+		_puddle_material = ShaderMaterial.new()
+		_puddle_material.shader = ELITE_PUDDLE_SHADER
+		_puddle_material.set_shader_parameter(&"puddle_texture", PUDDLE_SHEET)
+		_puddle_material.set_shader_parameter(&"pool_alpha", 0.45)
+		_puddle_sprite.material_override = _puddle_material
 	add_child(_puddle_sprite)
 
 
 func _build_light_particles() -> void:
+	var is_purple := _snare_slow_ratio > 0.0
+	var spark_mesh: QuadMesh = null
+	var glint_mesh: QuadMesh = null
+	if is_purple:
+		spark_mesh = QuadMesh.new()
+		spark_mesh.size = Vector2(0.24, 0.24)
+		spark_mesh.material = create_purple_particle_material(SPARK_TEXTURE, 1.35)
+		glint_mesh = QuadMesh.new()
+		glint_mesh.size = Vector2(0.16, 0.16)
+		glint_mesh.material = create_purple_particle_material(SPARK_TEXTURE, 1.45)
+
 	var spark_count := clampi(
 		int(roundf(_radius_meters * SPARK_DENSITY_PER_METER)), MIN_SPARK_COUNT, MAX_SPARK_COUNT
 	)
@@ -410,7 +468,10 @@ func _build_light_particles() -> void:
 		SPARK_LIFETIME_SECONDS,
 		_radius_meters * 0.88,
 		Vector2(0.24, 0.24),
-		true
+		true,
+		false,
+		true,
+		spark_mesh
 	)
 	_rising_sparks.amount_ratio = MIN_EMISSION_RATIO
 	var spark_process := _rising_sparks.process_material as ParticleProcessMaterial
@@ -422,9 +483,13 @@ func _build_light_particles() -> void:
 	spark_process.orbit_velocity_max = 0.45
 	spark_process.scale_min = 0.35
 	spark_process.scale_max = 0.9
-	spark_process.color_ramp = create_fade_ramp_texture(
-		Color(0.9, 1.0, 0.5, 0.9) * _visual_tint, Color(0.35, 0.95, 0.2, 0.0) * _visual_tint
+	var spark_start := (
+		Color(0.95, 0.72, 1.0, 0.95) if is_purple else Color(0.9, 1.0, 0.5, 0.9) * _visual_tint
 	)
+	var spark_end := (
+		Color(0.62, 0.22, 0.96, 0.0) if is_purple else Color(0.35, 0.95, 0.2, 0.0) * _visual_tint
+	)
+	spark_process.color_ramp = create_fade_ramp_texture(spark_start, spark_end)
 	add_child(_rising_sparks)
 	_rising_sparks.emitting = true
 
@@ -438,7 +503,10 @@ func _build_light_particles() -> void:
 		GLINT_LIFETIME_SECONDS,
 		_radius_meters * 0.78,
 		Vector2(0.16, 0.16),
-		true
+		true,
+		false,
+		true,
+		glint_mesh
 	)
 	_surface_glints.amount_ratio = MIN_EMISSION_RATIO
 	var glint_process := _surface_glints.process_material as ParticleProcessMaterial
@@ -448,9 +516,13 @@ func _build_light_particles() -> void:
 	glint_process.gravity = Vector3(0.0, -0.35, 0.0)
 	glint_process.scale_min = 0.4
 	glint_process.scale_max = 0.9
-	glint_process.color_ramp = create_fade_ramp_texture(
-		Color(1.0, 1.0, 0.68, 0.9) * _visual_tint, Color(0.55, 1.0, 0.25, 0.0) * _visual_tint
+	var glint_start := (
+		Color(1.0, 0.8, 1.0, 0.95) if is_purple else Color(1.0, 1.0, 0.68, 0.9) * _visual_tint
 	)
+	var glint_end := (
+		Color(0.75, 0.28, 1.0, 0.0) if is_purple else Color(0.55, 1.0, 0.25, 0.0) * _visual_tint
+	)
+	glint_process.color_ramp = create_fade_ramp_texture(glint_start, glint_end)
 	add_child(_surface_glints)
 	_surface_glints.emitting = true
 
@@ -458,7 +530,9 @@ func _build_light_particles() -> void:
 func _build_pool_light() -> void:
 	_pool_light = OmniLight3D.new()
 	_pool_light.name = "PoolLight"
-	_pool_light.light_color = Color(0.48, 1.0, 0.25)
+	_pool_light.light_color = (
+		Color(0.78, 0.28, 1.0) if _snare_slow_ratio > 0.0 else Color(0.48, 1.0, 0.25)
+	)
 	_pool_light.light_energy = 0.0
 	_pool_light.omni_range = _radius_meters * 1.85
 	_pool_light.shadow_enabled = false
@@ -469,7 +543,23 @@ func _build_pool_light() -> void:
 func _on_area_entered(other_area: Area3D) -> void:
 	if _stage == Stage.FADE_OUT:
 		return
-	_apply_poison_to_hurtbox(other_area as HurtBox)
+	var hurtbox := other_area as HurtBox
+	_apply_snare_to_hurtbox(hurtbox)
+	_apply_poison_to_hurtbox(hurtbox)
+
+
+func _apply_snare_to_overlapping_hurtboxes() -> void:
+	if _snare_slow_ratio <= 0.0 or not is_instance_valid(_area) or _stage == Stage.FADE_OUT:
+		return
+	for body_area in _area.get_overlapping_areas():
+		_apply_snare_to_hurtbox(body_area as HurtBox)
+
+
+func _apply_snare_to_hurtbox(hurtbox: HurtBox) -> void:
+	if _snare_slow_ratio <= 0.0 or hurtbox == null or not is_instance_valid(hurtbox.actor):
+		return
+	if hurtbox.actor.has_method(&"apply_snare"):
+		hurtbox.actor.call(&"apply_snare", SNARE_REFRESH_SECONDS, 1.0 - _snare_slow_ratio)
 
 
 func _apply_poison_tick() -> void:

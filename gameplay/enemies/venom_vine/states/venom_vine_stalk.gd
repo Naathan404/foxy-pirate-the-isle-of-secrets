@@ -56,6 +56,9 @@ func _update(delta: float) -> void:
 		vine.add_inner_agitation(delta)
 
 	var step := maxf(0.0, delta)
+	if vine._try_stalk_special_action(step):
+		return
+
 	_idle_remaining_seconds = maxf(0.0, _idle_remaining_seconds - step)
 	if _idle_remaining_seconds > 0.0:
 		return

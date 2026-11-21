@@ -5,15 +5,14 @@ extends EnemyBase
 const AI_CLASS := preload("res://gameplay/enemies/venom_vine/venom_vine_ai.gd")
 const PROJECTILE_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_pool_projectile.gd")
 const ACID_POOL_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_acid_pool.gd")
+const VFX_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_vine_vfx.gd")
 const GLOW_SHADER := preload("res://gameplay/enemies/venom_vine/venom_vine_glow.gdshader")
-const PARTICLE_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_acid_particles.png")
 const DORMANT_TEXTURE := preload("res://assets/sprites/enemies/venom_vine/venom_vine_dormant.png")
 const ACTIVE_TEXTURE := preload(
 	"res://assets/sprites/enemies/venom_vine/venom_vine_active_sheet.png"
 )
 const BURROW_TEXTURE := preload("res://assets/sprites/enemies/venom_vine/venom_vine_burrow.png")
 
-const PARTICLE_CELL_SIZE := 256.0
 const AGITATION_DECAY_PER_SECOND := 0.12
 const AGITATION_PER_HIT := 0.35
 const AGITATION_INNER_GAIN_PER_SECOND := 0.15
@@ -22,12 +21,8 @@ const MAX_FLIGHT_SECONDS := 0.85
 const IDLE_GLOW_AWAKE := 0.55
 const LIGHT_ENERGY_AWAKE := 0.6
 const LIGHT_ENERGY_CHARGE_BONUS := 1.15
-const MUZZLE_FLASH_DURATION := 0.18
-const MUZZLE_DROPLET_LIFETIME := 0.28
 const AMBIENT_SPORE_COUNT := 56
 const AMBIENT_SPORE_LIFETIME_SECONDS := 1.45
-const HIT_EFFECT_HEIGHT_METERS := 1.25
-const HIT_DROPLET_LIFETIME := 0.32
 const HIT_GLOW_BOOST := 1.1
 const HIT_COUNTER_GLOW_BOOST := 1.65
 const HIT_GLOW_DECAY_PER_SECOND := 3.2
@@ -93,7 +88,7 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 @export_range(0.4, 5.0, 0.05, "suffix:m") var pool_radius_meters: float = 1.05
 @export_range(0.5, 15.0, 0.1, "suffix:s") var pool_duration_seconds: float = 4.2
 @export_range(0.1, 4.0, 0.05, "suffix:s") var pool_tick_interval_seconds: float = 0.85
-@export_range(0.1, 20.0, 0.1) var pool_tick_damage_hp: float = 0.5
+@export_range(0.0, 5.0, 0.05) var pool_tick_damage_multiplier: float = 1.0
 @export_range(1, 12, 1) var max_active_pools: int = 4
 
 @export_group("Hit Reaction & Counter")
@@ -110,6 +105,7 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 @export_range(0.2, 3.0, 0.05, "suffix:s") var burrow_duration_seconds: float = 1.1
 @export_range(1.0, 15.0, 0.25, "suffix:s") var burrow_cooldown_seconds: float = 4.5
 @export_range(0.1, 2.0, 0.05, "suffix:s") var burrow_transition_seconds: float = 0.4
+@export_range(0.2, 3.0, 0.05, "suffix:s") var post_emerge_attack_delay_seconds: float = 0.7
 ## Khoảng cách thời gian tối đa giữa hai đòn cận chiến liên tiếp.
 @export_range(0.3, 5.0, 0.1, "suffix:s") var melee_combo_window_seconds: float = 2.0
 ## Quên các đòn cũ sau khoảng nghỉ để phản công dựa trên áp lực gần đây.
@@ -165,8 +161,6 @@ func _ready() -> void:
 	set_sprite_sheet_mode(true)
 	_setup_luminous_vfx()
 	damaged.connect(_on_vine_damaged)
-	_begin_burrow()
-	_show_burrow_frame(3)
 
 
 func _process(delta: float) -> void:
@@ -214,6 +208,11 @@ func receive_damage(damage: DamageContext) -> float:
 		var force_hide := _record_melee_hit(damage)
 		_hits_toward_counter += 2 if was_charging else 1
 		_counter_hit_remaining_seconds = counter_hit_window_seconds
+		if _try_custom_hit_reaction(was_charging, force_hide):
+			_trigger_hit_recoil()
+			_hit_glow_boost = HIT_COUNTER_GLOW_BOOST
+			_spawn_hit_impact_vfx(true)
+			return applied
 		var reaction := (
 			ai
 			. choose_hit_reaction(
@@ -282,6 +281,8 @@ func _record_melee_hit(damage: DamageContext) -> bool:
 
 
 func _request_burrow(counter_after_emerge: bool) -> bool:
+	if is_instance_valid(fsm) and fsm.current_state is VenomVineBurrow:
+		return false
 	if not request_state(&"burrow", BURROW_PRIORITY):
 		return false
 	_counter_after_burrow = counter_after_emerge
@@ -303,6 +304,13 @@ func _begin_burrow() -> void:
 	if is_burrowed:
 		return
 	is_burrowed = true
+	if is_instance_valid(_ambient_spores):
+		_ambient_spores.emitting = false
+		_ambient_spores.visible = false
+		_ambient_spores.restart()
+	if is_instance_valid(_venom_light):
+		_venom_light.light_energy = 0.0
+	_sync_glow_vfx()
 	_burrow_saved_hurtbox_enabled = hurtbox.enabled
 	_burrow_saved_hurtbox_layer = hurtbox.collision_layer
 	_burrow_saved_hurtbox_mask = hurtbox.collision_mask
@@ -331,6 +339,9 @@ func _end_burrow() -> void:
 	if not is_burrowed:
 		return
 	is_burrowed = false
+	if is_instance_valid(_ambient_spores):
+		_ambient_spores.visible = true
+	_sync_glow_vfx()
 	if not dead:
 		hurtbox.collision_layer = _burrow_saved_hurtbox_layer
 		hurtbox.collision_mask = _burrow_saved_hurtbox_mask
@@ -517,6 +528,12 @@ func build_counter_plan() -> Dictionary:
 	return plan
 
 
+func resolve_attack_damage(multiplier: float = 1.0) -> float:
+	if data == null:
+		return 0.0
+	return maxf(0.0, data.attack_damage * maxf(0.0, multiplier))
+
+
 ## Hook mở rộng cho EliteVenomVine override khi có chiêu đặc biệt.
 func can_use_special_attack() -> bool:
 	return false
@@ -538,11 +555,79 @@ func build_pool_config() -> Dictionary:
 		"pool_radius": pool_radius_meters,
 		"pool_duration_seconds": pool_duration_seconds,
 		"tick_interval_seconds": pool_tick_interval_seconds,
-		"tick_damage_hp": pool_tick_damage_hp,
+		"tick_damage_hp": resolve_attack_damage(pool_tick_damage_multiplier),
 		"snare_slow_ratio": 0.0,
 		"split_pod_count": 0,
 		"use_thorny_pod": false,
 	}
+
+
+func _get_relocate_telegraph_seconds() -> float:
+	return 0.0
+
+
+func _get_burrow_hidden_duration() -> float:
+	return burrow_duration_seconds
+
+
+func _should_always_relocate() -> bool:
+	return false
+
+
+func _on_vigilant_timeout() -> void:
+	ambushed_wake = false
+	set_awake(false)
+	request_state(&"dormant")
+
+
+func _consume_relocate_target() -> Variant:
+	return null
+
+
+func _try_custom_hit_reaction(_was_charging: bool, _melee_combo_reached: bool) -> bool:
+	return false
+
+
+func _try_stalk_special_action(_step: float) -> bool:
+	return false
+
+
+func _spawn_relocate_telegraph(
+	_old_pos: Vector3, _next_pos: Vector3, _duration_seconds: float
+) -> void:
+	pass
+
+
+func _clear_relocate_telegraph() -> void:
+	pass
+
+
+func _on_relocate_emerged() -> bool:
+	return false
+
+
+func _on_burrow_retreat_started() -> void:
+	pass
+
+
+func _update_burrow_retreat_visual(_progress: float) -> void:
+	pass
+
+
+func _on_burrow_emerge_started(_from_relocate: bool) -> void:
+	pass
+
+
+func _update_burrow_emerge_visual(_progress: float, _from_relocate: bool) -> void:
+	pass
+
+
+func _reset_burrow_visual_state() -> void:
+	if is_instance_valid(visual):
+		visual.visible = true
+		visual.position.y = 0.0
+		if is_instance_valid(visual.sprite):
+			visual.sprite.modulate.a = 1.0
 
 
 func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) -> void:
@@ -581,7 +666,7 @@ func fire_shot_at(landing_target: Vector3, custom_pool_config: Dictionary = {}) 
 	_active_projectiles = _active_projectiles.filter(func(p): return is_instance_valid(p))
 	_active_projectiles.append(proj)
 	parent.add_child(proj)
-	spawn_muzzle_flash()
+	_spawn_muzzle_flash()
 
 
 func set_charge_glow(strength: float, is_counter: bool = false) -> void:
@@ -590,141 +675,19 @@ func set_charge_glow(strength: float, is_counter: bool = false) -> void:
 	_sync_glow_vfx()
 
 
-func spawn_muzzle_flash() -> void:
-	var parent := get_parent()
-	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
-		return
+func _uses_purple_acid() -> bool:
+	return false
+
+
+func _spawn_muzzle_flash() -> void:
 	var spawn_pos := (
 		bullet_spawn.global_position
 		if is_instance_valid(bullet_spawn)
 		else global_position + Vector3.UP * 1.35
 	)
-	var flash_color := (
-		COUNTER_GLOW_COLOR.lerp(Color.WHITE, 0.35)
-		if _charge_counter_mix > 0.5
-		else NORMAL_GLOW_COLOR.lerp(Color.WHITE, 0.35)
+	VFX_SCRIPT.spawn_muzzle_flash(
+		get_parent(), spawn_pos, last_facing_direction, _charge_counter_mix, _uses_purple_acid()
 	)
-	_spawn_additive_atlas_burst(
-		parent,
-		"VenomMuzzleFlash",
-		spawn_pos,
-		{
-			"col": 0,
-			"pixel_size": 0.0062,
-			"tint": flash_color,
-			"start_scale": 0.45,
-			"end_scale": 1.25,
-			"duration": MUZZLE_FLASH_DURATION,
-			"billboard": true,
-		}
-	)
-
-	var shoot_dir := (last_facing_direction * 0.8 + Vector3.UP * 0.55).normalized()
-	_spawn_one_shot_spray(
-		parent,
-		"MuzzleAcidSpray",
-		spawn_pos,
-		shoot_dir,
-		{
-			"spread": 36.0,
-			"vel_min": 2.0,
-			"vel_max": 3.8,
-			"gravity_y": -7.5,
-			"count": 10,
-			"lifetime": MUZZLE_DROPLET_LIFETIME,
-			"start_color": Color(0.85, 1.0, 0.48, 0.95),
-			"end_color": Color(0.3, 0.95, 0.22, 0.0),
-			"col": 2,
-		}
-	)
-
-
-func _spawn_additive_atlas_burst(
-	parent: Node, node_name: String, world_pos: Vector3, config: Dictionary = {}
-) -> void:
-	var particle_col := int(config.get("col", 0))
-	var billboard := bool(config.get("billboard", true))
-	var pixel_size_value := float(config.get("pixel_size", 0.0056))
-	var start_scale := float(config.get("start_scale", 0.45))
-	var end_scale := float(config.get("end_scale", 1.2))
-	var duration_seconds := float(config.get("duration", 0.2))
-	var tint: Color = config.get("tint", NORMAL_GLOW_COLOR) as Color
-
-	var atlas := AtlasTexture.new()
-	atlas.atlas = PARTICLE_SHEET
-	atlas.region = Rect2(
-		float(particle_col) * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE
-	)
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.vertex_color_use_as_albedo = true
-	if billboard:
-		mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-	else:
-		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mat.albedo_texture = atlas
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
-
-	var burst := Sprite3D.new()
-	burst.name = node_name
-	burst.texture = atlas
-	burst.pixel_size = pixel_size_value
-	burst.billboard = (
-		BaseMaterial3D.BILLBOARD_ENABLED if billboard else BaseMaterial3D.BILLBOARD_DISABLED
-	)
-	if not billboard:
-		burst.rotation.x = -PI * 0.5
-	burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	burst.modulate = tint
-	burst.scale = Vector3.ONE * start_scale
-	burst.material_override = mat
-	burst.position = (parent as Node3D).to_local(world_pos) if parent is Node3D else world_pos
-	parent.add_child(burst)
-	burst.global_position = world_pos
-
-	var tween := burst.create_tween().set_parallel(true)
-	tween.tween_property(burst, "scale", Vector3.ONE * end_scale, duration_seconds)
-	tween.tween_property(burst, "modulate:a", 0.0, duration_seconds)
-	tween.chain().tween_callback(burst.queue_free)
-
-
-func _spawn_one_shot_spray(
-	parent: Node, node_name: String, world_pos: Vector3, spray_dir: Vector3, config: Dictionary = {}
-) -> void:
-	var lifetime_seconds := float(config.get("lifetime", 0.3))
-	var particle_col := int(config.get("col", 2))
-	var start_color: Color = config.get("start_color", Color(0.85, 1.0, 0.48, 0.95)) as Color
-	var end_color: Color = config.get("end_color", Color(0.3, 0.95, 0.22, 0.0)) as Color
-	var spray := CPUParticles3D.new()
-	spray.name = node_name
-	spray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	spray.amount = int(config.get("count", 10))
-	spray.lifetime = lifetime_seconds
-	spray.one_shot = true
-	spray.explosiveness = 1.0
-	spray.emitting = false
-	spray.local_coords = false
-	spray.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	spray.emission_sphere_radius = 0.14
-	spray.direction = spray_dir
-	spray.spread = float(config.get("spread", 45.0))
-	spray.initial_velocity_min = float(config.get("vel_min", 2.0))
-	spray.initial_velocity_max = float(config.get("vel_max", 4.0))
-	spray.gravity = Vector3(0.0, float(config.get("gravity_y", -8.0)), 0.0)
-	spray.scale_amount_min = 0.2
-	spray.scale_amount_max = 0.38
-	spray.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(start_color, end_color)
-	spray.mesh = ACID_POOL_SCRIPT.create_particle_quad(particle_col, Vector2(0.42, 0.42), true)
-	spray.position = (parent as Node3D).to_local(world_pos) if parent is Node3D else world_pos
-	parent.add_child(spray)
-	spray.global_position = world_pos
-	spray.emitting = true
-	var cleanup := spray.create_tween()
-	cleanup.tween_interval(lifetime_seconds + 0.18)
-	cleanup.tween_callback(spray.queue_free)
 
 
 func _trigger_hit_recoil() -> void:
@@ -761,91 +724,23 @@ func _trigger_hit_recoil() -> void:
 
 
 func _spawn_hit_impact_vfx(counter_triggered: bool) -> void:
-	var parent := get_parent()
-	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
-		return
-	var hit_pos := global_position + Vector3.UP * HIT_EFFECT_HEIGHT_METERS
-	var primary_col := (
-		COUNTER_GLOW_COLOR.lerp(Color.WHITE, 0.35)
-		if counter_triggered
-		else NORMAL_GLOW_COLOR.lerp(Color.WHITE, 0.4)
-	)
-	var end_col := Color(1.0, 0.35, 0.1, 0.0) if counter_triggered else Color(0.28, 0.95, 0.22, 0.0)
-	_spawn_additive_atlas_burst(
-		parent,
-		"VenomHitFlash",
-		hit_pos,
-		{
-			"col": 0,
-			"pixel_size": 0.0068 if counter_triggered else 0.0056,
-			"tint": primary_col,
-			"start_scale": 0.45,
-			"end_scale": 1.35 if counter_triggered else 1.1,
-			"duration": 0.18,
-			"billboard": true,
-		}
-	)
-	_spawn_additive_atlas_burst(
-		parent,
-		"VenomHitWave",
-		hit_pos,
-		{
-			"col": 3,
-			"pixel_size": 0.0066 if counter_triggered else 0.005,
-			"tint": COUNTER_GLOW_COLOR if counter_triggered else NORMAL_GLOW_COLOR,
-			"start_scale": 0.35,
-			"end_scale": 1.55 if counter_triggered else 1.2,
-			"duration": 0.24,
-			"billboard": true,
-		}
-	)
-	if counter_triggered:
-		_spawn_additive_atlas_burst(
-			parent,
-			"VenomCounterGroundRing",
-			global_position + Vector3.UP * 0.06,
-			{
-				"col": 3,
-				"pixel_size": 0.009,
-				"tint": COUNTER_GLOW_COLOR,
-				"start_scale": 0.45,
-				"end_scale": 1.75,
-				"duration": 0.34,
-				"billboard": false,
-			}
-		)
-	var away_dir := (
-		Vector3(pending_hit_direction.x, 0.65, pending_hit_direction.z).normalized()
-		if not pending_hit_direction.is_zero_approx()
-		else Vector3.UP
-	)
-	_spawn_one_shot_spray(
-		parent,
-		"VenomHitDroplets",
-		hit_pos,
-		away_dir,
-		{
-			"spread": 58.0,
-			"vel_min": 2.2,
-			"vel_max": 4.5,
-			"gravity_y": -8.5,
-			"count": 18 if counter_triggered else 12,
-			"lifetime": HIT_DROPLET_LIFETIME,
-			"start_color": primary_col,
-			"end_color": end_col,
-			"col": 2,
-		}
+	VFX_SCRIPT.spawn_hit_impact_vfx(
+		get_parent(), global_position, pending_hit_direction, counter_triggered
 	)
 
 
-func _on_projectile_impacted(_landing_pos: Vector3, pool: VenomAcidPool) -> void:
+func _register_spawned_pool(pool: VenomAcidPool) -> void:
 	_prune_active_pools()
-	if is_instance_valid(pool):
+	if is_instance_valid(pool) and pool not in _active_pools:
 		_active_pools.append(pool)
 	while _active_pools.size() > max_active_pools:
 		var oldest := _active_pools.pop_front() as VenomAcidPool
 		if is_instance_valid(oldest) and not oldest.is_fading():
 			oldest.begin_fade_out()
+
+
+func _on_projectile_impacted(_landing_pos: Vector3, pool: VenomAcidPool) -> void:
+	_register_spawned_pool(pool)
 
 
 func _prune_active_pools() -> void:
@@ -913,7 +808,14 @@ func _setup_luminous_vfx() -> void:
 	_glow_material = ShaderMaterial.new()
 	_glow_material.shader = GLOW_SHADER
 	if is_instance_valid(visual) and is_instance_valid(visual.sprite):
-		visual.sprite.material_overlay = _glow_material
+		var existing_overlay := visual.sprite.material_overlay
+		if existing_overlay != null:
+			var tail := existing_overlay
+			while tail.next_pass != null:
+				tail = tail.next_pass
+			tail.next_pass = _glow_material
+		else:
+			visual.sprite.material_overlay = _glow_material
 
 	var vfx_anchor: Node3D = bullet_spawn if is_instance_valid(bullet_spawn) else self
 	var offset := Vector3.ZERO if is_instance_valid(bullet_spawn) else Vector3(0.0, 2.0, 0.25)
@@ -945,7 +847,8 @@ func _setup_luminous_vfx() -> void:
 	spore_process.scale_min = 0.45
 	spore_process.scale_max = 1.15
 	spore_process.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp_texture(
-		Color(0.84, 1.0, 0.46, 0.94), Color(0.28, 0.94, 0.38, 0.0)
+		Color(0.92, 0.58, 1.0, 0.94) if _uses_purple_acid() else Color(0.84, 1.0, 0.46, 0.94),
+		Color(0.56, 0.18, 0.92, 0.0) if _uses_purple_acid() else Color(0.28, 0.94, 0.38, 0.0)
 	)
 	_ambient_spores.position = offset
 	vfx_anchor.add_child(_ambient_spores)

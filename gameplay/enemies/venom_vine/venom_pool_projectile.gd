@@ -62,6 +62,7 @@ var _elapsed_seconds: float = 0.0
 var _detonated: bool = false
 
 var _glob_particles: GPUParticles3D
+var _pod_sprite: Sprite3D
 var _flight_light: OmniLight3D
 var _shadow_mesh: MeshInstance3D
 var _trail_particles: GPUParticles3D
@@ -221,11 +222,24 @@ func cancel() -> void:
 	queue_free()
 
 
+func _is_elite_acid() -> bool:
+	return float(_pool_config.get("snare_slow_ratio", 0.0)) > 0.0
+
+
 func _build_flight_visuals() -> void:
-	_build_glob_particles()
-	_build_flight_light()
+	var is_purple := _is_elite_acid()
+	_build_glob_particles(is_purple)
+	_build_thorny_pod_sprite(is_purple)
+	_build_flight_light(is_purple)
 	_build_ground_shadow()
 
+	var trail_mesh: QuadMesh = null
+	if is_purple:
+		trail_mesh = QuadMesh.new()
+		trail_mesh.size = Vector2(0.34, 0.34)
+		trail_mesh.material = ACID_POOL_SCRIPT.create_purple_particle_material(
+			ACID_POOL_SCRIPT.SPORE_TEXTURE, 1.35
+		)
 	_trail_particles = ACID_POOL_SCRIPT.create_gpu_particles(
 		"TrailParticles",
 		ACID_POOL_SCRIPT.SPORE_TEXTURE,
@@ -235,7 +249,8 @@ func _build_flight_visuals() -> void:
 		Vector2(0.34, 0.34),
 		true,
 		true,
-		false
+		false,
+		trail_mesh
 	)
 	var trail_process := _trail_particles.process_material as ParticleProcessMaterial
 	trail_process.spread = 180.0
@@ -245,13 +260,39 @@ func _build_flight_visuals() -> void:
 	trail_process.scale_min = 0.4
 	trail_process.scale_max = 1.0
 	trail_process.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp_texture(
-		Color(0.88, 1.0, 0.48, 0.96), Color(0.28, 0.95, 0.35, 0.0)
+		Color(0.96, 0.68, 1.0, 0.96) if is_purple else Color(0.88, 1.0, 0.48, 0.96),
+		Color(0.58, 0.2, 0.95, 0.0) if is_purple else Color(0.28, 0.95, 0.35, 0.0)
 	)
 	add_child(_trail_particles)
 	_trail_particles.emitting = true
 
 
-func _build_glob_particles() -> void:
+func _build_thorny_pod_sprite(is_purple: bool) -> void:
+	if not bool(_pool_config.get("use_thorny_pod", false)):
+		return
+	var is_master_split := int(_pool_config.get("split_pod_count", 0)) > 0
+	_pod_sprite = Sprite3D.new()
+	_pod_sprite.name = "ThornyPodSprite"
+	_pod_sprite.texture = GLOB_SHEET
+	_pod_sprite.hframes = 4
+	_pod_sprite.vframes = 2
+	_pod_sprite.frame = 2
+	_pod_sprite.pixel_size = 0.0024 if is_master_split else 0.0018
+	_pod_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_pod_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_pod_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if is_purple:
+		_pod_sprite.modulate = (
+			Color(0.96, 0.56, 1.32, 0.98) if is_master_split else Color(0.88, 0.52, 1.24, 0.94)
+		)
+	else:
+		_pod_sprite.modulate = (
+			Color(1.08, 1.0, 1.15, 0.98) if is_master_split else Color(0.95, 1.0, 0.92, 0.92)
+		)
+	add_child(_pod_sprite)
+
+
+func _build_glob_particles(is_purple: bool) -> void:
 	_glob_particles = ACID_POOL_SCRIPT.create_gpu_particles(
 		"LuminousAcidGlob",
 		null,
@@ -262,7 +303,7 @@ func _build_glob_particles() -> void:
 		true,
 		true,
 		true,
-		ACID_POOL_SCRIPT.create_liquid_drop_mesh()
+		ACID_POOL_SCRIPT.create_liquid_drop_mesh(is_purple)
 	)
 	var process := _glob_particles.process_material as ParticleProcessMaterial
 	process.initial_velocity_min = GLOB_MOTE_VELOCITY_MIN
@@ -273,16 +314,17 @@ func _build_glob_particles() -> void:
 	process.scale_min = GLOB_MOTE_SCALE_MIN
 	process.scale_max = GLOB_MOTE_SCALE_MAX
 	process.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp_texture(
-		GLOB_MOTE_COLOR_START, GLOB_MOTE_COLOR_END
+		Color(0.96, 0.62, 1.0, 0.94) if is_purple else GLOB_MOTE_COLOR_START,
+		Color(0.54, 0.16, 0.92, 0.0) if is_purple else GLOB_MOTE_COLOR_END
 	)
 	add_child(_glob_particles)
 	_glob_particles.emitting = true
 
 
-func _build_flight_light() -> void:
+func _build_flight_light(is_purple: bool) -> void:
 	_flight_light = OmniLight3D.new()
 	_flight_light.name = "FlightLight"
-	_flight_light.light_color = Color(0.52, 1.0, 0.28)
+	_flight_light.light_color = Color(0.78, 0.28, 1.0) if is_purple else Color(0.52, 1.0, 0.28)
 	_flight_light.light_energy = 0.75
 	_flight_light.omni_range = 2.6
 	_flight_light.shadow_enabled = false
@@ -341,6 +383,8 @@ func _build_direct_hitbox() -> void:
 func _update_flight_visuals(progress: float) -> void:
 	if is_instance_valid(_glob_particles):
 		_glob_particles.amount_ratio = lerpf(0.75, 1.0, progress)
+	if is_instance_valid(_pod_sprite):
+		_pod_sprite.rotation.z = progress * TAU * 1.5
 	if is_instance_valid(_shadow_mesh):
 		var height := maxf(0.0, global_position.y - _landing_position.y)
 		var shadow_scale := clampf(1.0 - height * 0.12, 0.35, 1.0)
@@ -398,6 +442,7 @@ func _spawn_splash_burst() -> void:
 	var parent := get_parent()
 	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
 		return
+	var is_purple := _is_elite_acid()
 	var burst := Sprite3D.new()
 	burst.name = "AcidSplashBurst"
 	burst.texture = GLOB_SHEET
@@ -408,6 +453,8 @@ func _spawn_splash_burst() -> void:
 	burst.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	burst.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if is_purple:
+		burst.modulate = Color(0.92, 0.44, 1.35, 0.96)
 	var splash_pos := _landing_position + Vector3.UP * SPLASH_GROUND_OFFSET_METERS
 	burst.position = (parent as Node3D).to_local(splash_pos) if parent is Node3D else splash_pos
 	parent.add_child(burst)
@@ -417,11 +464,11 @@ func _spawn_splash_burst() -> void:
 	tween.tween_property(burst, "modulate:a", 0.0, 0.28)
 	tween.chain().tween_callback(burst.queue_free)
 
-	_spawn_impact_ring(parent)
-	_spawn_impact_droplets(parent)
+	_spawn_impact_ring(parent, is_purple)
+	_spawn_impact_droplets(parent, is_purple)
 
 
-func _spawn_impact_ring(parent: Node) -> void:
+func _spawn_impact_ring(parent: Node, is_purple: bool) -> void:
 	var pool_radius := maxf(0.4, float(_pool_config.get("pool_radius", 1.6)))
 	var ring_atlas := AtlasTexture.new()
 	ring_atlas.atlas = PARTICLE_SHEET
@@ -439,7 +486,7 @@ func _spawn_impact_ring(parent: Node) -> void:
 	wave.texture = ring_atlas
 	wave.pixel_size = (pool_radius * 2.0) / RING_PIXEL_DIVISOR
 	wave.rotation.x = -PI * 0.5
-	wave.modulate = Color(0.65, 1.0, 0.35, 0.9)
+	wave.modulate = Color(0.84, 0.16, 1.45, 0.92) if is_purple else Color(0.65, 1.0, 0.35, 0.9)
 	wave.scale = Vector3.ONE * 0.45
 	wave.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	wave.material_override = ring_mat
@@ -453,7 +500,7 @@ func _spawn_impact_ring(parent: Node) -> void:
 	wave_tween.chain().tween_callback(wave.queue_free)
 
 
-func _spawn_impact_droplets(parent: Node) -> void:
+func _spawn_impact_droplets(parent: Node, is_purple: bool) -> void:
 	var particles := CPUParticles3D.new()
 	particles.name = "ImpactDroplets"
 	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -474,9 +521,10 @@ func _spawn_impact_droplets(parent: Node) -> void:
 	particles.scale_amount_max = 0.42
 	particles.scale_amount_curve = ACID_POOL_SCRIPT.create_scale_curve(1.0, 0.15)
 	particles.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp(
-		Color(0.85, 1.0, 0.45, 0.95), Color(0.3, 0.95, 0.2, 0.0)
+		Color(0.96, 0.64, 1.0, 0.96) if is_purple else Color(0.85, 1.0, 0.45, 0.95),
+		Color(0.56, 0.16, 0.94, 0.0) if is_purple else Color(0.3, 0.95, 0.2, 0.0)
 	)
-	particles.mesh = ACID_POOL_SCRIPT.create_particle_quad(2, Vector2(0.45, 0.45), true)
+	particles.mesh = ACID_POOL_SCRIPT.create_particle_quad(2, Vector2(0.45, 0.45), true, is_purple)
 	var drop_pos := _landing_position + Vector3.UP * 0.15
 	particles.position = (parent as Node3D).to_local(drop_pos) if parent is Node3D else drop_pos
 	parent.add_child(particles)
@@ -494,25 +542,54 @@ func _spawn_split_pods_if_enabled() -> void:
 	var parent := get_parent()
 	if not is_instance_valid(parent) or parent.is_queued_for_deletion():
 		return
-	var split_radius := maxf(0.5, float(_pool_config.get("split_pool_radius", 1.1)))
-	var split_dist := maxf(1.2, float(_pool_config.get("split_distance_meters", 2.2)))
+	var split_radius := maxf(0.5, float(_pool_config.get("split_pool_radius", 0.85)))
+	var split_dist := maxf(1.2, float(_pool_config.get("split_distance_meters", 2.0)))
+	var primary_radius := maxf(0.4, float(_pool_config.get("pool_radius", 1.2)))
 	var sub_config := _pool_config.duplicate(true)
 	sub_config["split_pod_count"] = 0
 	sub_config["use_thorny_pod"] = false
 	sub_config["pool_radius"] = split_radius
+	if sub_config.has("split_tick_damage_hp"):
+		sub_config["tick_damage_hp"] = float(sub_config["split_tick_damage_hp"])
+	var space := (
+		get_world_3d().direct_space_state if is_inside_tree() and get_world_3d() != null else null
+	)
+	var excluded_rids: Array[RID] = []
+	if _source is CollisionObject3D and is_instance_valid(_source):
+		excluded_rids.append((_source as CollisionObject3D).get_rid())
+	var occupied := collect_active_pool_spots(self)
+	occupied.append({"pos": _landing_position, "radius": primary_radius})
 	var start_angle := randf() * TAU
 	for idx in range(split_count):
 		var angle := start_angle + TAU * float(idx) / float(split_count)
-		var target_pos := _landing_position + Vector3(cos(angle), 0.0, sin(angle)) * split_dist
+		var desired := _landing_position + Vector3(cos(angle), 0.0, sin(angle)) * split_dist
+		var resolved := resolve_landing_spot(
+			_landing_position,
+			desired,
+			_landing_position.y,
+			split_radius,
+			occupied,
+			space,
+			excluded_rids,
+			maxf(1.0, split_dist * 0.6),
+			split_dist * 1.4
+		)
+		occupied.append({"pos": resolved, "radius": split_radius})
 		var sub_proj := get_script().new() as VenomPoolProjectile
 		sub_proj.setup(
 			_source,
 			_source_team,
 			_landing_position + Vector3.UP * 0.35,
-			target_pos,
+			resolved,
 			0.38,
 			1.4,
 			_direct_damage_hp * 0.5,
 			sub_config
 		)
+		if is_instance_valid(_source) and _source.has_method(&"_register_spawned_pool"):
+			sub_proj.impacted.connect(
+				func(_pos: Vector3, spawned_pool: VenomAcidPool) -> void:
+					if is_instance_valid(_source):
+						_source.call(&"_register_spawned_pool", spawned_pool)
+			)
 		parent.add_child(sub_proj)
