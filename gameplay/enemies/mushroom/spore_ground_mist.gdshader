@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled;
 
 uniform vec4 outer_mist_color : source_color = vec4(0.36, 0.18, 0.48, 1.0);
-uniform vec4 spore_core_color : source_color = vec4(0.54, 0.78, 0.34, 1.0);
+uniform vec4 spore_core_color : source_color = vec4(0.62, 0.4, 0.8, 1.0);
 uniform float opacity : hint_range(0.0, 1.0) = 0.25;
 uniform float drift_speed : hint_range(0.0, 1.0) = 0.14;
 uniform float seed_offset = 0.0;

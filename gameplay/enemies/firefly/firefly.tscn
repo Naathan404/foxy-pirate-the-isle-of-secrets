@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://dsdij5n1mx7mt"]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://disgwmtrtlh2r" path="res://gameplay/enemies/firefly/firefly.gd" id="2_firefly"]
+[ext_resource type="Resource" path="res://data/enemies/firefly_data.tres" id="3_data"]
+[ext_resource type="Texture2D" uid="uid://bbeakgggwpsna" path="res://assets/sprites/enemies/firefly/firefly_ground_sheet.png" id="4_ground_tex"]
+[ext_resource type="AnimationLibrary" uid="uid://c4sayi3u7msg6" path="res://gameplay/enemies/firefly/firefly_anims.tres" id="5_anims"]
+[ext_resource type="Script" uid="uid://dkphw5ntewuq" path="res://gameplay/enemies/firefly/states/firefly_rest.gd" id="6_rest"]
+[ext_resource type="Script" uid="uid://cfkmu0kfeqkn4" path="res://gameplay/enemies/firefly/states/firefly_takeoff.gd" id="7_takeoff"]
+[ext_resource type="Script" uid="uid://5frwxy84abi0" path="res://gameplay/enemies/firefly/states/firefly_hover.gd" id="8_hover"]
+[ext_resource type="Script" uid="uid://d4h4bf4a2x3w" path="res://gameplay/enemies/firefly/states/firefly_charge.gd" id="9_charge"]
+[ext_resource type="Script" uid="uid://cbjopybnbig22" path="res://gameplay/enemies/firefly/states/firefly_detonate.gd" id="10_detonate"]
+[ext_resource type="Script" uid="uid://d2mo5a4e3eo5c" path="res://gameplay/enemies/firefly/states/firefly_exhausted.gd" id="11_exhausted"]
+[ext_resource type="Script" uid="uid://dy1mk1bgm18ej" path="res://gameplay/enemies/firefly/states/firefly_counter.gd" id="12_counter"]
+[ext_resource type="Script" path="res://gameplay/enemies/firefly/states/firefly_gentle_land.gd" id="13_gentle_land"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hurtbox"]
+radius = 0.72
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+height = 1.1
+radius = 0.52
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
+height = 4.0
+radius = 7.5
+
+[node name="Firefly" unique_id=732090385 instance=ExtResource("1_base")]
+script = ExtResource("2_firefly")
+hover_altitude_meters = 4.6
+charge_altitude_meters = 3.6
+airborne_hurt_threshold_meters = 0.25
+takeoff_duration_seconds = 1.15
+gentle_land_duration_seconds = 1.55
+fall_to_ground_seconds = 1.35
+gentle_rest_seconds = 1.05
+min_free_flight_seconds = 4.0
+max_hover_seconds = 8.5
+hover_bob_amplitude_meters = 0.36
+outer_detection_radius_meters = 7.5
+inner_attack_radius_meters = 2.75
+instant_takeoff_distance_meters = 4.2
+detection_hysteresis_meters = 1.2
+startle_delay_seconds = 0.22
+search_seconds = 1.2
+hover_speed_scale = 1.0
+weave_amplitude = 1.35
+weave_frequency = 2.8
+glitter_drop_interval_seconds = 1.65
+glitter_pool_radius_meters = 0.58
+glitter_pool_duration_seconds = 1.5
+glitter_damage_hp = 0.35
+charge_duration_seconds = 1.25
+detonate_recoil_seconds = 0.52
+blast_radius_meters = 2.35
+main_pool_radius_meters = 1.35
+main_pool_duration_seconds = 4.6
+pool_tick_interval_seconds = 0.85
+pool_tick_damage_hp = 0.6
+secondary_droplet_count = 2
+secondary_pool_radius_meters = 0.78
+secondary_pool_duration_seconds = 3.4
+max_active_pools = 5
+exhausted_duration_seconds = 2.15
+landing_clearance_meters = 0.55
+data = ExtResource("3_data")
+initial_state_name = &"Rest"
+destroy_on_death = true
+show_debug_health = true
+
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+hit_pulse_scale = 1.12
+hit_squash_scale = 0.86
+
+[node name="Sprite3D" parent="Visual" index="0" unique_id=718327590]
+offset = Vector2(0, 188)
+pixel_size = 0.004
+shaded = false
+alpha_cut = 0
+texture_filter = 3
+texture = ExtResource("4_ground_tex")
+hframes = 4
+
+[node name="AnimationPlayer" parent="Visual" index="1" unique_id=1154652120]
+libraries/ = ExtResource("5_anims")
+
+[node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
+enabled = true
+
+[node name="GroundRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="1" unique_id=1575501443]
+enabled = true
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+shape = SubResource("SphereShape3D_hurtbox")
+
+[node name="Hit" parent="States" parent_id_path=PackedInt32Array(1797154631) index="1" unique_id=1311034515]
+recovery_animation = &"exhausted"
+
+[node name="Rest" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=212670862]
+script = ExtResource("6_rest")
+
+[node name="Takeoff" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1354296900]
+script = ExtResource("7_takeoff")
+
+[node name="HoverOrbit" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="5" unique_id=835142057]
+script = ExtResource("8_hover")
+
+[node name="ChargeBurst" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="6" unique_id=801391379]
+script = ExtResource("9_charge")
+
+[node name="DetonateDrop" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="7" unique_id=605465161]
+script = ExtResource("10_detonate")
+
+[node name="ExhaustedLand" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="8" unique_id=2033289516]
+script = ExtResource("11_exhausted")
+
+[node name="CounterFlash" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="9" unique_id=1894321045]
+script = ExtResource("12_counter")
+
+[node name="GentleLand" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="10" unique_id=1954321088]
+script = ExtResource("13_gentle_land")
+
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("CylinderShape3D_body")
+
+[node name="DebugHealthLabel" parent="." index="6" unique_id=2012842134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+
+[node name="TargetDetector" type="Area3D" parent="." index="7" unique_id=2092362310]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector" index="0" unique_id=1248836165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_detector")

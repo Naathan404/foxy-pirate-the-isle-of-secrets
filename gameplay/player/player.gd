@@ -15,7 +15,7 @@ signal poison_ticked(applied_hp: float)
 signal dizzy_started(duration_seconds: float)
 
 const DIALOGUE_STATE_PRIORITY: int = 20
-const INK_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/ink_overlay.gd")
+const DIZZY_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/dizzy_swirl_overlay.gd")
 const VENOM_INK_OVERLAY_NAME := &"BlubberbeardVenomOverlay"
 const POISON_STATUS_HOLD_SECONDS: float = 1.6
 const WHIRLWIND_HIT_STUN_SECONDS: float = 0.52
@@ -318,7 +318,11 @@ func _apply_poison_damage_tick(damage: DamageContext, amount: float) -> float:
 	var applied_hp := hp.take_damage(amount)
 	_suppress_next_hit_reaction = false
 	if applied_hp > 0.0:
-		_apply_poison_status(not was_poisoned)
+		var overlay := get_node_or_null(NodePath(VENOM_INK_OVERLAY_NAME))
+		var overlay_active: bool = (
+			overlay != null and overlay.has_method("is_active") and bool(overlay.call("is_active"))
+		)
+		_apply_poison_status(not was_poisoned or not overlay_active)
 		poison_ticked.emit(applied_hp)
 		if is_instance_valid(charm_socket_manager):
 			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
@@ -349,7 +353,7 @@ func _prepare_incoming_hit_motion(damage: DamageContext) -> void:
 func _trigger_venom_ink_splash() -> void:
 	var overlay := get_node_or_null(NodePath(VENOM_INK_OVERLAY_NAME))
 	if overlay == null:
-		overlay = INK_OVERLAY_SCRIPT.new()
+		overlay = DIZZY_OVERLAY_SCRIPT.new()
 		overlay.name = VENOM_INK_OVERLAY_NAME
 		add_child(overlay)
 	overlay.splash(
