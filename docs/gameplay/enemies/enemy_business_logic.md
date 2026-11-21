@@ -23,6 +23,7 @@ gameplay/enemies/base/enemy_base.tscn
 | **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
 | **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
 | **Coral Skeleton** | Bắt đầu ngủ; thức dậy khi player vào vùng gần, đuổi và bắn chùm hoặc liên tiếp. Mất mục tiêu thì đi quanh co về vị trí ban đầu, canh gác rồi ngủ lại. | Enemy thường; quy tắc và cấu hình chi tiết trong [business logic Coral Skeleton](./coral_skeleton_business_logic.md). |
+| **Mushroom** | Ngụy trang xen kẽ đi lang thang theo nhịp nhảy; đuổi theo và có thể nhảy xa áp sát, gồng phun mây bào tử độc (tránh sinh chồng lên mây cũ), bật lùi ngắn và phản công khi bị đánh. | **EliteMushroom** giữ toàn bộ chiêu cũ và kết hợp chiêu **Thổi Luồng Khói & Bào Tử Liên Tục** (dùng hệ thống hạt hiện có thổi luồng về hướng khóa sẵn, giữ một phần tại gốc và mở rộng vùng độc ở cuối luồng). Chi tiết tại [business logic Mushroom](./mushroom_business_logic.md). |
 
 Các nhóm **Elite Normal Attack**, **Elite Special Attack** và **Elite Charged
 Feedback** trong Inspector của EliteBarrel cấu hình số đợt, số viên, góc bắn,
@@ -92,6 +93,8 @@ Crab thường được tạo khi khởi tạo. Starfish và Barrel đồng bộ
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
 | `barrel/elite_barrel.gd` | Thông số lượt thường, lượt 360°, tích lũy và cảnh báo. |
 | `coral_skeleton/coral_skeleton.gd` | Vùng nhận diện khi ngủ/thức, thời gian thức và ngủ, di chuyển về nhà và cấu hình đợt bắn. |
+| `mushroom/mushroom.gd` | Vùng nhận diện/ngụy trang, dáng nhảy, nhảy áp sát, thông số mây bào tử độc và bật lùi phản công. |
+| `mushroom/elite_mushroom.gd` | Cự ly, hồi chiêu, tầm thổi, thời lượng và mây gốc/cuối của chiêu Thổi Luồng Khói Bào Tử. |
 
 Ví dụ, đổi vùng nhận diện EliteCrab chỉ cần sửa `player_detection_radius` trên node root
 EliteCrab; script cập nhật bán kính `CylinderShape3D` của `TargetDetector` trước khi Base quét

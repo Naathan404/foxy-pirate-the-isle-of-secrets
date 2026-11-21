@@ -129,7 +129,7 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 @export_range(0.5, 5.0, 0.05) var ground_mist_scale: float = 2.45
 
 @export_group("Defensive Knockback")
-## Quãng đường bật lùi tối đa (m) khi dính đòn nhẹ; mặc định > cloud_radius để không trúng độc ngay.
+## Quãng đường bật lùi tối đa (m) khi dính đòn nhẹ để giữ nhịp giao tranh gần.
 @export_range(0.2, 12.0, 0.1, "suffix:m") var evade_distance: float = 3.2
 ## Thời gian thực hiện cú nhảy bật lùi (s).
 @export_range(0.1, 2.0, 0.05, "suffix:s") var evade_duration_seconds: float = 0.45
@@ -201,7 +201,7 @@ func _physics_process(delta: float) -> void:
 	var step := maxf(delta, 0.0)
 	_evade_cooldown_remaining = maxf(0.0, _evade_cooldown_remaining - step)
 	_knockback_spore_cooldown_remaining = maxf(0.0, _knockback_spore_cooldown_remaining - step)
-	if _evade_pending and not dead and not _is_in_hit_state():
+	if _evade_pending and not dead and not _is_in_hit_state() and can_start_defensive_hop():
 		_start_defensive_hop()
 	attack_cooldown_remaining = maxf(0.0, attack_cooldown_remaining - step)
 	super(delta)
@@ -241,6 +241,8 @@ func receive_damage(damage: DamageContext) -> float:
 	):
 		return applied
 	var in_detection := _is_attacker_in_detection(damage.source)
+	if not can_trigger_defensive_counter():
+		return applied
 	var will_hit := _is_in_hit_state()
 	var should_roll := (
 		in_detection
@@ -275,6 +277,14 @@ func consume_knockback_charge() -> bool:
 
 func is_evading() -> bool:
 	return _evade_remaining > 0.0
+
+
+func can_start_defensive_hop() -> bool:
+	return true
+
+
+func can_trigger_defensive_counter() -> bool:
+	return true
 
 
 func start_approach_leap(direction: Vector3, distance_meters: float) -> bool:
@@ -328,6 +338,13 @@ func is_point_in_poison_cloud(world_position: Vector3) -> bool:
 		)
 		if offset.length() <= cloud.get_radius() * cloud_overlap_block_factor:
 			return true
+	if is_inside_tree():
+		for stream_node in get_tree().get_nodes_in_group(&"mushroom_spore_stream"):
+			if stream_node != null and stream_node.has_method("covers_point"):
+				if bool(
+					stream_node.call("covers_point", world_position, cloud_overlap_block_factor)
+				):
+					return true
 	return false
 
 
@@ -416,7 +433,11 @@ func cancel_spore_charge() -> void:
 		visual.animation_player.speed_scale = 1.0
 
 
-func _spawn_cloud_at(world_position: Vector3) -> bool:
+func spawn_spore_cloud_at(
+	world_position: Vector3, radius_override: float = -1.0, duration_override: float = -1.0
+) -> bool:
+	var target_radius := radius_override if radius_override > 0.0 else cloud_radius
+	var target_duration := duration_override if duration_override > 0.0 else cloud_duration_seconds
 	if is_point_in_poison_cloud(world_position):
 		return false
 	var parent := get_parent()
@@ -425,8 +446,8 @@ func _spawn_cloud_at(world_position: Vector3) -> bool:
 	var cloud := SPORE_CLOUD.new() as MushroomSporeCloud
 	cloud.setup(
 		self,
-		cloud_radius,
-		cloud_duration_seconds,
+		target_radius,
+		target_duration,
 		spore_ramp_seconds,
 		poison_interval_seconds,
 		poison_damage
@@ -449,6 +470,10 @@ func _spawn_cloud_at(world_position: Vector3) -> bool:
 	cloud.activate_poison()
 	_register_spore_cloud(cloud)
 	return true
+
+
+func _spawn_cloud_at(world_position: Vector3) -> bool:
+	return spawn_spore_cloud_at(world_position)
 
 
 func _register_spore_cloud(cloud: MushroomSporeCloud) -> void:
@@ -575,9 +600,10 @@ func _build_hop_visuals() -> void:
 	_shadow_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_shadow_material.albedo_color = Color(0.04, 0.03, 0.06, 0.36)
 	_shadow_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var shadow_radius := HOP_SHADOW_RADIUS * _get_shadow_scale_factor()
 	var cyl := CylinderMesh.new()
-	cyl.top_radius = HOP_SHADOW_RADIUS
-	cyl.bottom_radius = HOP_SHADOW_RADIUS
+	cyl.top_radius = shadow_radius
+	cyl.bottom_radius = shadow_radius
 	cyl.height = 0.015
 	cyl.material = _shadow_material
 	_shadow_mesh = MeshInstance3D.new()
@@ -695,6 +721,12 @@ func _emit_hop_landing_vfx() -> void:
 	if is_instance_valid(_step_spores):
 		_step_spores.restart()
 		_step_spores.emitting = true
+
+
+func _get_shadow_scale_factor() -> float:
+	if is_instance_valid(visual):
+		return maxf(0.5, visual.scale.x)
+	return 1.0
 
 
 func _reset_hop_visuals() -> void:

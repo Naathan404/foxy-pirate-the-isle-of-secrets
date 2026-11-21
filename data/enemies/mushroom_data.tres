@@ -9,4 +9,5 @@ max_hp = 10.0
 move_speed = 1.1
 acceleration = 30.0
 deceleration = 30.0
+attack_damage = 0.2
 drop_item = ExtResource("2_drop")
