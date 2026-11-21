@@ -45,35 +45,51 @@
    - Dừng di chuyển, phát animation `spore_windup_*` kèm `EliteFeedback.begin_telegraph()`.
    - Quay hướng theo Player trong `0.6s` đầu, sau đó ở `stream_aim_lock_seconds = 0.35s` cuối khóa cứng hướng gió kèm độ lệch ngẫu nhiên `stream_aim_jitter_degrees = 14°` để tránh cảm giác nhắm thẳng vào Player.
 2. **Pha `STREAMING` (`1.65s`) → Tự trôi, bay lơ lửng & đọng theo `lifetime` (`3.8s`):**
-   - Tắt telegraph và tạo [MushroomSporeStream](../../gameplay/enemies/mushroom/mushroom_spore_stream.gd) ở tầm thấp (`y = 0.48m`), không dùng `MushroomSporeCloud` tách rời và **không tính trước điểm đích B**.
+   - Tắt telegraph và tạo [MushroomSporeStream](../../gameplay/enemies/mushroom/mushroom_spore_stream.gd) ở tầm thấp (`y = 0.44m`), không dùng `MushroomSporeCloud` tách rời và **không tính trước điểm đích B**.
    - **Động lực học đồng nhất giữa hạt GPU & vùng độc:**
-     - `StreamMist` (`220` hạt) + `StreamSpores` (`680` hạt) xuất phát từ vùng `EMISSION_SHAPE_BOX` với alpha vào mượt từ `0.0`, phóng mạnh về phía trước với vận tốc `11.8 – 14.4 m/s`, mở góc quạt `52°` cùng dao động gió vòi phun; `damping_curve` ghìm đà ở đoạn đầu (`0 → ~0.48` vòng đời) rồi xả về `0` kết hợp `velocity_limit_curve` để `gravity` nổi (`+0.15` / `+0.32`) và `turbulence` giữ hạt tiếp tục bay lơ lửng, bồng bềnh như chiêu cơ bản; kèm `NearSpillMist` (`64`) / `NearSpillSpores` (`180`) rỉ quanh gốc.
-     - Các cụm puff vật lý (`_puffs`) phát định kỳ mỗi `0.07s` trong vùng lõi đặc (`0.84–0.92×` tốc độ hạt, `damping = 8.8–10.6 m/s²`, có raycast cản tường `CombatLayers.WORLD`). Bán kính collider thu nhỏ hơn vùng hiển thị (`0.35m → 1.05m`, rỉ gần `0.85m`), chỉ kích hoạt sau `0.14s` và thu nhỏ/ngắt ở `68%` vòng đời trước khi hạt mờ hẳn, nên Player chỉ trúng độc (`1.0` HP mỗi `0.45s`, `tag = &"poison"`) khi nằm trong lõi khói bào tử thực sự nhìn thấy.
+     - `StreamMist` (`220` hạt) + `StreamSpores` (`680` hạt) xuất phát từ vùng `EMISSION_SHAPE_BOX` với alpha vào mượt từ `0.0`, phóng mạnh về phía trước với vận tốc `11.8 – 14.4 m/s`, mở góc quạt `52°` cùng dao động gió vòi phun; `damping_curve` ghìm đà mượt ở đoạn đầu (`0 → ~0.52` vòng đời) rồi xả về `0` kết hợp `velocity_limit_curve` để `gravity` nổi (`+0.30` / `+0.55`) và `turbulence` giữ hạt tiếp tục bay lơ lửng, bồng bềnh thay vì tụ tại miệng phun hay đứng yên; kèm `NearSpillMist` (`64`) / `NearSpillSpores` (`180`) rỉ quanh gốc.
+     - Các cụm puff vật lý (`_puffs`) phát định kỳ mỗi `0.07s` trong lõi quạt theo `@export stream_damage_core_fan_ratio = 0.32` ở trung tâm vùng hạt đặc (`0.84–0.92×` tốc độ hạt, `damping = 9.5–11.1 m/s²`, có raycast cản tường `CombatLayers.WORLD`). Bán kính collider thu nhỏ hơn rõ rệt vùng hiển thị (`0.20m → 0.55m`, rỉ gần `0.45m`), chỉ kích hoạt sau `0.18s` và thu nhỏ/ngắt ở `60%` vòng đời trước khi hạt mờ hẳn, lấy sát thương từ `data.attack_damage = 0.5` HP × `stream_tick_damage_multiplier = 1.0` mỗi `0.75s` (`tag = &"poison"`).
      - Sau khi đi hết đà, chính những hạt & puff này dừng lơ lửng tại chỗ chúng mất động lượng và kích hoạt sương mặt đất `DynamicGroundMist` (`spore_ground_mist.gdshader`) thấm hiện dần ngay bên dưới khói đọng, rồi tự tan khi hết vòng đời (`3.8s`); đăng ký nhóm `mushroom_spore_stream` để chống chồng lớp với các lần phun sau.
 3. **Pha `RECOVER` (`0.45s`):**
    - Gọi `stop_emitting()` để ngừng phát hạt mới từ nấm (các hạt đã bay ra vẫn tiếp tục trôi, đọng và tan tự nhiên), nghỉ `0.45s`, gọi `mark_skip_next_observe()` rồi quay về `Patrol` nối tiếp chiêu cũ.
 
 ---
 
-## 4. Cấu trúc file & Mở rộng cho Chiêu thứ 2
+## 4. Thiết kế Chiêu 2 cho `EliteMushroom`: Đại Bào Tử (`GreatSpore`)
 
-### 4.1. Cấu trúc file triển khai
+- **Kích hoạt khẩn cấp khi sắp bị tiêu diệt:**
+  - `EliteMushroomPatrol._update()` ưu tiên gọi state `GreatSpore` (`EliteMushroomGreatSpore`) khi máu tụt xuống ngưỡng (`great_spore_first_hp_ratio = 0.45` cho lần 1, `great_spore_second_hp_ratio = 0.22` cho lần 2; `great_spore_max_uses = 2`, hồi tối thiểu `6.0s`).
+- **Giai đoạn gồng phun & bay trên không (`MushroomGreatSpore`):**
+  - Gồng nén thân `0.95s` kèm `EliteFeedback.begin_telegraph()`, rồi bật bung người (animation `great_spore_release` / `legged_great_spore_release`) cùng vòi hạt `GreatSporeCastFountain` phóng `5` cụm Đại Bào Tử (tụ từ nhiều hạt sáng nhấp nháy `GreatSporeCoreCluster`, `GreatSporeSparkCluster` và vệt bụi phấn nhấp nháy tự do `GreatSporeBlinkTrail` + `GreatSporeMistTrail`, dùng chung bảng màu xanh-tím để Player không đoán trước được kết quả) vồng cao lên `5.6m`, lượn uốn tự do (`±2.35m`) và tỏa rộng `6.4–15.5m` khắp toàn map trong `2.8–4.2s` kèm bóng chiếu tại điểm đáp an toàn.
+- **2 trường hợp khi đáp đất (`0.78s`, xáo ngẫu nhiên `3` Trứng Nấm + `2` bãi độc trong `5` slot):**
+  1. **Trường hợp 1 (`OutcomeKind.SPORE_CLOUD` — `2/5`):** Bung vòng sóng xung kích tím `GreatSporeImpactRing` + chớp sáng + vệt khói bung ngang tốc độ cao (`ramp <= 0.24s`, tồn tại `5.2s`, `ground_mist >= 0.36`), tạo thành `MushroomSporeCloud` tím gây độc rõ ràng ngay tại điểm đáp.
+  2. **Trường hợp 2 (`OutcomeKind.MUSHROOM_EGG` — `3/5`):** Sinh ra `MushroomEgg` ([mushroom_egg.tscn](../../gameplay/enemies/mushroom/mushroom_egg.tscn), `4.0 HP`, `mushroom_egg_sheet.png` cây nấm non chưa tiến hóa; trần tối đa `6` đơn vị con). Player có thể tiêu diệt trong thời gian ủ mầm `5.5s`; nếu không kịp phá hủy, Trứng Nấm rung sáng lục cảnh báo rồi nở thành một `Mushroom` bình thường (`mushroom.tscn`).
+
+---
+
+## 5. Cấu trúc file tổng thể
+
 ```text
+assets/sprites/enemies/mushroom/
+└── mushroom_egg_sheet.png                         # Sprite 4x1 Trứng Nấm (nấm non trước khi nở)
+
 data/enemies/
-└── elite_mushroom_data.tres                       # 18 HP, speed 0.95, 2 dmg, 50% KB resist, drop 3x Mushroom Cap
+├── elite_mushroom_data.tres                       # Thông số EliteMushroom
+└── mushroom_egg_data.tres                         # 4.0 HP, bất động, không rơi đồ farm vô hạn
 
 gameplay/enemies/mushroom/
-├── mushroom.gd                                    # Thêm hook an toàn can_start_defensive_hop(), spawn_spore_cloud_at()
-├── mushroom_patrol.gd                             # Thêm hook _try_start_elite_attack() và skip_next_observe
-├── mushroom_spore_stream.gd                       # Luồng khói + bào tử liên tục (tái sử dụng hạt MushroomSporeCloud)
-├── elite_mushroom.gd                              # Root config Elite + start_spore_stream()
-├── elite_mushroom.tscn                            # Kế thừa mushroom.tscn (1.5x scale, collider, EliteFeedback, SporeStream)
+├── mushroom.gd / mushroom_patrol.gd               # Baseline Mushroom + hook an toàn cho Elite
+├── mushroom_spore_stream.gd                       # Chiêu 1: Luồng khói bào tử vật lý
+├── mushroom_great_spore.gd                        # Chiêu 2: Đại Bào Tử bay lơ lửng & đáp đất
+├── mushroom_egg.gd / mushroom_egg.tscn            # Enemy Trứng Nấm có thể phá hủy trước khi nở
+├── mushroom_egg_anims.tres                        # AnimationLibrary cho idle / hatch_soon / hit / death
+├── elite_mushroom.gd / elite_mushroom.tscn        # Root Elite kết hợp chiêu cũ + Chiêu 1 + Chiêu 2
 └── states/
-    ├── elite_mushroom_patrol.gd                   # Giữ chiêu cũ + gọi SporeStream (+ điểm nối Chiêu 2)
-    └── elite_mushroom_spore_stream.gd             # State SporeStream (WINDUP -> STREAMING -> RECOVER)
+    ├── elite_mushroom_patrol.gd                   # Chọn chiêu 1, chiêu 2 cận tử và chiêu cũ
+    ├── elite_mushroom_spore_stream.gd             # State Chiêu 1 (WINDUP -> STREAMING -> RECOVER)
+    ├── elite_mushroom_great_spore.gd              # State Chiêu 2 (WINDUP -> RELEASE -> RECOVER)
+    └── mushroom_egg_incubate.gd                   # State ủ mầm của Trứng Nấm
 ```
 
-### 4.2. Lộ trình tiếp theo
-1. **Đợt 1 *(Đã triển khai)*:** Tạo hook mở rộng trên `MushroomEnemy` / `MushroomPatrol`, hoàn thiện `EliteMushroom`, `MushroomSporeStream`, `EliteMushroomPatrol`, `EliteMushroomSporeStream`, `elite_mushroom_data.tres` và `elite_mushroom.tscn`.
-2. **Đợt 2 *(Dành cho user phát triển thêm)*:** Bổ sung **Chiêu thức thứ 2** bằng cách thêm một node state mới dưới `States/` trong `elite_mushroom.tscn` và gắn điều kiện chọn vào `_try_start_elite_attack()` trong [elite_mushroom_patrol.gd](../../gameplay/enemies/mushroom/states/elite_mushroom_patrol.gd).
-3. **Đợt 3:** Bổ sung `MonsterNote` cho `Mushroom` và `EliteMushroom` trong `data/notes/` (khi hoàn thiện nội dung sổ quái).
+1. **Đợt 1 & 2 *(Đã triển khai)*:** Hoàn thiện `EliteMushroom` với hai hình thái di chuyển `FOOTLESS <-> LEGGED` (`mushroom_move_4dir.png`, `mushroom_spore_4dir.png`, [elite_mushroom_anims.tres](../../gameplay/enemies/mushroom/elite_mushroom_anims.tres)) kèm quy tắc bọc sườn/giữ cự ly/né vật cản `7` hướng, kết hợp đầy đủ bộ chiêu Nấm thường, Chiêu 1 (`SporeStream`) và Chiêu 2 (`GreatSpore` + `MushroomEgg`).
+2. **Đợt 3:** Bổ sung `MonsterNote` cho `Mushroom` và `EliteMushroom` trong `data/notes/` (khi hoàn thiện nội dung sổ quái).

@@ -41,21 +41,5 @@ show_debug_health = true
 
 [node name="EliteMushroom" parent="." index="6" unique_id=316585749 instance=ExtResource("5_iu8j5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.783104, -1.9073486e-06, 8.328753)
-stream_min_distance_meters = 2.8
-stream_max_distance_meters = 8.8
-stream_jet_speed_min = 11.8
-stream_jet_speed_max = 14.4
-stream_fan_degrees = 52.0
-stream_aim_jitter_degrees = 14.0
-stream_cooldown_seconds = 4.6
-stream_windup_seconds = 0.95
-stream_aim_lock_seconds = 0.35
-stream_duration_seconds = 1.65
-stream_particle_lifetime_seconds = 3.8
-stream_recovery_seconds = 0.45
-stream_start_radius_meters = 0.35
-stream_end_radius_meters = 1.05
-stream_tick_interval_seconds = 0.45
-stream_tick_damage_hp = 1.0
-stream_near_cloud_radius = 0.85
 evade_distance = 1.6
+show_debug_health = true

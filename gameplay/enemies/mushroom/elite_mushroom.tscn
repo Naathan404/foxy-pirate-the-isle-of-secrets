@@ -1,15 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://7np7lhniajm5"]
 
 [ext_resource type="PackedScene" uid="uid://b5kdbd2ynvi15" path="res://gameplay/enemies/mushroom/mushroom.tscn" id="1_base"]
-[ext_resource type="Script" path="res://gameplay/enemies/mushroom/elite_mushroom.gd" id="2_script"]
-[ext_resource type="Resource" path="res://data/enemies/elite_mushroom_data.tres" id="3_data"]
-[ext_resource type="Script" path="res://gameplay/enemies/mushroom/states/elite_mushroom_patrol.gd" id="4_patrol"]
-[ext_resource type="Script" path="res://gameplay/enemies/mushroom/states/elite_mushroom_spore_stream.gd" id="5_stream"]
+[ext_resource type="Script" uid="uid://bq31q8yan47v2" path="res://gameplay/enemies/mushroom/elite_mushroom.gd" id="2_script"]
+[ext_resource type="Resource" uid="uid://ckki34wvxt0oi" path="res://data/enemies/elite_mushroom_data.tres" id="3_data"]
+[ext_resource type="Script" uid="uid://bcriv5wc3xr4f" path="res://gameplay/enemies/mushroom/states/elite_mushroom_patrol.gd" id="4_patrol"]
+[ext_resource type="Script" uid="uid://4sr4tplh3r8f" path="res://gameplay/enemies/mushroom/states/elite_mushroom_spore_stream.gd" id="5_stream"]
 [ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="6_feedback"]
-
-[sub_resource type="CylinderShape3D" id="DetectorShape"]
-height = 3.0
-radius = 9.0
+[ext_resource type="Script" uid="uid://ssh2qg3aeelh" path="res://gameplay/enemies/mushroom/states/elite_mushroom_great_spore.gd" id="7_great_spore"]
+[ext_resource type="AnimationLibrary" path="res://gameplay/enemies/mushroom/elite_mushroom_anims.tres" id="8_anims"]
 
 [sub_resource type="CapsuleShape3D" id="HurtShape"]
 radius = 0.85
@@ -19,14 +17,68 @@ height = 2.6
 radius = 0.68
 height = 2.55
 
-[node name="EliteMushroom" instance=ExtResource("1_base")]
+[sub_resource type="CylinderShape3D" id="DetectorShape"]
+height = 3.0
+radius = 9.0
+
+[node name="EliteMushroom" unique_id=223364778 instance=ExtResource("1_base")]
 script = ExtResource("2_script")
+legged_chase_speed_scale = 1.65
+morph_duration_seconds = 0.42
+stance_switch_cooldown_seconds = 3.5
+legged_stance_max_seconds = 5.8
+footless_stance_max_seconds = 3.8
+legged_chase_trigger_distance = 4.0
+stream_min_distance_meters = 2.8
+stream_max_distance_meters = 8.8
+stream_jet_speed_min = 11.8
+stream_jet_speed_max = 14.4
+stream_fan_degrees = 52.0
+stream_damage_core_fan_ratio = 0.32
+stream_aim_jitter_degrees = 14.0
+stream_cooldown_seconds = 4.6
+stream_windup_seconds = 0.95
+stream_aim_lock_seconds = 0.35
+stream_duration_seconds = 1.65
+stream_particle_lifetime_seconds = 3.8
+stream_recovery_seconds = 0.45
+stream_start_radius_meters = 0.2
+stream_end_radius_meters = 0.55
+stream_tick_interval_seconds = 0.75
+stream_tick_damage_multiplier = 1.0
+stream_near_cloud_radius = 0.45
+great_spore_max_uses = 2
+great_spore_first_hp_ratio = 0.45
+great_spore_second_hp_ratio = 0.22
+great_spore_cooldown_seconds = 6.0
+great_spore_windup_seconds = 0.95
+great_spore_release_seconds = 0.65
+great_spore_recovery_seconds = 0.45
+great_spore_count_per_cast = 5
+great_spore_eggs_per_cast = 3
+great_spore_max_active_minions = 6
+great_spore_hover_min_seconds = 2.8
+great_spore_hover_max_seconds = 4.2
+great_spore_hover_altitude_meters = 5.6
+great_spore_land_duration_seconds = 0.78
+great_spore_min_distance_meters = 6.4
+great_spore_spread_radius_meters = 13.5
+great_spore_egg_hatch_seconds = 5.5
 detection_radius = 9.0
+approach_leap_trigger_distance = 3.1
+approach_leap_distance_meters = 4.4
+approach_leap_duration_seconds = 0.52
+approach_leap_height = 1.25
+approach_leap_cooldown_seconds = 1.25
+approach_leap_chance = 0.9
 max_active_clouds = 4
 data = ExtResource("3_data")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="AnimationPlayer" parent="Visual" index="1" unique_id=1154652120]
+libraries/ = ExtResource("8_anims")
 
 [node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
@@ -43,8 +95,11 @@ shape = SubResource("HurtShape")
 [node name="Patrol" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=1027344009]
 script = ExtResource("4_patrol")
 
-[node name="SporeStream" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4"]
+[node name="SporeStream" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1728866293]
 script = ExtResource("5_stream")
+
+[node name="GreatSpore" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="5" unique_id=665360299]
+script = ExtResource("7_great_spore")
 
 [node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.275, 0)
@@ -57,6 +112,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("DetectorShape")
 
-[node name="EliteFeedback" type="Node3D" parent="." index="8"]
+[node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=822256328]
 script = ExtResource("6_feedback")
 telegraph_ring_radius = 1.55

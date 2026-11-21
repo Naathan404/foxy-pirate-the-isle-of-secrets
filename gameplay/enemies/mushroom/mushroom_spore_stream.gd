@@ -15,13 +15,13 @@ const PUFF_SPEED_MIN_FACTOR := 0.84
 const PUFF_SPEED_MAX_FACTOR := 0.92
 const PUFF_DRAG_MIN := 9.2
 const PUFF_DRAG_MAX := 10.8
-const NEAR_SPILL_SPEED_MIN := 2.2
-const NEAR_SPILL_SPEED_MAX := 3.9
-const NEAR_SPILL_DRAG_MIN := 2.5
-const NEAR_SPILL_DRAG_MAX := 3.3
-const PUFF_MIN_DAMAGE_AGE := 0.14
-const PUFF_DAMAGE_LIFE_RATIO := 0.68
-const PUFF_TAPER_START_RATIO := 0.56
+const NEAR_SPILL_SPEED_MIN := 2.0
+const NEAR_SPILL_SPEED_MAX := 2.8
+const NEAR_SPILL_DRAG_MIN := 2.2
+const NEAR_SPILL_DRAG_MAX := 2.6
+const PUFF_MIN_DAMAGE_AGE := 0.18
+const PUFF_DAMAGE_LIFE_RATIO := 0.6
+const PUFF_TAPER_START_RATIO := 0.48
 const PUFF_GROW_SECONDS := 1.4
 const SETTLE_SPEED_THRESHOLD := 4.2
 const MAX_MIST_PATCHES := 5
@@ -36,12 +36,13 @@ var _jet_speed_min: float = 11.8
 var _jet_speed_max: float = 14.4
 var _particle_lifetime: float = 3.8
 var _duration_seconds: float = 1.65
-var _start_radius: float = 0.35
-var _end_radius: float = 1.05
+var _start_radius: float = 0.2
+var _end_radius: float = 0.55
 var _fan_degrees: float = 52.0
-var _tick_interval: float = 0.45
-var _tick_damage: float = 1.0
-var _near_cloud_radius: float = 0.85
+var _damage_core_fan_ratio: float = 0.32
+var _tick_interval: float = 0.75
+var _tick_damage: float = 0.5
+var _near_cloud_radius: float = 0.45
 var _ground_y: float = 0.0
 
 var _elapsed: float = 0.0
@@ -73,12 +74,13 @@ func setup(config: Dictionary) -> void:
 	_jet_speed_max = maxf(_jet_speed_min, float(config.get("jet_speed_max", 14.4)))
 	_particle_lifetime = maxf(1.2, float(config.get("particle_lifetime", 3.8)))
 	_duration_seconds = maxf(0.4, float(config.get("duration_seconds", 1.65)))
-	_start_radius = maxf(0.25, float(config.get("start_radius", 0.35)))
-	_end_radius = maxf(_start_radius, float(config.get("end_radius", 1.05)))
+	_start_radius = maxf(0.15, float(config.get("start_radius", 0.2)))
+	_end_radius = maxf(_start_radius, float(config.get("end_radius", 0.55)))
 	_fan_degrees = clampf(float(config.get("fan_degrees", 52.0)), 18.0, 100.0)
-	_tick_interval = maxf(0.1, float(config.get("tick_interval", 0.45)))
-	_tick_damage = maxf(0.0, float(config.get("tick_damage", 1.0)))
-	_near_cloud_radius = maxf(0.0, float(config.get("near_cloud_radius", 0.85)))
+	_damage_core_fan_ratio = clampf(float(config.get("damage_core_fan_ratio", 0.32)), 0.1, 1.0)
+	_tick_interval = maxf(0.1, float(config.get("tick_interval", 0.75)))
+	_tick_damage = maxf(0.0, float(config.get("tick_damage", 0.5)))
+	_near_cloud_radius = maxf(0.0, float(config.get("near_cloud_radius", 0.45)))
 	_ground_y = float(config.get("ground_y", 0.0))
 	_sway_phase = _rng.randf_range(0.0, TAU)
 	var cross := Vector3(-_direction.z, 0.0, _direction.x).normalized()
@@ -222,9 +224,11 @@ func _get_current_forward() -> Vector3:
 func _emit_puff_volley() -> void:
 	_emit_index += 1
 	var fwd := _get_current_forward()
-	var half_rad := deg_to_rad(_fan_degrees * 0.28)
-	var lane_bias := [-0.45, 0.0, 0.45][_emit_index % 3] as float
-	var angle := clampf(lane_bias + _rng.randf_range(-0.35, 0.35), -1.0, 1.0) * half_rad
+	# Damage core puffs follow only the exported core ratio of the visual fan, leaving outer
+	# drifting haze safe so hits never happen before dense smoke visibly engulfs the target.
+	var half_rad := deg_to_rad(_fan_degrees * 0.5 * _damage_core_fan_ratio)
+	var lane_bias := [-0.3, 0.0, 0.3][_emit_index % 3] as float
+	var angle := clampf(lane_bias + _rng.randf_range(-0.22, 0.22), -1.0, 1.0) * half_rad
 	var jet_dir := fwd.rotated(Vector3.UP, angle).normalized()
 	var jet_speed := _rng.randf_range(
 		_jet_speed_min * PUFF_SPEED_MIN_FACTOR, _jet_speed_max * PUFF_SPEED_MAX_FACTOR
@@ -239,7 +243,7 @@ func _emit_puff_volley() -> void:
 				"damage_radius": 0.0,
 				"start_radius": _start_radius,
 				"max_radius": _end_radius,
-				"mist_visual_radius": maxf(_end_radius * 1.85, 1.9),
+				"mist_visual_radius": maxf(_end_radius * 2.8, 1.9),
 				"grow_seconds": PUFF_GROW_SECONDS,
 				"age": 0.0,
 				"lifetime": _particle_lifetime * 0.96,
@@ -248,7 +252,10 @@ func _emit_puff_volley() -> void:
 	)
 
 	if _near_cloud_radius > 0.0 and _emit_index % 2 == 1:
-		var near_angle := _rng.randf_range(-deg_to_rad(42.0), deg_to_rad(42.0))
+		var near_lane := [-0.5, 0.0, 0.5][(_emit_index >> 1) % 3] as float
+		var near_angle := (
+			clampf(near_lane + _rng.randf_range(-0.25, 0.25), -1.0, 1.0) * deg_to_rad(22.0)
+		)
 		var near_dir := fwd.rotated(Vector3.UP, near_angle).normalized()
 		var near_speed := _rng.randf_range(NEAR_SPILL_SPEED_MIN, NEAR_SPILL_SPEED_MAX)
 		(
@@ -262,8 +269,8 @@ func _emit_puff_volley() -> void:
 					"damage_radius": 0.0,
 					"start_radius": minf(_start_radius, _near_cloud_radius * 0.45),
 					"max_radius": _near_cloud_radius,
-					"mist_visual_radius": maxf(_near_cloud_radius * 1.9, 1.65),
-					"grow_seconds": 0.85,
+					"mist_visual_radius": maxf(_near_cloud_radius * 2.8, 1.65),
+					"grow_seconds": 0.45,
 					"age": 0.0,
 					"lifetime": maxf(2.2, _particle_lifetime * 0.68),
 				}
@@ -422,10 +429,10 @@ func _build_emitters() -> void:
 	mist_peak.a = minf(0.62, mist_peak.a * 1.18)
 	var mist_scale := _stream_scale_curve(0.62, 1.24, 1.82)
 	var spore_scale := _stream_scale_curve(0.85, 1.15, 0.56)
-	var jet_damping_curve := _stream_damping_curve(0.31, 0.48)
-	var near_damping_curve := _stream_damping_curve(0.28, 0.45)
-	var jet_vel_limit := _stream_velocity_limit_curve(20.0, 12.0, 1.5, 1.15)
-	var near_vel_limit := _stream_velocity_limit_curve(8.0, 4.5, 1.25, 0.95)
+	var jet_damping_curve := _stream_damping_curve(0.28, 0.42, 0.52)
+	var near_damping_curve := _stream_damping_curve(0.24, 0.38, 0.48)
+	var jet_vel_limit := _stream_velocity_limit_curve(20.0, 13.2, 1.95, 1.55)
+	var near_vel_limit := _stream_velocity_limit_curve(8.0, 4.8, 1.5, 1.2)
 
 	var stream_mist := _create_emitter(
 		{
@@ -437,13 +444,13 @@ func _build_emitters() -> void:
 			"additive": false,
 			"box_extents": Vector3(0.72, 0.24, 0.36),
 			"spread_deg": half_fan * 0.88,
-			"speed_range": Vector2(_jet_speed_min * 0.95, _jet_speed_max * 0.98),
-			"damping_range": Vector2(PUFF_DRAG_MIN, PUFF_DRAG_MAX),
+			"speed_range": Vector2(_jet_speed_min * 0.98, _jet_speed_max * 1.02),
+			"damping_range": Vector2(PUFF_DRAG_MIN * 0.82, PUFF_DRAG_MAX * 0.86),
 			"damping_curve": jet_damping_curve,
 			"vel_limit_curve": jet_vel_limit,
-			"dir": Vector3(0.0, 0.03, -1.0),
-			"gravity": Vector3(_wind_cross_world.x * 0.22, 0.15, _wind_cross_world.z * 0.22),
-			"turb_strength": 1.65,
+			"dir": Vector3(0.0, 0.08, -1.0),
+			"gravity": Vector3(_wind_cross_world.x * 0.24, 0.3, _wind_cross_world.z * 0.24),
+			"turb_strength": 1.75,
 			"peak_color": mist_peak,
 			"end_color": SPORE_CLOUD_SCRIPT.MIST_GLOW_END_COLOR,
 			"scale_range": Vector2(0.82, 1.38),
@@ -464,13 +471,13 @@ func _build_emitters() -> void:
 			"additive": true,
 			"box_extents": Vector3(0.68, 0.24, 0.34),
 			"spread_deg": half_fan,
-			"speed_range": Vector2(_jet_speed_min, _jet_speed_max * 1.04),
-			"damping_range": Vector2(PUFF_DRAG_MIN - 0.3, PUFF_DRAG_MAX - 0.2),
+			"speed_range": Vector2(_jet_speed_min * 1.02, _jet_speed_max * 1.08),
+			"damping_range": Vector2(PUFF_DRAG_MIN * 0.8, PUFF_DRAG_MAX * 0.84),
 			"damping_curve": jet_damping_curve,
 			"vel_limit_curve": jet_vel_limit,
-			"dir": Vector3(0.0, 0.04, -1.0),
-			"gravity": Vector3(_wind_cross_world.x * 0.28, 0.32, _wind_cross_world.z * 0.28),
-			"turb_strength": 2.1,
+			"dir": Vector3(0.0, 0.09, -1.0),
+			"gravity": Vector3(_wind_cross_world.x * 0.3, 0.55, _wind_cross_world.z * 0.3),
+			"turb_strength": 2.15,
 			"peak_color": SPORE_CLOUD_SCRIPT.SPORE_GLOW_START_COLOR,
 			"end_color": SPORE_CLOUD_SCRIPT.SPORE_GLOW_END_COLOR,
 			"scale_range":
@@ -494,15 +501,15 @@ func _build_emitters() -> void:
 				"lifetime": maxf(2.2, _particle_lifetime * 0.68),
 				"quad_size": Vector2(1.45, 1.45),
 				"additive": false,
-				"box_extents": Vector3(0.75, 0.22, 0.4),
+				"box_extents": Vector3(0.75, 0.24, 0.4),
 				"spread_deg": 56.0,
 				"speed_range": Vector2(NEAR_SPILL_SPEED_MIN, NEAR_SPILL_SPEED_MAX),
 				"damping_range": Vector2(NEAR_SPILL_DRAG_MIN, NEAR_SPILL_DRAG_MAX),
 				"damping_curve": near_damping_curve,
 				"vel_limit_curve": near_vel_limit,
-				"dir": Vector3(0.0, 0.02, -1.0),
-				"gravity": Vector3(0.0, 0.14, 0.0),
-				"turb_strength": 1.2,
+				"dir": Vector3(0.0, 0.09, -1.0),
+				"gravity": Vector3(0.0, 0.26, 0.0),
+				"turb_strength": 1.25,
 				"peak_color": mist_peak,
 				"end_color": SPORE_CLOUD_SCRIPT.MIST_GLOW_END_COLOR,
 				"scale_range": Vector2(0.75, 1.2),
@@ -521,15 +528,15 @@ func _build_emitters() -> void:
 				"lifetime": maxf(2.2, _particle_lifetime * 0.72),
 				"quad_size": Vector2(0.68, 0.68),
 				"additive": true,
-				"box_extents": Vector3(0.72, 0.22, 0.4),
+				"box_extents": Vector3(0.72, 0.24, 0.4),
 				"spread_deg": 62.0,
 				"speed_range": Vector2(NEAR_SPILL_SPEED_MIN, NEAR_SPILL_SPEED_MAX * 1.1),
 				"damping_range": Vector2(NEAR_SPILL_DRAG_MIN, NEAR_SPILL_DRAG_MAX),
 				"damping_curve": near_damping_curve,
 				"vel_limit_curve": near_vel_limit,
-				"dir": Vector3(0.0, 0.03, -1.0),
-				"gravity": Vector3(0.0, 0.32, 0.0),
-				"turb_strength": 1.6,
+				"dir": Vector3(0.0, 0.1, -1.0),
+				"gravity": Vector3(0.0, 0.48, 0.0),
+				"turb_strength": 1.65,
 				"peak_color": SPORE_CLOUD_SCRIPT.SPORE_GLOW_START_COLOR,
 				"end_color": SPORE_CLOUD_SCRIPT.SPORE_GLOW_END_COLOR,
 				"scale_range":
@@ -571,8 +578,8 @@ func _create_emitter(cfg: Dictionary) -> GPUParticles3D:
 	process.turbulence_noise_scale = 1.45
 	process.turbulence_noise_speed = Vector3(0.75, 0.45, 0.75)
 	process.turbulence_noise_speed_random = 0.5
-	process.turbulence_influence_min = 0.22
-	process.turbulence_influence_max = 0.68
+	process.turbulence_influence_min = 0.24
+	process.turbulence_influence_max = 0.7
 	process.turbulence_influence_over_life = _turbulence_life_curve()
 	var scale_range := cfg["scale_range"] as Vector2
 	process.scale_min = scale_range.x
@@ -617,7 +624,7 @@ func _apply_poison_tick() -> void:
 		var pos := puff["pos"] as Vector3
 		var skip := false
 		for center: Vector3 in sampled_centers:
-			if Vector2(pos.x - center.x, pos.z - center.z).length() < 0.65:
+			if Vector2(pos.x - center.x, pos.z - center.z).length() < 0.3:
 				skip = true
 				break
 		if skip:
@@ -698,13 +705,13 @@ func _stream_scale_curve(start_s: float, mid_s: float, end_s: float) -> CurveTex
 	return tex
 
 
-func _stream_damping_curve(hold_end: float, drop_end: float) -> CurveTexture:
-	# Damping is strong early to arrest forward jet momentum, then drops to 0 so
-	# buoyant gravity and 3D turbulence keep settled particles floating continuously.
+func _stream_damping_curve(early_t: float, mid_t: float, drop_end: float) -> CurveTexture:
+	# Smooth air drag carries the jet 6-9m outward without stopping prematurely, then
+	# releases to 0 so upward buoyancy and 3D turbulence keep settled spores floating.
 	var curve := Curve.new()
-	curve.add_point(Vector2(0.0, 1.0))
-	curve.add_point(Vector2(hold_end, 1.0))
-	curve.add_point(Vector2((hold_end + drop_end) * 0.5, 0.16))
+	curve.add_point(Vector2(0.0, 0.92))
+	curve.add_point(Vector2(early_t, 0.86))
+	curve.add_point(Vector2(mid_t, 0.2))
 	curve.add_point(Vector2(drop_end, 0.0))
 	curve.add_point(Vector2(1.0, 0.0))
 	var tex := CurveTexture.new()
@@ -720,7 +727,7 @@ func _stream_velocity_limit_curve(
 	curve.max_value = maxf(2.0, start_lim)
 	curve.add_point(Vector2(0.0, start_lim))
 	curve.add_point(Vector2(0.3, mid_lim))
-	curve.add_point(Vector2(0.46, float_lim))
+	curve.add_point(Vector2(0.48, float_lim))
 	curve.add_point(Vector2(1.0, end_lim))
 	var tex := CurveTexture.new()
 	tex.curve = curve
@@ -728,11 +735,13 @@ func _stream_velocity_limit_curve(
 
 
 func _turbulence_life_curve() -> CurveTexture:
+	# Mild initial curl keeps forward jet momentum clean instead of clumping at the nozzle,
+	# then ramps smoothly so airborne and settled clouds sway continuously.
 	var curve := Curve.new()
-	curve.add_point(Vector2(0.0, 0.03))
-	curve.add_point(Vector2(0.28, 0.12))
-	curve.add_point(Vector2(0.45, 0.72))
-	curve.add_point(Vector2(1.0, 0.96))
+	curve.add_point(Vector2(0.0, 0.06))
+	curve.add_point(Vector2(0.2, 0.16))
+	curve.add_point(Vector2(0.38, 0.7))
+	curve.add_point(Vector2(1.0, 1.0))
 	var tex := CurveTexture.new()
 	tex.curve = curve
 	return tex

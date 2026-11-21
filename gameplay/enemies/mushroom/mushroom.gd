@@ -106,8 +106,8 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 @export_range(0.05, 3.0, 0.05, "suffix:s") var spore_ramp_seconds: float = 0.8
 ## Chu kỳ gây sát thương độc (s/lần) lên Player đứng trong vùng mây độc.
 @export_range(0.1, 5.0, 0.05, "suffix:s") var poison_interval_seconds: float = 0.85
-## Lượng máu trừ mỗi nhịp độc (HP/tick).
-@export_range(0.1, 100.0, 0.1) var poison_damage: float = 1.0
+## Hệ số nhân với EnemyData.attack_damage cho mỗi nhịp độc của mây bào tử.
+@export_range(0.0, 5.0, 0.05) var poison_damage_multiplier: float = 1.0
 ## Số lượng đám mây độc tối đa tồn tại cùng lúc của con nấm này; vượt quá sẽ tắt đám cũ nhất.
 @export_range(1, 10, 1) var max_active_clouds: int = 3
 
@@ -355,7 +355,7 @@ func get_active_spore_clouds() -> Array[Node]:
 
 
 func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.0) -> void:
-	if not direction.is_zero_approx():
+	if not direction.is_zero_approx() and _can_use_hop_locomotion():
 		_move_requested_this_step = true
 		var air_factor := 0.0
 		if _hop_phase >= HOP_TAKEOFF_PHASE and _hop_phase < HOP_LAND_PHASE:
@@ -368,8 +368,20 @@ func move_in_direction(direction: Vector3, delta: float, speed_scale: float = 1.
 
 func play_directional_animation(action: StringName, restart: bool = false) -> bool:
 	if is_instance_valid(visual) and is_instance_valid(visual.sprite):
-		visual.sprite.texture = CHARGE_TEXTURE if action == &"spore_windup" else NORMAL_TEXTURE
-	return super(action, restart)
+		visual.sprite.texture = _get_texture_for_action(action)
+	return super(_resolve_animation_action(action), restart)
+
+
+func _can_use_hop_locomotion() -> bool:
+	return true
+
+
+func _get_texture_for_action(action: StringName) -> Texture2D:
+	return CHARGE_TEXTURE if action == &"spore_windup" else NORMAL_TEXTURE
+
+
+func _resolve_animation_action(action: StringName) -> StringName:
+	return action
 
 
 func begin_charge_animation(duration_seconds: float = -1.0) -> void:
@@ -450,7 +462,7 @@ func spawn_spore_cloud_at(
 		target_duration,
 		spore_ramp_seconds,
 		poison_interval_seconds,
-		poison_damage
+		_resolve_poison_damage()
 	)
 	cloud.configure_visuals(
 		spore_particle_count,
@@ -470,6 +482,11 @@ func spawn_spore_cloud_at(
 	cloud.activate_poison()
 	_register_spore_cloud(cloud)
 	return true
+
+
+func _resolve_poison_damage() -> float:
+	var base_damage := data.attack_damage if data != null else 0.5
+	return maxf(0.0, base_damage * maxf(0.0, poison_damage_multiplier))
 
 
 func _spawn_cloud_at(world_position: Vector3) -> bool:
@@ -519,6 +536,13 @@ func _is_target_detected_now() -> bool:
 	return offset.length_squared() <= detection_radius * detection_radius
 
 
+func _get_evade_direction_candidates(away: Vector3) -> Array[Vector3]:
+	var candidates: Array[Vector3] = []
+	for angle: float in EVADE_DIRECTION_ANGLES:
+		candidates.append(away.rotated(Vector3.UP, angle))
+	return candidates
+
+
 func _start_defensive_hop() -> void:
 	_evade_pending = false
 	cancel_approach_leap()
@@ -530,10 +554,10 @@ func _start_defensive_hop() -> void:
 			away = from_target.normalized()
 	if away.is_zero_approx():
 		away = -last_facing_direction
+	var candidates := _get_evade_direction_candidates(away)
 	for distance_factor: float in EVADE_DISTANCE_FACTORS:
 		var distance := evade_distance * distance_factor
-		for angle: float in EVADE_DIRECTION_ANGLES:
-			var direction := away.rotated(Vector3.UP, angle)
+		for direction: Vector3 in candidates:
 			if _is_hop_safe(direction, distance):
 				_evade_direction = direction
 				_evade_speed = distance / evade_duration_seconds
@@ -656,6 +680,15 @@ func _build_hop_visuals() -> void:
 
 
 func _update_walk_hop(step: float) -> void:
+	if not _can_use_hop_locomotion():
+		_move_requested_this_step = false
+		_was_moving_hop = false
+		_hop_phase = 0.0
+		_last_walk_anim = ""
+		if is_instance_valid(visual):
+			visual.position.y = move_toward(visual.position.y, 0.0, step * 5.0)
+			_update_shadow_for_height(visual.position.y)
+		return
 	var is_moving := _move_requested_this_step
 	_move_requested_this_step = false
 	if not is_instance_valid(visual):
