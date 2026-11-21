@@ -73,12 +73,18 @@ static func shake(target: Control) -> void:
 	tween.tween_callback(target.remove_meta.bind(SHAKE_BASE_META))
 
 
-## One-shot sparkle burst centered on a control, drawn on the menu overlay.
+## One-shot sparkle burst centered on a control, drawn on the visible menu overlay. Several menus
+## (Inventory, shops) own an overlay in FX_GROUP; only the one on screen can host the burst.
 static func burst(anchor: Control) -> void:
 	if not is_instance_valid(anchor) or not anchor.is_inside_tree():
 		return
-	var host := anchor.get_tree().get_first_node_in_group(FX_GROUP) as Control
-	if host == null or not host.is_visible_in_tree():
+	var host: Control
+	for node: Node in anchor.get_tree().get_nodes_in_group(FX_GROUP):
+		var candidate := node as Control
+		if candidate != null and candidate.is_visible_in_tree():
+			host = candidate
+			break
+	if host == null:
 		return
 	var particles := SPARKLE_SCENE.instantiate() as CPUParticles2D
 	host.add_child(particles)

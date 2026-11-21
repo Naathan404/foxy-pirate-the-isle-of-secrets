@@ -1,22 +1,26 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" uid="uid://5k6exq6ac4qg" path="res://gameplay/merchant/trade_toast_queue.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://dqceyyfji2yk0" path="res://assets/sprites/items/Coin.png" id="2_coin"]
-[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="3_font"]
+[ext_resource type="Texture2D" uid="uid://b05kh65o14823" path="res://assets/ui/silas_shop/PNG/26_small_currency_coin.png" id="2_coin"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="3_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleToast"]
-bg_color = Color(0.12, 0.07, 0.025, 0.94)
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 16.0
+content_margin_bottom = 6.0
+bg_color = Color(0.1, 0.07, 0.09, 0.95)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.96, 0.75, 0.27, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-shadow_color = Color(0, 0, 0, 0.55)
-shadow_size = 4
+border_color = Color(0.77, 0.61, 0.53, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 6
 
 [node name="TradeToastQueue" type="Control"]
 anchors_preset = 15
@@ -25,36 +29,40 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("3_theme")
 script = ExtResource("1_script")
 
 [node name="Panel" type="PanelContainer" parent="."]
-anchors_preset = 12
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
 anchor_top = 1.0
-anchor_right = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 260.0
-offset_top = -68.0
-offset_right = -260.0
-offset_bottom = -26.0
+offset_left = -230.0
+offset_top = -112.0
+offset_right = 230.0
+offset_bottom = -68.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleToast")
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 5
+mouse_filter = 2
 
 [node name="Row" type="HBoxContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+mouse_filter = 2
+theme_override_constants/separation = 10
+alignment = 1
 
 [node name="Coin" type="TextureRect" parent="Panel/MarginContainer/Row"]
-texture_filter = 1
 custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("2_coin")
 expand_mode = 1
 stretch_mode = 5
@@ -62,11 +70,8 @@ stretch_mode = 5
 [node name="Message" type="Label" parent="Panel/MarginContainer/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.9, 0.55, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 15
+theme_type_variation = &"BodyLabel"
+theme_override_font_sizes/font_size = 19
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 3
+text_overrun_behavior = 3

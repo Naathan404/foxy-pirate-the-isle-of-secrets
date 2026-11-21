@@ -1,57 +1,134 @@
 class_name TortugaForgePopup
 extends Control
+## Modal shown after a Forge roll has been paid: two different results side by side, each with
+## its description and a now -> new comparison of every affected stat. The panel decides what
+## happens with the choice; this popup only reports which card was picked.
 
 signal option_chosen(index: int)
 
 const ROW_SCENE: PackedScene = preload("res://gameplay/forge/tortuga_stat_row.tscn")
 const OPTION_COUNT := 2
+const OPTION_NAMES := ["Option I", "Option II"]
 const BASE_MULTIPLIER := 1.0
 const PERCENT_SCALE := 100.0
-const MAX_WINDOW_SCALE := 1.0
+const CARD_STAGGER_SECONDS := 0.08
 
-@export_group("Comparison Layout")
-@export_range(16.0, 64.0, 1.0) var row_height := 32.0
-@export_range(80.0, 500.0, 1.0) var minimum_rows_height := 250.0
-@export var reference_viewport_size := Vector2(950.0, 590.0)
+@export var notice_color: Color = Color(0.95, 0.56, 0.5)
+@export var subtitle_color: Color = Color(0.77, 0.61, 0.53)
 
-@onready var window: Control = $Window
-@onready var cards: Array[Control] = [$Window/CardA, $Window/CardB]
+var _choosing: bool = false
+
+@onready var _subtitle: Label = %Subtitle
+@onready var _cards: Array[Control] = [%CardA, %CardB]
 
 
 func _ready() -> void:
-	window.pivot_offset = window.size * 0.5
-	get_viewport().size_changed.connect(_fit_window)
-	for index in cards.size():
-		cards[index].get_node("Choose").pressed.connect(_on_choose.bind(index))
-	_fit_window()
+	for index in range(_cards.size()):
+		var button := _choose_button(_cards[index])
+		button.pressed.connect(_on_choose.bind(index))
+		InventoryHoverFeedback.attach(button)
 	hide()
 
 
-func show_choices(weapon: WeaponInstance, choices: Array[WeaponForge]) -> void:
-	if weapon == null or choices.size() != OPTION_COUNT:
+## `payment` describes what was already paid, so the player knows closing is not free.
+func show_choices(weapon: WeaponInstance, choices: Array[WeaponForge], payment: String) -> void:
+	if weapon == null or weapon.definition == null or choices.size() != OPTION_COUNT:
 		return
-	$Window/Subtitle.text = "Payment complete. Select one result to continue."
-	for index in OPTION_COUNT:
-		_fill_card(cards[index], weapon, choices[index])
+	_subtitle.text = (
+		"Paid %s. Keep one result; it replaces %s." % [payment, weapon.forge.display_name]
+		if weapon.forge != null
+		else "Paid %s. Keep one result." % payment
+	)
+	_subtitle.add_theme_color_override("font_color", subtitle_color)
+	for index in range(OPTION_COUNT):
+		_fill_card(_cards[index], index, weapon, choices[index])
+		_choose_button(_cards[index]).disabled = false
+	_choosing = true
 	show()
-	_fit_window()
+	for index in range(_cards.size()):
+		InventoryMenuFx.pop(
+			_cards[index], InventoryMenuFx.STAGGER_FROM_SCALE, index * CARD_STAGGER_SECONDS
+		)
+		InventoryMenuFx.burst(_cards[index].get_node("Icon") as Control)
+	_choose_button(_cards[0]).grab_focus.call_deferred()
 
 
-func _fill_card(card: Control, weapon: WeaponInstance, forge: WeaponForge) -> void:
-	card.get_node("Name").text = forge.display_name
-	card.get_node("Description").text = forge.description
-	var rows := card.get_node("StatsScroll/Rows") as Control
+## Explains why the popup cannot be dismissed yet (Esc, Back or a failed apply).
+func show_notice(text: String) -> void:
+	_subtitle.text = text
+	_subtitle.add_theme_color_override("font_color", notice_color)
+	InventoryMenuFx.shake(_subtitle)
+
+
+func close() -> void:
+	_choosing = false
+	hide()
+
+
+func _fill_card(card: Control, index: int, weapon: WeaponInstance, forge: WeaponForge) -> void:
+	(card.get_node("Icon") as TextureRect).texture = weapon.definition.icon
+	var title := card.get_node("Name") as Label
+	title.text = forge.display_name
+	title.tooltip_text = forge.display_name
+	var current := weapon.forge.display_name if weapon.forge != null else ""
+	(card.get_node("Kind") as Label).text = (
+		"%s  ·  replaces %s" % [OPTION_NAMES[index], current]
+		if not current.is_empty()
+		else "%s  ·  first forge" % OPTION_NAMES[index]
+	)
+	var body := card.get_node("StatsScroll/Margin/Body") as Control
+	var description := forge.description.strip_edges()
+	(body.get_node("Description") as Label).text = (
+		description if not description.is_empty() else "No description."
+	)
+	var rows := body.get_node("Rows") as VBoxContainer
 	for child in rows.get_children():
 		rows.remove_child(child)
 		child.queue_free()
 	var values := _comparison_rows(weapon, forge)
-	rows.custom_minimum_size.y = maxf(minimum_rows_height, values.size() * row_height)
-	for index in values.size():
-		var value: Dictionary = values[index]
-		var row := ROW_SCENE.instantiate() as Control
+	# Changed stats first; unchanged ones stay listed afterwards for reference.
+	var ordered: Array[Dictionary] = []
+	for value: Dictionary in values:
+		if value.trend != 0:
+			ordered.append(value)
+	for value: Dictionary in values:
+		if value.trend == 0:
+			ordered.append(value)
+	var better := 0
+	var worse := 0
+	for value: Dictionary in ordered:
+		var row := ROW_SCENE.instantiate() as TortugaStatRow
 		rows.add_child(row)
-		row.position = Vector2(0, index * row_height)
-		row.call(&"set_comparison", value.title, value.before, value.after, value.trend)
+		row.set_comparison(value.title, value.before, value.after, value.trend)
+		if value.trend > 0:
+			better += 1
+		elif value.trend < 0:
+			worse += 1
+	(card.get_node("StatsScroll") as ScrollContainer).scroll_vertical = 0
+	(card.get_node("Summary") as Label).text = (
+		"▲ %d better  ·  ▼ %d worse" % [better, worse] if better + worse > 0 else "No stat changes"
+	)
+
+
+func _choose_button(card: Control) -> Button:
+	return card.get_node("Choose") as Button
+
+
+func _on_choose(index: int) -> void:
+	if not _choosing:
+		return
+	# One choice per roll: lock both cards until the panel answers.
+	_choosing = false
+	for card: Control in _cards:
+		_choose_button(card).disabled = true
+	option_chosen.emit(index)
+
+
+## Re-enables the cards when the panel could not apply the choice.
+func allow_retry() -> void:
+	_choosing = true
+	for card: Control in _cards:
+		_choose_button(card).disabled = false
 
 
 func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dictionary]:
@@ -184,7 +261,7 @@ func _comparison_rows(weapon: WeaponInstance, chosen: WeaponForge) -> Array[Dict
 		)
 		_add_metric(
 			result,
-			"Projectile knockback",
+			"Proj. knockback",
 			_value(old, "projectile_knockback_multiplier"),
 			chosen.projectile_knockback_multiplier,
 			"%.2fx"
@@ -221,6 +298,7 @@ func _normal_damage(attack: AttackData, forge: WeaponForge) -> float:
 	return maxf(0.0, attack.damage_hp * multiplier + forge.flat_damage)
 
 
+## Lower values are better for windup, recovery and Stamina cost.
 func _add_metric(
 	rows: Array[Dictionary],
 	title: String,
@@ -247,22 +325,3 @@ func _value(forge: WeaponForge, property: String) -> float:
 
 func _bonus(forge: WeaponForge, property: String) -> float:
 	return float(forge.get(property)) if forge != null else 0.0
-
-
-func _flat(forge: WeaponForge) -> float:
-	return forge.flat_damage if forge != null else 0.0
-
-
-func _on_choose(index: int) -> void:
-	option_chosen.emit(index)
-
-
-func _fit_window() -> void:
-	var viewport_size := get_viewport().get_visible_rect().size
-	window.scale = Vector2.ONE * minf(
-		MAX_WINDOW_SCALE,
-		minf(
-			viewport_size.x / reference_viewport_size.x,
-			viewport_size.y / reference_viewport_size.y
-		)
-	)

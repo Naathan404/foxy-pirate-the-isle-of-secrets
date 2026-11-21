@@ -1,64 +1,225 @@
 [gd_scene format=3 uid="uid://dltw4fun83bl4"]
 
 [ext_resource type="Script" uid="uid://bld5tt2iup86q" path="res://gameplay/merchant/silas_shop_panel.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="2_book"]
-[ext_resource type="Texture2D" uid="uid://1q3c8vtxvd5b" path="res://assets/ui/silas_shop/PNG/01_shop_header_lantern_banner.png" id="3_header"]
-[ext_resource type="Texture2D" uid="uid://eeec67jm4h4y" path="res://assets/ui/silas_shop/PNG/32_tab_active_blank.png" id="4_tab_active"]
-[ext_resource type="Texture2D" uid="uid://h8nkhrn66qfw" path="res://assets/ui/silas_shop/PNG/33_tab_inactive_blank.png" id="5_tab_inactive"]
-[ext_resource type="Texture2D" uid="uid://cyvd8yj0r05td" path="res://assets/ui/silas_shop/PNG/12_money_bag_skull_with_coins.png" id="6_bag"]
-[ext_resource type="Texture2D" uid="uid://cuvxgeuhvn60s" path="res://assets/ui/silas_shop/PNG/22_currency_bar_blank.png" id="7_gold_bar"]
-[ext_resource type="Texture2D" uid="uid://b05kh65o14823" path="res://assets/ui/silas_shop/PNG/26_small_currency_coin.png" id="8_coin"]
-[ext_resource type="Texture2D" uid="uid://dn8xyc2ls77hv" path="res://assets/ui/silas_shop/PNG/15_detail_item_icon_slot.png" id="9_icon_slot"]
-[ext_resource type="Texture2D" uid="uid://bbnpp5em43u2o" path="res://assets/ui/silas_shop/PNG/16_item_name_ink_brushstroke.png" id="10_name"]
-[ext_resource type="Texture2D" uid="uid://cii684x8blio4" path="res://assets/ui/silas_shop/PNG/17_description_decorative_lines.png" id="11_lines"]
-[ext_resource type="Texture2D" uid="uid://fq6cncew76g3" path="res://assets/ui/silas_shop/PNG/18_effect_title_label.png" id="12_effect_title"]
-[ext_resource type="Texture2D" uid="uid://cb8p1wc4vqx1a" path="res://assets/ui/silas_shop/PNG/19_effect_description_outline.png" id="13_effect_frame"]
-[ext_resource type="Texture2D" uid="uid://7s3ih1xyueqv" path="res://assets/ui/silas_shop/PNG/20_price_pill_blank.png" id="14_price"]
-[ext_resource type="Texture2D" uid="uid://8emnykyk4aih" path="res://assets/ui/silas_shop/PNG/10_quantity_value_field_blank.png" id="15_quantity"]
-[ext_resource type="Texture2D" uid="uid://cibhr0st0jxvm" path="res://assets/ui/silas_shop/PNG/08_quantity_minus_button.png" id="16_minus"]
-[ext_resource type="Texture2D" uid="uid://c1r0r6vq4jyq1" path="res://assets/ui/silas_shop/PNG/09_quantity_plus_button.png" id="17_plus"]
-[ext_resource type="Texture2D" uid="uid://bootcj1j63ful" path="res://assets/ui/silas_shop/PNG/34_purchase_button_blank.png" id="18_action"]
-[ext_resource type="Texture2D" uid="uid://bghbjcbfj5hf6" path="res://assets/ui/silas_shop/PNG/27_detail_page_border_only.png" id="19_detail_border"]
-[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="21_font"]
-[ext_resource type="PackedScene" path="res://gameplay/merchant/trade_toast_queue.tscn" id="22_toasts"]
-[ext_resource type="Texture2D" uid="uid://djt3xrkck7v2j" path="res://assets/ui/silas_shop/PNG/28_label_plate_blank.png" id="23_leave_plate"]
-[ext_resource type="Script" uid="uid://bsn8narxl3gfb" path="res://gameplay/ui/button_press_feedback.gd" id="24_button_feedback"]
-[ext_resource type="Theme" path="res://gameplay/ui/paper_tooltip_theme.tres" id="paper_tooltips"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://n8cij43hta0r" path="res://assets/ui/HUD_Fox/Background.png" id="3_background"]
+[ext_resource type="Shader" uid="uid://bml4o602pp17d" path="res://gameplay/inventory/menu/ink_reveal.gdshader" id="4_ink"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/menu_tab_button.tscn" id="5_tab"]
+[ext_resource type="Texture2D" uid="uid://coy1i01cyyyhn" path="res://assets/ui/HUD_Fox/Shop/Buy_Icon.png" id="6_buy_idle"]
+[ext_resource type="Texture2D" uid="uid://ckydudsh6qsvy" path="res://assets/ui/HUD_Fox/Shop/Buy_Icon_Selected.png" id="7_buy_active"]
+[ext_resource type="Texture2D" uid="uid://dyx5i80eufk2" path="res://assets/ui/HUD_Fox/Weapons/Backpack_Icon.png" id="8_bag"]
+[ext_resource type="Texture2D" uid="uid://dbg16f7p7mc11" path="res://assets/ui/HUD_Fox/Shop/Sell_Icon_Selected.png" id="9_sell_active"]
+[ext_resource type="Texture2D" uid="uid://br7e6kyus57k1" path="res://assets/ui/HUD_Fox/Weapons/Deco_3.png" id="10_separator"]
+[ext_resource type="Texture2D" uid="uid://bylr4qwghj1dj" path="res://assets/ui/HUD_Fox/Weapons/Weapons_Line.png" id="11_lines"]
+[ext_resource type="Texture2D" uid="uid://dyhf4ywaf0lri" path="res://assets/ui/HUD_Fox/Weapons/Back_Button.png" id="12_back"]
+[ext_resource type="Texture2D" uid="uid://4cil6c50t34q" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="13_deco"]
+[ext_resource type="Texture2D" uid="uid://uv2ybm75xqot" path="res://assets/ui/HUD_Fox/Avatar_.png" id="14_avatar"]
+[ext_resource type="Texture2D" uid="uid://8n16ih7xarfv" path="res://assets/sprites/npcs/silas/Silas.png" id="15_silas"]
+[ext_resource type="Texture2D" uid="uid://wkib6wfntnrp" path="res://assets/ui/silas_shop/PNG/31_lantern_hanging.png" id="16_lantern"]
+[ext_resource type="Texture2D" uid="uid://b05kh65o14823" path="res://assets/ui/silas_shop/PNG/26_small_currency_coin.png" id="17_coin"]
+[ext_resource type="Texture2D" uid="uid://ma2b3ksi5acq" path="res://assets/ui/HUD_Fox/Weapons/Weapon Skill_Log.png" id="18_purse"]
+[ext_resource type="Texture2D" uid="uid://d11vihjtu2o3o" path="res://assets/ui/HUD_Fox/Inventory/Items_Stat.png" id="19_detail"]
+[ext_resource type="Shader" uid="uid://cn1h4g3fdy3vn" path="res://gameplay/inventory/menu/icon_glow.gdshader" id="20_glow"]
+[ext_resource type="PackedScene" path="res://gameplay/merchant/trade_toast_queue.tscn" id="21_toasts"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xarjo"]
+[sub_resource type="FastNoiseLite" id="ink_noise_source"]
+frequency = 0.012
+fractal_octaves = 4
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_owusy"]
+[sub_resource type="NoiseTexture2D" id="ink_noise"]
+width = 256
+height = 256
+noise = SubResource("ink_noise_source")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ink_material"]
+shader = ExtResource("4_ink")
+shader_parameter/progress = 1.0
+shader_parameter/noise = SubResource("ink_noise")
+shader_parameter/rim_color = Color(0.86, 0.58, 0.22, 1)
+shader_parameter/rim_width = 0.05
+shader_parameter/softness = 0.06
+shader_parameter/noise_strength = 0.35
+shader_parameter/aspect = 1.7778
+
+[sub_resource type="Gradient" id="mote_shape"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="mote_texture"]
+gradient = SubResource("mote_shape")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="mote_fade"]
+offsets = PackedFloat32Array(0, 0.2, 0.7, 1)
+colors = PackedColorArray(1, 0.82, 0.4, 0, 1, 0.82, 0.4, 0.6, 1, 0.92, 0.62, 0.35, 1, 0.92, 0.62, 0)
+
+[sub_resource type="CanvasItemMaterial" id="additive"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="lantern_light"]
+offsets = PackedFloat32Array(0, 0.45, 1)
+colors = PackedColorArray(1, 0.72, 0.32, 0.5, 1, 0.55, 0.2, 0.18, 1, 0.45, 0.15, 0)
+
+[sub_resource type="GradientTexture2D" id="lantern_light_texture"]
+gradient = SubResource("lantern_light")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="AtlasTexture" id="silas_portrait"]
+atlas = ExtResource("15_silas")
+region = Rect2(0, 474, 237, 237)
+
+[sub_resource type="AtlasTexture" id="line_left"]
+atlas = ExtResource("11_lines")
+region = Rect2(240, 60, 40, 990)
+
+[sub_resource type="AtlasTexture" id="line_right"]
+atlas = ExtResource("11_lines")
+region = Rect2(1100, 60, 43, 1027)
+
+[sub_resource type="ShaderMaterial" id="glow_material"]
+shader = ExtResource("20_glow")
+shader_parameter/glow_color = Color(1, 0.7, 0.32, 0.5)
+shader_parameter/pulse_speed = 1.4
+shader_parameter/pulse_amount = 0.3
+
+[sub_resource type="StyleBoxFlat" id="step_normal"]
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.07, 0.09, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.77, 0.61, 0.53, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="step_pressed"]
+content_margin_bottom = 2.0
+bg_color = Color(0.36, 0.11, 0.14, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.96, 0.89, 0.77, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="step_hover"]
+content_margin_bottom = 4.0
+bg_color = Color(0.22, 0.12, 0.14, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.96, 0.89, 0.77, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="step_disabled"]
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.07, 0.09, 0.4)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.37, 0.37, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="value_field"]
+bg_color = Color(0.06, 0.04, 0.05, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.77, 0.61, 0.53, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="AtlasTexture" id="tab_line"]
+atlas = ExtResource("11_lines")
+region = Rect2(480, 0, 663, 50)
 
 [node name="SilasShopPanel" type="CanvasLayer" unique_id=1877783852]
 layer = 20
 script = ExtResource("1_script")
 
-[node name="Dim" type="ColorRect" parent="." unique_id=1798462766]
+[node name="Root" type="Control" parent="." unique_id=291690336]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-color = Color(0.035, 0.025, 0.023, 0.76)
+theme = ExtResource("2_theme")
 
-[node name="Book" type="Control" parent="." unique_id=261697898]
-layout_mode = 3
+[node name="Background" type="TextureRect" parent="Root" unique_id=1256251688]
+unique_name_in_owner = true
+material = SubResource("ink_material")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Frame" type="Control" parent="Root" unique_id=910837898]
+unique_name_in_owner = true
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -550.0
-offset_top = -325.0
-offset_right = 550.0
-offset_bottom = 325.0
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 1
-theme = ExtResource("paper_tooltips")
+mouse_filter = 2
 
-[node name="Background" type="TextureRect" parent="Book" unique_id=655070703]
+[node name="Motes" type="CPUParticles2D" parent="Root/Frame" unique_id=1478272042]
+unique_name_in_owner = true
+position = Vector2(640, 740)
+emitting = false
+amount = 34
+texture = SubResource("mote_texture")
+lifetime = 10.0
+preprocess = 6.0
+emission_shape = 3
+emission_rect_extents = Vector2(660, 12)
+direction = Vector2(0, -1)
+spread = 28.0
+gravity = Vector2(0, -4)
+initial_velocity_min = 14.0
+initial_velocity_max = 36.0
+scale_amount_min = 0.12
+scale_amount_max = 0.38
+color_ramp = SubResource("mote_fade")
+
+[node name="Merchant" type="Control" parent="Root/Frame" unique_id=1244563726]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,480 +227,631 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_book")
-expand_mode = 1
-stretch_mode = 5
 
-[node name="Header" type="TextureRect" parent="Book" unique_id=412851739]
+[node name="Title" type="HBoxContainer" parent="Root/Frame/Merchant" unique_id=2147251882]
 layout_mode = 0
-offset_left = 73.0
-offset_top = -20.0
-offset_right = 515.0
-offset_bottom = 117.0
+offset_left = 14.0
+offset_top = 84.0
+offset_right = 298.0
+offset_bottom = 146.0
 mouse_filter = 2
-texture = ExtResource("3_header")
-expand_mode = 1
-stretch_mode = 5
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="Tabs" type="Control" parent="Book" unique_id=1579276211]
-anchors_preset = 0
-offset_left = 142.0
-offset_top = 113.0
-offset_right = 556.0
-offset_bottom = 178.0
-mouse_filter = 2
-
-[node name="Buy" type="TextureButton" parent="Book/Tabs" unique_id=1227771286]
-layout_mode = 0
-offset_left = 49.0
-offset_top = 2.0
-offset_right = 199.0
-offset_bottom = 52.0
-mouse_default_cursor_shape = 2
-toggle_mode = true
-texture_normal = ExtResource("4_tab_active")
-texture_pressed = ExtResource("4_tab_active")
-texture_hover = ExtResource("4_tab_active")
-texture_disabled = ExtResource("5_tab_inactive")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="Text" type="Label" parent="Book/Tabs/Buy" unique_id=679299787]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(1, 0.89, 0.68, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 27
-text = "Buy"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Sell" type="TextureButton" parent="Book/Tabs" unique_id=1515297713]
-layout_mode = 0
-offset_left = 202.0
-offset_top = 2.0
-offset_right = 352.0
-offset_bottom = 52.0
-mouse_default_cursor_shape = 2
-toggle_mode = true
-texture_normal = ExtResource("5_tab_inactive")
-texture_pressed = ExtResource("4_tab_active")
-texture_hover = ExtResource("4_tab_active")
-texture_disabled = ExtResource("5_tab_inactive")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="Text" type="Label" parent="Book/Tabs/Sell" unique_id=289819479]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.28, 0.1, 0.07, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 27
-text = "Sell"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="GridScroll" type="ScrollContainer" parent="Book" unique_id=495831893]
-layout_mode = 0
-offset_left = 159.0
-offset_top = 175.0
-offset_right = 509.0
-offset_bottom = 475.0
-horizontal_scroll_mode = 0
-
-[node name="Grid" type="Control" parent="Book/GridScroll" unique_id=246630478]
-custom_minimum_size = Vector2(350, 300)
+[node name="DecoLeft" type="TextureRect" parent="Root/Frame/Merchant/Title" unique_id=462842911]
+custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
-mouse_filter = 1
-
-[node name="Bag" type="TextureRect" parent="Book" unique_id=1927800823]
-layout_mode = 0
-offset_left = 101.0
-offset_top = 462.0
-offset_right = 221.0
-offset_bottom = 522.0
+size_flags_vertical = 4
 mouse_filter = 2
-texture = ExtResource("6_bag")
+texture = ExtResource("13_deco")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="GoldBadge" type="Control" parent="Book" unique_id=900180299]
-anchors_preset = 0
-offset_left = 834.0
-offset_top = 37.0
-offset_right = 1014.0
-offset_bottom = 97.0
-mouse_filter = 2
+[node name="TitleLabel" type="Label" parent="Root/Frame/Merchant/Title" unique_id=107977559]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 40
+text = "Black Market"
 
-[node name="Bar" type="TextureRect" parent="Book/GoldBadge" unique_id=1972665169]
-layout_mode = 0
-offset_right = 150.0
-offset_bottom = 50.0
+[node name="DecoRight" type="TextureRect" parent="Root/Frame/Merchant/Title" unique_id=1415571363]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
-texture = ExtResource("7_gold_bar")
+texture = ExtResource("13_deco")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Coin" type="TextureRect" parent="Book/GoldBadge" unique_id=125911335]
+[node name="LanternGlow" type="TextureRect" parent="Root/Frame/Merchant" unique_id=1587833190]
+unique_name_in_owner = true
+material = SubResource("additive")
 layout_mode = 0
-offset_left = 1.0
-offset_top = 4.0
-offset_right = 39.0
-offset_bottom = 42.0
+offset_left = 36.0
+offset_top = 70.0
+offset_right = 356.0
+offset_bottom = 390.0
 mouse_filter = 2
-texture = ExtResource("8_coin")
+texture = SubResource("lantern_light_texture")
 expand_mode = 1
-stretch_mode = 5
 
-[node name="Gold" type="Label" parent="Book/GoldBadge" unique_id=1571702570]
-layout_mode = 0
-offset_left = -1.0
-offset_top = 3.0
-offset_right = 127.0
-offset_bottom = 46.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 30
-text = "0"
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Info" type="Control" parent="Book" unique_id=1371563749]
-anchors_preset = 0
-offset_left = 578.0
-offset_top = 121.0
-offset_right = 1032.0
-offset_bottom = 591.0
-mouse_filter = 2
-
-[node name="Border" type="TextureRect" parent="Book/Info" unique_id=1155338720]
-visible = false
-layout_mode = 0
-offset_left = -21.0
-offset_top = -12.0
-offset_right = 467.0
-offset_bottom = 470.0
-mouse_filter = 2
-texture = ExtResource("19_detail_border")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="IconFrame" type="TextureRect" parent="Book/Info" unique_id=1703860890]
-layout_mode = 0
-offset_left = 3.0
-offset_top = -31.0
-offset_right = 103.0
-offset_bottom = 69.0
-mouse_filter = 2
-texture = ExtResource("9_icon_slot")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Icon" type="TextureRect" parent="Book/Info" unique_id=1944324782]
-texture_filter = 1
-layout_mode = 0
-offset_left = 13.0
-offset_top = -22.0
-offset_right = 93.0
-offset_bottom = 58.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="NameBrush" type="TextureRect" parent="Book/Info" unique_id=1862995927]
-layout_mode = 0
-offset_left = 89.0
-offset_top = -30.0
-offset_right = 380.0
-offset_bottom = 21.0
-mouse_filter = 2
-texture = ExtResource("10_name")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ItemName" type="Label" parent="Book/Info" unique_id=512126537]
-layout_mode = 0
-offset_left = 95.0
-offset_top = -27.0
-offset_right = 371.0
-offset_bottom = 19.0
-theme_override_colors/font_color = Color(0.17, 0.07, 0.05, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 27
-text = "Select an item"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="Category" type="Label" parent="Book/Info" unique_id=770086694]
-layout_mode = 0
-offset_left = 95.0
-offset_top = 16.0
-offset_right = 374.0
-offset_bottom = 42.0
-theme_override_colors/font_color = Color(0.44, 0.22, 0.13, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 18
-text = "Category"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Count" type="Label" parent="Book/Info" unique_id=317428696]
-layout_mode = 0
-offset_left = 95.0
-offset_top = 42.0
-offset_right = 374.0
-offset_bottom = 69.0
-theme_override_colors/font_color = Color(0.38, 0.19, 0.11, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 18
-text = "9999"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="DescriptionLines" type="TextureRect" parent="Book/Info" unique_id=1772189550]
+[node name="PortraitFrame" type="TextureRect" parent="Root/Frame/Merchant" unique_id=254996848]
 layout_mode = 0
 offset_left = 52.0
-offset_top = 171.0
-offset_right = 340.0
-offset_bottom = 201.0
+offset_top = 150.0
+offset_right = 252.0
+offset_bottom = 320.0
 mouse_filter = 2
-texture = ExtResource("11_lines")
+texture = ExtResource("14_avatar")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Description" type="Label" parent="Book/Info" unique_id=1190915399]
+[node name="Portrait" type="TextureRect" parent="Root/Frame/Merchant" unique_id=1028484697]
 layout_mode = 0
-offset_left = 58.0
-offset_top = 73.0
-offset_right = 335.0
-offset_bottom = 155.0
-theme_override_colors/font_color = Color(0.25, 0.13, 0.09, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 21
-text = "Choose an offer to see its details."
+offset_left = 78.0
+offset_top = 168.0
+offset_right = 222.0
+offset_bottom = 312.0
+tooltip_text = "Silas, dealer in goods nobody asks about"
+texture = SubResource("silas_portrait")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Lantern" type="TextureRect" parent="Root/Frame/Merchant" unique_id=67663064]
+layout_mode = 0
+offset_left = 214.0
+offset_top = 132.0
+offset_right = 264.0
+offset_bottom = 212.0
+mouse_filter = 2
+texture = ExtResource("16_lantern")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MerchantName" type="Label" parent="Root/Frame/Merchant" unique_id=689800150]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 320.0
+offset_right = 298.0
+offset_bottom = 360.0
+theme_type_variation = &"NameLabel"
+text = "Silas"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Role" type="Label" parent="Root/Frame/Merchant" unique_id=1872794194]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 358.0
+offset_right = 298.0
+offset_bottom = 380.0
+theme_type_variation = &"MutedLabel"
+text = "Black-market dealer"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Whisper" type="Label" parent="Root/Frame/Merchant" unique_id=1266554216]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 390.0
+offset_right = 298.0
+offset_bottom = 470.0
+theme_type_variation = &"HeadingLabel"
+theme_override_colors/font_color = Color(0.96, 0.89, 0.77, 1)
+theme_override_font_sizes/font_size = 27
+horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="EffectFrame" type="TextureRect" parent="Book/Info" unique_id=1419454762]
+[node name="PurseArt" type="TextureRect" parent="Root/Frame/Merchant" unique_id=1215294186]
 layout_mode = 0
-offset_left = -14.0
-offset_top = 200.0
-offset_right = 408.0
-offset_bottom = 292.0
+offset_left = 30.0
+offset_top = 492.0
+offset_right = 282.0
+offset_bottom = 632.0
 mouse_filter = 2
-texture = ExtResource("13_effect_frame")
+texture = ExtResource("18_purse")
+expand_mode = 1
+
+[node name="PurseTitle" type="Label" parent="Root/Frame/Merchant" unique_id=1718103539]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 522.0
+offset_right = 272.0
+offset_bottom = 546.0
+theme_type_variation = &"MutedLabel"
+text = "Your purse"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PurseCoin" type="TextureRect" parent="Root/Frame/Merchant" unique_id=2074426397]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 0
+offset_left = 57.0
+offset_top = 553.0
+offset_right = 95.0
+offset_bottom = 591.0
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("17_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EffectTitle" type="TextureRect" parent="Book/Info" unique_id=1099662653]
+[node name="PurseRow" type="HBoxContainer" parent="Root/Frame/Merchant" unique_id=415511190]
+layout_mode = 0
+offset_left = 59.0
+offset_top = 539.0
+offset_right = 249.0
+offset_bottom = 598.0
+tooltip_text = "Gold you carry"
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="GoldLabel" type="Label" parent="Root/Frame/Merchant/PurseRow" unique_id=472179504]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 36
+text = "0"
+vertical_alignment = 1
+
+[node name="Page" type="Control" parent="Root/Frame" unique_id=1483038785]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LineLeft" type="TextureRect" parent="Root/Frame/Page" unique_id=1043911495]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 168.0
+offset_right = 320.0
+offset_bottom = 552.0
+mouse_filter = 2
+texture = SubResource("line_left")
+expand_mode = 1
+
+[node name="LineRight" type="TextureRect" parent="Root/Frame/Page" unique_id=960449139]
+layout_mode = 0
+offset_left = 810.0
+offset_top = 118.0
+offset_right = 831.0
+offset_bottom = 622.0
+mouse_filter = 2
+texture = SubResource("line_right")
+expand_mode = 1
+
+[node name="SectionTitle" type="Label" parent="Root/Frame/Page" unique_id=360082407]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 330.0
+offset_top = 112.0
+offset_right = 640.0
+offset_bottom = 156.0
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 34
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Counter" type="HBoxContainer" parent="Root/Frame/Page" unique_id=1402935756]
+layout_mode = 0
+offset_left = 640.0
+offset_top = 118.0
+offset_right = 800.0
+offset_bottom = 156.0
+tooltip_text = "Bag slots in use / total slots"
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="BagIcon" type="TextureRect" parent="Root/Frame/Page/Counter" unique_id=1665943469]
+custom_minimum_size = Vector2(30, 32)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("8_bag")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CounterLabel" type="Label" parent="Root/Frame/Page/Counter" unique_id=1422953023]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 24
+text = "0/0"
+vertical_alignment = 1
+
+[node name="GridScroll" type="ScrollContainer" parent="Root/Frame/Page" unique_id=1766107319]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 326.0
+offset_top = 162.0
+offset_right = 806.0
+offset_bottom = 556.0
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="Root/Frame/Page/GridScroll" unique_id=1632166829]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Grid" type="GridContainer" parent="Root/Frame/Page/GridScroll/GridMargin" unique_id=1919421866]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 10
+columns = 4
+
+[node name="EmptyLabel" type="Label" parent="Root/Frame/Page" unique_id=317794404]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 340.0
+offset_top = 200.0
+offset_right = 796.0
+offset_bottom = 270.0
+theme_type_variation = &"BodyLabel"
+theme_override_colors/font_outline_color = Color(0.08, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Footnote" type="Label" parent="Root/Frame/Page" unique_id=2090621914]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 326.0
+offset_top = 562.0
+offset_right = 806.0
+offset_bottom = 588.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="DetailArt" type="TextureRect" parent="Root/Frame/Page" unique_id=116878994]
+layout_mode = 0
+offset_left = 838.0
+offset_top = 74.0
+offset_right = 1263.0
+offset_bottom = 642.0
+mouse_filter = 2
+texture = ExtResource("19_detail")
+expand_mode = 1
+
+[node name="Detail" type="Control" parent="Root/Frame/Page" unique_id=845851417]
+anchors_preset = 0
+offset_left = 838.0
+offset_top = 74.0
+offset_right = 1263.0
+offset_bottom = 642.0
+mouse_filter = 2
+
+[node name="Glow" type="ColorRect" parent="Root/Frame/Page/Detail" unique_id=244630522]
+material = SubResource("glow_material")
+layout_mode = 0
+offset_left = 80.0
+offset_top = 46.0
+offset_right = 300.0
+offset_bottom = 266.0
+mouse_filter = 2
+
+[node name="BigIcon" type="TextureRect" parent="Root/Frame/Page/Detail" unique_id=1902230465]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 120.0
+offset_top = 86.0
+offset_right = 260.0
+offset_bottom = 226.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemName" type="Label" parent="Root/Frame/Page/Detail" unique_id=964559532]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 30.0
+offset_top = 244.0
+offset_right = 394.0
+offset_bottom = 298.0
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 31
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="TypeBanner" type="Label" parent="Root/Frame/Page/Detail" unique_id=140026533]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 68.0
+offset_top = 305.0
+offset_right = 222.0
+offset_bottom = 343.0
+theme_type_variation = &"BannerLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="OwnedBanner" type="Label" parent="Root/Frame/Page/Detail" unique_id=1981975356]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 238.0
+offset_top = 305.0
+offset_right = 346.0
+offset_bottom = 343.0
+tooltip_text = "How many you carry"
+mouse_filter = 1
+theme_type_variation = &"BannerLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="DescriptionScroll" type="ScrollContainer" parent="Root/Frame/Page/Detail" unique_id=1803276171]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 30.0
+offset_top = 348.0
+offset_right = 396.0
+offset_bottom = 426.0
+horizontal_scroll_mode = 0
+
+[node name="DescriptionBox" type="VBoxContainer" parent="Root/Frame/Page/Detail/DescriptionScroll" unique_id=1872870631]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="Description" type="Label" parent="Root/Frame/Page/Detail/DescriptionScroll/DescriptionBox" unique_id=238339823]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EffectLabel" type="Label" parent="Root/Frame/Page/Detail/DescriptionScroll/DescriptionBox" unique_id=497588585]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TradeRow" type="Control" parent="Root/Frame/Page/Detail" unique_id=1730364836]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 22.0
+offset_top = 444.0
+offset_right = 402.0
+offset_bottom = 476.0
+mouse_filter = 2
+
+[node name="QuantityBox" type="HBoxContainer" parent="Root/Frame/Page/Detail/TradeRow" unique_id=920502266]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 6.0
-offset_top = 189.0
-offset_right = 156.0
-offset_bottom = 224.0
-mouse_filter = 2
-texture = ExtResource("12_effect_title")
-expand_mode = 1
-stretch_mode = 5
+offset_right = 160.0
+offset_bottom = 32.0
+theme_override_constants/separation = 6
+alignment = 1
 
-[node name="EffectText" type="Label" parent="Book/Info" unique_id=976026169]
-layout_mode = 0
-offset_left = 69.0
-offset_top = 212.0
-offset_right = 329.0
-offset_bottom = 282.0
-theme_override_colors/font_color = Color(0.3, 0.15, 0.09, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 20
-text = "Select an item"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="PricePlate" type="TextureRect" parent="Book/Info" unique_id=2053955550]
-layout_mode = 0
-offset_left = 225.0
-offset_top = 289.0
-offset_right = 345.0
-offset_bottom = 329.0
-mouse_filter = 2
-texture = ExtResource("14_price")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Coin" type="TextureRect" parent="Book/Info/PricePlate" unique_id=433622040]
-layout_mode = 0
-offset_left = -1.0
-offset_top = 1.0
-offset_right = 34.0
-offset_bottom = 36.0
-mouse_filter = 2
-texture = ExtResource("8_coin")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Trade" type="Label" parent="Book/Info/PricePlate" unique_id=1924972850]
-layout_mode = 0
-offset_left = 21.0
-offset_right = 121.0
-offset_bottom = 40.0
-theme_override_colors/font_color = Color(0.25, 0.11, 0.06, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 22
-text = "99999"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Quantity" type="Control" parent="Book/Info" unique_id=980025052]
-anchors_preset = 0
-offset_left = 35.0
-offset_top = 293.0
-offset_right = 290.0
-offset_bottom = 333.0
-mouse_filter = 2
-
-[node name="Minus" type="TextureButton" parent="Book/Info/Quantity" unique_id=263316293]
-layout_mode = 0
-offset_left = 3.0
-offset_right = 43.0
-offset_bottom = 30.0
+[node name="MinusButton" type="Button" parent="Root/Frame/Page/Detail/TradeRow/QuantityBox" unique_id=1616570927]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Trade one less"
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("16_minus")
-ignore_texture_size = true
-stretch_mode = 5
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("step_normal")
+theme_override_styles/pressed = SubResource("step_pressed")
+theme_override_styles/hover = SubResource("step_hover")
+theme_override_styles/disabled = SubResource("step_disabled")
+text = "-"
 
-[node name="PressFeedback" type="Node" parent="Book/Info/Quantity/Minus" unique_id=939795018]
-script = ExtResource("24_button_feedback")
+[node name="ValueField" type="PanelContainer" parent="Root/Frame/Page/Detail/TradeRow/QuantityBox" unique_id=1311712330]
+custom_minimum_size = Vector2(58, 32)
+layout_mode = 2
+tooltip_text = "Bundles in this trade"
+theme_override_styles/panel = SubResource("value_field")
 
-[node name="Field" type="TextureRect" parent="Book/Info/Quantity" unique_id=139086468]
-layout_mode = 0
-offset_left = 13.0
-offset_right = 152.0
-offset_bottom = 30.0
-mouse_filter = 2
-texture = ExtResource("15_quantity")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Value" type="Label" parent="Book/Info/Quantity" unique_id=297569328]
-layout_mode = 0
-offset_left = 32.0
-offset_right = 132.0
-offset_bottom = 30.0
-theme_override_colors/font_color = Color(0.27, 0.11, 0.05, 1)
-theme_override_fonts/font = ExtResource("21_font")
+[node name="QuantityLabel" type="Label" parent="Root/Frame/Page/Detail/TradeRow/QuantityBox/ValueField" unique_id=1055223920]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
 theme_override_font_sizes/font_size = 20
 text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Plus" type="TextureButton" parent="Book/Info/Quantity" unique_id=859957692]
-layout_mode = 0
-offset_left = 122.0
-offset_right = 162.0
-offset_bottom = 30.0
+[node name="PlusButton" type="Button" parent="Root/Frame/Page/Detail/TradeRow/QuantityBox" unique_id=1371925684]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Trade one more"
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("17_plus")
-ignore_texture_size = true
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("step_normal")
+theme_override_styles/pressed = SubResource("step_pressed")
+theme_override_styles/hover = SubResource("step_hover")
+theme_override_styles/disabled = SubResource("step_disabled")
+text = "+"
+
+[node name="TotalBox" type="HBoxContainer" parent="Root/Frame/Page/Detail/TradeRow" unique_id=727032619]
+layout_mode = 0
+offset_left = 262.0
+offset_right = 374.0
+offset_bottom = 32.0
+tooltip_text = "Total for this trade"
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="TotalCoin" type="TextureRect" parent="Root/Frame/Page/Detail/TradeRow/TotalBox" unique_id=530493231]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("17_coin")
+expand_mode = 1
 stretch_mode = 5
 
-[node name="PressFeedback" type="Node" parent="Book/Info/Quantity/Plus" unique_id=409415495]
-script = ExtResource("24_button_feedback")
+[node name="TotalLabel" type="Label" parent="Root/Frame/Page/Detail/TradeRow/TotalBox" unique_id=1817653956]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 26
+text = "0"
+vertical_alignment = 1
 
-[node name="Action" type="TextureButton" parent="Book/Info" unique_id=875970682]
+[node name="UnitLabel" type="Label" parent="Root/Frame/Page/Detail/TradeRow" unique_id=1764486030]
+unique_name_in_owner = true
 layout_mode = 0
-offset_left = 85.0
-offset_top = 343.0
-offset_right = 285.0
-offset_bottom = 383.0
+offset_left = 164.0
+offset_right = 260.0
+offset_bottom = 32.0
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="ActionButton" type="Button" parent="Root/Frame/Page/Detail" unique_id=1286697384]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(176, 36)
+layout_mode = 0
+offset_left = 124.0
+offset_top = 486.0
+offset_right = 300.0
+offset_bottom = 522.0
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("18_action")
-ignore_texture_size = true
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 20
+text = "Buy"
+
+[node name="Feedback" type="Label" parent="Root/Frame/Page/Detail" unique_id=1386676741]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 34.0
+offset_top = 527.0
+offset_right = 390.0
+offset_bottom = 544.0
+mouse_filter = 1
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="TabLine" type="TextureRect" parent="Root/Frame" unique_id=1782608092]
+layout_mode = 0
+offset_left = 475.0
+offset_top = 82.0
+offset_right = 806.0
+offset_bottom = 107.0
+mouse_filter = 2
+texture = SubResource("tab_line")
+expand_mode = 1
+
+[node name="TabBar" type="HBoxContainer" parent="Root/Frame" unique_id=1535480741]
+layout_mode = 0
+offset_left = 440.0
+offset_right = 840.0
+offset_bottom = 96.0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Separator1" type="TextureRect" parent="Root/Frame/TabBar" unique_id=1807635120]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("10_separator")
+expand_mode = 1
 stretch_mode = 5
 
-[node name="PressFeedback" type="Node" parent="Book/Info/Action" unique_id=609830071]
-script = ExtResource("24_button_feedback")
+[node name="BuyTab" parent="Root/Frame/TabBar" unique_id=1554560633 instance=ExtResource("5_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+idle_icon = ExtResource("6_buy_idle")
+active_icon = ExtResource("7_buy_active")
+title = "Buy"
 
-[node name="Text" type="Label" parent="Book/Info/Action" unique_id=58075750]
+[node name="Separator2" type="TextureRect" parent="Root/Frame/TabBar" unique_id=2129238162]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("10_separator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SellTab" parent="Root/Frame/TabBar" unique_id=1646895395 instance=ExtResource("5_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+idle_icon = ExtResource("8_bag")
+active_icon = ExtResource("9_sell_active")
+title = "Sell"
+
+[node name="Separator3" type="TextureRect" parent="Root/Frame/TabBar" unique_id=2081001113]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("10_separator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DebugReroll" type="Button" parent="Root/Frame" unique_id=19492271]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 326.0
+offset_top = 664.0
+offset_right = 560.0
+offset_bottom = 696.0
+tooltip_text = "Debug builds only: draw a new Buy stock"
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 17
+text = "Debug: Reroll Stock"
+
+[node name="BackButton" type="Button" parent="Root/Frame" unique_id=1938122050]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1160.0
+offset_top = 660.0
+offset_right = 1258.0
+offset_bottom = 696.0
+mouse_default_cursor_shape = 2
+
+[node name="BackArt" type="TextureRect" parent="Root/Frame/BackButton" unique_id=1929368184]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -2.0
-offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.7, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = SubResource("StyleBoxEmpty_xarjo")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_owusy")
-text = "Purchase"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Feedback" type="Label" parent="Book" unique_id=1397270875]
-layout_mode = 0
-offset_left = 586.0
-offset_top = 438.0
-offset_right = 940.0
-offset_bottom = 469.0
-theme_override_colors/font_color = Color(0.62, 0.13, 0.08, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 20
-text = "Do not enough money"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LeavePlate" type="TextureRect" parent="Book" unique_id=2115421042]
-layout_mode = 0
-offset_left = 473.0
-offset_top = 563.0
-offset_right = 623.0
-offset_bottom = 613.0
 mouse_filter = 2
-texture = ExtResource("23_leave_plate")
+texture = ExtResource("12_back")
 expand_mode = 1
+stretch_mode = 5
 
-[node name="Close" type="Button" parent="Book" unique_id=1266189592]
-layout_mode = 0
-offset_left = 474.0
-offset_top = 561.0
-offset_right = 624.0
-offset_bottom = 611.0
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.35, 0.13, 0.07, 1)
-theme_override_fonts/font = ExtResource("21_font")
-theme_override_font_sizes/font_size = 36
-text = "Leave"
-flat = true
-
-[node name="PressFeedback" type="Node" parent="Book/Close" unique_id=1968068662]
-script = ExtResource("24_button_feedback")
-
-[node name="TradeToastQueue" parent="." unique_id=1537738564 instance=ExtResource("22_toasts")]
-visible = false
-layout_mode = 3
-
-[node name="DebugReroll" type="Button" parent="." unique_id=2122193843]
-anchors_preset = 1
-anchor_left = 1.0
+[node name="FxLayer" type="Control" parent="Root" unique_id=1489389293 groups=["inventory_menu_fx"]]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = -190.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = 46.0
-grow_horizontal = 0
-text = "Debug: Reroll Stock"
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
-[node name="PressFeedback" type="Node" parent="DebugReroll" unique_id=1112941602]
-script = ExtResource("24_button_feedback")
+[node name="TradeToastQueue" parent="Root" unique_id=799443509 instance=ExtResource("21_toasts")]
+unique_name_in_owner = true
+layout_mode = 1
+theme = null

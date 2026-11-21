@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://data/items/charms/arrow_rain.tres" id="13_ral77"]
 [ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="15_fv4rj"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="15_hfst8"]
+[ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="16_fv4rj"]
 
 [sub_resource type="Resource" id="Resource_dqtxk"]
 script = ExtResource("11_h65mx")
@@ -114,6 +115,9 @@ max_aim_pitch_deg = 42.0
 
 [node name="MasterTortugaNpc" parent="." index="19" unique_id=122461608 instance=ExtResource("15_fv4rj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.563258, -0.17041826, -2.9011106)
+
+[node name="Silas" parent="." index="20" unique_id=402759795 instance=ExtResource("16_fv4rj")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -6.8508086, -0.32180452, -8.301233)
 
 [editable path="Environment/BaseGround"]
 [editable path="FlatTide"]

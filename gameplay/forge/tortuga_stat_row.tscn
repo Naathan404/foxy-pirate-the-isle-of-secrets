@@ -1,65 +1,53 @@
 [gd_scene format=3 uid="uid://cejksy1oyn43k"]
 
 [ext_resource type="Script" uid="uid://304t2blp8wf8" path="res://gameplay/forge/tortuga_stat_row.gd" id="1_script"]
-[ext_resource type="FontFile" uid="uid://cl7qpsbsai58n" path="res://assets/fonts/unifont-17.0.03.otf" id="2_font"]
 
-[node name="StatRow" type="Control" unique_id=1792403635]
-custom_minimum_size = Vector2(350, 30)
-layout_mode = 3
-anchors_preset = 0
-mouse_filter = 2
+[node name="StatRow" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 25)
+offset_right = 356.0
+offset_bottom = 25.0
+mouse_filter = 1
+theme_override_constants/separation = 6
 script = ExtResource("1_script")
 
-[node name="Shade" type="ColorRect" parent="." unique_id=408735437]
-layout_mode = 0
-offset_right = 350.0
-offset_bottom = 29.0
-mouse_filter = 2
-color = Color(0.52, 0.37, 0.21, 0.12)
-
-[node name="Title" type="Label" parent="." unique_id=1661148709]
-layout_mode = 0
-offset_left = 8.0
-offset_right = 138.0
-offset_bottom = 29.0
-theme_override_colors/font_color = Color(0.25, 0.14, 0.09, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 15
-text = "Stat"
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 17
 vertical_alignment = 1
 text_overrun_behavior = 3
 
-[node name="Before" type="Label" parent="." unique_id=1494331928]
-layout_mode = 0
-offset_left = 144.0
-offset_right = 230.0
-offset_bottom = 29.0
-theme_override_colors/font_color = Color(0.44, 0.33, 0.25, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 15
-text = "Old"
+[node name="Before" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 17
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="Arrow" type="Label" parent="." unique_id=1926009750]
-layout_mode = 0
-offset_left = 233.0
-offset_right = 260.0
-offset_bottom = 29.0
-theme_override_colors/font_color = Color(0.52, 0.32, 0.13, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 15
-text = ">"
-horizontal_alignment = 1
+[node name="Arrow" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 17
+text = "→"
 vertical_alignment = 1
 
-[node name="After" type="Label" parent="." unique_id=2118459198]
-layout_mode = 0
-offset_left = 264.0
-offset_right = 349.0
-offset_bottom = 29.0
-theme_override_fonts/font = ExtResource("2_font")
+[node name="After" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+theme_override_font_sizes/font_size = 17
+vertical_alignment = 1
+
+[node name="Trend" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
 theme_override_font_sizes/font_size = 15
-text = "New"
-horizontal_alignment = 2
 vertical_alignment = 1
