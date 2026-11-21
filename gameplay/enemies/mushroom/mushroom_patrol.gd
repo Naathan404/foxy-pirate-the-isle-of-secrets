@@ -1,11 +1,13 @@
 extends EnemyState
-## Ambush, observe, advance steadily toward detected players, spray spores
-## randomly in detection range or mandatorily in attack range, and abort on exit.
+## Ambush, observe, leap toward distant detected players, spray spores in range,
+## and return to searching when players leave detection range.
 
-enum Phase { DISGUISE, WANDER, OBSERVE, CHASE, CHARGE, RECOVER, SEARCH }
+enum Phase { DISGUISE, WANDER, OBSERVE, CHASE, CHASE_LEAP, CHARGE, RECOVER, SEARCH }
 
 const ARRIVAL_DISTANCE := 0.6
 const AVOID_ANGLE := PI / 3.0
+const CHASE_LEAP_RETRY_SECONDS := 0.65
+const APPROACH_LEAP_LANDING_BUFFER_METERS := 0.35
 
 var _phase: Phase = Phase.DISGUISE
 var _remaining: float = 0.0
@@ -15,6 +17,8 @@ var _wander_direction: Vector3 = Vector3.ZERO
 var _strafe_sign: float = 1.0
 var _has_awakened: bool = false
 var _chase_spore_check_remaining: float = 0.0
+var _chase_leap_cooldown_remaining: float = 0.0
+var _chase_leap_retry_remaining: float = 0.0
 var _ambush_hold_remaining: float = -1.0
 var _active_charge_duration: float = 1.6
 
@@ -45,6 +49,8 @@ func _update(delta: float) -> void:
 	if mushroom == null:
 		return
 	var step := maxf(delta, 0.0)
+	_chase_leap_cooldown_remaining = maxf(0.0, _chase_leap_cooldown_remaining - step)
+	_chase_leap_retry_remaining = maxf(0.0, _chase_leap_retry_remaining - step)
 	if mushroom.is_evading():
 		if _phase == Phase.CHARGE:
 			_reset_charge()
@@ -70,7 +76,7 @@ func _update(delta: float) -> void:
 			_chase_spore_check_remaining = maxf(0.0, _chase_spore_check_remaining - step)
 	else:
 		_ambush_reset()
-		if _phase in [Phase.OBSERVE, Phase.CHASE]:
+		if _phase in [Phase.OBSERVE, Phase.CHASE, Phase.CHASE_LEAP]:
 			_abort_to_search(mushroom)
 			return
 	_update_phase(mushroom, step, detected)
@@ -91,6 +97,8 @@ func _update_phase(mushroom: MushroomEnemy, step: float, detected: bool) -> void
 			_observe(mushroom, step, detected)
 		Phase.CHASE:
 			_chase(mushroom, step)
+		Phase.CHASE_LEAP:
+			_chase_leap(mushroom, step)
 		Phase.CHARGE:
 			_charge(mushroom, step, detected)
 		Phase.RECOVER:
@@ -118,6 +126,7 @@ func _set_phase(phase: Phase, duration: float) -> void:
 func _abort_to_search(mushroom: MushroomEnemy) -> void:
 	_reset_charge()
 	_reset_chase_spore_timer()
+	mushroom.cancel_approach_leap()
 	_set_phase(Phase.SEARCH, mushroom.search_seconds)
 
 
@@ -174,8 +183,6 @@ func _observe(mushroom: MushroomEnemy, delta: float, detected: bool) -> void:
 func _chase(mushroom: MushroomEnemy, delta: float) -> void:
 	if _try_start_close_charge(mushroom, delta):
 		return
-	if _try_roll_random_chase_charge(mushroom, delta):
-		return
 	var from_home := _horizontal(mushroom.global_position - mushroom.home_position)
 	if from_home.length() > mushroom.movement_radius:
 		_move_safely(mushroom, -from_home.normalized(), delta, mushroom.wander_speed_scale)
@@ -185,7 +192,47 @@ func _chase(mushroom: MushroomEnemy, delta: float) -> void:
 		mushroom.face_target()
 		_idle(mushroom, delta, &"idle")
 		return
+	if _try_start_approach_leap(mushroom, offset):
+		return
+	if _try_roll_random_chase_charge(mushroom, delta):
+		return
 	_move_safely(mushroom, offset.normalized(), delta, mushroom.chase_speed_scale)
+
+
+func _chase_leap(mushroom: MushroomEnemy, delta: float) -> void:
+	if not mushroom.is_approach_leaping():
+		_set_phase(Phase.CHASE, 0.0)
+		return
+	mushroom.stop_movement(delta)
+	mushroom.play_directional_animation(&"walk")
+
+
+func _try_start_approach_leap(mushroom: MushroomEnemy, target_offset: Vector3) -> bool:
+	if (
+		mushroom.ai == null
+		or _chase_leap_cooldown_remaining > 0.0
+		or _chase_leap_retry_remaining > 0.0
+	):
+		return false
+	var distance := target_offset.length()
+	if not mushroom.ai.roll_approach_leap(
+		distance, mushroom.approach_leap_trigger_distance, mushroom.approach_leap_chance
+	):
+		_chase_leap_retry_remaining = CHASE_LEAP_RETRY_SECONDS
+		return false
+	var leap_distance := minf(
+		mushroom.approach_leap_distance_meters,
+		distance - mushroom.attack_range - APPROACH_LEAP_LANDING_BUFFER_METERS
+	)
+	if leap_distance <= 0.0:
+		_chase_leap_retry_remaining = CHASE_LEAP_RETRY_SECONDS
+		return false
+	if not mushroom.start_approach_leap(target_offset.normalized(), leap_distance):
+		_chase_leap_retry_remaining = CHASE_LEAP_RETRY_SECONDS
+		return false
+	_chase_leap_cooldown_remaining = mushroom.approach_leap_cooldown_seconds
+	_set_phase(Phase.CHASE_LEAP, mushroom.approach_leap_duration_seconds)
+	return true
 
 
 func _charge(mushroom: MushroomEnemy, delta: float, _detected: bool) -> void:

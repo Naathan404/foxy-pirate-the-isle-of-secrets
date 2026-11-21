@@ -20,8 +20,9 @@ const HOP_STEP_DUST_AMOUNT := 10
 const HOP_STEP_DUST_LIFETIME := 0.42
 const CHARGE_TINT := Color(1.0, 1.0, 0.55, 1.0)
 const CHARGE_PULSE_COUNT := 4.0
-const EVADE_CHECK_UP := 1.2
-const EVADE_CHECK_DOWN := 2.4
+const HOP_CHECK_UP_METERS := 1.2
+const HOP_CHECK_DOWN_METERS := 2.4
+const HOP_GROUND_SAMPLE_FRACTIONS := [0.25, 0.5, 0.75, 1.0]
 const EVADE_DIRECTION_ANGLES := [
 	0.0,
 	PI / 4.0,
@@ -60,6 +61,18 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 @export_range(0.1, 1.2, 0.02, "suffix:m") var hop_height: float = 0.44
 ## Chu kỳ 1 bước nhảy hoàn chỉnh (s), tự co tốc độ animation walk_* (0.68s) theo nhịp này.
 @export_range(0.25, 1.5, 0.02, "suffix:s") var hop_cycle_seconds: float = 0.62
+## Khoảng cách tối thiểu (m) để cân nhắc nhảy xa áp sát Player.
+@export_range(1.0, 10.0, 0.1, "suffix:m") var approach_leap_trigger_distance: float = 4.5
+## Quãng đường tối đa (m) của cú nhảy áp sát.
+@export_range(1.0, 8.0, 0.1, "suffix:m") var approach_leap_distance_meters: float = 3.2
+## Thời gian (s) của cú nhảy áp sát.
+@export_range(0.2, 1.5, 0.05, "suffix:s") var approach_leap_duration_seconds: float = 0.55
+## Độ cao cung nhảy (m) khi áp sát.
+@export_range(0.2, 2.0, 0.05, "suffix:m") var approach_leap_height: float = 1.0
+## Thời gian hồi (s) giữa các cú nhảy áp sát.
+@export_range(0.5, 10.0, 0.1, "suffix:s") var approach_leap_cooldown_seconds: float = 2.8
+## Xác suất nấm chọn nhảy xa khi Player ở đủ xa.
+@export_range(0.0, 1.0, 0.05) var approach_leap_chance: float = 0.6
 ## Thời gian tối thiểu (s) mỗi lượt đi lang thang ngẫu nhiên khi chưa thấy Player.
 @export_range(0.2, 10.0, 0.1, "suffix:s") var wander_min_seconds: float = 1.2
 ## Thời gian tối đa (s) mỗi lượt đi lang thang ngẫu nhiên khi chưa thấy Player.
@@ -105,7 +118,7 @@ const EVADE_DISTANCE_FACTORS := [1.0, 0.75, 0.5]
 ## Số lượng hạt bụi độc (FloatingSpores) phát ra trong mỗi đám mây độc.
 @export_range(10, 1000, 10) var spore_particle_count: int = 240
 ## Số lượng cụm khói mờ (PoisonMist) 3D trong mỗi đám mây độc.
-@export_range(1, 100, 1) var mist_particle_count: int = 18
+@export_range(1, 100, 1) var mist_particle_count: int = 64
 ## Thời gian tồn tại (s) của mỗi hạt bụi độc.
 @export_range(0.2, 10.0, 0.1, "suffix:s") var spore_particle_lifetime: float = 2.0
 ## Thời gian tồn tại (s) của mỗi cụm khói mờ.
@@ -161,6 +174,9 @@ var _evade_speed: float = 0.0
 var _evade_cooldown_remaining: float = 0.0
 var _knockback_spore_cooldown_remaining: float = 0.0
 var _pending_knockback_charge: bool = false
+var _approach_leap_direction: Vector3 = Vector3.ZERO
+var _approach_leap_remaining: float = 0.0
+var _approach_leap_speed: float = 0.0
 var _active_clouds: Array[MushroomSporeCloud] = []
 
 
@@ -191,6 +207,8 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	if dead:
 		_evade_remaining = 0.0
+		_approach_leap_remaining = 0.0
+		_approach_leap_direction = Vector3.ZERO
 		_evade_pending = false
 		_pending_knockback_charge = false
 		_reset_hop_visuals()
@@ -201,6 +219,12 @@ func _physics_process(delta: float) -> void:
 			_reset_hop_visuals()
 			return
 		_update_defensive_hop(step)
+		return
+	if _approach_leap_remaining > 0.0:
+		if _is_in_hit_state():
+			cancel_approach_leap()
+		else:
+			_update_approach_leap(step)
 		return
 	_update_walk_hop(step)
 
@@ -251,6 +275,43 @@ func consume_knockback_charge() -> bool:
 
 func is_evading() -> bool:
 	return _evade_remaining > 0.0
+
+
+func start_approach_leap(direction: Vector3, distance_meters: float) -> bool:
+	if dead or is_evading() or _approach_leap_remaining > 0.0:
+		return false
+	var horizontal_direction := Vector3(direction.x, 0.0, direction.z).normalized()
+	var leap_distance := minf(distance_meters, approach_leap_distance_meters)
+	if horizontal_direction.is_zero_approx() or leap_distance <= 0.0:
+		return false
+	var landing_position := global_position + horizontal_direction * leap_distance
+	var from_home := landing_position - home_position
+	from_home.y = 0.0
+	if from_home.length() > movement_radius:
+		return false
+	if not _is_hop_safe(horizontal_direction, leap_distance):
+		return false
+	_approach_leap_direction = horizontal_direction
+	_approach_leap_speed = leap_distance / maxf(0.05, approach_leap_duration_seconds)
+	_approach_leap_remaining = approach_leap_duration_seconds
+	velocity.x = 0.0
+	velocity.z = 0.0
+	face_direction(horizontal_direction)
+	play_directional_animation(&"walk", true)
+	return true
+
+
+func is_approach_leaping() -> bool:
+	return _approach_leap_remaining > 0.0
+
+
+func cancel_approach_leap() -> void:
+	if not is_approach_leaping():
+		return
+	_approach_leap_remaining = 0.0
+	_approach_leap_direction = Vector3.ZERO
+	_approach_leap_speed = 0.0
+	_reset_hop_visuals()
 
 
 func is_inside_poison_cloud() -> bool:
@@ -435,6 +496,7 @@ func _is_target_detected_now() -> bool:
 
 func _start_defensive_hop() -> void:
 	_evade_pending = false
+	cancel_approach_leap()
 	var away := Vector3(_evade_away.x, 0.0, _evade_away.z).normalized()
 	if has_target():
 		var from_target := global_position - target.global_position
@@ -458,11 +520,11 @@ func _is_hop_safe(direction: Vector3, distance: float) -> bool:
 	if test_move(global_transform, direction * distance):
 		return false
 	var space := get_world_3d().direct_space_state
-	for fraction: float in [0.5, 1.0]:
+	for fraction: float in HOP_GROUND_SAMPLE_FRACTIONS:
 		var point := global_position + direction * distance * fraction
 		var query := PhysicsRayQueryParameters3D.create(
-			point + Vector3.UP * EVADE_CHECK_UP,
-			point + Vector3.DOWN * EVADE_CHECK_DOWN,
+			point + Vector3.UP * HOP_CHECK_UP_METERS,
+			point + Vector3.DOWN * HOP_CHECK_DOWN_METERS,
 			CombatLayers.WORLD
 		)
 		query.exclude = [get_rid()]
@@ -489,6 +551,24 @@ func _update_defensive_hop(delta: float) -> void:
 		_emit_hop_landing_vfx()
 
 
+func _update_approach_leap(delta: float) -> void:
+	var step := minf(maxf(delta, 0.0), _approach_leap_remaining)
+	var collision := move_and_collide(_approach_leap_direction * _approach_leap_speed * step)
+	_approach_leap_remaining = maxf(0.0, _approach_leap_remaining - step)
+	if collision != null:
+		_approach_leap_remaining = 0.0
+	var progress := 1.0 - _approach_leap_remaining / approach_leap_duration_seconds
+	var height := sin(progress * PI) * approach_leap_height
+	if is_instance_valid(visual):
+		visual.position.y = height
+	_update_shadow_for_height(height)
+	if _approach_leap_remaining <= 0.0:
+		_approach_leap_direction = Vector3.ZERO
+		_approach_leap_speed = 0.0
+		_reset_hop_visuals()
+		_emit_hop_landing_vfx()
+
+
 func _build_hop_visuals() -> void:
 	_shadow_material = StandardMaterial3D.new()
 	_shadow_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -508,7 +588,7 @@ func _build_hop_visuals() -> void:
 	add_child(_shadow_mesh)
 
 	var grad := Gradient.new()
-	grad.colors = PackedColorArray([Color(0.82, 0.68, 1.0, 0.85), Color(0.45, 0.92, 0.45, 0.0)])
+	grad.colors = PackedColorArray([Color(0.82, 0.68, 1.0, 0.85), Color(0.42, 0.22, 0.72, 0.0)])
 	grad.offsets = PackedFloat32Array([0.0, 1.0])
 	var mat := StandardMaterial3D.new()
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -603,7 +683,7 @@ func _sync_walk_animation_to_hop() -> void:
 
 func _update_shadow_for_height(height_meters: float) -> void:
 	if is_instance_valid(_shadow_mesh):
-		var max_h := maxf(hop_height, evade_hop_height)
+		var max_h := maxf(maxf(hop_height, evade_hop_height), approach_leap_height)
 		var ratio := clampf(height_meters / maxf(0.1, max_h), 0.0, 1.0)
 		var shadow_scale := lerpf(1.0, 0.52, ratio)
 		_shadow_mesh.scale = Vector3(shadow_scale, 1.0, shadow_scale)
