@@ -298,6 +298,7 @@ vertical_alignment = 1
 text_overrun_behavior = 3
 
 [node name="TypeBannerArt" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1074.0
 offset_top = 102.0

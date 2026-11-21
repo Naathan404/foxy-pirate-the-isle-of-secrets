@@ -35,9 +35,14 @@ const ENERGY_ORBIT_FLATTENING := 0.48
 const ENERGY_OPACITY := 0.75
 const REVEAL_RAY_COUNT := 12
 const REVEAL_RAY_LENGTH := 95.0
+const FLECK_COUNT := 26
+const FLECK_RISE_PIXELS := 120.0
+const FLECK_SPREAD_PIXELS := 150.0
+const FLECK_FALL_PIXELS := 70.0
+const FLECK_SIZE_PIXELS := 5.0
 
 @export var gold_color := Color("efb459")
-@export_range(80.0, 240.0, 1.0) var compass_radius_pixels := 123.0
+@export_range(80.0, 240.0, 1.0) var compass_radius_pixels := 150.0
 @export_range(8, 100, 1) var mote_count := 42
 
 var _center := Vector2.ZERO
@@ -224,6 +229,26 @@ func _draw_impact() -> void:
 		var distance := radius * (1.0 + float(index % 3) / 3.0)
 		var point := _destination + direction * distance
 		_spark(point, SPARK_LENGTH_PIXELS * opacity, opacity)
+	_draw_flecks(progress, opacity)
+
+
+## Paper flecks burst up from Foxy and drift down, as if the rolled plan had unfurled on arrival.
+func _draw_flecks(progress: float, opacity: float) -> void:
+	for index in range(FLECK_COUNT):
+		var seed_angle := float(index) * PHYLLOTAXIS_ANGLE
+		var spread := sin(seed_angle * 3.0)
+		var burst := 1.0 - pow(1.0 - progress, 2.0)
+		var at := _destination + Vector2(spread * FLECK_SPREAD_PIXELS * burst, 0.0)
+		at.y -= FLECK_RISE_PIXELS * burst * (0.5 + 0.5 * absf(cos(seed_angle)))
+		at.y += FLECK_FALL_PIXELS * progress * progress
+		var axis := Vector2.from_angle(seed_angle + _impact * 6.0)
+		draw_line(
+			at - axis * FLECK_SIZE_PIXELS,
+			at + axis * FLECK_SIZE_PIXELS,
+			Color(PAPER_COLOR, opacity),
+			FLECK_SIZE_PIXELS * 0.6 * absf(sin(seed_angle + _impact * 4.0)) + 1.0,
+			true
+		)
 
 
 func _arc(center: Vector2, radius: float, angle: float, sweep: float) -> PackedVector2Array:

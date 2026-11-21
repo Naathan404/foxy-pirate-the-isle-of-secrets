@@ -11,6 +11,11 @@ const GRID_COLUMNS := 4
 const MIN_VISIBLE_ROWS := 3
 const PERCENT_SCALE := 100.0
 const NO_VALUE := "—"
+const LOCKED_NAME := "???"
+const LOCKED_EFFECT := "Find this charm to learn what it does."
+const SILHOUETTE_MATERIAL: ShaderMaterial = preload(
+	"res://gameplay/inventory/menu/silhouette_material.tres"
+)
 const SP_PER_SECOND_PARAM := &"sp_per_second"
 const SOCKET_ACTIONS := {
 	CharmConstants.SocketId.Q: &"charm_slot_q",
@@ -45,6 +50,7 @@ var _dirty: bool = true
 @onready var _big_icon: TextureRect = %BigIcon
 @onready var _charm_name: Label = %CharmName
 @onready var _type_banner: Label = %TypeBanner
+@onready var _type_banner_art: TextureRect = %TypeBannerArt
 @onready var _status_banner: Label = %StatusBanner
 @onready var _cost_value: Label = %CostValue
 @onready var _type_value: Label = %TypeValue
@@ -215,7 +221,11 @@ func _refresh_grid() -> void:
 		var socket_id := _equipped_socket(definition.charm_id)
 		slot.present(definition.sprite, true, not owned, EQUIPPED_BADGE if socket_id >= 0 else null)
 		slot.set_selected(definition.charm_id == _selected_id)
-		slot.tooltip_text = definition.display_name + _state_suffix(owned, socket_id)
+		slot.tooltip_text = (
+			definition.display_name + _state_suffix(owned, socket_id)
+			if owned
+			else "Undiscovered charm"
+		)
 	_empty_label.visible = _entries.is_empty()
 
 
@@ -271,6 +281,8 @@ func _refresh_details() -> void:
 	var definition := _selected_definition()
 	if definition == null:
 		_big_icon.texture = null
+		_big_icon.material = null
+		_type_banner_art.visible = false
 		_charm_name.text = "No charm selected"
 		_charm_name.tooltip_text = ""
 		_type_banner.text = ""
@@ -288,8 +300,14 @@ func _refresh_details() -> void:
 	var owned := charms.registry.is_owned(definition.charm_id)
 	var socket_id := _equipped_socket(definition.charm_id)
 	_big_icon.texture = definition.sprite
+	_big_icon.material = null if owned else SILHOUETTE_MATERIAL
+	if not owned:
+		_show_locked_details()
+		_refresh_action(owned, socket_id)
+		return
 	_charm_name.text = definition.display_name
 	_charm_name.tooltip_text = definition.display_name
+	_type_banner_art.visible = true
 	_type_banner.text = "Active" if definition.is_active() else "Passive"
 	_status_banner.text = _status_text(definition, owned)
 	_cost_value.text = _cost_text(definition)
@@ -308,6 +326,20 @@ func _refresh_details() -> void:
 		else "No effect description yet."
 	)
 	_refresh_action(owned, socket_id)
+
+
+## Undiscovered charms reveal nothing but their silhouette.
+func _show_locked_details() -> void:
+	_charm_name.text = LOCKED_NAME
+	_charm_name.tooltip_text = ""
+	_type_banner.text = ""
+	_type_banner_art.visible = false
+	_status_banner.text = "Not owned"
+	for label: Label in [
+		_cost_value, _type_value, _socket_value, _cooldown_value, _chance_value, _owned_value
+	]:
+		label.text = NO_VALUE
+	_effect_text.text = LOCKED_EFFECT
 
 
 func _refresh_action(owned: bool, equipped_socket: int) -> void:

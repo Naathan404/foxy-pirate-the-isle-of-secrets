@@ -3,12 +3,17 @@ extends CanvasLayer
 
 enum Phase { REVEAL, WAITING, ABSORB, RETURN }
 
+const CONFIRM_KEY := KEY_SPACE
+const CONFIRM_KEY_TEXT := "SPACE"
+const CONFIRM_PROMPT := "to take the plan"
+const FORGE_HINT := "Bring the materials to Master Tortuga to forge it."
+const EYEBROW_TEXT := "Weapon Blueprint"
+const RECIPE_CHIP := "Forge recipe"
+const FALLBACK_DESCRIPTION := "A new weapon design, drawn but not yet forged."
 const MUSIC_BUS := &"Music"
 const MUSIC_DUCK_DB := 8.0
 const PLAYER_FOCUS_OFFSET := Vector3.UP
 const UI_FADE_SECONDS := 0.25
-const PROMPT_PULSE_SPEED := 3.0
-const PROMPT_MIN_ALPHA := 0.65
 const SHAKE_FREQUENCY := Vector2(61.0, 47.0)
 const RESTING_ICON_SCALE := 0.92
 const CLOSED_PAPER_WIDTH := 0.12
@@ -16,12 +21,21 @@ const START_ICON_SCALE := 0.35
 const FLIGHT_ARC_PIXELS := 65.0
 const IDLE_BOB_PIXELS := 4.0
 const IDLE_BOB_SPEED := 2.0
-const HIGH_TARGET_Y_RANGE := Vector2(0.30, 0.42)
+const HIGH_TARGET_Y_RANGE := Vector2(0.34, 0.38)
 const HEADER_REVEAL_FRACTION := 0.70
 const ROLL_FRACTION := 0.25
 const ABSORB_FADE_FRACTION := 0.80
 const MICROSECONDS_PER_SECOND := 1000000.0
 const PAPER_SWAY_DEGREES := 3.0
+const SHEET_OPEN_FRACTION := 0.8
+const SHEET_FADE_FRACTION := 0.35
+const STAMP_START_FRACTION := 0.8
+const STAMP_START_SCALE := 2.4
+const STAMP_OFFSET_PIXELS := Vector2(26.0, 90.0)
+const STAMP_ROTATION_DEGREES := -8.0
+const STAMP_SHAKE_SECONDS := 0.2
+const STAMP_FADE_IN_FRACTION := 0.5
+const CARD_START_SCALE := 0.94
 
 @export_group("Timeline")
 @export_range(0.1, 2.0, 0.05) var focus_seconds := 0.7
@@ -35,6 +49,9 @@ const PAPER_SWAY_DEGREES := 3.0
 @export_range(0.1, 0.4, 0.01) var elevation_viewport_ratio := 0.20
 @export_range(80.0, 300.0, 1.0) var icon_size_pixels := 164.0
 @export_range(0.0, 0.1, 0.001) var impact_shake_units := 0.035
+@export_group("Stamp")
+@export_range(0.05, 1.0, 0.01, "suffix:s") var stamp_slam_seconds := 0.22
+@export_range(0.0, 0.05, 0.001) var stamp_shake_units := 0.012
 @export_group("Shockwave")
 @export_range(0.1, 2.0, 0.05) var shockwave_seconds := 0.55
 @export_range(0.0, 0.08, 0.001) var shockwave_strength := 0.012
@@ -65,22 +82,25 @@ var _spine: Node
 var _spine_mode := Node.PROCESS_MODE_INHERIT
 var _last_usec := 0
 var _revealed := false
+var _stamped := false
 
 @onready var _veil: ColorRect = $Veil
 @onready var _effects: Control = $Effects
+@onready var _sheet: Control = $Sheet
 @onready var _icon: TextureRect = $Icon
+@onready var _stamp: Control = $Stamp
 @onready var _heading: Control = $UI/Heading
-@onready var _information: Control = $UI/Information
-@onready var _name: Label = $UI/Information/Rows/WeaponName
-@onready var _prompt: Label = $UI/Information/Rows/Prompt
+@onready var _card: RewardCard = $UI/Card
 @onready var _discovery_sound: AudioStreamPlayer = $DiscoverySound
 @onready var _reveal_sound: AudioStreamPlayer = $RevealSound
 @onready var _receive_sound: AudioStreamPlayer = $ReceiveSound
+@onready var _stamp_sound: AudioStreamPlayer = $StampSound
 
 
 func _ready() -> void:
 	_heading.modulate.a = 0.0
-	_information.modulate.a = 0.0
+	_card.modulate.a = 0.0
+	_stamp.modulate.a = 0.0
 	_icon.modulate.a = 0.0
 	set_process(false)
 
@@ -106,7 +126,7 @@ func _input(event: InputEvent) -> void:
 		return
 	# Consume Space before gameplay/menu input; holding it cannot skip the reveal.
 	if event is InputEventKey and _phase == Phase.WAITING:
-		if event.pressed and not event.echo and event.keycode == KEY_SPACE:
+		if event.pressed and not event.echo and event.keycode == CONFIRM_KEY:
 			_phase = Phase.ABSORB
 			_elapsed = 0.0
 	if event is InputEventKey or event is InputEventMouseButton:
@@ -139,7 +159,7 @@ func begin(source: ItemPickup, actor: Player) -> void:
 		+ _camera.global_basis.y * local_target.y
 	)
 	_icon.texture = source.item.icon
-	_name.text = _weapon.display_name
+	_fill_card()
 	_player.clear_gameplay_input()
 	_prepare_idle()
 	source.sprite.hide()
@@ -230,6 +250,8 @@ func _update_presentation() -> void:
 	var shake := 0.0
 	if _phase == Phase.RETURN:
 		shake = impact_shake_units * (1.0 - smoothstep(0.0, impact_seconds, _elapsed))
+	elif _stamp_since() >= 0.0 and _stamp_since() < STAMP_SHAKE_SECONDS:
+		shake = stamp_shake_units * (1.0 - _stamp_since() / STAMP_SHAKE_SECONDS)
 	_camera.h_offset = _base_offsets.x + sin(_clock * SHAKE_FREQUENCY.x) * shake
 	_camera.v_offset = _base_offsets.y + cos(_clock * SHAKE_FREQUENCY.y) * shake
 	if _music_index >= 0:
@@ -281,20 +303,67 @@ func _update_presentation() -> void:
 	elif _phase == Phase.RETURN:
 		text_alpha = 0.0
 	_heading.modulate.a = text_alpha
-	_information.modulate.a = text_alpha
-	_prompt.modulate.a = lerpf(
-		PROMPT_MIN_ALPHA, 1.0, (sin(_clock * PROMPT_PULSE_SPEED) + 1.0) / 2.0
+	_card.modulate.a = text_alpha
+	_card.pivot_offset = _card.size / 2.0
+	_card.scale = Vector2.ONE * lerpf(CARD_START_SCALE, 1.0, text_alpha)
+	_card.pulse_prompt(_clock)
+	var camera_alpha := alpha * smoothstep(0.0, focus_seconds, _clock)
+	var sheet_alpha := camera_alpha
+	if _phase == Phase.ABSORB:
+		sheet_alpha *= 1.0 - smoothstep(0.0, absorb_seconds * SHEET_FADE_FRACTION, _elapsed)
+	var stamp_point := center + STAMP_OFFSET_PIXELS
+	_sheet.present(
+		center,
+		smoothstep(0.0, SHEET_OPEN_FRACTION, reveal) * (1.0 - fold),
+		sheet_alpha,
+		_clock,
+		stamp_point,
+		_stamp_since()
 	)
+	_update_stamp(stamp_point, sheet_alpha)
 	_effects.present(
 		center,
 		destination,
 		high,
 		_clock,
 		reveal,
-		alpha * smoothstep(0.0, focus_seconds, _clock),
+		camera_alpha,
 		flight,
 		_elapsed if _phase == Phase.RETURN else -1.0
 	)
+
+
+func _stamp_landing_seconds() -> float:
+	return focus_seconds + lift_seconds + reveal_seconds * STAMP_START_FRACTION + stamp_slam_seconds
+
+
+## Seconds since the stamp landed on the sheet; negative while it is still in the air.
+func _stamp_since() -> float:
+	return _clock - _stamp_landing_seconds()
+
+
+## The stamp slams down late in the reveal, which marks this paper as a plan, not a weapon.
+func _update_stamp(point: Vector2, sheet_alpha: float) -> void:
+	var slam := clampf((_stamp_since() + stamp_slam_seconds) / stamp_slam_seconds, 0.0, 1.0)
+	_stamp.pivot_offset = _stamp.size / 2.0
+	_stamp.position = point - _stamp.pivot_offset
+	_stamp.scale = Vector2.ONE * lerpf(STAMP_START_SCALE, 1.0, slam * slam)
+	_stamp.rotation = deg_to_rad(STAMP_ROTATION_DEGREES)
+	_stamp.modulate.a = sheet_alpha * smoothstep(0.0, STAMP_FADE_IN_FRACTION, slam)
+	if not _stamped and _stamp_since() >= 0.0 and _phase != Phase.RETURN:
+		_stamped = true
+		_stamp_sound.play()
+
+
+func _fill_card() -> void:
+	var chips := PackedStringArray([_category_name(), RECIPE_CHIP])
+	var body := _weapon.description if not _weapon.description.is_empty() else FALLBACK_DESCRIPTION
+	_card.setup(EYEBROW_TEXT, _weapon.display_name, body, FORGE_HINT, chips, _effects.gold_color)
+	_card.set_prompt(CONFIRM_KEY_TEXT, CONFIRM_PROMPT)
+
+
+func _category_name() -> String:
+	return String(WeaponData.WeaponCategory.keys()[_weapon.category]).capitalize()
 
 
 func _finish() -> void:

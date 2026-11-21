@@ -6,9 +6,11 @@ extends Button
 ## glyph, so no state is communicated by color alone.
 
 const FILLED_FRAME: Texture2D = preload("res://assets/ui/HUD_Fox/Weapons/Unpick_Slot.png")
+const SILHOUETTE_MATERIAL: ShaderMaterial = preload(
+	"res://gameplay/inventory/menu/silhouette_material.tres"
+)
 const EMPTY_FRAME: Texture2D = preload("res://assets/ui/HUD_Fox/Weapons/NotUnlock_Slot.png")
 
-@export_range(0.0, 1.0, 0.01) var locked_icon_alpha: float = 0.3
 @export_range(0.0, 1.0, 0.01) var hover_selection_alpha: float = 0.45
 @export_range(1.0, 1.2, 0.01) var hover_scale: float = 1.07
 ## Pixel-art portraits (bestiary sprites) use nearest filtering; painted icons stay smooth.
@@ -45,7 +47,8 @@ func present(
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_frame.texture = FILLED_FRAME if filled else EMPTY_FRAME
 	_icon.texture = entry_icon
-	_icon.modulate.a = locked_icon_alpha if locked else 1.0
+	# Locked entries show only their shape, never the artwork.
+	_icon.material = SILHOUETTE_MATERIAL if locked else null
 	_lock.visible = locked
 	_badge.texture = badge
 	_badge.visible = badge != null
