@@ -1,6 +1,6 @@
 class_name MushroomAI
 extends RefCounted
-## Tactical RNG helper for the normal footless mushroom's ambush and spore rolls.
+## Tactical RNG helper for the normal footless mushroom's ambush, leap, and spore rolls.
 
 var _rng := RandomNumberGenerator.new()
 
@@ -38,6 +38,14 @@ func roll_chase_spore(chance: float) -> bool:
 	if chance >= 1.0:
 		return true
 	return _rng.randf() < chance
+
+
+func roll_approach_leap(
+	distance_meters: float, trigger_distance_meters: float, chance: float
+) -> bool:
+	if distance_meters < trigger_distance_meters:
+		return false
+	return _rng.randf() < clampf(chance, 0.0, 1.0)
 
 
 func compute_hp_pressure(current_hp: float, max_hp: float) -> float:

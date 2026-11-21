@@ -40,6 +40,10 @@ const MIN_MIST_COUNT := 3
 const MAX_MIST_COUNT := 7
 const MIST_LIFETIME_SECONDS := 1.1
 const MIN_EMISSION_RATIO := 0.2
+const LIQUID_DROP_RADIUS_METERS := 0.065
+const LIQUID_DROP_HEIGHT_METERS := 0.13
+const LIQUID_DROP_BASE_COLOR := Color(0.72, 1.0, 0.38, 0.8)
+const LIQUID_DROP_EMISSION_COLOR := Color(0.35, 0.82, 0.1)
 
 var _source: Node
 var _source_team: int = CombatTeams.ENEMY
@@ -103,6 +107,29 @@ static func create_fade_ramp_texture(start_color: Color, end_color: Color) -> Gr
 	return ramp
 
 
+static func create_liquid_drop_mesh() -> SphereMesh:
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	material.vertex_color_use_as_albedo = true
+	material.albedo_color = LIQUID_DROP_BASE_COLOR
+	material.metallic = 0.08
+	material.roughness = 0.2
+	material.emission_enabled = true
+	material.emission = LIQUID_DROP_EMISSION_COLOR
+	material.emission_energy_multiplier = 0.55
+	material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+
+	var mesh := SphereMesh.new()
+	mesh.radius = LIQUID_DROP_RADIUS_METERS
+	mesh.height = LIQUID_DROP_HEIGHT_METERS
+	mesh.radial_segments = 12
+	mesh.rings = 8
+	mesh.material = material
+	return mesh
+
+
 static func create_gpu_particles(
 	node_name: String,
 	texture: Texture2D,
@@ -112,7 +139,8 @@ static func create_gpu_particles(
 	quad_size: Vector2,
 	additive: bool = false,
 	use_sphere_emission: bool = false,
-	local_coords: bool = true
+	local_coords: bool = true,
+	draw_mesh: Mesh = null
 ) -> GPUParticles3D:
 	var particles := GPUParticles3D.new()
 	particles.name = node_name
@@ -140,20 +168,23 @@ static func create_gpu_particles(
 	process.spread = 45.0
 	particles.process_material = process
 
-	var material := StandardMaterial3D.new()
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.blend_mode = (
-		BaseMaterial3D.BLEND_MODE_ADD if additive else BaseMaterial3D.BLEND_MODE_MIX
-	)
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.vertex_color_use_as_albedo = true
-	material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	material.albedo_texture = texture
-	var mesh := QuadMesh.new()
-	mesh.size = quad_size
-	mesh.material = material
-	particles.draw_pass_1 = mesh
+	if draw_mesh != null:
+		particles.draw_pass_1 = draw_mesh
+	else:
+		var material := StandardMaterial3D.new()
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		material.blend_mode = (
+			BaseMaterial3D.BLEND_MODE_ADD if additive else BaseMaterial3D.BLEND_MODE_MIX
+		)
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.vertex_color_use_as_albedo = true
+		material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+		material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		material.albedo_texture = texture
+		var mesh := QuadMesh.new()
+		mesh.size = quad_size
+		mesh.material = material
+		particles.draw_pass_1 = mesh
 	return particles
 
 

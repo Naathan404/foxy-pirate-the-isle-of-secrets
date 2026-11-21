@@ -1,6 +1,6 @@
 class_name VenomPoolProjectile
 extends Node3D
-## Đạn nọc axit bay parabol: có bóng, vòng cảnh báo điểm rơi và sinh VenomAcidPool.
+## Đạn nọc axit bay parabol và sinh VenomAcidPool khi chạm đất.
 
 signal impacted(landing_position: Vector3, pool: VenomAcidPool)
 
@@ -9,16 +9,12 @@ const GLOB_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_glob_
 const PARTICLE_SHEET := preload("res://assets/sprites/enemies/venom_vine/venom_acid_particles.png")
 
 const PARTICLE_CELL_SIZE := 256.0
-const FRAME_ORB := 0
-const FRAME_STREAK := 1
-const FRAME_THORNY_POD := 2
 const FRAME_SPLASH_BURST := 3
 const MIN_FLIGHT_SECONDS := 0.15
 const MIN_ARC_HEIGHT_METERS := 0.4
 const DIRECT_HIT_RADIUS_METERS := 0.42
 const SHADOW_GROUND_OFFSET_METERS := 0.025
-const FILL_GROUND_OFFSET_METERS := 0.032
-const RING_GROUND_OFFSET_METERS := 0.04
+const IMPACT_RING_GROUND_OFFSET_METERS := 0.04
 const SPLASH_GROUND_OFFSET_METERS := 0.55
 const RING_PIXEL_DIVISOR := 200.0
 const GROUND_RAY_UP_METERS := 1.5
@@ -27,7 +23,31 @@ const POOL_SEPARATION_BUFFER_METERS := 0.15
 const IMPACT_DROPLET_LIFETIME := 0.36
 const DROPLET_BURST_SPEED_MIN := 1.8
 const DROPLET_BURST_SPEED_MAX := 3.6
-const SPOT_SEARCH_ANGLES_DEG := [0.0, 24.0, -24.0, 48.0, -48.0, 72.0, -72.0, 100.0, -100.0]
+const GLOB_MOTE_COUNT := 56
+const GLOB_MOTE_LIFETIME_SECONDS := 0.9
+const GLOB_EMISSION_RADIUS_METERS := 0.14
+const GLOB_MOTE_VELOCITY_MIN := 0.08
+const GLOB_MOTE_VELOCITY_MAX := 0.28
+const GLOB_MOTE_GRAVITY_Y := 0.16
+const GLOB_MOTE_ORBIT_VELOCITY_MIN := 0.22
+const GLOB_MOTE_ORBIT_VELOCITY_MAX := 0.58
+const GLOB_MOTE_SCALE_MIN := 0.45
+const GLOB_MOTE_SCALE_MAX := 1.0
+const GLOB_MOTE_COLOR_START := Color(0.95, 1.0, 0.48, 0.9)
+const GLOB_MOTE_COLOR_END := Color(0.55, 0.98, 0.16, 0.0)
+const SPOT_SEARCH_ANGLES_DEG := [
+	0.0,
+	24.0,
+	-24.0,
+	48.0,
+	-48.0,
+	72.0,
+	-72.0,
+	100.0,
+	-100.0,
+	135.0,
+	-135.0,
+]
 const SPOT_RADIAL_OFFSETS := [0.0, 1.1, 2.2, -0.75]
 
 var _source: Node
@@ -41,12 +61,9 @@ var _pool_config: Dictionary = {}
 var _elapsed_seconds: float = 0.0
 var _detonated: bool = false
 
-var _glob_sprite: Sprite3D
-var _comet_glow: Sprite3D
+var _glob_particles: GPUParticles3D
 var _flight_light: OmniLight3D
 var _shadow_mesh: MeshInstance3D
-var _landing_fill: MeshInstance3D
-var _landing_ring: Sprite3D
 var _trail_particles: GPUParticles3D
 var _direct_hitbox: HitBox
 
@@ -195,23 +212,9 @@ func _physics_process(delta: float) -> void:
 
 
 func _build_flight_visuals() -> void:
-	var pool_radius := maxf(0.4, float(_pool_config.get("pool_radius", 1.6)))
-	var use_thorny := bool(_pool_config.get("use_thorny_pod", false))
-
-	_glob_sprite = Sprite3D.new()
-	_glob_sprite.name = "VenomGlobSprite"
-	_glob_sprite.texture = GLOB_SHEET
-	_glob_sprite.hframes = 4
-	_glob_sprite.vframes = 2
-	_glob_sprite.frame = FRAME_THORNY_POD if use_thorny else FRAME_ORB
-	_glob_sprite.pixel_size = 0.0038
-	_glob_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_glob_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	_glob_sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(_glob_sprite)
-
-	_build_comet_aura()
-	_build_ground_telegraph(pool_radius)
+	_build_glob_particles()
+	_build_flight_light()
+	_build_ground_shadow()
 
 	_trail_particles = ACID_POOL_SCRIPT.create_gpu_particles(
 		"TrailParticles",
@@ -238,30 +241,35 @@ func _build_flight_visuals() -> void:
 	_trail_particles.emitting = true
 
 
-func _build_comet_aura() -> void:
-	var glow_atlas := AtlasTexture.new()
-	glow_atlas.atlas = PARTICLE_SHEET
-	glow_atlas.region = Rect2(0.0, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
-	var glow_mat := StandardMaterial3D.new()
-	glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	glow_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	glow_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-	glow_mat.albedo_texture = glow_atlas
-	glow_mat.albedo_color = Color(0.65, 1.0, 0.35, 0.48)
-	glow_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	glow_mat.no_depth_test = false
-	glow_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+func _build_glob_particles() -> void:
+	_glob_particles = ACID_POOL_SCRIPT.create_gpu_particles(
+		"LuminousAcidGlob",
+		null,
+		GLOB_MOTE_COUNT,
+		GLOB_MOTE_LIFETIME_SECONDS,
+		GLOB_EMISSION_RADIUS_METERS,
+		Vector2(0.28, 0.28),
+		true,
+		true,
+		true,
+		ACID_POOL_SCRIPT.create_liquid_drop_mesh()
+	)
+	var process := _glob_particles.process_material as ParticleProcessMaterial
+	process.initial_velocity_min = GLOB_MOTE_VELOCITY_MIN
+	process.initial_velocity_max = GLOB_MOTE_VELOCITY_MAX
+	process.gravity = Vector3(0.0, GLOB_MOTE_GRAVITY_Y, 0.0)
+	process.orbit_velocity_min = GLOB_MOTE_ORBIT_VELOCITY_MIN
+	process.orbit_velocity_max = GLOB_MOTE_ORBIT_VELOCITY_MAX
+	process.scale_min = GLOB_MOTE_SCALE_MIN
+	process.scale_max = GLOB_MOTE_SCALE_MAX
+	process.color_ramp = ACID_POOL_SCRIPT.create_fade_ramp_texture(
+		GLOB_MOTE_COLOR_START, GLOB_MOTE_COLOR_END
+	)
+	add_child(_glob_particles)
+	_glob_particles.emitting = true
 
-	_comet_glow = Sprite3D.new()
-	_comet_glow.name = "CometGlow"
-	_comet_glow.texture = glow_atlas
-	_comet_glow.pixel_size = 0.0032
-	_comet_glow.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_comet_glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_comet_glow.material_override = glow_mat
-	add_child(_comet_glow)
 
+func _build_flight_light() -> void:
 	_flight_light = OmniLight3D.new()
 	_flight_light.name = "FlightLight"
 	_flight_light.light_color = Color(0.52, 1.0, 0.28)
@@ -271,7 +279,7 @@ func _build_comet_aura() -> void:
 	add_child(_flight_light)
 
 
-func _build_ground_telegraph(pool_radius: float) -> void:
+func _build_ground_shadow() -> void:
 	var shadow_mat := StandardMaterial3D.new()
 	shadow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	shadow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -289,41 +297,10 @@ func _build_ground_telegraph(pool_radius: float) -> void:
 	_shadow_mesh.top_level = true
 	add_child(_shadow_mesh)
 
-	var fill_mat := StandardMaterial3D.new()
-	fill_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	fill_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	fill_mat.albedo_color = Color(0.45, 1.0, 0.22, 0.16)
-	fill_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	fill_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
-	var fill_cyl := CylinderMesh.new()
-	fill_cyl.top_radius = pool_radius
-	fill_cyl.bottom_radius = pool_radius
-	fill_cyl.height = 0.01
-	fill_cyl.material = fill_mat
-	_landing_fill = MeshInstance3D.new()
-	_landing_fill.name = "LandingWarningFill"
-	_landing_fill.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_landing_fill.mesh = fill_cyl
-	_landing_fill.top_level = true
-	add_child(_landing_fill)
-	_landing_fill.global_position = _landing_position + Vector3.UP * FILL_GROUND_OFFSET_METERS
-
-	var ring_atlas := AtlasTexture.new()
-	ring_atlas.atlas = PARTICLE_SHEET
-	ring_atlas.region = Rect2(3.0 * PARTICLE_CELL_SIZE, 0.0, PARTICLE_CELL_SIZE, PARTICLE_CELL_SIZE)
-	_landing_ring = Sprite3D.new()
-	_landing_ring.name = "LandingWarningRing"
-	_landing_ring.texture = ring_atlas
-	_landing_ring.pixel_size = (pool_radius * 2.0) / RING_PIXEL_DIVISOR
-	_landing_ring.rotation.x = -PI * 0.5
-	_landing_ring.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	_landing_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_landing_ring.top_level = true
-	add_child(_landing_ring)
-	_landing_ring.global_position = _landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS
-
 
 func _build_direct_hitbox() -> void:
+	if _direct_damage_hp <= 0.0:
+		return
 	_direct_hitbox = HitBox.new()
 	_direct_hitbox.name = "DirectHitBox"
 	_direct_hitbox.actor = _source if is_instance_valid(_source) else self
@@ -352,11 +329,8 @@ func _build_direct_hitbox() -> void:
 
 
 func _update_flight_visuals(progress: float) -> void:
-	if is_instance_valid(_glob_sprite):
-		_glob_sprite.rotation.z = sin(_elapsed_seconds * 12.0) * 0.18
-	if is_instance_valid(_comet_glow):
-		var glow_pulse := 0.86 + 0.22 * sin(_elapsed_seconds * 18.0)
-		_comet_glow.scale = Vector3.ONE * glow_pulse
+	if is_instance_valid(_glob_particles):
+		_glob_particles.amount_ratio = lerpf(0.75, 1.0, progress)
 	if is_instance_valid(_shadow_mesh):
 		var height := maxf(0.0, global_position.y - _landing_position.y)
 		var shadow_scale := clampf(1.0 - height * 0.12, 0.35, 1.0)
@@ -364,16 +338,6 @@ func _update_flight_visuals(progress: float) -> void:
 			global_position.x, _landing_position.y + SHADOW_GROUND_OFFSET_METERS, global_position.z
 		)
 		_shadow_mesh.scale = Vector3(shadow_scale, 1.0, shadow_scale)
-	if is_instance_valid(_landing_fill):
-		var fill_scale := lerpf(0.22, 1.0, progress)
-		_landing_fill.global_position = (_landing_position + Vector3.UP * FILL_GROUND_OFFSET_METERS)
-		_landing_fill.scale = Vector3(fill_scale, 1.0, fill_scale)
-	if is_instance_valid(_landing_ring):
-		var ring_scale := lerpf(0.5, 1.0, progress)
-		_landing_ring.global_position = (_landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS)
-		_landing_ring.scale = Vector3.ONE * ring_scale
-		_landing_ring.rotation.y = _elapsed_seconds * 1.8
-		_landing_ring.modulate.a = lerpf(0.35, 0.92, progress)
 
 
 func _on_direct_hit(_damage: DamageContext, _target: Node, _applied: float) -> void:
@@ -469,7 +433,7 @@ func _spawn_impact_ring(parent: Node) -> void:
 	wave.scale = Vector3.ONE * 0.45
 	wave.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	wave.material_override = ring_mat
-	var wave_pos := _landing_position + Vector3.UP * RING_GROUND_OFFSET_METERS
+	var wave_pos: Vector3 = _landing_position + Vector3.UP * IMPACT_RING_GROUND_OFFSET_METERS
 	wave.position = (parent as Node3D).to_local(wave_pos) if parent is Node3D else wave_pos
 	parent.add_child(wave)
 	wave.global_position = wave_pos

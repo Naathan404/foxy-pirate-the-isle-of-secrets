@@ -1,8 +1,8 @@
 extends SceneTree
-## Kiểm thử toàn diện cho VenomVine, VenomVineAI, VenomPoolProjectile, VenomAcidPool và ForestTest.
+## Kiểm thử VenomVine, VenomVineAI, VenomPoolProjectile, VenomAcidPool và ForestVenomVineTest.
 
 const VINE_SCENE := preload("res://gameplay/enemies/venom_vine/venom_vine.tscn")
-const FOREST_TEST_SCENE := preload("res://world/tests/forest_test.tscn")
+const FOREST_VENOM_VINE_TEST_SCENE := preload("res://world/tests/forest_venom_vine_test.tscn")
 const AI_CLASS := preload("res://gameplay/enemies/venom_vine/venom_vine_ai.gd")
 const POOL_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_acid_pool.gd")
 const PROJECTILE_SCRIPT := preload("res://gameplay/enemies/venom_vine/venom_pool_projectile.gd")
@@ -162,6 +162,30 @@ func _test_ai_intelligence() -> void:
 			sep01 >= 2.0 and sep02 >= 2.0,
 			"Inner fan shots must stay separated (sep01=%.2f, sep02=%.2f)" % [sep01, sep02]
 		)
+		for inner_spot in inner_aims:
+			var spot_v := inner_spot as Vector3
+			var d_player := Vector2(spot_v.x - 2.8, spot_v.z).length()
+			_check(d_player >= 1.4, "Inner fan shots must deflect off player (d=%.2f)" % d_player)
+
+	var counter_plan := (
+		ai
+		. build_counter_plan(
+			{
+				"origin_pos": Vector3.ZERO,
+				"target_pos": Vector3(2.2, 0.0, 0.0),
+				"target_velocity": Vector3.ZERO,
+				"ground_y": 0.0,
+				"inner_radius": 3.5,
+				"counter_pool_radius": 0.95,
+				"counter_inner_shots": 3,
+				"occupied_spots": [],
+			}
+		)
+	)
+	for counter_spot in counter_plan.get("aim_positions", []):
+		var c_spot := counter_spot as Vector3
+		var d_counter := Vector2(c_spot.x - 2.2, c_spot.z).length()
+		_check(d_counter >= 1.2, "Counter shots must deflect away from player (d=%.2f)" % d_counter)
 
 
 func _test_state_machine_and_zones() -> void:
@@ -180,13 +204,20 @@ func _test_state_machine_and_zones() -> void:
 	var outer_count := _active_pools_in_tree().size()
 	_check(outer_count == 1, "Outer ring must fire 1 shot initially, got %d" % outer_count)
 
-	# Bước vào vùng cận (2.6m <= 3.5m) -> bắn chùm quạt 3 phát.
+	# Bước vào vùng cận (2.6m <= 3.5m) -> bắn chùm quạt 3 phát lệch người chơi (0 direct hit).
 	player.position = Vector3(2.6, 0.0, 0.0)
 	player.velocity = Vector3.ZERO
 	await _step_frames(120)
 	var inner_count := _active_pools_in_tree().size()
 	_check(
 		inner_count >= 3, "Inner ring must fire multi-shot fan volley, got %d pools" % inner_count
+	)
+	_check(
+		player.direct_hits == 0,
+		(
+			"Venom projectiles must not deal direct collision damage (direct_hits=%d)"
+			% player.direct_hits
+		)
 	)
 
 	# Rời khỏi vùng nhận diện -> Vigilant -> quay lại Dormant.
@@ -336,7 +367,7 @@ func _test_hit_reaction_and_counterattack() -> void:
 
 
 func _test_forest_test_real_foxy_integration() -> void:
-	var forest := FOREST_TEST_SCENE.instantiate()
+	var forest := FOREST_VENOM_VINE_TEST_SCENE.instantiate()
 	root.add_child(forest)
 	await _step_frames(20)
 

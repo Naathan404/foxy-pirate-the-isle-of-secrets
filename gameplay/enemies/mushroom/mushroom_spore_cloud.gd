@@ -3,19 +3,38 @@ extends Node3D
 ## Gradually emitted spore cloud that marks its area on the ground and poisons players inside.
 
 const SPORE_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mote.png")
-const MIST_TEXTURE := preload("res://assets/sprites/enemies/mushroom/spore_mist.png")
 const GROUND_MIST_SHADER := preload("res://gameplay/enemies/mushroom/spore_ground_mist.gdshader")
 const POISON_CLOUD_GROUP := &"mushroom_spore_cloud"
 const DEFAULT_SPORE_COUNT := 240
-const DEFAULT_MIST_COUNT := 18
+const DEFAULT_MIST_COUNT := 64
 const DEFAULT_SPORE_LIFETIME := 2.0
 const DEFAULT_MIST_LIFETIME := 2.2
 const MIN_EMISSION_RATIO := 0.05
+const SOFT_MIST_TEXTURE_SIZE_PIXELS := 128
+const SOFT_MIST_TEXTURE_FALLOFF := 4.6
+const SOFT_MIST_TEXTURE_MAX_ALPHA := 0.24
+const SPORE_TEXTURE_SIZE_PIXELS := 128
 const POISON_AREA_HEIGHT := 1.8
 const DEFAULT_GROUND_MIST_OPACITY := 0.26
 const DEFAULT_GROUND_MIST_SCALE := 2.45
 const DEFAULT_VISUAL_SPREAD_SCALE := 1.15
 const FADE_OUT_SECONDS := 0.75
+const MIST_ORBIT_VELOCITY_MIN := 0.16
+const MIST_ORBIT_VELOCITY_MAX := 0.42
+const MIST_GLOW_START_COLOR := Color(0.72, 0.42, 0.94, 0.48)
+const MIST_GLOW_END_COLOR := Color(0.38, 0.2, 0.62, 0.0)
+const SPORE_INITIAL_VELOCITY_MIN := 0.42
+const SPORE_INITIAL_VELOCITY_MAX := 1.05
+const SPORE_GRAVITY_Y := 0.32
+const SPORE_ORBIT_VELOCITY_MIN := 0.22
+const SPORE_ORBIT_VELOCITY_MAX := 0.58
+const SPORE_SCALE_MIN := 0.35
+const SPORE_SCALE_MAX := 1.05
+const SPORE_GLOW_START_COLOR := Color(0.76, 0.46, 1.0, 0.98)
+const SPORE_GLOW_END_COLOR := Color(0.42, 0.22, 0.72, 0.0)
+
+static var _soft_mist_texture: ImageTexture
+static var _purple_spore_texture: ImageTexture
 
 var _source: Node3D
 var _radius: float = 2.6
@@ -40,6 +59,39 @@ var _particles: GPUParticles3D
 var _spores: GPUParticles3D
 var _ground_mist: MeshInstance3D
 var _ground_mist_material: ShaderMaterial
+
+
+static func _create_soft_mist_texture() -> ImageTexture:
+	if is_instance_valid(_soft_mist_texture):
+		return _soft_mist_texture
+	var image := Image.create(
+		SOFT_MIST_TEXTURE_SIZE_PIXELS, SOFT_MIST_TEXTURE_SIZE_PIXELS, false, Image.FORMAT_RGBA8
+	)
+	var texture_center := float(SOFT_MIST_TEXTURE_SIZE_PIXELS - 1) * 0.5
+	var texture_radius := float(SOFT_MIST_TEXTURE_SIZE_PIXELS) * 0.5
+	for y in range(SOFT_MIST_TEXTURE_SIZE_PIXELS):
+		var offset_y := (float(y) - texture_center) / texture_radius
+		for x in range(SOFT_MIST_TEXTURE_SIZE_PIXELS):
+			var offset_x := (float(x) - texture_center) / texture_radius
+			var distance_squared := offset_x * offset_x + offset_y * offset_y
+			var alpha := exp(-distance_squared * SOFT_MIST_TEXTURE_FALLOFF)
+			image.set_pixel(x, y, Color(1.0, 1.0, 1.0, alpha * SOFT_MIST_TEXTURE_MAX_ALPHA))
+	_soft_mist_texture = ImageTexture.create_from_image(image)
+	return _soft_mist_texture
+
+
+static func _create_purple_spore_texture() -> ImageTexture:
+	if is_instance_valid(_purple_spore_texture):
+		return _purple_spore_texture
+	var image := SPORE_TEXTURE.get_image()
+	image.resize(SPORE_TEXTURE_SIZE_PIXELS, SPORE_TEXTURE_SIZE_PIXELS, Image.INTERPOLATE_LANCZOS)
+	for y in range(SPORE_TEXTURE_SIZE_PIXELS):
+		for x in range(SPORE_TEXTURE_SIZE_PIXELS):
+			var source_color := image.get_pixel(x, y)
+			var brightness := maxf(maxf(source_color.r, source_color.g), source_color.b)
+			image.set_pixel(x, y, Color(1.0, 1.0, 1.0, source_color.a * brightness))
+	_purple_spore_texture = ImageTexture.create_from_image(image)
+	return _purple_spore_texture
 
 
 func _ready() -> void:
@@ -212,7 +264,9 @@ func _apply_poison_tick() -> void:
 
 
 func _build_smoke_particles() -> void:
-	_particles = _create_particles("PoisonMist", MIST_TEXTURE, _mist_count, _mist_lifetime)
+	_particles = _create_particles(
+		"PoisonMist", _create_soft_mist_texture(), _mist_count, _mist_lifetime
+	)
 	_particles.amount_ratio = MIN_EMISSION_RATIO
 	var mist_mesh := _particles.draw_pass_1 as QuadMesh
 	mist_mesh.size = Vector2(1.6, 1.6)
@@ -222,25 +276,29 @@ func _build_smoke_particles() -> void:
 	mist_process.gravity = Vector3(0.0, 0.12, 0.0)
 	mist_process.scale_min = 0.65
 	mist_process.scale_max = 1.15
-	mist_process.color_ramp = _color_ramp(
-		Color(0.68, 0.43, 0.78, 0.3), Color(0.32, 0.18, 0.42, 0.0)
-	)
+	mist_process.orbit_velocity_min = MIST_ORBIT_VELOCITY_MIN
+	mist_process.orbit_velocity_max = MIST_ORBIT_VELOCITY_MAX
+	mist_process.color_ramp = _color_ramp(MIST_GLOW_START_COLOR, MIST_GLOW_END_COLOR)
 	add_child(_particles)
 	_particles.emitting = true
 
-	_spores = _create_particles("FloatingSpores", SPORE_TEXTURE, _spore_count, _spore_lifetime)
+	_spores = _create_particles(
+		"FloatingSpores", _create_purple_spore_texture(), _spore_count, _spore_lifetime
+	)
 	_spores.amount_ratio = MIN_EMISSION_RATIO
 	var spore_mesh := _spores.draw_pass_1 as QuadMesh
 	spore_mesh.size = Vector2(0.65, 0.65)
 	var material := spore_mesh.material as StandardMaterial3D
 	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	var spore_process := _spores.process_material as ParticleProcessMaterial
-	spore_process.initial_velocity_min = 0.12
-	spore_process.initial_velocity_max = 0.65
-	spore_process.gravity = Vector3(0.0, 0.2, 0.0)
-	spore_process.scale_min = 0.55
-	spore_process.scale_max = 1.35
-	spore_process.color_ramp = _color_ramp(Color(0.82, 1.0, 0.5, 0.85), Color(0.65, 0.34, 0.9, 0.0))
+	spore_process.initial_velocity_min = SPORE_INITIAL_VELOCITY_MIN
+	spore_process.initial_velocity_max = SPORE_INITIAL_VELOCITY_MAX
+	spore_process.gravity = Vector3(0.0, SPORE_GRAVITY_Y, 0.0)
+	spore_process.orbit_velocity_min = SPORE_ORBIT_VELOCITY_MIN
+	spore_process.orbit_velocity_max = SPORE_ORBIT_VELOCITY_MAX
+	spore_process.scale_min = SPORE_SCALE_MIN
+	spore_process.scale_max = SPORE_SCALE_MAX
+	spore_process.color_ramp = _color_ramp(SPORE_GLOW_START_COLOR, SPORE_GLOW_END_COLOR)
 	add_child(_spores)
 	_spores.emitting = true
 
