@@ -700,16 +700,24 @@ func play_directional_animation(action: String, restart: bool = false) -> void:
 # Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
 ## Reuse hit recovery without applying damage when an environmental wave hits.
 func apply_environment_knockback(direction: Vector3, speed: float, duration: float) -> void:
+	if not apply_environment_push(direction, speed, duration):
+		return
+	pending_hit_direction = _environment_push_direction
+	pending_hit_knockback_multiplier = speed / 8.0
+	notify_hit(duration)
+
+
+## Carries the player along `direction` without a hit reaction (e.g. riding a tide surge).
+## Returns false when the push is rejected (dead, zero speed/duration or vertical direction).
+func apply_environment_push(direction: Vector3, speed: float, duration: float) -> bool:
 	var horizontal := Vector3(direction.x, 0.0, direction.z)
 	if dead or speed <= 0.0 or duration <= 0.0 or horizontal.length_squared() < 0.0001:
-		return
+		return false
 	_environment_push_direction = horizontal.normalized()
 	_environment_push_speed = speed
 	_environment_push_duration = duration
 	_environment_push_remaining = duration
-	pending_hit_direction = _environment_push_direction
-	pending_hit_knockback_multiplier = speed / 8.0
-	notify_hit(duration)
+	return true
 
 
 func _apply_environment_push(delta: float) -> void:

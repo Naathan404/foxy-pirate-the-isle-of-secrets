@@ -3,7 +3,7 @@ extends Area3D
 
 const NOTE_ITEM: BaseItem = preload("res://data/items/quest/note.tres")
 const BOSS_DIARY_ITEM: BaseItem = preload("res://data/items/quest/boss_diary.tres")
-const CHARM_UNLOCK := preload("res://gameplay/charms/progression/charm_unlock_presentation.gd")
+const CHARM_UNLOCK := preload("res://gameplay/charms/progression/charm_unlock.tscn")
 const BLUEPRINT_UNLOCK_PATH := "res://gameplay/weapons/blueprints/blueprint_unlock.tscn"
 
 @export var item: BaseItem
@@ -167,7 +167,7 @@ func _on_attraction_started(target: Node3D) -> void:
 	if item != null and item.charm != null:
 		_attraction.reset()
 		_collecting = true
-		var presentation := CHARM_UNLOCK.new()
+		var presentation := CHARM_UNLOCK.instantiate()
 		get_tree().root.add_child(presentation)
 		presentation.begin(self, target as Player)
 	elif item != null and item.weapon_blueprint != null:
@@ -183,7 +183,8 @@ func _on_attraction_started(target: Node3D) -> void:
 
 
 ## The presentation owns the reward transaction; this only releases the reserved pickup.
-func finish_blueprint_presentation(consumed: bool) -> void:
+## A consumed pickup is removed; otherwise it reappears and can be collected again.
+func finish_reward_presentation(consumed: bool) -> void:
 	if consumed:
 		queue_free()
 		return
@@ -191,6 +192,11 @@ func finish_blueprint_presentation(consumed: bool) -> void:
 	_collecting = false
 	_attraction.set_enabled(true)
 	_start_idle_animation()
+
+
+## Kept for existing callers; Blueprint and Charm reveals share one release path.
+func finish_blueprint_presentation(consumed: bool) -> void:
+	finish_reward_presentation(consumed)
 
 
 func _on_attraction_cancelled() -> void:
