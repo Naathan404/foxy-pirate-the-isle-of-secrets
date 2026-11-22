@@ -21,7 +21,12 @@ Dự án đang ở giai đoạn prototype, tập trung vào điều khiển nhâ
 
 1. Cài **Godot 4.7.2 Standard**.
 2. Mở Godot → **Import** → chọn [project.godot](project.godot).
-3. Đợi import hoàn tất, nhấn **F5** để chạy scene thử nghiệm.
+3. Đợi import hoàn tất. Trên Windows, sau lần import đầu của một checkout mới,
+   đóng và mở lại project để SpineBridge đăng ký importer và import `.atlas`/`.skel`.
+4. Đợi lượt import tiếp theo hoàn tất, nhấn **F5** để chạy scene thử nghiệm.
+
+Godot AI là công cụ cục bộ, không bắt buộc để chạy game. Không commit autoload
+`_mcp_game_helper` hoặc mục bật `addons/godot_ai/plugin.cfg` trong `project.godot`.
 
 | Phím | Hành động |
 | :---: | --- |

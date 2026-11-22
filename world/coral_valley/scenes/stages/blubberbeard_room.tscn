@@ -27,8 +27,8 @@ outer_radius = 1.7
 [node name="BlubberbeardRoom" unique_id=60789925 instance=ExtResource("1")]
 script = ExtResource("6")
 open_exits = 8
-left_destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
-left_destination_trigger_id = &"stage5_boss"
+left_destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+left_destination_trigger_id = &"right"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("SeaEnvironment")
@@ -85,8 +85,8 @@ enabled = false
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
-destination_scene = "res://world/coral_valley/scenes/stages/stage5.tscn"
-destination_trigger_id = &"stage5_boss"
+destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+destination_trigger_id = &"right"
 
 [node name="ExitPosition" parent="Exits/LeftPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.6731589, -5.3314714)

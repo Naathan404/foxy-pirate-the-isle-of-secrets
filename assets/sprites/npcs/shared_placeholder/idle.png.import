@@ -2,13 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-<<<<<<< HEAD:assets/models/kenney_mini_forest/Textures/colormap.png.import
-uid="uid://o86hs47nup5a"
-path.s3tc="res://.godot/imported/colormap.png-8e3378787b2b68462cf0a55df2ef1008.s3tc.ctex"
-=======
 uid="uid://boygebnjr0o5t"
 path.s3tc="res://.godot/imported/idle.png-c70509dd539ae07300113f6c2119946a.s3tc.ctex"
->>>>>>> 72bd32ff6cf942975073fb2e053b7aa77c1ea650:assets/sprites/npcs/shared_placeholder/idle.png.import
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
