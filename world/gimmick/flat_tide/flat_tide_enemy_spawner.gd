@@ -4,6 +4,11 @@ extends Node3D
 
 signal enemy_spawned(enemy: EnemyBase, is_elite: bool)
 
+# //NLVP sửa: Nhận diện nền đảo và số hướng dò mép.
+const SPAWN_GROUND_GROUP := &"tide_spawn_ground"
+const EDGE_PROBE_COUNT := 8
+const MINIMUM_GROUND_NORMAL_Y := 0.7
+
 @export_group("Spawn Effect")
 ## Set to empty to disable the visual; the enemy still spawns normally.
 @export var spawn_effect_scene: PackedScene = preload(
@@ -33,6 +38,8 @@ signal enemy_spawned(enemy: EnemyBase, is_elite: bool)
 @export_range(0.1, 20.0, 0.1, "suffix:m") var ground_search_distance: float = 2.0
 ## Khoảng nâng nhỏ để collider của enemy không giao với nền khi spawn.
 @export_range(0.01, 0.5, 0.01, "suffix:m") var ground_clearance: float = 0.05
+# //NLVP sửa: Khoảng lùi khỏi vực, chỉnh được trong Inspector.
+@export_range(0.0, 20.0, 0.1, "suffix:m") var edge_clearance: float = 2.0
 
 var _random := RandomNumberGenerator.new()
 var _pending: Array[Dictionary] = []
@@ -115,18 +122,52 @@ func _on_coverage_changed(_coverage: float) -> void:
 
 
 func _find_ground(point: Vector3, zone: FlatTideZone) -> Variant:
+	# //NLVP sửa: Chỉ nhận nền có group, loại cầu và vật thể khác.
+	var hit := _raycast_ground(point)
+	if hit.is_empty():
+		return null
+	var ground_body := hit.collider as StaticBody3D
+	if (
+		ground_body == null
+		or not ground_body.is_in_group(SPAWN_GROUND_GROUP)
+		or hit.normal.y < MINIMUM_GROUND_NORMAL_Y
+	):
+		return null
+	var ground: Vector3 = hit.position
+	if not zone.contains_flooded_point(ground):
+		return null
+	if not _has_edge_clearance(ground, ground_body):
+		return null
+	return ground
+
+
+# //NLVP sửa: Dò quanh điểm spawn để chừa khoảng lùi khỏi mép đảo.
+func _has_edge_clearance(point: Vector3, ground_body: StaticBody3D) -> bool:
+	if edge_clearance <= 0.0:
+		return true
+	# Nới vòng dò để giữ khoảng lùi ở cả các hướng chéo giữa hai tia.
+	var probe_radius := edge_clearance / cos(PI / EDGE_PROBE_COUNT)
+	for index in EDGE_PROBE_COUNT:
+		var angle := TAU * index / EDGE_PROBE_COUNT
+		var offset := Vector3(cos(angle), 0.0, sin(angle)) * probe_radius
+		var hit := _raycast_ground(point + offset)
+		if (
+			hit.is_empty()
+			or hit.collider != ground_body
+			or hit.normal.y < MINIMUM_GROUND_NORMAL_Y
+		):
+			return false
+	return true
+
+
+# //NLVP sửa: Dùng chung raycast cho điểm spawn và các điểm dò mép.
+func _raycast_ground(point: Vector3) -> Dictionary:
 	var ray := PhysicsRayQueryParameters3D.create(
 		point + Vector3.UP * ground_search_distance,
 		point + Vector3.DOWN * ground_search_distance,
 		ground_collision_mask
 	)
-	var hit := get_world_3d().direct_space_state.intersect_ray(ray)
-	if hit.is_empty() or not hit.collider is StaticBody3D or hit.normal.y < 0.7:
-		return null
-	var ground: Vector3 = hit.position
-	if not zone.contains_flooded_point(ground):
-		return null
-	return ground
+	return get_world_3d().direct_space_state.intersect_ray(ray)
 
 
 func _is_separated(point: Vector3) -> bool:

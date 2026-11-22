@@ -110,6 +110,9 @@ transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, -0.19104576)
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0, 0.65731)
 texture = ExtResource("6_2sqji")
 
+; //NLVP sửa: Chỉ nền đảo thuộc group này được spawn quái Tide.
+[node name="StaticBody3D" parent="Environment/BaseGround" index="1" unique_id=822018133 groups=["tide_spawn_ground"]]
+
 [node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, 0.2144967)
 shape = ExtResource("7_ground_shape")

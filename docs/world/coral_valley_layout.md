@@ -60,4 +60,34 @@ All non-Materials rooms spawn seaweed around their island rims on each visit. Me
 
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and moving-platform docks and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
-Coral and coconut palms do not appear in any other Coral Valley room. Remaining rooms keep their existing spawn counts and shell, stone and octopus pools. `RandomProps.include_coral` stays false; the Materials and Mobs 1–3 rooms specify their own `prop_scenes` arrays.
+Coral and coconut palms do not appear in any other Coral Valley room. The mixed
+shell, stone and octopus `RandomProps` spawners have been removed from all rooms,
+including the unused empty spawner in `room_00`. Only the Materials rooms and
+Mobs 1–3 retain `RandomProps`, with their explicit resource pools. Seaweed
+spawners retain their existing setup.
+
+## Tide enemy pools
+
+All six Mobs rooms inherit the same CameraBounds from `base_medium_room.tscn`.
+Their Tide setup matches `room_02`: the water zone has size `Vector2(45, 66)`
+and the same placement, with 8 seconds low, 6 seconds rising, 4 seconds high
+and 6 seconds falling.
+
+Mobs 1–3 select up to three enemies per falling tide. Each enemy independently
+chooses either entry in its room's pool with equal probability; a wave can contain
+three of the same type. All three spawners use `elite_chance = 10.0`, and only
+the Coral Skeleton entry has an elite scene assigned. A selected skeleton has
+a 10% chance to use its elite variant; starfish, barrel and crab remain normal.
+
+Mobs 4–6 each select up to three enemies of a single species per falling tide.
+Each enemy independently has a 10% chance to use that species' elite variant.
+These three rooms have no skeleton entries.
+
+| Room | Type | Tide enemy pool |
+| --- | --- | --- |
+| `room_02` | Mobs 1 | Starfish, Coral Skeleton |
+| `room_12` | Mobs 2 | Barrel, Coral Skeleton |
+| `room_21` | Mobs 3 | Crab, Coral Skeleton |
+| `room_23` | Mobs 4 | Barrel (normal or elite) |
+| `room_13` | Mobs 5 | Starfish (normal or elite) |
+| `room_16` | Mobs 6 | Crab (normal or elite) |

@@ -130,10 +130,6 @@ shape = SubResource("BoxShape3D_left_trigger")
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.0626488, 0)
 
-[node name="RandomProps" type="Node3D" parent="."]
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-8, 0, -5, -6, 0, 8, 6, 0, -8, 8, 0, 4, -3, 0, -10, 4, 0, 10)
-
 [node name="Campfire" parent="." instance=ExtResource("campfire")]
 
 [node name="RandomSeaweed" type="Node3D" parent="."]

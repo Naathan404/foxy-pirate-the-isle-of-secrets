@@ -36,6 +36,19 @@ Khi mép sóng đang dâng chạm Player, hoặc Player đi vào phần sóng đ
 - `Elite Chance`: xác suất chọn bản elite của loại enemy đã chọn, mặc định 10%.
 - `Minimum Spacing`: khoảng cách ngang tối thiểu giữa các vị trí trong cùng đợt. `Minimum Player Distance` tránh spawn sát Foxy.
 - `Attempts Per Enemy` giới hạn số lần tìm vị trí. `Ground Collision Mask`, `Ground Search Distance` và `Ground Clearance` điều chỉnh kiểm tra nền.
+- `Edge Clearance`: khoảng lùi khỏi mép vực theo đơn vị world, mặc định 2; chỉnh
+  trong Inspector của `EnemySpawner`. Đặt 0 để bỏ kiểm tra khoảng lùi.
+
+Spawner chỉ nhận nền `StaticBody3D` thuộc group `tide_spawn_ground`, giúp loại
+cầu gỗ và các vật thể khác. Collider nền trong `base_medium_room.tscn` đã có
+group này, nên sáu phòng Mobs tự kế thừa mà không cần gán từng phòng.
+`beach_test.tscn` cũng đánh dấu nền của nó để dùng chung spawner.
+
+Kiểm tra mép dùng tám tia xuống quanh điểm spawn và yêu cầu chúng chạm cùng
+collider nền, với mặt đủ phẳng. Các điểm dò không cần đang ngập; khoảng lùi
+được tính theo mép nền, không theo mép nước. Vòng dò được nới nhẹ để bảo toàn
+khoảng lùi ở hướng chéo trên nền đảo lồi hiện tại. Đây là kiểm tra lấy mẫu,
+không phải đo khoảng cách chính xác cho mọi hình dạng nền có khe nhỏ hoặc lõm.
 
 Nếu không tìm được đủ nền hợp lệ, hoặc vị trí bị nhân vật/vật cản chiếm khi nước rút đến, đợt đó có thể xuất hiện ít enemy hơn cấu hình. Gán `Controller` cho spawner khi dùng trong scene khác.
 
