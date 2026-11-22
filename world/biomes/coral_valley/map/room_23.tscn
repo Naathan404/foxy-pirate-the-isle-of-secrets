@@ -8,6 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="5_6kymb"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="prop_wood_log"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="prop_shell"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/octopus.tscn" id="prop_octopus"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
@@ -240,6 +243,20 @@ spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
 enemies = Array[ExtResource("3_enemy_entry")]([SubResource("Resource_c5nfo")])
 enemies_per_tide = 3
 elite_chance = 10.0
+
+[node name="RandomProps" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-7, 0, -9, -8, 0, -2, -5, 0, 8, 7, 0, -8, 8, 0, 0, 8, 0, 8, -3, 0, -6, -2, 0, 3, 4, 0, -2, 1, 0, 10)
+prop_scenes = Array[PackedScene]([ExtResource("prop_wood_log"), ExtResource("prop_shell")])
+min_spawn_count = 5
+max_spawn_count = 7
+
+[node name="RandomOctopus" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-7, 0, 4, -2, 0, -10, 3, 0, 4, 7, 0, -4, 3, 0, -8)
+prop_scenes = Array[PackedScene]([ExtResource("prop_octopus")])
+min_spawn_count = 1
+max_spawn_count = 3
 
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")

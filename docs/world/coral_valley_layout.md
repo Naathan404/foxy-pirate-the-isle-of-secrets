@@ -50,6 +50,13 @@ Each Materials room uses its existing spawn positions and randomly spawns 5–10
 
 Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
 
+Mobs 4, 5 and 6 (`room_23`, `room_13`, `room_16`) spawn two independent
+groups per visit: `RandomProps` chooses 5–7 props total, each equally likely
+to be wood log or shell; `RandomOctopus` chooses 1–3 destructible octopus props.
+The groups use ten and five distinct candidate positions respectively, with
+at least 3.6 units between groups and 3.3 units from seaweed candidates.
+Both use `random_props.gd`; its Inspector count range now starts at 1.
+
 All non-Materials rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
 
 | Layout | Rooms | Seaweed per visit |
@@ -60,11 +67,11 @@ All non-Materials rooms spawn seaweed around their island rims on each visit. Me
 
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and moving-platform docks and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
-Coral and coconut palms do not appear in any other Coral Valley room. The mixed
-shell, stone and octopus `RandomProps` spawners have been removed from all rooms,
-including the unused empty spawner in `room_00`. Only the Materials rooms and
-Mobs 1–3 retain `RandomProps`, with their explicit resource pools. Seaweed
-spawners retain their existing setup.
+Coral and coconut palms do not appear in any other Coral Valley room. The old
+mixed shell, stone and octopus pool is no longer used by any room, including
+the removed unused spawner in `room_00`. Only Materials and Mobs rooms use
+the explicit prop pools described above. Seaweed spawners retain their
+existing setup.
 
 ## Tide enemy pools
 

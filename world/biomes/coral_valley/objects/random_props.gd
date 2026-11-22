@@ -16,8 +16,9 @@ const CORAL_SCENES: Array[PackedScene] = [
 @export var fixed_spawn_count := 0
 @export var prop_scenes: Array[PackedScene] = PROP_SCENES.duplicate()
 @export var include_coral: bool = false
-@export_range(3, 64, 1) var min_spawn_count := 3
-@export_range(3, 64, 1) var max_spawn_count := 6
+# //NLVP sửa: Cho phép cấu hình nhóm chỉ sinh 1–3 vật thể.
+@export_range(1, 64, 1) var min_spawn_count := 3
+@export_range(1, 64, 1) var max_spawn_count := 6
 
 
 func _ready() -> void:
