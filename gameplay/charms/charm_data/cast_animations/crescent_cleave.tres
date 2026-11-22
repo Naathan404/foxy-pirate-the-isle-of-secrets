@@ -15,4 +15,4 @@ phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"active": PackedInt32Array(2, 3, 4),
 &"recover": PackedInt32Array(5, 6, 7)
 })
-looping_phases = Array[StringName]([&"active"])
+held_phases = Array[StringName]([&"active"])

@@ -323,7 +323,7 @@ mouse_filter = 2
 texture = ExtResource("avatar_frame")
 
 [node name="Portrait" type="TextureRect" parent="StatControl" unique_id=1664021248]
-texture_filter = 1
+texture_filter = 2
 layout_mode = 0
 offset_left = 16.888893
 offset_top = 39.111115
@@ -523,7 +523,7 @@ default_color = Color(0.02, 0.67, 0.92, 0.84)
 joint_mode = 2
 
 [node name="Rim" type="Line2D" parent="EquipmentControl/RecallBorder"]
-points = PackedVector2Array(24, 2, 43, 13, 43, 35, 24, 46, 5, 35, 5, 13, 24, 2)
+points = PackedVector2Array(32, 2, 62, 32, 32, 62, 2, 32, 32, 2)
 width = 2.4
 default_color = Color(0.78, 1, 1, 1)
 joint_mode = 2

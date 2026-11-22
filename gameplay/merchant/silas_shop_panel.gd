@@ -1,106 +1,191 @@
 class_name SilasShopPanel
 extends CanvasLayer
+## Silas's black-market stall, built on the pause Inventory's visual system.
+##
+## Buy lists the session stock catalog handed in by SilasNpc; Sell lists the player's carried
+## goods, one entry per item. Every trade goes through MerchantTransactionService, so this panel
+## only reads Inventory, GoldWallet and WeaponController to explain prices and limits.
 
-## Silas's shop follows its own parchment artwork while sharing the inventory book.
 signal shop_closed
 signal stock_reroll_requested
 
 enum Tab { BUY, SELL }
 
 const SLOT_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_slot.tscn")
-const TAB_ACTIVE: Texture2D = preload("res://assets/ui/silas_shop/PNG/32_tab_active_blank.png")
-const TAB_INACTIVE: Texture2D = preload("res://assets/ui/silas_shop/PNG/33_tab_inactive_blank.png")
-const MAX_STACK_QUANTITY := 99
+## Matches the per-trade limit enforced by MerchantTransactionService.
+const MAX_TRADE_QUANTITY := 99
 const MIN_TRADE_QUANTITY := 1
+const PREVIOUS_TAB_ACTION := &"ui_page_up"
+const NEXT_TAB_ACTION := &"ui_page_down"
+const CANCEL_ACTION := &"ui_cancel"
+const INK_PROGRESS_PARAM := &"progress"
+const INK_HIDDEN := 0.0
+const INK_SHOWN := 1.0
+const CENTER_RATIO := 0.5
+const MSEC_PER_SECOND := 1000.0
+## The purse row fits the coin plus about seven digits at full size; larger balances shrink.
+const PURSE_TEXT_WIDTH_PIXELS := 164.0
+const GOLD_FONT_SIZE := 32
+const GOLD_MIN_FONT_SIZE := 16
+const SUCCESS_MARK := "✓ "
+const REFUSAL_MARK := "✕ "
+const SECTION_TITLES := {Tab.BUY: "Under the counter", Tab.SELL: "Your goods"}
+const FOOTNOTES := {
+	Tab.BUY: "Stock stays the same for this play session.",
+	Tab.SELL: 'Goods marked "No deal" are not for Silas.',
+}
+const EMPTY_TEXTS := {
+	Tab.BUY: "Silas has nothing on offer right now.",
+	Tab.SELL: "Your bag is empty. Silas has nothing to haggle over.",
+}
+
+@export_range(1, 8, 1) var grid_columns: int = 4
+@export_multiline var buy_whisper: String = '"No names, no questions,\nno refunds."'
+@export_multiline var sell_whisper: String = '"Let\'s see what fell\noff the boat..."'
+
+@export_group("Feedback Colors")
+@export var success_color: Color = Color(0.66, 0.85, 0.58)
+@export var refusal_color: Color = Color(0.95, 0.56, 0.5)
+@export var hint_color: Color = Color(0.77, 0.61, 0.53)
+@export var unaffordable_total_color: Color = Color(0.95, 0.47, 0.44)
+@export var total_color: Color = Color(0.98, 0.93, 0.86)
 
 @export_group("Interaction Feedback")
-@export_range(1, 8, 1) var grid_columns := 4
-@export var grid_step := Vector2(86.0, 98.0)
-@export_range(100.0, 1000.0, 1.0) var grid_content_width := 414.0
-@export_range(1, 8, 1) var minimum_grid_rows := 2
-@export var scrollbar_tint := Color(0.6, 0.37, 0.2, 0.85)
-@export var reference_viewport_size := Vector2(1160.0, 700.0)
-@export_range(0.5, 1.0, 0.01) var minimum_book_scale := 0.96
-@export_range(0.05, 0.5, 0.01) var open_duration := 0.18
-@export_range(0.05, 0.5, 0.01) var close_duration := 0.12
-@export var selected_tab_scale := Vector2(1.04, 1.02)
-@export_range(0.05, 0.3, 0.01) var tab_feedback_duration := 0.12
-@export_range(1.0, 1.2, 0.01) var tab_click_punch_scale := 1.04
-@export_range(0.1, 1.0, 0.05) var tab_click_punch_duration_ratio := 0.6
-@export_range(0.0, 1.0, 0.01) var disabled_action_alpha := 0.55
-@export var selected_tab_text_color := Color(1.0, 0.9, 0.7)
-@export var idle_tab_text_color := Color(0.28, 0.1, 0.07)
-@export var selected_tab_tint := Color.WHITE
-@export var idle_tab_tint := Color(0.96, 0.94, 0.9)
+@export_range(0.05, 0.6, 0.01, "suffix:s") var open_duration: float = 0.3
+@export_range(0.05, 0.5, 0.01, "suffix:s") var close_duration: float = 0.2
+@export_range(0.5, 1.0, 0.01) var closed_frame_scale: float = 0.94
+@export_range(0.1, 1.5, 0.01, "suffix:s") var ink_open_seconds: float = 0.6
+@export_range(0.05, 1.0, 0.01, "suffix:s") var ink_close_seconds: float = 0.3
+@export_range(0.0, 0.4, 0.01, "suffix:s") var frame_open_delay: float = 0.12
+@export_range(0.0, 120.0, 1.0, "suffix:px") var page_slide_pixels: float = 36.0
+@export_range(0.05, 0.6, 0.01, "suffix:s") var page_switch_seconds: float = 0.22
+@export_range(1.0, 1.3, 0.01) var back_button_lift: float = 1.08
+## Ignores a second press this soon after a trade so a double click cannot repeat it.
+@export_range(0.0, 1.0, 0.01, "suffix:s") var trade_repeat_guard_seconds: float = 0.18
+@export_range(0.05, 1.0, 0.01, "suffix:s") var gold_count_seconds: float = 0.35
+
+@export_group("Lantern")
+@export_range(0.0, 1.0, 0.01) var lantern_glow_min_alpha: float = 0.55
+@export_range(0.0, 1.0, 0.01) var lantern_glow_max_alpha: float = 0.9
+@export_range(0.1, 10.0, 0.1, "suffix:Hz") var lantern_flicker_hz: float = 1.7
 
 var _catalog: MerchantCatalog
 var _service: MerchantTransactionService
 var _player: Player
 var _inventory: Inventory
 var _wallet: GoldWallet
-var _selected_offer: MerchantOffer
-var _selected_inventory_index := -1
-var _current_tab := Tab.BUY
-var _quantity := MIN_TRADE_QUANTITY
-var _previous_mouse_mode := Input.MOUSE_MODE_VISIBLE
+var _current_tab: Tab = Tab.BUY
+var _selected_offer_id: StringName = &""
+var _selected_item_id: String = ""
+var _quantity: int = MIN_TRADE_QUANTITY
+var _sell_entries: Array[SellEntry] = []
 var _slot_uis: Array[SilasShopSlot] = []
-var _slot_inventory_indices: Array[int] = []
+var _feedback_text: String = ""
+var _feedback_color: Color = Color.WHITE
+var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
+var _is_closing: bool = false
+var _next_trade_msec: int = 0
+var _shown_gold: int = 0
+var _lantern_time: float = 0.0
 var _transition_tween: Tween
-var _tab_tweens: Dictionary[TextureButton, Tween] = {}
-var _tab_base_scales: Dictionary[TextureButton, Vector2] = {}
-var _book_scale := Vector2.ONE
-var _is_closing := false
-var _error_message := ""
+var _page_tween: Tween
+var _gold_tween: Tween
 
-@onready var panel: Control = $Book
-@onready var gold_label: Label = $Book/GoldBadge/Gold
-@onready var buy_tab: TextureButton = $Book/Tabs/Buy
-@onready var sell_tab: TextureButton = $Book/Tabs/Sell
-@onready var item_scroll: ScrollContainer = $Book/GridScroll
-@onready var grid: Control = $Book/GridScroll/Grid
-@onready var item_icon: TextureRect = $Book/Info/Icon
-@onready var item_name: Label = $Book/Info/ItemName
-@onready var item_category: Label = $Book/Info/Category
-@onready var item_count: Label = $Book/Info/Count
-@onready var item_description: Label = $Book/Info/Description
-@onready var effect_label: Label = $Book/Info/EffectText
-@onready var price_plate: TextureRect = $Book/Info/PricePlate
-@onready var trade_label: Label = $Book/Info/PricePlate/Trade
-@onready var quantity_controls: Control = $Book/Info/Quantity
-@onready var minus_button: TextureButton = $Book/Info/Quantity/Minus
-@onready var plus_button: TextureButton = $Book/Info/Quantity/Plus
-@onready var quantity_label: Label = $Book/Info/Quantity/Value
-@onready var feedback: Label = $Book/Feedback
-@onready var action_button: TextureButton = $Book/Info/Action
-@onready var action_label: Label = $Book/Info/Action/Text
-@onready var close_button: Button = $Book/Close
-@onready var reroll_button: Button = $DebugReroll
-@onready var toast_queue: TradeToastQueue = $TradeToastQueue
+@onready var gold_label: Label = %GoldLabel
+## Public tab references stay plain buttons; the Inventory tab look is an implementation detail.
+@onready var buy_tab: BaseButton = %BuyTab
+@onready var sell_tab: BaseButton = %SellTab
+@onready var item_scroll: ScrollContainer = %GridScroll
+@onready var grid: GridContainer = %Grid
+@onready var action_button: Button = %ActionButton
+@onready var reroll_button: Button = %DebugReroll
+@onready var toast_queue: TradeToastQueue = %TradeToastQueue
+@onready var _background: TextureRect = %Background
+@onready var _frame: Control = %Frame
+@onready var _page: Control = %Page
+@onready var _motes: CPUParticles2D = %Motes
+@onready var _lantern_glow: CanvasItem = %LanternGlow
+@onready var _whisper: Label = %Whisper
+@onready var _purse_coin: Control = %PurseCoin
+@onready var _section_title: Label = %SectionTitle
+@onready var _footnote: Label = %Footnote
+@onready var _counter_label: Label = %CounterLabel
+@onready var _empty_label: Label = %EmptyLabel
+@onready var _big_icon: TextureRect = %BigIcon
+@onready var _item_name: Label = %ItemName
+@onready var _type_banner: Label = %TypeBanner
+@onready var _owned_banner: Label = %OwnedBanner
+@onready var _description: Label = %Description
+@onready var _description_scroll: ScrollContainer = %DescriptionScroll
+@onready var _effect_label: Label = %EffectLabel
+@onready var _trade_row: Control = %TradeRow
+@onready var _quantity_box: Control = %QuantityBox
+@onready var _minus_button: Button = %MinusButton
+@onready var _plus_button: Button = %PlusButton
+@onready var _quantity_label: Label = %QuantityLabel
+@onready var _total_label: Label = %TotalLabel
+@onready var _unit_label: Label = %UnitLabel
+@onready var _feedback: Label = %Feedback
+@onready var _back_button: Button = %BackButton
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	item_scroll.get_v_scroll_bar().modulate = scrollbar_tint
-	panel.pivot_offset = panel.size * 0.5
-	get_viewport().size_changed.connect(_fit_book)
-	_fit_book()
-	for button: TextureButton in [buy_tab, sell_tab]:
-		_tab_base_scales[button] = button.scale
-		button.resized.connect(_update_tab_pivot.bind(button))
+	hide()
+	set_process(false)
+	grid.columns = grid_columns
 	buy_tab.pressed.connect(_set_tab.bind(Tab.BUY))
 	sell_tab.pressed.connect(_set_tab.bind(Tab.SELL))
-	minus_button.pressed.connect(_change_quantity.bind(-1))
-	plus_button.pressed.connect(_change_quantity.bind(1))
+	_minus_button.pressed.connect(_change_quantity.bind(-1))
+	_plus_button.pressed.connect(_change_quantity.bind(1))
 	action_button.pressed.connect(_on_action_pressed)
-	close_button.pressed.connect(close_shop)
+	_back_button.pressed.connect(close_shop)
+	_back_button.tooltip_text = "Leave (%s)" % InventoryMenuFormat.action_key(CANCEL_ACTION)
 	reroll_button.visible = OS.has_feature("debug")
 	reroll_button.pressed.connect(_on_debug_reroll_pressed)
-	_restore_tab_feedback.call_deferred()
-	hide()
+	for button: Button in [_minus_button, _plus_button, action_button]:
+		InventoryHoverFeedback.attach(button)
+	InventoryHoverFeedback.attach(_back_button, null, back_button_lift)
+	_frame.resized.connect(_update_frame_pivot)
+	_update_frame_pivot()
+
+
+func _process(delta: float) -> void:
+	# A slow, uneven flicker: two sines at unrelated rates read as a flame, not a pulse.
+	_lantern_time += delta
+	var phase := _lantern_time * lantern_flicker_hz * TAU
+	var flicker := 0.5 + 0.35 * sin(phase) + 0.15 * sin(phase * 2.7 + 1.3)
+	_lantern_glow.modulate.a = lerpf(lantern_glow_min_alpha, lantern_glow_max_alpha, flicker)
+
+
+func _input(event: InputEvent) -> void:
+	if not visible or _is_closing:
+		return
+	if event.is_action_pressed(CANCEL_ACTION):
+		close_shop()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(PREVIOUS_TAB_ACTION) or event.is_action_pressed(NEXT_TAB_ACTION):
+		_set_tab(Tab.SELL if _current_tab == Tab.BUY else Tab.BUY)
+		_focus_default()
+		get_viewport().set_input_as_handled()
+
+
+func _exit_tree() -> void:
+	_kill_tween(_transition_tween)
+	_kill_tween(_page_tween)
+	_kill_tween(_gold_tween)
+	_disconnect_observers()
+	if visible:
+		Input.mouse_mode = _previous_mouse_mode
+		var manager := get_node_or_null("/root/GameManager")
+		if manager != null:
+			manager.exit_inventory()
 
 
 func open_for(player: Player, catalog: MerchantCatalog) -> bool:
 	if player == null or catalog == null or not catalog.validate().is_empty() or _is_closing:
+		return false
+	if visible:
 		return false
 	var manager := get_node_or_null("/root/GameManager")
 	if manager == null or not manager.enter_inventory():
@@ -119,13 +204,20 @@ func open_for(player: Player, catalog: MerchantCatalog) -> bool:
 	_connect_observers()
 	_previous_mouse_mode = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	_selected_offer = null
-	_selected_inventory_index = -1
+	_selected_offer_id = &""
+	_selected_item_id = ""
 	_quantity = MIN_TRADE_QUANTITY
-	_error_message = ""
+	_next_trade_msec = 0
+	_set_feedback("")
+	_show_gold(_wallet.get_balance(), false)
+	toast_queue.clear()
 	show()
-	_set_tab(Tab.BUY)
+	set_process(true)
+	_current_tab = Tab.BUY
+	_refresh_tabs(false)
+	_refresh()
 	_play_open_feedback()
+	_focus_default()
 	return true
 
 
@@ -133,360 +225,599 @@ func close_shop() -> void:
 	if not visible or _is_closing:
 		return
 	_is_closing = true
-	_kill_transition()
-	_transition_tween = create_tween().set_parallel()
-	_transition_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	_transition_tween.set_ignore_time_scale(true)
+	_kill_tween(_transition_tween)
+	_motes.emitting = false
+	_transition_tween = _make_tween()
+	_transition_tween.set_parallel()
 	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_transition_tween.tween_property(panel, "modulate:a", 0.0, close_duration)
+	_transition_tween.tween_property(_frame, "modulate:a", 0.0, close_duration)
 	_transition_tween.tween_property(
-		panel, "scale", _book_scale * minimum_book_scale, close_duration
+		_frame, "scale", Vector2.ONE * closed_frame_scale, close_duration
+	)
+	_transition_tween.tween_method(
+		_set_ink_progress, _ink_progress(), INK_HIDDEN, ink_close_seconds
 	)
 	_transition_tween.chain().tween_callback(_finish_close)
 
 
+## Replaces the open Buy stock (debug reroll). The selection survives if the offer remains.
 func update_stock(stock: MerchantCatalog) -> void:
 	if not visible or stock == null or not stock.validate().is_empty():
 		return
 	_catalog = stock
 	_service = MerchantTransactionService.new(stock)
-	_selected_offer = null
 	_quantity = MIN_TRADE_QUANTITY
+	_set_feedback("")
 	_set_tab(Tab.BUY)
 
 
 func _on_debug_reroll_pressed() -> void:
-	stock_reroll_requested.emit()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed(&"ui_cancel"):
-		close_shop()
-		get_viewport().set_input_as_handled()
+	if OS.has_feature("debug"):
+		stock_reroll_requested.emit()
 
 
 func _set_tab(tab: Tab) -> void:
 	if _catalog == null or _inventory == null:
 		return
+	var changed := tab != _current_tab
 	_current_tab = tab
 	_quantity = MIN_TRADE_QUANTITY
-	_error_message = ""
+	_set_feedback("")
+	_refresh_tabs(changed and visible and not _is_closing)
 	_refresh()
-	for index in range([buy_tab, sell_tab].size()):
-		var button: TextureButton = [buy_tab, sell_tab][index]
-		var selected := index == int(tab)
-		button.set_pressed_no_signal(selected)
-		_set_tab_feedback(button, selected, visible and not _is_closing)
+	if changed and visible and not _is_closing:
+		_slide_page_in(1 if tab == Tab.SELL else -1)
+
+
+func _refresh_tabs(animate: bool) -> void:
+	(buy_tab as InventoryMenuTabButton).set_active(_current_tab == Tab.BUY, animate)
+	(sell_tab as InventoryMenuTabButton).set_active(_current_tab == Tab.SELL, animate)
+	_whisper.text = buy_whisper if _current_tab == Tab.BUY else sell_whisper
+	_section_title.text = SECTION_TITLES[_current_tab]
+	_footnote.text = FOOTNOTES[_current_tab]
+	if animate:
+		InventoryMenuFx.burst(buy_tab if _current_tab == Tab.BUY else sell_tab)
 
 
 func _refresh() -> void:
 	if _catalog == null or _inventory == null or _wallet == null:
 		return
-	gold_label.text = str(_wallet.get_balance())
+	# Gold is set on open and animated by balance_changed; refreshing must not cut that short.
+	_counter_label.text = "%d/%d" % [_used_bag_slots(), _inventory.slots.size()]
 	_rebuild_grid()
-	_refresh_selected_info()
-	_refresh_feedback()
+	_refresh_details()
 
 
 func _rebuild_grid() -> void:
+	var focus_owner := get_viewport().gui_get_focus_owner()
+	var had_grid_focus := focus_owner != null and grid.is_ancestor_of(focus_owner)
 	for child in grid.get_children():
-		child.free()
+		grid.remove_child(child)
+		child.queue_free()
 	_slot_uis.clear()
-	_slot_inventory_indices.clear()
 
 	if _current_tab == Tab.BUY:
-		var buy_offers := _catalog.get_buy_offers()
-		if not buy_offers.has(_selected_offer):
-			_selected_offer = buy_offers.front() if not buy_offers.is_empty() else null
-		for offer: MerchantOffer in buy_offers:
-			var slot_ui := SLOT_SCENE.instantiate() as SilasShopSlot
-			grid.add_child(slot_ui)
-			_place_slot(slot_ui, _slot_uis.size())
-			slot_ui.set_item(offer.get_icon(), offer.trade_amount, offer.buy_price)
-			slot_ui.tooltip_text = offer.get_display_name()
-			slot_ui.clicked.connect(_select_buy_offer.bind(offer))
-			slot_ui.set_selected(offer == _selected_offer)
-			_slot_uis.append(slot_ui)
-		_resize_grid()
-		return
+		var offers := _catalog.get_buy_offers()
+		if _find_buy_offer(_selected_offer_id) == null:
+			_selected_offer_id = offers[0].offer_id if not offers.is_empty() else &""
+		for offer: MerchantOffer in offers:
+			var slot := _add_slot()
+			slot.present(offer.get_icon(), offer.trade_amount, offer.buy_price, _buy_state(offer))
+			slot.tooltip_text = _buy_tooltip(offer)
+			slot.pressed.connect(_select_buy_offer.bind(offer.offer_id))
+	else:
+		_collect_sell_entries()
+		if _find_sell_entry(_selected_item_id) == null:
+			_selected_item_id = (
+				_sell_entries[0].item.item_id if not _sell_entries.is_empty() else ""
+			)
+		for entry: SellEntry in _sell_entries:
+			var slot := _add_slot()
+			var price := entry.offer.sell_price if entry.offer != null else 0
+			var state := (
+				SilasShopSlot.PriceState.NORMAL
+				if entry.offer != null
+				else SilasShopSlot.PriceState.REFUSED
+			)
+			slot.present(entry.item.icon, entry.count, price, state)
+			slot.tooltip_text = (
+				"%s  ·  %d carried" % [entry.item.display_name, entry.count]
+				if entry.offer != null
+				else "%s  ·  Silas won't buy this." % entry.item.display_name
+			)
+			slot.pressed.connect(_select_sell_item.bind(entry.item.item_id))
+	_empty_label.text = EMPTY_TEXTS[_current_tab]
+	_empty_label.visible = _slot_uis.is_empty()
+	_update_slot_selection()
+	if had_grid_focus:
+		_focus_default()
 
-	for index in range(_inventory.slots.size()):
-		var slot := _inventory.get_slot(index)
-		if slot == null or slot.is_empty():
+
+func _add_slot() -> SilasShopSlot:
+	var slot := SLOT_SCENE.instantiate() as SilasShopSlot
+	grid.add_child(slot)
+	_slot_uis.append(slot)
+	return slot
+
+
+## One entry per carried item, sellable goods first, so a sale never shifts another index.
+func _collect_sell_entries() -> void:
+	_sell_entries.clear()
+	var refused: Array[SellEntry] = []
+	var seen: Dictionary[String, bool] = {}
+	for slot: InventorySlot in _inventory.slots:
+		if slot == null or slot.is_empty() or seen.has(slot.item.item_id):
 			continue
-		var slot_ui := SLOT_SCENE.instantiate() as SilasShopSlot
-		grid.add_child(slot_ui)
-		_place_slot(slot_ui, _slot_uis.size())
-		var offer := _catalog.get_sell_offer_for_item(slot.item.item_id)
-		slot_ui.set_item(
-			slot.item.icon, slot.quantity, offer.sell_price if offer != null else 0, offer != null
-		)
-		slot_ui.clicked.connect(_select_inventory_slot.bind(index))
-		slot_ui.set_unavailable(offer == null)
-		slot_ui.tooltip_text = (
-			slot.item.display_name if offer != null else "Silas is not buying this item."
-		)
-		slot_ui.set_selected(index == _selected_inventory_index)
-		_slot_uis.append(slot_ui)
-		_slot_inventory_indices.append(index)
-	if not _slot_inventory_indices.has(_selected_inventory_index):
-		_selected_inventory_index = (
-			_slot_inventory_indices.front() if not _slot_inventory_indices.is_empty() else -1
-		)
+		seen[slot.item.item_id] = true
+		var entry := SellEntry.new()
+		entry.item = slot.item
+		entry.count = _inventory.count_item(StringName(slot.item.item_id))
+		entry.offer = _catalog.get_sell_offer_for_item(StringName(slot.item.item_id))
+		if entry.offer != null:
+			_sell_entries.append(entry)
+		else:
+			refused.append(entry)
+	_sell_entries.append_array(refused)
+
+
+func _select_buy_offer(offer_id: StringName) -> void:
+	if offer_id == _selected_offer_id:
+		return
+	_selected_offer_id = offer_id
+	_on_selection_changed()
+
+
+func _select_sell_item(item_id: String) -> void:
+	if item_id == _selected_item_id:
+		return
+	_selected_item_id = item_id
+	_on_selection_changed()
+
+
+func _on_selection_changed() -> void:
+	_quantity = MIN_TRADE_QUANTITY
+	_set_feedback("")
 	_update_slot_selection()
-	_resize_grid()
-
-
-func _place_slot(slot_ui: SilasShopSlot, index: int) -> void:
-	var row := floori(float(index) / float(grid_columns))
-	slot_ui.position = Vector2(index % grid_columns, row) * grid_step
-
-
-func _resize_grid() -> void:
-	var rows := maxi(minimum_grid_rows, ceili(float(_slot_uis.size()) / grid_columns))
-	grid.custom_minimum_size = Vector2(grid_content_width, rows * grid_step.y)
-
-
-func _select_buy_offer(offer: MerchantOffer) -> void:
-	_selected_offer = offer
-	_quantity = 1
-	_error_message = ""
-	_update_slot_selection()
-	_refresh_selected_info()
-	_refresh_feedback()
-
-
-func _select_inventory_slot(index: int) -> void:
-	_selected_inventory_index = index
-	_quantity = 1
-	_error_message = ""
-	_update_slot_selection()
-	_refresh_selected_info()
-	_refresh_feedback()
+	_refresh_details()
+	InventoryMenuFx.pop(_big_icon, InventoryMenuFx.ICON_POP_FROM_SCALE)
 
 
 func _update_slot_selection() -> void:
 	for index in range(_slot_uis.size()):
+		var selected := false
 		if _current_tab == Tab.BUY:
 			var offers := _catalog.get_buy_offers()
-			_slot_uis[index].set_selected(
-				index < offers.size() and offers[index] == _selected_offer
-			)
+			selected = index < offers.size() and offers[index].offer_id == _selected_offer_id
 		else:
-			_slot_uis[index].set_selected(
-				_slot_inventory_indices[index] == _selected_inventory_index
+			selected = (
+				index < _sell_entries.size()
+				and _sell_entries[index].item.item_id == _selected_item_id
 			)
+		_slot_uis[index].set_selected(selected)
 
 
-func _refresh_selected_info() -> void:
-	var offer: MerchantOffer = _selected_offer if _current_tab == Tab.BUY else null
-	var item: BaseItem
-	var amount := 0
-
-	if _current_tab != Tab.BUY:
-		var slot := _inventory.get_slot(_selected_inventory_index)
-		if slot != null and not slot.is_empty():
-			item = slot.item
-			amount = _inventory.count_item(item.item_id)
-			offer = _catalog.get_sell_offer_for_item(item.item_id)
-
-	if _current_tab == Tab.BUY and offer != null:
-		_set_offer_info(offer)
-		return
-	if item != null:
-		_set_inventory_item_info(item, amount, offer)
-		return
-	_clear_info()
+func _refresh_details() -> void:
+	if _current_tab == Tab.BUY:
+		var offer := _find_buy_offer(_selected_offer_id)
+		if offer != null:
+			_show_buy_details(offer)
+			return
+	else:
+		var entry := _find_sell_entry(_selected_item_id)
+		if entry != null:
+			_show_sell_details(entry)
+			return
+	_show_empty_details()
 
 
-func _set_offer_info(offer: MerchantOffer) -> void:
-	_quantity = mini(
-		_quantity, MIN_TRADE_QUANTITY if offer.is_unique_purchase() else MAX_STACK_QUANTITY
+func _show_buy_details(offer: MerchantOffer) -> void:
+	var is_weapon := offer.kind == MerchantOffer.Kind.WEAPON
+	var unique_purchase := offer.is_unique_purchase()
+	_big_icon.texture = offer.get_icon()
+	_set_name(offer.get_display_name())
+	_type_banner.text = "Weapon" if is_weapon else _item_category(offer.item)
+	var owned := _owned_amount(offer)
+	if unique_purchase:
+		_owned_banner.text = "Owned" if owned > 0 else "Not owned"
+	else:
+		_owned_banner.text = "Have %d" % owned
+	_set_description(offer.weapon.description if is_weapon else offer.item.description)
+	_set_effect(_offer_effect(offer))
+
+	var maximum := MIN_TRADE_QUANTITY if unique_purchase else _max_buy_quantity(offer)
+	_quantity = clampi(_quantity, MIN_TRADE_QUANTITY, maxi(MIN_TRADE_QUANTITY, maximum))
+	_trade_row.show()
+	_quantity_box.visible = not unique_purchase
+	_update_quantity_buttons(maximum)
+	var total := offer.buy_price * _quantity
+	_total_label.text = InventoryMenuFormat.grouped(total)
+	_unit_label.text = _unit_text(offer.buy_price, offer.trade_amount)
+	_total_label.add_theme_color_override(
+		"font_color", unaffordable_total_color if not _wallet.can_afford(total) else total_color
 	)
-	item_icon.texture = offer.get_icon()
-	item_name.text = offer.get_display_name()
-	item_category.text = (
-		"Weapon" if offer.kind == MerchantOffer.Kind.WEAPON else _item_type_name(offer.item)
-	)
-	item_count.text = "Owned: %d" % _get_owned_amount(offer)
-	item_description.text = (
-		offer.weapon.description
-		if offer.kind == MerchantOffer.Kind.WEAPON
-		else offer.item.description
-	)
-	effect_label.text = _offer_effect(offer)
-	trade_label.text = str(offer.buy_price * _quantity)
-	price_plate.show()
-	_update_quantity_controls(not offer.is_unique_purchase(), MAX_STACK_QUANTITY)
-	action_label.text = (
-		"Owned" if offer.is_unique_purchase() and _get_owned_amount(offer) > 0 else "Purchase"
-	)
-	action_button.disabled = action_label.text == "Owned"
-	action_button.modulate.a = disabled_action_alpha if action_button.disabled else 1.0
 	action_button.show()
-
-
-func _set_inventory_item_info(item: BaseItem, amount: int, offer: MerchantOffer) -> void:
-	item_icon.texture = item.icon
-	item_name.text = item.display_name
-	item_category.text = _item_type_name(item)
-	item_count.text = "In bag: %d" % amount
-	item_description.text = item.description
-	effect_label.text = _item_effect(item)
-	if offer == null:
-		price_plate.hide()
-		quantity_controls.hide()
-		action_button.hide()
-		_error_message = "Silas does not buy this item."
+	if unique_purchase and owned > 0:
+		# Owning it is a state, not a refusal: keep any purchase message visible.
+		action_button.text = "Owned"
+		action_button.disabled = true
+		_show_hint("", "Already yours. Equip it from the Inventory.")
 		return
-	var maximum := mini(MAX_STACK_QUANTITY, floori(float(amount) / float(offer.trade_amount)))
-	_quantity = mini(_quantity, maxi(MIN_TRADE_QUANTITY, maximum))
-	trade_label.text = str(offer.sell_price * _quantity)
-	price_plate.show()
-	_update_quantity_controls(true, maximum)
-	action_label.text = "Sell"
-	action_button.disabled = maximum < 1
-	action_button.modulate.a = disabled_action_alpha if action_button.disabled else 1.0
+	var reason := _buy_block_reason(offer)
+	action_button.text = "Buy"
+	action_button.disabled = not reason.is_empty()
+	_show_hint(reason, _receive_text(offer))
+
+
+func _show_sell_details(entry: SellEntry) -> void:
+	_big_icon.texture = entry.item.icon
+	_set_name(entry.item.display_name)
+	_type_banner.text = _item_category(entry.item)
+	_owned_banner.text = "Have %d" % entry.count
+	_set_description(entry.item.description)
+	_set_effect(_item_effect(entry.item))
+	if entry.offer == null:
+		_trade_row.hide()
+		action_button.show()
+		action_button.text = "No deal"
+		action_button.disabled = true
+		_show_hint("Silas won't touch this.", "")
+		return
+	var bundles := floori(float(entry.count) / float(entry.offer.trade_amount))
+	var maximum := mini(MAX_TRADE_QUANTITY, bundles)
+	_quantity = clampi(_quantity, MIN_TRADE_QUANTITY, maxi(MIN_TRADE_QUANTITY, maximum))
+	_trade_row.show()
+	_quantity_box.show()
+	_update_quantity_buttons(maximum)
+	_total_label.text = "+" + InventoryMenuFormat.grouped(entry.offer.sell_price * _quantity)
+	_total_label.add_theme_color_override("font_color", total_color)
+	_unit_label.text = _unit_text(entry.offer.sell_price, entry.offer.trade_amount)
 	action_button.show()
+	action_button.text = "Sell"
+	var reason := _sell_block_reason(entry, bundles)
+	action_button.disabled = not reason.is_empty()
+	_show_hint(
+		reason, "Hand over %d %s." % [entry.offer.trade_amount * _quantity, entry.item.display_name]
+	)
 
 
-func _clear_info() -> void:
-	item_icon.texture = null
-	item_name.text = "Select an item"
-	item_category.text = ""
-	item_count.text = ""
-	item_description.text = "Choose an offer to see its details."
-	effect_label.text = "Select an item"
-	trade_label.text = ""
-	price_plate.hide()
-	quantity_controls.hide()
+func _show_empty_details() -> void:
+	_big_icon.texture = null
+	_set_name("Nothing selected")
+	_type_banner.text = ""
+	_owned_banner.text = ""
+	_set_description(
+		"Pick a ware to see its price." if _current_tab == Tab.BUY else "Pick something to sell."
+	)
+	_set_effect("")
+	_trade_row.hide()
 	action_button.hide()
+	_show_hint("", "")
 
 
-func _item_type_name(item: BaseItem) -> String:
+func _set_name(text: String) -> void:
+	_item_name.text = text
+	_item_name.tooltip_text = text
+
+
+## The effect line shares the description's scroll area and takes no room when empty.
+func _set_effect(text: String) -> void:
+	_effect_label.text = text
+	_effect_label.visible = not text.is_empty()
+
+
+func _set_description(text: String) -> void:
+	var clean := text.strip_edges()
+	_description.text = clean if not clean.is_empty() else "No description."
+	_description_scroll.scroll_vertical = 0
+
+
+## What blocks the action now beats the last trade's result, which beats the idle hint.
+func _show_hint(reason: String, hint: String) -> void:
+	if not reason.is_empty():
+		_feedback.text = REFUSAL_MARK + reason
+		_feedback.add_theme_color_override("font_color", refusal_color)
+	elif not _feedback_text.is_empty():
+		_feedback.text = _feedback_text
+		_feedback.add_theme_color_override("font_color", _feedback_color)
+	else:
+		_feedback.text = hint
+		_feedback.add_theme_color_override("font_color", hint_color)
+	_feedback.tooltip_text = _feedback.text
+
+
+func _set_feedback(text: String, color: Color = Color.WHITE) -> void:
+	_feedback_text = text
+	_feedback_color = color
+
+
+func _update_quantity_buttons(maximum: int) -> void:
+	_quantity_label.text = str(_quantity)
+	_minus_button.disabled = _quantity <= MIN_TRADE_QUANTITY
+	_plus_button.disabled = _quantity >= maximum
+	_plus_button.tooltip_text = (
+		"That's as many as you can trade right now." if _plus_button.disabled else "Trade one more"
+	)
+
+
+func _change_quantity(change: int) -> void:
+	_quantity = clampi(_quantity + change, MIN_TRADE_QUANTITY, MAX_TRADE_QUANTITY)
+	_set_feedback("")
+	_refresh_details()
+
+
+## Largest quantity the wallet and the bag can take, capped by the service limit; at least 1
+## so the panel can still explain why one bundle is out of reach.
+func _max_buy_quantity(offer: MerchantOffer) -> int:
+	if offer.buy_price <= 0 or offer.item == null:
+		return MIN_TRADE_QUANTITY
+	var affordable := floori(float(_wallet.get_balance()) / float(offer.buy_price))
+	var room := floori(
+		float(_inventory.get_available_space(offer.item)) / float(offer.trade_amount)
+	)
+	return clampi(mini(affordable, room), MIN_TRADE_QUANTITY, MAX_TRADE_QUANTITY)
+
+
+func _buy_block_reason(offer: MerchantOffer) -> String:
+	if (
+		not offer.is_unique_purchase()
+		and not _inventory.can_add_item(offer.item, offer.trade_amount * _quantity)
+	):
+		return _no_room_reason(offer.item)
+	var price := offer.buy_price * _quantity
+	if not _wallet.can_afford(price):
+		return "Need %s more gold." % InventoryMenuFormat.grouped(price - _wallet.get_balance())
+	return ""
+
+
+func _no_room_reason(item: BaseItem) -> String:
+	if item is Potion:
+		var kind := (item as Potion).potion_kind
+		var limit := _inventory.get_potion_capacity(kind)
+		if _inventory.count_potions(kind) >= limit:
+			return "Your potion pouch is full (%d/%d)." % [limit, limit]
+	return "Your bag has no room for that."
+
+
+func _sell_block_reason(entry: SellEntry, bundles: int) -> String:
+	if bundles < MIN_TRADE_QUANTITY:
+		return "Silas buys these %d at a time." % entry.offer.trade_amount
+	var price := entry.offer.sell_price * _quantity
+	if _wallet.get_balance() > GoldWallet.MAX_GOLD - price:
+		return "Your gold pouch is full."
+	return ""
+
+
+func _on_action_pressed() -> void:
+	if _service == null or _player == null or _inventory == null or _is_closing:
+		return
+	if Time.get_ticks_msec() < _next_trade_msec:
+		return
+	_next_trade_msec = Time.get_ticks_msec() + int(trade_repeat_guard_seconds * MSEC_PER_SECOND)
+	var quantity := _quantity
+	if _current_tab == Tab.BUY:
+		var offer := _find_buy_offer(_selected_offer_id)
+		if offer == null:
+			return
+		var result := _service.purchase(
+			offer.offer_id,
+			_inventory,
+			_wallet,
+			_player.weapon_controller,
+			quantity,
+			_player.charm_registry
+		)
+		if result == MerchantTransactionService.Result.SUCCESS and offer.offer_id == &"bow":
+			var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
+			if progress != null:
+				progress.mark_bow_purchased()
+		_finish_trade(result, offer, true, quantity)
+		return
+	var entry := _find_sell_entry(_selected_item_id)
+	if entry == null or entry.offer == null:
+		return
+	var sold := _service.sell(entry.offer.offer_id, _inventory, _wallet, quantity)
+	_finish_trade(sold, entry.offer, false, quantity)
+
+
+func _finish_trade(
+	result: MerchantTransactionService.Result,
+	offer: MerchantOffer,
+	was_purchase: bool,
+	quantity: int
+) -> void:
+	_quantity = MIN_TRADE_QUANTITY
+	if result != MerchantTransactionService.Result.SUCCESS:
+		_set_feedback(REFUSAL_MARK + _service.get_result_message(result), refusal_color)
+		_refresh()
+		InventoryMenuFx.shake(action_button)
+		return
+	var amount := offer.trade_amount * quantity
+	var gold := (offer.buy_price if was_purchase else offer.sell_price) * quantity
+	_set_feedback(
+		(
+			SUCCESS_MARK
+			+ ("Bought" if was_purchase else "Sold")
+			+ " %d %s." % [amount, offer.get_display_name()]
+		),
+		success_color
+	)
+	(
+		toast_queue
+		. enqueue_success(
+			(
+				"%s x%d %s  %s%s G"
+				% [
+					"Purchased" if was_purchase else "Sold",
+					amount,
+					offer.get_display_name(),
+					"-" if was_purchase else "+",
+					InventoryMenuFormat.grouped(gold),
+				]
+			)
+		)
+	)
+	_refresh()
+	InventoryMenuFx.burst(_big_icon)
+	InventoryMenuFx.pop(_purse_coin, InventoryMenuFx.BADGE_POP_FROM_SCALE)
+
+
+func _find_buy_offer(offer_id: StringName) -> MerchantOffer:
+	if _catalog == null or offer_id.is_empty():
+		return null
+	for offer: MerchantOffer in _catalog.get_buy_offers():
+		if offer.offer_id == offer_id:
+			return offer
+	return null
+
+
+func _find_sell_entry(item_id: String) -> SellEntry:
+	for entry: SellEntry in _sell_entries:
+		if entry.item.item_id == item_id:
+			return entry
+	return null
+
+
+func _buy_state(offer: MerchantOffer) -> SilasShopSlot.PriceState:
+	if offer.is_unique_purchase() and _owned_amount(offer) > 0:
+		return SilasShopSlot.PriceState.OWNED
+	if not _wallet.can_afford(offer.buy_price):
+		return SilasShopSlot.PriceState.UNAFFORDABLE
+	return SilasShopSlot.PriceState.NORMAL
+
+
+func _buy_tooltip(offer: MerchantOffer) -> String:
+	var text := offer.get_display_name()
+	if offer.trade_amount > 1:
+		text += "  ·  bundle of %d" % offer.trade_amount
+	match _buy_state(offer):
+		SilasShopSlot.PriceState.OWNED:
+			text += "  ·  already owned"
+		SilasShopSlot.PriceState.UNAFFORDABLE:
+			text += "  ·  not enough gold"
+	return text
+
+
+func _receive_text(offer: MerchantOffer) -> String:
+	if offer.kind == MerchantOffer.Kind.WEAPON:
+		return "Goes to your weapons. Equip it from the Inventory."
+	if offer.item.charm != null:
+		return "Equip it from the Charms tab."
+	return "You receive %d %s." % [offer.trade_amount * _quantity, offer.get_display_name()]
+
+
+func _unit_text(price: int, trade_amount: int) -> String:
+	if trade_amount > 1:
+		return "%s G per %d" % [InventoryMenuFormat.grouped(price), trade_amount]
+	return "%s G each" % InventoryMenuFormat.grouped(price)
+
+
+func _owned_amount(offer: MerchantOffer) -> int:
+	if offer.kind == MerchantOffer.Kind.WEAPON:
+		var weapons := _player.weapon_controller if _player != null else null
+		return 1 if weapons != null and weapons.is_weapon_owned(offer.weapon.weapon_id) else 0
+	if offer.item.charm != null:
+		return int(_player.charm_registry.is_owned(offer.item.charm.charm_id))
+	return _inventory.count_item(StringName(offer.item.item_id))
+
+
+func _used_bag_slots() -> int:
+	var used := 0
+	for slot: InventorySlot in _inventory.slots:
+		if slot != null and not slot.is_empty():
+			used += 1
+	return used
+
+
+## Arrows have no ItemType of their own; any attack that spends the item makes it ammunition.
+func _item_category(item: BaseItem) -> String:
+	if item == null:
+		return ""
 	if item.charm != null:
 		return "Charm"
+	if _is_ammunition(item):
+		return "Ammunition"
 	match item.type:
 		GlobalConstants.ItemType.CONSUMABLE:
 			return "Consumable"
 		GlobalConstants.ItemType.EQUIPMENT:
 			return "Equipment"
 		GlobalConstants.ItemType.QUEST:
-			return "Quest item"
-		_:
-			return "Material"
+			return "Quest Item"
+	return "Material"
+
+
+func _is_ammunition(item: BaseItem) -> bool:
+	var weapons := _player.weapon_controller if _player != null else null
+	if weapons == null:
+		return false
+	for entry: WeaponCollectionEntry in weapons.collection:
+		if entry == null or entry.definition == null:
+			continue
+		for attack: AttackData in [
+			entry.definition.normal_attack, entry.definition.secondary_attack
+		]:
+			if attack != null and String(attack.ammo_id) == item.item_id:
+				return true
+	return false
 
 
 func _item_effect(item: BaseItem) -> String:
+	if item is DualEssencePotion:
+		var dual := item as DualEssencePotion
+		return (
+			"✦ Restores %s HP and %s stamina"
+			% [
+				InventoryMenuFormat.number(dual.heal_amount),
+				InventoryMenuFormat.number(dual.stamina_amount),
+			]
+		)
 	if item is HealingPotion:
-		return "Restore %s HP" % String.num((item as HealingPotion).heal_amount, 0)
+		return "✦ Restores %s HP" % InventoryMenuFormat.number((item as HealingPotion).heal_amount)
 	if item is StaminaPotion:
-		return "Restore %s stamina" % String.num((item as StaminaPotion).restore_amount, 0)
+		return (
+			"✦ Restores %s stamina"
+			% InventoryMenuFormat.number((item as StaminaPotion).restore_amount)
+		)
+	if _is_ammunition(item):
+		return "✦ Spent by weapon attacks"
 	if item.type == GlobalConstants.ItemType.MATERIAL:
-		return "Used for crafting and trading."
-	return item.description
+		return "✦ Crafting and forging material"
+	return ""
 
 
 func _offer_effect(offer: MerchantOffer) -> String:
 	if offer.kind == MerchantOffer.Kind.WEAPON:
 		return (
-			"Stagger %s  •  Chaos +%s / hit"
+			"✦ Stagger %s  ·  Chaos +%s per hit"
 			% [
-				String.num(offer.weapon.stagger_damage, 0),
-				String.num(offer.weapon.chaos_per_hit, 0)
+				InventoryMenuFormat.number(offer.weapon.stagger_damage),
+				InventoryMenuFormat.number(offer.weapon.chaos_per_hit),
 			]
 		)
 	return _item_effect(offer.item)
 
 
-func _update_quantity_controls(allowed: bool, maximum: int) -> void:
-	quantity_controls.visible = allowed
-	quantity_label.text = str(_quantity)
-	minus_button.disabled = _quantity <= MIN_TRADE_QUANTITY
-	plus_button.disabled = _quantity >= maximum
-	minus_button.modulate.a = disabled_action_alpha if minus_button.disabled else 1.0
-	plus_button.modulate.a = disabled_action_alpha if plus_button.disabled else 1.0
-
-
-func _change_quantity(change: int) -> void:
-	var maximum := MAX_STACK_QUANTITY
-	if _current_tab == Tab.BUY and _selected_offer != null:
-		if _selected_offer.is_unique_purchase():
-			maximum = MIN_TRADE_QUANTITY
-	elif _current_tab == Tab.SELL:
-		var slot := _inventory.get_slot(_selected_inventory_index)
-		if slot == null or slot.is_empty():
-			return
-		var offer := _catalog.get_sell_offer_for_item(slot.item.item_id)
-		if offer == null:
-			return
-		maximum = mini(
-			MAX_STACK_QUANTITY,
-			floori(float(_inventory.count_item(slot.item.item_id)) / float(offer.trade_amount))
-		)
-	_quantity = clampi(_quantity + change, MIN_TRADE_QUANTITY, maxi(MIN_TRADE_QUANTITY, maximum))
-	_refresh_selected_info()
-
-
-func _refresh_feedback() -> void:
-	feedback.text = _error_message
-	feedback.visible = not _error_message.is_empty()
-
-
-func _on_action_pressed() -> void:
-	if _service == null or _player == null or _inventory == null:
+func _show_gold(balance: int, animate: bool) -> void:
+	_kill_tween(_gold_tween)
+	gold_label.tooltip_text = "%s gold" % InventoryMenuFormat.grouped(balance)
+	if not animate or not visible:
+		_shown_gold = balance
+		_set_gold_text(balance)
 		return
-	var result := MerchantTransactionService.Result.INVALID_OFFER
-	var traded_offer: MerchantOffer
-	var was_purchase := _current_tab == Tab.BUY
-	if was_purchase and _selected_offer != null:
-		traded_offer = _selected_offer
-		result = _service.purchase(
-			traded_offer.offer_id,
-			_inventory,
-			_wallet,
-			_player.weapon_controller,
-			_quantity,
-			_player.charm_registry
-		)
-		if result == MerchantTransactionService.Result.SUCCESS and traded_offer.offer_id == &"bow":
-			var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
-			if progress != null:
-				progress.mark_bow_purchased()
-	elif _current_tab == Tab.SELL:
-		var slot := _inventory.get_slot(_selected_inventory_index)
-		if slot != null and not slot.is_empty():
-			traded_offer = _catalog.get_sell_offer_for_item(slot.item.item_id)
-			if traded_offer != null:
-				result = _service.sell(traded_offer.offer_id, _inventory, _wallet, _quantity)
-
-	if result == MerchantTransactionService.Result.SUCCESS and traded_offer != null:
-		_error_message = ""
-		_queue_success_toast(traded_offer, was_purchase, _quantity)
-	else:
-		_error_message = _service.get_result_message(result)
-	_refresh()
+	_gold_tween = _make_tween()
+	_gold_tween.tween_method(_set_shown_gold, _shown_gold, balance, gold_count_seconds)
 
 
-func _queue_success_toast(offer: MerchantOffer, was_purchase: bool, quantity: int) -> void:
-	var verb := "Purchased" if was_purchase else "Sold"
-	var price_sign := "-" if was_purchase else "+"
-	var gold := (offer.buy_price if was_purchase else offer.sell_price) * quantity
-	toast_queue.enqueue_success(
-		(
-			"%s x%d %s  %s%d G"
-			% [verb, offer.trade_amount * quantity, offer.get_display_name(), price_sign, gold]
-		)
+func _set_shown_gold(value: int) -> void:
+	_shown_gold = value
+	_set_gold_text(value)
+
+
+func _set_gold_text(value: int) -> void:
+	gold_label.text = InventoryMenuFormat.grouped(value)
+	InventoryMenuFormat.fit_font_size(
+		gold_label, PURSE_TEXT_WIDTH_PIXELS, GOLD_FONT_SIZE, GOLD_MIN_FONT_SIZE
 	)
-	_quantity = MIN_TRADE_QUANTITY
-
-
-func _get_owned_amount(offer: MerchantOffer) -> int:
-	if offer.kind == MerchantOffer.Kind.WEAPON:
-		return 1 if _player.weapon_controller.is_weapon_owned(offer.weapon.weapon_id) else 0
-	if offer.item.charm != null and is_instance_valid(_player.charm_registry):
-		return int(_player.charm_registry.is_owned(offer.item.charm.charm_id))
-	return _inventory.count_item(offer.item.item_id)
 
 
 func _connect_observers() -> void:
@@ -497,15 +828,19 @@ func _connect_observers() -> void:
 
 
 func _disconnect_observers() -> void:
-	if _wallet != null and _wallet.balance_changed.is_connected(_on_wallet_changed):
+	if is_instance_valid(_wallet) and _wallet.balance_changed.is_connected(_on_wallet_changed):
 		_wallet.balance_changed.disconnect(_on_wallet_changed)
-	if _inventory != null and _inventory.changed.is_connected(_on_inventory_changed):
+	if is_instance_valid(_inventory) and _inventory.changed.is_connected(_on_inventory_changed):
 		_inventory.changed.disconnect(_on_inventory_changed)
 
 
 func _on_wallet_changed(balance: int, _change: int) -> void:
-	if visible:
-		gold_label.text = str(balance)
+	if not visible:
+		return
+	_show_gold(balance, true)
+	# Affordability marks on the grid and the action depend on the balance.
+	_rebuild_grid()
+	_refresh_details()
 
 
 func _on_inventory_changed() -> void:
@@ -513,26 +848,64 @@ func _on_inventory_changed() -> void:
 		_refresh()
 
 
+func _focus_default() -> void:
+	if not visible:
+		return
+	var index := -1
+	for slot_index in range(_slot_uis.size()):
+		if _slot_uis[slot_index].is_selected():
+			index = slot_index
+			break
+	var target: Control = _slot_uis[index] if index >= 0 else _back_button
+	target.grab_focus()
+
+
 func _play_open_feedback() -> void:
-	_kill_transition()
-	panel.modulate.a = 0.0
-	panel.scale = _book_scale * minimum_book_scale
-	_restore_tab_feedback.call_deferred()
-	_transition_tween = create_tween().set_parallel()
-	_transition_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	_transition_tween.set_ignore_time_scale(true)
-	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_transition_tween.tween_property(panel, "modulate:a", 1.0, open_duration)
-	_transition_tween.tween_property(panel, "scale", _book_scale, open_duration)
+	_kill_tween(_transition_tween)
+	_set_ink_progress(INK_HIDDEN)
+	_frame.modulate.a = 0.0
+	_frame.scale = Vector2.ONE * closed_frame_scale
+	_motes.emitting = true
+	_motes.restart()
+	_transition_tween = _make_tween()
+	_transition_tween.set_parallel()
+	var ink := _transition_tween.tween_method(
+		_set_ink_progress, INK_HIDDEN, INK_SHOWN, ink_open_seconds
+	)
+	ink.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var fade := _transition_tween.tween_property(_frame, "modulate:a", 1.0, open_duration)
+	fade.set_delay(frame_open_delay)
+	var grow := _transition_tween.tween_property(_frame, "scale", Vector2.ONE, open_duration)
+	grow.set_delay(frame_open_delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	InventoryMenuFx.stagger_in([buy_tab, sell_tab])
+	InventoryMenuFx.stagger_in(_slot_uis)
+	InventoryMenuFx.pop(_big_icon, InventoryMenuFx.ICON_POP_FROM_SCALE, frame_open_delay)
+
+
+func _slide_page_in(direction: int) -> void:
+	_kill_tween(_page_tween)
+	_page.position.x = page_slide_pixels * direction
+	_page.modulate.a = 0.0
+	_page_tween = _make_tween()
+	_page_tween.set_parallel()
+	_page_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_page_tween.tween_property(_page, "position:x", 0.0, page_switch_seconds)
+	_page_tween.tween_property(_page, "modulate:a", 1.0, page_switch_seconds)
+	InventoryMenuFx.stagger_in(_slot_uis)
 
 
 func _finish_close() -> void:
 	_is_closing = false
 	hide()
+	set_process(false)
 	toast_queue.clear()
-	_restore_tab_feedback()
-	panel.modulate.a = 1.0
-	panel.scale = _book_scale
+	_kill_tween(_page_tween)
+	_kill_tween(_gold_tween)
+	_page.position = Vector2.ZERO
+	_page.modulate.a = 1.0
+	_frame.modulate.a = 1.0
+	_frame.scale = Vector2.ONE
+	_set_ink_progress(INK_SHOWN)
 	Input.mouse_mode = _previous_mouse_mode
 	_disconnect_observers()
 	var manager := get_node_or_null("/root/GameManager")
@@ -542,81 +915,45 @@ func _finish_close() -> void:
 	_inventory = null
 	_catalog = null
 	_service = null
-	_selected_offer = null
-	_selected_inventory_index = -1
+	_wallet = null
+	_sell_entries.clear()
+	_selected_offer_id = &""
+	_selected_item_id = ""
 	_quantity = MIN_TRADE_QUANTITY
-	_error_message = ""
+	_set_feedback("")
 	shop_closed.emit()
 
 
-func _update_tab_pivot(button: TextureButton) -> void:
-	button.pivot_offset = button.size * 0.5
-
-
-func _set_tab_feedback(button: TextureButton, selected: bool, animate: bool) -> void:
-	var previous := _tab_tweens.get(button) as Tween
-	if previous != null and previous.is_valid():
-		previous.kill()
-	_update_tab_pivot(button)
-	button.texture_normal = TAB_ACTIVE if selected else TAB_INACTIVE
-	var label := button.get_node("Text") as Label
-	label.add_theme_color_override(
-		"font_color", selected_tab_text_color if selected else idle_tab_text_color
-	)
-	var base_scale := _tab_base_scales[button]
-	var target_scale := base_scale * (selected_tab_scale if selected else Vector2.ONE)
-	var target_color := selected_tab_tint if selected else idle_tab_tint
-	button.z_index = 1 if selected else 0
-	if not animate:
-		button.scale = target_scale
-		button.modulate = target_color
-		return
-	var tween := create_tween().set_parallel(true)
+## Shop tweens keep running while the tree is paused and ignore hit-stop time scale.
+func _make_tween() -> Tween:
+	var tween := create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.set_ignore_time_scale(true)
-	_tab_tweens[button] = tween
-	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(button, "modulate", target_color, tab_feedback_duration)
-	if selected:
-		tween.tween_property(
-			button,
-			"scale",
-			target_scale * Vector2(tab_click_punch_scale, 1.0),
-			tab_feedback_duration * tab_click_punch_duration_ratio
-		)
-		tween.chain().tween_property(button, "scale", target_scale, tab_feedback_duration)
-	else:
-		tween.tween_property(button, "scale", target_scale, tab_feedback_duration)
+	return tween
 
 
-func _restore_tab_feedback() -> void:
-	for index in range([buy_tab, sell_tab].size()):
-		_set_tab_feedback([buy_tab, sell_tab][index], index == int(_current_tab), false)
+func _kill_tween(tween: Tween) -> void:
+	if tween != null and tween.is_valid():
+		tween.kill()
 
 
-func _fit_book() -> void:
-	var viewport_size := get_viewport().get_visible_rect().size
-	var factor := minf(
-		1.0,
-		minf(
-			viewport_size.x / reference_viewport_size.x, viewport_size.y / reference_viewport_size.y
-		)
-	)
-	_book_scale = Vector2.ONE * factor
-	panel.scale = _book_scale
+func _update_frame_pivot() -> void:
+	_frame.pivot_offset = _frame.size * CENTER_RATIO
 
 
-func _kill_transition() -> void:
-	if _transition_tween != null and _transition_tween.is_valid():
-		_transition_tween.kill()
-	_transition_tween = null
+func _set_ink_progress(progress: float) -> void:
+	(_background.material as ShaderMaterial).set_shader_parameter(INK_PROGRESS_PARAM, progress)
 
 
-func _exit_tree() -> void:
-	_kill_transition()
-	_disconnect_observers()
-	if visible:
-		Input.mouse_mode = _previous_mouse_mode
-		var manager := get_node_or_null("/root/GameManager")
-		if manager != null:
-			manager.exit_inventory()
+func _ink_progress() -> float:
+	var material := _background.material as ShaderMaterial
+	return float(material.get_shader_parameter(INK_PROGRESS_PARAM))
+
+
+## A carried item as shown on the Sell tab: its total count and Silas's offer, if any.
+class SellEntry:
+	extends RefCounted
+
+	var item: BaseItem
+	var count: int = 0
+	var offer: MerchantOffer

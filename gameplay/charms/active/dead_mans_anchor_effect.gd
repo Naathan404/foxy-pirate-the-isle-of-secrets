@@ -5,6 +5,7 @@ extends CharmEffect
 const MARKER := preload("res://gameplay/charms/active/dead_mans_anchor_marker.tscn")
 const DROP_HEIGHT_UNITS := 1.6
 const DROP_SECONDS := 0.22
+const RECALL_TRAIL_SECONDS := 0.24
 
 var _marker: Sprite3D
 var _return_position := Vector3.ZERO
@@ -39,7 +40,7 @@ func activate(context: CharmActivationContext) -> bool:
 	if _armed:
 		var recalled := _recast()
 		if recalled:
-			_play_cast_animation(&"recall", context.direction, 0.3)
+			_play_cast_animation(&"recall", context.direction, RECALL_TRAIL_SECONDS)
 		return recalled
 	_window_duration = definition.get_param_float(&"recast_window_seconds", 5.0)
 	_window_remaining = _window_duration
@@ -47,17 +48,17 @@ func activate(context: CharmActivationContext) -> bool:
 	_marker = MARKER.instantiate() as Sprite3D
 	actor.get_parent().add_child(_marker)
 	_marker.global_position = _return_position + Vector3.UP * DROP_HEIGHT_UNITS
-	var drop := _marker.create_tween()
+	var drop := _marker.create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	(
 		drop
 		. tween_property(_marker, "global_position", _return_position, DROP_SECONDS)
 		. set_trans(Tween.TRANS_QUAD)
 		. set_ease(Tween.EASE_IN)
 	)
-	drop.tween_callback(_on_anchor_landed)
+	drop.tween_callback(_on_anchor_landed.bind(context.direction))
 	_armed = true
 	set_physics_process(true)
-	_play_cast_animation(&"cast", context.direction, 0.3)
+	_play_cast_animation(&"cast", context.direction, DROP_SECONDS)
 	return true
 
 
@@ -71,8 +72,9 @@ func _physics_process(delta: float) -> void:
 		cancel_active()
 
 
-func _on_anchor_landed() -> void:
+func _on_anchor_landed(direction: Vector3) -> void:
 	if _armed:
+		_play_cast_animation(&"land", direction, 0.0, true)
 		CharmVfx.spawn(actor.get_parent(), _return_position, CharmVfx.TIDE, 0.75)
 
 
@@ -96,7 +98,7 @@ func _recast() -> bool:
 		destination + Vector3.UP * 0.5,
 		CharmVfx.TIDE,
 		0.7,
-		0.24
+		RECALL_TRAIL_SECONDS
 	)
 	actor.global_position = destination
 	CharmVfx.spawn(actor.get_parent(), destination, CharmVfx.TIDE, 1.35)

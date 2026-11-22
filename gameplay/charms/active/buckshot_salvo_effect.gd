@@ -102,7 +102,7 @@ func _fire() -> void:
 			execution.max_travel_distance / execution.travel_speed_units_per_second + 0.1
 		)
 
-	_play_cast_animation(&"release", _cast_direction, RECOIL_SECONDS)
+	_play_cast_animation(&"release", _cast_direction, RECOIL_SECONDS, true)
 
 
 func _on_pellet_hit(at: Vector3) -> void:

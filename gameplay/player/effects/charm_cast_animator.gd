@@ -19,6 +19,8 @@ var _sequence: PackedInt32Array
 var _sequence_index: int = 0
 var _frame_elapsed: float = 0.0
 var _loop_sequence: PackedInt32Array
+var _hold_final_pose: bool
+var _phase_start_tick: int
 var _playback_rate: float = 1.0
 var _material: ShaderMaterial
 var _cast_direction: Vector3
@@ -37,6 +39,7 @@ func _ready() -> void:
 		_catalog[clip.charm_id] = clip
 	_sprite.hide()
 	set_process(false)
+	set_physics_process(false)
 
 
 func play(
@@ -57,6 +60,8 @@ func play(
 		_loop_sequence = clip.channel_loop_frames
 	elif phase in clip.looping_phases:
 		_loop_sequence = sequence
+	_hold_final_pose = phase in clip.held_phases
+	_phase_start_tick = Engine.get_physics_frames()
 	_playback_rate = (
 		clip.get_sequence_seconds(sequence) / duration_seconds if duration_seconds > 0.0 else 1.0
 	)
@@ -64,6 +69,7 @@ func play(
 	_update_view(true)
 	_sprite.show()
 	set_process(true)
+	set_physics_process(true)
 	return true
 
 
@@ -74,6 +80,7 @@ func stop(charm_id: StringName = &"") -> void:
 	_loop_sequence = PackedInt32Array()
 	_sprite.hide()
 	set_process(false)
+	set_physics_process(false)
 	finished.emit()
 
 
@@ -85,11 +92,17 @@ func is_playing_charm(charm_id: StringName) -> bool:
 	return _clip != null and _clip.charm_id == charm_id
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
+	_update_view()
+
+
+func _physics_process(delta: float) -> void:
 	if is_instance_valid(actor) and bool(actor.get("dead")):
 		stop()
 		return
-	_update_view()
+	# Events set the first pose immediately, regardless of node order within this tick.
+	if Engine.get_physics_frames() == _phase_start_tick or _playback_rate == 0.0:
+		return
 	if get_node("/root/HitstopController").is_frozen(actor):
 		return
 	_frame_elapsed += maxf(0.0, delta) * _playback_rate
@@ -97,6 +110,11 @@ func _process(delta: float) -> void:
 		_frame_elapsed -= _clip.frame_seconds[_sequence[_sequence_index]]
 		_sequence_index += 1
 		if _sequence_index >= _sequence.size():
+			if _hold_final_pose:
+				_sequence_index -= 1
+				_frame_elapsed = 0.0
+				_playback_rate = 0.0
+				break
 			if _loop_sequence.is_empty():
 				stop()
 				return

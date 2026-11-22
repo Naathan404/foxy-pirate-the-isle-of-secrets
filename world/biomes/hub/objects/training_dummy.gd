@@ -11,6 +11,7 @@ const DAMAGE_POPUP = preload("res://gameplay/combat/damage_popup_presenter.gd")
 func _ready() -> void:
 	super()
 	add_to_group("training_dummy")
+	add_to_group(&"immovable")
 
 
 func receive_damage(damage: DamageContext) -> float:
@@ -27,5 +28,7 @@ func receive_damage(damage: DamageContext) -> float:
 	damaged.emit(amount)
 	_play_hit_feedback()
 	_spawn_smoke(hit_smoke_amount)
-	DAMAGE_POPUP.show_damage(get_parent(), to_global(Vector3.UP * damage_popup_height), damage, amount)
+	DAMAGE_POPUP.show_damage(
+		get_parent(), to_global(Vector3.UP * damage_popup_height), damage, amount
+	)
 	return amount

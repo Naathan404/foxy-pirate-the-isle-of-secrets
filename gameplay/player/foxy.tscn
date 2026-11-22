@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bug5ypktngs38"]
 
-[ext_resource type="Texture2D" uid="uid://dtufe6c6gwjt6" path="res://assets/sprites/foxy/foxy_hat_sprite_sheet.png" id="1_0rjvg"]
+[ext_resource type="Texture2D" uid="uid://dyu4bcfy7diu8" path="res://assets/sprites/foxy/foxy_gameplay.png" id="1_0rjvg"]
 [ext_resource type="Script" uid="uid://digp88v0glq0y" path="res://gameplay/player/player.gd" id="1_rvh5s"]
 [ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="2_6gmdq"]
 [ext_resource type="Resource" uid="uid://dtb5nvjw0g12a" path="res://data/foxy/foxy_data.tres" id="2_av71s"]
@@ -983,16 +983,15 @@ animation_mapping = {
 "run_up": ["U_Run", "U"]
 }
 artwork_faces_left = false
-size_multiplier = 1.6
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
 transform = Transform3D(0.709, 0, 0, 0, 1, 0, 0, 0, 0.709, 0, 0, 0)
 visible = false
-offset = Vector2(0, 14)
-pixel_size = 0.0625
+offset = Vector2(0, 15.5)
+pixel_size = 0.024390244
 shaded = true
 alpha_cut = 1
-texture_filter = 0
+texture_filter = 1
 texture = ExtResource("1_0rjvg")
 hframes = 4
 vframes = 15

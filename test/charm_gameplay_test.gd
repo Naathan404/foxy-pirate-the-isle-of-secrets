@@ -554,7 +554,7 @@ func _wall_and_recall() -> void:
 		var border := player.find_child("RecallBorder", true, false) as Node2D
 		var rim := border.get_node("Rim") as Line2D
 		_check(
-			border.visible and rim.get_point_count() == 7, "new recall starts with all six edges"
+			border.visible and rim.get_point_count() == 5, "new recall starts with all four edges"
 		)
 		_check(not _cast(slot, RIGHT), "wall blocks recall")
 		var effect := registry.get_equipped(slot).effect as DeadMansAnchorEffect

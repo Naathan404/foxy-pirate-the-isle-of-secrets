@@ -25,6 +25,8 @@ extends Resource
 @export_range(0.1, 1.0, 0.01) var standing_height_fraction: float = 0.74
 @export var cast_frames: PackedInt32Array = PackedInt32Array([0, 1, 2, 3, 4, 5, 6, 7])
 @export var channel_loop_frames: PackedInt32Array = PackedInt32Array()
+## These phases keep their last pose until the effect advances or cancels the cast.
+@export var held_phases: Array[StringName] = []
 @export var release_frames: PackedInt32Array = PackedInt32Array()
 @export var recall_frames: PackedInt32Array = PackedInt32Array()
 ## Optional crop windows exclude stray pixels from neighbouring generated cells.
@@ -52,6 +54,13 @@ func is_valid() -> bool:
 		for frame_index: int in sequence:
 			if frame_index < 0 or frame_index >= count:
 				return false
+	for phase in held_phases:
+		if (
+			get_sequence(phase).is_empty()
+			or phase in looping_phases
+			or (phase == &"channel" and not channel_loop_frames.is_empty())
+		):
+			return false
 	return true
 
 

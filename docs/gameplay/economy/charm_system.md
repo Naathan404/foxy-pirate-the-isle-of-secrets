@@ -195,7 +195,7 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 | Shadow Lunge | Merchant/enemy drop 5% | 125 | 6 s | Lướt tối đa 5 đơn vị trong 0,18 s, dừng ở địa hình hoặc địch đầu tiên. Đâm 3× và có thể bị ngắt khi nhận đòn. |
 | Buckshot Salvo | Merchant/enemy drop 5% | 150 | 7 s | Giữ chân 0,18 s rồi bắn 8 viên theo 8 hướng, tầm 8 đơn vị, 0,5× mỗi viên. |
 | Tide Grapple | Captain Blubberbeard | 150 | 5 s | Tầm 7 đơn vị, 2,5× khi móc chạm. Kéo quái nhỏ và choáng 1 s. Kéo Foxy tới cách boss, địch lớn hoặc địa hình 1 đơn vị. |
-| Glacial Spikes | Borelis | 125 | 7 s | Vận 0,28 s. Chốt hướng nhìn lúc nhấn, chông mọc từ gần ra xa theo ba hàng 1–2–3, cách nhau 0,12 s. Mỗi mục tiêu nhận 1,5× một lần, quái thường choáng 1 s. |
+| Glacial Spikes | Borelis | 125 | 7 s | Vận 0,28 s. Chốt hướng nhìn lúc nhấn, chông mọc từ gần ra xa theo ba hàng 1–2–3, cách nhau 0,12 s. Mỗi chông kiểm tra va chạm với hurtbox mục tiêu ngay lúc trồi lên. Mỗi mục tiêu nhận 1,5× một lần, quái thường choáng 1 s. |
 | Meteor Strike | Cinderclaw | 250 | 10 s | Vận 0,38 s, ba thiên thạch 2× mỗi viên. Vùng lửa tồn tại 3 s, mỗi giây gây Bleed bằng 2% HP tối đa. Các vùng giao nhau dùng chung một tick cho mỗi mục tiêu. |
 | Devil Contract | Queen Seraphina | Toàn bộ SP, cần ≥300 | 20 s | Ký khế ước trong 0,32 s. Trong 10 s sau khi ký, tàn lửa đỏ bao quanh Foxy, sát thương và tốc độ chạy đều ×1,3. Hồi SP tự nhiên và từ vật phẩm đều bị khóa. |
 
@@ -409,6 +409,8 @@ Các file tích hợp của phần presentation:
 
 Mười một Active trong bảng dưới dùng sheet Foxy + VFX riêng trong
 `assets/sprites/foxy/charm_casts/`. Sheet ngang có lưới 4×2, sheet dọc có lưới 4×4.
+Riêng Whirlpool dùng 24 hình cho mỗi góc nhìn của Foxy Spine. Sheet ngang có lưới
+8×3. Sheet dọc 8×6 chứa hình lưng ở nửa trên và hình chính diện ở nửa dưới.
 Mỗi frame là một ô RGBA 256×256. `foxy_reference.png` được render từ Foxy Spine đang
 dùng trong `gameplay/player/foxy.tscn`; `generation.json` lưu đầy đủ prompt và nguồn
 của từng sheet được tạo bằng imagegen.
@@ -423,14 +425,17 @@ của từng sheet được tạo bằng imagegen.
 | `meteor_strike` | Gom hai đốm lửa, nâng tay và phóng thiên thạch. |
 | `devil_contract` | Mở khế ước, ký bằng ấn đỏ và tung tàn lửa quanh người. |
 | `tide_grapple` | Vung neo, phóng xích nước, ghì kéo và thu xích. |
-| `abyssal_whirlpool` | Gom xoáy nước, vỗ tay xuống, cuộn sóng và tan bọt nước. |
-| `dead_mans_anchor` | Frame 0–3 đặt ấn; frame 4–7 gọi về và tái hiện. |
+| `abyssal_whirlpool` | Hai bàn tay tụ cầu nước, mở ra khi xoáy lớn rồi hạ xuống. Cầu vỡ thành giọt khi xoáy nổ. |
+| `dead_mans_anchor` | Frame 0–1 thả neo, frame 2–3 tiếp đất. Frame 5–7 gọi về và tái hiện. |
 | `dead_mans_salute` | Frame 0–3 vào charge, lặp 2–3 khi giữ; frame 4–7 nổ và thu thế. |
 
 Theo hướng cast trên màn hình, Foxy dùng hình lưng khi ngắm lên, hình chính diện
 khi ngắm xuống và hình 3/4 khi ngắm ngang. Quay camera trong lúc cast cập nhật
-góc nhìn tại frame đang phát. Sheet dọc xếp 8 frame nhìn từ sau ở nửa trên và
-8 frame nhìn từ trước ở nửa dưới, cùng điểm đặt chân ở 50% chiều rộng và 90% chiều cao.
+góc nhìn tại frame đang phát. Mỗi bộ hình dọc xếp động tác nhìn từ sau trước động tác nhìn từ trước, cùng điểm đặt chân ở 50% chiều rộng và 90% chiều cao.
+
+Whirlpool dùng skin G1/U/D của rig Foxy và đặt nước theo đầu xương cẳng tay.
+Để dựng lại hai atlas, chạy Godot có renderer và SpineBridge với
+`--path . --script res://scripts/art/bake_whirlpool_cast.gd` rồi import lại hai PNG.
 
 `Visual/CharmCastAnimator` là child scene trong Foxy. `PlayerVisual` sở hữu quyền
 hiển thị: khi cast, ẩn các lớp nhân vật bên dưới; khi kết thúc, hiện lại pose hiện
@@ -448,22 +453,26 @@ Timing và pivot chỉnh trong mười một resource cùng tên tại
 - `standing_height_fraction`: tỷ lệ chiều cao artwork đứng trong một ô;
 - `frame_regions`: cửa sổ crop tùy chọn để bỏ phần VFX tràn từ ô lân cận; Tide còn
   crop phần móc/nước được vẽ sẵn bên phải Foxy để nhường chỗ cho móc bay thật;
-- `phase_frames`, `looping_phases`: các frame và pha lặp được execution điều khiển;
+- `phase_frames` ánh xạ tên pha sang các hình được phát theo thứ tự. Dùng `looping_phases` cho động tác lặp thực sự.
 - `cast_frames`, `channel_loop_frames`, `release_frames`, `recall_frames`: các đoạn
   dùng cho từng pha.
+- `held_phases` giữ hình cuối cho tới sự kiện kế tiếp hoặc khi bị ngắt. Animation tiến theo bước physics của gameplay. Sự kiện đặt pose đầu tiên ngay trong bước phát sinh.
 
 | Charm | Nguồn timing Foxy |
 | --- | --- |
-| Arrow Rain | Mỗi sự kiện bắn tên thực tế bắt đầu một chu kỳ `volley` dài đúng khoảng giữa hai phát. Giữ/lặp đến phát cuối, sau đó `finish` tối đa 0,1 giây. Đổi số tên hoặc `volley_duration_seconds` thì nhịp Foxy đổi cùng. Không đợi tên cuối rơi xong mới thu cung. |
+| Arrow Rain | Mỗi sự kiện bắn tên thực tế bắt đầu một chu kỳ `volley` dài đúng khoảng giữa hai phát. Giữ tư thế kéo cung đến phát tiếp theo, sau đó `finish` tối đa 0,1 giây. Đổi số tên hoặc `volley_duration_seconds` thì nhịp Foxy đổi cùng. Không đợi tên cuối rơi xong mới thu cung. |
 | Crescent Cleave | `active` theo `hit_duration_seconds`; execution hoàn tất mới chuyển `recover` 0,22 giây, cùng cửa sổ fade của vệt chém. |
-| Shadow Lunge | `active` theo quãng quét/tốc độ execution; signal `travel_finished` bắt đầu `recover` 0,1 giây. |
+| Shadow Lunge | `active` theo quãng quét/tốc độ execution; kết thúc quãng lướt hoặc chạm vật cản bắt đầu `recover` 0,1 giây. |
 | Buckshot Salvo | `windup` khóa chân 0,18 s. Khi bắn, Foxy được di chuyển, animation chuyển sang `release` 0,18 s và đạn tiếp tục bay độc lập. |
 | Tide Grapple | Execution phát `active` khi phóng, `latch` khi trúng, `miss` khi thu rỗng hoặc `retract` sau bám; mỗi pha truyền thời lượng bay/kéo thực tế. `recover` chỉ bắt đầu khi móc về tay. Contact giữ ít nhất 0,16 giây để đọc được cú bám. |
-| Abyssal Whirlpool | `sustain` lặp theo duration của field, chỉ chuyển `detonate` 0,4 giây tại chính sự kiện nổ. |
-| Dead Man's Anchor | Cast/recall dài 0,3 giây, trùng burst đặt ấn/gọi về. |
-| Dead Man's Salute | Giữ `channel` đến khi nhả/cạn SP; `release` dài 0,45 giây, trùng blast. |
+| Abyssal Whirlpool | Nhấn một lần. Hình 0–17 diễn tả 1,5 giây tụ nước, hình 18–23 diễn tả cú hạ tay, nước vỡ và thu thế trong 0,4 giây. |
+| Dead Man’s Anchor | Foxy cúi tay khi thả neo. Marker chạm đất sau 0,22 s kích hoạt pose đặt ấn. Gọi về chuyển thẳng sang pose dịch chuyển. |
+| Dead Man’s Salute | Hai hình giữ lực theo nhịp vòng sáng khoảng 0,56 s mỗi chu kỳ. Nhả phím hoặc cạn SP chuyển ngay sang pose nổ. |
+| Glacial Spikes | Foxy đập tay khi hàng đầu trồi lên, giữ tay trên đất trong khi các hàng lan ra và thu tay khi hàng cuối đạt đủ chiều cao. |
+| Meteor Strike | Kết thúc vận khi gọi viên đầu, giữ tay chỉ tới khi gọi viên cuối rồi thu thế. Từng viên xử lý va chạm riêng. |
+| Devil Contract | Hết 0,32 s ký khế ước, tư thế bung ấn bắt đầu cùng lúc áp buff và bật hạt đỏ. |
 
-Các pha đang lặp giữ quyền hiển thị tới khi execution chuyển pha/kết thúc. API
+Pha đang chờ giữ quyền hiển thị tới khi execution chuyển pha hoặc kết thúc. API
 `play_charm_cast` nhận thêm hai tham số tùy chọn `duration_seconds`, `continue_only`.
 Pha tiếp diễn dùng `continue_only=true`: sau hit, dash, đòn mới, chết hoặc unequip,
 callback muộn từ loạt tên/móc cũ không giành lại pose của Foxy. Call site cũ vẫn
@@ -480,7 +489,7 @@ Các điểm tích hợp code/scene:
 - `gameplay/player/spine_idle_preview.gd`: cung cấp kích thước/điểm chân chuẩn;
 - `gameplay/player/player.gd`: API `play_charm_cast` / `cancel_charm_cast`;
 - `gameplay/charms/base/charm_effect.gd`: helper presentation cho effect;
-- tám script `*_effect.gd` tương ứng trong `gameplay/charms/active/`: gọi đúng pha
+- mười một script `*_effect.gd` tương ứng trong `gameplay/charms/active/`: gọi đúng pha
   cast, channel, release hoặc recall.
 
 Salute phát release từ chính effect nên vẫn có animation nổ khi tự nhả do cạn SP.

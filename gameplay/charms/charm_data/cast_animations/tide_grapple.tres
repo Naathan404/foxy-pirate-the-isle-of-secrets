@@ -18,5 +18,5 @@ phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"retract": PackedInt32Array(5, 6),
 &"recover": PackedInt32Array(7)
 })
-looping_phases = Array[StringName]([&"active", &"latch", &"miss", &"retract"])
+held_phases = Array[StringName]([&"active", &"latch", &"miss", &"retract"])
 frame_regions = Array[Rect2]([Rect2(0, 0, 0.70, 1), Rect2(0.23, 0, 0.77, 1), Rect2(0, 0, 0.45, 1), Rect2(0, 0, 0.46, 1), Rect2(0, 0, 0.61, 1), Rect2(0, 0, 0.59, 1), Rect2(0, 0, 0.64, 1), Rect2(0, 0, 1, 1)])

@@ -61,7 +61,7 @@ func _physics_process(delta: float) -> void:
 			_remaining = definition.get_param_float(&"duration_seconds")
 			_particles = PARTICLES.instantiate() as CPUParticles3D
 			actor.add_child(_particles)
-			_play_cast_animation(&"release", _direction, RELEASE_SECONDS)
+			_play_cast_animation(&"release", _direction, RELEASE_SECONDS, true)
 			var attack_bonus := roundi(
 				(definition.get_param_float(&"damage_multiplier") - 1.0) * 100
 			)

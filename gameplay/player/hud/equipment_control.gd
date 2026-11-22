@@ -3,6 +3,7 @@ extends Control
 ## Hiển thị ô Charm và cooldown thật từ runtime; không quản lý trang bị hay tài nguyên
 
 const PROC_FEEDBACK_SCENE = preload("res://gameplay/player/hud/charm_proc_feedback.tscn")
+const RECALL_OUTLINE_SIZE := Vector2(64.0, 64.0)
 
 @export_group("Potion Feedback")
 @export_range(1.0, 1.5, 0.01) var potion_use_scale := 1.2
@@ -178,7 +179,7 @@ func _update_cooldown(socket_id: int, runtime: CharmRuntime) -> void:
 
 func _show_recall_border(slot: TextureRect, remaining_fraction: float) -> void:
 	recall_border.position = slot.position
-	recall_border.scale = slot.size / slot.texture.get_size()
+	recall_border.scale = slot.size / RECALL_OUTLINE_SIZE
 	# The authored outline starts at twelve o'clock and follows the socket clockwise.
 	var spent := (1.0 - clampf(remaining_fraction, 0.0, 1.0)) * _recall_perimeter
 	for i in range(1, _recall_outline.size()):

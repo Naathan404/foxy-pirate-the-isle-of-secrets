@@ -153,10 +153,17 @@ func _damage_target(
 
 
 func _targets_in_radius(center: Vector3, radius: float) -> Array[Node3D]:
+	var tree := actor.get_tree()
+	var candidates := tree.get_nodes_in_group(&"enemy")
+	for dummy in tree.get_nodes_in_group(&"training_dummy"):
+		if not dummy.is_in_group(&"enemy"):
+			candidates.append(dummy)
 	var targets: Array[Node3D] = []
-	for enemy in actor.get_tree().get_nodes_in_group(&"enemy"):
-		if enemy is Node3D and enemy.global_position.distance_squared_to(center) <= radius * radius:
-			targets.append(enemy)
+	var radius_squared := radius * radius
+	for candidate in candidates:
+		var target := candidate as Node3D
+		if target != null and target.global_position.distance_squared_to(center) <= radius_squared:
+			targets.append(target)
 	return targets
 
 

@@ -11,7 +11,9 @@ texture = ExtResource("2_sheet")
 vertical_texture = ExtResource("3_vertical")
 foot_anchors = PackedVector2Array(0.4961, 0.9102, 0.4961, 0.9085, 0.502, 0.9069, 0.4961, 0.9102, 0.4609, 0.8945, 0.4609, 0.8945, 0.4707, 0.8945, 0.4922, 0.8945)
 standing_height_fraction = 0.758
+held_phases = Array[StringName]([&"windup", &"release"])
 phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"windup": PackedInt32Array(0, 1, 2, 3),
-&"release": PackedInt32Array(4, 5, 6, 7)
+&"release": PackedInt32Array(4, 5),
+&"recover": PackedInt32Array(5, 6, 7)
 })

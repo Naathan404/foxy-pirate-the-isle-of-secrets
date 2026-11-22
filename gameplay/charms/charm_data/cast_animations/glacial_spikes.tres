@@ -10,7 +10,9 @@ charm_id = &"glacial_spikes"
 texture = ExtResource("2_sheet")
 vertical_texture = ExtResource("3_vertical")
 standing_height_fraction = 0.72
+held_phases = Array[StringName]([&"windup", &"slam"])
 phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"windup": PackedInt32Array(0, 1, 2, 3),
-&"release": PackedInt32Array(4, 5, 6, 7)
+&"slam": PackedInt32Array(4, 5),
+&"recover": PackedInt32Array(6, 7)
 })

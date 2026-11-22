@@ -9,8 +9,8 @@
     "frame_height": 256,
     "alpha": true
   },
-  "preparation": "Generated RGBA sprites are packed in 256px cells. Vertical sheets and the Glacial Spikes side sheet use a common foot pivot and standing scale across each eight-frame sequence.",
-  "playback": "Side sheets are mirrored for left aim. Four-row vertical sheets contain back and front sequences in that order. Each direction uses the phase timings in the corresponding cast animation resource.",
+  "preparation": "Generated RGBA sprites are packed in 256px cells. Vertical sheets and the Glacial Spikes side sheet use a common foot pivot and standing scale across each sequence.",
+  "playback": "Side sheets are mirrored for left aim. Vertical sheets contain back and front sequences in that order. Each direction uses the phase timings in the corresponding cast animation resource.",
   "assets": [
     {
       "charm_id": "arrow_rain",
@@ -45,8 +45,17 @@
     {
       "charm_id": "abyssal_whirlpool",
       "file": "abyssal_whirlpool.png",
-      "generated_source": "exec-8d0a6f0f-e0ac-4b5a-94a1-792e25b68867.png",
-      "prompt": "Use case: identity-preserve. Production 2D game animation sprite atlas. The first reference is an actual in-game render of Foxy and is the CHARACTER IDENTITY source. Preserve this exact fox: oversized orange fox head, two pointed ears with cream inner fur, very large glossy black oval eyes with tiny white highlights, cream muzzle with outward cheek tufts, tiny black nose/mouth, small slim orange torso, cream chest patch with a small black skull-like emblem, short dark navy trousers, bare orange paws/feet. NO hat, no coat, no shoes, no eyepatch, no extra costume. Match the reference's clean hand-drawn ink/cel-shaded cartoon style, its proportions and orange/cream/navy colors; NOT pixel art, not 3D, not realistic. Make exactly EIGHT distinct sequential frames in a strict FOUR-COLUMN by TWO-ROW grid, reading left-to-right then top-to-bottom. Wide canvas with aspect ratio 2:1, equal SQUARE cells, no gutters or drawn grid. Entirely transparent alpha background. Every frame shows ONE complete Foxy in the SAME three-quarter view facing RIGHT. Same camera, same scale, same body proportions and chest mark across all eight frames. Feet anchored at x=50%, y=90% WITHIN EACH CELL; full standing character from ears to feet about 72% of cell height. Pose movement is in-place, not translating between cells. Leave generous clear padding so no body or effect crosses any cell boundary. Effects may extend to 92% of a cell, must remain isolated inside their own cell. Use bold readable silhouettes and clear pose changes. No labels, no frame numbers, no text, no background, no panels, no drop shadow plate. This is a usable sprite sheet, not an illustration or concept-art page. The second reference is the approved Crescent Cleave atlas: match its character drawing, head-to-body ratio, frame spacing, fixed foot baseline and rendering finish exactly, while changing only the skill action and its VFX. Do not reproduce the sword or golden slash from that style reference.\nSkill: ABYSSAL WHIRLPOOL. Eight chronological frames: 1 Foxy bends his knees and cups both paws near his belly, a tiny dark teal spiral between them; 2 raises both paws and twists his shoulders, drawing two curved teal water ribbons inward; 3 thrusts his palms down and outward, summoning a compact spiraling magical pool under his fixed feet; 4 strong cast apex, arms spreading as a ring of foamy cyan water and three curling deep-blue tentacle-like WAVES spiral around his legs and hands, face fully clear; 5 pulls both paws inward as the watery vortex tightens and whips toward the right; 6 water breaks into bright cyan droplets; 7 residual bubbles and spray fade; 8 returns to exact reference idle. Palette deep ocean blue, turquoise, cyan and ivory foam. WATER magic with a dark rotating center, not fire, not a sword, no opaque water wall across the face. Keep feet at the fixed baseline; all waves and droplets contained inside each cell with clear padding."
+      "generator": "Godot",
+      "baker": "res://scripts/art/bake_whirlpool_cast.gd",
+      "hand_effect": "res://scripts/art/whirlpool_hand_water.gdshader",
+      "layout": {
+        "columns": 8,
+        "rows": 3,
+        "frames_per_view": 24,
+        "strips": [
+          "G1, side"
+        ]
+      }
     },
     {
       "charm_id": "dead_mans_anchor",
@@ -117,8 +126,18 @@
     {
       "charm_id": "abyssal_whirlpool",
       "file": "abyssal_whirlpool_vertical.png",
-      "generated_source": "exec-1f2362e3-7b99-4498-92d8-d03f726993f1.png",
-      "prompt": "Use case: identity-preserve. Asset for actual game, transparent animation sprite atlas of exactly the orange fox character in reference. SAME huge angular fox head, long cream cheek tufts, two ears, black oval eyes, orange fur, tiny cream chest patch and navy pants, barefoot. No hat, shoes, additional clothing or equipment except described. Clean bold ink, flat cel colors matching reference. Eight sequential full-body animation frames. Each cell equal square, no panels, writing, border or contact shadows. Keep feet at 50% width 89% height within each cell, same camera, head/body scale and spacing. Leave clear generous transparent margins, all parts inside EACH cell. SQUARE atlas, FOUR columns and FOUR rows, exactly 16 individual foxes. TOP TWO ROWS: eight frames reading across row1 then row2: FOX FACES DIRECTLY AWAY from camera, back of head and ears, NO eyes and no chest visible, aimed screen-UP/away. BOTTOM TWO ROWS: repeat the SAME eight poses in the same order with fox FACING DIRECTLY TOWARD camera, BOTH eyes and chest fully front, aimed screen-DOWN. Read each view as 4 frames then 4 frames. Every column and every row exactly equally spaced. Abyssal Whirlpool. F1 cups both palms over teal water, F2 rolls shoulders stirring a spiral, F3 spreads arms to summon a little water vortex, F4 holds with swirling arms, F5 pulls in a foam crest, F6 crushes the vortex, F7 lowers paws as spray falls, F8 neutral."
+      "generator": "Godot",
+      "baker": "res://scripts/art/bake_whirlpool_cast.gd",
+      "hand_effect": "res://scripts/art/whirlpool_hand_water.gdshader",
+      "layout": {
+        "columns": 8,
+        "rows": 6,
+        "frames_per_view": 24,
+        "strips": [
+          "U, back",
+          "D, front"
+        ]
+      }
     },
     {
       "charm_id": "dead_mans_anchor",

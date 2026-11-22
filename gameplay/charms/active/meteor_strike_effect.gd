@@ -2,9 +2,8 @@ extends CharmEffect
 ## Each impact starts its burn zone at the staff animation's authored contact frame.
 
 const METEOR := preload("res://gameplay/weapons/meteor_impact.tscn")
-const RELEASE_SECONDS := 0.2
 const FIRE := Color("ff652a")
-var _windup := 0.0
+var _winding_up := false
 var _launch_delay := 0.0
 var _sites: Array[Vector3] = []
 var _meteors: Array[Node3D] = []
@@ -27,22 +26,16 @@ func activate(context: CharmActivationContext) -> bool:
 		]
 	)
 	_heavy_hit = false
-	_windup = definition.get_param_float(&"windup_seconds")
-	_launch_delay = 0.0
+	_winding_up = true
+	_launch_delay = definition.get_param_float(&"windup_seconds")
 	_direction = context.direction
-	_play_cast_animation(&"windup", _direction, _windup)
-	CharmVfx.spawn(actor, actor.global_position, FIRE, 1.3, _windup, CharmVfx.Style.CHARGE)
+	_play_cast_animation(&"windup", _direction, _launch_delay)
+	CharmVfx.spawn(actor, actor.global_position, FIRE, 1.3, _launch_delay, CharmVfx.Style.CHARGE)
 	set_physics_process(true)
 	return true
 
 
 func _physics_process(delta: float) -> void:
-	if _windup > 0.0:
-		_windup -= delta
-		if _windup > 0.0:
-			return
-		_end_cast_lock()
-		_play_cast_animation(&"release", _direction, RELEASE_SECONDS)
 	if not _sites.is_empty():
 		_launch_delay -= delta
 		if _launch_delay <= 0.0:
@@ -63,6 +56,10 @@ func _physics_process(delta: float) -> void:
 
 
 func _launch_next() -> void:
+	if _winding_up:
+		_winding_up = false
+		_end_cast_lock()
+		_play_cast_animation(&"release", _direction, 0.0, true)
 	var site: Vector3 = _sites.pop_front()
 	var meteor := METEOR.instantiate()
 	actor.get_parent().add_child(meteor)
@@ -81,6 +78,8 @@ func _launch_next() -> void:
 	attack.charm_push = true
 	attack.knockback_multiplier = 0.7
 	meteor.call("launch", attack)
+	if _sites.is_empty():
+		_play_cast_animation(&"recover", _direction, 0.0, true)
 
 
 func _on_landed(site: Vector3, hit_target: bool) -> void:
@@ -126,7 +125,7 @@ func _burn() -> void:
 
 
 func on_input_cancelled() -> void:
-	if _windup > 0.0:
+	if _winding_up:
 		cancel_active()
 
 
@@ -144,4 +143,4 @@ func cancel_active() -> void:
 		if is_instance_valid(zone):
 			zone.queue_free()
 	_zones.clear()
-	_windup = 0.0
+	_winding_up = false

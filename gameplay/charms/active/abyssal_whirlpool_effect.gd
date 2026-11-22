@@ -37,7 +37,7 @@ func activate(context: CharmActivationContext) -> bool:
 	_exploded = false
 	set_physics_process(true)
 	_cast_direction = context.target_position - actor.global_position
-	_play_cast_animation(&"sustain", _cast_direction, _remaining / 4.0)
+	_play_cast_animation(&"channel", _cast_direction, _remaining)
 	return true
 
 
@@ -91,7 +91,7 @@ func _explode() -> void:
 			preload("res://assets/audio/combat/bow_impact.wav"), _zone.global_position, -6.0
 		)
 		get_node("/root/HitstopController").request(0.07)
-	_play_cast_animation(&"detonate", _cast_direction, 0.4, true)
+	_play_cast_animation(&"release", _cast_direction, 0.4, true)
 	_clear_zone()
 
 

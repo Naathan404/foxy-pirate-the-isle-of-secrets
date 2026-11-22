@@ -15,4 +15,4 @@ phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"volley": PackedInt32Array(3, 4, 1, 2),
 &"finish": PackedInt32Array(3, 6, 7)
 })
-looping_phases = Array[StringName]([&"volley"])
+held_phases = Array[StringName]([&"volley"])
