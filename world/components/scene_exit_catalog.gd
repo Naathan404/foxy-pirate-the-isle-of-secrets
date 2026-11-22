@@ -6,24 +6,22 @@ const ROOM_SCRIPT := "res://world/biomes/base/base_room.gd"
 const TRIGGER_SCRIPT := "res://world/components/scene_change_trigger.gd"
 const DIRECTIONS := ["up", "right", "down", "left"]
 const PATH_NAMES := ["UpPath", "RightPath", "DownPath", "LeftPath"]
+const ALL_EXITS_OPEN := 15
+const ROOM_ROLE_PROPERTY := "metadata/room_role"
 
 
 static func get_exit_ids(scene_path: String) -> PackedStringArray:
 	var ids := PackedStringArray()
-	if scene_path.is_empty() or not ResourceLoader.exists(scene_path, "PackedScene"):
+	var nodes := _read_nodes(scene_path)
+	if nodes.is_empty():
 		return ids
-	var packed := load(scene_path) as PackedScene
-	if packed == null:
-		return ids
-	var nodes: Dictionary = {}
-	_collect(packed.get_state(), "", nodes)
 	# BaseRoom owns its four path IDs and enabled flags; saved child values may
 	# still be the defaults from the path scene, so use the room's overrides.
 	for path: String in nodes:
 		var properties: Dictionary = nodes[path]
 		if not _uses_script(properties.get("script"), ROOM_SCRIPT):
 			continue
-		var flags := int(properties.get("open_exits", 15))
+		var flags := int(properties.get("open_exits", ALL_EXITS_OPEN))
 		for index in DIRECTIONS.size():
 			var child_path := _join(path, "Exits/" + PATH_NAMES[index] + "/SceneChangeTrigger")
 			if nodes.has(child_path):
@@ -41,6 +39,42 @@ static func get_exit_ids(scene_path: String) -> PackedStringArray:
 				ids.append(id)
 	ids.sort()
 	return ids
+
+
+## Open exits of a BaseRoom scene as direction index (see DIRECTIONS) -> destination
+## scene path. Exits without a destination are left out; non-room scenes return {}.
+static func get_room_destinations(scene_path: String) -> Dictionary[int, String]:
+	var destinations: Dictionary[int, String] = {}
+	var room := _room_properties(_read_nodes(scene_path))
+	if room.is_empty():
+		return destinations
+	var flags := int(room.get("open_exits", ALL_EXITS_OPEN))
+	for index in DIRECTIONS.size():
+		var destination := String(room.get(DIRECTIONS[index] + "_destination_scene", ""))
+		if flags & (1 << index) and not destination.is_empty():
+			destinations[index] = destination
+	return destinations
+
+
+## The designer note saved on a room root (Inspector metadata `room_role`), or "".
+static func get_room_role(scene_path: String) -> String:
+	return String(_room_properties(_read_nodes(scene_path)).get(ROOM_ROLE_PROPERTY, ""))
+
+
+static func _read_nodes(scene_path: String) -> Dictionary:
+	var nodes: Dictionary = {}
+	if scene_path.is_empty() or not ResourceLoader.exists(scene_path, "PackedScene"):
+		return nodes
+	var packed := load(scene_path) as PackedScene
+	if packed != null:
+		_collect(packed.get_state(), "", nodes)
+	return nodes
+
+
+## Saved properties of the scene root when it is a BaseRoom, merged with its base scenes.
+static func _room_properties(nodes: Dictionary) -> Dictionary:
+	var root: Dictionary = nodes.get("", {})
+	return root if _uses_script(root.get("script"), ROOM_SCRIPT) else {}
 
 
 static func configure_dropdown(

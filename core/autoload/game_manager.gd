@@ -5,7 +5,7 @@ signal player_changed(active_player: Player)
 signal state_changed(new_state: State)
 signal scene_transition_finished
 
-enum State { PLAYING, INVENTORY, TRANSITION, PAUSE_MENU }
+enum State { PLAYING, INVENTORY, TRANSITION, PAUSE_MENU, WORLD_MAP }
 
 const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
 const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
@@ -17,9 +17,12 @@ const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 var player: Player
 var inventory: Inventory
 var gold_wallet: GoldWallet = GoldWallet.new()
+var map_progress: MapProgress = MapProgress.new()
 var state: State = State.PLAYING
 ## Encounter state survives scene changes for the current game session.
 var boss_encounters: Dictionary[StringName, Dictionary] = {}
+## Story progress for this session, e.g. which biomes are open. In memory only, like Gold.
+var story_flags: Dictionary[StringName, bool] = {}
 # Debug-only progression flag. Each map owns a fresh Player scene, so keep the
 # HUD grant state on the autoload instead of on the scene-local CharmRegistry.
 var debug_all_charms_granted: bool = false
@@ -42,6 +45,9 @@ func register_player(active_player: Player) -> void:
 		player.inventory_ui.close_inventory(true)
 	player = active_player
 	inventory = player.get_node_or_null("Inventory") as Inventory
+	# Foxy is instanced in each room scene, so its owner is the room the player is in.
+	if is_instance_valid(player.owner):
+		map_progress.enter_room(player.owner.scene_file_path)
 	if (
 		OS.is_debug_build()
 		and debug_all_charms_granted
@@ -88,18 +94,44 @@ func exit_inventory() -> void:
 
 ## The pause menu owns the tree pause the same way the inventory does.
 func enter_pause_menu() -> bool:
+	return _enter_menu_state(State.PAUSE_MENU)
+
+
+func exit_pause_menu() -> void:
+	_exit_menu_state(State.PAUSE_MENU)
+
+
+func enter_world_map() -> bool:
+	return _enter_menu_state(State.WORLD_MAP)
+
+
+func exit_world_map() -> void:
+	_exit_menu_state(State.WORLD_MAP)
+
+
+func has_story_flag(flag: StringName) -> bool:
+	return story_flags.get(flag, false)
+
+
+func set_story_flag(flag: StringName) -> void:
+	if not flag.is_empty():
+		story_flags[flag] = true
+
+
+## Full-screen menus pause the tree only when nothing else owns it.
+func _enter_menu_state(menu_state: State) -> bool:
 	if _transition_pending or state != State.PLAYING or get_tree().paused:
 		return false
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
-	state = State.PAUSE_MENU
+	state = menu_state
 	get_tree().paused = true
 	state_changed.emit(state)
 	return true
 
 
-func exit_pause_menu() -> void:
-	if state != State.PAUSE_MENU:
+func _exit_menu_state(menu_state: State) -> void:
+	if state != menu_state:
 		return
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
@@ -113,9 +145,12 @@ func return_to_main_menu() -> bool:
 	return change_scene(main_menu_scene)
 
 
-## Forgets the in-memory run (wallet, boss encounters, debug grants). Saved files are untouched.
+## Forgets the in-memory run (wallet, explored rooms, story flags, boss encounters, debug
+## grants). Saved files are untouched.
 func reset_session() -> void:
 	gold_wallet = GoldWallet.new()
+	map_progress = MapProgress.new()
+	story_flags.clear()
 	boss_encounters.clear()
 	debug_all_charms_granted = false
 

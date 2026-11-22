@@ -21,6 +21,7 @@
 [ext_resource type="Script" uid="uid://0vpaeibrfouv" path="res://gameplay/inventory/inventory_slot.gd" id="16_n85vt"]
 [ext_resource type="PackedScene" uid="uid://dqmnkxuwherpm" path="res://gameplay/inventory/inventory_ui.tscn" id="16_nbuib"]
 [ext_resource type="PackedScene" uid="uid://c2pausemenu01x" path="res://ui/pause_menu/pause_menu.tscn" id="pause_menu"]
+[ext_resource type="PackedScene" uid="uid://b7worldmap01k" path="res://ui/world_map/world_map.tscn" id="world_map"]
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Script" uid="uid://c1ofpsqxwk0l6" path="res://gameplay/charms/base/charm_registry.gd" id="17_charm_registry"]
 [ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="17_unfpm"]
@@ -1089,6 +1090,8 @@ inventory = NodePath("../Inventory")
 potion_component = NodePath("../PotionComponent")
 
 [node name="PauseMenu" parent="." instance=ExtResource("pause_menu")]
+
+[node name="WorldMap" parent="." instance=ExtResource("world_map")]
 
 [node name="HealthComponent" type="Node" parent="." unique_id=786847308]
 script = ExtResource("11_rvh5s")

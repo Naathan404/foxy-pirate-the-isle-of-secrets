@@ -36,7 +36,8 @@ lan từ giữa). Đóng chạy ngược lại: mực thu về trái, trang trư
 
 ## Thay đổi contract
 
-- `GameManager.State` thêm `PAUSE_MENU` (cuối enum). Transition thất bại giờ trả
+- `GameManager.State` thêm `PAUSE_MENU` (cuối enum). Pause và
+  [bản đồ thế giới](world_map.md) dùng chung `_enter_menu_state()`/`_exit_menu_state()`. Transition thất bại giờ trả
   `state` về giá trị trước đó thay vì luôn `PLAYING`.
 - `GameManager` thêm `main_menu_scene`, `return_to_main_menu()`, `reset_session()`.
 - `ink_reveal.gdshader` thêm `from_left` (mặc định `false`).
