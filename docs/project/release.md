@@ -24,6 +24,7 @@ renderer Compatibility và tắt thread, nên không cần bật SharedArrayBuff
 | Cách kích hoạt | Build | Upload itch.io | Phiên bản hiển thị |
 | --- | --- | --- | --- |
 | Push tag `v*`, ví dụ `v0.2.0` | Có | Có | `0.2.0` |
+| Merge PR (hoặc push) vào nhánh `release` | Có | Có | `release-<sha 7 ký tự>` |
 | Actions → Release to itch.io → Run workflow | Có | Chỉ khi tick `publish` | `dev-<sha 7 ký tự>` |
 
 ## Cấu hình một lần
