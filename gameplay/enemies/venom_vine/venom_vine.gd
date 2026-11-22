@@ -77,6 +77,8 @@ const COUNTER_GLOW_COLOR := Color(1.0, 0.45, 0.18)
 ## Khoảng lệch tối thiểu/tối đa quanh Player (m) để bắn vùng lân cận thay vì bắn trực diện.
 @export_range(0.3, 5.0, 0.05, "suffix:m") var aim_scatter_min_meters: float = 1.5
 @export_range(0.5, 6.0, 0.05, "suffix:m") var aim_scatter_max_meters: float = 2.5
+## Xác suất mỗi lượt bắn thường nhắm thẳng vị trí Player thay vì bắn lệch xung quanh.
+@export_range(0.0, 1.0, 0.05) var direct_aim_chance: float = 0.3
 ## Giới hạn khoảng cách rơi đạn tính từ gốc cây (m).
 @export_range(0.5, 10.0, 0.1, "suffix:m") var min_shot_distance_meters: float = 1.6
 @export_range(1.0, 20.0, 0.1, "suffix:m") var max_shot_distance_meters: float = 6.2
@@ -471,6 +473,7 @@ func build_attack_plan() -> Dictionary:
 		"max_lead_meters": max_lead_meters,
 		"aim_scatter_min": aim_scatter_min_meters,
 		"aim_scatter_max": aim_scatter_max_meters,
+		"direct_aim_chance": direct_aim_chance,
 		"min_shot_distance": min_shot_distance_meters,
 		"max_shot_distance": max_shot_distance_meters,
 		"pool_radius": pool_radius_meters,

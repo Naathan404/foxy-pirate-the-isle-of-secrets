@@ -50,6 +50,7 @@ lead_accuracy = 0.75
 max_lead_meters = 2.0
 aim_scatter_min_meters = 1.5
 aim_scatter_max_meters = 2.5
+direct_aim_chance = 0.3
 min_shot_distance_meters = 1.6
 max_shot_distance_meters = 6.2
 projectile_arc_height_meters = 2.4

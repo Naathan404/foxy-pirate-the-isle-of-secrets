@@ -40,6 +40,7 @@ const OUTER_EXTRA_SHOT_HP_THRESHOLD := 0.65
 const INNER_EXTRA_SHOT_HP_THRESHOLD := 0.4
 const DEFAULT_AIM_SCATTER_MIN_METERS := 1.5
 const DEFAULT_AIM_SCATTER_MAX_METERS := 2.5
+const DIRECT_AIM_JITTER_METERS := 0.22
 const TARGET_DEFLECT_MARGIN_METERS := 0.45
 const DEFAULT_MIN_SHOT_DISTANCE_METERS := 1.6
 const DEFAULT_MAX_SHOT_DISTANCE_METERS := 6.2
@@ -376,7 +377,9 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var aim_positions: Array[Vector3] = []
 	var planned_occupied := occupied.duplicate()
 	var already_covered := is_position_covered_by_pool(target_pos, planned_occupied)
-	# Land near enough that an idle target must react, while keeping the impact off its center.
+	var direct_shot := _roll_direct_aim(context, already_covered)
+	# Đa số phát bắn vẫn giữ khoảng lệch ngẫu nhiên quanh mục tiêu; một tỷ lệ nhỏ sẽ ném thẳng
+	# vào vị trí Player để giữ áp lực khi Player đứng yên hoặc đánh cận chiến quá lâu.
 	var pressure_max := maxf(
 		OUTER_PRESSURE_MIN_OFFSET_METERS,
 		minf(scatter_max, pool_radius * OUTER_PRESSURE_POOL_FACTOR)
@@ -384,13 +387,21 @@ func _build_outer_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 	var pressure_min := clampf(scatter_min, OUTER_PRESSURE_MIN_OFFSET_METERS, pressure_max)
 
 	for shot_idx in range(outer_shots):
-		var nearby_offset := _pick_nearby_offset(
-			origin_pos, predicted, flat_vel, pressure_min, pressure_max, shot_idx
-		)
-		var desired := predicted + nearby_offset
-		if already_covered and shot_idx == 0:
-			desired += _pick_cutoff_offset(origin_pos, target_pos, flat_vel, shot_idx) * 0.5
-		desired = _clamp_shot_distance(origin_pos, desired, min_shot_dist, max_shot_dist, ground_y)
+		var desired := Vector3.ZERO
+		if direct_shot and shot_idx == 0:
+			desired = _pick_direct_aim_spot(
+				origin_pos, target_pos, ground_y, min_shot_dist, max_shot_dist
+			)
+		else:
+			var nearby_offset := _pick_nearby_offset(
+				origin_pos, predicted, flat_vel, pressure_min, pressure_max, shot_idx
+			)
+			desired = predicted + nearby_offset
+			if already_covered and shot_idx == 0:
+				desired += _pick_cutoff_offset(origin_pos, target_pos, flat_vel, shot_idx) * 0.5
+			desired = _clamp_shot_distance(
+				origin_pos, desired, min_shot_dist, max_shot_dist, ground_y
+			)
 		var resolved := VenomPoolProjectile.resolve_landing_spot(
 			origin_pos,
 			desired,
@@ -447,33 +458,43 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 		origin_pos, target_pos, target_vel, est_flight, max_lead, lead_accuracy
 	)
 	var flat_vel := Vector3(target_vel.x, 0.0, target_vel.z)
-	var nearby_anchor := (
-		predicted
-		+ _pick_nearby_offset(
-			origin_pos, predicted, flat_vel, scatter_min * 0.85, scatter_max * 0.9, 0
+	var aim_positions: Array[Vector3] = []
+	var planned_occupied := occupied.duplicate()
+	var already_covered := is_position_covered_by_pool(target_pos, planned_occupied)
+	var direct_center := _roll_direct_aim(context, already_covered)
+	var fan_anchor := target_pos
+	if not direct_center:
+		planned_occupied.append(_make_target_exclusion_spot(target_pos, pool_radius, scatter_min))
+		fan_anchor = (
+			predicted
+			+ _pick_nearby_offset(
+				origin_pos, predicted, flat_vel, scatter_min * 0.85, scatter_max * 0.9, 0
+			)
 		)
-	)
-	var base_vec := nearby_anchor - origin_pos
+	var base_vec := fan_anchor - origin_pos
 	base_vec.y = 0.0
 	var base_dist := clampf(base_vec.length(), min_shot_dist, minf(max_shot_dist, 4.6))
 	var base_dir := base_vec.normalized() if not base_vec.is_zero_approx() else Vector3.BACK
-
-	var aim_positions: Array[Vector3] = []
-	var planned_occupied := occupied.duplicate()
-	planned_occupied.append(_make_target_exclusion_spot(target_pos, pool_radius, scatter_min))
 	var arc_rad := deg_to_rad(fan_degrees)
 	var step := arc_rad / float(inner_shots - 1) if inner_shots > 1 else 0.0
 	var start_angle := -arc_rad * 0.5
 
-	# Bắn tâm lệch về vùng lân cận trước rồi tỏa ra hai cánh để ép hướng né.
+	# Bắn tâm (trúng thẳng khi nổ direct_aim, ngược lại giữ vùng lân cận) rồi tỏa ra hai cánh.
 	var order: Array[int] = _center_first_indices(inner_shots)
-	for idx in order:
-		var angle := start_angle + step * float(idx)
-		var ring_dist := clampf(
-			base_dist + (0.45 if idx % 2 == 1 else 0.0), min_shot_dist, max_shot_dist
-		)
-		var desired := origin_pos + base_dir.rotated(Vector3.UP, angle) * ring_dist
-		desired.y = ground_y
+	for order_pos in range(order.size()):
+		var idx := order[order_pos]
+		var desired := Vector3.ZERO
+		if direct_center and order_pos == 0:
+			desired = _pick_direct_aim_spot(
+				origin_pos, target_pos, ground_y, min_shot_dist, max_shot_dist
+			)
+		else:
+			var angle := start_angle + step * float(idx)
+			var ring_dist := clampf(
+				base_dist + (0.45 if idx % 2 == 1 else 0.0), min_shot_dist, max_shot_dist
+			)
+			desired = origin_pos + base_dir.rotated(Vector3.UP, angle) * ring_dist
+			desired.y = ground_y
 		var resolved := VenomPoolProjectile.resolve_landing_spot(
 			origin_pos,
 			desired,
@@ -496,6 +517,30 @@ func _build_inner_plan(shared: Dictionary, context: Dictionary) -> Dictionary:
 		"shot_interval_seconds": float(context.get("inner_shot_interval", 0.16)),
 		"recover_seconds": maxf(minf(raw_recover, 0.24), raw_recover * recover_scale),
 	}
+
+
+func _roll_direct_aim(context: Dictionary, already_covered: bool) -> bool:
+	if already_covered:
+		return false
+	var chance := clampf(float(context.get("direct_aim_chance", 0.0)), 0.0, 1.0)
+	if chance <= 0.0:
+		return false
+	if chance >= 1.0:
+		return true
+	return _rng.randf() < chance
+
+
+func _pick_direct_aim_spot(
+	origin_pos: Vector3,
+	target_pos: Vector3,
+	ground_y: float,
+	min_shot_dist: float,
+	max_shot_dist: float
+) -> Vector3:
+	var angle := _rng.randf_range(0.0, TAU)
+	var jitter_dist := _rng.randf_range(0.0, DIRECT_AIM_JITTER_METERS)
+	var desired := target_pos + Vector3(cos(angle), 0.0, sin(angle)) * jitter_dist
+	return _clamp_shot_distance(origin_pos, desired, min_shot_dist, max_shot_dist, ground_y)
 
 
 func _pick_nearby_offset(
