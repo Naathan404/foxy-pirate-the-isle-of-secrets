@@ -1,4 +1,4 @@
-[gd_resource type="NoiseTexture2D" format=3]
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://iw5vikqbjhpl"]
 
 [sub_resource type="FastNoiseLite" id="ink_noise_source"]
 frequency = 0.012
