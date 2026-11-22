@@ -78,12 +78,15 @@ boundaries keep their existing open-path behavior. Rooms outside these Coral
 Valley templates retain the default disabled setting.
 
 All six Mobs rooms inherit the same CameraBounds from `base_medium_room.tscn`.
-Their Tide setup matches `room_02`: two mirrored `Vector2(45, 66)` water zones
-run sequentially, with `LeftShallows` first and `RightShallows`
-second. Each zone rises for 6 seconds, stays high for 6,
-falls for 6 and rests for 6 before the next zone starts. A full left/right
-cycle takes 48 seconds. Timing is configured on each zone under `Cycle Timing`;
-the controller's `Zones` array controls order and supports additional directions.
+Mobs 1–3 use two mirrored `Vector2(45, 66)` water zones, running
+`LeftShallows` → `RightShallows`. Mobs 4–6 (`room_23`, `room_13`, `room_16`)
+run clockwise: `LeftShallows` → `UpShallows` → `RightShallows` →
+`DownShallows`. The added upper/lower zones use `Vector2(78, 45)` to span
+the room's width while keeping the same 45-unit travel depth.
+Each zone rises for 6 seconds, stays high for 6, falls for 6 and rests for 6
+before the next zone starts. A full cycle takes 48 seconds for Mobs 1–3
+or 96 seconds for Mobs 4–6. Timing is configured under `Cycle Timing`;
+the controller's `Zones` array controls order. Only one zone floods at a time.
 
 Mobs 1–3 select up to three enemies per falling tide. Each enemy independently
 chooses either entry in its room's pool with equal probability; a wave can contain

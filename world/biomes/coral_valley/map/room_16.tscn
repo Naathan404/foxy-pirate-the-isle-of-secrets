@@ -169,7 +169,7 @@ shape = SubResource("BoxShape3D_dxhdd")
 [node name="FlatTide" parent="." index="5" unique_id=256012692 node_paths=PackedStringArray("player", "zones") instance=ExtResource("2_flat_tide")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 player = NodePath("../Foxy")
-zones = [NodePath("LeftShallows"), NodePath("RightShallows")]
+zones = [NodePath("LeftShallows"), NodePath("UpShallows"), NodePath("RightShallows"), NodePath("DownShallows")]
 sequential_zones = true
 low_duration = 8.0
 rise_duration = 6.0
@@ -193,6 +193,36 @@ size = Vector2(45, 66)
 high_duration = 6.0
 fall_duration = 6.0
 rest_duration = 6.0
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
+
+[node name="UpShallows" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -15.0999727)
+script = ExtResource("tide_zone_script")
+rise_duration = 6.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+flow_direction = 3
+size = Vector2(78, 45)
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
+
+[node name="DownShallows" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, 5.9000273)
+script = ExtResource("tide_zone_script")
+rise_duration = 6.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+flow_direction = 2
+size = Vector2(78, 45)
 full_coverage = 0.78
 volume_depth = 2.0
 surface_segments_x = 30

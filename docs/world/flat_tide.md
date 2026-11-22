@@ -30,11 +30,12 @@ khô; cảnh báo xuất hiện ở vùng sắp tới lượt. Hết danh sách 
 Chọn từng node vùng nước để chỉnh `Cycle Timing`: `Rise Duration`,
 `High Duration`, `Fall Duration` và `Rest Duration`. Các giá trị này chỉ dùng
 khi chạy lần lượt; nhóm `Shared Timing` trên controller dùng cho chế độ đồng
-thời cũ. Hai vùng mặc định của các phòng Mobs chạy Trái → Phải với thời gian
-6s dâng, 6s giữ, 6s rút, 6s nghỉ; mỗi bên lặp lại sau 48s.
+thời cũ. Mobs 1–3 chạy Trái → Phải; Mobs 4–6 chạy theo chiều kim đồng hồ:
+Trái → Trên → Phải → Dưới. Mỗi vùng dâng 6s, giữ 6s, rút 6s và nghỉ 6s;
+một vòng mất 48s với hai hướng hoặc 96s với bốn hướng.
 
-Muốn chạy Trái → Dưới → Phải → Trên, đặt tên các vùng là `LeftShallows`,
-`DownShallows`, `RightShallows`, `UpShallows`; chỉnh hướng và vị trí từng
+Muốn chạy theo chiều kim đồng hồ, đặt tên các vùng là `LeftShallows`,
+`UpShallows`, `RightShallows`, `DownShallows`; chỉnh hướng và vị trí từng
 node, rồi kéo chúng vào `Zones` theo đúng thứ tự. Mỗi vùng có
 thể dùng thời gian riêng. Danh sách không được chứa node trống hoặc trùng nhau.
 Player, dấu chân và spawner vẫn dùng chung một controller; mỗi lần một vùng
