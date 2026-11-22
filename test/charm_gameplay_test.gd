@@ -455,16 +455,24 @@ func _passives() -> void:
 	player.last_facing_direction = Vector3.FORWARD
 	crab.global_position = RIGHT * 1.5
 	enemy_hp = crab.hp.current_hp
+	var dash_results: Array[bool] = []
+	player.dash_finished.connect(
+		func(interrupted: bool) -> void: dash_results.append(interrupted), CONNECT_ONE_SHOT
+	)
 	player.request_dash()
 	await _frames(48)
+	_check(dash_results == [false], "dash completes before testing Momentum Strike")
 	_check(crab.hp.current_hp < enemy_hp, "real dash leaves delayed shadow blast")
 	var attack := AttackContext.new()
 	attack.action = &"normal"
 	attack.damage_hp = 2.0
 	player.weapon_controller.attack_released.emit(attack)
 	_check(attack.damage_hp == 3.0, "dash empowers first normal release")
-	player.weapon_controller.attack_released.emit(attack)
-	_check(attack.damage_hp == 3.0, "momentum consumed exactly once")
+	var next_attack := AttackContext.new()
+	next_attack.action = &"normal"
+	next_attack.damage_hp = 2.0
+	player.weapon_controller.attack_released.emit(next_attack)
+	_check(next_attack.damage_hp == 2.0, "momentum consumed exactly once")
 	_equip(&"fortune_leaf")
 	var stats: Dictionary[StringName, float] = {}
 	registry.modify_stats(stats)
@@ -536,10 +544,15 @@ func _wall_and_recall() -> void:
 	await _frames(3)
 	_equip(&"shadow_lunge")
 	var hp := crab.hp.current_hp
+	var start_x := player.global_position.x
 	_check(_cast(Q, RIGHT * 5), "lunge launches toward thin wall")
 	await _frames(22)
 	_check(
-		player.global_position.x < 2 and crab.hp.current_hp == hp,
+		(
+			player.global_position.x > start_x
+			and player.global_position.x < wall.global_position.x
+			and crab.hp.current_hp == hp
+		),
 		"thin wall stops lunge before crab"
 	)
 	var hint := player.find_child("RecallHint", true, false) as Label
@@ -688,9 +701,11 @@ func _equip(id: StringName, socket_id: int = Q) -> void:
 	_check(manager.debug_equip_charm(id, socket_id), "equip %s" % id)
 
 
-func _frames(count: int) -> void:
-	for frame in count:
-		await physics_frame
+## The waits represent gameplay time. Hitstop can stretch a single normal-speed tick
+## across many physics frames when the engine runs faster than wall time.
+func _frames(normal_speed_ticks: int) -> void:
+	var seconds := float(normal_speed_ticks) / Engine.physics_ticks_per_second
+	await create_timer(seconds, false, true).timeout
 
 
 func _checkpoint(_label: String) -> void:
