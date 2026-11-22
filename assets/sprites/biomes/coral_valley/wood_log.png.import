@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bvragda4ovwqx"
-path.s3tc="res://.godot/imported/wood_log.png-a382be4ed7847561e8b91016ae02a192.s3tc.ctex"
+path="res://.godot/imported/wood_log.png-a382be4ed7847561e8b91016ae02a192.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/coral_valley/wood_log.png"
-dest_files=["res://.godot/imported/wood_log.png-a382be4ed7847561e8b91016ae02a192.s3tc.ctex"]
+dest_files=["res://.godot/imported/wood_log.png-a382be4ed7847561e8b91016ae02a192.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

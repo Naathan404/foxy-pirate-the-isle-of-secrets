@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgnb2qpxfxfks"
-path.s3tc="res://.godot/imported/venom_vine_dormant.png-fe4961dcccbf065a0ccac4a21e6832ed.s3tc.ctex"
+path="res://.godot/imported/venom_vine_dormant.png-fe4961dcccbf065a0ccac4a21e6832ed.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/enemies/venom_vine/venom_vine_dormant.png"
-dest_files=["res://.godot/imported/venom_vine_dormant.png-fe4961dcccbf065a0ccac4a21e6832ed.s3tc.ctex"]
+dest_files=["res://.godot/imported/venom_vine_dormant.png-fe4961dcccbf065a0ccac4a21e6832ed.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

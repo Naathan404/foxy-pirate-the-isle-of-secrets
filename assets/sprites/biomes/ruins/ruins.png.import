@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c5m0ixi74avo3"
-path.s3tc="res://.godot/imported/ruins.png-b8ee533810bd0a882eaaebd4a9d5c3ab.s3tc.ctex"
+path="res://.godot/imported/ruins.png-b8ee533810bd0a882eaaebd4a9d5c3ab.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/ruins/ruins.png"
-dest_files=["res://.godot/imported/ruins.png-b8ee533810bd0a882eaaebd4a9d5c3ab.s3tc.ctex"]
+dest_files=["res://.godot/imported/ruins.png-b8ee533810bd0a882eaaebd4a9d5c3ab.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
