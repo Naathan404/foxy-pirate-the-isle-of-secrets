@@ -12,6 +12,11 @@ Windows và bản Web bằng Godot 4.7.2, rồi đẩy lên itch.io bằng
 | `publish-itch` | `ubuntu-latest` | Tải artifact, cài butler, đẩy bản Windows vào channel `windows` và bản Web vào channel `html5`. |
 
 Build chạy trên Windows vì SpineBridge chỉ có thư viện native cho Windows.
+
+> **Bản Web đang tạm tắt** (`BUILD_WEB: "false"` trong workflow): trên Web
+> Foxy mất Spine và game còn giật. Workflow chỉ build và upload bản Windows; đặt
+> `BUILD_WEB: "true"` để bật lại. Các phần về Web bên dưới áp dụng khi bật lại.
+
 Preset `Web` loại `addons/spine_bridge/` và `assets/spine/`; trên web Foxy
 dùng sprite thay cho Spine (xem `spine_idle_preview.gd`). Bản Web dùng
 renderer Compatibility và tắt thread, nên không cần bật SharedArrayBuffer trên itch.io.
