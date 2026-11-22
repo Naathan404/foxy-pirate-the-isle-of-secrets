@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_animator.gd" id="1_animator"]
 [ext_resource type="Shader" path="res://gameplay/player/effects/charm_cast_sprite.gdshader" id="2_shader"]
@@ -12,13 +12,17 @@
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/cast_animations/dead_mans_anchor.tres" id="9_clip"]
 [ext_resource type="Resource" path="res://gameplay/charms/charm_data/cast_animations/dead_mans_salute.tres" id="10_clip"]
 
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/cast_animations/glacial_spikes.tres" id="glacial_spikes"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/cast_animations/meteor_strike.tres" id="meteor_strike"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/cast_animations/devil_contract.tres" id="devil_contract"]
+
 [sub_resource type="ShaderMaterial" id="Material_cast"]
 render_priority = 2
 shader = ExtResource("2_shader")
 
 [node name="CharmCastAnimator" type="Node3D"]
 script = ExtResource("1_animator")
-clips = Array[ExtResource("clip_type")]([ExtResource("3_clip"), ExtResource("4_clip"), ExtResource("5_clip"), ExtResource("6_clip"), ExtResource("7_clip"), ExtResource("8_clip"), ExtResource("9_clip"), ExtResource("10_clip")])
+clips = Array[ExtResource("clip_type")]([ExtResource("3_clip"), ExtResource("4_clip"), ExtResource("5_clip"), ExtResource("6_clip"), ExtResource("7_clip"), ExtResource("8_clip"), ExtResource("9_clip"), ExtResource("10_clip"), ExtResource("glacial_spikes"), ExtResource("meteor_strike"), ExtResource("devil_contract")])
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 visible = false

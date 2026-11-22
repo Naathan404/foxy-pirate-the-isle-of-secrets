@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/shadow_renment_effect.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/shadow_renment.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+charm_id = &"shadow_renment"
+display_name = "Shadow Renment"
+description = "Leave a shadow at the start of a dash. It bursts after half a second."
+sprite = ExtResource("3")
+charm_type = 1
+effect_scene = ExtResource("2")
+acquisition_source = &"prototype_debug"
+content_status = 1
+tags = Array[StringName]([&"passive"])
+effect_params = {
+"damage_multiplier": 1.5,
+"radius_units": 2,
+"delay_seconds": 0.5
+}

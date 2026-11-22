@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/active/glacial_spikes_effect.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/glacial_spikes.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+charm_id = &"glacial_spikes"
+display_name = "Glacial Spikes"
+description = "Raise six ice spikes in three widening rows directly ahead of Foxy. Each enemy can be struck once and stunned for one second."
+sprite = ExtResource("3")
+charm_type = 0
+effect_scene = ExtResource("2")
+resource_cost = 125.0
+cooldown_seconds = 7.0
+acquisition_source = &"fixed_boss_reward"
+drop_chance = 1
+tags = Array[StringName]([&"active"])
+effect_params = {
+"damage_multiplier": 1.5,
+"row_count": 3,
+"first_row_distance": 1.15,
+"row_spacing": 1.2,
+"column_spacing": 1.45,
+"row_interval_seconds": 0.12,
+"stun_seconds": 1,
+"windup_seconds": 0.28,
+"radius_units": 1.25
+}

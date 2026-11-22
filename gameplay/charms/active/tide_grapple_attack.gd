@@ -58,6 +58,7 @@ func activate() -> bool:
 	look_at(global_position + context.direction, Vector3.UP)
 	if context.actor is CollisionObject3D:
 		raycast.add_exception(context.actor as CollisionObject3D)
+	raycast.position = HAND_HEIGHT
 	raycast.target_position = Vector3(0.0, 0.0, -range_units)
 	raycast.enabled = true
 	raycast.force_raycast_update()
@@ -66,7 +67,7 @@ func activate() -> bool:
 	_target = null
 	if raycast.is_colliding():
 		_pending_collider = raycast.get_collider()
-		_destination = raycast.get_collision_point() + HAND_HEIGHT
+		_destination = raycast.get_collision_point()
 		_target = _get_damage_target(_pending_collider) as Node3D
 		if is_instance_valid(_target):
 			_target_offset = _destination - _target.global_position
@@ -227,6 +228,9 @@ func _apply_damage(collider: Object, target: Node) -> void:
 	elif target.has_method("receive_damage"):
 		applied_hp = float(target.call("receive_damage", damage))
 	if applied_hp > 0:
+		get_node("/root/AudioManager").play_sfx_3d(
+			preload("res://assets/audio/combat/bow_impact.wav"), _hook_position, -8.0
+		)
 		context.damage_applied.emit(damage, target, applied_hp)
 		get_node("/root/HitstopController").request_local(context.actor, target as Node3D, 0.04)
 

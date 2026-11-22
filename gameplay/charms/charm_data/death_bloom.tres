@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/death_bloom_effect.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/death_bloom.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+charm_id = &"death_bloom"
+display_name = "Death Bloom"
+description = "Enemies slain by normal attacks explode after a brief warning, damaging Foxy and nearby foes."
+sprite = ExtResource("3")
+charm_type = 1
+effect_scene = ExtResource("2")
+acquisition_source = &"prototype_debug"
+content_status = 1
+tags = Array[StringName]([&"passive"])
+effect_params = {
+"blast_hp": 1,
+"radius_units": 2,
+"delay_seconds": 0.32
+}

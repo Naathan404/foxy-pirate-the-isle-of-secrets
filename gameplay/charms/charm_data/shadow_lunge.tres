@@ -8,7 +8,7 @@
 script = ExtResource("1_data")
 charm_id = &"shadow_lunge"
 display_name = "Shadow Lunge"
-description = "Dash forward and deal 300% base weapon damage."
+description = "Lunge up to 5 units. Stop at the first enemy or obstacle and strike for 300% weapon damage. Taking a hit can interrupt the lunge."
 sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
@@ -20,5 +20,6 @@ tags = Array[StringName]([&"active", &"dash", &"melee"])
 effect_params = {
 "damage_multiplier": 3.0,
 "dash_distance_units": 5.0,
+"travel_seconds": 0.18,
 "wall_padding": 0.35
 }

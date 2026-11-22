@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/fortune_leaf_effect.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/fortune_leaf.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+charm_id = &"fortune_leaf"
+display_name = "Fortune Leaf"
+description = "Multiply the chance of enemy item drops by 1.10."
+sprite = ExtResource("3")
+charm_type = 1
+effect_scene = ExtResource("2")
+acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.25
+tags = Array[StringName]([&"passive", &"elite_drop"])
+effect_params = {
+"drop_multiplier": 1.1
+}

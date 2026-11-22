@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/shadow_renment.png" id="2"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/shadow_renment.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+item_id = "charm_shadow_renment"
+display_name = "Shadow Renment"
+icon = ExtResource("2")
+description = "Unlocks the Shadow Renment Charm."
+type = 3
+charm = ExtResource("3")

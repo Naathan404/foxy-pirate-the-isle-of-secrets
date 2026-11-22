@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bug5ypktngs38"]
 
-[ext_resource type="Texture2D" uid="uid://dtufe6c6gwjt6" path="res://assets/sprites/foxy/foxy_hat_sprite_sheet.png" id="1_0rjvg"]
+[ext_resource type="Texture2D" uid="uid://dyu4bcfy7diu8" path="res://assets/sprites/foxy/foxy_gameplay.png" id="1_0rjvg"]
 [ext_resource type="Script" uid="uid://digp88v0glq0y" path="res://gameplay/player/player.gd" id="1_rvh5s"]
 [ext_resource type="Script" uid="uid://y2cqem8ifvo3" path="res://core/state_machine/fsm.gd" id="2_6gmdq"]
 [ext_resource type="Resource" uid="uid://dtb5nvjw0g12a" path="res://data/foxy/foxy_data.tres" id="2_av71s"]
@@ -42,6 +42,15 @@
 [ext_resource type="Script" uid="uid://b4jjfhk68ly5q" path="res://gameplay/inventory/potion_component.gd" id="39_unfpm"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/ambient_motes.tscn" id="ambient_motes"]
 [ext_resource type="Script" uid="uid://cl78s3j6pfbde" path="res://gameplay/player/bounded_follow_camera_3d.gd" id="camera_bounds_follow"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/glacial_spikes.tres" id="glacial_spikes"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/meteor_strike.tres" id="meteor_strike"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/devil_contract.tres" id="devil_contract"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/crimson_band.tres" id="crimson_band"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/death_bloom.tres" id="death_bloom"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/shadow_renment.tres" id="shadow_renment"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/skull_cracker.tres" id="skull_cracker"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/momentum_strike.tres" id="momentum_strike"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/fortune_leaf.tres" id="fortune_leaf"]
 [ext_resource type="Resource" uid="uid://c1gtfqtbeobfm" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
 [ext_resource type="Resource" uid="uid://btyx2ybnfoih7" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
@@ -974,16 +983,15 @@ animation_mapping = {
 "run_up": ["U_Run", "U"]
 }
 artwork_faces_left = false
-size_multiplier = 1.6
 
 [node name="Sprite3D" type="Sprite3D" parent="Visual" unique_id=1889883831]
 transform = Transform3D(0.709, 0, 0, 0, 1, 0, 0, 0, 0.709, 0, 0, 0)
 visible = false
-offset = Vector2(0, 14)
-pixel_size = 0.0625
+offset = Vector2(0, 15.5)
+pixel_size = 0.024390244
 shaded = true
 alpha_cut = 1
-texture_filter = 0
+texture_filter = 1
 texture = ExtResource("1_0rjvg")
 hframes = 4
 vframes = 15
@@ -1109,7 +1117,7 @@ loadout = SubResource("Resource_ieged")
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")
-definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute")])
+definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute"), ExtResource("glacial_spikes"), ExtResource("meteor_strike"), ExtResource("devil_contract"), ExtResource("crimson_band"), ExtResource("death_bloom"), ExtResource("shadow_renment"), ExtResource("skull_cracker"), ExtResource("momentum_strike"), ExtResource("fortune_leaf")])
 
 [node name="ChaosComponent" type="Node" parent="." unique_id=2085136369]
 script = ExtResource("21_chaos")

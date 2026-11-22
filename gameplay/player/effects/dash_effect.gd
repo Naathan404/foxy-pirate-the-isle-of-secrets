@@ -142,9 +142,8 @@ func _show_next_ghost() -> void:
 		g.hide()
 		return
 	_spine_ghosts[index].hide()
-	# A newly selected Spine clip may not have rendered its first mesh yet.
-	# Never reveal the hidden legacy sheet as a dash afterimage.
-	if is_instance_valid(spine_preview) and bool(spine_preview.get("enabled")):
+	# A new Spine clip may still be preparing its first mesh. Snapshot the visible actor.
+	if not sprite.is_visible_in_tree():
 		g.hide()
 		return
 
@@ -153,6 +152,7 @@ func _show_next_ghost() -> void:
 	g.vframes = sprite.vframes
 	g.frame = sprite.frame
 	g.pixel_size = sprite.pixel_size
+	g.texture_filter = sprite.texture_filter
 	g.offset = sprite.offset
 	g.centered = sprite.centered
 	g.flip_h = sprite.flip_h

@@ -30,11 +30,12 @@ func can_activate(context: CharmActivationContext) -> bool:
 
 
 func activate(context: CharmActivationContext) -> bool:
-	if not can_activate(context):
+	if not can_activate(context) or not _begin_cast_lock():
 		return false
 	var execution := CHARM_ATTACK_SCENE.instantiate() as CrescentCleaveAttack
 	var parent := actor.get_parent()
 	if execution == null or not is_instance_valid(parent):
+		_end_cast_lock()
 		if is_instance_valid(execution):
 			execution.free()
 		return false
@@ -51,6 +52,7 @@ func activate(context: CharmActivationContext) -> bool:
 	if execution.activate():
 		_play_cast_animation(&"active", _cast_direction, execution.active_seconds)
 		return true
+	_end_cast_lock()
 	execution.queue_free()
 	_execution = null
 	return false
@@ -68,6 +70,7 @@ func cancel_active() -> void:
 
 
 func _on_active_completed() -> void:
+	_end_cast_lock()
 	# Same fade window used by the heavy MeleeSlashVFX.
 	_play_cast_animation(&"recover", _cast_direction, 0.22, true)
 
@@ -88,15 +91,6 @@ func _build_context(activation: CharmActivationContext) -> AttackContext:
 		0.0, _get_base_damage() * definition.get_param_float(&"damage_multiplier")
 	)
 	return result
-
-
-func _get_base_damage() -> float:
-	var weapon_controller := actor.get("weapon_controller") as WeaponController
-	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
-		var attack := weapon_controller.equipped.get_attack(&"normal")
-		if attack != null:
-			return attack.damage_hp
-	return 1
 
 
 func _on_execution_exited(execution: CrescentCleaveAttack) -> void:

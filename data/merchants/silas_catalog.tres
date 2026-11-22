@@ -17,14 +17,18 @@
 [ext_resource type="Resource" uid="uid://bt21m2gguymn5" path="res://data/items/materials/venom_vibe.tres" id="14_bwia0"]
 [ext_resource type="Resource" uid="uid://7fidgq5qktgt" path="res://data/items/materials/black_volcanic_soil.tres" id="item_black_volcanic_soil"]
 [ext_resource type="Resource" uid="uid://byyg810qiyovc" path="res://data/items/materials/cannonball.tres" id="item_cannonball"]
+[ext_resource type="Resource" path="res://data/items/charms/crimson_band.tres" id="item_crimson_band"]
 [ext_resource type="Resource" uid="uid://cwsiey2oila6t" path="res://data/items/materials/curse_stone.tres" id="item_curse_stone"]
 [ext_resource type="Resource" uid="uid://bf8plhgkwh3xm" path="res://data/items/materials/eternal_ice.tres" id="item_eternal_ice"]
 [ext_resource type="Resource" uid="uid://cxsmklbe8xp2j" path="res://data/items/materials/fire_slime.tres" id="item_fire_slime"]
 [ext_resource type="Resource" uid="uid://6ywrjvdb7pny" path="res://data/items/materials/flame.tres" id="item_flame"]
+[ext_resource type="Resource" path="res://data/items/charms/fortune_leaf.tres" id="item_fortune_leaf"]
 [ext_resource type="Resource" uid="uid://bsy5osltvxael" path="res://data/items/materials/hard_stone.tres" id="item_hard_stone"]
 [ext_resource type="Resource" uid="uid://3av06idqqvw5" path="res://data/items/materials/misty_swamp_weed.tres" id="item_misty_swamp_weed"]
+[ext_resource type="Resource" path="res://data/items/charms/momentum_strike.tres" id="item_momentum_strike"]
 [ext_resource type="Resource" uid="uid://drubq7hdupci8" path="res://data/items/materials/red_volcanic_soil.tres" id="item_red_volcanic_soil"]
 [ext_resource type="Resource" uid="uid://mhr3jnw8jpft" path="res://data/items/materials/skeleton_bone.tres" id="item_skeleton_bone"]
+[ext_resource type="Resource" path="res://data/items/charms/skull_cracker.tres" id="item_skull_cracker"]
 [ext_resource type="Resource" uid="uid://cvr2hcko42lkb" path="res://data/items/materials/snowball.tres" id="item_snowball"]
 [ext_resource type="Resource" uid="uid://dh7x2cv5sulr7" path="res://data/items/materials/snowflake.tres" id="item_snowflake"]
 [ext_resource type="Resource" uid="uid://btgw3svx2w1ro" path="res://data/items/materials/snow_ghost_cloak.tres" id="item_snow_ghost_cloak"]
@@ -231,8 +235,32 @@ offer_id = &"curse_stone"
 item = ExtResource("item_curse_stone")
 sell_price = 50
 
+[sub_resource type="Resource" id="Offer_crimson_band"]
+script = ExtResource("2_offer")
+offer_id = &"crimson_band"
+item = ExtResource("item_crimson_band")
+buy_price = 100
+
+[sub_resource type="Resource" id="Offer_skull_cracker"]
+script = ExtResource("2_offer")
+offer_id = &"skull_cracker"
+item = ExtResource("item_skull_cracker")
+buy_price = 100
+
+[sub_resource type="Resource" id="Offer_momentum_strike"]
+script = ExtResource("2_offer")
+offer_id = &"momentum_strike"
+item = ExtResource("item_momentum_strike")
+buy_price = 100
+
+[sub_resource type="Resource" id="Offer_fortune_leaf"]
+script = ExtResource("2_offer")
+offer_id = &"fortune_leaf"
+item = ExtResource("item_fortune_leaf")
+buy_price = 200
+
 [resource]
 script = ExtResource("1_catalog")
-offers = Array[ExtResource("2_offer")]([SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_large_healing"), SubResource("Offer_large_stamina"), SubResource("Offer_starfish"), SubResource("Offer_crab"), SubResource("Offer_gunpowder"), SubResource("Resource_pgjsf"), SubResource("Resource_a82x4"), SubResource("Resource_bggsi"), SubResource("Resource_yqegw"), SubResource("Resource_1q27o"), SubResource("Resource_xg348"), SubResource("Offer_skeleton_bone"), SubResource("Offer_misty_swamp_weed"), SubResource("Offer_wood_log"), SubResource("Offer_flame"), SubResource("Offer_fire_slime"), SubResource("Offer_cannonball"), SubResource("Offer_red_volcanic_soil"), SubResource("Offer_black_volcanic_soil"), SubResource("Offer_snowball"), SubResource("Offer_hard_stone"), SubResource("Offer_snow_ghost_cloak"), SubResource("Offer_eternal_ice"), SubResource("Offer_snowflake"), SubResource("Offer_curse_stone")])
+offers = Array[ExtResource("2_offer")]([SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_large_healing"), SubResource("Offer_large_stamina"), SubResource("Offer_starfish"), SubResource("Offer_crab"), SubResource("Offer_gunpowder"), SubResource("Resource_pgjsf"), SubResource("Resource_a82x4"), SubResource("Resource_bggsi"), SubResource("Resource_yqegw"), SubResource("Resource_1q27o"), SubResource("Resource_xg348"), SubResource("Offer_skeleton_bone"), SubResource("Offer_misty_swamp_weed"), SubResource("Offer_wood_log"), SubResource("Offer_flame"), SubResource("Offer_fire_slime"), SubResource("Offer_cannonball"), SubResource("Offer_red_volcanic_soil"), SubResource("Offer_black_volcanic_soil"), SubResource("Offer_snowball"), SubResource("Offer_hard_stone"), SubResource("Offer_snow_ghost_cloak"), SubResource("Offer_eternal_ice"), SubResource("Offer_snowflake"), SubResource("Offer_curse_stone"), SubResource("Offer_crimson_band"), SubResource("Offer_skull_cracker"), SubResource("Offer_momentum_strike"), SubResource("Offer_fortune_leaf")])
 guaranteed_buy_offer_ids = Array[StringName]([&"wooden_arrow", &"small_healing_potion", &"small_stamina_potion"])
 random_buy_offer_count = 4

@@ -27,6 +27,10 @@ func get_icon() -> Texture2D:
 	return item.icon if item != null else null
 
 
+func is_unique_purchase() -> bool:
+	return kind == Kind.WEAPON or (item != null and item.charm != null)
+
+
 func is_valid() -> bool:
 	if offer_id.is_empty():
 		return false

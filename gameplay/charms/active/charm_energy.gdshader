@@ -50,11 +50,31 @@ void fragment() {
 		float rings = pow(wave, 18.0) * smoothstep(0.1, 0.65, r);
 		float fire = pow(max(0.0, sin(a * 12.0 + r * 8.0 - phase * 9.0)), 14.0);
 		mask = (rings + fire * r * 0.45) * (1.0 - smoothstep(0.84, 1.0, r));
-	} else {
+	} else if (style == 5) {
 		float ring = band(r - 0.9, 0.022);
 		float ticks = pow(max(0.0, cos(a * 8.0)), 40.0) * band(r - 0.77, 0.09);
 		float sweep = pow(max(0.0, cos(a - phase * 5.0)), 12.0) * band(r - 0.88, 0.05);
 		mask = ring * 0.45 + ticks + sweep;
+	} else if (style == 6) {
+		// Six branching fractures open from the foot of the crystal.
+		float sector = mod(a + 0.5236, 1.0472) - 0.5236;
+		vec2 sector_pos = vec2(cos(sector), abs(sin(sector))) * r;
+		float spine = band(sector_pos.y, mix(0.048, 0.012, r));
+		float forks = band(sector_pos.y - (sector_pos.x - 0.32) * 0.64, 0.027);
+		forks *= smoothstep(0.31, 0.39, sector_pos.x) * (1.0 - smoothstep(0.63, 0.78, r));
+		float reach = mix(0.24, 1.03, smoothstep(0.0, 0.35, progress));
+		mask = (spine + forks) * (1.0 - smoothstep(reach - 0.12, reach, r));
+	} else {
+		// Disconnected crystal tips leave space between telegraphs in adjacent rows.
+		float sector = mod(a + 0.5236, 1.0472) - 0.5236;
+		vec2 tip = vec2(cos(sector), abs(sin(sector))) * r;
+		float inner = mix(0.64, 0.42, progress);
+		float outline = band(tip.y - (tip.x - inner) * 0.36, 0.024);
+		outline *= smoothstep(inner - 0.03, inner + 0.03, tip.x);
+		outline *= 1.0 - smoothstep(0.74, 0.84, r);
+		float seed = band(abs(p.x) + abs(p.y) * 0.72 - 0.10, 0.034);
+		mask = outline + seed;
+		fade = mix(0.46, 0.90, progress);
 	}
 	mask *= 0.88 + grain * 0.12;
 	ALBEDO = mix(tint.rgb, vec3(1.0, 0.98, 0.9), clamp(mask - 0.5, 0.0, 0.75)) * 1.7;

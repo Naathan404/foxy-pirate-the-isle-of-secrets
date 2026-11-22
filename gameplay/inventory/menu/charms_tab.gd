@@ -250,6 +250,8 @@ func _refresh_sockets(animate: bool) -> void:
 		if safe
 		else "Not a safe location: rest at a checkpoint or the hub to change charms."
 	)
+	if not safe and is_instance_valid(charms) and charms.can_debug_change_loadout():
+		_safe_label.text = "Debug: owned charms can be equipped here."
 	_socket_count_label.text = (
 		"Sockets open: %d/%d" % [unlocked_count, CharmConstants.MAX_SOCKET_COUNT]
 	)
@@ -345,11 +347,12 @@ func _show_locked_details() -> void:
 func _refresh_action(owned: bool, equipped_socket: int) -> void:
 	var target_name := _socket_name(_target_socket)
 	var in_target := equipped_socket == _target_socket
+	var debug_loadout := charms.can_debug_change_loadout(_selected_id)
 	_action_button.text = "Unequip" if in_target else "Equip to %s" % target_name
 	var reason := ""
 	if not owned:
 		reason = "You have not acquired this charm yet."
-	elif not charms.is_socket_unlocked(_target_socket):
+	elif not charms.is_socket_unlocked(_target_socket) and not debug_loadout:
 		reason = "The %s socket is locked." % target_name
 	elif not in_target and equipped_socket >= 0:
 		reason = "Already in %s. Unequip it there first." % _socket_name(equipped_socket)
@@ -363,6 +366,10 @@ func _refresh_action(owned: bool, equipped_socket: int) -> void:
 	_action_button.disabled = not reason.is_empty()
 	if not reason.is_empty():
 		_action_hint.text = reason
+	elif debug_loadout and not charms.is_socket_unlocked(_target_socket):
+		_action_hint.text = "Equipping this charm will unlock %s in debug." % target_name
+	elif debug_loadout and not charms.can_change_loadout():
+		_action_hint.text = "Debug: equip or remove an owned charm on this map."
 	elif not charms.can_change_loadout():
 		_action_hint.text = "Not a safe location: changes will be refused."
 	else:
@@ -376,11 +383,19 @@ func _on_action_pressed() -> void:
 	var unequip := charms.get_equipped_charm(_target_socket) == definition.charm_id
 	_awaiting_result = true
 	_last_rejection = &""
-	var changed := (
-		charms.unequip_charm(_target_socket)
-		if unequip
-		else charms.equip_charm(definition.charm_id, _target_socket)
-	)
+	var changed: bool
+	if charms.can_debug_change_loadout(definition.charm_id):
+		changed = (
+			charms.debug_unequip_charm(_target_socket)
+			if unequip
+			else charms.debug_equip_charm(definition.charm_id, _target_socket)
+		)
+	else:
+		changed = (
+			charms.unequip_charm(_target_socket)
+			if unequip
+			else charms.equip_charm(definition.charm_id, _target_socket)
+		)
 	_awaiting_result = false
 	refresh()
 	if changed:

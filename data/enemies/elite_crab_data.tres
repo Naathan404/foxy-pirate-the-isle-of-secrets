@@ -15,6 +15,7 @@ hit_knockback_speed = 8.0
 knockback_resistance = 0.5
 hit_deceleration = 20.0
 stagger_threshold = 120.0
+elite_charm_drops = true
 drop_item = ExtResource("2_drop")
 drop_quantity = 3
 drop_chance = 1.0
