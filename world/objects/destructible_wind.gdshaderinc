@@ -62,6 +62,11 @@ void fragment() {
 	ALBEDO = mix(texel.rgb * COLOR.rgb, flash_color.rgb, flash_strength * flash_color.a);
 	ALPHA = texel.a * COLOR.a;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	// Compatibility (used by Web) keeps the mesh normal when vertex() rewrites
+	// MODELVIEW_MATRIX, so lights between root and tip darkened half the card.
+	NORMAL = vec3(0.0, 0.0, 1.0);
+#endif
 #ifdef UPRIGHT_DEPTH
 	if (PROJECTION_MATRIX[3][3] > 0.5) {
 		// Orthographic shadow pass (a prop that still casts a shadow-map shadow): the camera
@@ -75,7 +80,12 @@ void fragment() {
 			? dot(pivot_view, upright_normal_view) / facing
 			: length(VERTEX);
 		vec4 clip = PROJECTION_MATRIX * vec4(ray * distance_along_ray, 1.0);
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+		// OpenGL clip depth spans -1..1, while DEPTH expects the 0..1 window range.
+		DEPTH = clip.z / clip.w * 0.5 + 0.5;
+#else
 		DEPTH = clip.z / clip.w;
+#endif
 	}
 #endif
 }

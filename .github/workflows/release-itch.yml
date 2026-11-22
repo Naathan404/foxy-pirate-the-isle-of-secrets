@@ -22,6 +22,9 @@ env:
   WINDOWS_PRESET: Windows Desktop
   WINDOWS_DIR: build/windows
   WINDOWS_EXECUTABLE: foxy_pirate_tios.exe
+  # Web build is paused: SpineBridge has no Web library and the Web build
+  # stutters. Set to "true" to export and upload the html5 channel again.
+  BUILD_WEB: "false"
   WEB_PRESET: Web
   WEB_DIR: build/web
   # itch.io rejects HTML5 uploads containing a single file above this size.
@@ -29,7 +32,7 @@ env:
 
 jobs:
   build:
-    name: Export Windows and Web builds
+    name: Export builds
     # SpineBridge ships native libraries only for Windows, so the export must
     # run on a Windows host for the extension to load during import.
     runs-on: windows-latest
@@ -102,14 +105,20 @@ jobs:
           run_godot 300s --editor --import --quit
           run_godot 300s --editor --import --quit
 
-          mkdir -p "$WINDOWS_DIR" "$WEB_DIR"
+          mkdir -p "$WINDOWS_DIR"
           run_godot 600s --export-release "$WINDOWS_PRESET" "$WINDOWS_DIR/$WINDOWS_EXECUTABLE"
           require_file "$WINDOWS_DIR/$WINDOWS_EXECUTABLE"
+          ls -la "$WINDOWS_DIR"
+
+          if [[ "$BUILD_WEB" != "true" ]]; then
+            echo "Web build is disabled (BUILD_WEB=$BUILD_WEB)."
+            exit 0
+          fi
+          mkdir -p "$WEB_DIR"
           # itch.io serves the HTML5 build from index.html at the archive root.
           run_godot 600s --export-release "$WEB_PRESET" "$WEB_DIR/index.html"
           require_file "$WEB_DIR/index.html"
-
-          ls -la "$WINDOWS_DIR" "$WEB_DIR"
+          ls -la "$WEB_DIR"
           find "$WEB_DIR" -type f -size +"${ITCH_WEB_FILE_LIMIT_BYTES}"c -print0 \
             | while IFS= read -r -d '' oversized; do
                 echo "::warning file=$oversized::Web file exceeds the itch.io per-file limit"
@@ -123,6 +132,7 @@ jobs:
           retention-days: 14
 
       - uses: actions/upload-artifact@v4
+        if: env.BUILD_WEB == 'true'
         with:
           name: web-build
           path: ${{ env.WEB_DIR }}
@@ -169,4 +179,6 @@ jobs:
           fi
           butler -V
           butler push builds/windows-build "$ITCH_GAME:windows" --userversion "$BUILD_VERSION"
-          butler push builds/web-build "$ITCH_GAME:html5" --userversion "$BUILD_VERSION"
+          if [[ "$BUILD_WEB" == "true" ]]; then
+            butler push builds/web-build "$ITCH_GAME:html5" --userversion "$BUILD_VERSION"
+          fi
