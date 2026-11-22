@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://11t211sqmt73"
-path.s3tc="res://.godot/imported/meteor.png-d578e7038eb8a938370f6ded7af3489a.s3tc.ctex"
+path="res://.godot/imported/meteor.png-d578e7038eb8a938370f6ded7af3489a.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/effects/meteor/meteor.png"
-dest_files=["res://.godot/imported/meteor.png-d578e7038eb8a938370f6ded7af3489a.s3tc.ctex"]
+dest_files=["res://.godot/imported/meteor.png-d578e7038eb8a938370f6ded7af3489a.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

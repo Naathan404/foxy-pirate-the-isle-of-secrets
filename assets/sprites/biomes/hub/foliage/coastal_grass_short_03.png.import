@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dny82w00yiajj"
-path.s3tc="res://.godot/imported/coastal_grass_short_03.png-0346c2ab5a2ad6b90960d3bcd8ad931d.s3tc.ctex"
+path="res://.godot/imported/coastal_grass_short_03.png-0346c2ab5a2ad6b90960d3bcd8ad931d.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/hub/foliage/coastal_grass_short_03.png"
-dest_files=["res://.godot/imported/coastal_grass_short_03.png-0346c2ab5a2ad6b90960d3bcd8ad931d.s3tc.ctex"]
+dest_files=["res://.godot/imported/coastal_grass_short_03.png-0346c2ab5a2ad6b90960d3bcd8ad931d.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

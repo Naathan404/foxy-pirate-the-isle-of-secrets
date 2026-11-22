@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgg8euwsnpull"
-path.s3tc="res://.godot/imported/sleep_6.png-b68b5072057e1834a07ea486e359bed9.s3tc.ctex"
+path="res://.godot/imported/sleep_6.png-b68b5072057e1834a07ea486e359bed9.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/enemies/coral_skeleton/sleep_6.png"
-dest_files=["res://.godot/imported/sleep_6.png-b68b5072057e1834a07ea486e359bed9.s3tc.ctex"]
+dest_files=["res://.godot/imported/sleep_6.png-b68b5072057e1834a07ea486e359bed9.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

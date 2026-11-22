@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cosmx2jjbfa1y"
-path.s3tc="res://.godot/imported/Master_Tortuga_Talking.png-7d95054ef2434986209ce6b492667cfb.s3tc.ctex"
+path="res://.godot/imported/Master_Tortuga_Talking.png-7d95054ef2434986209ce6b492667cfb.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/npcs/master_tortuga/Master_Tortuga_Talking.png"
-dest_files=["res://.godot/imported/Master_Tortuga_Talking.png-7d95054ef2434986209ce6b492667cfb.s3tc.ctex"]
+dest_files=["res://.godot/imported/Master_Tortuga_Talking.png-7d95054ef2434986209ce6b492667cfb.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
