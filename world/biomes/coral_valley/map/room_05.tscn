@@ -76,6 +76,7 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_05" instance=ExtResource("1_base")]
+safe_room = true
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_04.tscn"
 
