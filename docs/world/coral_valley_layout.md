@@ -2,7 +2,15 @@
 
 Numbering follows the reference diagram: middle row left to right, then top row, then bottom row.
 
-Mobs, Raid, Chest, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (12 Medium and 14 Small rooms). Two-island rooms keep both islands and their moving-platform connections.
+Mobs, Raid, Chest, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (12 Medium and 14 Small rooms). Two-island rooms keep both islands; their moving platforms have been removed.
+
+All 26 map rooms use the clipped-corner Coral Valley ground and convex ground
+collision. The right-hand islands (`Environment/BaseGround2`) in `room_04`,
+`room_09` and `room_24` match the Small template's ground texture, sprite
+transform, scale and convex collider. Their secondary seaweed candidate
+positions match the main island's rim positions translated 43 units to the right.
+Moving platforms and their docks were removed from these three rooms;
+there is currently no platform connection between their two islands.
 
 | Room | Row | Type | Layout | Exits |
 | --- | --- | --- | --- | --- |
@@ -65,7 +73,7 @@ All non-Materials rooms spawn seaweed around their island rims on each visit. Me
 | Small, one island | `room_01`, `room_03`, `room_06`, `room_11`, `room_15`, `room_17`, `room_18`, `room_20`, `room_22` | 15 per room |
 | Small, two islands | `room_04`, `room_09`, `room_24` | 15 on each island, 30 per room |
 
-Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and moving-platform docks and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
+Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
 Coral and coconut palms do not appear in any other Coral Valley room. The old
 mixed shell, stone and octopus pool is no longer used by any room, including

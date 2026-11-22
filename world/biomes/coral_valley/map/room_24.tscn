@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ground"]
-[ext_resource type="Texture2D" uid="uid://br6nlj3hqp28h" path="res://assets/sprites/biomes/coral_valley/Whimsical Square Beach Island Tile.png" id="3_ground_texture"]
-[ext_resource type="PackedScene" uid="uid://d255p1ch6pm45" path="res://world/objects/moving_platform.tscn" id="4_platform"]
+[ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://assets/sprites/biomes/coral_valley/coral_valley_ground.png" id="3_ground_texture"]
+[ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="ground_shape"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
@@ -79,14 +79,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ground_right"]
-resource_local_to_scene = true
-size = Vector3(10.95, 1, 12.2875)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_ot41l"]
-resource_local_to_scene = true
-size = Vector3(4, 0.5, 4)
-
 [node name="room_24" instance=ExtResource("1_base")]
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_25.tscn"
@@ -147,29 +139,15 @@ shape = SubResource("BoxShape3D_left_trigger")
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 43, 0, -0.19104576)
 
 [node name="Sprite3D" parent="Environment/BaseGround2" index="0" unique_id=516185212]
+transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0, 0.753676)
 texture = ExtResource("3_ground_texture")
 
 [node name="CollisionShape3D" parent="Environment/BaseGround2/StaticBody3D" index="0" unique_id=87426523]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, -0.13125)
-shape = SubResource("BoxShape3D_ground_right")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, 0.31086218)
+shape = ExtResource("ground_shape")
 
 [node name="CornerB" parent="CameraBounds" index="1" unique_id=258800514 parent_id_path=PackedInt32Array(1592807299)]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78.538887, 0, -34.597424)
-
-[node name="MovingPlatform" parent="." instance=ExtResource("4_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, -0.03991985, -0.19104576)
-
-[node name="CollisionShape3D" parent="MovingPlatform/Platform" index="2" unique_id=395830429]
-shape = SubResource("BoxShape3D_ot41l")
-
-[node name="End" parent="MovingPlatform" index="2" unique_id=1910727390]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.425, 0, 0)
-
-[node name="StartDock" parent="MovingPlatform" index="3" unique_id=1539520790]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4, 0.77503157, -4)
-
-[node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 18.425, 0.77503157, -4)
 
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")
@@ -179,7 +157,7 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 
 [node name="RandomSeaweed2" type="Node3D" parent="."]
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(32.649, 0, -7.039, 33.659, 0, -8.787, 34.084, 0, -12.739, 37.289, 0, -11.97, 40.863, 0, -11.532, 44.259, 0, -12.493, 46.573, 0, -12.181, 50.783, 0, -12.684, 53.682, 0, -12.701, 52.69, 0, -10.775, 52.313, 0, -8.327, 52.446, 0, -6.132, 52.73, 0, 8.2, 53.57, 0, 11.122, 51.306, 0, 11.391, 48.622, 0, 10.514, 46.691, 0, 11.797, 42.654, 0, 10.648, 40.014, 0, 11.381, 37.762, 0, 11.183, 35.45, 0, 11.589, 32.852, 0, 11.382, 32.745, 0, 9.11, 32.933, 0, 5.004)
+spawn_positions = PackedVector3Array(35.824, 0, -9.789, 38.079, 0, -10.654, 40.266, 0, -11.256, 42.374, 0, -11.979, 44.264, 0, -10.98, 46.24, 0, -10.64, 48.177, 0, -11.919, 48.803, 0, -9.816, 52.317, 0, -5.243, 52.478, 0, 5.657, 52.551, 0, 8.175, 51.941, 0, 10.795, 49.826, 0, 11.172, 47.757, 0, 12.841, 45.441, 0, 11.701, 42.532, 0, 12.208, 40.118, 0, 12.619, 37.799, 0, 12.497, 35.79, 0, 12.365, 34.828, 0, 10.605, 33.331, 0, 9.102, 32.98, 0, 7.111, 33.44, 0, 5.016)
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
@@ -193,4 +171,3 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [editable path="Exits/LeftPath"]
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround2"]
-[editable path="MovingPlatform"]
