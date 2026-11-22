@@ -73,7 +73,8 @@ func _draw() -> void:
 	var camera := get_viewport().get_camera_3d()
 	if not is_instance_valid(camera):
 		return
-	var ratio := get_viewport_rect().size / reference_size
+	var visible_area := get_viewport_rect()
+	var ratio := visible_area.size / reference_size
 	if ratio.x <= 0.0 or ratio.y <= 0.0:
 		return
 	if _reference_camera_size <= 0.0:
@@ -91,6 +92,12 @@ func _draw() -> void:
 			continue
 		var zoom_scale := _projection_scale(camera, world_point)
 		var screen_point := camera.unproject_position(world_point)
+		# The field covers the whole room, so most items are off screen in a large room.
+		# Skip them: each trail is dozens of polygons, and drawing them all dominated the frame.
+		var reach := leaf_size if index < leaf_count else trail_length + trail_wave_height
+		var reach_pixels := reach * maxf(ratio.x, ratio.y) * zoom_scale
+		if not visible_area.grow(reach_pixels).has_point(screen_point):
+			continue
 		# Draw shapes around the projected world point; camera zoom scales them too.
 		var point := screen_point / (ratio * zoom_scale)
 		if index < leaf_count:

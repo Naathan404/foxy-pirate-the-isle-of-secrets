@@ -5,16 +5,16 @@
 
 [node name="room_06" unique_id=971402708 instance=ExtResource("1_base")]
 open_exits = 14
-right_destination_scene = "res://world/biomes/hub/map/room_07.tscn"
-down_destination_scene = "res://world/biomes/hub/map/room_02.tscn"
-left_destination_scene = "res://world/biomes/hub/map/room_05.tscn"
+right_destination_scene = "res://world/biomes/hub/legacy/room_07.tscn"
+down_destination_scene = "res://world/biomes/hub/legacy/room_02.tscn"
+left_destination_scene = "res://world/biomes/hub/legacy/room_05.tscn"
 metadata/room_role = "Train"
 
 [node name="DirectionalLight3D" parent="General" index="1"]
 light_energy = 1.5
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/hub/map/room_02.tscn"
+destination_scene = "res://world/biomes/hub/legacy/room_02.tscn"
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false
@@ -33,10 +33,10 @@ enabled = false
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/hub/map/room_07.tscn"
+destination_scene = "res://world/biomes/hub/legacy/room_07.tscn"
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/hub/map/room_05.tscn"
+destination_scene = "res://world/biomes/hub/legacy/room_05.tscn"
 
 [node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252096, 0)

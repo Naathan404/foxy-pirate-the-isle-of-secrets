@@ -81,7 +81,7 @@ size = Vector3(0.5, 2, 4)
 safe_room = true
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
-left_destination_scene = "res://world/biomes/hub/map/room_04.tscn"
+left_destination_scene = "res://world/biomes/hub/map/castaway_cove.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_w8c4o")
@@ -146,7 +146,7 @@ shape = SubResource("BoxShape3D_vib4w")
 shape = SubResource("BoxShape3D_gbjkc")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/hub/map/room_04.tscn"
+destination_scene = "res://world/biomes/hub/map/castaway_cove.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_tpgxu")

@@ -115,7 +115,8 @@ khác vẫn còn hoạt động.
   permission suốt thời gian Player ở phòng đó. Phòng là source, nên đổi phòng sẽ giải phóng
   nó và tự tắt permission.
   - Toàn bộ Hub: bật trên ba scene gốc `world/biomes/hub/base_scenes/base_*_room.tscn`, nên
-    mọi phòng Hub, kể cả phòng mới, đều là safe room.
+    mọi phòng Hub kế thừa chúng (như `silas_tent.tscn`) đều là safe room. Hub trung tâm
+    `castaway_cove.tscn` kế thừa thẳng `hub_room.tscn` nên tự bật cờ trên gốc scene.
   - Phòng nghỉ có lửa trại: bật trên từng phòng (hiện là Coral Valley `room_00`, `room_05`).
     Lửa trại chỉ là prop phá được, không tự tạo permission; đặt lửa trại vào phòng mới thì
     bật thêm cờ cho phòng đó.

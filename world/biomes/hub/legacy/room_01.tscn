@@ -1,12 +1,12 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cwrljro2qwmen" path="res://world/biomes/hub/base_scenes/base_small_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://d28ts6bee173j" path="res://world/biomes/hub/base_scenes/base_medium_room.tscn" id="1_base"]
 
-[node name="room_04" instance=ExtResource("1_base")]
+[node name="room_01" instance=ExtResource("1_base")]
 open_exits = 10
-right_destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
-left_destination_scene = "res://world/biomes/hub/map/room_03.tscn"
-metadata/room_role = "Coral"
+right_destination_scene = "res://world/biomes/hub/legacy/room_02.tscn"
+left_destination_scene = "res://world/biomes/hub/legacy/room_00.tscn"
+metadata/room_role = "NPC1"
 
 [node name="DirectionalLight3D" parent="General" index="1"]
 light_energy = 1.5

@@ -39,4 +39,4 @@ The GDD specifies gold and materials for each Forge but the balance sheet does n
 
 Blueprint/weapon ownership, inventory and Forge changes are runtime state. The project still needs its general save system to retain them between launches. Blueprint item resources are available for pickup or drop configuration; their world locations and drop rates are not configured here.
 
-`test/tortuga_test.gd` is no longer in the repository. Check Tortuga by playing `world/biomes/hub/map/room_07.tscn`: greeting, Craft with and without materials, Forge, the choice popup, leaving with Esc or Back, and talking to him again.
+`test/tortuga_test.gd` is no longer in the repository. Check Tortuga by playing `world/biomes/hub/map/castaway_cove.tscn` (he stands by the forge on the east road): greeting, Craft with and without materials, Forge, the choice popup, leaving with Esc or Back, and talking to him again.

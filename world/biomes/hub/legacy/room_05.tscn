@@ -2,12 +2,10 @@
 
 [ext_resource type="PackedScene" uid="uid://cwrljro2qwmen" path="res://world/biomes/hub/base_scenes/base_small_room.tscn" id="1_base"]
 
-[node name="room_09" instance=ExtResource("1_base")]
-open_exits = 11
-up_destination_scene = "res://world/biomes/hub/map/room_02.tscn"
-right_destination_scene = "res://world/biomes/hub/map/room_10.tscn"
-left_destination_scene = "res://world/biomes/hub/map/room_08.tscn"
-metadata/room_role = "Empty"
+[node name="room_05" instance=ExtResource("1_base")]
+open_exits = 2
+right_destination_scene = "res://world/biomes/hub/legacy/room_06.tscn"
+metadata/room_role = "Frozen"
 
 [node name="DirectionalLight3D" parent="General" index="1"]
 light_energy = 1.5

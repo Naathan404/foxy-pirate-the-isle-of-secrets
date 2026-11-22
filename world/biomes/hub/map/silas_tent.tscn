@@ -2,20 +2,30 @@
 
 [ext_resource type="PackedScene" uid="uid://d28ts6bee173j" path="res://world/biomes/hub/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="2_silas"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/hub_landmark_placeholder.tscn" id="3_placeholder"]
 
-[node name="room_08" instance=ExtResource("1_base")]
-open_exits = 2
-right_destination_scene = "res://world/biomes/hub/map/room_09.tscn"
+[node name="silas_tent" instance=ExtResource("1_base")]
+open_exits = 4
+down_destination_scene = "res://world/biomes/hub/map/castaway_cove.tscn"
+down_destination_trigger_id = &"hub_to_silas"
 metadata/room_role = "NPC2"
 
 [node name="DirectionalLight3D" parent="General" index="1"]
 light_energy = 1.5
 
-[node name="Foxy" parent="." index="3" unique_id=1350175917]
-position = Vector3(5, 2.0626488, 0)
+[node name="Foxy" parent="." index="3"]
+position = Vector3(0, 2.0626488, 8)
 
 [node name="Silas" parent="." index="5" instance=ExtResource("2_silas")]
-position = Vector3(0, 0.252096, 0)
+position = Vector3(0, 0.252096, -2)
+
+[node name="MerchantTent" parent="." index="6" instance=ExtResource("3_placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252096, -8.5)
+title = "Lều thương nhân"
+status_note = "chưa xây · chưa có hệ thống xây dựng"
+footprint_meters = Vector2(8, 4)
+height_meters = 3.0
+tint = Color(0.72, 0.5, 0.42, 1)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
