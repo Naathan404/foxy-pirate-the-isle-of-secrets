@@ -5,11 +5,12 @@ signal player_changed(active_player: Player)
 signal state_changed(new_state: State)
 signal scene_transition_finished
 
-enum State { PLAYING, INVENTORY, TRANSITION }
+enum State { PLAYING, INVENTORY, TRANSITION, PAUSE_MENU }
 
 const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
 const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 
+@export_file("*.tscn") var main_menu_scene: String = "res://ui/main_menu/main_menu.tscn"
 @export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.4
 @export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.45
 
@@ -85,6 +86,40 @@ func exit_inventory() -> void:
 	state_changed.emit(state)
 
 
+## The pause menu owns the tree pause the same way the inventory does.
+func enter_pause_menu() -> bool:
+	if _transition_pending or state != State.PLAYING or get_tree().paused:
+		return false
+	if is_instance_valid(player):
+		player.clear_gameplay_input()
+	state = State.PAUSE_MENU
+	get_tree().paused = true
+	state_changed.emit(state)
+	return true
+
+
+func exit_pause_menu() -> void:
+	if state != State.PAUSE_MENU:
+		return
+	if is_instance_valid(player):
+		player.clear_gameplay_input()
+	state = State.PLAYING
+	get_tree().paused = false
+	state_changed.emit(state)
+
+
+## Leaves the current run for the main menu; returns whether the transition was accepted.
+func return_to_main_menu() -> bool:
+	return change_scene(main_menu_scene)
+
+
+## Forgets the in-memory run (wallet, boss encounters, debug grants). Saved files are untouched.
+func reset_session() -> void:
+	gold_wallet = GoldWallet.new()
+	boss_encounters.clear()
+	debug_all_charms_granted = false
+
+
 func reload_current_scene() -> void:
 	if _transition_pending:
 		return
@@ -120,6 +155,8 @@ func _transition_scene(
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
 	var was_paused := get_tree().paused
+	# A failed transition returns to whatever owned the pause (e.g. the pause menu).
+	var previous_state := state
 	state = State.TRANSITION
 	get_tree().paused = true
 	get_node("/root/HitstopController").cancel()
@@ -161,7 +198,7 @@ func _transition_scene(
 	# Resume before revealing the room so held movement continues during fade-in.
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
-	state = State.PLAYING
+	state = previous_state if error != OK else State.PLAYING
 	get_tree().paused = was_paused if error != OK else false
 	state_changed.emit(state)
 	# The first active physics/animation tick can also upload new visual resources.
