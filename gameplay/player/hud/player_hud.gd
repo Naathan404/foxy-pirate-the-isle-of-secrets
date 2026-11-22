@@ -9,6 +9,9 @@ extends CanvasLayer
 @export var weapon_controller: WeaponController
 @export var ammo: AmmoComponent
 
+## Fill máu là ảnh tối nên cần tint tăng sáng để thấy rõ trạng thái trúng độc.
+@export var poison_arc_tint := Color(0.3, 3.5, 0.8)
+
 var _displayed_ammo_id: StringName = &""
 var _player: Player
 var _poison_displayed: bool = false
@@ -137,7 +140,7 @@ func _process(_delta: float) -> void:
 		_poison_displayed = poisoned
 		portrait.set_poisoned(poisoned)
 		if is_instance_valid(health_arc.fill):
-			health_arc.fill.modulate = Color(0.58, 0.94, 0.46) if poisoned else Color.WHITE
+			health_arc.fill.modulate = poison_arc_tint if poisoned else Color.WHITE
 
 
 func _on_health_damaged(amount: float) -> void:

@@ -209,6 +209,12 @@ Chỉnh góc bắt đầu, độ dài cung và số điểm tương ứng cung �
 `Stats/*Arc` trong Inspector, thay vì trên root HUD. Các node này tham chiếu
 capacity, fill, shadow và fill effect qua export. `ChaosArc` có thêm `value_label`
 và `readiness_icon`; script không phụ thuộc trực tiếp vào ChaosComponent.
+
+`HealthArc` và `StaminaArc` tắt `scale_arc_with_maximum`: cung luôn dài `maximum_arc`
+(ảnh `HUD_Fox/Health_Bar.png`, `Stamina_Bar.png`, tâm cung đặt bằng `radial_center_offset`),
+chỉ phần fill đổi theo `current / maximum`. Nâng cấp hoặc đổi chỉ số tối đa không kéo
+dài cung; `BarFillEffect.rescale` giữ nguyên tỷ lệ đang hiển thị khi maximum đổi. `ChaosArc`
+vẫn bật tùy chọn này nên cung Chaos tiếp tục co theo `points_at_full_arc`.
 Texture phản ứng, ngưỡng ít máu và thời gian hit chỉnh trên `StatControl/Portrait`;
 thời gian chờ tooltip chỉnh trên `StatTooltip`.
 

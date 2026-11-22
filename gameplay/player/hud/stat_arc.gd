@@ -9,11 +9,16 @@ const MINIMUM_STAT_VALUE := 0.01
 @export var shadow: TextureProgressBar
 @export var fill_effect: BarFillEffect
 @export var stat_name: String = "HP"
+## Tên hiển thị trong tooltip; để trống thì dùng stat_name.
+@export var tooltip_title: String = ""
 
 @export_group("Arc Layout")
 @export_range(0.0, 360.0) var initial_angle: float = 200.0
 @export_range(1.0, 360.0) var maximum_arc: float = 225.0
+## Chỉ dùng khi scale_arc_with_maximum bật: giá trị tối đa tương ứng với cung dài nhất.
 @export_range(1.0, 10000.0) var points_at_full_arc: float = 20.0
+## Tắt để cung luôn dài maximum_arc; chỉ phần fill đổi theo current / maximum (HP, SP).
+@export var scale_arc_with_maximum: bool = true
 
 @export_group("Optional Indicators")
 @export var value_label: Label
@@ -40,7 +45,12 @@ func _ready() -> void:
 
 
 func set_stat(current: float, maximum: float) -> void:
-	var degrees := maximum_arc * clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
+	var degrees := maximum_arc
+	if scale_arc_with_maximum:
+		degrees *= clampf(maximum / maxf(points_at_full_arc, 1.0), 0.0, 1.0)
+	if not scale_arc_with_maximum:
+		# Đổi maximum giữ nguyên tỷ lệ đang hiển thị, không tạo hiệu ứng hồi/mất giả.
+		fill_effect.rescale(maxf(maximum, MINIMUM_STAT_VALUE))
 	for bar: TextureProgressBar in [capacity, fill, shadow]:
 		if stat_name == "HP":
 			bar.step = 0.0
@@ -53,7 +63,13 @@ func set_stat(current: float, maximum: float) -> void:
 	var text := "%s: %d / %d" % [stat_name, floori(current), floori(maximum)]
 	if stat_name == "HP":
 		text = "%s: %s / %s" % [stat_name, String.num(current, 2), String.num(maximum, 2)]
-	capacity.set_stat_tooltip(text)
+	var title := tooltip_title if not tooltip_title.is_empty() else stat_name
+	capacity.set_stat_tooltip(
+		(
+			"%s  %s / %s"
+			% [title, InventoryMenuFormat.number(current), InventoryMenuFormat.number(maximum)]
+		)
+	)
 	if is_instance_valid(value_label):
 		value_label.text = text
 	if is_instance_valid(readiness_icon):

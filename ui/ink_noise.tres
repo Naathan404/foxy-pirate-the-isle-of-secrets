@@ -1,0 +1,11 @@
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://iw5vikqbjhpl"]
+
+[sub_resource type="FastNoiseLite" id="ink_noise_source"]
+frequency = 0.012
+fractal_octaves = 4
+
+[resource]
+width = 256
+height = 256
+noise = SubResource("ink_noise_source")
+seamless = true
