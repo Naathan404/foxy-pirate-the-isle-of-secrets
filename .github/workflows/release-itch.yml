@@ -2,6 +2,9 @@ name: Release to itch.io
 
 on:
   push:
+    # A merged pull request is a push to its base branch, so this covers
+    # every merge into release.
+    branches: [release]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
@@ -48,6 +51,8 @@ jobs:
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
             version="${GITHUB_REF_NAME#v}"
+          elif [[ "$GITHUB_REF" == "refs/heads/release" ]]; then
+            version="release-${GITHUB_SHA::7}"
           else
             version="dev-${GITHUB_SHA::7}"
           fi
@@ -142,7 +147,10 @@ jobs:
   publish-itch:
     name: Upload to itch.io
     needs: build
-    if: github.ref_type == 'tag' || inputs.publish
+    if: >-
+      github.ref_type == 'tag'
+      || (github.event_name == 'push' && github.ref == 'refs/heads/release')
+      || inputs.publish
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: itch
