@@ -187,6 +187,112 @@ func _test_ai_intelligence() -> void:
 		var d_counter := Vector2(c_spot.x - 2.2, c_spot.z).length()
 		_check(d_counter >= 1.2, "Counter shots must deflect away from player (d=%.2f)" % d_counter)
 
+	# Khi bật direct_aim_chance = 1.0, vòng ngoài và tâm quạt phải ném trúng vị trí Player.
+	var direct_outer := (
+		ai
+		. select_attack_plan(
+			{
+				"zone": VenomVineAI.Zone.OUTER_RING,
+				"origin_pos": Vector3.ZERO,
+				"target_pos": Vector3(5.0, 0.0, 0.0),
+				"target_velocity": Vector3.ZERO,
+				"occupied_spots": [],
+				"ground_y": 0.0,
+				"pool_radius": 1.05,
+				"outer_shots": 1,
+				"direct_aim_chance": 1.0,
+				"min_shot_distance": 1.6,
+				"max_shot_distance": 6.2,
+			}
+		)
+	)
+	var direct_outer_aims: Array = direct_outer.get("aim_positions", [])
+	_check(direct_outer_aims.size() == 1, "Direct outer shot must produce 1 shot")
+	if not direct_outer_aims.is_empty():
+		var spot := direct_outer_aims[0] as Vector3
+		var d_outer := Vector2(spot.x - 5.0, spot.z).length()
+		_check(
+			d_outer <= AI_CLASS.DIRECT_AIM_JITTER_METERS + 0.05,
+			"Direct outer shot must land on player position (offset=%.2f)" % d_outer
+		)
+
+	var direct_inner := (
+		ai
+		. select_attack_plan(
+			{
+				"zone": VenomVineAI.Zone.INNER_RING,
+				"origin_pos": Vector3.ZERO,
+				"target_pos": Vector3(2.8, 0.0, 0.0),
+				"target_velocity": Vector3.ZERO,
+				"occupied_spots": [],
+				"ground_y": 0.0,
+				"pool_radius": 1.05,
+				"inner_shots": 3,
+				"inner_fan_degrees": 64.0,
+				"direct_aim_chance": 1.0,
+				"min_shot_distance": 1.6,
+				"max_shot_distance": 6.2,
+			}
+		)
+	)
+	var direct_inner_aims: Array = direct_inner.get("aim_positions", [])
+	_check(direct_inner_aims.size() == 3, "Direct inner fan must produce 3 shots")
+	if direct_inner_aims.size() == 3:
+		var center_spot := direct_inner_aims[0] as Vector3
+		var d_center := Vector2(center_spot.x - 2.8, center_spot.z).length()
+		_check(
+			d_center <= AI_CLASS.DIRECT_AIM_JITTER_METERS + 0.05,
+			"Direct inner center shot must land on player position (offset=%.2f)" % d_center
+		)
+		var sep_left := center_spot.distance_to(direct_inner_aims[1] as Vector3)
+		var sep_right := center_spot.distance_to(direct_inner_aims[2] as Vector3)
+		_check(
+			sep_left >= 2.0 and sep_right >= 2.0,
+			(
+				"Direct inner side shots must still fan out cleanly (sepL=%.2f, sepR=%.2f)"
+				% [sep_left, sep_right]
+			)
+		)
+
+	# Xác suất 0.3 vẫn giữ cả phát bắn đúng vị trí lẫn phát lệch ngẫu nhiên xung quanh Player.
+	var direct_hits := 0
+	var scattered_shots := 0
+	for _sample in range(120):
+		var sampled := (
+			ai
+			. select_attack_plan(
+				{
+					"zone": VenomVineAI.Zone.OUTER_RING,
+					"origin_pos": Vector3.ZERO,
+					"target_pos": Vector3(5.0, 0.0, 0.0),
+					"target_velocity": Vector3.ZERO,
+					"occupied_spots": [],
+					"ground_y": 0.0,
+					"pool_radius": 1.05,
+					"outer_shots": 1,
+					"direct_aim_chance": 0.3,
+					"min_shot_distance": 1.6,
+					"max_shot_distance": 6.2,
+				}
+			)
+		)
+		var sampled_spot := (sampled.get("aim_positions", []) as Array)[0] as Vector3
+		var dist_off := Vector2(sampled_spot.x - 5.0, sampled_spot.z).length()
+		if dist_off <= AI_CLASS.DIRECT_AIM_JITTER_METERS + 0.05:
+			direct_hits += 1
+		else:
+			scattered_shots += 1
+	_check(
+		direct_hits >= 15 and direct_hits <= 60 and scattered_shots >= 55,
+		(
+			(
+				"Modest direct_aim_chance=0.3 must mix direct hits and scattered shots "
+				+ "(direct=%d/120, scatter=%d/120)"
+			)
+			% [direct_hits, scattered_shots]
+		)
+	)
+
 
 func _test_state_machine_and_zones() -> void:
 	var arena := _create_arena()
@@ -240,6 +346,8 @@ func _test_state_machine_and_zones() -> void:
 func _test_sniper_anger_stagger_and_death_pools() -> void:
 	var arena := _create_arena()
 	var vine := _spawn_fast_vine(arena)
+	# Tránh RNG chui đất xen ngang khi đang test cơ chế bắn tỉa & tồn tại vũng axit lúc chết.
+	vine._burrow_cooldown_remaining = 10.0
 	vine.max_active_pools = 2
 	vine.pool_duration_seconds = 0.8
 	# Đứng ở 8.0m (ngoài vùng nhận diện thường 6.5m, nhưng nằm trong vùng mở rộng 6.5 + 2.5 = 9.0m).
@@ -300,6 +408,8 @@ func _test_sniper_anger_stagger_and_death_pools() -> void:
 func _test_hit_reaction_and_counterattack() -> void:
 	var arena := _create_arena()
 	var vine := _spawn_fast_vine(arena)
+	# Tránh RNG chui đất xen ngang khi đang test flinch và phản công 2 đòn.
+	vine._burrow_cooldown_remaining = 10.0
 	vine.hits_before_counter = 2
 	vine.counter_cooldown_seconds = 2.0
 	vine.counter_charge_seconds = 0.2
@@ -374,11 +484,30 @@ func _test_forest_test_real_foxy_integration() -> void:
 	var foxy := forest.get_node_or_null("Foxy") as Player
 	var vine_a := forest.get_node_or_null("VenomVineA") as VenomVine
 	var vine_b := forest.get_node_or_null("VenomVineB") as VenomVine
+	var elite_vine := forest.get_node_or_null("EliteVenomVine") as VenomVine
 	_check(foxy != null, "ForestTest must have Foxy")
-	_check(vine_a != null and vine_b != null, "ForestTest must have VenomVineA and VenomVineB")
-	if foxy == null or vine_a == null or vine_b == null:
+	_check(
+		vine_a != null and (vine_b != null or elite_vine != null),
+		"ForestTest must have VenomVineA and second vine (VenomVineB or EliteVenomVine)"
+	)
+	if foxy == null or vine_a == null or (vine_b == null and elite_vine == null):
 		forest.queue_free()
 		return
+	_check(
+		is_equal_approx(vine_a.direct_aim_chance, 0.3),
+		(
+			"Normal VenomVine must configure modest direct_aim_chance=0.3 (got %.2f)"
+			% vine_a.direct_aim_chance
+		)
+	)
+	if elite_vine != null:
+		_check(
+			is_zero_approx(elite_vine.direct_aim_chance),
+			(
+				"EliteVenomVine keeps direct_aim_chance=0.0 separate from normal VenomVine (got %.2f)"
+				% elite_vine.direct_aim_chance
+			)
+		)
 
 	# Nếu cây nằm ngoài tầm phát hiện tại spawn thì phải giữ trạng thái Dormant.
 	var spawn_dist_a := (
@@ -456,6 +585,7 @@ func _spawn_fast_vine(arena: Node3D) -> VenomVine:
 	vine.ambush_delay_max_seconds = 0.05
 	vine.wake_duration_seconds = 0.1
 	vine.wake_attack_delay_seconds = 0.08
+	vine.idle_min_duration_seconds = 0.05
 	vine.charge_duration_seconds = 0.2
 	vine.recover_duration_seconds = 0.1
 	vine.outer_cooldown_seconds = 0.8
