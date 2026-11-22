@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/charms/passive/fortune_leaf_effect.gd" id="1"]
+
+[node name="FortuneLeafEffect" type="Node"]
+script = ExtResource("1")

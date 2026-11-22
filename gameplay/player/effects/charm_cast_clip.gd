@@ -4,6 +4,8 @@ extends Resource
 
 @export var charm_id: StringName
 @export var texture: Texture2D
+## Two complete sequences stacked vertically: back view above front view.
+@export var vertical_texture: Texture2D
 @export var grid: Vector2i = Vector2i(4, 2)
 @export var frame_seconds: PackedFloat32Array = PackedFloat32Array(
 	[0.035, 0.045, 0.04, 0.065, 0.055, 0.055, 0.05, 0.045]
@@ -32,7 +34,9 @@ extends Resource
 
 
 func is_valid() -> bool:
-	if charm_id.is_empty() or texture == null or grid.x <= 0 or grid.y <= 0:
+	if charm_id.is_empty() or texture == null or vertical_texture == null:
+		return false
+	if grid.x <= 0 or grid.y <= 0:
 		return false
 	var count := grid.x * grid.y
 	if frame_seconds.size() != count or foot_anchors.size() != count or cast_frames.is_empty():

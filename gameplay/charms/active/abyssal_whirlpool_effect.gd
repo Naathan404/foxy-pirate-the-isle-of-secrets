@@ -16,6 +16,8 @@ var _cast_direction: Vector3 = Vector3.BACK
 func activate(context: CharmActivationContext) -> bool:
 	if not super.can_activate(context) or not context.has_target or not is_instance_valid(actor):
 		return false
+	if not _begin_cast_lock():
+		return false
 	_zone = Area3D.new()
 	var shape := CollisionShape3D.new()
 	var sphere := SphereShape3D.new()
@@ -24,7 +26,7 @@ func activate(context: CharmActivationContext) -> bool:
 	shape.shape = sphere
 	_zone.add_child(shape)
 	_zone.collision_layer = 0
-	_zone.collision_mask = 16
+	_zone.collision_mask = CombatLayers.ENEMY_HURTBOX
 	actor.get_parent().add_child(_zone)
 	_zone.global_position = context.target_position
 	_remaining = definition.get_param_float(&"duration_seconds", 1.5)
@@ -81,21 +83,13 @@ func _explode() -> void:
 		SHOCKWAVE_RADIUS_PIXELS
 	)
 	var hit_confirmed := false
-	for node in actor.get_tree().get_nodes_in_group("enemy"):
-		if not node is Node3D or node.is_in_group("boss"):
-			continue
-		if (node as Node3D).global_position.distance_to(_zone.global_position) > radius:
-			continue
-		if node.has_method("receive_damage"):
-			var context := DamageContext.new()
-			context.source = actor
-			context.source_team = actor.get("team")
-			context.amount_hp = damage
-			context.base_amount_hp = damage
-			context.tag = definition.charm_id
-			if float(node.call("receive_damage", context)) > 0.0:
-				hit_confirmed = true
+	for target in _targets_in_radius(_zone.global_position, radius):
+		if _damage_target(target, damage, _zone.global_position, 1.4) > 0.0:
+			hit_confirmed = true
 	if hit_confirmed:
+		get_node("/root/AudioManager").play_sfx_3d(
+			preload("res://assets/audio/combat/bow_impact.wav"), _zone.global_position, -6.0
+		)
 		get_node("/root/HitstopController").request(0.07)
 	_play_cast_animation(&"detonate", _cast_direction, 0.4, true)
 	_clear_zone()
@@ -107,18 +101,10 @@ func cancel_active() -> void:
 
 
 func _clear_zone() -> void:
+	_end_cast_lock()
 	set_physics_process(false)
 	if is_instance_valid(_zone):
 		_zone.queue_free()
 	_zone = null
 	_remaining = 0.0
 	_exploded = false
-
-
-func _get_base_damage() -> float:
-	var weapon_controller := actor.get("weapon_controller") as WeaponController
-	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
-		var attack := weapon_controller.equipped.get_attack(&"normal")
-		if attack != null:
-			return attack.damage_hp
-	return 1.0

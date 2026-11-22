@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_data")
+elite_charm_drops = true
 max_hp = 18.0
 move_speed = 0.95
 acceleration = 24.0

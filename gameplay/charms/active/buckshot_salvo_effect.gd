@@ -2,12 +2,14 @@ class_name BuckshotSalvoEffect
 extends CharmEffect
 ## Radial burst; each pellet has independent target reservation.
 
+const RECOIL_SECONDS := 0.18
 const ATTACK_SCENE := preload("res://gameplay/charms/active/buckshot_projectile_attack.tscn")
 const PROJECTILE_SHEET: Texture2D = preload(
 	"res://assets/sprites/effects/charms/buckshot_projectile.png"
 )
 var _executions: Array[CharmActiveAttack] = []
-var _casting: bool = false
+var _impact_reported := false
+var _windup := 0.0
 var _cast_direction: Vector3 = Vector3.BACK
 
 
@@ -18,6 +20,7 @@ func can_activate(context: CharmActivationContext) -> bool:
 		and context.is_valid()
 		and is_instance_valid(actor)
 		and is_instance_valid(actor.get_parent())
+		and definition.get_param_float(&"windup_seconds") > 0.0
 		and definition.get_param_int(&"projectile_count", 8) > 0
 		and definition.get_param_float(&"projectile_speed", 14.0) > 0.0
 		and definition.get_param_float(&"range_units", 5.0) > 0.0
@@ -25,16 +28,36 @@ func can_activate(context: CharmActivationContext) -> bool:
 
 
 func activate(context: CharmActivationContext) -> bool:
-	if not can_activate(context):
+	if not can_activate(context) or not _begin_cast_lock():
 		return false
-	var count := definition.get_param_int(&"projectile_count", 8)
 	var base_direction := context.direction
 	base_direction.y = 0.0
 	if base_direction.is_zero_approx():
 		base_direction = Vector3.BACK
 	base_direction = base_direction.normalized()
+	_impact_reported = false
 	_cast_direction = base_direction
-	var base_angle := atan2(base_direction.x, base_direction.z)
+	_windup = definition.get_param_float(&"windup_seconds")
+	_play_cast_animation(&"windup", _cast_direction, _windup)
+	set_physics_process(true)
+	return true
+
+
+func _physics_process(delta: float) -> void:
+	if _windup <= 0.0:
+		set_physics_process(false)
+		return
+	_windup = maxf(0.0, _windup - delta)
+	if _windup > 0.0:
+		return
+	set_physics_process(false)
+	_end_cast_lock()
+	_fire()
+
+
+func _fire() -> void:
+	var count := definition.get_param_int(&"projectile_count", 8)
+	var base_angle := atan2(_cast_direction.x, _cast_direction.z)
 	CharmSpriteVfx.spawn(
 		actor.get_parent(),
 		actor.global_position + Vector3.UP * 0.65,
@@ -51,10 +74,13 @@ func activate(context: CharmActivationContext) -> bool:
 		if execution == null:
 			continue
 		actor.get_parent().add_child(execution)
+		(execution as BuckshotProjectileAttack).pellet_hit.connect(_on_pellet_hit)
 		_executions.append(execution)
-		execution.tree_exited.connect(_on_execution_exited.bind(execution), CONNECT_ONE_SHOT)
+		execution.tree_exited.connect(_executions.erase.bind(execution), CONNECT_ONE_SHOT)
 		execution.context = AttackContext.new()
 		execution.context.delivery_type = AttackData.DeliveryType.PROJECTILE
+		execution.context.charm_push = true
+		execution.context.knockback_multiplier = 0.55
 		execution.context.actor = actor
 		execution.context.team = actor.get("team")
 		execution.context.attack_id = Time.get_ticks_usec() + index
@@ -75,41 +101,26 @@ func activate(context: CharmActivationContext) -> bool:
 		execution.release_after(
 			execution.max_travel_distance / execution.travel_speed_units_per_second + 0.1
 		)
-	if _executions.is_empty():
-		return false
-	_casting = true
-	_play_cast_animation(
-		&"active",
-		base_direction,
-		(
-			definition.get_param_float(&"range_units", 5.0)
-			/ maxf(0.01, definition.get_param_float(&"projectile_speed", 14.0))
-		)
+
+	_play_cast_animation(&"release", _cast_direction, RECOIL_SECONDS)
+
+
+func _on_pellet_hit(at: Vector3) -> void:
+	if _impact_reported:
+		return
+	_impact_reported = true
+	get_node("/root/ScreenShakeController").request(5.5, 0.14)
+	get_node("/root/AudioManager").play_sfx_3d(
+		preload("res://assets/audio/combat/bow_impact.wav"), at, -6.0
 	)
-	return true
 
 
 func cancel_active() -> void:
-	_casting = false
+	_windup = 0.0
+	set_physics_process(false)
 	_stop_cast_animation()
 	for execution: CharmActiveAttack in _executions:
 		if is_instance_valid(execution):
 			execution.deactivate()
 			execution.queue_free()
 	_executions.clear()
-
-
-func _get_base_damage() -> float:
-	var weapon_controller := actor.get("weapon_controller") as WeaponController
-	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
-		var attack := weapon_controller.equipped.get_attack(&"normal")
-		if attack != null:
-			return attack.damage_hp
-	return 1.0
-
-
-func _on_execution_exited(execution: CharmActiveAttack) -> void:
-	_executions.erase(execution)
-	if _casting and _executions.is_empty():
-		_casting = false
-		_play_cast_animation(&"recover", _cast_direction, 0.12, true)

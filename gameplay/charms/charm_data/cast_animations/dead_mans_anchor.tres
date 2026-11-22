@@ -1,12 +1,14 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
 [ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/dead_mans_anchor.png" id="2_sheet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/dead_mans_anchor_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"dead_mans_anchor"
 texture = ExtResource("2_sheet")
+vertical_texture = ExtResource("3_vertical")
 foot_anchors = PackedVector2Array(0.5137, 0.9102, 0.44, 0.9102, 0.4512, 0.8945, 0.48, 0.8945, 0.4844, 0.8945, 0.5, 0.9, 0.4863, 0.8906, 0.5039, 0.8945)
 standing_height_fraction = 0.73
 cast_frames = PackedInt32Array(0, 1, 2, 3)

@@ -6,6 +6,7 @@ extends Node
 # Báo đánh xong hoặc bị ngắt để Player thoát state Attack
 signal attack_finished
 signal attack_started(context: AttackContext)
+signal attack_released(context: AttackContext)
 signal charge_released(context: AttackContext)
 signal weapon_changed(weapon: WeaponInstance)
 signal collection_changed
@@ -785,6 +786,7 @@ func _advance_phase() -> void:
 				# Keep an unlaunched projectile hidden and suspended throughout startup.
 				_execution.process_mode = Node.PROCESS_MODE_INHERIT
 				_execution.show()
+			attack_released.emit(_context)
 			_execution.activate()
 		Phase.ACTIVE:
 			_phase = Phase.RECOVERY

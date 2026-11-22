@@ -74,7 +74,7 @@ func _physics_process(delta: float) -> void:
 
 	if not _impact_armed and progress >= impact_activation_progress:
 		_impact_armed = true
-		if not hitbox.begin_attack(context.damage_hp, context.attack_id, context.action):
+		if not hitbox.begin_attack_with_context(context.create_damage_context()):
 			_cancel_and_free()
 			return
 		# Catch a target crossed between physics frames on the descending leg.
@@ -88,9 +88,8 @@ func _physics_process(delta: float) -> void:
 			if is_instance_valid(_trail):
 				_trail.hide()
 			CharmVfx.spawn(get_parent(), flight_end, trail_color, 1.1 if volley_finisher else 0.65)
-			get_node("/root/ScreenShakeController").request(
-				3.5 if volley_finisher else 1.4, 0.16 if volley_finisher else 0.08
-			)
+			if volley_finisher and _impact_reported:
+				get_node("/root/ScreenShakeController").request(4.0, 0.14)
 		_impact_hold_remaining -= step
 		if _impact_hold_remaining <= 0.0:
 			_cancel_and_free()

@@ -1,16 +1,17 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
 [ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/buckshot_salvo.png" id="2_sheet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/buckshot_salvo_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"buckshot_salvo"
 texture = ExtResource("2_sheet")
+vertical_texture = ExtResource("3_vertical")
 foot_anchors = PackedVector2Array(0.4824, 0.9023, 0.4785, 0.9023, 0.4727, 0.9023, 0.4766, 0.9023, 0.4824, 0.9023, 0.4844, 0.9023, 0.4883, 0.9023, 0.4902, 0.9062)
 standing_height_fraction = 0.73
 phase_frames = Dictionary[StringName, PackedInt32Array]({
-&"active": PackedInt32Array(2, 3, 4),
-&"recover": PackedInt32Array(5, 6, 7)
+&"windup": PackedInt32Array(0, 1, 2),
+&"release": PackedInt32Array(3, 4, 5, 6, 7)
 })
-looping_phases = Array[StringName]([&"active"])

@@ -1,3 +1,4 @@
+# gdlint: disable=max-public-methods
 class_name EnemyBase
 extends CharacterBody3D
 
@@ -24,6 +25,7 @@ const DAMAGE_POPUP = preload("res://gameplay/combat/damage_popup_presenter.gd")
 const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive drops.
 
 @export var data: EnemyData
+@export var charm_loot: Array[BaseItem] = []
 @export var initial_state_name: StringName = &"Idle"
 @export var initial_facing: InitialFacing = InitialFacing.DOWN
 @export var destroy_on_death: bool = false
@@ -61,6 +63,8 @@ var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_knockback_multiplier: float = 1.0
 var pending_charm_stun_seconds: float = 0.0
 var stagger_amount: float = 0.0
+var _charm_stun_remaining := 0.0
+var _resume_animation := false
 var _stagger_decay_remaining: float = 0.0
 var _stagger_immunity_remaining: float = 0.0
 var _charm_grapple_tween: Tween
@@ -113,6 +117,12 @@ func _physics_process(delta: float) -> void:
 		and bool(hitstop_controller.call("is_frozen", self))
 	):
 		return
+	if _charm_stun_remaining > 0.0 and not dead:
+		_charm_stun_remaining = maxf(0.0, _charm_stun_remaining - delta)
+		if _charm_stun_remaining <= 0.0:
+			_resume_stunned_animation()
+		else:
+			return
 	_update_stagger(delta)
 	fsm._update(delta)
 	if dead:
@@ -298,7 +308,7 @@ func receive_damage(damage: DamageContext) -> float:
 	if damage.source == self or damage.source_team == team:
 		return 0
 	pending_hit_direction = _get_hit_direction(damage.source)
-	if damage.is_melee_normal_attack():
+	if damage.charm_push or damage.is_melee_normal_attack():
 		var direction := Vector3(damage.direction.x, 0.0, damage.direction.z)
 		if not direction.is_zero_approx():
 			pending_hit_direction = direction.normalized()
@@ -308,6 +318,8 @@ func receive_damage(damage: DamageContext) -> float:
 		if is_instance_valid(damage.source) and damage.source.has_signal("combat_activity"):
 			damage.source.emit_signal("combat_activity")
 		if not dead and hp.is_alive():
+			if damage.charm_push:
+				_apply_external_push(consume_hit_knockback_velocity())
 			_accumulate_stagger(damage.stagger_damage)
 		DAMAGE_POPUP.show_damage(
 			get_parent(), _damage_popup_position(), damage, applied_hp, damage_popup_size_multiplier
@@ -341,6 +353,26 @@ func consume_hit_knockback_velocity() -> Vector3:
 	var speed := data.hit_knockback_speed * maxf(0.0, multiplier)
 	speed *= 1.0 - data.knockback_resistance
 	return direction.normalized() * speed
+
+
+func apply_charm_stun(seconds: float) -> void:
+	if dead or is_in_group(&"boss") or seconds <= 0.0:
+		return
+	if _charm_stun_remaining <= 0.0:
+		end_active_attack()
+		_stop_contact_damage()
+		request_state(&"hit", 60)
+		var animation := visual.animation_player
+		_resume_animation = is_instance_valid(animation) and animation.is_playing()
+		if _resume_animation:
+			animation.pause()
+	_charm_stun_remaining = maxf(_charm_stun_remaining, seconds)
+
+
+func _resume_stunned_animation() -> void:
+	if _resume_animation and is_instance_valid(visual.animation_player):
+		visual.animation_player.play()
+	_resume_animation = false
 
 
 func apply_charm_grapple(
@@ -430,9 +462,11 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	_resume_stunned_animation()
 	_loot_direction_angle = randf() * TAU
 	_loot_drop_index = 0
 	_drop_loot.call_deferred()
+	_drop_charms.call_deferred()
 	_drop_gold.call_deferred()
 	_drop_note.call_deferred()
 	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
@@ -671,26 +705,54 @@ func _prepare_loot_pools() -> void:
 
 # drop itemmm =========
 func _drop_loot() -> void:
-	if data == null or data.drop_item == null or data.drop_quantity <= 0:
+	if data == null or data.drop_item == null or data.drop_quantity <= 0 or not is_inside_tree():
 		return
+	var player := get_tree().get_first_node_in_group(&"player") as Player
+	_roll_item_pickup(
+		data.drop_item, data.drop_quantity, data.drop_chance, _loot_multiplier(player)
+	)
 
-	if data.drop_chance <= 0.0:
-		return
-	if data.drop_chance < 1.0 and randf() >= data.drop_chance:
-		return
-	if not is_inside_tree():
-		return
-	var loot_parent: Node = get_parent()
-	if loot_parent == null or loot_parent.is_queued_for_deletion():
-		return
 
+func _drop_charms() -> void:
+	if data == null or not is_inside_tree() or charm_loot.is_empty():
+		return
+	var player := get_tree().get_first_node_in_group(&"player") as Player
+	if not is_instance_valid(player) or not is_instance_valid(player.charm_registry):
+		return
+	var multiplier := _loot_multiplier(player)
+	for item in charm_loot:
+		if item == null or item.charm == null:
+			continue
+		var charm := item.charm
+		if not charm.is_playable() or player.charm_registry.is_owned(charm.charm_id):
+			continue
+		if charm.tags.has(&"elite_drop") and not data.elite_charm_drops:
+			continue
+		_roll_item_pickup(item, 1, charm.drop_chance, multiplier)
+
+
+func _loot_multiplier(player: Player) -> float:
+	var stats: Dictionary[StringName, float] = {}
+	if is_instance_valid(player) and is_instance_valid(player.charm_registry):
+		player.charm_registry.modify_stats(stats)
+	return stats.get(&"item_drop_multiplier", 1.0)
+
+
+func _roll_item_pickup(item: BaseItem, quantity: int, chance: float, multiplier: float) -> void:
+	var loot_parent := get_parent()
+	if chance <= 0.0 or loot_parent == null or loot_parent.is_queued_for_deletion():
+		return
+	var roll := randf()
+	if not CharmAcquisitionService.is_item_drop(roll, chance, multiplier):
+		return
 	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
-	# gán trước add_child để _ready của pickup lấy đúng icon
-	pickup.item = data.drop_item
-	pickup.quantity = data.drop_quantity
+	pickup.item = item
+	pickup.quantity = quantity
 	loot_parent.add_child(pickup)
 	pickup.global_position = global_position
 	pickup.play_drop_animation(_next_loot_direction())
+	if roll >= chance and chance < 1.0:
+		CharmVfx.spawn(loot_parent, global_position, Color.SPRING_GREEN, 0.8)
 
 
 func _drop_note() -> void:

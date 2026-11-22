@@ -31,7 +31,6 @@ func _initialize() -> void:
 	print("Silas merchant tests: %s" % ("passed" if _failures == 0 else "failed"))
 	quit(0 if _failures == 0 else 1)
 
-
 func _test_purchase_rejections() -> void:
 	var service := MerchantTransactionService.new(CATALOG)
 	var wallet := _make_empty_wallet()

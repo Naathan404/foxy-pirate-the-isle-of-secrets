@@ -17,7 +17,13 @@ func get_activation_cost(_context: CharmActivationContext) -> float:
 
 
 func activate(context: CharmActivationContext) -> bool:
-	if _charging or not is_instance_valid(actor):
+	var stamina := actor.get("stamina") as StaminaComponent
+	if (
+		_charging
+		or not is_instance_valid(stamina)
+		or stamina.get_current_sp() <= 0.0
+		or not _begin_cast_lock()
+	):
 		return false
 	_charging = true
 	_charge_seconds = 0.0
@@ -49,13 +55,12 @@ func _physics_process(delta: float) -> void:
 		cancel_active()
 		return
 	var cost := definition.get_param_float(&"sp_per_second", 100.0) * maxf(0.0, delta)
-	if not stamina.try_consume(cost):
-		_release()
-		return
+	var spent := minf(stamina.get_current_sp(), cost)
+	stamina.try_consume(spent)
+	_charge_seconds += spent / definition.get_param_float(&"sp_per_second")
 	if stamina.get_current_sp() <= 0.0:
 		_release()
 		return
-	_charge_seconds += maxf(0.0, delta)
 	if is_instance_valid(_ring):
 		var radius := (
 			definition.get_param_float(&"min_radius_units", 0.75)
@@ -83,22 +88,13 @@ func _release() -> void:
 	CharmVfx.spawn(actor.get_parent(), actor.global_position, CharmVfx.GOLD, radius, 0.45)
 	get_node("/root/ScreenShakeController").request(minf(10.0, 4.0 + _charge_seconds * 2.0), 0.24)
 	var hit_confirmed := false
-	for node in actor.get_tree().get_nodes_in_group("enemy"):
-		if (
-			not node is Node3D
-			or (node as Node3D).global_position.distance_to(actor.global_position) > radius
-		):
-			continue
-		if node.has_method("receive_damage"):
-			var context := DamageContext.new()
-			context.source = actor
-			context.source_team = actor.get("team")
-			context.amount_hp = damage
-			context.base_amount_hp = damage
-			context.tag = definition.charm_id
-			if float(node.call("receive_damage", context)) > 0.0:
-				hit_confirmed = true
+	for target in _targets_in_radius(actor.global_position, radius):
+		if _damage_target(target, damage, actor.global_position, 1.4) > 0.0:
+			hit_confirmed = true
 	if hit_confirmed:
+		get_node("/root/AudioManager").play_sfx_3d(
+			preload("res://assets/audio/combat/bow_impact.wav"), actor.global_position, -6.0
+		)
 		get_node("/root/HitstopController").request(minf(0.09, 0.04 + _charge_seconds * 0.015))
 	runtime.start_cooldown()
 	_play_cast_animation(&"release", _cast_direction, 0.45, true)
@@ -111,18 +107,10 @@ func cancel_active() -> void:
 
 
 func _clear_charge() -> void:
+	_end_cast_lock()
 	set_physics_process(false)
 	_charging = false
 	_charge_seconds = 0.0
 	if is_instance_valid(_ring):
 		_ring.queue_free()
 	_ring = null
-
-
-func _get_base_damage() -> float:
-	var weapon_controller := actor.get("weapon_controller") as WeaponController
-	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
-		var attack := weapon_controller.equipped.get_attack(&"normal")
-		if attack != null:
-			return attack.damage_hp
-	return 1.0

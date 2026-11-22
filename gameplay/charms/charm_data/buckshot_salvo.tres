@@ -8,7 +8,7 @@
 script = ExtResource("1_data")
 charm_id = &"buckshot_salvo"
 display_name = "Buckshot Salvo"
-description = "Fire a radial 360-degree burst of pellets."
+description = "Fire eight pellets in a full circle. Each travels up to 8 units and deals 50% weapon damage."
 sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
@@ -18,8 +18,9 @@ acquisition_source = &"merchant_or_enemy_drop"
 drop_chance = 0.05
 tags = Array[StringName]([&"active", &"projectile", &"radial"])
 effect_params = {
+"windup_seconds": 0.18,
 "damage_percent": 0.5,
 "projectile_count": 8,
 "projectile_speed": 14.0,
-"range_units": 5.0
+"range_units": 8.0
 }

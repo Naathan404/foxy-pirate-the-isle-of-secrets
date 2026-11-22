@@ -10,6 +10,7 @@ var runtime: CharmRuntime
 
 func _exit_tree() -> void:
 	cancel_active()
+	_end_cast_lock()
 
 
 func setup(owner_actor: Node3D, charm_definition: CharmData, charm_runtime: CharmRuntime) -> bool:
@@ -90,7 +91,8 @@ func on_input_released(_context: CharmActivationContext) -> bool:
 
 
 func on_input_cancelled() -> void:
-	cancel_active()
+	if definition != null and definition.is_active():
+		cancel_active()
 
 
 func get_activation_cost(_context: CharmActivationContext) -> float:
@@ -118,7 +120,57 @@ func _play_cast_animation(
 		)
 
 
+func _get_base_damage() -> float:
+	var controller := actor.get("weapon_controller") as WeaponController
+	var base := 1.0
+	if is_instance_valid(controller) and controller.equipped != null:
+		var attack := controller.equipped.get_attack(&"normal")
+		if attack != null:
+			base = attack.damage_hp
+	if actor is Player:
+		var stats: Dictionary[StringName, float] = {}
+		(actor as Player).charm_registry.modify_stats(stats)
+		base *= stats.get(&"charm_damage_multiplier", 1.0)
+	return base
+
+
+func _damage_target(
+	target: Node3D, amount: float, origin: Vector3, push: float = 0.0, tag: StringName = &""
+) -> float:
+	if not is_instance_valid(target) or not target.has_method("receive_damage"):
+		return 0.0
+	var damage := DamageContext.new()
+	damage.source = actor
+	damage.source_team = actor.get("team")
+	damage.tag = definition.charm_id if tag.is_empty() else tag
+	damage.amount_hp = amount
+	damage.base_amount_hp = amount
+	damage.origin = origin
+	damage.direction = origin.direction_to(target.global_position)
+	damage.charm_push = push > 0.0
+	damage.knockback_multiplier = push
+	return target.call("receive_damage", damage)
+
+
+func _targets_in_radius(center: Vector3, radius: float) -> Array[Node3D]:
+	var targets: Array[Node3D] = []
+	for enemy in actor.get_tree().get_nodes_in_group(&"enemy"):
+		if enemy is Node3D and enemy.global_position.distance_squared_to(center) <= radius * radius:
+			targets.append(enemy)
+	return targets
+
+
+func _begin_cast_lock() -> bool:
+	return not actor is Player or (actor as Player).begin_charm_cast(self)
+
+
+func _end_cast_lock() -> void:
+	if is_instance_valid(actor) and actor is Player:
+		(actor as Player).end_charm_cast(self)
+
+
 func _stop_cast_animation() -> void:
+	_end_cast_lock()
 	if is_instance_valid(actor) and actor.has_method("cancel_charm_cast"):
 		actor.call("cancel_charm_cast", definition.charm_id)
 

@@ -32,6 +32,7 @@ var delivery_type: int = -1
 var origin: Vector3 = Vector3.ZERO
 var direction: Vector3 = Vector3.BACK
 var target_defeated: bool = false
+var charm_push: bool = false
 var knockback_multiplier: float = 1.0
 
 # Mỗi Charm ghi kết quả theo ID để event lặp không roll hoặc áp dụng lần hai.
@@ -58,6 +59,7 @@ func create_hit_copy(hit_target: Node = null) -> DamageContext:
 	result.delivery_type = delivery_type
 	result.origin = origin
 	result.direction = direction
+	result.charm_push = charm_push
 	result.knockback_multiplier = knockback_multiplier
 	return result
 
