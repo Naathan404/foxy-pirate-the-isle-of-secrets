@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://d4kfj61xo7nds"]
+[gd_scene format=3 uid="uid://cr7bduoq8osyq"]
 
-[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_kbs7a"]
+[ext_resource type="PackedScene" uid="uid://c0y1euj63gk4x" path="res://world/objects/destructible_prop.tscn" id="1_kbs7a"]
 [ext_resource type="Resource" uid="uid://os3iull80808" path="res://data/items/materials/coconut.tres" id="2_kbs7a"]
 [ext_resource type="Texture2D" uid="uid://b16kqbgm02pv4" path="res://assets/sprites/biomes/beach/Coconut_Tree_Leaning.png" id="3_kbs7a"]
 
@@ -27,3 +27,6 @@ texture = ExtResource("3_kbs7a")
 [node name="CollisionShape3D" parent="HurtBox" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62250257, 1.0003922, 0.10475467)
 shape = SubResource("BoxShape3D_kbs7a")
+
+[node name="MovementBody" parent="." index="3"]
+collision_layer = 256
