@@ -45,6 +45,7 @@ shader = ExtResource("8_hub_ground")
 shader_parameter/sprite_texture = ExtResource("6_8m7ht")
 
 [node name="BaseSmallRoom2" unique_id=525086743 instance=ExtResource("1_xdmpo")]
+safe_room = true
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 light_energy = 0.95

@@ -1,0 +1,541 @@
+[gd_scene format=3 uid="uid://brgah10vnmb6k"]
+
+[ext_resource type="Shader" uid="uid://b11blnw20i5e" path="res://world/effects/vintage_overlay.gdshader" id="5_vmhto"]
+[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
+[ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_large_01.tscn" id="coastal_grass_large_01"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_large_02.tscn" id="coastal_grass_large_02"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_short_01.tscn" id="coastal_grass_short_01"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_short_02.tscn" id="coastal_grass_short_02"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_short_03.tscn" id="coastal_grass_short_03"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_small_01.tscn" id="coastal_grass_small_01"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_small_02.tscn" id="coastal_grass_small_02"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_small_03.tscn" id="coastal_grass_small_03"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_tall_01.tscn" id="coastal_grass_tall_01"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/coastal_grass_tall_02.tscn" id="coastal_grass_tall_02"]
+[ext_resource type="PackedScene" path="res://world/effects/cursed_wisps.tscn" id="cursed_wisps"]
+[ext_resource type="PackedScene" uid="uid://cwcjm2qq8066b" path="res://world/biomes/hub/objects/training_dummy.tscn" id="dummy"]
+[ext_resource type="Material" uid="uid://b05eemsvxvbvq" path="res://world/biomes/hub/ground/hub_grass_terrain.tres" id="grass_terrain"]
+[ext_resource type="PackedScene" uid="uid://bqdk2i44s10bf" path="res://world/biomes/hub/base_scenes/hub_room.tscn" id="hub_room"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/pine_tree_asymmetric.tscn" id="pine_tree_asymmetric"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/pine_tree_tall.tscn" id="pine_tree_tall"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/foliage/pine_tree_wide.tscn" id="pine_tree_wide"]
+[ext_resource type="PackedScene" path="res://world/biomes/hub/objects/hub_landmark_placeholder.tscn" id="placeholder"]
+[ext_resource type="PackedScene" uid="uid://dmaoemr3iesre" path="res://world/components/scene_change_trigger.tscn" id="scene_trigger"]
+[ext_resource type="Material" uid="uid://gfbrcpcs6dvp" path="res://world/biomes/hub/ground/hub_stone_terrain.tres" id="stone_terrain"]
+[ext_resource type="Script" uid="uid://cbnq43pyx4xi2" path="res://world/biomes/hub/ground/hub_terrain.gd" id="terrain_script"]
+[ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="tortuga"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_coral_floor"]
+size = Vector3(6, 1, 6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_coral_trigger"]
+size = Vector3(1, 3, 6)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sma6a"]
+resource_local_to_scene = true
+shader = ExtResource("5_vmhto")
+shader_parameter/exposure = 1.00000002375
+shader_parameter/saturation = 0.78
+shader_parameter/tint = Color(1, 0.94, 0.83, 1)
+shader_parameter/vignette_strength = 0.150000007125
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_silas_trigger"]
+size = Vector3(4, 3, 1)
+
+[node name="castaway_cove" unique_id=1002311401 instance=ExtResource("hub_room")]
+safe_room = true
+open_exits = 2
+right_destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
+metadata/room_role = "Checkpoint"
+
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
+light_energy = 1.2
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62, 0, 0)
+
+[node name="Sprite3D" parent="Exits/RightPath" index="0" unique_id=1887481611]
+visible = false
+
+[node name="StaticBody3D" parent="Exits/RightPath" index="1" unique_id=2124921856]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" index="0" unique_id=1059153531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_coral_floor")
+
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" index="1" unique_id=2046027508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_coral_floor")
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
+trigger_id = &"right"
+destination_scene = "res://world/biomes/coral_valley/map/room_00.tscn"
+destination_trigger_id = &"left"
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_coral_trigger")
+
+[node name="ExitPosition" parent="Exits/RightPath/SceneChangeTrigger" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.7, 0)
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
+[node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
+visible = false
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+disabled = true
+
+[node name="BaseGroundTerrain" type="Node3D" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=873753642]
+script = ExtResource("terrain_script")
+grass_material = ExtResource("grass_terrain")
+stone_material = ExtResource("stone_terrain")
+grass_rects = Array[Rect2]([Rect2(-18, -15, 36, 30), Rect2(-14, -39, 28, 18), Rect2(-7, -64, 14, 19), Rect2(24, -7, 41, 14), Rect2(28, -21, 16, 14), Rect2(-66, -7, 42, 14), Rect2(-38, -15, 10, 8), Rect2(-7, 21, 14, 43), Rect2(7, 26, 16, 14)])
+stone_rects = Array[Rect2]([Rect2(-13, -11, 26, 22), Rect2(-2, -15, 4, 4), Rect2(-3, -21, 6, 6), Rect2(-2, -39, 4, 18), Rect2(-3, -45, 6, 6), Rect2(-2, -64, 4, 19), Rect2(13, -2, 5, 4), Rect2(18, -3, 6, 6), Rect2(24, -2, 41, 4), Rect2(34, -13, 4, 11), Rect2(-18, -2, 5, 4), Rect2(-24, -3, 6, 6), Rect2(-66, -2, 42, 4), Rect2(-35, -15, 4, 13), Rect2(-2, 11, 4, 4), Rect2(-3, 15, 6, 6), Rect2(-2, 21, 4, 43), Rect2(2, 31, 7, 4)])
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 8)
+
+[node name="CursedWisps" parent="Foxy" index="23" unique_id=1598952146 instance=ExtResource("cursed_wisps")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
+
+[node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -68, 0, 66)
+
+[node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68, 0, -66)
+
+[node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1766076537, 1300233738) index="0" unique_id=1611482802]
+material = SubResource("ShaderMaterial_sma6a")
+
+[node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1766076537, 1300233738) index="1" unique_id=1448896067]
+leaf_count = 40
+trail_count = 12
+
+[node name="Plaza" type="Node3D" parent="." index="6" unique_id=1245508191]
+
+[node name="Campfire" parent="Plaza" index="0" unique_id=814489543 instance=ExtResource("campfire")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 7, 0, 5)
+ground_shadow = true
+
+[node name="CampfireEmbers" parent="Plaza" index="1" unique_id=2034972263 instance=ExtResource("campfire_embers")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.4, 6.4)
+
+[node name="TrainingYard" type="Node3D" parent="." index="7" unique_id=760209713]
+
+[node name="TrainingDummy1" parent="TrainingYard" index="0" unique_id=1584775080 instance=ExtResource("dummy")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -6, 0, -25)
+damage_popup_height = 3.0
+
+[node name="TrainingDummy2" parent="TrainingYard" index="1" unique_id=516338446 instance=ExtResource("dummy")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6, 0, -25)
+damage_popup_height = 3.0
+
+[node name="TrainingDummy3" parent="TrainingYard" index="2" unique_id=313804058 instance=ExtResource("dummy")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -10, 0, -30)
+damage_popup_height = 3.0
+
+[node name="TrainingDummy4" parent="TrainingYard" index="3" unique_id=1859718616 instance=ExtResource("dummy")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 10, 0, -30)
+damage_popup_height = 3.0
+
+[node name="TrainingDummy5" parent="TrainingYard" index="4" unique_id=178197188 instance=ExtResource("dummy")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -6, 0, -35)
+damage_popup_height = 3.0
+
+[node name="TrainingDummy6" parent="TrainingYard" index="5" unique_id=2085656867 instance=ExtResource("dummy")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6, 0, -35)
+damage_popup_height = 3.0
+
+[node name="EastRoad" type="Node3D" parent="." index="8" unique_id=1224205489]
+
+[node name="MasterTortugaNpc" parent="EastRoad" index="0" unique_id=1226713959 instance=ExtResource("tortuga")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, -10)
+
+[node name="WestRoad" type="Node3D" parent="." index="9" unique_id=97671335]
+
+[node name="SilasTentEntrance" parent="WestRoad" index="0" unique_id=980545008 instance=ExtResource("scene_trigger")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, 0, -14)
+trigger_id = &"hub_to_silas"
+destination_scene = "res://world/biomes/hub/map/silas_tent.tscn"
+destination_trigger_id = &"down"
+
+[node name="CollisionShape3D" parent="WestRoad/SilasTentEntrance" index="0" unique_id=482012259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_silas_trigger")
+
+[node name="ExitPosition" parent="WestRoad/SilasTentEntrance" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 3.5)
+
+[node name="Landmarks" type="Node3D" parent="." index="10" unique_id=1764628372]
+
+[node name="StoneTable" parent="Landmarks" index="0" unique_id=551200853 instance=ExtResource("placeholder")]
+title = "Thạch bàn"
+status_note = "4 ô chìa · chưa có hệ thống đặt chìa"
+footprint_meters = Vector2(4, 4)
+height_meters = 1.2
+tint = Color(0.62, 0.6, 0.66, 1)
+
+[node name="HubTeleport" parent="Landmarks" index="1" unique_id=1603078919 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.002472, 0, 4.7980356)
+title = "Điểm tele Hub"
+status_note = "chưa xây · chưa có hệ thống tele"
+footprint_meters = Vector2(3, 3)
+height_meters = 0.25
+tint = Color(0.45, 0.62, 0.85, 1)
+blocks_movement = false
+
+[node name="QuestBoard" parent="Landmarks" index="2" unique_id=788777266 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6551476, 0, -12.325011)
+title = "Bảng nhiệm vụ"
+status_note = "chưa xây · chưa có hệ thống nhiệm vụ"
+footprint_meters = Vector2(2.4, 0.6)
+height_meters = 2.2
+tint = Color(0.7, 0.52, 0.34, 1)
+
+[node name="FirePillar" parent="Landmarks" index="3" unique_id=307750859 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, -54)
+title = "Trụ đá lửa"
+status_note = "chưa xây · chưa có hệ thống xây dựng"
+height_meters = 3.0
+tint = Color(0.85, 0.36, 0.24, 1)
+
+[node name="LavaGate" parent="Landmarks" index="4" unique_id=242201260 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -63)
+title = "Cổng sang Lava"
+status_note = "chưa có scene biome Lava"
+footprint_meters = Vector2(14, 1.5)
+height_meters = 3.5
+tint = Color(0.5, 0.28, 0.24, 1)
+
+[node name="Forge" parent="Landmarks" index="5" unique_id=203550879 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, -16)
+title = "Nhà thợ rèn"
+status_note = "chưa có asset · chưa xây · chưa có hệ thống xây dựng"
+footprint_meters = Vector2(9, 6)
+height_meters = 3.5
+tint = Color(0.55, 0.48, 0.42, 1)
+
+[node name="WaterPillar" parent="Landmarks" index="6" unique_id=5153577 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 0, -4.5)
+title = "Trụ đá nước"
+status_note = "có sẵn theo thiết kế · chưa có hệ thống trụ"
+height_meters = 3.0
+tint = Color(0.3, 0.55, 0.8, 1)
+
+[node name="WaterGlow" type="OmniLight3D" parent="Landmarks/WaterPillar" index="3" unique_id=1284633434]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 2.2)
+light_color = Color(0.35, 0.65, 1, 1)
+light_energy = 5.0
+omni_range = 8.0
+
+[node name="CoralSign" parent="Landmarks" index="7" unique_id=1723657408 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, -5.5)
+title = "→ Coral Valley"
+footprint_meters = Vector2(0.4, 0.4)
+height_meters = 1.2
+tint = Color(0.86, 0.72, 0.5, 1)
+blocks_movement = false
+
+[node name="SilasSign" parent="Landmarks" index="8" unique_id=1900780862 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.5, 0, -11)
+title = "Lều Silas ↑"
+footprint_meters = Vector2(0.4, 0.4)
+height_meters = 1.2
+tint = Color(0.86, 0.72, 0.5, 1)
+blocks_movement = false
+
+[node name="GrassPillar" parent="Landmarks" index="9" unique_id=1639269448 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48, 0, -4.5)
+title = "Trụ đá cỏ"
+status_note = "chưa xây · chưa có hệ thống xây dựng"
+height_meters = 3.0
+tint = Color(0.42, 0.68, 0.32, 1)
+
+[node name="SwampGate" parent="Landmarks" index="10" unique_id=298153877 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64, 0, 0)
+title = "Cổng sang Swamp"
+status_note = "chưa có scene biome Swamp"
+footprint_meters = Vector2(1.5, 14)
+height_meters = 3.5
+tint = Color(0.3, 0.42, 0.3, 1)
+
+[node name="MadamCroak" parent="Landmarks" index="11" unique_id=394122483 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 33)
+title = "Khu Madam Croak"
+status_note = "NPC chưa có trong dự án"
+footprint_meters = Vector2(1.6, 1.6)
+height_meters = 1.6
+tint = Color(0.5, 0.7, 0.45, 1)
+blocks_movement = false
+
+[node name="WindPillar" parent="Landmarks" index="12" unique_id=1619458148 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, 50)
+title = "Trụ đá gió"
+status_note = "chưa xây · chưa có hệ thống xây dựng"
+height_meters = 3.0
+tint = Color(0.75, 0.88, 0.95, 1)
+
+[node name="IceGate" parent="Landmarks" index="13" unique_id=1871165024 instance=ExtResource("placeholder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 63)
+title = "Cổng sang Ice"
+status_note = "chưa có scene biome Ice"
+footprint_meters = Vector2(14, 1.5)
+height_meters = 3.5
+tint = Color(0.6, 0.74, 0.85, 1)
+
+[node name="Foliage" type="Node3D" parent="." index="11" unique_id=1508711106]
+
+[node name="PineTreeAsymmetric1" parent="Foliage" index="0" unique_id=2056741599 instance=ExtResource("pine_tree_asymmetric")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.68, 0, -58.24)
+
+[node name="PineTreeTall1" parent="Foliage" index="1" unique_id=572229085 instance=ExtResource("pine_tree_tall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.82, 0, -36.37)
+
+[node name="PineTreeWide1" parent="Foliage" index="2" unique_id=1985736503 instance=ExtResource("pine_tree_wide")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.71, 0, 38.68)
+
+[node name="PineTreeAsymmetric2" parent="Foliage" index="3" unique_id=95230632 instance=ExtResource("pine_tree_asymmetric")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.53, 0, 52.43)
+
+[node name="PineTreeTall2" parent="Foliage" index="4" unique_id=1034630635 instance=ExtResource("pine_tree_tall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.91, 0, 25.16)
+
+[node name="PineTreeWide2" parent="Foliage" index="5" unique_id=1617674139 instance=ExtResource("pine_tree_wide")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.34, 0, 27.14)
+
+[node name="PineTreeAsymmetric3" parent="Foliage" index="6" unique_id=1190522796 instance=ExtResource("pine_tree_asymmetric")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.1, 0, 5.83)
+
+[node name="PineTreeAsymmetric4" parent="Foliage" index="7" unique_id=1473389141 instance=ExtResource("pine_tree_asymmetric")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.74, 0, -23.37)
+
+[node name="PineTreeAsymmetric5" parent="Foliage" index="8" unique_id=295287222 instance=ExtResource("pine_tree_asymmetric")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54.91, 0, -5.55)
+
+[node name="CoastalGrassTall021" parent="Foliage" index="9" unique_id=384353172 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.77, 0, -52.19)
+
+[node name="CoastalGrassTall011" parent="Foliage" index="10" unique_id=249831694 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.8, 0, 38.28)
+
+[node name="CoastalGrassTall012" parent="Foliage" index="11" unique_id=953321341 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.29, 0, 4.98)
+
+[node name="CoastalGrassTall013" parent="Foliage" index="12" unique_id=1135334081 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.69, 0, 28.4)
+
+[node name="CoastalGrassTall014" parent="Foliage" index="13" unique_id=1055595295 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.01, 0, -14.48)
+
+[node name="CoastalGrassTall022" parent="Foliage" index="14" unique_id=381004440 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.38, 0, -62.67)
+
+[node name="CoastalGrassTall023" parent="Foliage" index="15" unique_id=394851732 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.72, 0, 4.99)
+
+[node name="CoastalGrassTall024" parent="Foliage" index="16" unique_id=601251665 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 0, -48.84)
+
+[node name="CoastalGrassTall025" parent="Foliage" index="17" unique_id=1757295514 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.28, 0, 24.1)
+
+[node name="CoastalGrassTall026" parent="Foliage" index="18" unique_id=1293612304 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.37, 0, -32.77)
+
+[node name="CoastalGrassTall015" parent="Foliage" index="19" unique_id=1629446875 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.2, 0, -5.35)
+
+[node name="CoastalGrassTall016" parent="Foliage" index="20" unique_id=492338754 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.97, 0, -23.7)
+
+[node name="CoastalGrassTall027" parent="Foliage" index="21" unique_id=1645875703 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.82, 0, 36.95)
+
+[node name="CoastalGrassTall017" parent="Foliage" index="22" unique_id=1685032651 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.54, 0, 27.56)
+
+[node name="CoastalGrassTall018" parent="Foliage" index="23" unique_id=1074033355 instance=ExtResource("coastal_grass_tall_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.17, 0, -37.5)
+
+[node name="CoastalGrassTall028" parent="Foliage" index="24" unique_id=1755504530 instance=ExtResource("coastal_grass_tall_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.75, 0, -13.07)
+
+[node name="CoastalGrassSmall031" parent="Foliage" index="25" unique_id=371736814 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.68, 0, 34.53)
+
+[node name="CoastalGrassSmall032" parent="Foliage" index="26" unique_id=1486514921 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.81, 0, -5.94)
+
+[node name="CoastalGrassSmall011" parent="Foliage" index="27" unique_id=762499021 instance=ExtResource("coastal_grass_small_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.95, 0, 58.82)
+
+[node name="CoastalGrassSmall012" parent="Foliage" index="28" unique_id=943945411 instance=ExtResource("coastal_grass_small_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.87, 0, -23.36)
+
+[node name="CoastalGrassSmall021" parent="Foliage" index="29" unique_id=1530449559 instance=ExtResource("coastal_grass_small_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.99, 0, 4.67)
+
+[node name="CoastalGrassSmall033" parent="Foliage" index="30" unique_id=1634072275 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.64, 0, 4.06)
+
+[node name="CoastalGrassSmall022" parent="Foliage" index="31" unique_id=2098793467 instance=ExtResource("coastal_grass_small_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -63.06, 0, -5.98)
+
+[node name="CoastalGrassSmall023" parent="Foliage" index="32" unique_id=40730529 instance=ExtResource("coastal_grass_small_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.86, 0, 4.07)
+
+[node name="CoastalGrassSmall034" parent="Foliage" index="33" unique_id=549570411 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59.01, 0, -4.99)
+
+[node name="CoastalGrassSmall035" parent="Foliage" index="34" unique_id=1241670169 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.05, 0, 38.97)
+
+[node name="CoastalGrassSmall036" parent="Foliage" index="35" unique_id=237729251 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.54, 0, 13.56)
+
+[node name="CoastalGrassSmall013" parent="Foliage" index="36" unique_id=552594277 instance=ExtResource("coastal_grass_small_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.38, 0, 5.83)
+
+[node name="CoastalGrassSmall014" parent="Foliage" index="37" unique_id=1018060412 instance=ExtResource("coastal_grass_small_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -54.74, 0, 4.16)
+
+[node name="CoastalGrassSmall037" parent="Foliage" index="38" unique_id=136597939 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.55, 0, 4.08)
+
+[node name="CoastalGrassSmall038" parent="Foliage" index="39" unique_id=368573851 instance=ExtResource("coastal_grass_small_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.63, 0, -5.81)
+
+[node name="CoastalGrassSmall015" parent="Foliage" index="40" unique_id=1481168202 instance=ExtResource("coastal_grass_small_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.91, 0, 5.41)
+
+[node name="CoastalGrassSmall024" parent="Foliage" index="41" unique_id=84932698 instance=ExtResource("coastal_grass_small_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.57, 0, -13.67)
+
+[node name="CoastalGrassSmall016" parent="Foliage" index="42" unique_id=1377572229 instance=ExtResource("coastal_grass_small_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.73, 0, 42.55)
+
+[node name="CoastalGrassLarge021" parent="Foliage" index="43" unique_id=1944638122 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.42, 0, -10.61)
+
+[node name="CoastalGrassLarge011" parent="Foliage" index="44" unique_id=1945038356 instance=ExtResource("coastal_grass_large_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.19, 0, 10.94)
+
+[node name="CoastalGrassLarge012" parent="Foliage" index="45" unique_id=644185041 instance=ExtResource("coastal_grass_large_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.33, 0, -61.87)
+
+[node name="CoastalGrassLarge022" parent="Foliage" index="46" unique_id=1207428664 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.75, 0, -48.8)
+
+[node name="CoastalGrassLarge023" parent="Foliage" index="47" unique_id=1164100367 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.85, 0, -4.51)
+
+[node name="CoastalGrassLarge024" parent="Foliage" index="48" unique_id=647026076 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.13, 0, -36.5)
+
+[node name="CoastalGrassLarge013" parent="Foliage" index="49" unique_id=1949077441 instance=ExtResource("coastal_grass_large_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.93, 0, 41.73)
+
+[node name="CoastalGrassLarge025" parent="Foliage" index="50" unique_id=1852873916 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.89, 0, -4.79)
+
+[node name="CoastalGrassLarge026" parent="Foliage" index="51" unique_id=2009942566 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.02, 0, 13.87)
+
+[node name="CoastalGrassLarge027" parent="Foliage" index="52" unique_id=77572915 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.14, 0, -10.06)
+
+[node name="CoastalGrassLarge028" parent="Foliage" index="53" unique_id=1097244376 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.31, 0, 10.23)
+
+[node name="CoastalGrassLarge029" parent="Foliage" index="54" unique_id=1829941299 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.31, 0, 62.27)
+
+[node name="CoastalGrassLarge014" parent="Foliage" index="55" unique_id=616714667 instance=ExtResource("coastal_grass_large_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 0, 55.65)
+
+[node name="CoastalGrassLarge0210" parent="Foliage" index="56" unique_id=159575558 instance=ExtResource("coastal_grass_large_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.92, 0, -19.4)
+
+[node name="CoastalGrassLarge015" parent="Foliage" index="57" unique_id=140966198 instance=ExtResource("coastal_grass_large_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.22, 0, 5.75)
+
+[node name="CoastalGrassLarge016" parent="Foliage" index="58" unique_id=2108971489 instance=ExtResource("coastal_grass_large_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.39, 0, 28.21)
+
+[node name="CoastalGrassShort011" parent="Foliage" index="59" unique_id=1068298517 instance=ExtResource("coastal_grass_short_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.61, 0, -27.72)
+
+[node name="CoastalGrassShort021" parent="Foliage" index="60" unique_id=1642741457 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.46, 0, 47.29)
+
+[node name="CoastalGrassShort031" parent="Foliage" index="61" unique_id=1489324284 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.84, 0, -59.17)
+
+[node name="CoastalGrassShort022" parent="Foliage" index="62" unique_id=483870037 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.79, 0, 58.69)
+
+[node name="CoastalGrassShort032" parent="Foliage" index="63" unique_id=541141835 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.86, 0, 46.57)
+
+[node name="CoastalGrassShort033" parent="Foliage" index="64" unique_id=618300218 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8, 0, 28.66)
+
+[node name="CoastalGrassShort034" parent="Foliage" index="65" unique_id=44879382 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.23, 0, 13.61)
+
+[node name="CoastalGrassShort023" parent="Foliage" index="66" unique_id=1863428262 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.4, 0, -13.65)
+
+[node name="CoastalGrassShort024" parent="Foliage" index="67" unique_id=2122482421 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.33, 0, 5.35)
+
+[node name="CoastalGrassShort025" parent="Foliage" index="68" unique_id=819843582 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 31.63)
+
+[node name="CoastalGrassShort012" parent="Foliage" index="69" unique_id=7229728 instance=ExtResource("coastal_grass_short_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.55, 0, 5.76)
+
+[node name="CoastalGrassShort013" parent="Foliage" index="70" unique_id=1371751585 instance=ExtResource("coastal_grass_short_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.03, 0, -22.6)
+
+[node name="CoastalGrassShort035" parent="Foliage" index="71" unique_id=1954094752 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44.68, 0, -5.42)
+
+[node name="CoastalGrassShort036" parent="Foliage" index="72" unique_id=1449652263 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.71, 0, -13.05)
+
+[node name="CoastalGrassShort026" parent="Foliage" index="73" unique_id=1285275747 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.73, 0, 4.6)
+
+[node name="CoastalGrassShort037" parent="Foliage" index="74" unique_id=349594314 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.89, 0, 38.87)
+
+[node name="CoastalGrassShort027" parent="Foliage" index="75" unique_id=1977108664 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.68, 0, -33.22)
+
+[node name="CoastalGrassShort038" parent="Foliage" index="76" unique_id=815119247 instance=ExtResource("coastal_grass_short_03")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.15, 0, 5.38)
+
+[node name="CoastalGrassShort028" parent="Foliage" index="77" unique_id=1149321643 instance=ExtResource("coastal_grass_short_02")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51.49, 0, -4.15)
+
+[node name="CoastalGrassShort014" parent="Foliage" index="78" unique_id=1565755100 instance=ExtResource("coastal_grass_short_01")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.9, 0, 4.7)
+
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
+[editable path="RoomAtmosphere"]
+[editable path="WestRoad/SilasTentEntrance"]

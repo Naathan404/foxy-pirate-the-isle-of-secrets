@@ -5,7 +5,7 @@
 
 [node name="room_07" unique_id=1749149702 instance=ExtResource("1_base")]
 open_exits = 8
-left_destination_scene = "res://world/biomes/hub/map/room_06.tscn"
+left_destination_scene = "res://world/biomes/hub/legacy/room_06.tscn"
 metadata/room_role = "NPC3"
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
@@ -60,7 +60,7 @@ enabled = false
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
-destination_scene = "res://world/biomes/hub/map/room_06.tscn"
+destination_scene = "res://world/biomes/hub/legacy/room_06.tscn"
 
 [node name="RandomGrass" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252096, 0)

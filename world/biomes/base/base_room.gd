@@ -19,6 +19,11 @@ const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
 @export var void_reload_enabled: bool = true
 @export var void_height: float = -6.0
 
+@export_group("Safe room")
+## Charms can be changed anywhere in this room (the hub, campfire rests). Checkpoints still
+## add their own safe area in rooms without this flag.
+@export var safe_room: bool = false
+
 @export_group("Ground boundaries")
 ## Openings in room-local X/Z coordinates, for example at moving platform docks.
 @export var boundary_openings: Array[Rect2] = []
@@ -96,6 +101,7 @@ func _ready() -> void:
 	_refresh_exits()
 	if not Engine.is_editor_hint():
 		_rebuild_ground_boundaries()
+		_grant_safe_room()
 	if Engine.is_editor_hint():
 		set_physics_process(false)
 		update_configuration_warnings()
@@ -110,6 +116,18 @@ func _physics_process(_delta: float) -> void:
 		return
 	if to_local(active_player.global_position).y < void_height:
 		manager.reload_current_scene()
+
+
+## Foxy is a child of the room, so it has registered with GameManager before the room is
+## ready. The room is the safe source: leaving the room frees it and ends the permission.
+func _grant_safe_room() -> void:
+	if not safe_room:
+		return
+	var active_player := get_node("/root/GameManager").player as Player
+	if not is_instance_valid(active_player) or not is_ancestor_of(active_player):
+		return
+	if is_instance_valid(active_player.charm_socket_manager):
+		active_player.charm_socket_manager.enter_safe_location(self)
 
 
 func _queue_refresh() -> void:

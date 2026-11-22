@@ -1,0 +1,66 @@
+[gd_scene format=3]
+
+[sub_resource type="Gradient" id="dot_gradient"]
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.55, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="dot_texture"]
+gradient = SubResource("dot_gradient")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="Gradient" id="wisp_gradient"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
+colors = PackedColorArray(0.75, 1.6, 0.9, 0, 0.75, 1.6, 0.9, 0.9, 0.45, 0.9, 0.55, 0.35, 0.8, 1.7, 1.0, 0.85, 0.75, 1.6, 0.9, 0)
+
+[sub_resource type="GradientTexture1D" id="wisp_ramp"]
+gradient = SubResource("wisp_gradient")
+use_hdr = true
+
+[sub_resource type="ParticleProcessMaterial" id="wisp_process"]
+emission_shape = 3
+emission_box_extents = Vector3(13, 0.9, 9)
+direction = Vector3(0.6, 0.3, 0.2)
+spread = 180.0
+initial_velocity_min = 0.1
+initial_velocity_max = 0.35
+gravity = Vector3(0, 0.03, 0)
+turbulence_enabled = true
+turbulence_noise_strength = 0.5
+turbulence_noise_scale = 6.0
+turbulence_noise_speed_random = 0.3
+turbulence_influence_min = 0.03
+turbulence_influence_max = 0.08
+scale_min = 0.6
+scale_max = 1.0
+color_ramp = SubResource("wisp_ramp")
+
+[sub_resource type="StandardMaterial3D" id="wisp_material"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("dot_texture")
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="wisp_mesh"]
+material = SubResource("wisp_material")
+size = Vector2(0.24, 0.24)
+
+[node name="CursedWisps" type="GPUParticles3D"]
+cast_shadow = 0
+amount = 36
+lifetime = 7.0
+preprocess = 7.0
+fixed_fps = 30
+local_coords = false
+visibility_aabb = AABB(-16, -2, -12, 32, 6, 24)
+process_material = SubResource("wisp_process")
+draw_pass_1 = SubResource("wisp_mesh")
