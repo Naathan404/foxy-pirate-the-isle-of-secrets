@@ -13,9 +13,273 @@
 [ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="note_type"]
 [ext_resource type="Script" uid="uid://e1whya78g8bs" path="res://gameplay/inventory/notes_tab.gd" id="script"]
 [ext_resource type="Resource" uid="uid://c8p2d5sfb87ah" path="res://data/notes/starfish.tres" id="starfish"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="deco"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/filter_chip.tscn" id="chip"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Inventory/All_Icon_Inven.png" id="all_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Journey/Creature_Icon.png" id="creature_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Journey/Boss_Icon.png" id="boss_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Weapons_Line.png" id="lines"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Journal_Icon.png" id="journal_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Stat_Weapon_Log.png" id="panel"]
+[ext_resource type="Material" path="res://gameplay/inventory/menu/icon_glow_material.tres" id="glow_mat"]
+
+[sub_resource type="AtlasTexture" id="line_left"]
+atlas = ExtResource("lines")
+region = Rect2(240, 60, 40, 990)
+
+[sub_resource type="AtlasTexture" id="line_right"]
+atlas = ExtResource("lines")
+region = Rect2(1100, 60, 43, 1027)
 
 [node name="Notes" type="Control" unique_id=1900962950]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("script")
 notes = Array[ExtResource("note_type")]([ExtResource("starfish"), ExtResource("crab"), ExtResource("barrel"), ExtResource("coral_skeleton"), ExtResource("elite_starfish"), ExtResource("elite_crab"), ExtResource("elite_barrel"), ExtResource("diary_ember"), ExtResource("diary_tide"), ExtResource("diary_flora"), ExtResource("diary_gale")])
+
+[node name="Title" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 84.0
+offset_right = 360.0
+offset_bottom = 152.0
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Title"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Title"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "Journey"
+
+[node name="DecoRight" type="TextureRect" parent="Title"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Filters" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 166.0
+offset_right = 240.0
+offset_bottom = 336.0
+theme_override_constants/separation = 6
+
+[node name="FilterAll" parent="Filters" instance=ExtResource("chip")]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Every bestiary entry"
+chip_icon = ExtResource("all_icon")
+chip_text = "All"
+
+[node name="FilterCreatures" parent="Filters" instance=ExtResource("chip")]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Creature records"
+chip_icon = ExtResource("creature_icon")
+chip_text = "Creatures"
+
+[node name="FilterBosses" parent="Filters" instance=ExtResource("chip")]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Boss encounters"
+chip_icon = ExtResource("boss_icon")
+chip_text = "Bosses"
+
+[node name="Hint" type="Label" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 352.0
+offset_right = 236.0
+offset_bottom = 452.0
+theme_type_variation = &"MutedLabel"
+text = "Collect creature notes and boss diaries to fill in new pages."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="LineLeft" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 168.0
+offset_right = 270.0
+offset_bottom = 552.0
+mouse_filter = 2
+texture = SubResource("line_left")
+expand_mode = 1
+
+[node name="LineRight" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 810.0
+offset_top = 118.0
+offset_right = 831.0
+offset_bottom = 622.0
+mouse_filter = 2
+texture = SubResource("line_right")
+expand_mode = 1
+
+[node name="Counter" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 640.0
+offset_top = 124.0
+offset_right = 800.0
+offset_bottom = 160.0
+tooltip_text = "Entries discovered / total entries"
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="JournalIcon" type="TextureRect" parent="Counter"]
+custom_minimum_size = Vector2(32, 30)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("journal_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CounterLabel" type="Label" parent="Counter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 24
+text = "0/0"
+vertical_alignment = 1
+
+[node name="GridScroll" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 162.0
+offset_right = 808.0
+offset_bottom = 550.0
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="GridScroll"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Grid" type="GridContainer" parent="GridScroll/GridMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="EmptyLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 300.0
+offset_top = 196.0
+offset_right = 790.0
+offset_bottom = 240.0
+theme_type_variation = &"BodyLabel"
+theme_override_colors/font_outline_color = Color(0.08, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="DetailArt" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 855.0
+offset_top = 36.0
+offset_right = 1248.0
+offset_bottom = 639.0
+mouse_filter = 2
+texture = ExtResource("panel")
+expand_mode = 1
+
+[node name="Glow" type="ColorRect" parent="."]
+material = ExtResource("glow_mat")
+layout_mode = 0
+offset_left = 944.0
+offset_top = 68.0
+offset_right = 1134.0
+offset_bottom = 258.0
+mouse_filter = 2
+
+[node name="Portrait" type="TextureRect" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 0
+offset_left = 975.0
+offset_top = 99.0
+offset_right = 1103.0
+offset_bottom = 227.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EntryName" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 232.0
+offset_right = 1230.0
+offset_bottom = 270.0
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+text = "Journey"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="EntryKind" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 268.0
+offset_right = 1230.0
+offset_bottom = 290.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+
+[node name="DetailsScroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 878.0
+offset_top = 296.0
+offset_right = 1228.0
+offset_bottom = 526.0
+horizontal_scroll_mode = 0
+
+[node name="SectionsMargin" type="MarginContainer" parent="DetailsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_right = 16
+
+[node name="Sections" type="VBoxContainer" parent="DetailsScroll/SectionsMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Footer" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 544.0
+offset_right = 1230.0
+offset_bottom = 568.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1

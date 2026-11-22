@@ -1,20 +1,53 @@
 extends Control
-## Bestiary pages in the inventory book. Entries and their defaults are edited in Inspector.
+## Journey page: a read-only bestiary of MonsterNote entries. Entries and their default unlock
+## state are edited in the Inspector; runtime unlocks live in the NoteProgress autoload.
 
-const TITLE_FONT: Font = preload("res://assets/fonts/BlackCrest-gwPyY.otf")
-const BODY_FONT: Font = preload("res://assets/fonts/unifont-17.0.03.otf")
-const INK := Color(0.24, 0.12, 0.10)
-const MUTED := Color(0.40, 0.25, 0.19)
+enum Filter { ALL, CREATURES, BOSSES }
+
+const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/menu/catalog_slot.tscn")
+const BOSS_BADGE: Texture2D = preload("res://assets/ui/HUD_Fox/Journey/Boss_Icon.png")
+## Item art for notes/diaries without a portrait, matching the pickup that unlocks them.
+const NOTE_ICON: Texture2D = preload("res://assets/sprites/items/Monster_Notes.png")
+const DIARY_ICON: Texture2D = preload("res://assets/sprites/items/Boss_Diary.png")
+const GRID_COLUMNS := 5
+const MIN_VISIBLE_ROWS := 4
+const LOCKED_NAME := "???"
+const FILTER_NAMES := {
+	Filter.ALL: "entries",
+	Filter.CREATURES: "creature entries",
+	Filter.BOSSES: "boss entries",
+}
 
 @export var notes: Array[MonsterNote] = []
+@export_range(12, 40, 1) var section_heading_size: int = 25
+@export_range(12, 30, 1) var section_body_size: int = 17
 
-var _rows: VBoxContainer
-var _detail: VBoxContainer
-var _selected_id: StringName
+var _filter: Filter = Filter.ALL
+var _entries: Array[MonsterNote] = []
+var _selected_id: StringName = &""
+var _slots: Array[InventoryCatalogSlot] = []
+var _dirty: bool = true
+
+@onready var _grid: GridContainer = %Grid
+@onready var _counter_label: Label = %CounterLabel
+@onready var _empty_label: Label = %EmptyLabel
+@onready var _portrait: TextureRect = %Portrait
+@onready var _entry_name: Label = %EntryName
+@onready var _entry_kind: Label = %EntryKind
+@onready var _details_scroll: ScrollContainer = %DetailsScroll
+@onready var _sections: VBoxContainer = %Sections
+@onready var _footer: Label = %Footer
+@onready var _filter_chips: Dictionary[Filter, InventoryFilterChip] = {
+	Filter.ALL: %FilterAll,
+	Filter.CREATURES: %FilterCreatures,
+	Filter.BOSSES: %FilterBosses,
+}
 
 
 func _ready() -> void:
-	_build_layout()
+	for filter: Filter in _filter_chips:
+		_filter_chips[filter].pressed.connect(_set_filter.bind(filter))
+	visibility_changed.connect(_on_visibility_changed)
 	get_node("/root/NoteProgress").changed.connect(_on_note_progress_changed)
 	refresh()
 
@@ -31,232 +64,220 @@ func is_note_unlocked(note: MonsterNote) -> bool:
 	return get_node("/root/NoteProgress").is_unlocked(note)
 
 
-func _on_note_progress_changed(_note_id: StringName) -> void:
-	refresh()
-
-
 func refresh() -> void:
-	if not is_instance_valid(_rows):
+	_dirty = false
+	if not is_node_ready():
 		return
-	_clear(_rows)
-	var selected: MonsterNote
+	_rebuild_entries()
+	var selected := _find_entry(_selected_id)
+	if selected == null and not _entries.is_empty():
+		selected = _first_unlocked_entry()
+		_selected_id = selected.note_id if selected != null else _entries[0].note_id
+	_refresh_grid()
+	_render_detail(_find_entry(_selected_id))
+
+
+## Entrance animation played by the menu when this page appears.
+func play_intro() -> void:
+	InventoryMenuFx.stagger_in(_slots)
+	InventoryMenuFx.pop(_portrait, InventoryMenuFx.ICON_POP_FROM_SCALE)
+
+
+func focus_default() -> void:
+	var index := _index_of(_selected_id)
+	var target: Control = _slots[index] if index >= 0 else _filter_chips[_filter]
+	target.grab_focus.call_deferred()
+
+
+func _on_note_progress_changed(_note_id: StringName) -> void:
+	if is_visible_in_tree():
+		refresh()
+	else:
+		_dirty = true
+
+
+func _on_visibility_changed() -> void:
+	if is_visible_in_tree() and _dirty:
+		refresh()
+
+
+func _set_filter(filter: Filter) -> void:
+	var changed := filter != _filter
+	_filter = filter
+	refresh()
+	if changed:
+		InventoryMenuFx.stagger_in(_slots)
+
+
+## Keeps the authored catalog order; entries without an ID are skipped as before.
+func _rebuild_entries() -> void:
+	_entries.clear()
+	var found: int = 0
+	var total: int = 0
 	for note in notes:
 		if note == null or note.note_id.is_empty():
 			continue
+		total += 1
+		found += 1 if is_note_unlocked(note) else 0
+		if _matches(note):
+			_entries.append(note)
+	_counter_label.text = "%d/%d" % [found, total]
+	for filter: Filter in _filter_chips:
+		_filter_chips[filter].set_active(filter == _filter)
+
+
+func _matches(note: MonsterNote) -> bool:
+	match _filter:
+		Filter.CREATURES:
+			return note.layout == MonsterNote.Layout.MONSTER
+		Filter.BOSSES:
+			return note.layout == MonsterNote.Layout.BOSS
+	return true
+
+
+func _refresh_grid() -> void:
+	var rows: int = maxi(MIN_VISIBLE_ROWS, ceili(float(_entries.size()) / GRID_COLUMNS))
+	var cell_count: int = rows * GRID_COLUMNS
+	while _slots.size() < cell_count:
+		var slot := SLOT_SCENE.instantiate() as InventoryCatalogSlot
+		slot.icon_texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_grid.add_child(slot)
+		slot.pressed.connect(_select_index.bind(_slots.size()))
+		_slots.append(slot)
+	for index in range(_slots.size()):
+		var slot := _slots[index]
+		slot.visible = index < cell_count
+		if index >= _entries.size():
+			slot.present_placeholder()
+			continue
+		var note := _entries[index]
 		var unlocked := is_note_unlocked(note)
-		var row := Button.new()
-		row.text = ("  " + note.display_name) if unlocked else "  ???   ·   LOCKED"
-		row.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		row.custom_minimum_size = Vector2(0, 44)
-		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.disabled = not unlocked
-		row.focus_mode = Control.FOCUS_ALL if unlocked else Control.FOCUS_NONE
-		row.mouse_default_cursor_shape = (
-			Control.CURSOR_POINTING_HAND if unlocked else Control.CURSOR_ARROW
+		var boss := note.layout == MonsterNote.Layout.BOSS
+		slot.present(
+			_portrait_of(note) if unlocked else null,
+			unlocked,
+			not unlocked,
+			BOSS_BADGE if boss else null
 		)
-		row.add_theme_font_override("font", BODY_FONT)
-		row.add_theme_font_size_override("font_size", 16)
-		row.add_theme_color_override("font_color", INK)
-		row.add_theme_color_override("font_hover_color", INK)
-		row.add_theme_color_override("font_pressed_color", INK)
-		row.add_theme_color_override("font_disabled_color", Color(0.77, 0.69, 0.61, 0.8))
-		row.add_theme_stylebox_override("normal", _row_style(Color(0.55, 0.32, 0.22, 0.16)))
-		row.add_theme_stylebox_override("hover", _row_style(Color(0.66, 0.37, 0.20, 0.30)))
-		row.add_theme_stylebox_override("pressed", _row_style(Color(0.62, 0.32, 0.17, 0.40)))
-		row.add_theme_stylebox_override("disabled", _row_style(Color(0.12, 0.09, 0.09, 0.76)))
-		if unlocked:
-			row.pressed.connect(_select.bind(note))
-		if unlocked and note.note_id == _selected_id:
-			selected = note
-			row.add_theme_stylebox_override("normal", _row_style(Color(0.62, 0.32, 0.17, 0.35)))
-		_rows.add_child(row)
-	if selected == null:
-		_selected_id = &""
-	_render_detail(selected)
+		slot.set_selected(note.note_id == _selected_id)
+		slot.tooltip_text = (
+			note.display_name if unlocked else "Undiscovered %s" % ("boss" if boss else "creature")
+		)
+	_empty_label.visible = _entries.is_empty()
+	_empty_label.text = "No %s in this journey yet." % FILTER_NAMES[_filter]
 
 
-func _select(note: MonsterNote) -> void:
-	if not is_note_unlocked(note):
-		return
-	_selected_id = note.note_id
-	refresh()
-
-
-func _build_layout() -> void:
-	# Match the printable areas of the existing 1100 x 650 inventory book.
-	var left := Control.new()
-	left.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	left.anchor_right = 0.5
-	left.offset_left = 108
-	left.offset_right = -52
-	left.offset_top = 55
-	left.offset_bottom = -100
-	add_child(left)
-	var right := Control.new()
-	right.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	right.anchor_left = 0.5
-	right.offset_left = 50
-	right.offset_right = -96
-	right.offset_top = 55
-	right.offset_bottom = -100
-	add_child(right)
-
-	var left_column := _column(left)
-	_add_label(left_column, "Field Notes", 38, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER)
-	_add_label(
-		left_column, "CREATURES OF THE ISLE", 12, BODY_FONT, HORIZONTAL_ALIGNMENT_CENTER, MUTED
-	)
-	_add_divider(left_column)
-	var list_scroll := ScrollContainer.new()
-	list_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	list_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	left_column.add_child(list_scroll)
-	_rows = VBoxContainer.new()
-	_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_rows.add_theme_constant_override("separation", 6)
-	list_scroll.add_child(_rows)
-
-	var detail_scroll := ScrollContainer.new()
-	detail_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	right.add_child(detail_scroll)
-	_detail = VBoxContainer.new()
-	_detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_detail.add_theme_constant_override("separation", 7)
-	detail_scroll.add_child(_detail)
+func _select_index(index: int) -> void:
+	if index < _entries.size():
+		var changed := _entries[index].note_id != _selected_id
+		_selected_id = _entries[index].note_id
+		refresh()
+		if changed:
+			InventoryMenuFx.pop(_portrait, InventoryMenuFx.ICON_POP_FROM_SCALE)
 
 
 func _render_detail(note: MonsterNote) -> void:
-	_clear(_detail)
+	_clear_sections()
+	_details_scroll.scroll_vertical = 0
+	_portrait.texture = null
 	if note == null:
-		_add_label(_detail, "The Bestiary", 38, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER)
-		_add_divider(_detail)
-		_add_spacer(_detail, 110)
-		_add_label(
-			_detail,
-			"Select an unlocked note to read about the creatures of the isle.",
-			17,
-			BODY_FONT,
-			HORIZONTAL_ALIGNMENT_CENTER,
-			MUTED
-		)
+		_entry_name.text = "Journey"
+		_entry_kind.text = ""
+		_add_body("Creatures and bosses you learn about are recorded here.")
+		_footer.text = ""
 		return
+
 	var boss := note.layout == MonsterNote.Layout.BOSS
-	_add_label(
-		_detail,
-		"BOSS ENCOUNTER" if boss else "CREATURE RECORD",
-		12,
-		BODY_FONT,
-		HORIZONTAL_ALIGNMENT_CENTER,
-		MUTED
-	)
-	_add_label(
-		_detail, note.display_name, 36 if boss else 32, TITLE_FONT, HORIZONTAL_ALIGNMENT_CENTER
-	)
-	_add_divider(_detail)
-	if boss:
-		_add_portrait(_detail, note.portrait, Vector2(0, 160))
-		_add_stats(_detail, note, HORIZONTAL_ALIGNMENT_CENTER)
-		_section("THE ENCOUNTER", note.description)
-		_section("THE STORY", note.story)
-		_section("BATTLE NOTES", note.behavior)
-		_section("PIRATE'S STRATEGY", note.strategy)
-	else:
-		var summary := HBoxContainer.new()
-		summary.add_theme_constant_override("separation", 14)
-		_detail.add_child(summary)
-		_add_portrait(summary, note.portrait, Vector2(120, 115))
-		var facts := VBoxContainer.new()
-		facts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		facts.add_theme_constant_override("separation", 7)
-		summary.add_child(facts)
-		_add_label(facts, "FIELD PROFILE", 13, BODY_FONT, HORIZONTAL_ALIGNMENT_LEFT, MUTED)
-		_add_stats(facts, note, HORIZONTAL_ALIGNMENT_LEFT)
-		_add_label(facts, note.description, 16, BODY_FONT)
-		_add_divider(_detail)
-		_section("BEHAVIOR", note.behavior)
-		_section("FIELD TIP", note.strategy)
+	if not is_note_unlocked(note):
+		# Locked entries never reveal their name, portrait or text.
+		_entry_name.text = LOCKED_NAME
+		_entry_kind.text = "Undiscovered boss" if boss else "Undiscovered creature"
+		_add_body("Find this entry's %s to fill in this page." % ("boss diary" if boss else "note"))
+		_footer.text = ""
+		return
 
-
-func _add_portrait(parent: Node, texture: Texture2D, minimum: Vector2) -> void:
-	var portrait := TextureRect.new()
-	portrait.custom_minimum_size = minimum
-	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	portrait.texture = texture
-	parent.add_child(portrait)
-
-
-func _add_stats(parent: Node, note: MonsterNote, alignment: HorizontalAlignment) -> void:
+	_portrait.texture = _portrait_of(note)
+	_entry_name.text = note.display_name
+	_entry_name.tooltip_text = note.display_name
+	_entry_kind.text = "Boss encounter" if boss else "Creature record"
 	if note.enemy_data != null:
-		_add_label(
-			parent,
-			(
-				"HEALTH  %s    ATTACK  %s"
-				% [str(note.enemy_data.max_hp), str(note.enemy_data.attack_damage)]
-			),
-			13,
-			BODY_FONT,
-			alignment,
-			MUTED
+		_add_stats_line(note.enemy_data)
+	if boss:
+		_add_section("The Encounter", note.description)
+		_add_section("The Story", note.story)
+		_add_section("Battle Notes", note.behavior)
+		_add_section("Pirate's Strategy", note.strategy)
+	else:
+		_add_section("Description", note.description)
+		_add_section("Behavior", note.behavior)
+		_add_section("Field Tip", note.strategy)
+	_footer.text = "Entry %d of %d" % [_index_of(note.note_id) + 1, _entries.size()]
+
+
+func _add_stats_line(data: EnemyData) -> void:
+	var label := _add_body(
+		(
+			"Health  %s     Attack  %s"
+			% [
+				InventoryMenuFormat.number(data.max_hp),
+				InventoryMenuFormat.number(data.attack_damage)
+			]
 		)
+	)
+	label.theme_type_variation = &"MutedLabel"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 
-func _section(title: String, body: String) -> void:
+func _add_section(title: String, body: String) -> void:
 	if body.strip_edges().is_empty():
 		return
-	_add_label(_detail, title, 13, BODY_FONT, HORIZONTAL_ALIGNMENT_LEFT, MUTED)
-	_add_label(_detail, body, 16, BODY_FONT)
+	var heading := Label.new()
+	heading.text = title
+	heading.theme_type_variation = &"HeadingLabel"
+	heading.add_theme_font_size_override("font_size", section_heading_size)
+	_sections.add_child(heading)
+	_add_body(body.strip_edges())
 
 
-func _column(parent: Control) -> VBoxContainer:
-	var column := VBoxContainer.new()
-	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	column.add_theme_constant_override("separation", 7)
-	parent.add_child(column)
-	return column
-
-
-func _add_label(
-	parent: Node,
-	text: String,
-	font_size: int,
-	font: Font,
-	alignment: HorizontalAlignment = HORIZONTAL_ALIGNMENT_LEFT,
-	color: Color = INK
-) -> Label:
+func _add_body(text: String) -> Label:
 	var label := Label.new()
 	label.text = text
-	label.horizontal_alignment = alignment
+	label.theme_type_variation = &"BodyLabel"
+	label.add_theme_font_size_override("font_size", section_body_size)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_override("font", font)
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", color)
-	parent.add_child(label)
+	_sections.add_child(label)
 	return label
 
 
-func _add_divider(parent: Node) -> void:
-	var divider := HSeparator.new()
-	parent.add_child(divider)
-
-
-func _add_spacer(parent: Node, height: float) -> void:
-	var spacer := Control.new()
-	spacer.custom_minimum_size.y = height
-	parent.add_child(spacer)
-
-
-func _row_style(color: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(6)
-	return style
-
-
-func _clear(parent: Node) -> void:
-	for child in parent.get_children():
-		parent.remove_child(child)
+func _clear_sections() -> void:
+	_entry_name.tooltip_text = ""
+	for child in _sections.get_children():
+		_sections.remove_child(child)
 		child.queue_free()
+
+
+func _portrait_of(note: MonsterNote) -> Texture2D:
+	if note.portrait != null:
+		return note.portrait
+	if note.pickup_item != null and note.pickup_item.icon != null:
+		return note.pickup_item.icon
+	return DIARY_ICON if note.layout == MonsterNote.Layout.BOSS else NOTE_ICON
+
+
+func _first_unlocked_entry() -> MonsterNote:
+	for note in _entries:
+		if is_note_unlocked(note):
+			return note
+	return null
+
+
+func _find_entry(note_id: StringName) -> MonsterNote:
+	var index := _index_of(note_id)
+	return _entries[index] if index >= 0 else null
+
+
+func _index_of(note_id: StringName) -> int:
+	for index in range(_entries.size()):
+		if _entries[index].note_id == note_id:
+			return index
+	return -1
