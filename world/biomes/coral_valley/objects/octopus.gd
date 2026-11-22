@@ -1,5 +1,5 @@
 extends DestructibleProp
-## Ink lands on the attacking player's screen, including the killing hit.
+## Ink splashes the player's screen after player or enemy damage, including the killing hit.
 
 const INK_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/ink_overlay.gd")
 const INK_OVERLAY_NAME := "OctopusInkOverlay"
@@ -18,10 +18,15 @@ const INK_OVERLAY_NAME := "OctopusInkOverlay"
 
 func receive_damage(damage: DamageContext) -> float:
 	var applied := super.receive_damage(damage)
-	if applied <= 0.0 or damage == null or not is_instance_valid(damage.source):
+	if applied <= 0.0 or damage == null:
 		return applied
-	var player := damage.source as Player
-	if player == null:
+	# //NLVP sửa: Quái đánh trúng cũng phun mực lên người chơi hiện tại.
+	var player: Player
+	if is_instance_valid(damage.source):
+		player = damage.source as Player
+	if player == null and damage.source_team == CombatTeams.ENEMY:
+		player = GameManager.player
+	if not is_instance_valid(player):
 		return applied
 	var overlay := player.get_node_or_null(INK_OVERLAY_NAME)
 	if overlay == null:

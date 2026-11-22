@@ -13,6 +13,12 @@
 9 - PlayerBoundary - Vách giới hạn di chuyển của người chơi
 10 - EnemyBoundary - Vách giới hạn di chuyển của quái
 ```
+
+Vật thể bật `DestructibleProp.receives_enemy_attacks` dùng hurtbox trung lập
+(`CombatTeams.NONE`) trên cả `PlayerHurtBox` và `EnemyHurtBox`, nhận mask
+`PlayerAttack | EnemyAttack`. Octopus bật sẵn tùy chọn này để đòn của cả hai
+phe kích hoạt phun mực; các vật thể khác giữ cấu hình nhận đòn người chơi.
+
 `EnemyBoundary` được thêm vào `CombatLayers.ENEMY_BODY_MASK` và
 `CombatLayers.ENEMY_FRONT_OBSTACLE_MASK`. Player, hitbox và các raycast nền
 không nhận layer này. Khi bật `Enemy Boundary Enabled`, `base_room.gd` dùng
