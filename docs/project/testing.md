@@ -37,6 +37,9 @@ Lint và formatter không thay thế kiểm tra Godot hoặc review. Ý nghĩa t
 - Plugin Godot AI tự thêm lại `_mcp_game_helper` trỏ tới `res://addons/godot_ai/runtime/game_helper.gd` khi bật plugin. Trước khi commit, nên bỏ autoload này và mục `res://addons/godot_ai/plugin.cfg` khỏi diff. CI cũng loại đúng hai mục đó sau checkout, trước khi chạy Godot, để cấu hình cục bộ không làm fail import hoặc báo thiếu plugin.
 - Bước chuẩn bị trên chỉ bỏ autoload và mục bật plugin Godot AI có đúng tên và đường dẫn đã biết. Không bỏ các autoload hay plugin khác, không tắt Dialogic và không lọc lỗi engine khỏi log. Thiếu script/resource gameplay vẫn làm CI fail như trước.
 - Chạy game hoặc scene liên quan đến thay đổi.
+- Với checkout sạch trên Windows, chạy import hai lượt: lượt đầu phát hiện
+  GDExtension SpineBridge; lượt sau đăng ký importer native và tạo tài nguyên
+  `.atlas`/`.skel`. Không sao chép hoặc commit cache `.godot/` để thay thế bước này.
 - Khi sửa scene, resource hoặc `project.godot`, mở lại project bằng Godot để kiểm tra tham chiếu.
 - Test độc lập đặt tại `test/**/*_test.gd` hoặc cạnh module trong `gameplay/charms/**/*_test.gd`, kế thừa `SceneTree` hoặc `MainLoop`, gọi `quit()` khi hoàn tất và trả mã thoát khác 0 khi thất bại.
 - CI có hai job: lint và kiểm tra Godot. Job Godot import project rồi chỉ chạy các file được liệt kê trong [`.github/godot-tests.txt`](../../.github/godot-tests.txt). Danh sách hiện trống, nên test GDScript phải được chạy thủ công cho tới khi có test được đưa vào CI.
@@ -48,12 +51,28 @@ log có `SCRIPT ERROR:` / `ERROR:`, hoặc vượt timeout. Import có giới h�
 Chạy ở máy cá nhân bằng PowerShell:
 
 ~~~powershell
-& 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --editor --import --quit
+$godot = 'C:/path/to/Godot_v4.7.2-stable_win64_console.exe'
+1..2 | ForEach-Object {
+    & $godot --headless --path . --editor --import --quit
+    if ($LASTEXITCODE -ne 0) { throw 'Godot import failed' }
+}
 foreach ($testScript in Get-ChildItem test, gameplay/charms -Recurse -Filter '*_test.gd' -File) {
-    & 'D:/Godot7/Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script $testScript.FullName
+    & $godot --headless --path . --script $testScript.FullName
     if ($LASTEXITCODE -ne 0) { throw "Test failed: $($testScript.Name)" }
 }
 ~~~
+
+### Lỗi shutdown đang theo dõi trên Windows
+
+`test/silas_panel_autowire_test.gd` hiện có thể in `PASS` rồi tiến trình Godot
+thoát với `0xC0000005` sau khi mở hội thoại farewell. Không coi dòng `PASS` là
+kết quả thành công nếu mã thoát khác `0`.
+
+Đã tái hiện với Godot 4.7.2 Standard/.NET và 4.7.1 Standard, cả headless lẫn
+renderer thật trên 4.7.2. Bản thử 4.8 beta4 thoát với mã `0` nhưng báo lỗi đăng ký
+member của SpineBridge (`is_valid`, `is_binary`); chưa đổi phiên bản chung của
+dự án. Chưa xác định được nguyên nhân native chính xác hoặc bản sửa an toàn.
+Không bỏ callback farewell hoặc lọc mã crash khỏi kết quả để làm test xanh.
 
 ### Các bộ test hiện có
 

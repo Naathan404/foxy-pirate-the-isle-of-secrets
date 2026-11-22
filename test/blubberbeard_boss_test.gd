@@ -2,6 +2,8 @@ extends SceneTree
 
 const BOSS_SCENE := preload("res://gameplay/bosses/blubberbeard/blubberbeard.tscn")
 const HAZARD_SCRIPT := preload("res://gameplay/bosses/blubberbeard/boss_hazard.gd")
+const REWARD_TIMEOUT_SECONDS := 5.0
+const EXPECTED_REWARD_COUNT := 4
 var failures: Array[String] = []
 
 
@@ -158,6 +160,8 @@ func _run() -> void:
 	behavior._choose_skill()
 	behavior._execute_skill()
 	var death_position := boss.global_position
+	var spawned_rewards: Array[Node3D] = []
+	boss.reward_spawned.connect(func(chest: Node3D) -> void: spawned_rewards.append(chest))
 	boss.take_damage(maximum_hp * 0.5)
 	boss.take_damage(10.0)
 	_check(
@@ -170,12 +174,21 @@ func _run() -> void:
 		if child.get_script() == HAZARD_SCRIPT and not child.is_queued_for_deletion():
 			live_hazards += 1
 	_check(live_hazards == 0, "Boss hazards remained active after death")
+	behavior.sound.stop()
+	# Blubberbeard transforms into the chest after the death cinematic finishes.
+	var reward_timeout := create_timer(REWARD_TIMEOUT_SECONDS)
+	while spawned_rewards.is_empty() and reward_timeout.time_left > 0.0:
+		await process_frame
 	var chests := arena.find_children("BossRewardChest", "", false, false)
 	_check(chests.size() == 1, "Death must spawn exactly one chest")
+	_check(spawned_rewards.size() == 1, "Death must emit exactly one reward event")
 	if chests.size() == 1:
 		var chest := chests[0] as BossRewardChest
 		_check(
-			chest.global_position == death_position and chest.rewards.size() == 3,
+			(
+				chest.global_position.is_equal_approx(death_position)
+				and chest.rewards.size() == EXPECTED_REWARD_COUNT
+			),
 			"Chest position or rewards are incorrect"
 		)
 		var damage := DamageContext.new()
@@ -186,8 +199,7 @@ func _run() -> void:
 		for child in arena.get_children():
 			if child is ItemPickup:
 				count += 1
-		_check(count == 3, "Opening the chest did not spawn all three item pickups")
-	behavior.sound.stop()
+		_check(count == EXPECTED_REWARD_COUNT, "Opening the chest did not spawn all reward pickups")
 	root.get_node("AudioManager").stop_all_sfx()
 	arena.queue_free()
 	await process_frame
