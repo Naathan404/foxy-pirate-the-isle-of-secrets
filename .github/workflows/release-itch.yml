@@ -1,0 +1,148 @@
+name: Release to itch.io
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Upload the build to itch.io (unchecked = build only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  EXPORT_PRESET: Windows Desktop
+  EXPORT_DIR: build/windows
+  EXECUTABLE_NAME: foxy_pirate_tios.exe
+  ITCH_CHANNEL: windows
+
+jobs:
+  build-windows:
+    name: Export Windows build
+    # SpineBridge ships native libraries only for Windows, so the export must
+    # run on a Windows host for the extension to load during import.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve build version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="dev-${GITHUB_SHA::7}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Build version: $version"
+
+      - name: Remove local Godot AI configuration
+        shell: bash
+        run: |
+          # Same cleanup as ci.yml: the local Godot AI plugin is not shipped.
+          sed -i '/^<<<<<<<HEAD_mcp_game_helper=/d' project.godot
+          sed -i '/^<<<<<<<HEADenabled=.*godot_ai\/plugin.cfg/d' project.godot
+          sed -i '/^<<<<<<<HEADcharm_slot_q=/,/^}/d' project.godot
+          sed -i '\|addons/godot_ai/runtime/game_helper\.gd|d' project.godot
+          sed -i 's|"res://addons/godot_ai/plugin.cfg", ||g; s|, "res://addons/godot_ai/plugin.cfg"||g; s|"res://addons/godot_ai/plugin.cfg"||g' project.godot
+          if grep -nE '^(<<<<<<<|=======|>>>>>>>)' project.godot; then
+            echo "::error::project.godot contains merge conflict markers"
+            exit 1
+          fi
+
+      - uses: lihop/setup-godot@v3
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          export-templates: true
+
+      - name: Import project and export
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          run_godot() {
+            local limit="$1"
+            shift
+            timeout "$limit" godot --headless --path . "$@" 2>&1 | tee "$RUNNER_TEMP/godot.log"
+            # Known shutdown noise: https://github.com/godotengine/godot/issues/117243
+            if grep -E 'SCRIPT ERROR:|ERROR:' "$RUNNER_TEMP/godot.log" | grep -Ev '^ERROR: Plugin is not attached to debugger\.$'; then
+              echo "::error::Godot reported an error; see the log above."
+              exit 1
+            fi
+          }
+
+          # A clean Windows checkout needs two imports: the first detects the
+          # SpineBridge GDExtension, the second registers its native importers.
+          run_godot 300s --editor --import --quit
+          run_godot 300s --editor --import --quit
+
+          mkdir -p "$EXPORT_DIR"
+          run_godot 600s --export-release "$EXPORT_PRESET" "$EXPORT_DIR/$EXECUTABLE_NAME"
+
+          if [[ ! -f "$EXPORT_DIR/$EXECUTABLE_NAME" ]]; then
+            echo "::error::Export did not produce $EXPORT_DIR/$EXECUTABLE_NAME"
+            exit 1
+          fi
+          ls -la "$EXPORT_DIR"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: ${{ env.EXPORT_DIR }}
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-itch:
+    name: Upload to itch.io
+    needs: build-windows
+    if: github.ref_type == 'tag' || inputs.publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: itch
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: windows-build
+
+      - name: Install butler
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL -o butler.zip \
+            https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d "$RUNNER_TEMP/butler"
+          chmod +x "$RUNNER_TEMP/butler/butler"
+          echo "$RUNNER_TEMP/butler" >> "$GITHUB_PATH"
+
+      - name: Push build
+        shell: bash
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_GAME: ${{ vars.ITCH_GAME }}
+          BUILD_VERSION: ${{ needs.build-windows.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$BUTLER_API_KEY" ]]; then
+            echo "::error::Missing secret BUTLER_API_KEY"
+            exit 1
+          fi
+          if [[ ! "$ITCH_GAME" =~ ^[^/]+/[^/]+$ ]]; then
+            echo "::error::Variable ITCH_GAME must look like <itch-user>/<game-slug>"
+            exit 1
+          fi
+          butler -V
+          butler push windows-build "$ITCH_GAME:$ITCH_CHANNEL" \
+            --userversion "$BUILD_VERSION"
