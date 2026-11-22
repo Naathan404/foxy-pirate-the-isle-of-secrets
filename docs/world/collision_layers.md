@@ -10,5 +10,13 @@
 6 - PlayerAttack - Vùng tấn công của Người chơi
 7 - EnemyAttack - Vùng tấn công của Kẻ địch
 8 - TargetDetector - 
+9 - PlayerBoundary - Vách giới hạn di chuyển của người chơi
+10 - EnemyBoundary - Vách giới hạn di chuyển của quái
 ```
-từ từ viết nha :DD
+`EnemyBoundary` được thêm vào `CombatLayers.ENEMY_BODY_MASK` và
+`CombatLayers.ENEMY_FRONT_OBSTACLE_MASK`. Player, hitbox và các raycast nền
+không nhận layer này. Khi bật `Enemy Boundary Enabled`, `base_room.gd` dùng
+cơ chế dựng biên nền có sẵn để tạo biên quái từ nền đảo, không tính các path
+hay cửa mở dành cho người chơi. Cả base Small, Medium và Large của Coral Valley
+bật sẵn tùy chọn này, nên các phòng kế thừa chặn quái đi lên cầu và rơi khỏi
+mép đảo.

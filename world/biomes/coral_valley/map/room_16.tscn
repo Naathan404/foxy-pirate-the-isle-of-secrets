@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_flat_tide"]
+[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="3_enemy_entry"]
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="4_tide_enemy"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="5_6kymb"]
@@ -165,19 +166,38 @@ destination_scene = "res://world/biomes/coral_valley/map/room_15.tscn"
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_dxhdd")
 
-[node name="FlatTide" parent="." index="5" unique_id=256012692 node_paths=PackedStringArray("player") instance=ExtResource("2_flat_tide")]
+[node name="FlatTide" parent="." index="5" unique_id=256012692 node_paths=PackedStringArray("player", "zones") instance=ExtResource("2_flat_tide")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 player = NodePath("../Foxy")
+zones = [NodePath("LeftShallows"), NodePath("RightShallows")]
+sequential_zones = true
 low_duration = 8.0
 rise_duration = 6.0
 high_duration = 4.0
 fall_duration = 6.0
 flooded_move_multiplier = 0.5
 
-[node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
+[node name="RightShallows" parent="FlatTide" index="0" unique_id=928133442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.200718, 0.25, -4.5999727)
 size = Vector2(45, 66)
 volume_depth = 2.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+
+[node name="LeftShallows" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
+script = ExtResource("tide_zone_script")
+flow_direction = 1
+size = Vector2(45, 66)
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
 
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")

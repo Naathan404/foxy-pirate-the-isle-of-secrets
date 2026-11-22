@@ -4,7 +4,7 @@
 
 ## Thiết lập vùng
 
-- Trong Inspector của `NorthShallows` hoặc `SouthShallows`, chỉnh `Size`, `Volume Depth` và vị trí node. Điểm gốc Y của node là đáy vùng nước, gần cao độ mặt đất; mặt nước nằm cao hơn một khoảng `Volume Depth`.
+- Trong Inspector của `LeftShallows` hoặc `RightShallows`, chỉnh `Size`, `Volume Depth` và vị trí node. Điểm gốc Y của node là đáy vùng nước, gần cao độ mặt đất; mặt nước nằm cao hơn một khoảng `Volume Depth`.
 - `Start Coverage` và `Full Coverage` quyết định ngưỡng bắt đầu và kết thúc ngập của vùng theo mức triều chung. `Full Coverage` cần lớn hơn `Start Coverage`.
 - `Shore Wave Amplitude/Length/Speed` và `Shore Detail Amplitude/Length/Speed` chỉnh hai lớp sóng ở mép nước. `Surface Wave Height/Length/Speed` và `Surface Detail Height/Length/Speed` chỉnh độ nhấp nhô mặt trên. Mép sóng dùng cùng thông số và thời gian cho hình ảnh lẫn kiểm tra ngập.
 - `Surface Segments X/Z` chỉnh độ mịn mesh; tăng số đoạn theo chiều Z để mép sóng cong mượt hơn, đổi lại tăng số đỉnh. `Floor Tolerance` giới hạn độ cao của điểm được xem là nằm trên nền vùng nước.
@@ -21,6 +21,24 @@ Khung debug là hình học hiển thị, không tạo collider. `Player Ground 
 ## Chu kỳ và dấu chân
 
 Controller giữ bốn pha `LOW`, `RISING`, `HIGH`, `FALLING`. `Warning Seconds` chọn lúc bắt đầu báo nước dâng; `Warning Fade Duration` làm mờ vệt cảnh báo trước khi nước dâng. Nước và sóng dừng cùng game khi pause.
+
+Bật `Sequential Zones` trên `FlatTide` để các vùng chạy lần lượt theo thứ tự
+trong mảng `Zones`. Vùng đầu tiên dâng ngay khi vào phòng; mỗi vùng dâng, giữ,
+rút và nghỉ xong mới chuyển sang vùng tiếp theo. Các vùng chưa tới lượt luôn
+khô; cảnh báo xuất hiện ở vùng sắp tới lượt. Hết danh sách thì quay lại đầu.
+
+Chọn từng node vùng nước để chỉnh `Cycle Timing`: `Rise Duration`,
+`High Duration`, `Fall Duration` và `Rest Duration`. Các giá trị này chỉ dùng
+khi chạy lần lượt; nhóm `Shared Timing` trên controller dùng cho chế độ đồng
+thời cũ. Hai vùng mặc định của các phòng Mobs chạy Trái → Phải với thời gian
+6s dâng, 6s giữ, 6s rút, 6s nghỉ; mỗi bên lặp lại sau 48s.
+
+Muốn chạy Trái → Dưới → Phải → Trên, đặt tên các vùng là `LeftShallows`,
+`DownShallows`, `RightShallows`, `UpShallows`; chỉnh hướng và vị trí từng
+node, rồi kéo chúng vào `Zones` theo đúng thứ tự. Mỗi vùng có
+thể dùng thời gian riêng. Danh sách không được chứa node trống hoặc trùng nhau.
+Player, dấu chân và spawner vẫn dùng chung một controller; mỗi lần một vùng
+bắt đầu rút vẫn là một đợt spawn.
 
 Khi mép sóng đang dâng chạm Player, hoặc Player đi vào phần sóng đang tiến, sóng đẩy Player theo hướng dòng nước một lần mỗi đợt dâng. `Wave Knockback Speed` mặc định là 14 m/s và `Wave Knockback Duration` là 0,65 giây; cả hai chỉnh được trên `FlatTideController`. Lực đẩy được áp dụng sau vận tốc của trạng thái Player, nên đi hoặc dash ngược chiều không triệt tiêu được lực trong thời gian tác dụng. Va chạm với tường và vật cản vẫn giới hạn chuyển động.
 

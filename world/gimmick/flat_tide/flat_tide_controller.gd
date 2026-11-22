@@ -11,11 +11,17 @@ const SHOCKWAVE_DURATION := 0.3
 const SHOCKWAVE_STRENGTH := 0.005
 const SHOCKWAVE_COLOR := Color("78dfff")
 const SHOCKWAVE_RADIUS_PIXELS := 110.0
+# //NLVP sửa: Giữ mỗi pha có thời lượng hợp lệ.
+const MIN_PHASE_DURATION_SECONDS := 0.1
 
 ## Nhân vật chịu ảnh hưởng của nước; gán node Foxy trong phòng.
 @export var player: Player
-## Danh sách các vùng nước cùng chạy theo chu kỳ thủy triều này.
+## Danh sách các vùng nước do controller điều khiển.
 @export var zones: Array[FlatTideZone] = []
+# //NLVP sửa: Chạy lần lượt bao nhiêu vùng tùy thứ tự Inspector.
+## Chạy từng vùng lần lượt theo thứ tự Zones.
+@export var sequential_zones: bool = false
+@export_group("Shared Timing")
 ## Thời gian giữ triều thấp, tính bằng giây.
 @export_range(0.1, 120.0, 0.1) var low_duration: float = 12.0
 ## Thời gian nước dâng từ thấp lên cao; số lớn hơn làm nước dâng chậm hơn.
@@ -24,6 +30,7 @@ const SHOCKWAVE_RADIUS_PIXELS := 110.0
 @export_range(0.1, 120.0, 0.1) var high_duration: float = 12.0
 ## Thời gian nước rút từ cao xuống thấp; số lớn hơn làm nước rút chậm hơn.
 @export_range(0.1, 30.0, 0.1) var fall_duration: float = 4.0
+@export_group("")
 ## Số giây báo trước khi nước bắt đầu dâng; đặt 0 để tắt cảnh báo.
 @export_range(0.0, 20.0, 0.1) var warning_seconds: float = 3.0
 ## Số giây vệt cảnh báo mờ dần ngay trước lúc nước dâng.
@@ -45,9 +52,26 @@ var _warned: bool = false
 var _visual_time: float = 0.0
 var _wave_hit_player: bool = false
 var _wave_previous_wet: Dictionary[int, bool] = {}
+# //NLVP sửa: Vùng đang chạy hoặc vừa kết thúc trước khoảng nghỉ.
+var _active_zone_index := 0
 
 
 func _ready() -> void:
+	# //NLVP sửa: Sóng đầu chạy ngay; danh sách quyết định thứ tự các hướng.
+	if sequential_zones:
+		if zones.is_empty():
+			push_warning("FlatTideController: hãy gán Zones để chạy lần lượt.")
+			set_physics_process(false)
+			return
+		var assigned_zones: Array[FlatTideZone] = []
+		for zone in zones:
+			if not is_instance_valid(zone) or zone in assigned_zones:
+				push_warning("FlatTideController: Zones không được trống hoặc trùng nhau.")
+				set_physics_process(false)
+				return
+			assigned_zones.append(zone)
+		state = State.RISING
+		state_changed.emit(state)
 	_apply_coverage()
 	_update_player()
 
@@ -73,7 +97,11 @@ func is_point_flooded(point: Vector3) -> bool:
 
 func get_flooded_zone(point: Vector3) -> FlatTideZone:
 	for zone in zones:
-		if is_instance_valid(zone) and zone.contains_flooded_point(point):
+		if (
+			is_instance_valid(zone)
+			and _is_zone_active(zone)
+			and zone.contains_flooded_point(point)
+		):
 			return zone
 	return null
 
@@ -86,18 +114,33 @@ func _exit_tree() -> void:
 
 
 func _phase_duration() -> float:
+	# //NLVP sửa: Chế độ lần lượt dùng thời gian riêng trên từng vùng nước.
+	if sequential_zones:
+		var zone := zones[_active_zone_index]
+		match state:
+			State.LOW:
+				return maxf(MIN_PHASE_DURATION_SECONDS, zone.rest_duration)
+			State.RISING:
+				return maxf(MIN_PHASE_DURATION_SECONDS, zone.rise_duration)
+			State.HIGH:
+				return maxf(MIN_PHASE_DURATION_SECONDS, zone.high_duration)
+			_:
+				return maxf(MIN_PHASE_DURATION_SECONDS, zone.fall_duration)
 	match state:
 		State.LOW:
-			return maxf(0.1, low_duration)
+			return maxf(MIN_PHASE_DURATION_SECONDS, low_duration)
 		State.RISING:
-			return maxf(0.1, rise_duration)
+			return maxf(MIN_PHASE_DURATION_SECONDS, rise_duration)
 		State.HIGH:
-			return maxf(0.1, high_duration)
+			return maxf(MIN_PHASE_DURATION_SECONDS, high_duration)
 		_:
-			return maxf(0.1, fall_duration)
+			return maxf(MIN_PHASE_DURATION_SECONDS, fall_duration)
 
 
 func _enter_state(next_state: State) -> void:
+	# //NLVP sửa: Hết khoảng nghỉ mới chuyển sang vùng tiếp theo.
+	if sequential_zones and state == State.LOW and next_state == State.RISING:
+		_active_zone_index = (_active_zone_index + 1) % zones.size()
 	state = next_state
 	_elapsed = 0.0
 	if state == State.LOW:
@@ -126,6 +169,11 @@ func _apply_coverage() -> void:
 		warning_strength = clampf((_phase_duration() - _elapsed) / warning_fade_duration, 0.0, 1.0)
 	for zone in zones:
 		if is_instance_valid(zone):
+			# //NLVP sửa: Vùng chưa tới lượt luôn khô, chỉ báo trước cho vùng kế tiếp.
+			var zone_warning := warning and _is_warning_zone(zone)
+			if not _is_zone_active(zone):
+				zone.set_coverage(0.0, zone_warning, _visual_time, warning_strength)
+				continue
 			var ground_point := Vector3.ZERO
 			var was_wet := false
 			var check_wave := state == State.RISING and not _wave_hit_player and is_instance_valid(player)
@@ -133,7 +181,7 @@ func _apply_coverage() -> void:
 				ground_point = player.global_position + Vector3.DOWN * player_ground_offset
 				was_wet = zone.is_point_in_advancing_wave(ground_point)
 			zone.set_coverage(
-				coverage, warning, _visual_time, warning_strength,
+				coverage, zone_warning, _visual_time, warning_strength,
 				state == State.RISING, state == State.FALLING
 			)
 			if check_wave:
@@ -164,8 +212,21 @@ func _check_warning() -> void:
 		_warned = true
 		for zone in zones:
 			if is_instance_valid(zone):
-				zone.set_coverage(coverage, true, _visual_time)
+				zone.set_coverage(coverage, _is_warning_zone(zone), _visual_time)
 		rising_warned.emit(remaining)
+
+
+# //NLVP sửa: Dùng chung lịch cho nước, lực đẩy, dấu chân và spawn quái.
+func _is_zone_active(zone: FlatTideZone) -> bool:
+	return not sequential_zones or zone == zones[_active_zone_index]
+
+
+# //NLVP sửa: Cảnh báo đúng vùng sắp chạy sau khoảng nghỉ.
+func _is_warning_zone(zone: FlatTideZone) -> bool:
+	if not sequential_zones:
+		return true
+	var next_index := (_active_zone_index + 1) % zones.size()
+	return zone == zones[next_index]
 
 
 func _update_player() -> void:

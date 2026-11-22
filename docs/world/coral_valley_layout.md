@@ -68,10 +68,22 @@ spawners retain their existing setup.
 
 ## Tide enemy pools
 
+The Small, Medium and Large Coral Valley base scenes enable
+`Enemy Boundary Enabled` under Ground boundaries.
+The existing floor-boundary builder generates `EnemyGroundBoundaries` from
+island floors only, keeping the outline closed across all four path entrances
+and player-only openings. Enemy bodies and their forward obstacle rays use
+the `EnemyBoundary` layer; player movement and attacks ignore it. Player
+boundaries keep their existing open-path behavior. Rooms outside these Coral
+Valley templates retain the default disabled setting.
+
 All six Mobs rooms inherit the same CameraBounds from `base_medium_room.tscn`.
-Their Tide setup matches `room_02`: the water zone has size `Vector2(45, 66)`
-and the same placement, with 8 seconds low, 6 seconds rising, 4 seconds high
-and 6 seconds falling.
+Their Tide setup matches `room_02`: two mirrored `Vector2(45, 66)` water zones
+run sequentially, with `LeftShallows` first and `RightShallows`
+second. Each zone rises for 6 seconds, stays high for 6,
+falls for 6 and rests for 6 before the next zone starts. A full left/right
+cycle takes 48 seconds. Timing is configured on each zone under `Cycle Timing`;
+the controller's `Zones` array controls order and supports additional directions.
 
 Mobs 1–3 select up to three enemies per falling tide. Each enemy independently
 chooses either entry in its room's pool with equal probability; a wave can contain
