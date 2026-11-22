@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c7p5mfkke71hd"
-path.s3tc="res://.godot/imported/hub_grass.png-ad4d2b2eae98c51fbe3d5ac1e33fd191.s3tc.ctex"
+path="res://.godot/imported/hub_grass.png-ad4d2b2eae98c51fbe3d5ac1e33fd191.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/hub/hub_grass.png"
-dest_files=["res://.godot/imported/hub_grass.png-ad4d2b2eae98c51fbe3d5ac1e33fd191.s3tc.ctex"]
+dest_files=["res://.godot/imported/hub_grass.png-ad4d2b2eae98c51fbe3d5ac1e33fd191.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

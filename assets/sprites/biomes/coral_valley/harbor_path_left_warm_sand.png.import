@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://uexrx1p2ci64"
-path.s3tc="res://.godot/imported/harbor_path_left_warm_sand.png-1cb82aa2de195774e0a20b8b44797981.s3tc.ctex"
+path="res://.godot/imported/harbor_path_left_warm_sand.png-1cb82aa2de195774e0a20b8b44797981.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/coral_valley/harbor_path_left_warm_sand.png"
-dest_files=["res://.godot/imported/harbor_path_left_warm_sand.png-1cb82aa2de195774e0a20b8b44797981.s3tc.ctex"]
+dest_files=["res://.godot/imported/harbor_path_left_warm_sand.png-1cb82aa2de195774e0a20b8b44797981.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
