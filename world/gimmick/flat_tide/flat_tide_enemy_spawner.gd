@@ -4,8 +4,7 @@ extends Node3D
 
 signal enemy_spawned(enemy: EnemyBase, is_elite: bool)
 
-# //NLVP sửa: Nhận diện nền đảo và số hướng dò mép.
-const SPAWN_GROUND_GROUP := &"tide_spawn_ground"
+# //NLVP sửa: Số hướng dò mép và độ phẳng nền.
 const EDGE_PROBE_COUNT := 8
 const MINIMUM_GROUND_NORMAL_Y := 0.7
 
@@ -18,6 +17,9 @@ const MINIMUM_GROUND_NORMAL_Y := 0.7
 
 ## Controller cung cấp các vùng nước và chu kỳ triều.
 @export var controller: FlatTideController
+# //NLVP sửa: Kéo thả collider nền thay cho group.
+## Nền đảo được phép sinh quái.
+@export var spawn_ground: StaticBody3D
 ## Danh sách loại enemy; mỗi phần tử gồm scene thường và scene elite tương ứng.
 @export var enemies: Array[FlatTideEnemyEntry] = []
 ## Số enemy tối đa được chọn cho mỗi lần nước rút.
@@ -39,6 +41,7 @@ const MINIMUM_GROUND_NORMAL_Y := 0.7
 ## Khoảng nâng nhỏ để collider của enemy không giao với nền khi spawn.
 @export_range(0.01, 0.5, 0.01, "suffix:m") var ground_clearance: float = 0.05
 # //NLVP sửa: Khoảng lùi khỏi vực, chỉnh được trong Inspector.
+## Khoảng cách tối thiểu từ điểm spawn đến mép đảo.
 @export_range(0.0, 20.0, 0.1, "suffix:m") var edge_clearance: float = 2.0
 
 var _random := RandomNumberGenerator.new()
@@ -48,6 +51,10 @@ var _pending: Array[Dictionary] = []
 func _ready() -> void:
 	if not is_instance_valid(controller):
 		push_warning("FlatTideEnemySpawner: hãy gán controller.")
+		return
+	# //NLVP sửa: Báo rõ khi chưa kéo nền vào Inspector.
+	if not is_instance_valid(spawn_ground):
+		push_warning("FlatTideEnemySpawner: hãy gán Spawn Ground trong Inspector.")
 		return
 	controller.state_changed.connect(_on_state_changed)
 	controller.coverage_changed.connect(_on_coverage_changed)
@@ -122,21 +129,18 @@ func _on_coverage_changed(_coverage: float) -> void:
 
 
 func _find_ground(point: Vector3, zone: FlatTideZone) -> Variant:
-	# //NLVP sửa: Chỉ nhận nền có group, loại cầu và vật thể khác.
+	# //NLVP sửa: Chỉ nhận đúng nền được kéo vào Spawn Ground.
+	if not is_instance_valid(spawn_ground):
+		return null
 	var hit := _raycast_ground(point)
 	if hit.is_empty():
 		return null
-	var ground_body := hit.collider as StaticBody3D
-	if (
-		ground_body == null
-		or not ground_body.is_in_group(SPAWN_GROUND_GROUP)
-		or hit.normal.y < MINIMUM_GROUND_NORMAL_Y
-	):
+	if hit.collider != spawn_ground or hit.normal.y < MINIMUM_GROUND_NORMAL_Y:
 		return null
 	var ground: Vector3 = hit.position
 	if not zone.contains_flooded_point(ground):
 		return null
-	if not _has_edge_clearance(ground, ground_body):
+	if not _has_edge_clearance(ground, spawn_ground):
 		return null
 	return ground
 

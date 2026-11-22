@@ -39,10 +39,10 @@ Khi mép sóng đang dâng chạm Player, hoặc Player đi vào phần sóng đ
 - `Edge Clearance`: khoảng lùi khỏi mép vực theo đơn vị world, mặc định 2; chỉnh
   trong Inspector của `EnemySpawner`. Đặt 0 để bỏ kiểm tra khoảng lùi.
 
-Spawner chỉ nhận nền `StaticBody3D` thuộc group `tide_spawn_ground`, giúp loại
-cầu gỗ và các vật thể khác. Collider nền trong `base_medium_room.tscn` đã có
-group này, nên sáu phòng Mobs tự kế thừa mà không cần gán từng phòng.
-`beach_test.tscn` cũng đánh dấu nền của nó để dùng chung spawner.
+`Spawn Ground` chọn nền `StaticBody3D` được phép sinh quái. Trong Inspector của
+`FlatTide/EnemySpawner`, kéo `Environment/BaseGround/StaticBody3D` từ Scene tree
+vào ô này. Sáu phòng Mobs của Coral Valley đã được gán sẵn; không cần dùng group.
+Raycast chỉ nhận đúng collider được gán, giúp loại cầu gỗ và các vật thể khác.
 
 Kiểm tra mép dùng tám tia xuống quanh điểm spawn và yêu cầu chúng chạm cùng
 collider nền, với mặt đủ phẳng. Các điểm dò không cần đang ngập; khoảng lùi

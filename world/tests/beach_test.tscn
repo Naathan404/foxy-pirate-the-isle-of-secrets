@@ -44,9 +44,6 @@ transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -0.19104576)
 transform = Transform3D(1.15, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0.23909378)
 texture = ExtResource("2_aimq4")
 
-; //NLVP sửa: Scene dùng chung spawner cũng cần đánh dấu nền hợp lệ.
-[node name="StaticBody3D" parent="Environment/BaseGround" index="1" unique_id=822018133 groups=["tide_spawn_ground"]]
-
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 collision_mask = 5
 

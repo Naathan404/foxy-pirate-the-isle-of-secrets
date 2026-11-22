@@ -184,7 +184,9 @@ volume_depth = 2.0
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
 
-[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
+; //NLVP sửa: Gán nền đảo vào ô Spawn Ground.
+[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
+spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
 enemies = Array[ExtResource("3_enemy_entry")]([SubResource("Resource_c5nfo")])
 enemies_per_tide = 3
 elite_chance = 10.0

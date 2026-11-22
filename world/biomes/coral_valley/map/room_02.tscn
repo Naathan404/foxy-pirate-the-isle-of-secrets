@@ -183,7 +183,8 @@ volume_depth = 2.0
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
 
-[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
+[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
+spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
 enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg"), SubResource("Resource_tide_skeleton")])
 enemies_per_tide = 3
 
