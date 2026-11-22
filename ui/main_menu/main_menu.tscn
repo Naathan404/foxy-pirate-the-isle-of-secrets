@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://dm7mainmenu01k"]
+
+[ext_resource type="Script" path="res://ui/main_menu/main_menu.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Background.png" id="3_background"]
+[ext_resource type="Shader" uid="uid://bml4o602pp17d" path="res://gameplay/inventory/menu/ink_reveal.gdshader" id="4_ink"]
+[ext_resource type="NoiseTexture2D" path="res://ui/ink_noise.tres" id="5_noise"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="6_deco"]
+
+[sub_resource type="ShaderMaterial" id="ink_material"]
+shader = ExtResource("4_ink")
+shader_parameter/progress = 1.0
+shader_parameter/noise = ExtResource("5_noise")
+shader_parameter/rim_color = Color(0.85, 0.2, 0.24, 1)
+shader_parameter/rim_width = 0.05
+shader_parameter/softness = 0.06
+shader_parameter/noise_strength = 0.35
+shader_parameter/aspect = 1.7778
+shader_parameter/from_left = false
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+material = SubResource("ink_material")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Center" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -230.0
+offset_right = 260.0
+offset_bottom = 230.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 56
+alignment = 1
+
+[node name="TitleBlock" type="VBoxContainer" parent="Center"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Center/TitleBlock"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.03, 0.95)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 96
+text = "Foxy Pirate"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="HBoxContainer" parent="Center/TitleBlock"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Center/TitleBlock/Subtitle"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("6_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Center/TitleBlock/Subtitle"]
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "The Isle of Secrets"
+
+[node name="DecoRight" type="TextureRect" parent="Center/TitleBlock/Subtitle"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("6_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Buttons" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="Center/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 32
+text = "Play"
+
+[node name="QuitButton" type="Button" parent="Center/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 32
+text = "Quit"
