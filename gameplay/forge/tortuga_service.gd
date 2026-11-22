@@ -87,6 +87,13 @@ func apply_forge(weapon_id: StringName, chosen: WeaponForge) -> bool:
 	return chosen != null and weapons != null and weapons.set_weapon_forge(weapon_id, chosen)
 
 
+## Returns one Forge roll's payment. Only for a paid roll that can no longer be chosen, such as
+## the panel being torn down with the choice still open; a normal close keeps the choice modal.
+func refund_forge_roll() -> void:
+	if catalog != null and is_instance_valid(wallet) and is_instance_valid(inventory):
+		_refund(catalog.forge_gold_cost, catalog.forge_ingredients)
+
+
 func _pay(gold_cost: int, ingredients: Array[TortugaIngredient]) -> bool:
 	if not can_pay(gold_cost, ingredients) or not wallet.try_spend(gold_cost):
 		return false

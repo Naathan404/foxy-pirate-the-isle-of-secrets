@@ -113,7 +113,7 @@ func _apply_impact_feedback(target: Node) -> void:
 	if local_hitstop:
 		hitstop.request_local(null, target as Node3D, hitstop_seconds)
 	else:
-		hitstop.request(hitstop_seconds)
+		hitstop.request(hitstop_seconds, target)
 	get_node("/root/ScreenShakeController").request(shake_pixels, 0.14)
 
 

@@ -1,484 +1,275 @@
 [gd_scene format=3 uid="uid://dqmnkxuwherpm"]
 
 [ext_resource type="Script" uid="uid://by2le7hjaf5sv" path="res://gameplay/inventory/inventory_ui.gd" id="1_e0l88"]
-[ext_resource type="FontFile" uid="uid://b16jsisjajgbf" path="res://assets/fonts/Minecraft.ttf" id="2_0s057"]
-[ext_resource type="Texture2D" uid="uid://bcma6bo7ti53l" path="res://assets/ui/player_hud/inventory/Book_Background.png" id="6_tbeqg"]
-[ext_resource type="Texture2D" uid="uid://clenpaycphul8" path="res://assets/ui/silas_shop/PNG/13_divider_ink.png" id="7_bixt0"]
-[ext_resource type="FontFile" uid="uid://n82tankcqyl" path="res://assets/fonts/BlackCrestSlant-4nJW9.otf" id="9_tbeqg"]
-[ext_resource type="FontFile" uid="uid://v0d0qy3csnvo" path="res://assets/fonts/BlackCrest-gwPyY.otf" id="10_bixt0"]
-[ext_resource type="Texture2D" uid="uid://o4p6o6ophyid" path="res://assets/ui/player_hud/inventory/Orange_Markbook.png" id="13_tbeqg"]
-[ext_resource type="Texture2D" uid="uid://csjd6ws35fa3l" path="res://assets/ui/player_hud/inventory/Blue_Markbook.png" id="15_gv8eq"]
-[ext_resource type="Texture2D" uid="uid://c6ekls8nx38sw" path="res://assets/ui/player_hud/inventory/Gray_Markbook.png" id="17_mgn5m"]
-[ext_resource type="Texture2D" uid="uid://cccale5aivvkq" path="res://assets/ui/Bag_Icon.png" id="18_i4mv5"]
-[ext_resource type="Texture2D" uid="uid://c2bqkjccs1agf" path="res://assets/ui/Armor_Icon.png" id="20_p826a"]
-[ext_resource type="Texture2D" uid="uid://ctiw56eujrsp" path="res://assets/ui/Monster_Emblem_Icon.png" id="22_b41lr"]
-[ext_resource type="PackedScene" uid="uid://c6lni27p5k43v" path="res://gameplay/inventory/equipment_tab.tscn" id="equipment_tab"]
-[ext_resource type="PackedScene" uid="uid://dldq3as5whn6v" path="res://gameplay/inventory/notes_tab.tscn" id="notes_tab"]
-[ext_resource type="Theme" uid="uid://cks1ueubqpl0a" path="res://gameplay/ui/paper_tooltip_theme.tres" id="paper_tooltips"]
-[ext_resource type="Texture2D" uid="uid://bootcj1j63ful" path="res://assets/ui/silas_shop/PNG/34_purchase_button_blank.png" id="shop_action"]
-[ext_resource type="Texture2D" uid="uid://cyvd8yj0r05td" path="res://assets/ui/silas_shop/PNG/12_money_bag_skull_with_coins.png" id="shop_bag"]
-[ext_resource type="Texture2D" uid="uid://cmg1ofjv3y76t" path="res://assets/ui/silas_shop/PNG/30_description_box_outline.png" id="shop_description_frame"]
-[ext_resource type="Texture2D" uid="uid://bghbjcbfj5hf6" path="res://assets/ui/silas_shop/PNG/27_detail_page_border_only.png" id="shop_detail_border"]
-[ext_resource type="Texture2D" uid="uid://dn8xyc2ls77hv" path="res://assets/ui/silas_shop/PNG/15_detail_item_icon_slot.png" id="shop_icon_frame"]
-[ext_resource type="Texture2D" uid="uid://djt3xrkck7v2j" path="res://assets/ui/silas_shop/PNG/28_label_plate_blank.png" id="shop_label_plate"]
-[ext_resource type="Texture2D" uid="uid://bbnpp5em43u2o" path="res://assets/ui/silas_shop/PNG/16_item_name_ink_brushstroke.png" id="shop_name_brush"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://n8cij43hta0r" path="res://assets/ui/HUD_Fox/Background.png" id="3_background"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/menu_tab_button.tscn" id="4_tab"]
+[ext_resource type="Texture2D" uid="uid://b3bjsmxpldxbh" path="res://assets/ui/HUD_Fox/Weapons/Inventory_Icon.png" id="5_inventory_idle"]
+[ext_resource type="Texture2D" uid="uid://dgqbmuw6621px" path="res://assets/ui/HUD_Fox/Inventory/Inventory_Selected.png" id="6_inventory_active"]
+[ext_resource type="Texture2D" uid="uid://bn262sj8yi1lt" path="res://assets/ui/HUD_Fox/Charms/Weapons.png" id="7_weapons_idle"]
+[ext_resource type="Texture2D" uid="uid://hlp61msqfj30" path="res://assets/ui/HUD_Fox/Weapons/Weapons_Icon.png" id="8_weapons_active"]
+[ext_resource type="Texture2D" uid="uid://baiijxyql5por" path="res://assets/ui/HUD_Fox/Weapons/Charms_Icon.png" id="9_charms_idle"]
+[ext_resource type="Texture2D" uid="uid://bqypj0jnm8fkq" path="res://assets/ui/HUD_Fox/Charms/Charms_Selected.png" id="10_charms_active"]
+[ext_resource type="Texture2D" uid="uid://ccb43mtdg7dti" path="res://assets/ui/HUD_Fox/Weapons/Journal_Icon.png" id="11_journey_idle"]
+[ext_resource type="Texture2D" uid="uid://bhqgucyfxovhj" path="res://assets/ui/HUD_Fox/Journey/Journey_Icon_Selected.png" id="12_journey_active"]
+[ext_resource type="Texture2D" uid="uid://br7e6kyus57k1" path="res://assets/ui/HUD_Fox/Weapons/Deco_3.png" id="13_separator"]
+[ext_resource type="Texture2D" uid="uid://bylr4qwghj1dj" path="res://assets/ui/HUD_Fox/Weapons/Weapons_Line.png" id="14_lines"]
+[ext_resource type="Texture2D" uid="uid://dyhf4ywaf0lri" path="res://assets/ui/HUD_Fox/Weapons/Back_Button.png" id="15_back"]
+[ext_resource type="PackedScene" uid="uid://bn1llm76ub0a4" path="res://gameplay/inventory/menu/items_tab.tscn" id="16_items"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/weapons_tab.tscn" id="17_weapons"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/charms_tab.tscn" id="18_charms"]
+[ext_resource type="PackedScene" uid="uid://dldq3as5whn6v" path="res://gameplay/inventory/notes_tab.tscn" id="19_journey"]
+[ext_resource type="Shader" uid="uid://bml4o602pp17d" path="res://gameplay/inventory/menu/ink_reveal.gdshader" id="20_ink"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n0v5f"]
+[sub_resource type="FastNoiseLite" id="ink_noise_source"]
+frequency = 0.012
+fractal_octaves = 4
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_p826a"]
+[sub_resource type="NoiseTexture2D" id="ink_noise"]
+width = 256
+height = 256
+noise = SubResource("ink_noise_source")
+seamless = true
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_i4mv5"]
+[sub_resource type="ShaderMaterial" id="ink_material"]
+shader = ExtResource("20_ink")
+shader_parameter/progress = 1.0
+shader_parameter/noise = SubResource("ink_noise")
+shader_parameter/rim_color = Color(0.85, 0.2, 0.24, 1)
+shader_parameter/rim_width = 0.05
+shader_parameter/softness = 0.06
+shader_parameter/noise_strength = 0.35
+shader_parameter/aspect = 1.7778
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6drgk"]
+[sub_resource type="Gradient" id="ember_shape"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbeqg"]
+[sub_resource type="GradientTexture2D" id="ember_texture"]
+gradient = SubResource("ember_shape")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gv8eq"]
+[sub_resource type="Gradient" id="ember_fade"]
+offsets = PackedFloat32Array(0, 0.2, 0.7, 1)
+colors = PackedColorArray(1, 0.55, 0.45, 0, 1, 0.55, 0.45, 0.55, 1, 0.85, 0.72, 0.35, 1, 0.85, 0.72, 0)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mgn5m"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_btrla"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ntv6s"]
-content_margin_left = 25.0
-content_margin_top = 20.0
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bixt0"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_21gur"]
-
-[sub_resource type="ButtonGroup" id="ButtonGroup_jpyye"]
-
-[sub_resource type="ButtonGroup" id="ButtonGroup_orua6"]
+[sub_resource type="AtlasTexture" id="tab_line"]
+atlas = ExtResource("14_lines")
+region = Rect2(480, 0, 663, 50)
 
 [node name="InventoryUI" type="CanvasLayer" unique_id=333365260]
+layer = 15
 script = ExtResource("1_e0l88")
+close_duration = 0.22000000000000003
+ink_open_seconds = 0.7999999999999999
+ink_close_seconds = 0.5
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1388724657]
+[node name="Root" type="Control" parent="." unique_id=2013642764]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.7058824)
+theme = ExtResource("2_theme")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=2033281845]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -550.0
-offset_top = -325.0
-offset_right = 550.0
-offset_bottom = 325.0
-grow_horizontal = 2
-grow_vertical = 2
-offset_transform_enabled = true
-theme = ExtResource("paper_tooltips")
-theme_override_styles/panel = SubResource("StyleBoxEmpty_n0v5f")
-
-[node name="Background" type="TextureRect" parent="PanelContainer" unique_id=91486886]
-texture_filter = 1
-layout_mode = 2
-offset_transform_enabled = true
-offset_transform_position = Vector2(0, 10)
-offset_transform_scale = Vector2(1.1, 1.1)
-texture = ExtResource("6_tbeqg")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1006084618]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="Tabs" type="TabContainer" parent="PanelContainer/MarginContainer" unique_id=1620969003]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("2_0s057")
-theme_override_font_sizes/font_size = 20
-theme_override_styles/panel = SubResource("StyleBoxEmpty_p826a")
-theme_override_styles/tabbar_background = SubResource("StyleBoxEmpty_i4mv5")
-theme_override_styles/tab_unselected = SubResource("StyleBoxEmpty_6drgk")
-theme_override_styles/tab_hovered = SubResource("StyleBoxEmpty_tbeqg")
-theme_override_styles/tab_selected = SubResource("StyleBoxEmpty_gv8eq")
-theme_override_styles/tab_disabled = SubResource("StyleBoxEmpty_mgn5m")
-theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_btrla")
-tab_alignment = 2
-current_tab = 2
-tabs_visible = false
-
-[node name="Material" type="MarginContainer" parent="PanelContainer/MarginContainer/Tabs" unique_id=1098953536]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 0
-
-[node name="Content" type="Control" parent="PanelContainer/MarginContainer/Tabs/Material" unique_id=1804850431]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="PageTitlePlate" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content" unique_id=1485599586]
-layout_mode = 0
-offset_left = 165.0
-offset_top = 12.0
-offset_right = 435.0
-offset_bottom = 83.0
-mouse_filter = 2
-texture = ExtResource("shop_label_plate")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="PageTitle" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content" unique_id=1024165283]
-layout_mode = 0
-offset_left = 177.0
-offset_top = 20.0
-offset_right = 423.0
-offset_bottom = 72.0
-theme_override_colors/font_color = Color(0.28, 0.11, 0.07, 1)
-theme_override_fonts/font = ExtResource("10_bixt0")
-theme_override_font_sizes/font_size = 35
-text = "Inventory"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Bag" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content" unique_id=1342385827]
-layout_mode = 0
-offset_left = 171.0
-offset_top = 471.0
-offset_right = 397.0
-offset_bottom = 600.0
-mouse_filter = 2
-texture = ExtResource("shop_bag")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ItemScroll" type="ScrollContainer" parent="PanelContainer/MarginContainer/Tabs/Material/Content" unique_id=1669920801]
-layout_mode = 0
-offset_left = 80.0
-offset_top = 70.0
-offset_right = 460.0
-offset_bottom = 470.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-offset_transform_enabled = true
-theme_override_styles/panel = SubResource("StyleBoxEmpty_ntv6s")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_bixt0")
-horizontal_scroll_mode = 0
-
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemScroll" unique_id=739456219]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 4
-
-[node name="ItemInfo" type="PanelContainer" parent="PanelContainer/MarginContainer/Tabs/Material/Content" unique_id=561347594]
-layout_mode = 0
-offset_left = 544.0
-offset_right = 1076.0
-offset_bottom = 626.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxEmpty_21gur")
-
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo" unique_id=1731627427]
-layout_mode = 2
-theme_override_constants/margin_left = 25
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 80
-theme_override_constants/margin_bottom = 80
-
-[node name="VBoxContainer" type="Control" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer" unique_id=1738765268]
-layout_mode = 2
-offset_transform_enabled = true
-offset_transform_position = Vector2(5, -5)
-
-[node name="DetailBorder" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=158354258]
-visible = false
-layout_mode = 0
-offset_left = -21.0
-offset_top = -25.0
-offset_right = 449.0
-offset_bottom = 514.0
-mouse_filter = 2
-texture = ExtResource("shop_detail_border")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="IconCenter" type="Control" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=85743749]
-anchors_preset = 0
-offset_left = 12.0
-offset_top = 84.0
-offset_right = 148.0
-offset_bottom = 220.0
-mouse_filter = 2
-
-[node name="IconFrame" type="Control" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/IconCenter" unique_id=1921629602]
-texture_filter = 1
-anchors_preset = 0
-offset_left = 1.0
-offset_top = -20.0
-offset_right = 101.0
-offset_bottom = 80.0
-mouse_filter = 2
-
-[node name="Bg" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/IconCenter/IconFrame" unique_id=167200851]
-texture_filter = 1
-layout_mode = 0
-offset_right = 100.0
-offset_bottom = 100.0
-mouse_filter = 2
-texture = ExtResource("shop_icon_frame")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ItemIcon" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/IconCenter/IconFrame" unique_id=1236013656]
-layout_mode = 0
-offset_left = 14.0
-offset_top = 5.0
-offset_right = 94.0
-offset_bottom = 85.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Quantity" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=1129607073]
-layout_mode = 0
-offset_left = 127.0
-offset_top = 135.0
-offset_right = 368.0
-offset_bottom = 164.0
-theme_override_colors/font_color = Color(0.37, 0.19, 0.11, 1)
-theme_override_fonts/font = ExtResource("9_tbeqg")
-theme_override_font_sizes/font_size = 22
-text = "0 / 99"
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="NameBrush" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=1623066388]
-layout_mode = 0
-offset_left = 114.0
-offset_top = 58.0
-offset_right = 380.0
-offset_bottom = 110.0
-mouse_filter = 2
-texture = ExtResource("shop_name_brush")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ItemName" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=1694544853]
-layout_mode = 0
-offset_left = 125.0
-offset_top = 58.0
-offset_right = 370.0
-offset_bottom = 106.0
-theme_override_colors/font_color = Color(0.19, 0.08, 0.05, 1)
-theme_override_fonts/font = ExtResource("10_bixt0")
-theme_override_font_sizes/font_size = 27
-text = "Select an item"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="ItemType" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=807015299]
-layout_mode = 0
-offset_left = 126.0
-offset_top = 105.0
-offset_right = 367.0
-offset_bottom = 133.0
-theme_override_colors/font_color = Color(0.59, 0.18, 0.11, 1)
-theme_override_fonts/font = ExtResource("10_bixt0")
-theme_override_font_sizes/font_size = 22
-text = "Item Type"
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=45160296]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 180.0
-offset_right = 410.0
-offset_bottom = 208.0
-mouse_filter = 2
-texture = ExtResource("7_bixt0")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=49488357]
-visible = false
-layout_mode = 0
-offset_left = 29.0
-offset_top = 238.0
-offset_right = 379.0
-offset_bottom = 242.0
-
-[node name="DescriptionFrame" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=1065004537]
-layout_mode = 0
-offset_left = 12.0
-offset_top = 244.0
-offset_right = 402.0
-offset_bottom = 432.0
-mouse_filter = 2
-texture = ExtResource("shop_description_frame")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="DescriptionPlate" type="TextureRect" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=911332573]
-layout_mode = 0
-offset_left = 85.0
-offset_top = 225.0
-offset_right = 341.0
-offset_bottom = 281.0
-mouse_filter = 2
-texture = ExtResource("shop_label_plate")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="DescriptionHeading" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=2046395234]
-layout_mode = 0
-offset_left = 106.0
-offset_top = 232.0
-offset_right = 320.0
-offset_bottom = 270.0
-theme_override_colors/font_color = Color(0.26, 0.1, 0.06, 1)
-theme_override_fonts/font = ExtResource("10_bixt0")
-theme_override_font_sizes/font_size = 26
-text = "Description"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Description" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=788758602]
-layout_mode = 0
-offset_left = 35.0
-offset_top = 299.0
-offset_right = 391.0
-offset_bottom = 407.0
-theme_override_colors/font_color = Color(0.25, 0.13, 0.09, 1)
-theme_override_fonts/font = ExtResource("10_bixt0")
-theme_override_font_sizes/font_size = 22
-text = "Item description"
-autowrap_mode = 3
-
-[node name="EquipPotionButton" type="TextureButton" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer" unique_id=2009356972]
-texture_filter = 1
-layout_mode = 0
-offset_left = 95.0
-offset_top = 407.0
-offset_right = 329.0
-offset_bottom = 462.0
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("shop_action")
-texture_pressed = ExtResource("shop_action")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="Label" type="Label" parent="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/EquipPotionButton" unique_id=1631458597]
+[node name="Background" type="TextureRect" parent="Root" unique_id=22442859]
+unique_name_in_owner = true
+material = SubResource("ink_material")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.7, 1)
-theme_override_fonts/font = ExtResource("10_bixt0")
-theme_override_font_sizes/font_size = 28
-text = "Equip"
-horizontal_alignment = 1
-vertical_alignment = 1
+mouse_filter = 2
+texture = ExtResource("3_background")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="Equipment" parent="PanelContainer/MarginContainer/Tabs" unique_id=218277719 instance=ExtResource("equipment_tab")]
+[node name="Frame" type="Control" parent="Root" unique_id=1480784603]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Embers" type="CPUParticles2D" parent="Root/Frame" unique_id=1778055364]
+unique_name_in_owner = true
+position = Vector2(640, 740)
+emitting = false
+amount = 40
+texture = SubResource("ember_texture")
+lifetime = 9.0
+preprocess = 6.0
+emission_shape = 3
+emission_rect_extents = Vector2(660, 12)
+direction = Vector2(0, -1)
+spread = 22.0
+gravity = Vector2(0, -6)
+initial_velocity_min = 18.0
+initial_velocity_max = 46.0
+scale_amount_min = 0.15
+scale_amount_max = 0.45
+color_ramp = SubResource("ember_fade")
+
+[node name="Pages" type="Control" parent="Root/Frame" unique_id=1623607418]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ItemsTab" parent="Root/Frame/Pages" unique_id=546839462 instance=ExtResource("16_items")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="WeaponsTab" parent="Root/Frame/Pages" unique_id=2023240857 instance=ExtResource("17_weapons")]
+unique_name_in_owner = true
 visible = false
-layout_mode = 2
-metadata/_tab_index = 1
+layout_mode = 1
 
-[node name="Notes" parent="PanelContainer/MarginContainer/Tabs" unique_id=930459895 instance=ExtResource("notes_tab")]
-layout_mode = 2
-metadata/_tab_index = 2
+[node name="CharmsTab" parent="Root/Frame/Pages" unique_id=2139337867 instance=ExtResource("18_charms")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
 
-[node name="TabButtons" type="Control" parent="." unique_id=1242098219]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 1077.0
-offset_top = 197.0
-offset_right = 1197.0
-offset_bottom = 497.0
+[node name="JourneyTab" parent="Root/Frame/Pages" unique_id=599502583 instance=ExtResource("19_journey")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
 
-[node name="MaterialButton" type="TextureButton" parent="TabButtons" unique_id=2041143295]
-texture_filter = 1
-custom_minimum_size = Vector2(64, 64)
+[node name="TabLine" type="TextureRect" parent="Root/Frame" unique_id=19499785]
 layout_mode = 0
-offset_left = 28.0
-offset_top = -51.0
-offset_right = 168.0
-offset_bottom = 49.0
-toggle_mode = true
-button_pressed = true
-button_group = SubResource("ButtonGroup_jpyye")
-texture_normal = ExtResource("13_tbeqg")
-ignore_texture_size = true
-stretch_mode = 4
-
-[node name="TextureRect" type="TextureRect" parent="TabButtons/MaterialButton" unique_id=1657789012]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 21.0
-offset_right = 89.0
-offset_bottom = 77.0
-texture = ExtResource("18_i4mv5")
+offset_left = 498.0
+offset_top = 82.0
+offset_right = 829.0
+offset_bottom = 107.0
+mouse_filter = 2
+texture = SubResource("tab_line")
 expand_mode = 1
 
-[node name="EquipmentButton" type="TextureButton" parent="TabButtons" unique_id=750127928]
-texture_filter = 1
-custom_minimum_size = Vector2(64, 64)
+[node name="TabBar" type="HBoxContainer" parent="Root/Frame" unique_id=435344553]
 layout_mode = 0
-offset_left = 29.0
-offset_top = 38.0
-offset_right = 169.0
-offset_bottom = 138.0
-toggle_mode = true
-button_group = SubResource("ButtonGroup_orua6")
-texture_normal = ExtResource("15_gv8eq")
-ignore_texture_size = true
-stretch_mode = 4
+offset_left = 300.0
+offset_right = 980.0
+offset_bottom = 96.0
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="TabButtons/EquipmentButton" unique_id=1264270180]
-layout_mode = 0
-offset_left = 36.0
-offset_top = 23.0
-offset_right = 88.0
-offset_bottom = 75.0
-texture = ExtResource("20_p826a")
+[node name="Separator1" type="TextureRect" parent="Root/Frame/TabBar" unique_id=189543882]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_separator")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NotesButton" type="TextureButton" parent="TabButtons" unique_id=1831605610]
-texture_filter = 1
-custom_minimum_size = Vector2(64, 64)
-layout_mode = 0
-offset_left = 23.0
-offset_top = 272.0
-offset_right = 173.0
-offset_bottom = 392.0
-toggle_mode = true
-button_group = SubResource("ButtonGroup_orua6")
-texture_normal = ExtResource("17_mgn5m")
-ignore_texture_size = true
-stretch_mode = 4
+[node name="InventoryTabButton" parent="Root/Frame/TabBar" unique_id=560413448 instance=ExtResource("4_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+idle_icon = ExtResource("5_inventory_idle")
+active_icon = ExtResource("6_inventory_active")
+title = "Inventory"
 
-[node name="TextureRect" type="TextureRect" parent="TabButtons/NotesButton" unique_id=438146471]
-layout_mode = 0
-offset_left = 40.0
-offset_top = 29.0
-offset_right = 96.0
-offset_bottom = 85.0
-texture = ExtResource("22_b41lr")
+[node name="Separator2" type="TextureRect" parent="Root/Frame/TabBar" unique_id=2050374676]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_separator")
 expand_mode = 1
 stretch_mode = 5
 
-[connection signal="pressed" from="PanelContainer/MarginContainer/Tabs/Material/Content/ItemInfo/MarginContainer/VBoxContainer/EquipPotionButton" to="." method="_on_equip_potion_button_pressed"]
-[connection signal="pressed" from="TabButtons/MaterialButton" to="." method="_on_material_button_pressed"]
-[connection signal="pressed" from="TabButtons/EquipmentButton" to="." method="_on_equipment_button_pressed"]
-[connection signal="pressed" from="TabButtons/NotesButton" to="." method="_on_notes_button_pressed"]
+[node name="WeaponsTabButton" parent="Root/Frame/TabBar" unique_id=821262955 instance=ExtResource("4_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+idle_icon = ExtResource("7_weapons_idle")
+active_icon = ExtResource("8_weapons_active")
+title = "Weapon"
+
+[node name="Separator3" type="TextureRect" parent="Root/Frame/TabBar" unique_id=1959598335]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_separator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharmsTabButton" parent="Root/Frame/TabBar" unique_id=510983129 instance=ExtResource("4_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+idle_icon = ExtResource("9_charms_idle")
+active_icon = ExtResource("10_charms_active")
+title = "Charms"
+
+[node name="Separator4" type="TextureRect" parent="Root/Frame/TabBar" unique_id=605399636]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_separator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="JourneyTabButton" parent="Root/Frame/TabBar" unique_id=297313455 instance=ExtResource("4_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+idle_icon = ExtResource("11_journey_idle")
+active_icon = ExtResource("12_journey_active")
+title = "Journey"
+
+[node name="Separator5" type="TextureRect" parent="Root/Frame/TabBar" unique_id=68783069]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_separator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BackButton" type="Button" parent="Root/Frame" unique_id=564098843]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1160.0
+offset_top = 660.0
+offset_right = 1258.0
+offset_bottom = 696.0
+mouse_default_cursor_shape = 2
+
+[node name="BackArt" type="TextureRect" parent="Root/Frame/BackButton" unique_id=1908863019]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("15_back")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FxLayer" type="Control" parent="Root" unique_id=1557278677 groups=["inventory_menu_fx"]]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

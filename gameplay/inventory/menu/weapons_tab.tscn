@@ -1,0 +1,394 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/menu/weapons_tab.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="2_deco"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Deco_1.png" id="3_compass"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Current_weapon Slot.png" id="4_current"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Weapons_Line.png" id="5_lines"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Backpack_Icon.png" id="6_bag"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Weapon Skill_Log.png" id="7_skill"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Stat_Weapon_Log.png" id="8_panel"]
+[ext_resource type="Material" path="res://gameplay/inventory/menu/icon_glow_material.tres" id="glow_mat"]
+
+[sub_resource type="AtlasTexture" id="line_left"]
+atlas = ExtResource("5_lines")
+region = Rect2(240, 60, 40, 990)
+
+[sub_resource type="AtlasTexture" id="line_right"]
+atlas = ExtResource("5_lines")
+region = Rect2(1100, 60, 43, 1027)
+
+[node name="WeaponsTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Compass" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 78.0
+offset_right = 360.0
+offset_bottom = 310.0
+mouse_filter = 2
+texture = ExtResource("3_compass")
+expand_mode = 1
+
+[node name="Title" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 84.0
+offset_right = 330.0
+offset_bottom = 152.0
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Title"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Title"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "Weapon"
+
+[node name="DecoRight" type="TextureRect" parent="Title"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CurrentWeapon" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 196.0
+offset_right = 312.0
+offset_bottom = 466.0
+mouse_default_cursor_shape = 2
+
+[node name="Frame" type="TextureRect" parent="CurrentWeapon"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_current")
+expand_mode = 1
+
+[node name="CurrentIcon" type="TextureRect" parent="CurrentWeapon"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 62.0
+offset_top = 62.0
+offset_right = -62.0
+offset_bottom = -62.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CurrentName" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 474.0
+offset_right = 344.0
+offset_bottom = 514.0
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 28
+text = "No weapon"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="CurrentState" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 512.0
+offset_right = 344.0
+offset_bottom = 536.0
+theme_type_variation = &"MutedLabel"
+text = "Equipped"
+horizontal_alignment = 1
+
+[node name="LineLeft" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 375.0
+offset_top = 118.0
+offset_right = 395.0
+offset_bottom = 612.0
+mouse_filter = 2
+texture = SubResource("line_left")
+expand_mode = 1
+
+[node name="LineRight" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 810.0
+offset_top = 118.0
+offset_right = 831.0
+offset_bottom = 622.0
+mouse_filter = 2
+texture = SubResource("line_right")
+expand_mode = 1
+
+[node name="Counter" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 640.0
+offset_top = 124.0
+offset_right = 800.0
+offset_bottom = 160.0
+tooltip_text = "Weapons owned / weapons in the collection"
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="BagIcon" type="TextureRect" parent="Counter"]
+custom_minimum_size = Vector2(30, 32)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_bag")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CounterLabel" type="Label" parent="Counter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 24
+text = "0/0"
+vertical_alignment = 1
+
+[node name="GridScroll" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_left = 396.0
+offset_top = 162.0
+offset_right = 808.0
+offset_bottom = 460.0
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="GridScroll"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Grid" type="GridContainer" parent="GridScroll/GridMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="SkillArt" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 462.0
+offset_right = 806.0
+offset_bottom = 687.0
+mouse_filter = 2
+texture = ExtResource("7_skill")
+expand_mode = 1
+
+[node name="SkillHeading" type="Label" parent="."]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 482.0
+offset_right = 640.0
+offset_bottom = 516.0
+theme_type_variation = &"HeadingLabel"
+text = "Weapon Skill"
+
+[node name="SkillIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 744.0
+offset_top = 482.0
+offset_right = 786.0
+offset_bottom = 524.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkillName" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 420.0
+offset_top = 514.0
+offset_right = 740.0
+offset_bottom = 542.0
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 23
+text = "No weapon skill"
+text_overrun_behavior = 3
+
+[node name="SkillMeta" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 420.0
+offset_top = 542.0
+offset_right = 788.0
+offset_bottom = 564.0
+theme_type_variation = &"MutedLabel"
+text_overrun_behavior = 3
+
+[node name="SkillScroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 420.0
+offset_top = 566.0
+offset_right = 790.0
+offset_bottom = 630.0
+horizontal_scroll_mode = 0
+
+[node name="SkillDescription" type="Label" parent="SkillScroll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(354, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+
+[node name="DetailArt" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 855.0
+offset_top = 36.0
+offset_right = 1248.0
+offset_bottom = 639.0
+mouse_filter = 2
+texture = ExtResource("8_panel")
+expand_mode = 1
+
+[node name="Glow" type="ColorRect" parent="."]
+material = ExtResource("glow_mat")
+layout_mode = 0
+offset_left = 944.0
+offset_top = 68.0
+offset_right = 1134.0
+offset_bottom = 258.0
+mouse_filter = 2
+
+[node name="BigIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 984.0
+offset_top = 108.0
+offset_right = 1094.0
+offset_bottom = 218.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WeaponName" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 226.0
+offset_right = 1230.0
+offset_bottom = 264.0
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+text = "No weapon selected"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="WeaponKind" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 262.0
+offset_right = 1230.0
+offset_bottom = 284.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+
+[node name="DetailsScroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 878.0
+offset_top = 290.0
+offset_right = 1228.0
+offset_bottom = 524.0
+horizontal_scroll_mode = 0
+
+[node name="DetailsMargin" type="MarginContainer" parent="DetailsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_right = 16
+
+[node name="Details" type="VBoxContainer" parent="DetailsScroll/DetailsMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Description" type="Label" parent="DetailsScroll/DetailsMargin/Details"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+
+[node name="StatsList" type="VBoxContainer" parent="DetailsScroll/DetailsMargin/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="ForgeHeading" type="Label" parent="DetailsScroll/DetailsMargin/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 1
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 26
+text = "Forge"
+
+[node name="ForgeRows" type="VBoxContainer" parent="DetailsScroll/DetailsMargin/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ActionHint" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 540.0
+offset_right = 1230.0
+offset_bottom = 564.0
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="EquipButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 962.0
+offset_top = 568.0
+offset_right = 1146.0
+offset_bottom = 613.0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+text = "Equip"

@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://b7worldmap01k"]
+
+[ext_resource type="Script" path="res://ui/world_map/world_map.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Background.png" id="3_background"]
+[ext_resource type="Shader" uid="uid://bml4o602pp17d" path="res://gameplay/inventory/menu/ink_reveal.gdshader" id="4_ink"]
+[ext_resource type="NoiseTexture2D" path="res://ui/ink_noise.tres" id="5_noise"]
+[ext_resource type="Script" path="res://ui/world_map/world_map_canvas.gd" id="6_canvas"]
+[ext_resource type="Resource" path="res://world/world_map/world_map.tres" id="7_data"]
+
+[sub_resource type="ShaderMaterial" id="ink_material"]
+resource_local_to_scene = true
+shader = ExtResource("4_ink")
+shader_parameter/progress = 1.0
+shader_parameter/noise = ExtResource("5_noise")
+shader_parameter/rim_color = Color(0.85, 0.2, 0.24, 1)
+shader_parameter/rim_width = 0.05
+shader_parameter/softness = 0.06
+shader_parameter/noise_strength = 0.35
+shader_parameter/aspect = 1.7778
+shader_parameter/from_left = false
+
+[node name="WorldMap" type="CanvasLayer"]
+process_mode = 3
+layer = 28
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Background" type="TextureRect" parent="Root"]
+unique_name_in_owner = true
+material = SubResource("ink_material")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Content" type="Control" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Header" type="VBoxContainer" parent="Root/Content"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 124.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Root/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 60
+text = "World Map"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Root/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+theme_override_font_sizes/font_size = 22
+text = "Castaway Cove  -  3 / 11 rooms explored"
+horizontal_alignment = 1
+
+[node name="Canvas" type="Control" parent="Root/Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 156.0
+offset_right = -48.0
+offset_bottom = -64.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_canvas")
+world_map = ExtResource("7_data")
+
+[node name="Hint" type="Label" parent="Root/Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -52.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 18
+text = "Arrows  Select      Enter  Explore      M / Esc  Close"
+horizontal_alignment = 1

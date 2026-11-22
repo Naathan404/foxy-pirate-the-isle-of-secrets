@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://olsucfx3fn5"
-path.s3tc="res://.godot/imported/hub_right.png-53c2d23e34cefe76c684b6bda7b4b4aa.s3tc.ctex"
+path="res://.godot/imported/hub_right.png-53c2d23e34cefe76c684b6bda7b4b4aa.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/hub/hub_right.png"
-dest_files=["res://.godot/imported/hub_right.png-53c2d23e34cefe76c684b6bda7b4b4aa.s3tc.ctex"]
+dest_files=["res://.godot/imported/hub_right.png-53c2d23e34cefe76c684b6bda7b4b4aa.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

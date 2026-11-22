@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://lgort084r3my"
-path.s3tc="res://.godot/imported/walk_1.png-06d07106e6d7b4a43f3690b482816ead.s3tc.ctex"
+path="res://.godot/imported/walk_1.png-06d07106e6d7b4a43f3690b482816ead.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/npcs/shared_placeholder/walk_1.png"
-dest_files=["res://.godot/imported/walk_1.png-06d07106e6d7b4a43f3690b482816ead.s3tc.ctex"]
+dest_files=["res://.godot/imported/walk_1.png-06d07106e6d7b4a43f3690b482816ead.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

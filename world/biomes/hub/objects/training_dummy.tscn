@@ -19,6 +19,7 @@ scale = Vector3(1.5, 1.5, 1.5)
 max_hp = 100000.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
+hitstop_scale = 1.0
 fragment_source = NodePath("Visual/Sprite3D")
 drop_chance = 0.0
 

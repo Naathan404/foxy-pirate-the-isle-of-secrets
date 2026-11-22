@@ -1,263 +1,132 @@
 class_name InventoryUI
 extends CanvasLayer
+## Pause menu with the Inventory, Weapon, Charms and Journey tabs.
+##
+## Owns the open/close lifecycle, the GameManager pause gate and the mouse mode. Each tab binds
+## to the live data owners (Inventory, PotionComponent, WeaponController, CharmSocketManager,
+## NoteProgress) and never duplicates their state.
 
-const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/inventory_slot_ui.tscn")
+enum Tab { INVENTORY, WEAPONS, CHARMS, JOURNEY }
 
-# túi dữ liệu
+## Built-in UI actions (PageUp / PageDown) so no gameplay binding is reused while paused.
+const PREVIOUS_TAB_ACTION := &"ui_page_up"
+const NEXT_TAB_ACTION := &"ui_page_down"
+const CANCEL_ACTION := &"ui_cancel"
+const INK_PROGRESS_PARAM := &"progress"
+const INK_HIDDEN := 0.0
+const INK_SHOWN := 1.0
+const CENTER_RATIO := 0.5
+
 @export var inventory: Inventory
 @export var toggle_action: StringName = &"inventory"
 @export var potion_component: PotionComponent
 
 @export_group("Interaction Feedback")
-@export_range(0.05, 0.5, 0.01) var open_duration: float = 0.18
-@export_range(0.05, 0.5, 0.01) var close_duration: float = 0.12
-@export var selected_tab_scale: Vector2 = Vector2(1.12, 1.05)
-@export_range(0.05, 0.3, 0.01) var tab_feedback_duration: float = 0.12
-@export_range(0.0, 1.0, 0.01) var deselected_info_alpha := 0.55
-@export_range(0.01, 0.5, 0.01) var info_fade_duration := 0.12
-@export_range(1.0, 1.2, 0.01) var tab_click_punch_scale := 1.04
-@export_range(0.1, 1.0, 0.05) var tab_click_punch_duration_ratio := 0.6
-@export_range(0.5, 1.0, 0.01) var closed_background_scale := 0.96
-@export var selected_tab_tint := Color.WHITE
-@export var idle_tab_tint := Color.GRAY
-
-@export_group("Button labels")
-@export var equip_text: String = "Equip"
-@export var unequip_text: String = "Unequip"
-
-var blue_button = preload("res://assets/ui/player_hud/inventory/Blue_Markbook.png")
-var white_button = preload("res://assets/ui/player_hud/inventory/Gray_Markbook.png")
-var orange_button = preload("res://assets/ui/player_hud/inventory/Orange_Markbook.png")
-
-# các ô hiển thị trên giao diện tương ứng với inventory
-var slot_uis: Array[InventorySlotUI] = []
-var selected_slot_index: int = -1
+@export_range(0.05, 0.6, 0.01, "suffix:s") var open_duration: float = 0.3
+@export_range(0.05, 0.5, 0.01, "suffix:s") var close_duration: float = 0.16
+@export_range(0.5, 1.0, 0.01) var closed_frame_scale: float = 0.94
+## The background ink spreads from the center before the frame springs in.
+@export_range(0.1, 1.5, 0.01, "suffix:s") var ink_open_seconds: float = 0.5
+@export_range(0.05, 1.0, 0.01, "suffix:s") var ink_close_seconds: float = 0.26
+@export_range(0.0, 0.4, 0.01, "suffix:s") var frame_open_delay: float = 0.16
+@export_range(0.0, 120.0, 1.0, "suffix:px") var page_slide_pixels: float = 40.0
+@export_range(1.0, 1.3, 0.01) var back_button_lift: float = 1.08
+@export_range(0.05, 0.6, 0.01, "suffix:s") var page_switch_seconds: float = 0.24
 
 var _is_open: bool = false
 var _is_closing: bool = false
 var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 var _transition_tween: Tween
-var _info_tween: Tween
-var _book_scale: Vector2
-var _tab_base_scales: Dictionary[TextureButton, Vector2] = {}
-var _tab_tweens: Dictionary[TextureButton, Tween] = {}
+var _page_tween: Tween
+var _current_tab: Tab = Tab.INVENTORY
 
-@onready var panel: PanelContainer = $PanelContainer
-@onready var book_background: TextureRect = $PanelContainer/Background
-@onready var tab_buttons: Control = $TabButtons
-@onready var tabs: TabContainer = $PanelContainer/MarginContainer/Tabs
-@onready var grid: GridContainer = tabs.get_node("Material/Content/ItemScroll/GridContainer")
-@onready var material_button: TextureButton = $TabButtons/MaterialButton
-@onready var equipment_button: TextureButton = $TabButtons/EquipmentButton
-@onready var notes_button: TextureButton = $TabButtons/NotesButton
-@onready
-var info_layout: Control = tabs.get_node("Material/Content/ItemInfo/MarginContainer/VBoxContainer")
-@onready var equip_potion_button: TextureButton = info_layout.get_node("EquipPotionButton")
-@onready var equip_potion_label: Label = equip_potion_button.get_node("Label")
-@onready var item_icon: TextureRect = info_layout.get_node("IconCenter/IconFrame/ItemIcon")
-@onready var item_name: Label = info_layout.get_node("ItemName")
-@onready var item_type: Label = info_layout.get_node("ItemType")
-@onready var item_description: Label = info_layout.get_node("Description")
-@onready var item_quantity: Label = info_layout.get_node("Quantity")
-@onready var equipment_tab: Control = tabs.get_node("Equipment")
+@onready var _background: TextureRect = %Background
+@onready var _frame: Control = %Frame
+@onready var _embers: CPUParticles2D = %Embers
+@onready var _back_button: Button = %BackButton
+@onready var _items_tab: InventoryItemsTab = %ItemsTab
+@onready var _weapons_tab: InventoryWeaponsTab = %WeaponsTab
+@onready var _charms_tab: InventoryCharmsTab = %CharmsTab
+@onready var _tab_buttons: Dictionary[Tab, InventoryMenuTabButton] = {
+	Tab.INVENTORY: %InventoryTabButton,
+	Tab.WEAPONS: %WeaponsTabButton,
+	Tab.CHARMS: %CharmsTabButton,
+	Tab.JOURNEY: %JourneyTabButton,
+}
+@onready var _pages: Dictionary[Tab, Control] = {
+	Tab.INVENTORY: %ItemsTab,
+	Tab.WEAPONS: %WeaponsTab,
+	Tab.CHARMS: %CharmsTab,
+	Tab.JOURNEY: %JourneyTab,
+}
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_book_scale = book_background.scale
-	for button: TextureButton in [material_button, equipment_button, notes_button]:
-		_tab_base_scales[button] = button.scale
-		button.resized.connect(_update_tab_pivot.bind(button))
-	_restore_tab_feedback.call_deferred()
-	_bind_equipment.call_deferred()
 	hide()
+	for tab: Tab in _tab_buttons:
+		_tab_buttons[tab].pressed.connect(select_tab.bind(tab))
+	_back_button.pressed.connect(close_inventory)
+	_back_button.tooltip_text = "Close (%s)" % InventoryMenuFormat.action_key(CANCEL_ACTION)
+	InventoryHoverFeedback.attach(_back_button, null, back_button_lift)
+	_frame.resized.connect(_update_frame_pivot)
+	_update_frame_pivot()
+	_show_page(_current_tab, false)
 	if inventory == null:
-		push_error("Chưa gán inventory cho ui")
-		return
-
-	for index in range(inventory.slots.size()):
-		var slot_ui = SLOT_SCENE.instantiate() as InventorySlotUI
-		slot_ui.inventory = inventory
-		slot_ui.slot_index = index
-		grid.add_child(slot_ui)
-		slot_ui.clicked.connect(_on_slot_clicked.bind(index))
-		slot_ui.item_dropped.connect(_on_item_dropped)
-		slot_uis.append(slot_ui)
-		slot_ui.refresh(inventory.slots[index])
-		slot_ui.set_potion_assignment(_potion_assignment(inventory.slots[index]))
-
-	inventory.changed.connect(refresh)
-	if is_instance_valid(potion_component):
-		potion_component.equipped_potion_changed.connect(_on_equipped_potion_changed)
-		potion_component.secondary_potion_changed.connect(_on_equipped_potion_changed)
-	_select_tab(0)
-	_refresh_item_info()
+		push_error("InventoryUI: inventory is not assigned")
+	# Player exports are resolved once the whole player scene is ready.
+	_bind_components.call_deferred()
 
 
 func _input(event: InputEvent) -> void:
-	# Xử lý trước GUI để Tab không bị dùng làm phím chuyển focus.
+	# Runs before GUI so Tab toggles the menu instead of moving focus.
 	if event.is_action_pressed(toggle_action):
 		toggle_inventory()
 		get_viewport().set_input_as_handled()
-	elif _is_open and event.is_action_pressed(&"ui_cancel"):
+		return
+	if not _is_open or _is_closing:
+		return
+	if event.is_action_pressed(CANCEL_ACTION):
 		close_inventory()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(PREVIOUS_TAB_ACTION):
+		select_tab(wrapi(_current_tab - 1, 0, Tab.size()) as Tab)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(NEXT_TAB_ACTION):
+		select_tab(wrapi(_current_tab + 1, 0, Tab.size()) as Tab)
 		get_viewport().set_input_as_handled()
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and _is_open:
+		_items_tab.cancel_drag()
+
+
+func _exit_tree() -> void:
+	if _is_open:
+		Input.mouse_mode = _previous_mouse_mode
+		get_node("/root/GameManager").exit_inventory()
+
+
+## Refreshes the visible page from its data owner.
 func refresh() -> void:
-	for index in range(slot_uis.size()):
-		slot_uis[index].refresh(inventory.slots[index])
-		slot_uis[index].set_potion_assignment(_potion_assignment(inventory.slots[index]))
-	_refresh_item_info()
-	_update_slot_selection()
-	equipment_tab.refresh()
+	var page := _pages[_current_tab]
+	if page.has_method("refresh"):
+		page.call("refresh")
 
 
-func _bind_equipment() -> void:
-	var player := get_parent() as Player
-	if player != null:
-		equipment_tab.bind_components(player.weapon_controller, player.charm_socket_manager)
-
-
-func _on_slot_clicked(index: int) -> void:
-	selected_slot_index = index
-	_refresh_item_info()
-	_update_slot_selection()
-	if selected_slot_index >= 0:
-		if _info_tween != null and _info_tween.is_valid():
-			_info_tween.kill()
-		info_layout.modulate.a = deselected_info_alpha
-		_info_tween = create_tween()
-		_info_tween.tween_property(info_layout, "modulate:a", 1.0, info_fade_duration)
-
-
-func _update_slot_selection() -> void:
-	for index in range(slot_uis.size()):
-		slot_uis[index].set_selected(index == selected_slot_index)
-
-
-func _on_item_dropped(from_index: int, to_index: int) -> void:
-	if inventory.move_item(from_index, to_index):
-		_on_slot_clicked(to_index)
-		slot_uis[to_index].play_drop_feedback()
-
-
-func _refresh_item_info() -> void:
-	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
-	if slot == null or slot.is_empty():
-		selected_slot_index = -1
-		item_icon.texture = null
-		item_name.text = "Select an item"
-		item_type.text = ""
-		item_description.text = "Choose a slot to see its details."
-		item_quantity.text = ""
-		equip_potion_button.hide()
+func select_tab(tab: Tab) -> void:
+	if not _pages.has(tab):
 		return
-
-	item_icon.texture = slot.item.icon
-	item_name.text = slot.item.display_name
-	item_type.text = GlobalConstants.ItemType.keys()[slot.item.type]
-	item_description.text = slot.item.description
-	item_quantity.text = "%d/%d" % [slot.quantity, slot.item.max_stack]
-
-	equip_potion_button.visible = slot.item is Potion and is_instance_valid(potion_component)
-	if not equip_potion_button.visible:
-		return
-	var equipped := potion_component.is_equipped(slot.item as Potion)
-	equip_potion_label.text = unequip_text if equipped else equip_text
-	equip_potion_button.tooltip_text = "Tháo bình chính" if equipped else "Trang bị bình chính"
-
-
-func _on_equipped_potion_changed(_potion: Potion) -> void:
-	_refresh_potion_assignments()
-	_refresh_item_info()
-
-
-func _refresh_potion_assignments() -> void:
-	for index in range(slot_uis.size()):
-		slot_uis[index].set_potion_assignment(_potion_assignment(inventory.slots[index]))
-
-
-func _potion_assignment(slot: InventorySlot) -> String:
-	if slot == null or slot.is_empty() or not slot.item is Potion:
-		return ""
-	if not is_instance_valid(potion_component):
-		return ""
-	var potion := slot.item as Potion
-	if potion_component.is_equipped(potion):
-		return "MAIN"
-	if potion_component.is_secondary_equipped(potion):
-		return "BACKUP"
-	return ""
-
-
-func _on_material_button_pressed() -> void:
-	_select_tab(0)
-
-
-func _on_equipment_button_pressed() -> void:
-	_select_tab(1)
-
-
-func _on_notes_button_pressed() -> void:
-	_select_tab(2)
-
-
-func _select_tab(index: int) -> void:
-	var buttons: Array[TextureButton] = [material_button, equipment_button, notes_button]
-	var active_textures: Array[Texture2D] = [orange_button, blue_button, white_button]
-
-	if index < 0 or index >= buttons.size():
-		return
-
-	_cancel_inventory_drag()
-	tabs.current_tab = index
-	if index == 1:
-		equipment_tab.refresh()
-
-	for i in range(buttons.size()):
-		var selected: bool = i == index
-		buttons[i].set_pressed_no_signal(selected)
-		_set_tab_feedback(buttons[i], selected, _is_open and not _is_closing)
-
-
-func _update_tab_pivot(button: TextureButton) -> void:
-	# Grow outward from the book edge without moving the VBox or its hit-area layout.
-	button.pivot_offset = Vector2(0.0, button.size.y * 0.5)
-
-
-func _set_tab_feedback(button: TextureButton, selected: bool, animate: bool) -> void:
-	var previous := _tab_tweens.get(button) as Tween
-	if previous != null and previous.is_valid():
-		previous.kill()
-	_update_tab_pivot(button)
-	var base_scale := _tab_base_scales[button]
-	var target_scale := base_scale * (selected_tab_scale if selected else Vector2.ONE)
-	var target_color := selected_tab_tint if selected else idle_tab_tint
-	button.z_index = 1 if selected else 0
-	if not animate:
-		button.scale = target_scale
-		button.modulate = target_color
-		return
-	var tween := create_tween().set_parallel(true)
-	_tab_tweens[button] = tween
-	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(button, "modulate", target_color, tab_feedback_duration)
-	if selected:
-		# Keep vertical growth small so adjacent tabs remain separated during the punch.
-		var punch_scale := target_scale * Vector2(tab_click_punch_scale, 1.0)
-		tween.tween_property(
-			button, "scale", punch_scale, tab_feedback_duration * tab_click_punch_duration_ratio
-		)
-		tween.chain().tween_property(button, "scale", target_scale, tab_feedback_duration)
-	else:
-		tween.tween_property(button, "scale", target_scale, tab_feedback_duration)
-
-
-func _restore_tab_feedback() -> void:
-	var buttons: Array[TextureButton] = [material_button, equipment_button, notes_button]
-	for i in buttons.size():
-		_set_tab_feedback(buttons[i], i == tabs.current_tab, false)
+	var previous := _current_tab
+	_current_tab = tab
+	var animate := _is_open and not _is_closing
+	_show_page(tab, animate)
+	if tab != previous and _is_open:
+		if animate:
+			_slide_page_in(tab, signi(tab - previous))
+			InventoryMenuFx.burst(_tab_buttons[tab])
+		_focus_page()
 
 
 func open_inventory() -> void:
@@ -275,20 +144,26 @@ func open_inventory() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_is_open = true
 	_is_closing = false
-	refresh()
 	show()
-	# Containers reset child scale when laying out; restore after the opening layout pass.
-	_restore_tab_feedback.call_deferred()
-	book_background.pivot_offset = book_background.size * 0.5
+	_show_page(_current_tab, false)
+	refresh()
+	_embers.emitting = true
 	if fresh_open:
-		panel.modulate.a = 0.0
-		tab_buttons.modulate.a = 0.0
-		book_background.scale = _book_scale * closed_background_scale
+		_set_ink_progress(INK_HIDDEN)
+		_frame.modulate.a = 0.0
+		_frame.scale = Vector2.ONE * closed_frame_scale
+		_embers.restart()
+		_focus_page()
+		_play_intro()
 	_transition_tween = create_tween().set_parallel()
-	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_transition_tween.tween_property(panel, "modulate:a", 1.0, open_duration)
-	_transition_tween.tween_property(tab_buttons, "modulate:a", 1.0, open_duration)
-	_transition_tween.tween_property(book_background, "scale", _book_scale, open_duration)
+	var ink := _transition_tween.tween_method(
+		_set_ink_progress, _ink_progress(), INK_SHOWN, ink_open_seconds
+	)
+	ink.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var fade := _transition_tween.tween_property(_frame, "modulate:a", 1.0, open_duration)
+	fade.set_delay(frame_open_delay)
+	var grow := _transition_tween.tween_property(_frame, "scale", Vector2.ONE, open_duration)
+	grow.set_delay(frame_open_delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func close_inventory(immediate: bool = false) -> void:
@@ -296,20 +171,102 @@ func close_inventory(immediate: bool = false) -> void:
 		return
 	if _is_closing and not immediate:
 		return
-	_cancel_inventory_drag()
+	_items_tab.cancel_drag()
 	_kill_transition()
 	if immediate:
 		_finish_close()
 		return
 	_is_closing = true
+	_embers.emitting = false
 	_transition_tween = create_tween().set_parallel()
 	_transition_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_transition_tween.tween_property(panel, "modulate:a", 0.0, close_duration)
-	_transition_tween.tween_property(tab_buttons, "modulate:a", 0.0, close_duration)
+	_transition_tween.tween_property(_frame, "modulate:a", 0.0, close_duration)
 	_transition_tween.tween_property(
-		book_background, "scale", _book_scale * closed_background_scale, close_duration
+		_frame, "scale", Vector2.ONE * closed_frame_scale, close_duration
+	)
+	_transition_tween.tween_method(
+		_set_ink_progress, _ink_progress(), INK_HIDDEN, ink_close_seconds
 	)
 	_transition_tween.chain().tween_callback(_finish_close)
+
+
+func toggle_inventory() -> void:
+	if _is_closing or not _is_open:
+		open_inventory()
+	else:
+		close_inventory()
+
+
+func is_open() -> bool:
+	return _is_open
+
+
+func _bind_components() -> void:
+	var player := get_parent() as Player
+	var weapons: WeaponController = player.weapon_controller if player != null else null
+	var charms: CharmSocketManager = player.charm_socket_manager if player != null else null
+	_items_tab.setup(inventory, potion_component, weapons)
+	_weapons_tab.setup(weapons)
+	_charms_tab.setup(charms)
+
+
+func _show_page(tab: Tab, animate: bool) -> void:
+	if tab != Tab.INVENTORY:
+		_items_tab.cancel_drag()
+	for page_tab: Tab in _pages:
+		_pages[page_tab].visible = page_tab == tab
+		_tab_buttons[page_tab].set_active(page_tab == tab, animate)
+
+
+## Tabs drop in one by one and the current page plays its own entrance.
+func _play_intro() -> void:
+	InventoryMenuFx.stagger_in(_tab_buttons.values())
+	_play_page_intro(_pages[_current_tab])
+
+
+func _play_page_intro(page: Control) -> void:
+	if page.has_method("play_intro"):
+		page.call("play_intro")
+
+
+## Slides the new page in from the side of the tab it came from.
+func _slide_page_in(tab: Tab, direction: int) -> void:
+	_reset_pages()
+	var page := _pages[tab]
+	page.position.x = page_slide_pixels * direction
+	page.modulate.a = 0.0
+	_page_tween = create_tween().set_parallel()
+	_page_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_page_tween.tween_property(page, "position:x", 0.0, page_switch_seconds)
+	_page_tween.tween_property(page, "modulate:a", 1.0, page_switch_seconds)
+	_play_page_intro(page)
+
+
+func _reset_pages() -> void:
+	if _page_tween != null and _page_tween.is_valid():
+		_page_tween.kill()
+	for page: Control in _pages.values():
+		page.position = Vector2.ZERO
+		page.modulate.a = 1.0
+
+
+func _focus_page() -> void:
+	var page := _pages[_current_tab]
+	if page.has_method("focus_default"):
+		page.call("focus_default")
+
+
+func _update_frame_pivot() -> void:
+	_frame.pivot_offset = _frame.size * CENTER_RATIO
+
+
+func _set_ink_progress(progress: float) -> void:
+	(_background.material as ShaderMaterial).set_shader_parameter(INK_PROGRESS_PARAM, progress)
+
+
+func _ink_progress() -> float:
+	var material := _background.material as ShaderMaterial
+	return float(material.get_shader_parameter(INK_PROGRESS_PARAM))
 
 
 func _kill_transition() -> void:
@@ -322,52 +279,10 @@ func _finish_close() -> void:
 	_is_open = false
 	_is_closing = false
 	hide()
-	_restore_tab_feedback()
-	panel.modulate.a = 1.0
-	tab_buttons.modulate.a = 1.0
-	book_background.scale = _book_scale
+	_embers.emitting = false
+	_reset_pages()
+	_frame.modulate.a = 1.0
+	_frame.scale = Vector2.ONE
+	_set_ink_progress(INK_SHOWN)
 	Input.mouse_mode = _previous_mouse_mode
 	get_node("/root/GameManager").exit_inventory()
-
-
-func _cancel_inventory_drag() -> void:
-	var viewport: Viewport = get_viewport()
-	if not viewport.gui_is_dragging():
-		return
-	var data: Variant = viewport.gui_get_drag_data()
-	if data is Dictionary and data.get("inventory") == inventory:
-		viewport.gui_cancel_drag()
-
-
-func toggle_inventory() -> void:
-	if _is_closing:
-		open_inventory()
-	elif _is_open:
-		close_inventory()
-	else:
-		open_inventory()
-
-
-func is_open() -> bool:
-	return _is_open
-
-
-func _exit_tree() -> void:
-	if _is_open:
-		Input.mouse_mode = _previous_mouse_mode
-		get_node("/root/GameManager").exit_inventory()
-
-
-func _on_equip_potion_button_pressed() -> void:
-	if potion_component == null:
-		return
-
-	var slot: InventorySlot = inventory.get_slot(selected_slot_index)
-	if slot == null or slot.is_empty() or slot.item is not Potion:
-		return
-
-	var potion := slot.item as Potion
-	if potion_component.is_equipped(potion):
-		potion_component.unequip_potion()
-	else:
-		potion_component.equip_potion(potion)

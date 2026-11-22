@@ -1,5 +1,8 @@
 extends Node
 
+## Hit targets may expose this property (0..1) to soften the hitstop of hits on them.
+const TARGET_SCALE_PROPERTY := &"hitstop_scale"
+
 @export_range(0.001, 0.1, 0.001) var stop_scale: float = 0.01
 @export_range(0.01, 0.3, 0.01) var maximum_duration: float = 0.12
 
@@ -15,7 +18,9 @@ func _ready() -> void:
 	set_process(false)
 
 
-func request(duration: float = 0.06) -> void:
+## Pass the hit target when there is one, so props can soften the stop (see `get_target_scale`).
+func request(duration: float = 0.06, target: Node = null) -> void:
+	duration *= get_target_scale(target)
 	if duration <= 0.0:
 		return
 
@@ -81,6 +86,7 @@ func _apply_time_scale() -> void:
 
 ## Melee freezes only combat actors/animations; UI, audio and other actors keep running.
 func request_local(source: Node3D, target: Node3D, duration: float) -> void:
+	duration *= get_target_scale(target)
 	if duration <= 0.0 or get_tree().paused:
 		return
 	for actor: Node3D in [source, target]:
@@ -100,6 +106,13 @@ func request_local(source: Node3D, target: Node3D, duration: float) -> void:
 		if animation != null:
 			animation.speed_scale = 0.0
 	set_process(true)
+
+
+## Hitstop multiplier a hit target asks for; 1.0 for enemies and anything without one.
+func get_target_scale(target: Node) -> float:
+	if not is_instance_valid(target) or not TARGET_SCALE_PROPERTY in target:
+		return 1.0
+	return clampf(float(target.get(TARGET_SCALE_PROPERTY)), 0.0, 1.0)
 
 
 func is_frozen(actor: Node) -> bool:

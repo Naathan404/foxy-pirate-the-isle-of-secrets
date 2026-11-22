@@ -12,6 +12,7 @@ const ELITE_SPRITE_GLOW_SHADER: Shader = preload(
 @export_group("Elite Identity")
 @export_range(0.0, 1.0, 0.01) var elite_glow_strength: float = 0.9
 @export_group("Attack Telegraph")
+@export var show_ground_telegraph_ring: bool = true
 @export_range(0.5, 5.0, 0.05, "suffix:m") var telegraph_ring_radius: float = 1.35
 @export_range(0.01, 0.2, 0.005, "suffix:m") var telegraph_ring_thickness: float = 0.045
 @export_group("Movement Dust")
@@ -41,7 +42,8 @@ func _ready() -> void:
 		# Child _ready runs before EnemyBase caches its @onready visual field.
 		_source_sprite = enemy.get_node_or_null("Visual/Sprite3D") as Sprite3D
 	_setup_elite_sprite_glow()
-	_create_telegraph_ring()
+	if show_ground_telegraph_ring:
+		_create_telegraph_ring()
 	_create_movement_smoke()
 
 
@@ -77,7 +79,13 @@ func _setup_elite_sprite_glow() -> void:
 	_elite_sprite_glow_material = ShaderMaterial.new()
 	_elite_sprite_glow_material.shader = ELITE_SPRITE_GLOW_SHADER
 	_elite_sprite_glow_material.render_priority = 2
-	_source_sprite.material_overlay = _elite_sprite_glow_material
+	if _previous_sprite_overlay != null:
+		var tail := _previous_sprite_overlay
+		while tail.next_pass != null:
+			tail = tail.next_pass
+		tail.next_pass = _elite_sprite_glow_material
+	else:
+		_source_sprite.material_overlay = _elite_sprite_glow_material
 	_sync_elite_sprite_glow_parameters()
 
 
@@ -188,7 +196,12 @@ func _update_elite_sprite_glow() -> void:
 	if _elite_sprite_glow_material == null or not is_instance_valid(_source_sprite):
 		return
 	var enemy := get_parent() as EnemyBase
-	if enemy == null or enemy.dead:
+	var burrowed_prop: Variant = enemy.get("is_burrowed") if enemy != null else null
+	var is_burrowed_now := (burrowed_prop is bool) and (burrowed_prop as bool)
+	var is_hidden_burrowed := (
+		enemy != null and (is_burrowed_now or not _source_sprite.is_visible_in_tree())
+	)
+	if enemy == null or enemy.dead or is_hidden_burrowed:
 		_elite_sprite_glow_material.set_shader_parameter("glow_strength", 0.0)
 		return
 	_sync_elite_sprite_glow_parameters()
@@ -305,8 +318,14 @@ func _get_enemy_foot_position(enemy: EnemyBase) -> Vector3:
 
 
 func _exit_tree() -> void:
-	if (
-		is_instance_valid(_source_sprite)
-		and _source_sprite.material_overlay == _elite_sprite_glow_material
-	):
+	if not is_instance_valid(_source_sprite) or _elite_sprite_glow_material == null:
+		return
+	if _source_sprite.material_overlay == _elite_sprite_glow_material:
 		_source_sprite.material_overlay = _previous_sprite_overlay
+		return
+	var cursor := _source_sprite.material_overlay
+	while cursor != null:
+		if cursor.next_pass == _elite_sprite_glow_material:
+			cursor.next_pass = _elite_sprite_glow_material.next_pass
+			break
+		cursor = cursor.next_pass

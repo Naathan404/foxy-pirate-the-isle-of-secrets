@@ -1,6 +1,6 @@
 # Sổ quái và phần thưởng rương
 
-Tab Notes hiển thị danh sách `MonsterNote` ở trang trái và thông tin ở trang phải. Note khóa có màu tối và không thể chọn. Mỗi note có ID duy nhất, ảnh, mô tả, dữ liệu quái tùy chọn và bố cục quái thường hoặc boss.
+Tab **Journey** của menu Inventory hiển thị các `MonsterNote` thành lưới ở giữa và thông tin ở panel bên phải, có bộ lọc All/Creatures/Bosses. Entry khóa hiện ổ khóa; khi chọn chỉ hiện `???`, không lộ tên, ảnh hay nội dung. Mỗi note có ID duy nhất, ảnh, mô tả, dữ liệu quái tùy chọn và bố cục quái thường hoặc boss. Scene của tab vẫn là `gameplay/inventory/notes_tab.tscn`; xem thêm [Menu Inventory](equipment_inventory.md).
 
 ## Tạo note
 
@@ -15,7 +15,7 @@ Starfish được mở mặc định. Các mô tả hiện tại là nội dung 
 
 `data/items/quest/boss_diary.tres` là item hiển thị cho các entry có layout `BOSS`, dùng icon Boss Diary. Khi tạo `MonsterNote` cho boss, nhập cốt truyện ở trường `Story`; nội dung xuất hiện trong mục **The Story** ở trang boss. Các trường mô tả, hành vi và chiến thuật vẫn có thể dùng như trước.
 
-Bốn entry đã được tạo sẵn và thêm vào tab Notes: `data/notes/diary_ember.tres`, `diary_tide.tres`, `diary_flora.tres` và `diary_gale.tres`. Mỗi entry đang khóa mặc định và liên kết với item `data/items/quest/diary_<vùng>.tres` có tên riêng cho popup, cùng icon Boss Diary. Chọn entry tương ứng tại `Note Drop` của boss; cập nhật chân dung, tên boss, cốt truyện và thông tin chiến đấu khi nội dung được quyết định. Để đổi item hiển thị cho entry, chỉnh trường `Pickup Item`; để trống thì dùng Note hoặc Boss Diary mặc định theo layout. Item tùy chọn phải bật `Opens Note` để không bị nhặt nhầm như vật phẩm thường khi thiếu entry.
+Bốn entry đã được tạo sẵn và thêm vào tab Journey: `data/notes/diary_ember.tres`, `diary_tide.tres`, `diary_flora.tres` và `diary_gale.tres`. Mỗi entry đang khóa mặc định và liên kết với item `data/items/quest/diary_<vùng>.tres` có tên riêng cho popup, cùng icon Boss Diary. Chọn entry tương ứng tại `Note Drop` của boss; cập nhật chân dung, tên boss, cốt truyện và thông tin chiến đấu khi nội dung được quyết định. Để đổi item hiển thị cho entry, chỉnh trường `Pickup Item`; để trống thì dùng Note hoặc Boss Diary mặc định theo layout. Item tùy chọn phải bật `Opens Note` để không bị nhặt nhầm như vật phẩm thường khi thiếu entry.
 
 Trên scene hoặc instance của boss kế thừa `EnemyBase`, mở nhóm **Note Drop**, gán resource `MonsterNote` vào `Note Drop` và chỉnh `Note Drop Chance` từ 0 đến 1. Khi boss chết, pickup sẽ rơi cùng item và vàng thông thường; khi nhặt, diary mở entry đã chọn, hiện popup với icon riêng và không chiếm ô túi. Không gán item Boss Diary đơn lẻ vào drop thường vì pickup cần tham chiếu entry để biết phải mở khóa gì. Cơ chế này cũng hỗ trợ entry quái thường; pickup tự chọn icon theo `Layout` của entry.
 

@@ -16,7 +16,7 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 | Nhóm | Tài liệu |
 | --- | --- |
 | Player | [Luồng Player](gameplay/player/player_business_logic.md) · [Hút vật phẩm](gameplay/player/player_attraction.md) |
-| Enemy | [Hành vi enemy](gameplay/enemies/enemy_business_logic.md) · [Enemy khi thủy triều rút](world/flat_tide.md#enemy-khi-nước-rút) |
+| Enemy | [Hành vi enemy](gameplay/enemies/enemy_business_logic.md) · [Coral Skeleton](gameplay/enemies/coral_skeleton_business_logic.md) · [Mushroom](gameplay/enemies/mushroom_business_logic.md) · [Enemy khi thủy triều rút](world/flat_tide.md#enemy-khi-nước-rút) |
 | NPC | [Hệ NPC](gameplay/npcs/npc_business_logic.md) · [Silas](gameplay/npcs/silas_merchant.md) · [Master Tortuga](gameplay/npcs/master_tortuga.md) |
 | Vũ khí | [Tổng quan](gameplay/weapons/weapon_business_logic.md) · [Thu thập](gameplay/weapons/weapon_collection.md) · [Rèn](gameplay/weapons/weapon_forges.md) · [Dao găm](gameplay/weapons/dagger_combo.md) · [Cung](gameplay/weapons/bow_weapon.md) · [Harpoon](gameplay/weapons/harpoon_weapon.md) · [Meteor staff](gameplay/weapons/meteor_staff.md) |
 | Trang bị và tài nguyên | [Inventory](gameplay/economy/equipment_inventory.md) · [Item data](gameplay/economy/item_data.md) · [Tiền](gameplay/economy/currency_system.md) · [Charm](gameplay/economy/charm_system.md) · [Potion](gameplay/economy/potion_capacity.md) |
@@ -24,7 +24,7 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Thế giới · `world/`
 
-[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Collision layers](world/collision_layers.md)
+[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Bố cục Hub](world/hub_layout.md) · [Collision layers](world/collision_layers.md)
 
 ## Hệ thống · `systems/`
 
@@ -36,6 +36,6 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Kế hoạch · `plans/`
 
-[Kế hoạch Charm System](plans/charm-system-development-plan.md) · [Kế hoạch phát triển Captain Blubberbeard](plans/blubberbeard_development_plan.md)
+[Kế hoạch Charm System](plans/charm-system-development-plan.md) · [Kế hoạch phát triển Captain Blubberbeard](plans/blubberbeard_development_plan.md) · [Kế hoạch phát triển Mushroom](plans/mushroom_development_plan.md)
 
 Sổ quái: [Monster Notes](gameplay/economy/monster_notes.md).

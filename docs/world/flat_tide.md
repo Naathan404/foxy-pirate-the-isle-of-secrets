@@ -1,6 +1,6 @@
-# Thủy triều cho nền phẳng
+# Thủy triều cho nền phẳng (Flat Tide)
 
-`world/tests/beach_test.tscn` dùng `FlatTideController` và các `FlatTideZone`. Mỗi vùng là một khối nước nông: mặt trên có sóng, bốn mặt bên và mặt đáy. Nước tiến từ cạnh **X dương về X âm trong tọa độ của vùng**. `Size` là kích thước tối đa trên X/Z; dùng hai số bằng nhau để có vùng vuông trên mặt đất. Camera phối cảnh vẫn có thể khiến hình vuông trông thành hình thang trên màn hình.
+`world/gimmick/flat_tide/flat_tide.tscn` gồm `FlatTideController` và các `FlatTideZone`. Các phòng `coral_valley/map/room_02`, `room_09`, `room_14` và `world/tests/beach_test` dùng scene này. `flat_tide_playground.tscn` (cùng thư mục) là phòng thử tự chứa với hai vùng chồng nhau, một vùng xoay và vài enemy; dùng nó để thử mà không phải mở hay lưu scene map.
 
 ## Thiết lập vùng
 
@@ -10,17 +10,20 @@
 - `Surface Segments X/Z` chỉnh độ mịn mesh; tăng số đoạn theo chiều Z để mép sóng cong mượt hơn, đổi lại tăng số đỉnh. `Floor Tolerance` giới hạn độ cao của điểm được xem là nằm trên nền vùng nước.
 - `Water Material` là resource `flat_tide_volume_material.tres`. Mở resource này để chỉnh màu nông, màu sâu, màu mặt bên, bọt, độ đục và cường độ vân sáng. Material được sao chép khi chạy để mỗi vùng nhận mức triều riêng. Muốn một vùng có màu khác, tạo bản sao material rồi gán cho vùng đó.
 
-## Khung debug
+Mỗi vùng là **một tấm nước bám nền**, không còn khối hộp có mặt bên hay đáy. Nước tiến từ cạnh **X dương về X âm trong tọa độ của vùng** (hoặc theo `Flow Direction`):
 
-Trong nhóm `Editor Preview`, `Show Editor Preview` hiển thị chính khối nước ngay trong viewport mà không cần chạy game. `Editor Preview Coverage` chỉnh mức triều chung từ 0 đến 1; `Animate Editor Preview` bật chuyển động sóng. Đây là phần xem trước trong editor, chu kỳ lúc chơi vẫn do controller điều khiển.
+- **Báo hiệu** (`Warning Seconds` trên controller): cạnh màn hình phía sóng sắp tràn vào phát sáng đỏ và nhấp nháy chậm, nhanh dần khi sắp dâng (xem [Cảnh báo trên màn hình](#cảnh-báo-trên-màn-hình)). Trong thế giới game không vẽ gì thêm, và báo hiệu không làm ngập hay đẩy ai.
+- **Dâng**: mép nước là một đường cong mượt, cắt theo từng pixel, chạm đất đúng tại đường ngập gameplay. Ngay trong mép có viền bọt lăn tăn và phần nước mờ dần (`Edge Softness`, `Edge Breakup` trên material). Phía sau mép là đỉnh sóng có mặt trước sáng, bọt vỡ và bóng phía sau. Sau đỉnh là nước nông `Rest Height`.
+- **Triều cao**: nước nông trong suốt với vân noise chuyển động chậm, đậm dần về phía biển rồi mờ hẳn ở mép nguồn. Nhân vật chỉ ngập tới mắt cá.
+- **Rút**: không có đỉnh sóng; gợn chảy ngược ra biển. Phần cát nước đã rút khỏi không còn vẽ gì, nên không có lớp tối phủ lên nền.
 
-`Show Debug Area` mặc định bật và vẽ khung quanh **toàn bộ phạm vi có thể ngập** trong editor, kể cả khi game chưa chạy. Chỉnh `Debug Color` để đổi màu. Bật thêm `Debug In Game` để xem khung này khi chơi; đường `Active Debug Color` hiển thị ranh giới vùng đang thực sự ngập và cập nhật theo mép sóng. Tắt `Show Debug Area` để ẩn cả hai.
+Hai cạnh bên và phía biển được làm mờ có nhiễu (`Side Fade Length`, `Source Fade Length`), nên không thấy cạnh thẳng. Nước trông tự nhiên nhất khi phía biển của vùng nằm ở mép map, vách đá hoặc ngoài khung hình. Vùng đặt giữa bãi sẽ trông như một vũng nước; khi đó tăng hai giá trị fade.
 
-Khung debug là hình học hiển thị, không tạo collider. `Player Ground Offset` trên controller chọn điểm gần chân Foxy để kiểm tra vùng ngập; `Floor Tolerance` của vùng bảo vệ nền ở cao độ khác.
+### Nguồn sự thật cho mép nước
 
-## Chu kỳ và dấu chân
+`FlatTideZone._shore_x()` tính mép ngập trên CPU; shader dùng đúng công thức đó và cắt mép nước theo từng pixel, nên mép không bị gãy góc theo lưới. Viền bọt chỉ lùi vào trong (tối đa `Edge Breakup`), không bao giờ vẽ ra ngoài đường ngập gameplay. Ngập, cưỡi sóng, sóng cuốn, dấu chân và spawn enemy đều dùng phép kiểm tra này. Bật `Debug In Game` để xem đường mép do CPU tính (màu `Active Debug Color`) trùng với mép nước. `get_surface_height_at()` trả về đúng độ cao mặt nước đang hiển thị, kể cả đỉnh sóng.
 
-Controller giữ bốn pha `LOW`, `RISING`, `HIGH`, `FALLING`. `Warning Seconds` chọn lúc bắt đầu báo nước dâng; `Warning Fade Duration` làm mờ vệt cảnh báo trước khi nước dâng. Nước và sóng dừng cùng game khi pause.
+Khi gần ngập hết, mép lùi vào trong vùng một khoảng bằng biên độ sóng bờ, để mép vẫn uốn lượn thay vì nằm thẳng trên cạnh vùng. Vì vậy khi triều cao, dải sát cạnh trong cùng (tối đa `Shore Wave Amplitude + Shore Detail Amplitude`) có thể khô xen kẽ.
 
 Bật `Sequential Zones` trên `FlatTide` để các vùng chạy lần lượt theo thứ tự
 trong mảng `Zones`. Vùng đầu tiên dâng ngay khi vào phòng; mỗi vùng dâng, giữ,
@@ -43,13 +46,70 @@ bắt đầu rút vẫn là một đợt spawn.
 
 Khi mép sóng đang dâng chạm Player, hoặc Player đi vào phần sóng đang tiến, sóng đẩy Player theo hướng dòng nước một lần mỗi đợt dâng. `Wave Knockback Speed` mặc định là 14 m/s và `Wave Knockback Duration` là 0,65 giây; cả hai chỉnh được trên `FlatTideController`. Lực đẩy được áp dụng sau vận tốc của trạng thái Player, nên đi hoặc dash ngược chiều không triệt tiêu được lực trong thời gian tác dụng. Va chạm với tường và vật cản vẫn giới hạn chuyển động.
 
-`WaterFootsteps` tạo dấu khi Foxy di chuyển trên nền ngập. Các dấu đi theo cao độ mặt sóng và được ẩn nếu nước rút khỏi vị trí đó. `Footprint Size`, `Surface Clearance`, `Step Distance`, `Step Width`, `Mark Lifetime`, `Minimum Speed`, `Max Marks` và `Max Step Displacement` có thể chỉnh trong Inspector.
+- **Area:** `Flow Direction`, `Size` (kích thước tối đa trên X/Z), `Start/Full Coverage` (ngưỡng ngập theo mức triều chung; `Full` phải lớn hơn `Start`), `Floor Tolerance`.
+- **Tide shape:**
+  - `Rest Height` (mặc định 0,16 m): độ cao nước nông.
+  - `Crest Height` (0,55 m): độ cao đỉnh sóng khi dâng; 0 để tắt.
+  - `Crest Rise Length` và `Crest Tail Length`: độ dốc mặt trước và độ dài lưng sóng.
+  - `Rest Ramp Length`: khoảng nước dâng từ mép lên `Rest Height`.
+  - `Source Fade Length`, `Side Fade Length`: làm mờ ở phía biển và hai cạnh bên.
+- **Water volume:**
+  - `Volume Depth` giờ là **trần chiều cao hiển thị**: `Rest Height` và `Crest Height` bị giới hạn bởi giá trị này. Các phòng đang đặt 2–2,75 m không cần sửa.
+  - `Surface Segments X` là số hàng theo hướng dòng (dồn về phía mép để đỉnh sóng mịn). `Surface Segments Z` chia ngang dòng, tối thiểu mỗi 0,5 m một đoạn; số này chỉ ảnh hưởng độ mịn đỉnh sóng, không ảnh hưởng mép nước.
+  - `Water Material`, `Water Render Priority`.
+- **Waves:**
+  - Hai lớp sóng bờ (`Shore Wave/Detail Amplitude/Length/Speed`) tạo hình mép; mặc định 0,55 m và 0,18 m.
+  - Hai lớp sóng mặt (`Surface Wave/Detail Height/Length/Speed`).
+- **Water Material** (`flat_tide_volume_material.tres`):
+  - Màu nông, sâu, bọt.
+  - `Surface/Deep Opacity`, `Foam Width/Strength`, `Crest Foam Strength`, `Caustic Strength`, `Streak Strength`.
+  - `Edge Softness` (độ mờ của mép), `Edge Breakup` (viền bọt lùi vào trong mép bao nhiêu mét).
+  - Noise texture dùng cho vân nước.
+  - Material được sao chép khi chạy; muốn vùng có màu riêng thì tạo bản sao.
+
+Inspector cảnh báo khi `Full Coverage <= Start Coverage` hoặc `Crest Height > Volume Depth`.
+
+## Chu kỳ, di chuyển và sóng
+
+- **Bốn pha:** controller giữ `LOW`, `RISING`, `HIGH`, `FALLING`. Pause làm triều dừng, kể cả cảnh báo.
+- **Trong nước:** `Flooded Move Multiplier` và `Flooded Dash Multiplier` áp dụng khi chân Foxy (`Player Ground Offset`) nằm trong vùng ngập.
+- **Sóng đẩy Player:** mỗi đợt dâng, khi mép nước đi qua Foxy, sóng đẩy Foxy theo hướng dòng một lần (`Wave Knockback Speed/Duration`), kèm phản ứng trúng đòn. Đi hoặc dash ngược chiều không triệt tiêu được lực này.
+
+### Cảnh báo trên màn hình
+
+Trong `Warning Seconds` cuối của triều thấp, controller tạo một `FlatTideWarningOverlay` (CanvasLayer, cùng lớp với các viền màu khác của Player, nằm dưới HUD). Overlay vẽ viền đỏ ở cạnh màn hình phía biển của vùng, tức phía nước sẽ tràn vào. Hướng được chiếu từ hướng dòng qua camera hiện tại, nên vẫn đúng khi vùng xoay hoặc dòng chảy theo Z. Mỗi hướng sóng có một viền riêng (tối đa 4): Foxy đứng giữa hai vùng tràn vào từ hai phía sẽ thấy hai cạnh màn hình cùng sáng. Các vùng có hướng gần trùng nhau trên màn hình dùng chung một viền. Viền đậm dần khi Foxy lại gần vùng tương ứng.
+
+- `Warning Overlay Enabled`: tắt hẳn overlay.
+- `Warning Color`, `Warning Overlay Strength`, `Warning Edge Width`.
+- `Warning Pulse Start Hz` (1) → `Warning Pulse End Hz` (2,2): nhịp nhấp nháy tăng dần, giữ thấp để không chói mắt.
+- `Warning Player Margin` (6 m): chỉ cảnh báo khi Foxy ở trong vùng có thể ngập hoặc cách vùng không quá khoảng này.
+- `Warning Fade Duration`: số giây overlay mờ dần sau khi nước bắt đầu dâng.
+
+### Cơ chế sóng cuốn (Surge)
+
+Mục tiêu là biến cơn sóng từ một hình phạt thành một công cụ có rủi ro.
+
+1. **Nhận biết:** viền đỏ ở cạnh màn hình cho biết hướng sóng và thời điểm sắp dâng. Khi dâng, đỉnh sóng bọt trắng tiến dần về phía người chơi.
+2. **Lựa chọn:**
+   - Ra khỏi vùng để tránh.
+   - Đứng chịu: bị đẩy và khựng lại 0,65 s như trước.
+   - **Cưỡi sóng**: dash xuôi dòng ngay trước khi sóng tới.
+   - Kéo enemy vào đường đi của sóng.
+3. **Cưỡi sóng** (`Surge Ride`): nếu một cú dash xuôi dòng (`Ride Alignment`) bắt đầu trong vòng `Ride Window Seconds` (1,2 s) trước khi sóng đuổi kịp, Foxy không bị phản ứng trúng đòn mà được sóng mang theo (`Ride Speed` 15 m/s trong `Ride Duration` 0,9 s), kèm chấn động màu sáng. Dash ngược dòng vẫn bị đẩy như cũ. Signal `wave_ridden`.
+4. **Sóng cuốn enemy** (`Surge Sweep`): enemy (không phải boss) bị mép sóng đang dâng đi qua sẽ bị choáng `Enemy Sweep Stun Seconds` (1,2 s) và bị đẩy theo dòng, với lực bằng `Enemy Sweep Knockback Multiplier` × lực trúng đòn của chính enemy đó (nên kháng đẩy của enemy vẫn có tác dụng). Đây là khoảng trống để đánh. Không gây sát thương. Signal `enemy_swept`.
+5. **Kết thúc:** mỗi Player và mỗi enemy chỉ bị tác động một lần mỗi đợt dâng, kể cả khi các vùng chồng nhau. Triều cao không còn đẩy.
+
+Tắt từng phần bằng `Ride Enabled` hoặc `Sweep Enemies` trên `FlatTide` của phòng. Hai cơ chế mặc định bật cho mọi phòng dùng `flat_tide.tscn`.
+
+## Dấu chân
+
+`WaterFootsteps` tạo dấu khi Foxy di chuyển trên nền ngập. Dấu nằm trên mặt nước (theo `get_surface_height_at`) và ẩn khi nước rút khỏi vị trí đó. Các thông số `Footprint Size`, `Surface Clearance`, `Step Distance`, `Step Width`, `Mark Lifetime`, `Minimum Speed`, `Max Marks`, `Max Step Displacement` chỉnh trong Inspector.
 
 ## Enemy khi nước rút
 
-`FlatTide/EnemySpawner` trong `beach_test` chọn ngẫu nhiên vị trí đang ngập khi bắt đầu pha `FALLING`. Mỗi enemy xuất hiện khi tất cả vùng nước đã rút khỏi điểm đó, kể cả khi các vùng chồng lên nhau. Mỗi đợt chọn lại vị trí; enemy cũ tiếp tục tồn tại theo hành vi thông thường.
+`FlatTide/EnemySpawner` chọn ngẫu nhiên vị trí đang ngập khi bắt đầu pha `FALLING`. Mỗi enemy xuất hiện khi tất cả vùng nước đã rút khỏi điểm đó, kể cả khi các vùng chồng lên nhau.
 
-- `Enemies Per Tide`: số enemy tối đa trong một đợt, mặc định 1.
+- `Enemies Per Tide`: số enemy tối đa mỗi đợt, mặc định 1.
 - `Wave Chance`: xác suất có đợt spawn, mặc định 100%.
 - `Enemies`: danh sách loại enemy được chọn ngẫu nhiên với xác suất bằng nhau. Mỗi phần tử là một `FlatTideEnemyEntry` gồm `Normal Scene` và `Elite Scene` tương ứng; để trống elite nếu loại đó chỉ có bản thường.
 - `Elite Chance`: xác suất chọn bản elite của loại enemy đã chọn, mặc định 10%.
@@ -69,18 +129,21 @@ collider nền, với mặt đủ phẳng. Các điểm dò không cần đang n
 khoảng lùi ở hướng chéo trên nền đảo lồi hiện tại. Đây là kiểm tra lấy mẫu,
 không phải đo khoảng cách chính xác cho mọi hình dạng nền có khe nhỏ hoặc lõm.
 
-Nếu không tìm được đủ nền hợp lệ, hoặc vị trí bị nhân vật/vật cản chiếm khi nước rút đến, đợt đó có thể xuất hiện ít enemy hơn cấu hình. Gán `Controller` cho spawner khi dùng trong scene khác.
+Nếu không tìm đủ nền hợp lệ, hoặc vị trí bị chiếm khi nước rút đến, đợt đó có thể ít enemy hơn cấu hình. Hiệu ứng xuất hiện dùng `flat_tide_spawn_effect.tscn` (`Spawn Effect Scene`, để trống để tắt).
 
-Hiệu ứng xuất hiện của enemy dùng `flat_tide_spawn_effect.tscn`: hai vòng nước và hạt nước tại vị trí vừa khô; elite có hiệu ứng lớn hơn. Trong Inspector của `EnemySpawner`, thay `Spawn Effect Scene` để dùng hiệu ứng khác, hoặc để trống để tắt. Hiệu ứng chỉ chạy sau khi spawn thành công, không trì hoãn AI hay va chạm.
+## Thiết lập mà không sửa map
+
+Mọi thay đổi hình ảnh nằm trong script, shader và material của gimmick, nên các map đang override `Size` hay `Volume Depth` vẫn dùng được. Để thử cấu hình mới, mở `flat_tide_playground.tscn` hoặc tạo scene kế thừa riêng, thay vì chỉnh trực tiếp map đang có người làm. Khi đã chốt, chỉ đổi đúng property cần thiết trên node `FlatTide` hay zone của phòng.
 
 ## Kiểm tra
 
 ```powershell
-Godot --headless --path . --script res://test/flat_tide_zone_test.gd
-Godot --headless --path . --script res://test/flat_tide_footsteps_test.gd
-Godot --headless --path . --script res://test/flat_tide_enemy_spawner_test.gd
-Godot --headless --path . --script res://test/flat_tide_spawn_effect_test.gd
-Godot --headless --editor --path . --script res://test/flat_tide_editor_test.gd
+Godot --headless --path . --script res://test/flat_tide_pressure_test.gd
 ```
 
-Các kiểm tra bao gồm hình học khối, góc của vùng vuông, vùng khô/ngập theo mép sóng và phép quay node, khung debug trong game và editor, cùng vị trí và thời điểm ẩn dấu chân. Nên chơi thử thêm ở cả bốn pha và kiểm tra hiển thị với camera của từng phòng.
+Mở `flat_tide_playground.tscn` và chạy (F6) để thử:
+
+- Báo hiệu, dâng, triều cao, rút.
+- Dash xuôi và ngược dòng khi sóng tới.
+- Starfish bị cuốn.
+- Hai vùng chồng nhau, dấu chân, enemy xuất hiện khi rút.

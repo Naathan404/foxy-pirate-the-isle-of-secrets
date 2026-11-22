@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_room"]
+[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_tide"]
+[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="3_zone"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="4_starfish"]
+
+[node name="FlatTidePlayground" instance=ExtResource("1_room")]
+
+[node name="Foxy" parent="." index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+
+[node name="FlatTide" parent="." node_paths=PackedStringArray("player", "zones") instance=ExtResource("2_tide")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+player = NodePath("../Foxy")
+zones = [NodePath("NorthShallows"), NodePath("EastInlet")]
+low_duration = 5.0
+high_duration = 3.0
+flooded_move_multiplier = 0.5
+
+[node name="NorthShallows" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.200718, 0.25, 0.40002728)
+size = Vector2(20, 40)
+volume_depth = 2.0
+
+[node name="EastInlet" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(0.9396926, 0, 0.34202015, 0, 1, 0, -0.34202015, 0, 0.9396926, -9, 0.25, -3)
+script = ExtResource("3_zone")
+flow_direction = 3
+size = Vector2(10, 12)
+start_coverage = 0.2
+debug_color = Color(1, 0.6, 0.1, 1)
+
+[node name="WaterFootsteps" parent="FlatTide" node_paths=PackedStringArray("player")]
+player = NodePath("../../Foxy")
+
+[node name="StarfishA" parent="." instance=ExtResource("4_starfish")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.5, 4)
+
+[node name="StarfishB" parent="." instance=ExtResource("4_starfish")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.5, -5)
+
+[node name="StarfishOutside" parent="." instance=ExtResource("4_starfish")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.5, 8)
+
+[editable path="FlatTide"]

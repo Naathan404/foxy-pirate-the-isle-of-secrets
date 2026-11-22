@@ -7,8 +7,16 @@
 background_mode = 1
 background_color = Color(0.012, 0.016, 0.019, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.45, 0.52, 0.58, 1)
-ambient_light_energy = 0.65
+ambient_light_color = Color(0.42, 0.45, 0.56, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+tonemap_exposure = 1.0
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.6
+glow_strength = 0.9
+glow_bloom = 0.0
+glow_hdr_threshold = 1.0
 
 [node name="HubRoom" unique_id=371468771 instance=ExtResource("1")]
 
@@ -16,7 +24,13 @@ ambient_light_energy = 0.65
 environment = SubResource("HubEnvironment")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
-light_color = Color(0.82, 0.86, 0.92, 1)
-light_energy = 0.95
+transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
+light_color = Color(0.93, 0.9, 0.84, 1)
+light_energy = 1.0
+shadow_enabled = true
+shadow_opacity = 0.7
+shadow_blur = 1.0
+directional_shadow_mode = 0
+directional_shadow_max_distance = 45.0
 
 [node name="RoomAtmosphere" parent="." index="5" unique_id=1766076537 instance=ExtResource("2")]

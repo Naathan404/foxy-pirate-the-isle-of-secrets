@@ -75,7 +75,9 @@ func burst_from_sprite(source: Sprite3D, settings: FragmentSettings) -> void:
 		add_child(piece)
 		piece.basis = camera_basis
 		var local_center := center - Vector2(frame_origin)
-		var offset := local_center - Vector2(frame_size) * 0.5 + source.offset
+		# Pixel space points down, but Sprite3D.offset.y raises the sprite (3D y points up).
+		var sprite_offset := Vector2(source.offset.x, -source.offset.y)
+		var offset := local_center - Vector2(frame_size) * 0.5 + sprite_offset
 		piece.position = right * (offset.x * pixel_scale_x) - up * (offset.y * pixel_scale_y)
 		_pieces.append(piece)
 		_origins.append(piece.position)

@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://djadfsar86rd5"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://c0nu47ksokiuu" path="res://world/biomes/forest/oak_tree.tscn" id="2_oak"]
+[ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/forest/pine_tree.tscn" id="3_pine"]
+[ext_resource type="PackedScene" uid="uid://cs3ghcsvlo13v" path="res://gameplay/enemies/venom_vine/venom_vine.tscn" id="4_venom_vine"]
+[ext_resource type="PackedScene" uid="uid://brbwmwi1i7d8n" path="res://gameplay/enemies/venom_vine/elite_venom_vine.tscn" id="5_elite_vine"]
+
+[node name="ForestVenomVineTest" unique_id=340104391 instance=ExtResource("1_base")]
+open_exits = 2
+down_destination_scene = "res://world/biomes/ruins/ruins_01.tscn"
+left_destination_scene = "res://world/biomes/forest/forest_02.tscn"
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
+[node name="OakTreeA" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1302372724 instance=ExtResource("2_oak")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -8, 0, -6)
+
+[node name="PineTreeA" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="2" unique_id=1075259643 instance=ExtResource("3_pine")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 9, 0, -7)
+
+[node name="PineTreeB" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="3" unique_id=2023250599 instance=ExtResource("3_pine")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -8, 0, 7)
+
+[node name="OakTreeC" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="4" unique_id=1191224656 instance=ExtResource("2_oak")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -2, 0, -8)
+
+[node name="VenomVineA" parent="." index="5" unique_id=1370111680 instance=ExtResource("4_venom_vine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.185109, 2.861023e-06, 3.7894478)
+projectile_direct_damage_hp = 0.0
+burrow_duration_seconds = 1.1
+burrow_cooldown_seconds = 4.5
+burrow_transition_seconds = 0.4
+post_emerge_attack_delay_seconds = 0.7
+melee_combo_window_seconds = 2.0
+counter_hit_window_seconds = 3.0
+idle_min_duration_seconds = 0.65
+idle_decision_interval_seconds = 1.0
+
+[node name="EliteVenomVine" parent="." index="6" unique_id=295374047 instance=ExtResource("5_elite_vine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0, -3.2)

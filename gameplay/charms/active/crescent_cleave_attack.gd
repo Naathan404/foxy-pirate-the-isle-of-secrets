@@ -126,7 +126,7 @@ func _try_hit(area: Area3D) -> void:
 		CharmVfx.spawn(get_parent(), at, CharmVfx.GOLD, 0.85)
 		if not _impact_reported:
 			_impact_reported = true
-			get_node("/root/HitstopController").request(0.065)
+			get_node("/root/HitstopController").request(0.065, hurtbox.actor)
 			get_node("/root/ScreenShakeController").request(6.0, 0.18)
 
 

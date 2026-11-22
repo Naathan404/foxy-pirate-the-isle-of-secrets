@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cxu75vft4ydpl"
-path.s3tc="res://.godot/imported/Coconut_Tree_Short.png-74ebd96bf4b6b162e721e5a4bcab6fbe.s3tc.ctex"
+path="res://.godot/imported/Coconut_Tree_Short.png-74ebd96bf4b6b162e721e5a4bcab6fbe.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/beach/Coconut_Tree_Short.png"
-dest_files=["res://.godot/imported/Coconut_Tree_Short.png-74ebd96bf4b6b162e721e5a4bcab6fbe.s3tc.ctex"]
+dest_files=["res://.godot/imported/Coconut_Tree_Short.png-74ebd96bf4b6b162e721e5a4bcab6fbe.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

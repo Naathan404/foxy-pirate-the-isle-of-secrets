@@ -15,9 +15,10 @@ signal poison_ticked(applied_hp: float)
 signal dizzy_started(duration_seconds: float)
 
 const DIALOGUE_STATE_PRIORITY: int = 20
-const INK_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/ink_overlay.gd")
+const DIZZY_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/dizzy_swirl_overlay.gd")
 const VENOM_INK_OVERLAY_NAME := &"BlubberbeardVenomOverlay"
 const POISON_STATUS_HOLD_SECONDS: float = 1.6
+const MIN_SNARE_MOVE_SPEED_MULTIPLIER: float = 0.2
 const WHIRLWIND_HIT_STUN_SECONDS: float = 0.52
 const WHIRLWIND_DIZZY_SECONDS: float = 2.2
 const WHIRLWIND_SPIRAL_STRENGTH: float = 1.0
@@ -69,6 +70,7 @@ var pending_hit_tangent_direction: Vector3 = Vector3.ZERO
 var pending_hit_spiral_strength: float = 0.0
 var poison_remaining: float = 0.0
 var dizzy_remaining: float = 0.0
+var snare_remaining: float = 0.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
@@ -78,6 +80,7 @@ var environment_move_speed_multiplier: float = 1.0
 var environment_dash_distance_multiplier: float = 1.0
 var environment_is_water: bool = false
 var potion_selection_active: bool = false
+var _snare_move_speed_multiplier: float = 1.0
 var _environment_push_direction := Vector3.ZERO
 var _environment_push_speed := 0.0
 var _environment_push_remaining := 0.0
@@ -262,6 +265,21 @@ func apply_dizzy(duration_seconds: float) -> void:
 	dizzy_started.emit(dizzy_remaining)
 
 
+func is_snared() -> bool:
+	return not dead and snare_remaining > 0.0
+
+
+func apply_snare(duration_seconds: float, speed_multiplier: float = 0.75) -> void:
+	if dead or duration_seconds <= 0.0:
+		return
+	var clamped_multiplier := clampf(speed_multiplier, MIN_SNARE_MOVE_SPEED_MULTIPLIER, 1.0)
+	if snare_remaining <= 0.0:
+		_snare_move_speed_multiplier = clamped_multiplier
+	else:
+		_snare_move_speed_multiplier = minf(_snare_move_speed_multiplier, clamped_multiplier)
+	snare_remaining = maxf(snare_remaining, duration_seconds)
+
+
 func is_suppressing_hit_reaction() -> bool:
 	return _suppress_next_hit_reaction
 
@@ -318,7 +336,11 @@ func _apply_poison_damage_tick(damage: DamageContext, amount: float) -> float:
 	var applied_hp := hp.take_damage(amount)
 	_suppress_next_hit_reaction = false
 	if applied_hp > 0.0:
-		_apply_poison_status(not was_poisoned)
+		var overlay := get_node_or_null(NodePath(VENOM_INK_OVERLAY_NAME))
+		var overlay_active: bool = (
+			overlay != null and overlay.has_method("is_active") and bool(overlay.call("is_active"))
+		)
+		_apply_poison_status(not was_poisoned or not overlay_active)
 		poison_ticked.emit(applied_hp)
 		if is_instance_valid(charm_socket_manager):
 			charm_socket_manager.dispatch_event(&"damage_received", [damage, applied_hp])
@@ -349,7 +371,7 @@ func _prepare_incoming_hit_motion(damage: DamageContext) -> void:
 func _trigger_venom_ink_splash() -> void:
 	var overlay := get_node_or_null(NodePath(VENOM_INK_OVERLAY_NAME))
 	if overlay == null:
-		overlay = INK_OVERLAY_SCRIPT.new()
+		overlay = DIZZY_OVERLAY_SCRIPT.new()
 		overlay.name = VENOM_INK_OVERLAY_NAME
 		add_child(overlay)
 	overlay.splash(
@@ -366,6 +388,9 @@ func _physics_process(delta: float) -> void:
 	_post_hit_invulnerability_remaining = maxf(0.0, _post_hit_invulnerability_remaining - delta)
 	poison_remaining = maxf(0.0, poison_remaining - delta)
 	dizzy_remaining = maxf(0.0, dizzy_remaining - delta)
+	snare_remaining = maxf(0.0, snare_remaining - delta)
+	if snare_remaining <= 0.0:
+		_snare_move_speed_multiplier = 1.0
 	dash_buffer_remaining = maxf(0.0, dash_buffer_remaining - delta)
 	attack_buffer_remaining = maxf(0.0, attack_buffer_remaining - delta)
 	if attack_buffer_remaining <= 0.0:
@@ -696,16 +721,24 @@ func play_directional_animation(action: String, restart: bool = false) -> void:
 # Ngắt đòn đang đánh và yêu cầu chuyển sang state Hit
 ## Reuse hit recovery without applying damage when an environmental wave hits.
 func apply_environment_knockback(direction: Vector3, speed: float, duration: float) -> void:
+	if not apply_environment_push(direction, speed, duration):
+		return
+	pending_hit_direction = _environment_push_direction
+	pending_hit_knockback_multiplier = speed / 8.0
+	notify_hit(duration)
+
+
+## Carries the player along `direction` without a hit reaction (e.g. riding a tide surge).
+## Returns false when the push is rejected (dead, zero speed/duration or vertical direction).
+func apply_environment_push(direction: Vector3, speed: float, duration: float) -> bool:
 	var horizontal := Vector3(direction.x, 0.0, direction.z)
 	if dead or speed <= 0.0 or duration <= 0.0 or horizontal.length_squared() < 0.0001:
-		return
+		return false
 	_environment_push_direction = horizontal.normalized()
 	_environment_push_speed = speed
 	_environment_push_duration = duration
 	_environment_push_remaining = duration
-	pending_hit_direction = _environment_push_direction
-	pending_hit_knockback_multiplier = speed / 8.0
-	notify_hit(duration)
+	return true
 
 
 func _apply_environment_push(delta: float) -> void:
@@ -751,6 +784,8 @@ func die() -> void:
 	dead = true
 	poison_remaining = 0.0
 	dizzy_remaining = 0.0
+	snare_remaining = 0.0
+	_snare_move_speed_multiplier = 1.0
 	if is_instance_valid(potion_selector):
 		potion_selector.cancel_selection()
 	if is_instance_valid(inventory_ui):
@@ -809,4 +844,6 @@ func _get_status_move_speed_multiplier() -> float:
 		mult = minf(mult, poison_move_speed_multiplier)
 	if is_dizzy():
 		mult = minf(mult, dizzy_move_speed_multiplier)
+	if is_snared():
+		mult = minf(mult, _snare_move_speed_multiplier)
 	return mult

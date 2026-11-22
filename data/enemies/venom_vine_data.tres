@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://b55jbve3vubf6"]
+
+[ext_resource type="Script" uid="uid://bh64oflsqtaty" path="res://data/enemies/enemy_data.gd" id="1_enemy_data"]
+[ext_resource type="Resource" uid="uid://bt21m2gguymn5" path="res://data/items/materials/venom_vibe.tres" id="2_drop"]
+
+[resource]
+script = ExtResource("1_enemy_data")
+max_hp = 10.0
+move_speed = 0.0
+acceleration = 0.0
+deceleration = 0.0
+attack_damage = 0.5
+hit_duration = 0.18
+hit_recovery_duration = 0.25
+hit_knockback_speed = 0.0
+knockback_resistance = 1.0
+hit_deceleration = 20.0
+stagger_threshold = 55.0
+drop_item = ExtResource("2_drop")
+drop_chance = 0.75
+min_gold_amount = 3
+max_gold_amount = 7
+gold_drop_chance = 0.65

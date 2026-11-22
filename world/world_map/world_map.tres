@@ -1,0 +1,299 @@
+[gd_resource type="Resource" script_class="WorldMapData" format=3 uid="uid://7s0b6oo64efr"]
+
+[ext_resource type="Script" uid="uid://dfmm50jw1q6y3" path="res://world/world_map/world_map_data.gd" id="1_world"]
+[ext_resource type="Script" uid="uid://c3rf1kro52a36" path="res://world/world_map/biome_map_data.gd" id="2_biome"]
+[ext_resource type="Script" uid="uid://bg4llfb5dpra8" path="res://world/world_map/room_map_data.gd" id="2_imd3g"]
+
+[sub_resource type="Resource" id="Resource_sv6s8"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/hub/map/castaway_cove.tscn"
+marker = 1
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_00.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_4pkn2"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/hub/map/silas_tent.tscn"
+cell = Vector2i(0, -1)
+marker = 2
+exits = Dictionary[int, String]({
+2: "res://world/biomes/hub/map/castaway_cove.tscn"
+})
+
+[sub_resource type="Resource" id="hub"]
+script = ExtResource("2_biome")
+biome_id = &"hub"
+display_name = "Castaway Cove"
+accent = Color(0.86, 0.71, 0.45, 1)
+rooms = Array[ExtResource("2_imd3g")]([SubResource("Resource_sv6s8"), SubResource("Resource_4pkn2")])
+
+[sub_resource type="Resource" id="Resource_2wtv7"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_00.tscn"
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_01.tscn",
+3: "res://world/biomes/hub/map/castaway_cove.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_qj3ma"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_01.tscn"
+cell = Vector2i(1, 0)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_09.tscn",
+1: "res://world/biomes/coral_valley/map/room_02.tscn",
+3: "res://world/biomes/coral_valley/map/room_00.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_m8pfc"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_02.tscn"
+cell = Vector2i(2, 0)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_03.tscn",
+2: "res://world/biomes/coral_valley/map/room_17.tscn",
+3: "res://world/biomes/coral_valley/map/room_01.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_e7pjb"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_03.tscn"
+cell = Vector2i(3, 0)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_10.tscn",
+1: "res://world/biomes/coral_valley/map/room_04.tscn",
+3: "res://world/biomes/coral_valley/map/room_02.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_x2dh2"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_04.tscn"
+cell = Vector2i(4, 0)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_11.tscn",
+1: "res://world/biomes/coral_valley/map/room_05.tscn",
+2: "res://world/biomes/coral_valley/map/room_20.tscn",
+3: "res://world/biomes/coral_valley/map/room_03.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_2oa1e"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_05.tscn"
+cell = Vector2i(5, 0)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_13.tscn",
+1: "res://world/biomes/coral_valley/map/room_06.tscn",
+2: "res://world/biomes/coral_valley/map/room_22.tscn",
+3: "res://world/biomes/coral_valley/map/room_04.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_bdk1j"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_06.tscn"
+cell = Vector2i(1, -1)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_14.tscn",
+1: "res://world/biomes/coral_valley/map/room_07.tscn",
+3: "res://world/biomes/coral_valley/map/room_05.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_5uukc"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_07.tscn"
+cell = Vector2i(2, -1)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_08.tscn",
+3: "res://world/biomes/coral_valley/map/room_06.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_2nsfp"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_08.tscn"
+cell = Vector2i(4, -1)
+exits = Dictionary[int, String]({
+3: "res://world/biomes/coral_valley/map/room_07.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_x7ush"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_09.tscn"
+cell = Vector2i(5, -1)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_10.tscn",
+2: "res://world/biomes/coral_valley/map/room_01.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_w3m6v"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_10.tscn"
+cell = Vector2i(2, 1)
+exits = Dictionary[int, String]({
+2: "res://world/biomes/coral_valley/map/room_03.tscn",
+3: "res://world/biomes/coral_valley/map/room_09.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_5xr84"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_11.tscn"
+cell = Vector2i(3, 1)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_12.tscn",
+2: "res://world/biomes/coral_valley/map/room_04.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_ifktn"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_12.tscn"
+cell = Vector2i(4, 2)
+exits = Dictionary[int, String]({
+3: "res://world/biomes/coral_valley/map/room_11.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_1lds4"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_13.tscn"
+cell = Vector2i(4, 1)
+exits = Dictionary[int, String]({
+2: "res://world/biomes/coral_valley/map/room_05.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_7ojkx"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_14.tscn"
+cell = Vector2i(5, 1)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_15.tscn",
+2: "res://world/biomes/coral_valley/map/room_06.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_imd3g"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_15.tscn"
+cell = Vector2i(6, 2)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_16.tscn",
+3: "res://world/biomes/coral_valley/map/room_14.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_g0cow"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_16.tscn"
+cell = Vector2i(7, 2)
+exits = Dictionary[int, String]({
+3: "res://world/biomes/coral_valley/map/room_15.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_csbnn"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_17.tscn"
+cell = Vector2i(1, 1)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_02.tscn",
+1: "res://world/biomes/coral_valley/map/room_18.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_iq32y"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_18.tscn"
+cell = Vector2i(2, 2)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_19.tscn",
+3: "res://world/biomes/coral_valley/map/room_17.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_sutvc"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_19.tscn"
+cell = Vector2i(3, 2)
+exits = Dictionary[int, String]({
+3: "res://world/biomes/coral_valley/map/room_18.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_fv0e8"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_20.tscn"
+cell = Vector2i(5, 2)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_04.tscn",
+1: "res://world/biomes/coral_valley/map/room_21.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_okd46"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_21.tscn"
+cell = Vector2i(6, 3)
+exits = Dictionary[int, String]({
+3: "res://world/biomes/coral_valley/map/room_20.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_sjb4i"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_22.tscn"
+cell = Vector2i(6, 1)
+exits = Dictionary[int, String]({
+0: "res://world/biomes/coral_valley/map/room_05.tscn",
+1: "res://world/biomes/coral_valley/map/room_23.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_8yrdl"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_23.tscn"
+cell = Vector2i(7, 1)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_24.tscn",
+3: "res://world/biomes/coral_valley/map/room_22.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_7fk3r"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_24.tscn"
+cell = Vector2i(8, 1)
+exits = Dictionary[int, String]({
+1: "res://world/biomes/coral_valley/map/room_25.tscn",
+3: "res://world/biomes/coral_valley/map/room_23.tscn"
+})
+
+[sub_resource type="Resource" id="Resource_reocb"]
+script = ExtResource("2_imd3g")
+scene_path = "res://world/biomes/coral_valley/map/room_25.tscn"
+cell = Vector2i(9, 1)
+exits = Dictionary[int, String]({
+3: "res://world/biomes/coral_valley/map/room_24.tscn"
+})
+
+[sub_resource type="Resource" id="coral_valley"]
+script = ExtResource("2_biome")
+biome_id = &"coral_valley"
+display_name = "Coral Valley"
+world_cell = Vector2i(1, 0)
+accent = Color(0.27, 0.74, 0.7, 1)
+rooms = Array[ExtResource("2_imd3g")]([SubResource("Resource_2wtv7"), SubResource("Resource_qj3ma"), SubResource("Resource_m8pfc"), SubResource("Resource_e7pjb"), SubResource("Resource_x2dh2"), SubResource("Resource_2oa1e"), SubResource("Resource_bdk1j"), SubResource("Resource_5uukc"), SubResource("Resource_2nsfp"), SubResource("Resource_x7ush"), SubResource("Resource_w3m6v"), SubResource("Resource_5xr84"), SubResource("Resource_ifktn"), SubResource("Resource_1lds4"), SubResource("Resource_7ojkx"), SubResource("Resource_imd3g"), SubResource("Resource_g0cow"), SubResource("Resource_csbnn"), SubResource("Resource_iq32y"), SubResource("Resource_sutvc"), SubResource("Resource_fv0e8"), SubResource("Resource_okd46"), SubResource("Resource_sjb4i"), SubResource("Resource_8yrdl"), SubResource("Resource_7fk3r"), SubResource("Resource_reocb")])
+
+[sub_resource type="Resource" id="misty_swamp"]
+script = ExtResource("2_biome")
+biome_id = &"misty_swamp"
+display_name = "Misty Swamp"
+world_cell = Vector2i(-1, 0)
+accent = Color(0.47, 0.62, 0.32, 1)
+unlock_flag = &"misty_swamp_open"
+
+[sub_resource type="Resource" id="smithy_mountain"]
+script = ExtResource("2_biome")
+biome_id = &"smithy_mountain"
+display_name = "Smithy Mountain"
+world_cell = Vector2i(0, -1)
+accent = Color(0.88, 0.42, 0.22, 1)
+unlock_flag = &"smithy_mountain_open"
+
+[sub_resource type="Resource" id="frostwind_graveyard"]
+script = ExtResource("2_biome")
+biome_id = &"frostwind_graveyard"
+display_name = "Frostwind Graveyard"
+world_cell = Vector2i(0, 1)
+accent = Color(0.58, 0.74, 0.92, 1)
+unlock_flag = &"frostwind_graveyard_open"
+
+[resource]
+script = ExtResource("1_world")
+biomes = Array[ExtResource("2_biome")]([SubResource("hub"), SubResource("coral_valley"), SubResource("misty_swamp"), SubResource("smithy_mountain"), SubResource("frostwind_graveyard")])

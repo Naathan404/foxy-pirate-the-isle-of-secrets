@@ -1,0 +1,129 @@
+[gd_scene format=3 uid="uid://cs3ghcsvlo13v"]
+
+[ext_resource type="PackedScene" uid="uid://y61woas1du77" path="res://gameplay/enemies/base/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://edrg7oyiwyye" path="res://gameplay/enemies/venom_vine/venom_vine.gd" id="2_vine"]
+[ext_resource type="Resource" uid="uid://b55jbve3vubf6" path="res://data/enemies/venom_vine_data.tres" id="3_data"]
+[ext_resource type="Texture2D" uid="uid://dgnb2qpxfxfks" path="res://assets/sprites/enemies/venom_vine/venom_vine_dormant.png" id="4_dormant_tex"]
+[ext_resource type="AnimationLibrary" uid="uid://dy2p4e7p58nu7" path="res://gameplay/enemies/venom_vine/venom_vine_anims.tres" id="5_anims"]
+[ext_resource type="Script" uid="uid://rmcogpye0ghl" path="res://gameplay/enemies/venom_vine/states/venom_vine_dormant.gd" id="6_dormant"]
+[ext_resource type="Script" uid="uid://pqxis1yhtck1" path="res://gameplay/enemies/venom_vine/states/venom_vine_wake.gd" id="7_wake"]
+[ext_resource type="Script" uid="uid://cn2g2thwssrle" path="res://gameplay/enemies/venom_vine/states/venom_vine_stalk.gd" id="8_stalk"]
+[ext_resource type="Script" uid="uid://bxbffptpreym4" path="res://gameplay/enemies/venom_vine/states/venom_vine_attack.gd" id="9_attack"]
+[ext_resource type="Script" uid="uid://rmcljolly8hd" path="res://gameplay/enemies/venom_vine/states/venom_vine_vigilant.gd" id="10_vigilant"]
+[ext_resource type="Script" path="res://gameplay/enemies/venom_vine/states/venom_vine_burrow.gd" id="11_burrow"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hurtbox"]
+height = 2.5
+radius = 0.9
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
+radius = 0.7
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
+height = 3.0
+radius = 6.5
+
+[node name="VenomVine" unique_id=168718595 instance=ExtResource("1_base")]
+script = ExtResource("2_vine")
+outer_detection_radius_meters = 6.5
+inner_attack_radius_meters = 3.5
+ambush_wake_distance_meters = 4.0
+detection_hysteresis_meters = 1.0
+ambush_delay_min_seconds = 0.25
+ambush_delay_max_seconds = 0.65
+wake_duration_seconds = 0.45
+wake_attack_delay_seconds = 0.42
+vigilant_duration_seconds = 3.5
+retract_duration_seconds = 0.35
+anger_radius_bonus_meters = 2.5
+anger_detect_duration_seconds = 6.0
+outer_shots_per_volley = 1
+outer_cooldown_seconds = 2.6
+outer_shot_interval_seconds = 0.28
+inner_shots_per_volley = 3
+inner_fan_degrees = 64.0
+inner_cooldown_seconds = 1.6
+inner_shot_interval_seconds = 0.16
+charge_duration_seconds = 0.75
+recover_duration_seconds = 0.45
+lead_accuracy = 0.75
+max_lead_meters = 2.0
+aim_scatter_min_meters = 1.5
+aim_scatter_max_meters = 2.5
+direct_aim_chance = 0.3
+min_shot_distance_meters = 1.6
+max_shot_distance_meters = 6.2
+projectile_arc_height_meters = 2.4
+pool_radius_meters = 1.05
+pool_duration_seconds = 4.2
+pool_tick_interval_seconds = 0.85
+pool_tick_damage_multiplier = 1.0
+max_active_pools = 4
+hits_before_counter = 2
+counter_cooldown_seconds = 1.65
+counter_charge_seconds = 0.28
+counter_inner_shots = 3
+counter_outer_shots = 2
+counter_pool_radius_meters = 0.95
+hit_flinch_seconds = 0.22
+data = ExtResource("3_data")
+initial_state_name = &"Dormant"
+burrow_duration_seconds = 0.4
+destroy_on_death = true
+charm_grapple_large = true
+show_debug_health = true
+
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+hit_pulse_scale = 1.0
+hit_squash_scale = 1.0
+
+[node name="Sprite3D" parent="Visual" index="0" unique_id=718327590]
+offset = Vector2(0, 220)
+pixel_size = 0.0072
+shaded = false
+alpha_cut = 0
+texture_filter = 3
+texture = ExtResource("4_dormant_tex")
+hframes = 4
+frame = 1
+
+[node name="AnimationPlayer" parent="Visual" index="1" unique_id=1154652120]
+libraries/ = ExtResource("5_anims")
+
+[node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("CylinderShape3D_hurtbox")
+
+[node name="BulletSpawn" type="Marker3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=1962054639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15, 0.4)
+
+[node name="Dormant" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=692344062]
+script = ExtResource("6_dormant")
+
+[node name="Wake" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1826856114]
+script = ExtResource("7_wake")
+
+[node name="Stalk" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="5" unique_id=905805931]
+script = ExtResource("8_stalk")
+
+[node name="Attack" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="6" unique_id=54381927]
+script = ExtResource("9_attack")
+
+[node name="Vigilant" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="7" unique_id=1534181809]
+script = ExtResource("10_vigilant")
+
+[node name="Burrow" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="8"]
+script = ExtResource("11_burrow")
+
+[node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_body")
+
+[node name="DebugHealthLabel" parent="." index="6" unique_id=2012842134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+
+[node name="TargetDetector" type="Area3D" parent="." index="7" unique_id=721249310]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDetector" index="0" unique_id=955359008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_detector")

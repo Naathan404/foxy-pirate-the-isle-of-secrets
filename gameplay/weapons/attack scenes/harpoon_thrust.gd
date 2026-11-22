@@ -143,7 +143,7 @@ func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) 
 		impact.call("burst", 0.35)
 	if dash_attack or not _impact_played:
 		if dash_attack and not _impact_played:
-			get_node("/root/HitstopController").request(0.045 * power)
+			get_node("/root/HitstopController").request(0.045 * power, target)
 		_impact_played = true
 		get_node("/root/HitstopController").request_local(
 			null if dash_attack else context.actor, target as Node3D,

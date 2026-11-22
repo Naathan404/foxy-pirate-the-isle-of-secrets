@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cs78ha0hbmq2w"
-path.s3tc="res://.godot/imported/Master_Tortuga_Idle.png-c7b52d0cfbb4e4b94f93a690747a20b0.s3tc.ctex"
+path="res://.godot/imported/Master_Tortuga_Idle.png-c7b52d0cfbb4e4b94f93a690747a20b0.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/npcs/master_tortuga/Master_Tortuga_Idle.png"
-dest_files=["res://.godot/imported/Master_Tortuga_Idle.png-c7b52d0cfbb4e4b94f93a690747a20b0.s3tc.ctex"]
+dest_files=["res://.godot/imported/Master_Tortuga_Idle.png-c7b52d0cfbb4e4b94f93a690747a20b0.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -43,8 +43,8 @@ Do not modify `slots` directly when adding items; use the inventory API.
 ## Main and secondary potion
 
 `PotionComponent` owns two assigned resources: `equipped_potion` (the active/main
-slot consumed by F) and `secondary_potion` (backup). Inventory's existing equip
-button assigns/removes the main potion; `Equip secondary` assigns/removes backup.
+slot consumed by F) and `secondary_potion` (backup). In the Inventory tab,
+`Set Main`/`Remove Main` and `Set 2nd`/`Remove 2nd` call these APIs directly.
 Assigning a potion already in the opposite slot swaps the slots instead of
 duplicating the assignment. Assignments do not reserve or remove inventory items.
 
