@@ -11,6 +11,13 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/quiz_shuttle_platform.tscn" id="shuttle_platform"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="reward_chest"]
+[ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
+[ext_resource type="Resource" path="res://data/notes/starfish.tres" id="chest_note"]
+
+[sub_resource type="Resource" id="GuaranteedNoteDrop"]
+script = ExtResource("chest_note_drop")
+note = ExtResource("chest_note")
+chance = 1.0
 
 [sub_resource type="Environment" id="Environment_4clvr"]
 resource_local_to_scene = true
@@ -195,6 +202,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.612848, -0.03991985, 0.554
 [node name="TreasureChest" parent="." instance=ExtResource("reward_chest")]
 position = Vector3(54.96114925, 0.21008015, 0.58610969)
 editor_description = "Center of the right Quiz island."
+gold_min = 10
+gold_max = 20
+note_drops = Array[ExtResource("chest_note_drop")]([SubResource("GuaranteedNoteDrop")])
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

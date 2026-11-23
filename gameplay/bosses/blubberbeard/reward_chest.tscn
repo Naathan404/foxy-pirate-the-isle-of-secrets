@@ -8,15 +8,6 @@
 [ext_resource type="Resource" path="res://data/items/quest/ancient_key_of_tides.tres" id="6"]
 [ext_resource type="Resource" path="res://data/items/charms/tide_grapple.tres" id="7_khbls"]
 
-[sub_resource type="BoxShape3D" id="ChestBody"]
-size = Vector3(1.5, 1.5, 0.8)
-
 [node name="BossRewardChest" unique_id=609333493 instance=ExtResource("1")]
 script = ExtResource("2")
 rewards = Array[ExtResource("5")]([ExtResource("6"), ExtResource("3"), ExtResource("4"), ExtResource("7_khbls")])
-
-[node name="MovementBody" type="StaticBody3D" parent="." index="3" unique_id=1944663747]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MovementBody" index="0" unique_id=2142360271]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-shape = SubResource("ChestBody")

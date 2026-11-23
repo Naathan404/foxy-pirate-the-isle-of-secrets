@@ -26,3 +26,8 @@ cơ chế dựng biên nền có sẵn để tạo biên quái từ nền đảo
 hay cửa mở dành cho người chơi. Cả base Small, Medium và Large của Coral Valley
 bật sẵn tùy chọn này, nên các phòng kế thừa chặn quái đi lên cầu và rơi khỏi
 mép đảo.
+
+`treasure_chest.tscn` supplies a shared `MovementBody` on World (layer 1),
+with mask 0 and an enabled 1.5 × 1.5 × 0.6 box. The body is narrower than
+the attack HurtBox so incoming attacks reach the HurtBox before the solid body.
+Opened chests retain this body. The Blubberbeard reward chest inherits it.

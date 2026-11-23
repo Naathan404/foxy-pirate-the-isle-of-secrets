@@ -126,7 +126,7 @@ External paths attach to the islands shown in the final diagram:
 | room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
 | room_24 | Bottom | Farm | Medium | left: room_23 |
 
-Six standard `treasure_chest.tscn` instances are placed as room rewards: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` and Boss `08` at their room centers. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. The other five use the chest defaults (10–20 gold, no item/note entries). All six are present when entering the room; no encounter or puzzle gate is attached.
+Six standard `treasure_chest.tscn` instances are placed as room rewards: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` and Boss `08` at their room centers. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` and Boss `08` use the chest defaults (10–20 gold, no item/note entries). All six are present when entering the room; no encounter or puzzle gate is attached.
 
 ## Scene identity
 
