@@ -99,19 +99,12 @@ func _build_context(activation: CharmActivationContext) -> AttackContext:
 		if not activation.direction.is_zero_approx()
 		else Vector3.BACK
 	)
+	result.direction.y = 0.0
+	result.direction = result.direction.normalized()
 	result.damage_hp = maxf(
 		0.0, _get_base_damage() * definition.get_param_float(&"damage_multiplier")
 	)
 	return result
-
-
-func _get_base_damage() -> float:
-	var weapon_controller := actor.get("weapon_controller") as WeaponController
-	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
-		var attack := weapon_controller.equipped.get_attack(&"normal")
-		if attack != null:
-			return attack.damage_hp
-	return 1
 
 
 func _on_grapple_resolved(result: StringName, target: Node) -> void:

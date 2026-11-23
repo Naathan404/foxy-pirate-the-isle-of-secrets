@@ -32,6 +32,40 @@ The player is blocked during `Open`; dialogue begins when that animation finishe
 `Close` finishes, then Silas returns to `Idle_close` at the same position and
 can be interacted with again.
 
+### Giao diện cửa hàng
+
+`gameplay/merchant/silas_shop_panel.tscn` dùng theme, nền mực, nút tab, khung
+slot, panel chi tiết và nút Back của Inventory, nên cửa hàng trông cùng một hệ
+với menu. Điểm riêng của chợ đen: đèn lồng chập chờn cạnh chân dung Silas, viền
+mực màu hổ phách và bụi vàng bay lên.
+
+- **Trái:** chân dung, lời thì thầm theo tab và số vàng đang có.
+- **Giữa:** lưới hàng (`silas_shop_slot.tscn`) và số ô túi đang dùng. Mỗi ô có
+  giá dưới icon. Trạng thái luôn có chữ hoặc dấu, không chỉ dựa vào màu:
+  `✕ 50` là không đủ tiền, `Owned` là vũ khí đã có, `No deal` là món Silas
+  không mua.
+- **Phải:** chi tiết món, bộ chọn số lượng, tổng giá, nút Buy/Sell và một dòng
+  phản hồi.
+
+Luật hiển thị:
+
+- **Số lượng là số gói.** Một gói là `trade_amount` món: giá đơn vị ghi "8 G per 5",
+  còn dòng gợi ý dưới nút ghi số món thực nhận hoặc giao ("You receive 15 Wooden
+  Arrow."). Nút `+` dừng ở mức tối đa
+  mà ví, chỗ trong túi hoặc giới hạn mang potion cho phép.
+- **Dòng phản hồi:** lý do bị chặn (thiếu vàng, túi hoặc túi potion đầy, bán
+  theo gói, ví đầy) được ưu tiên trước kết quả giao dịch vừa rồi, rồi mới tới gợi
+  ý. Thành công còn hiện toast ở cuối màn hình.
+- **Tab Sell** gom mỗi loại item thành một ô với tổng số đang mang; hàng Silas
+  mua đứng trước, hàng không mua đứng sau. Lựa chọn theo `item_id`, nên bán hết
+  một stack không làm chọn nhầm món khác.
+- **Bấm nhanh:** lần bấm thứ hai trong `trade_repeat_guard_seconds` (0,18 s) bị
+  bỏ qua, để double click không mua hay bán hai lần. Mọi giao dịch vẫn đi qua
+  `MerchantTransactionService`.
+- **Điều khiển:** chuột; Page Up / Page Down đổi tab; phím mũi tên di chuyển giữa
+  các ô; Enter / Space chọn; Esc hoặc Back rời cửa hàng. Nút `Debug: Reroll Stock`
+  chỉ hiện trong bản debug.
+
 ## 3. Placing Silas on a map
 
 1. Instance `SilasShopPanel` and `Silas` as siblings. Update `shop_panel_path`
@@ -113,10 +147,10 @@ nên gọi API reset rõ ràng của SaveManager, không truy cập field privat
 
 ## 6. Những việc chưa giải quyết
 
-1. **Save system toàn game:** cần một `SaveManager` có schema/version/migration,
-   slot save, atomic write và ownership rõ ràng cho Player, inventory, wallet,
-   quest và world state. Khi có nó, migrate hai flag của Silas vào payload chung
-   và đọc file cũ một lần để tương thích save hiện tại.
+1. **Save system toàn game:** đã có ([Save/Load](../../systems/save_system.md)). Hai
+   flag của Silas nằm trong section `merchant` của save; New Game reset và Continue
+   ghi đè chúng qua `reset_progress()` / `apply_save_data()`. `silas_progress.save`
+   vẫn được ghi ngay khi đổi để giữ tương thích; chưa có bước bỏ hẳn file riêng này.
 2. **Stock và economy:** bể hàng được rút một lần mỗi lượt chơi và có thể đổi
    bằng hàm hoặc nút debug; chưa có giới hạn số lượng, restock theo ngày,
    price modifier, buyback hoặc state riêng cho từng offer.

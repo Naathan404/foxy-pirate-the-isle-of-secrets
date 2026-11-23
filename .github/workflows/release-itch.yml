@@ -1,0 +1,192 @@
+name: Release to itch.io
+
+on:
+  push:
+    # A merged pull request is a push to its base branch, so this covers
+    # every merge into release.
+    branches: [release]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Upload the builds to itch.io (unchecked = build only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  WINDOWS_PRESET: Windows Desktop
+  WINDOWS_DIR: build/windows
+  WINDOWS_EXECUTABLE: foxy_pirate_tios.exe
+  # Web build is paused: SpineBridge has no Web library and the Web build
+  # stutters. Set to "true" to export and upload the html5 channel again.
+  BUILD_WEB: "false"
+  WEB_PRESET: Web
+  WEB_DIR: build/web
+  # itch.io rejects HTML5 uploads containing a single file above this size.
+  ITCH_WEB_FILE_LIMIT_BYTES: 200000000
+
+jobs:
+  build:
+    name: Export builds
+    # SpineBridge ships native libraries only for Windows, so the export must
+    # run on a Windows host for the extension to load during import.
+    runs-on: windows-latest
+    timeout-minutes: 45
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve build version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          elif [[ "$GITHUB_REF" == "refs/heads/release" ]]; then
+            version="release-${GITHUB_SHA::7}"
+          else
+            version="dev-${GITHUB_SHA::7}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Build version: $version"
+
+      - name: Remove local Godot AI configuration
+        shell: bash
+        run: |
+          # Same cleanup as ci.yml: the local Godot AI plugin is not shipped.
+          sed -i '/^<<<<<<<HEAD_mcp_game_helper=/d' project.godot
+          sed -i '/^<<<<<<<HEADenabled=.*godot_ai\/plugin.cfg/d' project.godot
+          sed -i '/^<<<<<<<HEADcharm_slot_q=/,/^}/d' project.godot
+          sed -i '\|addons/godot_ai/runtime/game_helper\.gd|d' project.godot
+          sed -i 's|"res://addons/godot_ai/plugin.cfg", ||g; s|, "res://addons/godot_ai/plugin.cfg"||g; s|"res://addons/godot_ai/plugin.cfg"||g' project.godot
+          if grep -nE '^(<<<<<<<|=======|>>>>>>>)' project.godot; then
+            echo "::error::project.godot contains merge conflict markers"
+            exit 1
+          fi
+
+      - uses: lihop/setup-godot@v3
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          export-templates: true
+
+      - name: Import project and export
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          run_godot() {
+            local limit="$1"
+            shift
+            timeout "$limit" godot --headless --path . "$@" 2>&1 | tee "$RUNNER_TEMP/godot.log"
+            # Ignored: debugger shutdown noise
+            # (https://github.com/godotengine/godot/issues/117243) and the
+            # leak summary the headless editor prints when it exits after export.
+            if grep -E 'SCRIPT ERROR:|ERROR:' "$RUNNER_TEMP/godot.log" \
+              | grep -Ev '^ERROR: Plugin is not attached to debugger\.$' \
+              | grep -Ev '^ERROR: [0-9]+ (RID allocations of type .* were leaked|resources still in use) at exit'; then
+              echo "::error::Godot reported an error; see the log above."
+              exit 1
+            fi
+          }
+
+          require_file() {
+            if [[ ! -f "$1" ]]; then
+              echo "::error::Export did not produce $1"
+              exit 1
+            fi
+          }
+
+          # A clean Windows checkout needs two imports: the first detects the
+          # SpineBridge GDExtension, the second registers its native importers.
+          run_godot 300s --editor --import --quit
+          run_godot 300s --editor --import --quit
+
+          mkdir -p "$WINDOWS_DIR"
+          run_godot 600s --export-release "$WINDOWS_PRESET" "$WINDOWS_DIR/$WINDOWS_EXECUTABLE"
+          require_file "$WINDOWS_DIR/$WINDOWS_EXECUTABLE"
+          ls -la "$WINDOWS_DIR"
+
+          if [[ "$BUILD_WEB" != "true" ]]; then
+            echo "Web build is disabled (BUILD_WEB=$BUILD_WEB)."
+            exit 0
+          fi
+          mkdir -p "$WEB_DIR"
+          # itch.io serves the HTML5 build from index.html at the archive root.
+          run_godot 600s --export-release "$WEB_PRESET" "$WEB_DIR/index.html"
+          require_file "$WEB_DIR/index.html"
+          ls -la "$WEB_DIR"
+          find "$WEB_DIR" -type f -size +"${ITCH_WEB_FILE_LIMIT_BYTES}"c -print0 \
+            | while IFS= read -r -d '' oversized; do
+                echo "::warning file=$oversized::Web file exceeds the itch.io per-file limit"
+              done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: ${{ env.WINDOWS_DIR }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: env.BUILD_WEB == 'true'
+        with:
+          name: web-build
+          path: ${{ env.WEB_DIR }}
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-itch:
+    name: Upload to itch.io
+    needs: build
+    if: >-
+      github.ref_type == 'tag'
+      || (github.event_name == 'push' && github.ref == 'refs/heads/release')
+      || inputs.publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: itch
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: builds
+
+      - name: Install butler
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL -o butler.zip \
+            https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d "$RUNNER_TEMP/butler"
+          chmod +x "$RUNNER_TEMP/butler/butler"
+          echo "$RUNNER_TEMP/butler" >> "$GITHUB_PATH"
+
+      - name: Push builds
+        shell: bash
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_GAME: ${{ vars.ITCH_GAME }}
+          BUILD_VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$BUTLER_API_KEY" ]]; then
+            echo "::error::Missing secret BUTLER_API_KEY"
+            exit 1
+          fi
+          if [[ ! "$ITCH_GAME" =~ ^[^/]+/[^/]+$ ]]; then
+            echo "::error::Variable ITCH_GAME must look like <itch-user>/<game-slug>"
+            exit 1
+          fi
+          butler -V
+          butler push builds/windows-build "$ITCH_GAME:windows" --userversion "$BUILD_VERSION"
+          if [[ "$BUILD_WEB" == "true" ]]; then
+            butler push builds/web-build "$ITCH_GAME:html5" --userversion "$BUILD_VERSION"
+          fi

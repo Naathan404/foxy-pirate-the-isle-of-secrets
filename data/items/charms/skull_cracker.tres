@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://0lutefxrittx"]
+
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://b0gcc26vnbtt5" path="res://assets/sprites/charms/skull_cracker.png" id="2"]
+[ext_resource type="Resource" uid="uid://b28d2n48fbjsd" path="res://gameplay/charms/charm_data/skull_cracker.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+item_id = "charm_skull_cracker"
+display_name = "Skull Cracker"
+icon = ExtResource("2")
+description = "Unlocks the Skull Cracker Charm."
+type = 3
+charm = ExtResource("3")

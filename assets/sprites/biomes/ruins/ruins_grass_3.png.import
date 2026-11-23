@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b3ew13d1tdjex"
-path.s3tc="res://.godot/imported/ruins_grass_3.png-28e9e8735f6b5c7d99a4c64b999e9210.s3tc.ctex"
+path="res://.godot/imported/ruins_grass_3.png-28e9e8735f6b5c7d99a4c64b999e9210.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/ruins/ruins_grass_3.png"
-dest_files=["res://.godot/imported/ruins_grass_3.png-28e9e8735f6b5c7d99a4c64b999e9210.s3tc.ctex"]
+dest_files=["res://.godot/imported/ruins_grass_3.png-28e9e8735f6b5c7d99a4c64b999e9210.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

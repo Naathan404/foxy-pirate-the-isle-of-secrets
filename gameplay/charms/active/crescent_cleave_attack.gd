@@ -118,6 +118,8 @@ func _try_hit(area: Area3D) -> void:
 		return
 	_hit_actor_ids[target_id] = true
 	var damage := context.create_damage_context()
+	damage.charm_push = true
+	damage.knockback_multiplier = 1.6
 	var applied_hp := hurtbox.take_damage(damage)
 	if applied_hp > 0:
 		context.damage_applied.emit(damage, hurtbox.actor, applied_hp)
@@ -126,8 +128,9 @@ func _try_hit(area: Area3D) -> void:
 		CharmVfx.spawn(get_parent(), at, CharmVfx.GOLD, 0.85)
 		if not _impact_reported:
 			_impact_reported = true
-			get_node("/root/HitstopController").request(0.065)
+			get_node("/root/HitstopController").request(0.065, hurtbox.actor)
 			get_node("/root/ScreenShakeController").request(6.0, 0.18)
+			CharmVfx.heavy_impact(get_parent(), at, CharmVfx.GOLD)
 
 
 func _finish() -> void:

@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://cs4charmunl0k"]
+
+[ext_resource type="Script" uid="uid://bi7atgucdimmv" path="res://gameplay/charms/progression/charm_unlock_presentation.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/charm_awaken.wav" id="2_awaken"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/charm_reveal.wav" id="3_reveal"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/charm_confirm.wav" id="4_confirm"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/charm_absorb.wav" id="5_absorb"]
+
+[node name="CharmUnlock" type="CanvasLayer"]
+process_mode = 3
+layer = 100
+script = ExtResource("1_script")
+
+[node name="AwakenSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_awaken")
+volume_db = -8.0
+bus = &"UI"
+
+[node name="RevealSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_reveal")
+volume_db = -7.0
+bus = &"UI"
+
+[node name="ConfirmSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_confirm")
+volume_db = -8.0
+bus = &"UI"
+
+[node name="AbsorbSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_absorb")
+volume_db = -5.0
+bus = &"UI"

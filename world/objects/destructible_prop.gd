@@ -6,6 +6,12 @@ signal destroyed
 
 const HIT_FLASH_SHADER: Shader = preload("res://world/objects/destructible_hit_flash.gdshader")
 const WIND_SHADER: Shader = preload("res://world/objects/destructible_wind.gdshader")
+const WIND_UPRIGHT_SHADER: Shader = preload(
+	"res://world/objects/destructible_wind_upright.gdshader"
+)
+const GROUND_SHADOW_SHADER: Shader = preload(
+	"res://world/objects/destructible_ground_shadow.gdshader"
+)
 const DEFAULT_FRAGMENTS_SCENE: PackedScene = preload(
 	"res://world/objects/destructible_fragments.tscn"
 )
@@ -28,15 +34,32 @@ const FragmentSettings = preload("res://world/objects/destructible_fragment_sett
 @export var smoke_offset: Vector3 = Vector3(0.0, 0.8, 0.0)
 @export_range(1, 128, 1) var hit_smoke_amount: int = 5
 @export_range(1, 256, 1) var destroy_smoke_amount: int = 14
+## Multiplies the hitstop of hits on this prop. Breaking scenery should not freeze the swing as
+## hard as hitting an enemy; HitstopController reads this from the hit target.
+@export_range(0.0, 1.0, 0.05) var hitstop_scale: float = 0.3
 
 @export_group("Wind Sway")
 @export var swingable: bool = false
+## Depth-test the camera-facing sprite as if it stood upright like a character, so a character
+## standing beside a tall prop is never cut through by the tilted quad. Use on trees and tall
+## plants; needs `swingable`. Costs early depth testing, so leave it off on small props.
+@export var upright_depth: bool = false
 @export_range(0.0, 0.5, 0.005) var wind_amplitude: float = 0.28
 @export_range(0.1, 6.0, 0.05) var wind_speed: float = 4.4
 @export_range(0.0, 1.0, 0.01) var wind_gust_strength: float = 0.38
 @export_range(0.0, 0.9, 0.01) var wind_root_height: float = 0.08
 @export_range(0.5, 4.0, 0.05) var wind_bend_power: float = 1.35
 @export_range(0.0, 6.28, 0.01) var wind_phase_offset: float = 0.0
+
+@export_group("Ground Shadow")
+## Lay the sprite's outline on the ground as its shadow, starting at its base, instead of casting
+## a shadow-map shadow. Shadow maps cast billboards from the light's side, so their shadow leaves
+## the sprite at a wrong angle. Needs `visual_root` to be a Sprite3D whose base is the prop origin.
+@export var ground_shadow: bool = false
+## Ground shift (x, z) per metre of sprite height: the shadow's direction and length. Keep it
+## leaning the same way as the room's sun shadows. Negative z leans it up the screen.
+@export var ground_shadow_offset_per_meter := Vector2(0.8, -0.6)
+@export var ground_shadow_color := Color(0.04, 0.05, 0.08, 0.6)
 
 @export_group("Break Fragments")
 @export var fragment_source: Sprite3D
@@ -88,6 +111,8 @@ func _ready() -> void:
 		_visual_scale = visual_root.scale
 	if swingable:
 		_configure_wind()
+	if ground_shadow:
+		_configure_ground_shadow()
 
 
 func _configure_wind() -> void:
@@ -96,7 +121,7 @@ func _configure_wind() -> void:
 		push_warning("DestructibleProp: swingable requires a Sprite3D with a texture")
 		return
 	_wind_material = ShaderMaterial.new()
-	_wind_material.shader = WIND_SHADER
+	_wind_material.shader = WIND_UPRIGHT_SHADER if upright_depth else WIND_SHADER
 	var columns := maxi(sprite.hframes, 1)
 	var rows := maxi(sprite.vframes, 1)
 	var frame_width := 1.0 / float(columns)
@@ -126,6 +151,61 @@ func _configure_wind() -> void:
 	)
 	_wind_material.set_shader_parameter("flash_color", hit_flash_color)
 	sprite.material_override = _wind_material
+
+
+func _configure_ground_shadow() -> void:
+	var sprite := visual_root as Sprite3D
+	if sprite == null or sprite.texture == null:
+		push_warning("DestructibleProp: ground_shadow requires a Sprite3D with a texture")
+		return
+	sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Sprite image in this prop's space (without the prop's own scale, which the child inherits).
+	# Sprite3D.get_aabb() is a billboard-safe cube, so rebuild the image rectangle the way
+	# Sprite3D lays it out: offset in pixels, y up, centred on the origin when `centered`.
+	var sprite_space := global_transform.affine_inverse() * sprite.global_transform
+	var scale_in_prop := sprite_space.basis.get_scale()
+	var columns := maxi(sprite.hframes, 1)
+	var rows := maxi(sprite.vframes, 1)
+	var frame_size := Vector2(1.0 / float(columns), 1.0 / float(rows))
+	var frame_origin := Vector2(sprite.frame % columns, sprite.frame / columns) * frame_size
+	var frame_pixels := Vector2(sprite.texture.get_size()) * frame_size
+	var corner_pixels := sprite.offset - (frame_pixels * 0.5 if sprite.centered else Vector2.ZERO)
+	var left := sprite_space.origin.x + corner_pixels.x * sprite.pixel_size * scale_in_prop.x
+	var bottom := sprite_space.origin.y + corner_pixels.y * sprite.pixel_size * scale_in_prop.y
+	var width := frame_pixels.x * sprite.pixel_size * scale_in_prop.x
+	var height := frame_pixels.y * sprite.pixel_size * scale_in_prop.y
+
+	var material := ShaderMaterial.new()
+	material.shader = GROUND_SHADOW_SHADER
+	material.set_shader_parameter("sprite_texture", sprite.texture)
+	material.set_shader_parameter(
+		"frame_uv", Vector4(frame_origin.x, frame_origin.y, frame_size.x, frame_size.y)
+	)
+	material.set_shader_parameter("sprite_rect", Vector4(left, bottom, width, height))
+	material.set_shader_parameter("sprite_depth_meters", sprite_space.origin.z)
+	material.set_shader_parameter("shadow_offset_per_meter", ground_shadow_offset_per_meter)
+	material.set_shader_parameter("shadow_color", ground_shadow_color)
+	material.set_shader_parameter("flip_h", sprite.flip_h)
+	material.set_shader_parameter("flip_v", sprite.flip_v)
+
+	var shadow := MeshInstance3D.new()
+	shadow.name = "GroundShadow"
+	shadow.mesh = QuadMesh.new()
+	shadow.material_override = material
+	shadow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# The shader moves the vertices, so give culling the shadow's real bounds.
+	var tip_shift := ground_shadow_offset_per_meter * (bottom + height)
+	var base_shift := ground_shadow_offset_per_meter * bottom
+	var bounds := AABB(Vector3(left, -0.1, sprite_space.origin.z), Vector3(width, 0.2, 0.0))
+	for shift: Vector2 in [tip_shift, base_shift]:
+		bounds = bounds.merge(
+			AABB(
+				Vector3(left + shift.x, -0.1, sprite_space.origin.z + shift.y),
+				Vector3(width, 0.2, 0.0)
+			)
+		)
+	shadow.custom_aabb = bounds.grow(0.1)
+	add_child(shadow)
 
 
 func receive_damage(damage: DamageContext) -> float:

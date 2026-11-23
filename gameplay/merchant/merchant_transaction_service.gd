@@ -25,7 +25,8 @@ func purchase(
 	inventory: Inventory,
 	wallet: GoldWallet,
 	weapons: WeaponController,
-	quantity: int = 1
+	quantity: int = 1,
+	charms: CharmRegistry = null
 ) -> Result:
 	var offer := _get_buy_offer(offer_id)
 	if offer == null or wallet == null or quantity < 1 or quantity > 99:
@@ -35,6 +36,18 @@ func purchase(
 		if quantity != 1:
 			return Result.INVALID_OFFER
 		return _purchase_weapon(offer, wallet, weapons)
+	if offer.item != null and offer.item.charm != null:
+		var id := offer.item.charm.charm_id
+		if charms == null or quantity != 1 or charms.get_definition(id) != offer.item.charm:
+			return Result.INVALID_OFFER
+		if charms.is_owned(id):
+			return Result.ALREADY_OWNED
+		if not wallet.try_spend(offer.buy_price):
+			return Result.INSUFFICIENT_GOLD
+		if not charms.set_owned(id, true):
+			wallet.add_gold(offer.buy_price)
+			return Result.GRANT_FAILED
+		return Result.SUCCESS
 	return _purchase_item(offer, inventory, wallet, quantity)
 
 
@@ -116,7 +129,7 @@ func get_result_message(result: Result) -> String:
 		Result.GOLD_CAP_REACHED:
 			return "Your gold pouch is full."
 		Result.GRANT_FAILED:
-			return "Unable to grant that weapon."
+			return "Unable to grant that equipment."
 		_:
 			return "This trade is unavailable."
 

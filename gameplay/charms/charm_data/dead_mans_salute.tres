@@ -8,10 +8,11 @@
 script = ExtResource("1_data")
 charm_id = &"dead_mans_salute"
 display_name = "Dead Man's Salute"
-description = "Prototype: hold to charge, spending 100 SP per second, then release a blast."
+description = "Stand still and hold to charge at 100 SP per second. Release or run out of SP to detonate."
 sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
+cooldown_seconds = 6.0
 acquisition_source = &"prototype_debug"
 content_status = 1
 tags = Array[StringName]([&"active", &"prototype", &"channel"])

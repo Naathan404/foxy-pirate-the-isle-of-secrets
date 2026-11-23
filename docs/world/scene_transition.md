@@ -58,6 +58,8 @@ Trigger chỉ dò layer PlayerBody, bỏ qua enemy, vật thể và Player đã 
 GameManager chặn yêu cầu chuyển trùng. Đặt `ExitPosition` ở map đích ngoài vùng
 trigger quay về để tránh chuyển qua lại ngay khi vừa vào map.
 
+Kết nối thực tế của Hub (Coral, lều Silas) liệt kê tại [Bố cục Hub](hub_layout.md).
+
 Transition chưa lưu/chuyển HP, inventory hoặc vũ khí qua map.
 
 Kiểm tra logic bằng Godot:

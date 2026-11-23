@@ -4,25 +4,37 @@ extends Node
 signal player_changed(active_player: Player)
 signal state_changed(new_state: State)
 signal scene_transition_finished
+## Emitted after a Continue transition settles; `error` is OK only when the saved room,
+## campfire and progress were all restored.
+signal saved_game_loaded(error: Error)
 
-enum State { PLAYING, INVENTORY, TRANSITION }
+enum State { PLAYING, INVENTORY, TRANSITION, PAUSE_MENU, WORLD_MAP, REST_MENU }
 
 const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
 const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
+const SAVE_SLOT_PATH := "user://saves/slot_1.json"
 
+@export_file("*.tscn") var main_menu_scene: String = "res://ui/main_menu/main_menu.tscn"
 @export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.4
 @export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.45
 
 var player: Player
 var inventory: Inventory
 var gold_wallet: GoldWallet = GoldWallet.new()
+var map_progress: MapProgress = MapProgress.new()
 var state: State = State.PLAYING
 ## Encounter state survives scene changes for the current game session.
 var boss_encounters: Dictionary[StringName, Dictionary] = {}
+## Story progress for this session, e.g. which biomes are open. In memory only, like Gold.
+var story_flags: Dictionary[StringName, bool] = {}
 # Debug-only progression flag. Each map owns a fresh Player scene, so keep the
 # HUD grant state on the autoload instead of on the scene-local CharmRegistry.
 var debug_all_charms_granted: bool = false
+## The single save slot. Tests point its path at their own directory.
+var save_slot: SaveGameFile = SaveGameFile.new(SAVE_SLOT_PATH)
 var _transition_pending: bool = false
+## Validated save payload consumed by the next scene transition (Continue).
+var _pending_load: Dictionary = {}
 var _transition_overlay: CanvasLayer
 var _fade_rect: ColorRect
 
@@ -41,6 +53,9 @@ func register_player(active_player: Player) -> void:
 		player.inventory_ui.close_inventory(true)
 	player = active_player
 	inventory = player.get_node_or_null("Inventory") as Inventory
+	# Foxy is instanced in each room scene, so its owner is the room the player is in.
+	if is_instance_valid(player.owner):
+		map_progress.enter_room(player.owner.scene_file_path)
 	if (
 		OS.is_debug_build()
 		and debug_all_charms_granted
@@ -85,6 +100,135 @@ func exit_inventory() -> void:
 	state_changed.emit(state)
 
 
+## The pause menu owns the tree pause the same way the inventory does.
+func enter_pause_menu() -> bool:
+	return _enter_menu_state(State.PAUSE_MENU)
+
+
+func exit_pause_menu() -> void:
+	_exit_menu_state(State.PAUSE_MENU)
+
+
+func enter_world_map() -> bool:
+	return _enter_menu_state(State.WORLD_MAP)
+
+
+func exit_world_map() -> void:
+	_exit_menu_state(State.WORLD_MAP)
+
+
+## A campfire rest menu owns the pause like the other full-screen menus.
+func enter_rest_menu() -> bool:
+	return _enter_menu_state(State.REST_MENU)
+
+
+func exit_rest_menu() -> void:
+	_exit_menu_state(State.REST_MENU)
+
+
+## Writes the slot from a campfire. Only a campfire whose room has `safe_room` enabled may
+## save, and only for the Player standing in that room. The previous save is kept on error.
+func save_game(rest_point: CampfireRestPoint) -> Error:
+	if _transition_pending:
+		return ERR_BUSY
+	if not is_instance_valid(rest_point) or not rest_point.is_inside_tree():
+		return ERR_INVALID_PARAMETER
+	if not rest_point.is_save_allowed():
+		return ERR_UNAUTHORIZED
+	var room := rest_point.get_room()
+	if not is_instance_valid(player) or player.dead or not room.is_ancestor_of(player):
+		return ERR_UNAVAILABLE
+	if room.scene_file_path.is_empty():
+		return ERR_UNCONFIGURED
+	var location := {
+		"scene": room.scene_file_path,
+		"rest_point": String(room.get_path_to(rest_point)),
+	}
+	var payload := GameSaveSnapshot.capture(
+		player, location, self, _get_merchant_progress(), _get_note_progress()
+	)
+	var problem := GameSaveSnapshot.validate(payload)
+	if not problem.is_empty():
+		push_warning("GameManager: refusing to write an invalid save: %s" % problem)
+		return ERR_INVALID_DATA
+	return save_slot.write(payload)
+
+
+## Starts the transition to the saved campfire. Returns OK when it was accepted; the result
+## of the load itself arrives through `saved_game_loaded`.
+func load_saved_game() -> Error:
+	if _transition_pending:
+		return ERR_BUSY
+	var saved := save_slot.read()
+	if saved.error != OK:
+		return saved.error
+	var scene_path := GameSaveSnapshot.get_scene_path(saved.payload)
+	if not ResourceLoader.exists(scene_path, "PackedScene"):
+		return ERR_FILE_NOT_FOUND
+	_pending_load = saved.payload
+	if not change_scene(scene_path):
+		_pending_load = {}
+		return ERR_CANT_OPEN
+	return OK
+
+
+## New Game never inherits the last run: session state and the merchant/note stores reset.
+## The save slot itself is kept until the player saves again.
+func start_new_game(scene_path: String) -> bool:
+	if _transition_pending or not ResourceLoader.exists(scene_path, "PackedScene"):
+		return false
+	reset_session()
+	_get_merchant_progress().reset_progress()
+	_get_note_progress().reset_progress()
+	return change_scene(scene_path)
+
+
+func has_story_flag(flag: StringName) -> bool:
+	return story_flags.get(flag, false)
+
+
+func set_story_flag(flag: StringName) -> void:
+	if not flag.is_empty():
+		story_flags[flag] = true
+
+
+## Full-screen menus pause the tree only when nothing else owns it.
+func _enter_menu_state(menu_state: State) -> bool:
+	if _transition_pending or state != State.PLAYING or get_tree().paused:
+		return false
+	if is_instance_valid(player):
+		player.clear_gameplay_input()
+	state = menu_state
+	get_tree().paused = true
+	state_changed.emit(state)
+	return true
+
+
+func _exit_menu_state(menu_state: State) -> void:
+	if state != menu_state:
+		return
+	if is_instance_valid(player):
+		player.clear_gameplay_input()
+	state = State.PLAYING
+	get_tree().paused = false
+	state_changed.emit(state)
+
+
+## Leaves the current run for the main menu; returns whether the transition was accepted.
+func return_to_main_menu() -> bool:
+	return change_scene(main_menu_scene)
+
+
+## Forgets the in-memory run (wallet, explored rooms, story flags, boss encounters, debug
+## grants). Saved files are untouched.
+func reset_session() -> void:
+	gold_wallet = GoldWallet.new()
+	map_progress = MapProgress.new()
+	story_flags.clear()
+	boss_encounters.clear()
+	debug_all_charms_granted = false
+
+
 func reload_current_scene() -> void:
 	if _transition_pending:
 		return
@@ -114,12 +258,16 @@ func _request_scene_transition(
 func _transition_scene(
 	scene_path: String, reload_scene: bool, destination_trigger_id: StringName
 ) -> void:
+	var load_payload := _pending_load
+	_pending_load = {}
 	if is_instance_valid(player) and is_instance_valid(player.inventory_ui):
 		player.inventory_ui.close_inventory(true)
 	exit_inventory()
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
 	var was_paused := get_tree().paused
+	# A failed transition returns to whatever owned the pause (e.g. the pause menu).
+	var previous_state := state
 	state = State.TRANSITION
 	get_tree().paused = true
 	get_node("/root/HitstopController").cancel()
@@ -132,7 +280,8 @@ func _transition_scene(
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 	var player_state: RefCounted
-	if is_instance_valid(player):
+	# A loaded game replaces the whole run, so nothing is carried over from this Player.
+	if is_instance_valid(player) and load_payload.is_empty():
 		player_state = PLAYER_SCENE_STATE.new()
 		player_state.capture(player)
 	var error: Error = load_error
@@ -144,13 +293,18 @@ func _transition_scene(
 			await get_tree().process_frame
 		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
 			var destination := ResourceLoader.load_threaded_get(scene_path) as PackedScene
-			error = get_tree().change_scene_to_packed(destination)
+			if not load_payload.is_empty():
+				error = _prepare_saved_world(destination, load_payload)
+			if error == OK:
+				error = get_tree().change_scene_to_packed(destination)
 		else:
 			error = ERR_CANT_OPEN
 	if error == OK:
 		# SceneTree signals after the new scene has entered the tree and run _ready().
 		await get_tree().scene_changed
-		if player_state != null and is_instance_valid(player):
+		if not load_payload.is_empty():
+			error = _arrive_at_saved_rest_point(load_payload)
+		elif player_state != null and is_instance_valid(player):
 			player_state.restore(player, not reload_scene)
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
@@ -161,7 +315,7 @@ func _transition_scene(
 	# Resume before revealing the room so held movement continues during fade-in.
 	if is_instance_valid(player):
 		player.clear_gameplay_input()
-	state = State.PLAYING
+	state = previous_state if error != OK else State.PLAYING
 	get_tree().paused = was_paused if error != OK else false
 	state_changed.emit(state)
 	# The first active physics/animation tick can also upload new visual resources.
@@ -171,8 +325,63 @@ func _transition_scene(
 	_transition_overlay.hide()
 	_transition_pending = false
 	scene_transition_finished.emit()
-	if error != OK:
+	if not load_payload.is_empty():
+		# A rejected save is an expected outcome reported to the menu, not an engine fault.
+		if error != OK:
+			push_warning("GameManager: không thể tải save: %s" % error_string(error))
+		saved_game_loaded.emit(error)
+	elif error != OK:
 		push_error("GameManager: chuyển scene thất bại: %s" % error_string(error))
+
+
+## Runs behind the black fade, before the saved room replaces the current scene. The saved
+## campfire and a Player must exist, otherwise the current scene is kept untouched.
+func _prepare_saved_world(destination: PackedScene, payload: Dictionary) -> Error:
+	if destination == null:
+		return ERR_CANT_OPEN
+	var room := destination.instantiate()
+	var has_rest_point := (
+		room.get_node_or_null(GameSaveSnapshot.get_rest_point_path(payload)) is CampfireRestPoint
+	)
+	var has_player := _contains_player(room)
+	room.free()
+	if not has_rest_point:
+		return ERR_DOES_NOT_EXIST
+	if not has_player:
+		return ERR_UNCONFIGURED
+	GameSaveSnapshot.restore_world(payload, self, _get_merchant_progress(), _get_note_progress())
+	return OK
+
+
+func _arrive_at_saved_rest_point(payload: Dictionary) -> Error:
+	var scene := get_tree().current_scene
+	var rest_point := (
+		scene.get_node_or_null(GameSaveSnapshot.get_rest_point_path(payload)) as CampfireRestPoint
+	)
+	if rest_point == null or not is_instance_valid(player) or not scene.is_ancestor_of(player):
+		return ERR_DOES_NOT_EXIST
+	GameSaveSnapshot.restore_player(payload, player)
+	player.global_position = rest_point.get_spawn_position()
+	player.velocity = Vector3.ZERO
+	player.reset_physics_interpolation()
+	return OK
+
+
+func _contains_player(node: Node) -> bool:
+	if node is Player:
+		return true
+	for child: Node in node.get_children():
+		if _contains_player(child):
+			return true
+	return false
+
+
+func _get_merchant_progress() -> SilasProgressStore:
+	return get_node("/root/SilasProgress") as SilasProgressStore
+
+
+func _get_note_progress() -> Node:
+	return get_node("/root/NoteProgress")
 
 
 func _prepare_arrival_render(frame_count: int = 2) -> void:

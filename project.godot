@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="foxy-pirate-the-isle-of-secret"
-run/main_scene="res://world/biomes/hub/map/room_02.tscn"
+run/main_scene="res://ui/main_menu/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -23,6 +23,7 @@ GameManager="*res://core/autoload/game_manager.gd"
 Dialogic="*uid://ds2q0uclmolvu"
 AudioManager="*res://core/autoload/audio_manager.gd"
 SilasProgress="*res://gameplay/merchant/silas_progress_store.gd"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 CombatMomentController="*res://core/autoload/combat_moment_controller.gd"
 NoteProgress="*res://gameplay/inventory/note_progress_store.gd"
 ShockwaveController="*res://core/autoload/shockwave_controller.gd"
@@ -96,6 +97,7 @@ project/assembly_name="foxy-pirate-the-isle-of-secret"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/dialogic/plugin.cfg")
+<<<<<<<HEADenabled=PackedStringArray("res://addons/dialogic/plugin.cfg", "res://addons/godot_ai/plugin.cfg")
 
 [input]
 
@@ -137,6 +139,11 @@ test_hit={
 secondary_attack={
 "deadzone": 0.2,
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":2,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+<<<<<<<HEADcharm_slot_q={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":81,"key_label":0,"unicode":113,"location":0,"echo":false,"script":null)
 ]
 }
 charm_slot_space={
@@ -181,6 +188,11 @@ interact={
 swap_potion={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":82,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+open_world_map={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":77,"key_label":0,"unicode":109,"location":0,"echo":false,"script":null)
 ]
 }
 

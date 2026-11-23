@@ -1,0 +1,513 @@
+[gd_scene format=3 uid="uid://bn1llm76ub0a4"]
+
+[ext_resource type="Script" uid="uid://dpsarotf6pedg" path="res://gameplay/inventory/menu/items_tab.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://gameplay/inventory/menu/filter_chip.tscn" id="2_chip"]
+[ext_resource type="Texture2D" uid="uid://4cil6c50t34q" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="3_deco"]
+[ext_resource type="Texture2D" uid="uid://chms805kbum41" path="res://assets/ui/HUD_Fox/Inventory/All_Icon_Inven.png" id="4_all"]
+[ext_resource type="Texture2D" uid="uid://csncj70bebwee" path="res://assets/ui/HUD_Fox/Inventory/Consumable_Icon_Inven.png" id="5_consumable"]
+[ext_resource type="Texture2D" uid="uid://chbcvfh6h4n13" path="res://assets/ui/HUD_Fox/Inventory/Ammunition_Icon_Inven.png" id="6_ammo"]
+[ext_resource type="Texture2D" uid="uid://cfpcxvcakeos" path="res://assets/ui/HUD_Fox/Inventory/Material_Icon_Inven.png" id="7_material"]
+[ext_resource type="Texture2D" uid="uid://diakx05wj0yam" path="res://assets/ui/HUD_Fox/Inventory/QuestItem_Icon_Inven.png" id="8_quest"]
+[ext_resource type="Texture2D" uid="uid://bylr4qwghj1dj" path="res://assets/ui/HUD_Fox/Weapons/Weapons_Line.png" id="9_lines"]
+[ext_resource type="Texture2D" uid="uid://dyx5i80eufk2" path="res://assets/ui/HUD_Fox/Weapons/Backpack_Icon.png" id="10_bag"]
+[ext_resource type="Texture2D" uid="uid://cu50mm4bn5a76" path="res://assets/ui/HUD_Fox/Inventory/Potion_Loadout.png" id="11_loadout"]
+[ext_resource type="Texture2D" uid="uid://db7rxrlwbqqmb" path="res://assets/ui/HUD_Fox/Inventory/Potion_Loadout_Equip.png" id="12_loadout_slot"]
+[ext_resource type="Texture2D" uid="uid://d11vihjtu2o3o" path="res://assets/ui/HUD_Fox/Inventory/Items_Stat.png" id="13_panel"]
+[ext_resource type="Material" path="res://gameplay/inventory/menu/icon_glow_material.tres" id="14_glow"]
+
+[sub_resource type="AtlasTexture" id="line_left"]
+atlas = ExtResource("9_lines")
+region = Rect2(240, 60, 40, 990)
+
+[sub_resource type="AtlasTexture" id="line_right"]
+atlas = ExtResource("9_lines")
+region = Rect2(1100, 60, 43, 1027)
+
+[sub_resource type="AtlasTexture" id="loadout_left"]
+atlas = ExtResource("11_loadout")
+region = Rect2(0, 0, 312, 140)
+
+[sub_resource type="AtlasTexture" id="loadout_right"]
+atlas = ExtResource("11_loadout")
+region = Rect2(740, 88, 112, 52)
+
+[node name="ItemsTab" type="Control" unique_id=290760009]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Title" type="HBoxContainer" parent="." unique_id=1691436744]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 84.0
+offset_right = 360.0
+offset_bottom = 152.0
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Title" unique_id=1822562198]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Title" unique_id=495248750]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "Inventory"
+
+[node name="DecoRight" type="TextureRect" parent="Title" unique_id=1185202850]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Filters" type="VBoxContainer" parent="." unique_id=875548195]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 166.0
+offset_right = 240.0
+offset_bottom = 446.0
+theme_override_constants/separation = 6
+
+[node name="FilterAll" parent="Filters" unique_id=69708438 instance=ExtResource("2_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+chip_icon = ExtResource("4_all")
+chip_text = "All"
+
+[node name="FilterConsumable" parent="Filters" unique_id=168575376 instance=ExtResource("2_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+chip_icon = ExtResource("5_consumable")
+chip_text = "Consumable"
+
+[node name="FilterAmmunition" parent="Filters" unique_id=1624039412 instance=ExtResource("2_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Arrows and other ammo used by your weapons"
+chip_icon = ExtResource("6_ammo")
+chip_text = "Ammunition"
+
+[node name="FilterMaterial" parent="Filters" unique_id=1212840863 instance=ExtResource("2_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+chip_icon = ExtResource("7_material")
+chip_text = "Material"
+
+[node name="FilterQuest" parent="Filters" unique_id=126832533 instance=ExtResource("2_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+chip_icon = ExtResource("8_quest")
+chip_text = "Quest Item"
+
+[node name="LineLeft" type="TextureRect" parent="." unique_id=1783987177]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 168.0
+offset_right = 270.0
+offset_bottom = 552.0
+mouse_filter = 2
+texture = SubResource("line_left")
+expand_mode = 1
+
+[node name="LineRight" type="TextureRect" parent="." unique_id=1023574556]
+layout_mode = 0
+offset_left = 810.0
+offset_top = 118.0
+offset_right = 831.0
+offset_bottom = 622.0
+mouse_filter = 2
+texture = SubResource("line_right")
+expand_mode = 1
+
+[node name="Counter" type="HBoxContainer" parent="." unique_id=333520910]
+layout_mode = 0
+offset_left = 640.0
+offset_top = 124.0
+offset_right = 800.0
+offset_bottom = 160.0
+tooltip_text = "Bag slots in use / total slots"
+theme_override_constants/separation = 10
+alignment = 2
+
+[node name="BagIcon" type="TextureRect" parent="Counter" unique_id=1376717048]
+custom_minimum_size = Vector2(30, 32)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("10_bag")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CounterLabel" type="Label" parent="Counter" unique_id=362763917]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 24
+text = "0/0"
+vertical_alignment = 1
+
+[node name="GridScroll" type="ScrollContainer" parent="." unique_id=122455791]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 162.0
+offset_right = 808.0
+offset_bottom = 550.0
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="GridScroll" unique_id=377852602]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Grid" type="GridContainer" parent="GridScroll/GridMargin" unique_id=1366271322]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="EmptyLabel" type="Label" parent="." unique_id=923837015]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 300.0
+offset_top = 196.0
+offset_right = 790.0
+offset_bottom = 240.0
+theme_type_variation = &"BodyLabel"
+theme_override_colors/font_outline_color = Color(0.08, 0.05, 0.07, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "No items in your bag yet."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Loadout" type="HBoxContainer" parent="." unique_id=1202184035]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 556.0
+offset_right = 808.0
+offset_bottom = 690.0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LoadoutHeading" type="Control" parent="Loadout" unique_id=1726101514]
+custom_minimum_size = Vector2(164, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LoadoutArt" type="TextureRect" parent="Loadout/LoadoutHeading" unique_id=985974939]
+layout_mode = 0
+offset_top = 10.0
+offset_right = 156.0
+offset_bottom = 80.0
+mouse_filter = 2
+texture = SubResource("loadout_left")
+expand_mode = 1
+
+[node name="LoadoutTitle" type="Label" parent="Loadout/LoadoutHeading" unique_id=1130783264]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 14.0
+offset_right = 170.0
+offset_bottom = 54.0
+theme_type_variation = &"HeadingLabel"
+theme_override_colors/font_color = Color(0.96, 0.89, 0.77, 1)
+theme_override_font_sizes/font_size = 32
+text = "Potion Loadout"
+
+[node name="MainBlock" type="VBoxContainer" parent="Loadout" unique_id=2104564204]
+custom_minimum_size = Vector2(118, 0)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="MainLoadout" type="Button" parent="Loadout/MainBlock" unique_id=2075974704]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+
+[node name="Frame" type="TextureRect" parent="Loadout/MainBlock/MainLoadout" unique_id=1814131876]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("12_loadout_slot")
+expand_mode = 1
+
+[node name="MainLoadoutIcon" type="TextureRect" parent="Loadout/MainBlock/MainLoadout" unique_id=143130001]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 17.0
+offset_right = -24.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MainLoadoutCount" type="Label" parent="Loadout/MainBlock/MainLoadout" unique_id=450302580]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 63.0
+offset_top = 67.0
+offset_right = 90.0
+offset_bottom = 92.0
+theme_type_variation = &"CountLabel"
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MainCaption" type="Label" parent="Loadout/MainBlock" unique_id=797824984]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Main"
+horizontal_alignment = 1
+
+[node name="SecondaryBlock" type="VBoxContainer" parent="Loadout" unique_id=878473075]
+custom_minimum_size = Vector2(118, 0)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="SecondaryLoadout" type="Button" parent="Loadout/SecondaryBlock" unique_id=508553834]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+
+[node name="Frame" type="TextureRect" parent="Loadout/SecondaryBlock/SecondaryLoadout" unique_id=873378682]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("12_loadout_slot")
+expand_mode = 1
+
+[node name="SecondaryLoadoutIcon" type="TextureRect" parent="Loadout/SecondaryBlock/SecondaryLoadout" unique_id=385045546]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 17.0
+offset_right = -24.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SecondaryLoadoutCount" type="Label" parent="Loadout/SecondaryBlock/SecondaryLoadout" unique_id=1783917291]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 63.0
+offset_top = 67.0
+offset_right = 90.0
+offset_bottom = 92.0
+theme_type_variation = &"CountLabel"
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SecondaryCaption" type="Label" parent="Loadout/SecondaryBlock" unique_id=747438161]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Secondary"
+horizontal_alignment = 1
+
+[node name="DecoHolder" type="Control" parent="Loadout" unique_id=1239681726]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LoadoutDecoRight" type="TextureRect" parent="Loadout/DecoHolder" unique_id=1955950632]
+layout_mode = 0
+offset_top = 50.0
+offset_right = 56.0
+offset_bottom = 76.0
+mouse_filter = 2
+texture = SubResource("loadout_right")
+expand_mode = 1
+
+[node name="DetailArt" type="TextureRect" parent="." unique_id=362738402]
+layout_mode = 0
+offset_left = 838.0
+offset_top = 74.0
+offset_right = 1263.0
+offset_bottom = 642.0
+mouse_filter = 2
+texture = ExtResource("13_panel")
+expand_mode = 1
+
+[node name="Detail" type="Control" parent="." unique_id=1701871683]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 838.0
+offset_top = 74.0
+offset_right = 1263.0
+offset_bottom = 642.0
+mouse_filter = 2
+
+[node name="Glow" type="ColorRect" parent="Detail" unique_id=1114817444]
+material = ExtResource("14_glow")
+layout_mode = 0
+offset_left = 80.0
+offset_top = 46.0
+offset_right = 300.0
+offset_bottom = 266.0
+mouse_filter = 2
+
+[node name="BigIcon" type="TextureRect" parent="Detail" unique_id=337493023]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 120.0
+offset_top = 86.0
+offset_right = 260.0
+offset_bottom = 226.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemName" type="Label" parent="Detail" unique_id=788708433]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 30.0
+offset_top = 244.0
+offset_right = 394.0
+offset_bottom = 298.0
+mouse_filter = 1
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 33
+text = "No item selected"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="TypeBanner" type="Label" parent="Detail" unique_id=1413069680]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 68.0
+offset_top = 305.0
+offset_right = 222.0
+offset_bottom = 343.0
+theme_type_variation = &"BannerLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="StackBanner" type="Label" parent="Detail" unique_id=673391912]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 238.0
+offset_top = 305.0
+offset_right = 346.0
+offset_bottom = 343.0
+mouse_filter = 1
+theme_type_variation = &"BannerLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="DescriptionScroll" type="ScrollContainer" parent="Detail" unique_id=999209186]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 34.0
+offset_top = 352.0
+offset_right = 392.0
+offset_bottom = 428.0
+horizontal_scroll_mode = 0
+
+[node name="Description" type="Label" parent="Detail/DescriptionScroll" unique_id=994286496]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="CarryInfo" type="Label" parent="Detail" unique_id=242452442]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 28.0
+offset_top = 440.0
+offset_right = 396.0
+offset_bottom = 462.0
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="ActionHint" type="Label" parent="Detail" unique_id=2112889211]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 28.0
+offset_top = 462.0
+offset_right = 396.0
+offset_bottom = 484.0
+mouse_filter = 1
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Actions" type="HBoxContainer" parent="Detail" unique_id=2003808498]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 488.0
+offset_right = 396.0
+offset_bottom = 533.0
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="MainButton" type="Button" parent="Detail/Actions" unique_id=1218114992]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(170, 45)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+text = "Set Main"
+
+[node name="SecondaryButton" type="Button" parent="Detail/Actions" unique_id=403905300]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(170, 45)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ActionButton"
+text = "Set 2nd"

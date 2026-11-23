@@ -9,11 +9,13 @@
 [ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="9_txy4b"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="10_ryrkc"]
 [ext_resource type="Script" uid="uid://bmmcdjskrqbrf" path="res://world/objects/chest_item_drop.gd" id="11_h65mx"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="11_ryrkc"]
+[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="11_ryrkc"]
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="11_txy4b"]
 [ext_resource type="Resource" path="res://data/items/blueprints/bow_blueprint.tres" id="12_h65mx"]
 [ext_resource type="Resource" path="res://data/items/charms/arrow_rain.tres" id="13_ral77"]
+[ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="15_fv4rj"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="15_hfst8"]
+[ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="16_fv4rj"]
 
 [sub_resource type="Resource" id="Resource_dqtxk"]
 script = ExtResource("11_h65mx")
@@ -83,6 +85,8 @@ player = NodePath("../Foxy")
 
 [node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8256235, 0.08, 0.40002728)
+shore_wave_amplitude = 0.3
+shore_detail_amplitude = 0.08
 shore_detail_length = 10.0
 
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
@@ -108,6 +112,12 @@ shot_mode = 0
 bullet_lifetime = 3.0
 aim_height_offset = 0.85
 max_aim_pitch_deg = 42.0
+
+[node name="MasterTortugaNpc" parent="." index="19" unique_id=122461608 instance=ExtResource("15_fv4rj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.563258, -0.17041826, -2.9011106)
+
+[node name="Silas" parent="." index="20" unique_id=402759795 instance=ExtResource("16_fv4rj")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -6.8508086, -0.32180452, -8.301233)
 
 [editable path="Environment/BaseGround"]
 [editable path="FlatTide"]

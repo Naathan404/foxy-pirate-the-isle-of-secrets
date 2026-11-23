@@ -255,6 +255,10 @@ func unequip_charm(socket_id: int) -> bool:
 	return true
 
 
+func get_slot_action(socket_id: int) -> StringName:
+	return _sockets[socket_id].input_action
+
+
 func get_equipped_charm(socket_id: int) -> StringName:
 	var socket := _sockets.get(socket_id) as CharmSocket
 	return socket.charm_id if socket != null else &""

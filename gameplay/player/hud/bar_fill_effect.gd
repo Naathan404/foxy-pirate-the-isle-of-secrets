@@ -77,6 +77,25 @@ func set_target(amount: float) -> void:
 		_start_following()
 
 
+## Đổi max_value của fill nhưng giữ nguyên tỷ lệ đang hiển thị và dừng hiệu ứng đang chạy.
+func rescale(new_maximum: float) -> void:
+	var old_maximum := color_fill.max_value
+	if not _initialized or old_maximum <= 0.0 or is_equal_approx(new_maximum, old_maximum):
+		return
+	for tween: Tween in [_lead_tween, _follow_tween, _delay_tween, _fade_tween]:
+		_stop(tween)
+	# Các tween đã bị dừng: chốt luôn ở giá trị đích để value và _target không lệch nhau.
+	_active = false
+	_following = false
+	_target = clampf(_target * new_maximum / old_maximum, color_fill.min_value, new_maximum)
+	color_fill.max_value = new_maximum
+	color_fill.value = _target
+	white_fill.max_value = new_maximum
+	white_fill.value = _target
+	white_fill.hide()
+	white_fill.modulate.a = 0.0
+
+
 # sync các thuộc tính của fill
 func _sync_white_fill() -> void:
 	white_fill.position = color_fill.position

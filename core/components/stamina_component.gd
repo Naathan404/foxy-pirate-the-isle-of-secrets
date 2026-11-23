@@ -16,6 +16,7 @@ var _max_modifiers: Dictionary[StringName, float] = {}
 ### hồi phục sp
 var _regen_rate: float = 0.0
 var _regen_delay: float = 0.0
+var _recovery_blocks: Dictionary[StringName, bool] = {}
 var _regeneration_enabled: bool = true
 # thời gian chờ thêm trước khi bắt đầu hồi thể lực
 var _delay_remaining: float = 0.0
@@ -80,7 +81,7 @@ func try_consume(cost_sp: float) -> bool:
 
 # Hồi SP và trả về lượng thực tế đã hồi, không vượt quá max hiện tại.
 func restore(amount_sp: float) -> float:
-	if not _configured or amount_sp <= 0.0:
+	if not _configured or amount_sp <= 0.0 or not _recovery_blocks.is_empty():
 		return 0.0
 	var applied := minf(amount_sp, _max_sp - _current_sp)
 	if applied > 0.0:
@@ -90,13 +91,25 @@ func restore(amount_sp: float) -> float:
 
 
 # bật công tắc hồi sp =)))
+func set_recovery_block(source: StringName, blocked: bool) -> void:
+	if blocked:
+		_recovery_blocks[source] = true
+	else:
+		_recovery_blocks.erase(source)
+
+
 func set_regeneration_enabled(enabled: bool) -> void:
 	_regeneration_enabled = enabled
 
 
 # Update để hồi stamina
 func _physics_process(delta: float) -> void:
-	if not _configured or not _regeneration_enabled or delta <= 0.0:
+	if (
+		not _configured
+		or not _regeneration_enabled
+		or not _recovery_blocks.is_empty()
+		or delta <= 0.0
+	):
 		return
 	# Neu het thoi gian cho giua frame, chi hoi trong phan thoi gian con lai cua frame do.
 	var regen_delta := maxf(0.0, delta - _delay_remaining)

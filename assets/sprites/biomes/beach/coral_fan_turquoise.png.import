@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c0ib7dcswoc0q"
-path.s3tc="res://.godot/imported/coral_fan_turquoise.png-da7ee76b579b5bd5b1b5fdcc10b5efbf.s3tc.ctex"
+path="res://.godot/imported/coral_fan_turquoise.png-da7ee76b579b5bd5b1b5fdcc10b5efbf.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/beach/coral_fan_turquoise.png"
-dest_files=["res://.godot/imported/coral_fan_turquoise.png-da7ee76b579b5bd5b1b5fdcc10b5efbf.s3tc.ctex"]
+dest_files=["res://.godot/imported/coral_fan_turquoise.png-da7ee76b579b5bd5b1b5fdcc10b5efbf.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

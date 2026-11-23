@@ -1,20 +1,27 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" format=3 uid="uid://lvtsk8k1f37f"]
 
-[ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
-[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/tide_grapple.png" id="2_sheet"]
+[ext_resource type="Script" uid="uid://c6ksneei08ge8" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
+[ext_resource type="Texture2D" uid="uid://b1j2vrb3dul2g" path="res://assets/sprites/foxy/charm_casts/tide_grapple.png" id="2_sheet"]
+[ext_resource type="Texture2D" uid="uid://bbkpedcyowx5p" path="res://assets/sprites/foxy/charm_casts/tide_grapple_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"tide_grapple"
 texture = ExtResource("2_sheet")
+vertical_texture = ExtResource("3_vertical")
+frame_seconds = null
 foot_anchors = PackedVector2Array(0.4297, 0.8945, 0.4121, 0.8984, 0.2539, 0.8945, 0.2949, 0.8984, 0.3359, 0.8789, 0.291, 0.875, 0.3652, 0.8711, 0.4883, 0.875)
 standing_height_fraction = 0.73
+cast_frames = null
+channel_loop_frames = null
+held_phases = Array[StringName]([&"active", &"latch", &"miss", &"retract"])
+release_frames = null
+recall_frames = null
+frame_regions = Array[Rect2]([Rect2(0, 0, 0.7, 1), Rect2(0.23, 0, 0.77, 1), Rect2(0, 0, 0.45, 1), Rect2(0, 0, 0.46, 1), Rect2(0, 0, 0.61, 1), Rect2(0, 0, 0.59, 1), Rect2(0, 0, 0.64, 1), Rect2(0, 0, 1, 1)])
 phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"active": PackedInt32Array(2, 3),
 &"latch": PackedInt32Array(3, 4),
 &"miss": PackedInt32Array(5, 6),
-&"retract": PackedInt32Array(5, 6),
-&"recover": PackedInt32Array(7)
+&"recover": PackedInt32Array(7),
+&"retract": PackedInt32Array(5, 6)
 })
-looping_phases = Array[StringName]([&"active", &"latch", &"miss", &"retract"])
-frame_regions = Array[Rect2]([Rect2(0, 0, 0.70, 1), Rect2(0.23, 0, 0.77, 1), Rect2(0, 0, 0.45, 1), Rect2(0, 0, 0.46, 1), Rect2(0, 0, 0.61, 1), Rect2(0, 0, 0.59, 1), Rect2(0, 0, 0.64, 1), Rect2(0, 0, 1, 1)])

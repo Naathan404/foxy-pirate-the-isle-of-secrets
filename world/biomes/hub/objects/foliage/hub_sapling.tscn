@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://bhxhdrqwmppq8"]
+
+[ext_resource type="PackedScene" uid="uid://c0y1euj63gk4x" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://djc6ses35uq46" path="res://assets/sprites/biomes/forest/PineTree.png" id="2_jx2u1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qocyg"]
+resource_local_to_scene = true
+size = Vector3(3.37, 4.42, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_m7enp"]
+resource_local_to_scene = true
+height = 0.8
+radius = 0.45
+
+[node name="HubSapling" unique_id=1240572098 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+max_hp = 6.0
+visual_root = NodePath("Visual/Sprite3D")
+swingable = true
+upright_depth = true
+ground_shadow = true
+wind_root_height = 0.42
+fragment_source = NodePath("Visual/Sprite3D")
+drop_chance = 0.0
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(881353462) index="0" unique_id=538322777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.026, 0)
+offset = Vector2(8.0, 716.0)
+pixel_size = 0.00775
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture = ExtResource("2_jx2u1")
+
+[node name="CollisionShape3D" parent="HurtBox" parent_id_path=PackedInt32Array(9422287) index="0" unique_id=137273012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.24, 0)
+shape = SubResource("BoxShape3D_qocyg")
+
+[node name="CollisionShape3D" parent="MovementBody" parent_id_path=PackedInt32Array(1343867957) index="0" unique_id=1194784799]
+shape = SubResource("CylinderShape3D_m7enp")
+disabled = false

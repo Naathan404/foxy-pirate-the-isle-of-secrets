@@ -5,6 +5,11 @@ extends RefCounted
 const SHOP_SOURCES: Array[StringName] = [&"shop", &"merchant_or_enemy_drop"]
 
 
+static func is_item_drop(roll: float, chance: float, multiplier: float) -> bool:
+	var adjusted := clampf(chance * multiplier, 0.0, 1.0)
+	return adjusted >= 1.0 or roll < adjusted
+
+
 func grant_fixed_boss_reward(registry: CharmRegistry, charm_id: StringName) -> bool:
 	if not is_instance_valid(registry):
 		return false
@@ -63,7 +68,9 @@ func _is_playable(definition: CharmData) -> bool:
 	)
 
 
-func get_enemy_drop_pool(registry: CharmRegistry, include_owned: bool = false) -> Array[CharmData]:
+func get_enemy_drop_pool(
+	registry: CharmRegistry, include_owned: bool = false, elite: bool = false
+) -> Array[CharmData]:
 	var result: Array[CharmData] = []
 	if not is_instance_valid(registry):
 		return result
@@ -74,6 +81,8 @@ func get_enemy_drop_pool(registry: CharmRegistry, include_owned: bool = false) -
 			or definition.acquisition_source != &"merchant_or_enemy_drop"
 		):
 			continue
+		if definition.tags.has(&"elite_drop") and not elite:
+			continue
 		if definition.drop_chance < 0.0 or (not include_owned and registry.is_owned(charm_id)):
 			continue
 		result.append(definition)
@@ -83,17 +92,21 @@ func get_enemy_drop_pool(registry: CharmRegistry, include_owned: bool = false) -
 func roll_enemy_drop(
 	registry: CharmRegistry,
 	random: RandomNumberGenerator,
-	source: StringName = &"merchant_or_enemy_drop"
+	source: StringName = &"merchant_or_enemy_drop",
+	elite: bool = false
 ) -> CharmData:
 	if random == null or not is_instance_valid(registry):
 		return null
+	var stats: Dictionary[StringName, float] = {}
+	registry.modify_stats(stats)
+	var multiplier: float = stats.get(&"item_drop_multiplier", 1.0)
 	var candidates: Array[CharmData] = []
-	for definition: CharmData in get_enemy_drop_pool(registry):
+	for definition: CharmData in get_enemy_drop_pool(registry, false, elite):
 		if definition.acquisition_source != source:
 			continue
 		if definition.drop_chance <= 0.0:
 			continue
-		if definition.drop_chance < 1.0 and random.randf() >= definition.drop_chance:
+		if not is_item_drop(random.randf(), definition.drop_chance, multiplier):
 			continue
 		candidates.append(definition)
 	if candidates.is_empty():

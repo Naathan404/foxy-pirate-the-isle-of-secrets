@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/enemies/enemy_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+max_hp = 4.0
+move_speed = 0.0
+acceleration = 0.0
+deceleration = 20.0
+attack_damage = 0.0
+hit_duration = 0.14
+hit_recovery_duration = 0.16
+hit_knockback_speed = 1.6
+knockback_resistance = 0.75
+hit_deceleration = 20.0
+stagger_threshold = 12.0
+stagger_decay_delay = 1.0
+stagger_decay_per_second = 10.0
+stagger_immunity_duration = 0.4
+drop_quantity = 0
+drop_chance = 0.0
+min_gold_amount = 0
+max_gold_amount = 0
+gold_drop_chance = 0.0

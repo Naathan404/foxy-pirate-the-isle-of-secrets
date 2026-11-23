@@ -93,7 +93,7 @@ External paths attach to the islands shown in the final diagram:
 
 | Room | Row | Type | Layout | Exits |
 | --- | --- | --- | --- | --- |
-| room_00 | Middle | Checkpoint | Medium | right: room_01, left: Hub room_04 |
+| room_00 | Middle | Checkpoint | Medium | right: room_01, left: Hub `castaway_cove` (east gate) |
 | room_01 | Middle | Empty | Small | left: room_00, right: room_02, up: room_09 |
 | room_02 | Middle | Mobs 1 | Medium | left: room_01, right: room_03, down: room_17 |
 | room_03 | Middle | Empty | Small | left: room_02, right: room_04, up: room_10 |

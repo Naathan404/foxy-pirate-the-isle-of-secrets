@@ -34,4 +34,4 @@ shape = SubResource("BoxShape3D_yqj0l")
 [node name="CollisionShape3D" parent="MovementBody" index="0"]
 position = Vector3(-0.15, 0.4, 0)
 shape = SubResource("MovementShape")
-disabled = false
+disabled = true

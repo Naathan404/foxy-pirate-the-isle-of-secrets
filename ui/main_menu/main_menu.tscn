@@ -1,0 +1,274 @@
+[gd_scene format=3 uid="uid://c4r1e0x3a0m2e"]
+
+[ext_resource type="Script" uid="uid://bbi6cwtgfjmdu" path="res://ui/main_menu/main_menu.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://n8cij43hta0r" path="res://assets/ui/HUD_Fox/Background.png" id="3_background"]
+[ext_resource type="Shader" uid="uid://bml4o602pp17d" path="res://gameplay/inventory/menu/ink_reveal.gdshader" id="4_ink"]
+[ext_resource type="Texture2D" uid="uid://iw5vikqbjhpl" path="res://ui/ink_noise.tres" id="5_noise"]
+[ext_resource type="Texture2D" uid="uid://4cil6c50t34q" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="6_deco"]
+[ext_resource type="Shader" uid="uid://ditcjo80i8n0l" path="res://ui/main_menu/title_shimmer.gdshader" id="7_shimmer"]
+[ext_resource type="Shader" uid="uid://bpwop3iaag4tf" path="res://ui/main_menu/vignette.gdshader" id="8_vignette"]
+
+[sub_resource type="ShaderMaterial" id="ink_material"]
+shader = ExtResource("4_ink")
+shader_parameter/progress = 1.0
+shader_parameter/noise = ExtResource("5_noise")
+shader_parameter/rim_color = Color(0.85, 0.2, 0.24, 1)
+shader_parameter/rim_width = 0.05
+shader_parameter/softness = 0.06
+shader_parameter/noise_strength = 0.35
+shader_parameter/aspect = 1.7778
+shader_parameter/from_left = false
+
+[sub_resource type="ShaderMaterial" id="vignette_material"]
+shader = ExtResource("8_vignette")
+shader_parameter/shade_color = Color(0.02, 0.01, 0.015, 1)
+shader_parameter/edge_strength = 0.75
+shader_parameter/inner_radius = 0.35
+shader_parameter/outer_radius = 0.95
+shader_parameter/glow_color = Color(0.85, 0.2, 0.24, 1)
+shader_parameter/glow_strength = 0.16
+shader_parameter/pulse_speed = 0.8
+
+[sub_resource type="CanvasItemMaterial" id="additive"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="spark_shape"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="spark_texture"]
+gradient = SubResource("spark_shape")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="dust_fade"]
+offsets = PackedFloat32Array(0, 0.3, 0.7, 1)
+colors = PackedColorArray(1, 0.9, 0.8, 0, 1, 0.9, 0.8, 0.5, 1, 0.9, 0.8, 0.5, 1, 0.9, 0.8, 0)
+
+[sub_resource type="Gradient" id="ember_fade"]
+offsets = PackedFloat32Array(0, 0.15, 0.7, 1)
+colors = PackedColorArray(1, 0.4, 0.3, 0, 1, 0.45, 0.35, 0.85, 1, 0.8, 0.55, 0.6, 1, 0.85, 0.7, 0)
+
+[sub_resource type="ShaderMaterial" id="shimmer_material"]
+shader = ExtResource("7_shimmer")
+shader_parameter/sweep = 1.0
+shader_parameter/glint_color = Color(1, 0.86, 0.78, 1)
+shader_parameter/band_width = 0.07
+shader_parameter/slant = 0.35
+shader_parameter/strength = 0.85
+
+[node name="MainMenu" type="Control" unique_id=246775210]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+gameplay_scene = "uid://brgah10vnmb6k"
+
+[node name="Background" type="TextureRect" parent="." unique_id=643890980]
+unique_name_in_owner = true
+material = SubResource("ink_material")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Vignette" type="ColorRect" parent="." unique_id=1367548681]
+material = SubResource("vignette_material")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dust" type="CPUParticles2D" parent="." unique_id=9462791]
+unique_name_in_owner = true
+material = SubResource("additive")
+amount = 36
+texture = SubResource("spark_texture")
+lifetime = 9.0
+preprocess = 9.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 360)
+direction = Vector2(0.3, -1)
+spread = 60.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 4.0
+initial_velocity_max = 14.0
+scale_amount_min = 0.06
+scale_amount_max = 0.18
+color_ramp = SubResource("dust_fade")
+
+[node name="Embers" type="CPUParticles2D" parent="." unique_id=962593509]
+unique_name_in_owner = true
+material = SubResource("additive")
+amount = 70
+texture = SubResource("spark_texture")
+lifetime = 8.0
+preprocess = 8.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 14)
+direction = Vector2(0, -1)
+spread = 28.0
+gravity = Vector2(0, -8)
+initial_velocity_min = 30.0
+initial_velocity_max = 90.0
+angular_velocity_min = -40.0
+angular_velocity_max = 40.0
+scale_amount_min = 0.1
+scale_amount_max = 0.5
+color_ramp = SubResource("ember_fade")
+
+[node name="Center" type="VBoxContainer" parent="." unique_id=1236890588]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -230.0
+offset_right = 260.0
+offset_bottom = 230.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 56
+alignment = 1
+
+[node name="TitleBlock" type="VBoxContainer" parent="Center" unique_id=2050627168]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Center/TitleBlock" unique_id=1198766774]
+unique_name_in_owner = true
+material = SubResource("shimmer_material")
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.03, 0.95)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 96
+text = "Foxy Pirate"
+horizontal_alignment = 1
+
+[node name="TitleGlow" type="Label" parent="Center/TitleBlock/Title" unique_id=44616178]
+unique_name_in_owner = true
+show_behind_parent = true
+material = SubResource("additive")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_color = Color(0.85, 0.2, 0.24, 0)
+theme_override_colors/font_outline_color = Color(0.85, 0.2, 0.24, 0.55)
+theme_override_constants/outline_size = 34
+theme_override_font_sizes/font_size = 96
+horizontal_alignment = 1
+
+[node name="Subtitle" type="HBoxContainer" parent="Center/TitleBlock" unique_id=1235558553]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DecoLeft" type="TextureRect" parent="Center/TitleBlock/Subtitle" unique_id=1716304996]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("6_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Center/TitleBlock/Subtitle" unique_id=912158593]
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "The Isle of Secrets"
+
+[node name="DecoRight" type="TextureRect" parent="Center/TitleBlock/Subtitle" unique_id=1153485430]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("6_deco")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Buttons" type="VBoxContainer" parent="Center" unique_id=767483593]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="ContinueButton" type="Button" parent="Center/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 32
+disabled = true
+text = "Continue"
+
+[node name="NewGameButton" type="Button" parent="Center/Buttons" unique_id=727685548]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 32
+text = "New Game"
+
+[node name="QuitButton" type="Button" parent="Center/Buttons" unique_id=1296569642]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 32
+text = "Quit"
+
+[node name="SaveStatus" type="Label" parent="Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="FxLayer" type="Control" parent="." unique_id=2047370408 groups=["inventory_menu_fx"]]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Flash" type="ColorRect" parent="." unique_id=1221073221]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.93, 0.88, 1)

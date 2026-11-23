@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://djnp68hgbhkms"
-path.s3tc="res://.godot/imported/pine_tree.png-324f10b7cf21c2bbc22f74e6f8d6516a.s3tc.ctex"
+path="res://.godot/imported/pine_tree.png-324f10b7cf21c2bbc22f74e6f8d6516a.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/biomes/forest/pine_tree.png"
-dest_files=["res://.godot/imported/pine_tree.png-324f10b7cf21c2bbc22f74e6f8d6516a.s3tc.ctex"]
+dest_files=["res://.godot/imported/pine_tree.png-324f10b7cf21c2bbc22f74e6f8d6516a.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

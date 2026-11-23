@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://8jqsp05sq5e5"]
+
+[ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://c0nu47ksokiuu" path="res://world/biomes/forest/oak_tree.tscn" id="2_oak"]
+[ext_resource type="PackedScene" uid="uid://bby73hdjtqtui" path="res://world/biomes/forest/pine_tree.tscn" id="3_pine"]
+[ext_resource type="PackedScene" uid="uid://dsdij5n1mx7mt" path="res://gameplay/enemies/firefly/firefly.tscn" id="4_firefly"]
+
+[node name="ForestFireflyTest" unique_id=340104391 instance=ExtResource("1_base")]
+open_exits = 2
+down_destination_scene = "res://world/biomes/ruins/ruins_01.tscn"
+left_destination_scene = "res://world/biomes/forest/forest_02.tscn"
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
+[node name="OakTreeA" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1302372724 instance=ExtResource("2_oak")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -8, 0, -6)
+
+[node name="PineTreeA" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="2" unique_id=1075259643 instance=ExtResource("3_pine")]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 9, 0, -7)
+
+[node name="OakTreeB" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="3" unique_id=1726070442 instance=ExtResource("2_oak")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 7, 0, 6)
+
+[node name="PineTreeB" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="4" unique_id=2023250599 instance=ExtResource("3_pine")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -8, 0, 7)
+
+[node name="OakTreeC" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="5" unique_id=1191224656 instance=ExtResource("2_oak")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -2, 0, -8)
+
+[node name="FireflyA" parent="." index="5" unique_id=75692701 instance=ExtResource("4_firefly")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, 2.5)
+multi_burst_chance = 0.65
+blast_recoil_pop_height_meters = 1.35
+post_burst_hover_cooldown_seconds = 1.6
+max_damage_per_exhausted_window = 3.8
+hits_before_counter = 2
+heavy_hit_reaction_threshold_hp = 2.5
+swift_escape_windup_seconds = 0.18
+vent_escape_windup_seconds = 0.34
+counter_windup_seconds = 0.5
+counter_blast_radius_meters = 2.1
+counter_damage_hp = 0.0
+counter_pool_radius_meters = 0.85
+counter_pool_duration_seconds = 2.6
+vent_pool_arm_delay_seconds = 0.55
+counter_cooldown_seconds = 0.4
+
+[node name="FireflyB" parent="." index="6" unique_id=1819165227 instance=ExtResource("4_firefly")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.2, 0, 2.2)
+multi_burst_chance = 0.65
+blast_recoil_pop_height_meters = 1.35
+post_burst_hover_cooldown_seconds = 1.6
+max_damage_per_exhausted_window = 3.8
+hits_before_counter = 2
+heavy_hit_reaction_threshold_hp = 2.5
+swift_escape_windup_seconds = 0.18
+vent_escape_windup_seconds = 0.34
+counter_windup_seconds = 0.5
+counter_blast_radius_meters = 2.1
+counter_damage_hp = 0.0
+counter_pool_radius_meters = 0.85
+counter_pool_duration_seconds = 2.6
+vent_pool_arm_delay_seconds = 0.55
+counter_cooldown_seconds = 0.4
