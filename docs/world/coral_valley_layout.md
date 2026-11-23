@@ -4,19 +4,47 @@ Numbering follows the final reference diagram: middle row left to right (`room_0
 
 ![Numbered room and path diagram](coral_valley_layout.svg)
 
-Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Two-island rooms keep both islands; their moving platforms have been removed.
+Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz rooms `04`, `09` and `23` have three stationary platforms; Quiz `18` has one lever-operated shuttle platform.
 
 All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
-collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`;
-each inherits `quiz_room.tscn` and contains two Small islands, one room root,
-and one shared CameraBounds covering both islands.
+collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`.
+Each contains two Small islands, one room root and one shared CameraBounds.
+Rooms `04`, `09` and `23` inherit `quiz_room.tscn`; `room_18` uses the Small
+room template with its own shuttle platform.
 
-The gap is measured edge to edge along X from the ground colliders. The moving
-platform collider is 4 units long, so the requested gap is `3 × 4 = 12` units.
-Each Small ground is `2 × 5.475 × 2.5 = 27.375` units wide; therefore the right
-island is offset `27.375 + 12 = 39.375` units from the left island. Ground artwork,
-colliders, right-side paths, seaweed positions and the shared camera's right
-extent use this same offset. Platforms and docks remain removed as requested.
+Spacing uses the visible sprite edges (alpha >= 0.5), rather than the platform's
+4-unit collision box. Each platform is rotated 90 degrees around Y, keeping its
+surface horizontal. At the existing sprite scale, the rotated visible width along
+X is `716 × 0.01 × 0.5 = 3.58` units.
+
+Three platforms create four gaps: island–platform, platform–platform,
+platform–platform, platform–island. Each gap is 4 units, giving **16 empty units**
+and a total visible island gap of `3 × 3.58 + 4 × 4 = 26.74` units.
+The ground artwork spans `1134 × 0.01 × 0.995455 × 2.5 = 28.22114925` units along X,
+so the right island center is offset `54.96114925` units. Its paths, seaweed and
+shared CameraBounds move with it.
+
+`quiz_room.tscn` supplies `Platform`, `Platform2` and `Platform3` to rooms `04`, `09` and `23`.
+Their X coordinates are `20.03284825`, `27.61284825`, and `35.19284825`; all use
+Y `-0.03991985` and Z `0.55447969`. Their collider top surfaces match the island
+floor height. The existing sprite and `4 × 0.5 × 4` colliders are retained.
+These three rooms have no levers, call docks or movement.
+
+Quiz `room_18` removes both side platforms and places
+`objects/quiz_shuttle_platform.tscn` at the former center position. Its onboard
+lever uses the existing attack HurtBox and `MovingPlatform.receive_damage`.
+The platform starts at Center. Each valid player hit requests the next stop:
+**Left → Center → Right → Center**, repeating even if hit during travel.
+The former platform positions remain the stop coordinates: X `20.03284825`,
+`27.61284825` and `35.19284825`. Speed is 3 units/second. No shore call levers
+are added. The existing two-stop platform behavior remains the default; this
+scene enables `center_stop_enabled` and supplies a `Center` marker.
+
+The Quiz scenes open the player boundary at both island edges facing the
+platforms using `boundary_openings`: `Rect2(12.7, -2.33552031, 29.58614925, 5.78)`.
+The 5.78-unit-wide passage follows the platforms' visible sprite width along Z, centered
+at `0.55447969`. Other island edges retain their player boundaries, and enemy
+boundaries stay closed. The existing gaps between islands and platforms remain.
 
 External paths attach to the islands shown in the final diagram:
 

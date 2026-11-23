@@ -80,7 +80,7 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_09" unique_id=1931917380 instance=ExtResource("1_base")]
-editor_description = "Quiz: left and right Small islands in one room. Shared CameraBounds. Edge-to-edge gap = 3 x 4-unit moving platform length = 12 units; island center offset = 39.375 units."
+editor_description = "Paired Quiz: 3 platforms rotated 90 degrees around Y. Visual platform width 3.58 units; four 4-unit clearances total 16 empty units. Island center offset 54.96114925 units. Shared CameraBounds."
 open_exits = 6
 right_destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
 down_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
@@ -92,7 +92,7 @@ environment = SubResource("Environment_u07ny")
 mesh = SubResource("QuadMesh_y56tq")
 
 [node name="DownPath" parent="Exits" index="0" unique_id=872527392 parent_id_path=PackedInt32Array(2100215242)]
-transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 38.84198105, -0.02048206, 24.479424)
+transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, 54.4281303, -0.02048206, 24.479424)
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_f1230")
@@ -113,7 +113,7 @@ shape = SubResource("BoxShape3D_68fjj")
 shape = SubResource("BoxShape3D_ucece")
 
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 67.029852, -0.05280208, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 82.61600125, -0.05280208, 0)
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_16o5g")
@@ -134,7 +134,7 @@ shape = SubResource("BoxShape3D_mebl1")
 shape = SubResource("BoxShape3D_4ngaf")
 
 [node name="BaseGround2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1946064963 instance=ExtResource("2_ground")]
-transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 39.375, 0, -0.19104576)
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 54.96114925, 0, -0.19104576)
 
 [node name="Sprite3D" parent="Environment/BaseGround2" index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0, 0.753676)
@@ -145,7 +145,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, 0.3108621
 shape = ExtResource("ground_shape")
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.913887, 0, -34.597424)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.50003625, 0, -34.597424)
 
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")
@@ -155,7 +155,7 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 
 [node name="RandomSeaweed2" type="Node3D" parent="."]
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(29.53, 0, -0.882, 29.706, 0, -3.466, 29.064, 0, -5.401, 33.143, 0, -9.266, 33.436, 0, -11.431, 35.677, 0, -12.027, 37.233, 0, -10.594, 40.637, 0, -11.727, 42.481, 0, -10.884, 44.257, 0, -11.822, 44.889, 0, -9.653, 49.204, 0, -5.644, 49.16, 0, 5.32, 49.924, 0, 7.628, 48.706, 0, 9.625, 46.643, 0, 11.098, 44.68, 0, 11.848, 34.101, 0, 12.043, 31.121, 0, 11.169, 29.818, 0, 9.606, 29.312, 0, 7.535, 30.008, 0, 5.528, 29.079, 0, 3.735, 28.74, 0, 1.571)
+spawn_positions = PackedVector3Array(45.11614925, 0, -0.882, 45.29214925, 0, -3.466, 44.65014925, 0, -5.401, 48.72914925, 0, -9.266, 49.02214925, 0, -11.431, 51.26314925, 0, -12.027, 52.81914925, 0, -10.594, 56.22314925, 0, -11.727, 58.06714925, 0, -10.884, 59.84314925, 0, -11.822, 60.47514925, 0, -9.653, 64.79014925, 0, -5.644, 64.74614925, 0, 5.32, 65.51014925, 0, 7.628, 64.29214925, 0, 9.625, 62.22914925, 0, 11.098, 60.26614925, 0, 11.848, 49.68714925, 0, 12.043, 46.70714925, 0, 11.169, 45.40414925, 0, 9.606, 44.89814925, 0, 7.535, 45.59414925, 0, 5.528, 44.66514925, 0, 3.735, 44.32614925, 0, 1.571)
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 

@@ -80,7 +80,7 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_04" unique_id=1963513335 instance=ExtResource("1_base")]
-editor_description = "Quiz: left and right Small islands in one room. Shared CameraBounds. Edge-to-edge gap = 3 x 4-unit moving platform length = 12 units; island center offset = 39.375 units."
+editor_description = "Paired Quiz: 3 platforms rotated 90 degrees around Y. Visual platform width 3.58 units; four 4-unit clearances total 16 empty units. Island center offset 54.96114925 units. Shared CameraBounds."
 up_destination_scene = "res://world/biomes/coral_valley/map/room_11.tscn"
 right_destination_scene = "res://world/biomes/coral_valley/map/room_05.tscn"
 down_destination_scene = "res://world/biomes/coral_valley/map/room_19.tscn"
@@ -121,7 +121,7 @@ destination_scene = "res://world/biomes/coral_valley/map/room_11.tscn"
 shape = SubResource("BoxShape3D_ngx15")
 
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 67.029852, -0.05280208, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 82.61600125, -0.05280208, 0)
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_nxqrk")
@@ -148,7 +148,7 @@ destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
 shape = SubResource("BoxShape3D_8w1j2")
 
 [node name="BaseGround2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1656402816 instance=ExtResource("2_ground")]
-transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 39.375, 0, -0.19104576)
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 54.96114925, 0, -0.19104576)
 
 [node name="Sprite3D" parent="Environment/BaseGround2" index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0, 0.753676)
@@ -159,7 +159,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, 0.3108621
 shape = ExtResource("ground_shape")
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.913887, 0, -34.597424)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.50003625, 0, -34.597424)
 
 [node name="RandomSeaweed" type="Node3D" parent="." index="5" unique_id=381411378]
 script = ExtResource("random_props")
@@ -169,7 +169,7 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 
 [node name="RandomSeaweed2" type="Node3D" parent="." index="6" unique_id=1051652682]
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(29.038, 0, -5.42, 32.796, 0, -9.688, 34.277, 0, -11.229, 36.759, 0, -10.837, 40.005, 0, -10.588, 41.543, 0, -11.984, 44.051, 0, -11.771, 45.018, 0, -9.587, 49.089, 0, -5.358, 48.606, 0, 4.891, 49.424, 0, 6.738, 49.204, 0, 9.453, 47.925, 0, 11.084, 45.98, 0, 11.604, 43.98, 0, 13.136, 42.233, 0, 11.681, 39.968, 0, 12.85, 37.909, 0, 12.071, 35.02, 0, 12.145, 33.131, 0, 13.041, 32.307, 0, 11.169, 30.356, 0, 10.427, 29.453, 0, 7.833, 30.017, 0, 5.179)
+spawn_positions = PackedVector3Array(44.62414925, 0, -5.42, 48.38214925, 0, -9.688, 49.86314925, 0, -11.229, 52.34514925, 0, -10.837, 55.59114925, 0, -10.588, 57.12914925, 0, -11.984, 59.63714925, 0, -11.771, 60.60414925, 0, -9.587, 64.67514925, 0, -5.358, 64.19214925, 0, 4.891, 65.01014925, 0, 6.738, 64.79014925, 0, 9.453, 63.51114925, 0, 11.084, 61.56614925, 0, 11.604, 59.56614925, 0, 13.136, 57.81914925, 0, 11.681, 55.55414925, 0, 12.85, 53.49514925, 0, 12.071, 50.60614925, 0, 12.145, 48.71714925, 0, 13.041, 47.89314925, 0, 11.169, 45.94214925, 0, 10.427, 45.03914925, 0, 7.833, 45.60314925, 0, 5.179)
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
