@@ -1,16 +1,32 @@
 # Coral Valley room layout
 
-Numbering follows the reference diagram: middle row left to right, then top row, then bottom row.
+Numbering follows the final reference diagram: middle row left to right (`room_00`–`room_08`), then top row (`room_09`–`room_16`), then bottom row (`room_17`–`room_24`). Quiz left/right counts as one room.
 
-Mobs, Raid, Chest, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (12 Medium and 14 Small rooms). Two-island rooms keep both islands; their moving platforms have been removed.
+![Numbered room and path diagram](coral_valley_layout.svg)
 
-All 26 map rooms use the clipped-corner Coral Valley ground and convex ground
-collision. The right-hand islands (`Environment/BaseGround2`) in `room_04`,
-`room_09` and `room_24` match the Small template's ground texture, sprite
-transform, scale and convex collider. Their secondary seaweed candidate
-positions match the main island's rim positions translated 43 units to the right.
-Moving platforms and their docks were removed from these three rooms;
-there is currently no platform connection between their two islands.
+Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Two-island rooms keep both islands; their moving platforms have been removed.
+
+All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
+collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`;
+each inherits `quiz_room.tscn` and contains two Small islands, one room root,
+and one shared CameraBounds covering both islands.
+
+The gap is measured edge to edge along X from the ground colliders. The moving
+platform collider is 4 units long, so the requested gap is `3 × 4 = 12` units.
+Each Small ground is `2 × 5.475 × 2.5 = 27.375` units wide; therefore the right
+island is offset `27.375 + 12 = 39.375` units from the left island. Ground artwork,
+colliders, right-side paths, seaweed positions and the shared camera's right
+extent use this same offset. Platforms and docks remain removed as requested.
+
+External paths attach to the islands shown in the final diagram:
+
+- `room_04`: left, up (Empty `room_11`) and down (NPC `room_19`) on the left
+  island; right (Checkpoint 2 `room_05`) on the right island.
+- `room_09`: down (Empty `room_01`) and right (Materials `room_10`) on the
+  right island.
+- `room_18`: left (Empty `room_17`) on the left island; no other external exit.
+- `room_23`: left (Mobs 4 `room_22`) on the left island; right (Farm
+  `room_24`) on the right island.
 
 | Room | Row | Type | Layout | Exits |
 | --- | --- | --- | --- | --- |
@@ -18,12 +34,12 @@ there is currently no platform connection between their two islands.
 | room_01 | Middle | Empty | Small | left: room_00, right: room_02, up: room_09 |
 | room_02 | Middle | Mobs 1 | Medium | left: room_01, right: room_03, down: room_17 |
 | room_03 | Middle | Empty | Small | left: room_02, right: room_04, up: room_10 |
-| room_04 | Middle | Quiz (2 islands) | Small, 2 islands | left: room_03, right: room_05, up: room_11, down: room_20 |
-| room_05 | Middle | Checkpoint 2 | Medium | left: room_04, right: room_06, up: room_13, down: room_22 |
+| room_04 | Middle | Quiz (2 islands) | Small, 2 islands | left: room_03, right: room_05, up: room_11, down: room_19 |
+| room_05 | Middle | Checkpoint 2 | Medium | left: room_04, right: room_06, up: room_13, down: room_21 |
 | room_06 | Middle | Empty | Small | left: room_05, right: room_07, up: room_14 |
 | room_07 | Middle | Raid | Medium | left: room_06, right: room_08 |
 | room_08 | Middle | Boss | Medium | left: room_07 |
-| room_09 | Top | Empty (2 islands) | Small, 2 islands | right: room_10, down: room_01 |
+| room_09 | Top | Quiz (2 islands) | Small, 2 islands | right: room_10, down: room_01 |
 | room_10 | Top | Materials | Small | left: room_09, down: room_03 |
 | room_11 | Top | Empty | Small | right: room_12, down: room_04 |
 | room_12 | Top | Mobs 2 | Medium | left: room_11 |
@@ -32,20 +48,25 @@ there is currently no platform connection between their two islands.
 | room_15 | Top | Empty | Small | left: room_14, right: room_16 |
 | room_16 | Top | Mobs 6 | Medium | left: room_15 |
 | room_17 | Bottom | Empty | Small | right: room_18, up: room_02 |
-| room_18 | Bottom | Quiz | Small | left: room_17, right: room_19 |
-| room_19 | Bottom | Chest | Medium | left: room_18 |
-| room_20 | Bottom | NPC | Small | right: room_21, up: room_04 |
-| room_21 | Bottom | Mobs 3 | Medium | left: room_20 |
-| room_22 | Bottom | Empty | Small | right: room_23, up: room_05 |
-| room_23 | Bottom | Mobs 4 | Medium | left: room_22, right: room_24 |
-| room_24 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_23, right: room_25 |
-| room_25 | Bottom | Farm | Medium | left: room_24 |
+| room_18 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_17 |
+| room_19 | Bottom | NPC | Small | right: room_20, up: room_04 |
+| room_20 | Bottom | Mobs 3 | Medium | left: room_19 |
+| room_21 | Bottom | Empty | Small | right: room_22, up: room_05 |
+| room_22 | Bottom | Mobs 4 | Medium | left: room_21, right: room_23 |
+| room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
+| room_24 | Bottom | Farm | Medium | left: room_23 |
 
-## Existing scene renumbering
+## Scene identity
 
-00 -> 00, 01 -> 01, 02 -> 02, 03 -> 03, 04 -> 04, 05 -> 05, 06 -> 09, 07 -> 10, 08 -> 11, 09 -> 12, 10 -> 17, 11 -> 18, 12 -> 19, 13 -> 20, 14 -> 21
-
-The 15 existing scenes keep their authored contents and scene UIDs. New materials, mobs, empty and two-island quiz rooms reuse their existing counterparts. Raid, Boss and Farm instantiate their room templates; their gameplay encounters are not authored by this layout change. Ground artwork is unchanged.
+The map contains 25 rooms, numbered `room_00`–`room_24`. The former single-island
+Quiz `room_18` and Chest `room_19` are replaced by one paired Quiz `room_18`;
+the Chest room and its scene transition are removed. Former rooms `20`–`25`
+move to `19`–`24` (NPC, Mobs 3, Empty, Mobs 4, paired Quiz, Farm).
+Retained scenes keep their authored content and scene UIDs. Every scene root
+matches its filename. All path destinations and the Silas room fixture use the
+new IDs; the Hub connection through `hub/map/room_04.tscn` stays the same.
+Raid, Boss and Farm instantiate their room templates; their gameplay encounters
+are not authored by this layout change. Ground artwork is unchanged.
 
 ## Random destructible props
 
@@ -56,9 +77,9 @@ The two Materials rooms use the Small room template, with spawn positions pulled
 
 Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
 
-Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
+Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_20`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
 
-Mobs 4, 5 and 6 (`room_23`, `room_13`, `room_16`) spawn two independent
+Mobs 4, 5 and 6 (`room_22`, `room_13`, `room_16`) spawn two independent
 groups per visit: `RandomProps` chooses 5–7 props total, each equally likely
 to be wood log or shell; `RandomOctopus` chooses 1–3 destructible octopus props.
 The groups use ten and five distinct candidate positions respectively, with
@@ -69,9 +90,9 @@ All non-Materials rooms spawn seaweed around their island rims on each visit. Me
 
 | Layout | Rooms | Seaweed per visit |
 | --- | --- | --- |
-| Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_19`, `room_21`, `room_23`, `room_25` | 20 per room |
-| Small, one island | `room_01`, `room_03`, `room_06`, `room_11`, `room_15`, `room_17`, `room_18`, `room_20`, `room_22` | 15 per room |
-| Small, two islands | `room_04`, `room_09`, `room_24` | 15 on each island, 30 per room |
+| Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22`, `room_24` | 20 per room |
+| Small, one island | `room_01`, `room_03`, `room_06`, `room_11`, `room_15`, `room_17`, `room_19`, `room_21` | 15 per room |
+| Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 15 on each island, 30 per room |
 
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
@@ -94,7 +115,7 @@ Valley templates retain the default disabled setting.
 
 All six Mobs rooms inherit the same CameraBounds from `base_medium_room.tscn`.
 Mobs 1–3 use two mirrored `Vector2(45, 66)` water zones, running
-`LeftShallows` → `RightShallows`. Mobs 4–6 (`room_23`, `room_13`, `room_16`)
+`LeftShallows` → `RightShallows`. Mobs 4–6 (`room_22`, `room_13`, `room_16`)
 run clockwise: `LeftShallows` → `UpShallows` → `RightShallows` →
 `DownShallows`. The added upper/lower zones use `Vector2(78, 45)` to span
 the room's width while keeping the same 45-unit travel depth.
@@ -117,7 +138,7 @@ These three rooms have no skeleton entries.
 | --- | --- | --- |
 | `room_02` | Mobs 1 | Starfish, Coral Skeleton |
 | `room_12` | Mobs 2 | Barrel, Coral Skeleton |
-| `room_21` | Mobs 3 | Crab, Coral Skeleton |
-| `room_23` | Mobs 4 | Barrel (normal or elite) |
+| `room_20` | Mobs 3 | Crab, Coral Skeleton |
+| `room_22` | Mobs 4 | Barrel (normal or elite) |
 | `room_13` | Mobs 5 | Starfish (normal or elite) |
 | `room_16` | Mobs 6 | Crab (normal or elite) |

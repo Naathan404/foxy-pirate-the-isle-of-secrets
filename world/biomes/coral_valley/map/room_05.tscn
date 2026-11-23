@@ -82,7 +82,7 @@ size = Vector3(0.5, 2, 4)
 open_exits = 15
 up_destination_scene = "res://world/biomes/coral_valley/map/room_13.tscn"
 right_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
-down_destination_scene = "res://world/biomes/coral_valley/map/room_22.tscn"
+down_destination_scene = "res://world/biomes/coral_valley/map/room_21.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_04.tscn"
 
 [node name="WorldEnvironment" parent="General" index="0" unique_id=212262502 parent_id_path=PackedInt32Array(461960862)]

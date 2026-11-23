@@ -1,7 +1,7 @@
 extends SceneTree
 
 const SILAS: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
-const ROOM: PackedScene = preload("res://world/biomes/coral_valley/map/room_20.tscn")
+const ROOM: PackedScene = preload("res://world/biomes/coral_valley/map/room_19.tscn")
 
 
 func _initialize() -> void:
@@ -32,7 +32,7 @@ func run_test() -> void:
 	for i in 5:
 		await physics_frame
 	if silas.catalog == null or not silas.catalog.validate().is_empty():
-		push_error("Silas catalog must load and validate in room_20")
+		push_error("Silas catalog must load and validate in room_19")
 		quit(1)
 		return
 	if not silas.interaction_area.interaction_requested.is_connected(
@@ -55,7 +55,7 @@ func run_test() -> void:
 		push_error("Left click should start Silas interaction and block combat")
 		quit(1)
 		return
-	print("Shared Silas and room_20 interaction tests passed")
+	print("Shared Silas and room_19 interaction tests passed")
 	room.queue_free()
 	await process_frame
 	quit(0)
