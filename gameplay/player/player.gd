@@ -85,6 +85,7 @@ var _environment_push_direction := Vector3.ZERO
 var _environment_push_speed := 0.0
 var _environment_push_remaining := 0.0
 var _environment_push_duration := 0.0
+var _casting_charm: CharmEffect
 var _charm_grapple_tween: Tween
 var _post_hit_invulnerability_remaining: float = 0.0
 var _suppress_next_hit_reaction: bool = false
@@ -244,6 +245,8 @@ func _on_damaged(_applied_hp: float) -> void:
 		return
 	# Đòn chí mạng để state Death xử lý, không vào Hit nữa
 	if hp.is_alive():
+		if is_charm_casting():
+			_casting_charm.cancel_active()
 		var hit_duration := (
 			WHIRLWIND_HIT_STUN_SECONDS if pending_hit_spiral_strength > 0.0 else -1.0
 		)
@@ -403,6 +406,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	fsm._update(delta)
+	if is_instance_valid(_casting_charm):
+		set_horizontal_velocity(Vector3.ZERO)
 	var game_manager = get_node("/root/GameManager")
 	if (
 		not dead
@@ -445,7 +450,7 @@ func _read_input() -> void:
 		if not potion_selection_active:
 			clear_gameplay_input()
 		return
-	if dead:
+	if dead or is_instance_valid(_casting_charm):
 		return
 	attack_held = Input.is_action_pressed(attack_action)
 	var secondary_blocked: bool = (
@@ -516,6 +521,26 @@ func hold_for_dialogue() -> void:
 		play_directional_animation("idle")
 
 
+func begin_charm_cast(effect: CharmEffect) -> bool:
+	if dead or is_instance_valid(_casting_charm) or not can_equip_weapon():
+		return false
+	if is_instance_valid(weapon_controller) and weapon_controller.busy:
+		return false
+	_casting_charm = effect
+	clear_gameplay_input()
+	set_horizontal_velocity(Vector3.ZERO)
+	return true
+
+
+func end_charm_cast(effect: CharmEffect) -> void:
+	if _casting_charm == effect:
+		_casting_charm = null
+
+
+func is_charm_casting() -> bool:
+	return is_instance_valid(_casting_charm)
+
+
 func is_gameplay_input_blocked() -> bool:
 	return (
 		blocked
@@ -531,12 +556,12 @@ func _get_active_camera() -> Camera3D:
 
 
 func request_dash() -> void:
-	if not dead and not is_gameplay_input_blocked():
+	if not dead and not is_gameplay_input_blocked() and not is_charm_casting():
 		dash_buffer_remaining = data.dash_buffer_duration
 
 
 func request_attack(action: StringName = &"normal") -> void:
-	if not dead and not is_gameplay_input_blocked():
+	if not dead and not is_gameplay_input_blocked() and not is_charm_casting():
 		pending_attack_action = action
 		attack_requested = true
 		attack_buffer_remaining = 0.18
@@ -603,7 +628,7 @@ func can_equip_weapon() -> bool:
 
 # Cho phép state Attack gọi controller, nhưng không đánh khi rơi hoặc bị ngắt
 func can_start_weapon_attack() -> bool:
-	if dead or not is_on_floor() or not is_instance_valid(fsm):
+	if dead or is_charm_casting() or not is_on_floor() or not is_instance_valid(fsm):
 		return false
 	var allowed_states := ["idle", "run", "attack"]
 	for state: FsmState in [fsm.current_state, fsm.next_state]:

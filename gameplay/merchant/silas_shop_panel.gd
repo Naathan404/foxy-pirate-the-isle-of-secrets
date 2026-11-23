@@ -412,21 +412,22 @@ func _refresh_details() -> void:
 
 func _show_buy_details(offer: MerchantOffer) -> void:
 	var is_weapon := offer.kind == MerchantOffer.Kind.WEAPON
+	var unique_purchase := offer.is_unique_purchase()
 	_big_icon.texture = offer.get_icon()
 	_set_name(offer.get_display_name())
 	_type_banner.text = "Weapon" if is_weapon else _item_category(offer.item)
 	var owned := _owned_amount(offer)
-	if is_weapon:
+	if unique_purchase:
 		_owned_banner.text = "Owned" if owned > 0 else "Not owned"
 	else:
 		_owned_banner.text = "Have %d" % owned
 	_set_description(offer.weapon.description if is_weapon else offer.item.description)
 	_set_effect(_offer_effect(offer))
 
-	var maximum := 1 if is_weapon else _max_buy_quantity(offer)
+	var maximum := MIN_TRADE_QUANTITY if unique_purchase else _max_buy_quantity(offer)
 	_quantity = clampi(_quantity, MIN_TRADE_QUANTITY, maxi(MIN_TRADE_QUANTITY, maximum))
 	_trade_row.show()
-	_quantity_box.visible = not is_weapon
+	_quantity_box.visible = not unique_purchase
 	_update_quantity_buttons(maximum)
 	var total := offer.buy_price * _quantity
 	_total_label.text = InventoryMenuFormat.grouped(total)
@@ -435,7 +436,7 @@ func _show_buy_details(offer: MerchantOffer) -> void:
 		"font_color", unaffordable_total_color if not _wallet.can_afford(total) else total_color
 	)
 	action_button.show()
-	if is_weapon and owned > 0:
+	if unique_purchase and owned > 0:
 		# Owning it is a state, not a refusal: keep any purchase message visible.
 		action_button.text = "Owned"
 		action_button.disabled = true
@@ -558,7 +559,7 @@ func _max_buy_quantity(offer: MerchantOffer) -> int:
 
 func _buy_block_reason(offer: MerchantOffer) -> String:
 	if (
-		offer.kind != MerchantOffer.Kind.WEAPON
+		not offer.is_unique_purchase()
 		and not _inventory.can_add_item(offer.item, offer.trade_amount * _quantity)
 	):
 		return _no_room_reason(offer.item)
@@ -598,7 +599,12 @@ func _on_action_pressed() -> void:
 		if offer == null:
 			return
 		var result := _service.purchase(
-			offer.offer_id, _inventory, _wallet, _player.weapon_controller, quantity
+			offer.offer_id,
+			_inventory,
+			_wallet,
+			_player.weapon_controller,
+			quantity,
+			_player.charm_registry
 		)
 		if result == MerchantTransactionService.Result.SUCCESS and offer.offer_id == &"bow":
 			var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
@@ -672,7 +678,7 @@ func _find_sell_entry(item_id: String) -> SellEntry:
 
 
 func _buy_state(offer: MerchantOffer) -> SilasShopSlot.PriceState:
-	if offer.kind == MerchantOffer.Kind.WEAPON and _owned_amount(offer) > 0:
+	if offer.is_unique_purchase() and _owned_amount(offer) > 0:
 		return SilasShopSlot.PriceState.OWNED
 	if not _wallet.can_afford(offer.buy_price):
 		return SilasShopSlot.PriceState.UNAFFORDABLE
@@ -694,6 +700,8 @@ func _buy_tooltip(offer: MerchantOffer) -> String:
 func _receive_text(offer: MerchantOffer) -> String:
 	if offer.kind == MerchantOffer.Kind.WEAPON:
 		return "Goes to your weapons. Equip it from the Inventory."
+	if offer.item.charm != null:
+		return "Equip it from the Charms tab."
 	return "You receive %d %s." % [offer.trade_amount * _quantity, offer.get_display_name()]
 
 
@@ -707,6 +715,8 @@ func _owned_amount(offer: MerchantOffer) -> int:
 	if offer.kind == MerchantOffer.Kind.WEAPON:
 		var weapons := _player.weapon_controller if _player != null else null
 		return 1 if weapons != null and weapons.is_weapon_owned(offer.weapon.weapon_id) else 0
+	if offer.item.charm != null:
+		return int(_player.charm_registry.is_owned(offer.item.charm.charm_id))
 	return _inventory.count_item(StringName(offer.item.item_id))
 
 
@@ -722,6 +732,8 @@ func _used_bag_slots() -> int:
 func _item_category(item: BaseItem) -> String:
 	if item == null:
 		return ""
+	if item.charm != null:
+		return "Charm"
 	if _is_ammunition(item):
 		return "Ammunition"
 	match item.type:
@@ -845,7 +857,7 @@ func _focus_default() -> void:
 			index = slot_index
 			break
 	var target: Control = _slot_uis[index] if index >= 0 else _back_button
-	target.grab_focus.call_deferred()
+	target.grab_focus()
 
 
 func _play_open_feedback() -> void:

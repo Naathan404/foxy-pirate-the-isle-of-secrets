@@ -2,8 +2,11 @@ class_name CharmVfx
 extends Node3D
 ## Self-contained presentation; collision and damage remain owned by the skill execution.
 
-enum Style { IMPACT, STREAM, VORTEX, ANCHOR, CHARGE, TARGET }
+enum Style { IMPACT, STREAM, VORTEX, ANCHOR, CHARGE, TARGET, FROST_FRACTURE, FROST_PRIMER }
 
+const HEAVY_HITSTOP_SECONDS := 0.08
+const HEAVY_SHAKE_PIXELS := 8.0
+const HEAVY_SHAKE_SECONDS := 0.18
 const GOLD := Color(1.0, 0.62, 0.16)
 const SHADOW := Color(0.65, 0.32, 1.0)
 const TIDE := Color(0.18, 0.85, 1.0)
@@ -38,6 +41,15 @@ static func spawn(
 	effect.global_position = at
 	effect.scale = Vector3.ONE * maxf(0.01, radius)
 	return effect
+
+
+static func heavy_impact(parent: Node3D, at: Vector3, color: Color) -> void:
+	spawn(parent, at + Vector3.UP * 0.5, color, 1.35)
+	parent.get_node("/root/HitstopController").request(HEAVY_HITSTOP_SECONDS)
+	parent.get_node("/root/ScreenShakeController").request(HEAVY_SHAKE_PIXELS, HEAVY_SHAKE_SECONDS)
+	parent.get_node("/root/AudioManager").play_sfx_3d(
+		preload("res://assets/audio/combat/dagger_hit.wav"), at, -7.0
+	)
 
 
 static func streak(
@@ -97,7 +109,9 @@ func set_endpoints(from: Vector3, to: Vector3, width: float) -> void:
 
 
 func _update_materials() -> void:
-	var progress := clampf(_age / lifetime, 0.0, 1.0) if not sustained else 0.2
+	var progress := clampf(_age / lifetime, 0.0, 1.0)
+	if sustained and style != Style.FROST_PRIMER:
+		progress = 0.2
 	_material.set_shader_parameter("progress", progress)
 	_material.set_shader_parameter("phase", _age)
 	_flash_material.set_shader_parameter("progress", minf(1.0, progress * 2.5))

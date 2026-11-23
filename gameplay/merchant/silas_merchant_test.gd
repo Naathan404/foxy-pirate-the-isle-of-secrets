@@ -6,7 +6,7 @@ const ARROW: BaseItem = preload("res://data/items/consumables/wooden_arrow.tres"
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
-const NPC_TEST_SCENE_PATH := "res://world/hub/scenes/hub.tscn"
+const NPC_TEST_SCENE_PATH := "res://world/biomes/hub/map/silas_tent.tscn"
 const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
 const SHOP_PANEL_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_panel.tscn")
@@ -359,9 +359,6 @@ func _test_npc_scene_smoke() -> void:
 			(npc.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden"
 		)
 		npc.free()
-	if not ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"):
-		print("Silas Hub integration test skipped: Hub scene has been removed")
-		return
 	if DisplayServer.get_name() == "headless":
 		_assert_true(
 			ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"), "Silas Hub scene is present"
@@ -379,7 +376,7 @@ func _test_npc_scene_smoke() -> void:
 	await process_frame
 	await process_frame
 	var silas := scene.get_node_or_null("Silas") as SilasNpc
-	var panel := scene.get_node_or_null("SilasShopPanel") as SilasShopPanel
+	var panel := scene.find_child("SilasShopPanel", true, false) as SilasShopPanel
 	var player := _get_game_manager_player()
 	_assert_true(silas != null, "npc test scene contains Silas")
 	_assert_true(panel != null, "npc test scene contains shop panel")
@@ -409,7 +406,7 @@ func _test_npc_scene_smoke() -> void:
 		_assert_equal(panel.grid_columns, 4, "shop grid uses the mockup's four columns")
 		var first_buy_slot := panel.grid.get_child(0) as SilasShopSlot
 		_assert_true(first_buy_slot != null, "shop uses the Silas slot art")
-		_assert_true(panel.buy_tab is TextureButton, "buy tab uses the supplied texture")
+		_assert_true(panel.buy_tab is InventoryMenuTabButton, "buy tab uses the inventory UI")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
 		var inventory := player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
@@ -418,7 +415,7 @@ func _test_npc_scene_smoke() -> void:
 				"sell tab renders occupied inventory slots"
 			)
 		panel.close_shop()
-		await create_timer(panel.close_duration + 0.05, true).timeout
+		await panel.shop_closed
 		_assert_false(panel.visible, "shop panel closes")
 		_assert_true(
 			ResourceLoader.exists(silas.data.dialogue_timeline), "first-meeting timeline exists"

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharmCastClip" format=3 uid="uid://dmv28ta7ry8wd"]
+
+[ext_resource type="Script" uid="uid://c6ksneei08ge8" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
+[ext_resource type="Texture2D" uid="uid://8gjbsynklp56" path="res://assets/sprites/foxy/charm_casts/devil_contract.png" id="2_sheet"]
+[ext_resource type="Texture2D" uid="uid://bipjewwook1uq" path="res://assets/sprites/foxy/charm_casts/devil_contract_vertical.png" id="3_vertical"]
+
+[resource]
+script = ExtResource("1_clip")
+charm_id = &"devil_contract"
+texture = ExtResource("2_sheet")
+vertical_texture = ExtResource("3_vertical")
+frame_seconds = null
+foot_anchors = PackedVector2Array(0.5059, 0.9023, 0.5059, 0.9023, 0.5059, 0.9023, 0.5059, 0.9023, 0.5059, 0.9023, 0.5059, 0.9023, 0.5059, 0.9023, 0.5059, 0.9023)
+standing_height_fraction = 0.855
+cast_frames = null
+channel_loop_frames = null
+held_phases = Array[StringName]([&"windup"])
+release_frames = null
+recall_frames = null
+phase_frames = Dictionary[StringName, PackedInt32Array]({
+&"release": PackedInt32Array(4, 5, 6, 7),
+&"windup": PackedInt32Array(0, 1, 2, 3)
+})

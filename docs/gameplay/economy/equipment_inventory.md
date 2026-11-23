@@ -61,7 +61,7 @@ Asset tự tạo để bù phần còn thiếu, đều suy ra từ art có sẵn
 - Ba socket: Space ở trên, Q bên trái, E bên phải; tên phím đọc từ Input Map. Socket đích có dấu và chữ "Target", socket khóa có ổ khóa và chữ "Locked". UI không mở socket.
 - Danh sách lấy từ `CharmRegistry` theo thứ tự đăng ký. Charm Prototype/Disabled chỉ hiện khi đã sở hữu (ví dụ nhờ công cụ debug). Charm chưa sở hữu hiện mờ với ổ khóa. Bộ lọc All/Active/Passive. Bộ đếm là số charm sở hữu / số charm hiển thị trong catalog.
 - Panel chi tiết hiện Cost, Cooldown, Type, Chance, Socket, Status và mô tả hiệu ứng. Chưa có dữ liệu rarity nên băng tím hiện trạng thái sở hữu.
-- Equip/Unequip chỉ gọi `CharmSocketManager.equip_charm()`/`unequip_charm()`. Nút bị vô hiệu khi chưa sở hữu, socket khóa, charm đã ở socket khác hoặc socket đích đang có charm khác. Điều kiện safe location do manager kiểm tra khi bấm; lý do từ chối lấy từ `loadout_change_rejected`. Menu mới không còn dùng đường debug equip (vốn tự mở socket và bỏ qua safe location); công cụ debug trên `CharmSocketManager` vẫn giữ nguyên.
+- Trong bản phát hành, Equip/Unequip gọi `CharmSocketManager.equip_charm()` và `unequip_charm()`. Manager kiểm tra vùng an toàn khi bấm. Khi test trong editor, nút này dùng đường debug cho charm đã sở hữu và mở các ô cần thiết theo thứ tự Q → E → Space. Chọn một socket rồi chọn charm trong lưới. Muốn đổi charm ở ô đang dùng, tháo charm cũ trước.
 
 ## Tab Journey
 

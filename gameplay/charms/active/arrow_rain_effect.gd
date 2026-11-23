@@ -46,7 +46,7 @@ func can_activate(context: CharmActivationContext) -> bool:
 
 
 func activate(context: CharmActivationContext) -> bool:
-	if not can_activate(context):
+	if not can_activate(context) or not _begin_cast_lock():
 		return false
 	_remaining_projectiles = definition.get_param_int(&"projectile_count")
 	_projectile_timer = 0.0
@@ -149,7 +149,9 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 	var impact_position := _target_position + radial_offset
 	# Keep the impact/damage facing stable for downstream knockback and callbacks;
 	# the arrow sprite itself follows the parabolic tangent independently.
-	execution.context.direction = Vector3.BACK
+	execution.context.charm_push = true
+	execution.context.knockback_multiplier = 0.3
+	execution.context.direction = (impact_position - actor.global_position).normalized()
 	execution.context.damage_hp = maxf(
 		0.0, _get_base_damage() * definition.get_param_float(&"damage_percent", 0.35)
 	)
@@ -184,6 +186,7 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 			_launched_projectile_count > 1
 		)
 	else:
+		_end_cast_lock()
 		_volley_finished = true
 		_play_cast_animation(
 			&"finish",
@@ -197,15 +200,6 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 		execution.context.direction,
 		execution.context.damage_hp
 	)
-
-
-func _get_base_damage() -> float:
-	var weapon_controller := actor.get("weapon_controller") as WeaponController
-	if is_instance_valid(weapon_controller) and weapon_controller.equipped != null:
-		var attack := weapon_controller.equipped.get_attack(&"normal")
-		if attack != null:
-			return attack.damage_hp
-	return 1
 
 
 func _get_projectile_interval() -> float:

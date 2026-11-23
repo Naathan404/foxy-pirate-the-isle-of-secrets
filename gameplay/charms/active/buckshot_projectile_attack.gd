@@ -2,6 +2,8 @@ class_name BuckshotProjectileAttack
 extends CharmActiveAttack
 ## Tangible pellet sprite follows the same execution that owns its hitbox.
 
+signal pellet_hit(at: Vector3)
+
 const SHEET: Texture2D = preload("res://assets/sprites/effects/charms/buckshot_projectile.png")
 
 var _projectile: CharmSpriteVfx
@@ -29,4 +31,5 @@ func _on_charm_hit(_damage: DamageContext, target: Node, applied_hp: float) -> v
 	if target is Node3D:
 		at = (target as Node3D).global_position + Vector3.UP * 0.7
 	CharmSpriteVfx.spawn(get_parent(), at, SHEET, 1, 1.2, 0.22)
-	_apply_impact_feedback(target)
+	get_node("/root/HitstopController").request_local(null, target as Node3D, hitstop_seconds)
+	pellet_hit.emit(at)

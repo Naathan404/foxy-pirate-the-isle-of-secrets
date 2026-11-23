@@ -19,6 +19,9 @@ const FragmentSettings = preload("res://world/objects/destructible_fragment_sett
 
 @export_group("Durability")
 @export_range(0.01, 100000.0, 0.01) var max_hp: float = 1.0
+# //NLVP sửa: Chỉ bật cho vật thể cần nhận thêm đòn quái.
+## Cho phép đòn quái gây sát thương lên vật thể.
+@export var receives_enemy_attacks: bool = false
 
 @export_group("Hit Feedback")
 @export var visual_root: Node3D
@@ -99,6 +102,11 @@ func _ready() -> void:
 	_hurtbox.team = CombatTeams.ENEMY
 	_hurtbox.collision_layer = CombatLayers.ENEMY_HURTBOX
 	_hurtbox.collision_mask = CombatLayers.PLAYER_ATTACK
+	# //NLVP sửa: Hai phe cùng đánh được vật thể trung lập đã bật tùy chọn.
+	if receives_enemy_attacks:
+		_hurtbox.team = CombatTeams.NONE
+		_hurtbox.collision_layer |= CombatLayers.PLAYER_HURTBOX
+		_hurtbox.collision_mask |= CombatLayers.ENEMY_ATTACK
 	if is_instance_valid(visual_root):
 		_visual_scale = visual_root.scale
 	if swingable:
@@ -201,7 +209,14 @@ func _configure_ground_shadow() -> void:
 
 
 func receive_damage(damage: DamageContext) -> float:
-	if _destroyed or damage == null or damage.source_team != CombatTeams.PLAYER:
+	if _destroyed or damage == null:
+		return 0.0
+	# //NLVP sửa: Gỗ, đá vẫn chỉ nhận đòn người chơi theo mặc định.
+	var accepted_team := (
+		damage.source_team == CombatTeams.PLAYER
+		or (receives_enemy_attacks and damage.source_team == CombatTeams.ENEMY)
+	)
+	if not accepted_team:
 		return 0.0
 	var applied_hp := _health.take_damage(damage.amount_hp)
 	if applied_hp <= 0.0:

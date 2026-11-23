@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://b28d2n48fbjsd"]
+
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/skull_cracker_effect.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://b0gcc26vnbtt5" path="res://assets/sprites/charms/skull_cracker.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+charm_id = &"skull_cracker"
+display_name = "Skull Cracker"
+description = "Every fourth normal hit on the same enemy stuns it for 0.6 seconds. Bosses resist."
+sprite = ExtResource("3")
+effect_scene = ExtResource("2")
+acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.1
+tags = Array[StringName]([&"passive"])
+effect_params = {
+"hit_threshold": 4,
+"stun_seconds": 0.6
+}

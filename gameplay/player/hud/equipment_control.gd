@@ -3,6 +3,7 @@ extends Control
 ## Hiển thị ô Charm và cooldown thật từ runtime; không quản lý trang bị hay tài nguyên
 
 const PROC_FEEDBACK_SCENE = preload("res://gameplay/player/hud/charm_proc_feedback.tscn")
+const RECALL_OUTLINE_SIZE := Vector2(64.0, 64.0)
 
 @export_group("Potion Feedback")
 @export_range(1.0, 1.5, 0.01) var potion_use_scale := 1.2
@@ -19,7 +20,11 @@ var _potion_tween: Tween
 var _potion_rest_scale: Vector2
 var _charm_runtimes: Dictionary[int, CharmRuntime] = {}
 var _charm_feedback: Dictionary[int, CharmProcFeedback] = {}
+var _recall_outline: PackedVector2Array
+var _recall_perimeter := 0.0
 
+@onready var recall_border: Node2D = $RecallBorder
+@onready var recall_hint: Label = $RecallHint
 @onready var q_socket: TextureRect = $Q_socket
 @onready var e_socket: TextureRect = $E_socket
 @onready var space_socket: TextureRect = $SPACE_socket
@@ -31,9 +36,14 @@ var _charm_feedback: Dictionary[int, CharmProcFeedback] = {}
 @onready var potion_quantity: Label = $Potion_socket/Potion_count
 @onready var secondary_potion_icon: TextureRect = $Second_Potion_socket/Potion_icon
 @onready var secondary_potion_quantity: Label = $Second_Potion_socket/Potion_count
+@onready var _recall_rim: Line2D = $RecallBorder/Rim
+@onready var _recall_glow: Line2D = $RecallBorder/Glow
 
 
 func _ready() -> void:
+	_recall_outline = _recall_rim.points
+	for i in range(1, _recall_outline.size()):
+		_recall_perimeter += _recall_outline[i - 1].distance_to(_recall_outline[i])
 	_slots = {
 		CharmConstants.SocketId.Q: q_socket,
 		CharmConstants.SocketId.E: e_socket,
@@ -101,6 +111,8 @@ func _on_charm_loadout_changed(_charm_id: StringName, _socket_id: int) -> void:
 func refresh() -> void:
 	var manager_valid := is_instance_valid(_manager)
 	potion_socket.show()
+	recall_hint.hide()
+	recall_border.hide()
 	for socket_id: int in _slots:
 		var unlocked := manager_valid and _manager.is_socket_unlocked(socket_id)
 		_slots[socket_id].visible = unlocked
@@ -150,10 +162,55 @@ func _update_cooldown(socket_id: int, runtime: CharmRuntime) -> void:
 	var cooling_down := remaining > 0.0 and duration > 0.0
 	var overlay := _cooldowns[socket_id]
 	var label := _cooldown_labels[socket_id]
+	var anchor := runtime.effect as DeadMansAnchorEffect if runtime != null else null
+	var recall_fraction := anchor.get_recast_fraction() if is_instance_valid(anchor) else 0.0
+	if recall_fraction > 0.0:
+		_show_recall_border(_slots[socket_id], recall_fraction)
+		overlay.hide()
+		recall_hint.text = "[%s]  RECALL" % _binding_text(socket_id)
+		recall_hint.show()
+		label.hide()
+		return
 	overlay.visible = cooling_down
 	label.visible = cooling_down
 	overlay.value = clampf(remaining / duration, 0.0, 1.0) if cooling_down else 0.0
 	label.text = str(ceili(remaining)) if cooling_down else ""
+
+
+func _show_recall_border(slot: TextureRect, remaining_fraction: float) -> void:
+	recall_border.position = slot.position
+	recall_border.scale = slot.size / RECALL_OUTLINE_SIZE
+	# The authored outline starts at twelve o'clock and follows the socket clockwise.
+	var spent := (1.0 - clampf(remaining_fraction, 0.0, 1.0)) * _recall_perimeter
+	for i in range(1, _recall_outline.size()):
+		var start := _recall_outline[i - 1]
+		var end := _recall_outline[i]
+		var length := start.distance_to(end)
+		if spent >= length:
+			spent -= length
+			continue
+		var points := _recall_outline.slice(i - 1)
+		points[0] = start.lerp(end, spent / length)
+		_recall_rim.points = points
+		_recall_glow.points = points
+		recall_border.show()
+		return
+
+
+func _binding_text(socket_id: int) -> String:
+	var action := _manager.get_slot_action(socket_id)
+	var bindings := InputMap.action_get_events(action)
+	if bindings.is_empty():
+		return String(action)
+	var event := bindings[0] as InputEventKey
+	if event == null:
+		return bindings[0].as_text()
+	var code := event.keycode
+	if code == KEY_NONE:
+		code = event.physical_keycode
+		if DisplayServer.get_name() != "headless":
+			code = DisplayServer.keyboard_get_keycode_from_physical(code)
+	return OS.get_keycode_string(code).to_upper()
 
 
 func set_potion_icon(potion: Potion) -> void:

@@ -171,10 +171,6 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -4, 0.77503157, -4)
 [node name="EndDock" parent="MovingPlatform" index="4" unique_id=1860631709]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 18.425, 0.77503157, -4)
 
-[node name="RandomProps" type="Node3D" parent="."]
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-8, 0, -7, 8, 0, -8, -7, 0, 8, 36, 0, 6, 42, 0, -8, 49, 0, 5)
-
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-7.176, 0, -9.789, -4.921, 0, -10.654, -2.734, 0, -11.256, -0.626, 0, -11.979, 1.264, 0, -10.98, 3.24, 0, -10.64, 5.177, 0, -11.919, 5.803, 0, -9.816, 9.317, 0, -5.243, 9.478, 0, 5.657, 9.551, 0, 8.175, 8.941, 0, 10.795, 6.826, 0, 11.172, 4.757, 0, 12.841, 2.441, 0, 11.701, -0.468, 0, 12.208, -2.882, 0, 12.619, -5.201, 0, 12.497, -7.21, 0, 12.365, -8.172, 0, 10.605, -9.669, 0, 9.102, -10.02, 0, 7.111, -9.56, 0, 5.016)

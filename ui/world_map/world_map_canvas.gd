@@ -23,6 +23,7 @@ const CHECKPOINT_SIZE_RATIO := 0.22
 const NPC_RADIUS_RATIO := 0.13
 const CURRENT_DOT_RATIO := 0.12
 const MINI_RING_GROW_PIXELS := 1.0
+const WHEEL_ZOOM_STEP := 1.15
 
 @export var world_map: WorldMapData:
 	set(value):
@@ -68,6 +69,7 @@ const MINI_RING_GROW_PIXELS := 1.0
 @export_range(0, 6, 1, "suffix:px") var room_border_pixels: int = 2
 @export_range(1.0, 10.0, 0.5, "suffix:px") var link_width_pixels: float = 4.0
 @export_range(4.0, 30.0, 1.0, "suffix:px") var exit_arrow_pixels: float = 16.0
+@export_range(1.0, 8.0, 0.1) var max_view_zoom: float = 4.0
 @export_range(0.5, 10.0, 0.1) var pulse_speed: float = 3.5
 @export_range(0.0, 12.0, 0.5, "suffix:px") var pulse_grow_pixels: float = 5.0
 
@@ -88,7 +90,7 @@ var focused_index: int = NO_BIOME:
 var zoom_index: int = NO_BIOME:
 	set(value):
 		zoom_index = value
-		queue_redraw()
+		reset_view()
 var zoom_progress: float = 0.0:
 	set(value):
 		zoom_progress = clampf(value, 0.0, 1.0)
@@ -102,6 +104,10 @@ var shake_offset_pixels: float = 0.0:
 var _progress: MapProgress = MapProgress.new()
 var _unlocked: Dictionary[StringName, bool] = {}
 var _hovered_index: int = NO_BIOME
+## Player zoom and pan of the room layer: screen point = point * scale + offset.
+var _view_scale: float = 1.0
+var _view_offset: Vector2 = Vector2.ZERO
+var _dragging_view: bool = false
 var _box: StyleBoxFlat = StyleBoxFlat.new()
 
 
@@ -129,6 +135,11 @@ func _draw() -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	var motion := event as InputEventMouseMotion
+	if motion != null and _dragging_view:
+		_view_offset += motion.relative
+		_clamp_view()
+		queue_redraw()
+		return
 	if motion != null:
 		var index := _biome_at(motion.position)
 		if index != _hovered_index:
@@ -137,7 +148,13 @@ func _gui_input(event: InputEvent) -> void:
 				biome_hovered.emit(index)
 		return
 	var button := event as InputEventMouseButton
-	if button == null or not button.pressed:
+	if button == null:
+		return
+	if _is_room_layer_shown():
+		if _handle_view_button(button):
+			accept_event()
+			return
+	if not button.pressed:
 		return
 	if button.button_index == MOUSE_BUTTON_LEFT:
 		var index := _biome_at(button.position)
@@ -161,12 +178,53 @@ func get_status(index: int) -> BiomeMapData.Status:
 	return biome.get_status(_progress, _unlocked.get(biome.biome_id, false))
 
 
+## Back to the fitted view; called whenever another biome is shown.
+func reset_view() -> void:
+	_view_scale = 1.0
+	_view_offset = Vector2.ZERO
+	_dragging_view = false
+	queue_redraw()
+
+
 func get_progress() -> MapProgress:
 	return _progress
 
 
 func get_current_biome_index() -> int:
 	return world_map.biomes.find(world_map.find_biome_of_room(_progress.current_room))
+
+
+func _is_room_layer_shown() -> bool:
+	return zoom_index != NO_BIOME and zoom_progress >= 1.0
+
+
+## Wheel zooms around the cursor; dragging with a mouse button pans.
+func _handle_view_button(button: InputEventMouseButton) -> bool:
+	match button.button_index:
+		MOUSE_BUTTON_WHEEL_UP:
+			_zoom_view(WHEEL_ZOOM_STEP, button.position)
+		MOUSE_BUTTON_WHEEL_DOWN:
+			_zoom_view(1.0 / WHEEL_ZOOM_STEP, button.position)
+		MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE:
+			_dragging_view = button.pressed
+		_:
+			return false
+	return true
+
+
+func _zoom_view(factor: float, anchor: Vector2) -> void:
+	var new_scale := clampf(_view_scale * factor, 1.0, max_view_zoom)
+	var ratio := new_scale / _view_scale
+	_view_offset = anchor - (anchor - _view_offset) * ratio
+	_view_scale = new_scale
+	_clamp_view()
+	queue_redraw()
+
+
+## Keeps the zoomed map covering the canvas so it cannot be dragged out of sight.
+func _clamp_view() -> void:
+	var slack := size * (_view_scale - 1.0)
+	_view_offset = _view_offset.clamp(-slack, Vector2.ZERO)
 
 
 func _draw_world_layer(target: int, zoom: float) -> void:
@@ -278,16 +336,32 @@ func _draw_links(biome: BiomeMapData, grid: Transform2D, alpha: float) -> void:
 			if drawn.has(key):
 				continue
 			drawn[key] = true
-			# Leave the room straight out of its door, cross the gap, then enter the other.
-			var step := Vector2(RoomMapData.offset_of(direction)) * half_cell
-			var from := grid * Vector2(room.cell)
-			var to := grid * Vector2(other.cell)
 			draw_polyline(
-				PackedVector2Array([from, from + step, to - step, to]),
+				_link_route(
+					grid * Vector2(room.cell),
+					grid * Vector2(other.cell),
+					Vector2(RoomMapData.offset_of(direction)),
+					half_cell
+				),
 				_faded(muted_color, alpha),
 				link_width_pixels,
 				true
 			)
+
+
+## Axis-aligned route that leaves `from` through its door and enters `to` from the opposite
+## side. Rooms the data places off the door's axis get one elbow in the gap instead of a
+## diagonal. The turn is placed in the gap right outside the door, so it never crosses a room.
+func _link_route(
+	from: Vector2, to: Vector2, forward: Vector2, half_cell: float
+) -> PackedVector2Array:
+	var exit_point := from + forward * half_cell
+	var entry_point := to - forward * half_cell
+	var across := Vector2(absf(forward.y), absf(forward.x))
+	if (entry_point - exit_point).dot(across) == 0.0:
+		return PackedVector2Array([from, to])
+	var slid := exit_point + across * (entry_point - exit_point).dot(across)
+	return PackedVector2Array([from, exit_point, slid, entry_point, to])
 
 
 ## Arrows in the neighbouring biome's colour mark doors that leave this biome.
@@ -364,9 +438,12 @@ func _grid_transform(biome: BiomeMapData, rect: Rect2, detailed: bool) -> Transf
 	if detailed:
 		cell_pixels = minf(cell_pixels, max_room_cell_pixels)
 	var middle := Vector2(lowest + highest) * HALF
-	return Transform2D(
+	var fitted := Transform2D(
 		0.0, Vector2.ONE * cell_pixels, 0.0, rect.get_center() - middle * cell_pixels
 	)
+	if not detailed:
+		return fitted
+	return Transform2D(0.0, Vector2.ONE * _view_scale, 0.0, _view_offset) * fitted
 
 
 ## World layer placement: shrunk to fit the canvas, then zoomed towards `target`.

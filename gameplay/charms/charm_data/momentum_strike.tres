@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://b6b1pik4jtxjk"]
+
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/charms/passive/momentum_strike_effect.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://473461umcv4k" path="res://assets/sprites/charms/momentum_strike.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+charm_id = &"momentum_strike"
+display_name = "Momentum Strike"
+description = "Completing a dash empowers your next normal attack by 50%."
+sprite = ExtResource("3")
+effect_scene = ExtResource("2")
+acquisition_source = &"merchant_or_enemy_drop"
+drop_chance = 0.1
+tags = Array[StringName]([&"passive"])
+effect_params = {
+"damage_multiplier": 1.5
+}

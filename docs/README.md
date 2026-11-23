@@ -28,11 +28,11 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Hệ thống · `systems/`
 
-[AudioManager](systems/audio_manager.md)
+[AudioManager](systems/audio_manager.md) · [Save/Load](systems/save_system.md) · [Menu chính và tạm dừng](systems/main_pause_menu.md) · [Bản đồ thế giới](systems/world_map.md)
 
 ## Hình ảnh · `art/`
 
-[Shader nước](art/shaders/water_shader.md) · [Prompt ảnh Foxy cầm cung](art/references/foxy_bow_imagegen_prompt.md)
+[Art direction Coral Valley](art/coral_valley_art_direction.md) · [Shader nước](art/shaders/water_shader.md) · [Prompt ảnh Foxy cầm cung](art/references/foxy_bow_imagegen_prompt.md)
 
 ## Kế hoạch · `plans/`
 

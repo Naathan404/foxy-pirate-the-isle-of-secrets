@@ -1,14 +1,18 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" format=3 uid="uid://dd2l0lhon7g4w"]
 
-[ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
-[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/dead_mans_salute.png" id="2_sheet"]
+[ext_resource type="Script" uid="uid://c6ksneei08ge8" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
+[ext_resource type="Texture2D" uid="uid://bx2xaxue38aik" path="res://assets/sprites/foxy/charm_casts/dead_mans_salute.png" id="2_sheet"]
+[ext_resource type="Texture2D" uid="uid://cffy8rh52xoay" path="res://assets/sprites/foxy/charm_casts/dead_mans_salute_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"dead_mans_salute"
 texture = ExtResource("2_sheet")
+vertical_texture = ExtResource("3_vertical")
+frame_seconds = PackedFloat32Array(0.035, 0.045, 0.24, 0.31556, 0.055, 0.055, 0.05, 0.045)
 foot_anchors = PackedVector2Array(0.4844, 0.9375, 0.4785, 0.9375, 0.482, 0.9375, 0.482, 0.9375, 0.4688, 0.9336, 0.4355, 0.9297, 0.4531, 0.9297, 0.4863, 0.9336)
 standing_height_fraction = 0.73
 cast_frames = PackedInt32Array(0, 1, 2, 3)
 channel_loop_frames = PackedInt32Array(2, 3)
 release_frames = PackedInt32Array(4, 5, 6, 7)
+recall_frames = null
