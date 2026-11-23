@@ -126,7 +126,7 @@ External paths attach to the islands shown in the final diagram:
 | room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
 | room_24 | Bottom | Farm | Medium | left: room_23 |
 
-Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` and Boss `08` at their room centers. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses the chest defaults (10–20 gold, no item/note entries). The other five chests are present on entry.
+Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
 
 Raid `room_07` starts when Foxy enters the interior activation area. During combat, `BaseRoom.set_exits_locked(true)` closes the existing player
 boundary across the exits and disables their scene-change triggers. The paths
@@ -155,6 +155,18 @@ its opened/loot state currently resets like the other normal chests.
 `FlatTideController.externally_advanced` defaults to false, preserving automatic
 cycles in Mobs rooms. The finite spawner subclasses the existing tide spawner,
 whose `_spawn()` now reports success as a boolean without changing its old callers.
+
+Boss `room_08` contains Captain Blubberbeard at
+`Vector3(6, 0.25209618, 0.45244434)` and reuses `BossEncounter` with the
+`captain_blubberbeard` encounter ID. Entering the island's interior locks the
+existing player boundary and scene-change exit via `BaseRoom.set_exits_locked()`.
+The exit reopens on `fight_finished`; the boss's existing death sequence creates
+his configured reward chest at his death position. There is no preplaced chest,
+extra barrier or collapsing bridge. The existing boss reward scene and its loot
+are retained. Defeat, chest-open state and uncollected reward items are restored
+by the existing encounter persistence when returning during the same run.
+The optional room/activation-area references default to empty, leaving the old
+boss test scene's custom bridge lock unchanged.
 
 ## Scene identity
 

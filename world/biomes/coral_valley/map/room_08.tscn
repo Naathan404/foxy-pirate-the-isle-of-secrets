@@ -5,7 +5,11 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
-[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="reward_chest"]
+[ext_resource type="PackedScene" uid="uid://c60eka7xvsqh8" path="res://gameplay/bosses/blubberbeard/blubberbeard.tscn" id="boss"]
+[ext_resource type="Script" path="res://gameplay/bosses/boss_encounter.gd" id="boss_encounter"]
+
+[sub_resource type="BoxShape3D" id="BossEntryShape"]
+size = Vector3(24, 5, 26)
 
 [node name="room_08" instance=ExtResource("1_base")]
 open_exits = 8
@@ -17,6 +21,22 @@ spawn_positions = PackedVector3Array(-11.962, 0, -5.651, -8.156, 0, -11.247, -8.
 fixed_spawn_count = 20
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
-[node name="TreasureChest" parent="." instance=ExtResource("reward_chest")]
-position = Vector3(0, 0.25209618, 0.45244434)
-editor_description = "Center of the Boss room; standard placed chest."
+[node name="CaptainBlubberbeard" parent="." instance=ExtResource("boss")]
+position = Vector3(6, 0.25209618, 0.45244434)
+hits_before_counter = 6
+counter_cooldown = 7.5
+
+[node name="BossEncounter" type="Node" parent="." node_paths=PackedStringArray("boss", "room", "activation_area")]
+script = ExtResource("boss_encounter")
+encounter_id = &"captain_blubberbeard"
+boss = NodePath("../CaptainBlubberbeard")
+room = NodePath("..")
+activation_area = NodePath("../BossEntryArea")
+
+[node name="BossEntryArea" type="Area3D" parent="."]
+position = Vector3(0, 1.5, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossEntryArea"]
+shape = SubResource("BossEntryShape")
