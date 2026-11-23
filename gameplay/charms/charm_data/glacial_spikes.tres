@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CharmData" format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://da8dd510kdfi7"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/glacial_spikes_effect.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/charms/glacial_spikes.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://cna23155leo8m" path="res://assets/sprites/charms/glacial_spikes.png" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -18,13 +18,13 @@ acquisition_source = &"fixed_boss_reward"
 drop_chance = 1
 tags = Array[StringName]([&"active"])
 effect_params = {
-"damage_multiplier": 1.5,
-"row_count": 3,
-"first_row_distance": 1.15,
-"row_spacing": 1.2,
 "column_spacing": 1.45,
+"damage_multiplier": 1.5,
+"first_row_distance": 1.15,
+"radius_units": 1.25,
+"row_count": 3,
 "row_interval_seconds": 0.12,
+"row_spacing": 1.2,
 "stun_seconds": 1,
-"windup_seconds": 0.28,
-"radius_units": 1.25
+"windup_seconds": 0.28
 }
