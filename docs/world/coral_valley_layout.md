@@ -128,6 +128,13 @@ External paths attach to the islands shown in the final diagram:
 
 Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
 
+Quiz `09` retains four Elite Barrels around its chest at local X/Z `(±5, ±5)`,
+forming a square with four 10-unit sides. Quiz `04`, `18` and `23` retain only
+the two right-side Elite Barrels: TopRight `(5, -5)` and BottomRight `(5, 5)`;
+TopLeft and BottomLeft have been removed. Groups remain centered on their chests,
+and the remaining guards keep their positions and heights. No new scripts or
+changes to loot, puzzle controls, island spacing or paths are introduced.
+
 Raid `room_07` starts when Foxy enters the interior activation area. During combat, `BaseRoom.set_exits_locked(true)` closes the existing player
 boundary across the exits and disables their scene-change triggers. The paths
 stay visible; no separate barriers or barrier visuals are created.

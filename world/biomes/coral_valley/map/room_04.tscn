@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="reward_chest"]
 [ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
 [ext_resource type="Resource" path="res://data/notes/barrel.tres" id="chest_note"]
+[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="chest_barrel"]
 
 [sub_resource type="Resource" id="GuaranteedNoteDrop"]
 script = ExtResource("chest_note_drop")
@@ -235,6 +236,16 @@ editor_description = "Center of the right Quiz island."
 gold_min = 10
 gold_max = 20
 note_drops = Array[ExtResource("chest_note_drop")]([SubResource("GuaranteedNoteDrop")])
+
+[node name="ChestBarrels" type="Node3D" parent="."]
+position = Vector3(54.96114925, 0.21008015, 0.58610969)
+editor_description = "Two Elite Barrels to the right of the chest: top-right and bottom-right at local X/Z (5, -5) and (5, 5)."
+
+[node name="TopRight" parent="ChestBarrels" instance=ExtResource("chest_barrel")]
+position = Vector3(5, 0.05, -5)
+
+[node name="BottomRight" parent="ChestBarrels" instance=ExtResource("chest_barrel")]
+position = Vector3(5, 0.05, 5)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
