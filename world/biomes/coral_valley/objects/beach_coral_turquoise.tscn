@@ -30,4 +30,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
 [node name="CollisionShape3D" parent="MovementBody" index="0"]
 position = Vector3(-0.1, 0.4, 0)
 shape = SubResource("MovementShape")
-disabled = false
+disabled = true
