@@ -13,6 +13,8 @@ signal destination_reached(at_end: bool)
 @export var start_at_center: bool = false
 ## Ordered closed route. The first marker is the initial stop; overrides endpoint modes.
 @export var route_marker_paths: Array[NodePath] = []
+## Follow the closed route clockwise until a stop is requested.
+@export var route_autoplay: bool = false
 
 var _moving := false
 var _target_end := false
@@ -21,6 +23,7 @@ var _target_marker: Marker3D
 var _route_markers: Array[Marker3D] = []
 var _route_index := 0
 var _route_step_queue: Array[int] = []
+var _route_looping := false
 
 @onready var platform: AnimatableBody3D = $Platform
 @onready var start_marker: Marker3D = get_node_or_null("Start") as Marker3D
@@ -59,6 +62,9 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 	platform.position = _target_marker.position
+	if route_autoplay and not _route_markers.is_empty():
+		_route_looping = true
+		request_route_steps(1)
 	if lever_hurtbox != null:
 		lever_hurtbox.actor = self
 		lever_hurtbox.team = CombatTeams.ENEMY
@@ -139,6 +145,25 @@ func is_targeting_end() -> bool:
 	return _target_end
 
 
+## Finish the current edge, then stay at that marker. Repeated hits are harmless.
+func request_route_stop() -> void:
+	_route_looping = false
+	if _route_step_queue.size() > 1:
+		_route_step_queue.resize(1)
+
+
+## Toggle the requested state, including while travelling toward a pending stop.
+func toggle_route_motion() -> void:
+	if _route_markers.size() < 2:
+		return
+	if _route_looping:
+		request_route_stop()
+		return
+	_route_looping = true
+	if not _moving:
+		request_route_steps(1)
+
+
 func _request_stop(marker: Marker3D) -> void:
 	_target_marker = marker
 	_target_end = marker == end_marker
@@ -171,4 +196,8 @@ func _advance_route_movement(distance_remaining: float) -> void:
 		distance_remaining -= distance
 		_route_index = next_index
 		_route_step_queue.pop_front()
+		if _route_looping and _route_step_queue.is_empty():
+			_route_step_queue.append(1)
+			if distance_remaining <= 0.0:
+				return
 	_moving = false

@@ -9,12 +9,14 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
-[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="platform_texture"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/quiz_orbit_platform.tscn" id="orbit_platform"]
-[ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="orbit_lever"]
 
-[sub_resource type="BoxShape3D" id="QuizPlatformShape"]
+[ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="center_lever"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/quiz_orbit_platform.tscn" id="orbit_platform"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="platform_texture"]
+
+[sub_resource type="BoxShape3D" id="PlatformShape"]
 size = Vector3(4, 0.5, 4)
+
 
 [sub_resource type="Environment" id="Environment_smj7s"]
 resource_local_to_scene = true
@@ -86,8 +88,8 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_23" unique_id=1607608505 instance=ExtResource("1_base")]
-editor_description = "Quiz 23: fixed center platform; moving platform confined to 8 surrounding stops. Upper levers advance 3 stops clockwise; lower levers reverse 2 stops. Both islands control the same moving platform."
-boundary_openings = Array[Rect2]([Rect2(12.7, -3.33552031, 2, 5.78), Rect2(40.28614925, -3.33552031, 2, 5.78)])
+editor_description = "Timing Quiz: a fixed center platform carries one lever. The outer platform loops clockwise around eight stops. Hits alternate between stopping at the next marker and resuming clockwise travel."
+boundary_openings = Array[Rect2]([Rect2(12.7, -2.3355203, 29.58615, 5.78)])
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_24.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_22.tscn"
@@ -191,47 +193,26 @@ spawn_positions = PackedVector3Array(47.78515, 0, -9.789, 50.04015, 0, -10.654, 
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
-[node name="Platform2" type="AnimatableBody3D" parent="."]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 27.61284825, -0.03991985, -0.44552031)
+[node name="CenterPlatform" type="StaticBody3D" parent="." index="7" unique_id=1147580054]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 27.612848, -0.03991985, 0.5544797)
 
-[node name="Sprite3D" type="Sprite3D" parent="Platform2"]
+[node name="Sprite3D" type="Sprite3D" parent="CenterPlatform" index="0" unique_id=2067800621]
 transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
 alpha_cut = 1
 texture = ExtResource("platform_texture")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform2"]
-shape = SubResource("QuizPlatformShape")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CenterPlatform" index="1" unique_id=1208114308]
+shape = SubResource("PlatformShape")
 
-[node name="MovingPlatform" parent="." instance=ExtResource("orbit_platform")]
-position = Vector3(27.61284825, -0.03991985, -0.44552031)
+[node name="StopLever" parent="CenterPlatform" index="2" unique_id=202302279 node_paths=PackedStringArray("target_platforms") instance=ExtResource("center_lever")]
+editor_description = "Shoot to stop the orbit platform at its next marker; shoot again to resume clockwise travel."
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 1.05, 0)
+target_platforms = [NodePath("../../MovingPlatform")]
+destination_mode = 4
 
-[node name="LeftUpperLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
-transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 10.7, 0.21008015, -5.44552031)
-editor_description = "Moves the orbit platform forward 3 stops clockwise per player hit."
-target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
-destination_mode = 3
-route_step_count = 3
-
-[node name="LeftLowerLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
-transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 10.7, 0.21008015, 4.55447969)
-editor_description = "Moves the orbit platform backward 2 stops counterclockwise per player hit."
-target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
-destination_mode = 3
-route_step_count = -2
-
-[node name="RightUpperLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
-transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 44.26114925, 0.21008015, -5.44552031)
-editor_description = "Moves the orbit platform forward 3 stops clockwise per player hit."
-target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
-destination_mode = 3
-route_step_count = 3
-
-[node name="RightLowerLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
-transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 44.26114925, 0.21008015, 4.55447969)
-editor_description = "Moves the orbit platform backward 2 stops counterclockwise per player hit."
-target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
-destination_mode = 3
-route_step_count = -2
+[node name="MovingPlatform" parent="." index="8" unique_id=190808785 instance=ExtResource("orbit_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.612848, -0.03991985, 0.5544797)
+route_autoplay = true
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

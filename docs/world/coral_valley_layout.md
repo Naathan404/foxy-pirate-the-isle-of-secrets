@@ -4,13 +4,12 @@ Numbering follows the final reference diagram: middle row left to right (`room_0
 
 ![Numbered room and path diagram](coral_valley_layout.svg)
 
-Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `04` has three stationary platforms; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `23` has a fixed center and an eight-stop orbit platform controlled from both shores.
+Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `23` has a fixed center lever and an automatically orbiting platform; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `04` has a fixed center and an eight-stop orbit platform controlled from both shores.
 
 All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
 collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`.
 Each contains two Small islands, one room root and one shared CameraBounds.
-Room `04` inherits `quiz_room.tscn`. Rooms `09`, `18` and `23` use the Small
-room template with their own platform layouts.
+All four Quiz rooms use the Small room template with their own platform layouts.
 
 Spacing uses the visible sprite edges (alpha >= 0.5), rather than the platform's
 4-unit collision box. Each platform is rotated 90 degrees around Y, keeping its
@@ -24,11 +23,24 @@ The ground artwork spans `1134 × 0.01 × 0.995455 × 2.5 = 28.22114925` units a
 so the right island center is offset `54.96114925` units. Its paths, seaweed and
 shared CameraBounds move with it.
 
-`quiz_room.tscn` supplies `Platform`, `Platform2` and `Platform3` to room `04`.
-Their X coordinates are `20.03284825`, `27.61284825`, and `35.19284825`; all use
-Y `-0.03991985` and Z `0.55447969`. Their collider top surfaces match the island
-floor height. The existing sprite and `4 × 0.5 × 4` colliders are retained.
-This room has no levers, call docks or movement.
+Quiz `room_04` keeps `Platform2` fixed at
+`Vector3(27.61284825, -0.03991985, -0.44552031)`. Its other platform begins directly
+right of it, and can stop only at eight surrounding markers: **E → SE → S → SW →
+W → NW → N → NE**, clockwise. The center is never a moving-platform stop.
+Horizontal pitch is 7.58 units; vertical pitch is 9.78 units, preserving 4 units
+between the platform sprites. Travel follows neighboring markers around the
+perimeter in either direction, without crossing the fixed platform.
+
+Each shore has two attack-operated `platform_puzzle_lever.tscn` instances. All
+four target the same `MovingPlatform`. Upper levers request **+3 stops clockwise**;
+lower levers request **−2 stops counterclockwise**. Steps wrap modulo eight.
+Hits during movement queue their signed steps after the existing travel; turns
+remain on the perimeter. No lever is attached to either platform.
+The existing `MovingPlatform` script exposes `route_marker_paths` and
+`request_route_steps(count)`; `PlatformLever.DestinationMode.ADVANCE_ROUTE` uses
+its signed `route_step_count`. Existing endpoint and Quiz 18 center-stop modes
+remain supported. Both inward island openings follow the fixed center's Z,
+and remain 5.78 units wide.
 
 Quiz `room_09` replaces all three stationary platforms with one `MovingPlatform`
 using two-endpoint mode with `start_at_center = true`. It initially rests at
@@ -56,26 +68,21 @@ The former platform positions remain the stop coordinates: X `20.03284825`,
 are added. The existing two-stop platform behavior remains the default; this
 scene enables `center_stop_enabled` and supplies a `Center` marker.
 
-Quiz `room_23` keeps `Platform2` fixed at
-`Vector3(27.61284825, -0.03991985, -0.44552031)`. Its other platform begins directly
-right of it, and can stop only at eight surrounding markers: **E → SE → S → SW →
-W → NW → N → NE**, clockwise. The center is never a moving-platform stop.
-Horizontal pitch is 7.58 units; vertical pitch is 9.78 units, preserving 4 units
-between the platform sprites. Travel follows neighboring markers around the
-perimeter in either direction, without crossing the fixed platform.
+Quiz `room_23` has a fixed center platform at
+`Vector3(27.61284825, -0.03991985, 0.55447969)` and one moving platform using
+`objects/quiz_orbit_platform.tscn`, the same eight surrounding stops as Quiz 04.
+It starts east and automatically loops clockwise at 6 units/second, without
+pauses at markers or crossing the center. One attack-operated lever sits on the
+fixed center platform; there are no shore or remote-room levers.
+On a player hit, `PlatformLever.DestinationMode.TOGGLE_ROUTE_LOOP` calls
+`MovingPlatform.toggle_route_motion()`: finish the current edge and stop exactly
+at its destination marker. The next hit resumes clockwise travel, alternating
+stop/resume on every hit. A hit during a pending stop cancels that stop and keeps
+the platform moving. This state resets when the scene is reloaded.
+Only Quiz 23 enables `route_autoplay`; Quiz 04
+keeps its manual +3/-2 controls. Island spacing, paths and CameraBounds are retained.
 
-Each shore has two attack-operated `platform_puzzle_lever.tscn` instances. All
-four target the same `MovingPlatform`. Upper levers request **+3 stops clockwise**;
-lower levers request **−2 stops counterclockwise**. Steps wrap modulo eight.
-Hits during movement queue their signed steps after the existing travel; turns
-remain on the perimeter. No lever is attached to either platform.
-The existing `MovingPlatform` script exposes `route_marker_paths` and
-`request_route_steps(count)`; `PlatformLever.DestinationMode.ADVANCE_ROUTE` uses
-its signed `route_step_count`. Existing endpoint and Quiz 18 center-stop modes
-remain supported. Both inward island openings follow the fixed center's Z,
-and remain 5.78 units wide.
-
-Rooms `04`, `09` and `18` open the player boundary at both island edges facing the
+Rooms `23`, `09` and `18` open the player boundary at both island edges facing the
 platforms using `boundary_openings`: `Rect2(12.7, -2.33552031, 29.58614925, 5.78)`.
 The 5.78-unit-wide passage follows the platforms' visible sprite width along Z, centered
 at `0.55447969`. Other island edges retain their player boundaries, and enemy

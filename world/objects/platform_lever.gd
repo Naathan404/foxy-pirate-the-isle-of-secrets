@@ -6,7 +6,7 @@ extends StaticBody3D
 ## Scene tree into Target Platforms. Built-in docks can use their parent
 ## platform when this list is empty.
 
-enum DestinationMode { START, END, TOGGLE, ADVANCE_ROUTE }
+enum DestinationMode { START, END, TOGGLE, ADVANCE_ROUTE, TOGGLE_ROUTE_LOOP }
 
 @export_group("Platform Targets")
 @export var target_platforms: Array[MovingPlatform] = []:
@@ -101,6 +101,8 @@ func receive_damage(damage: DamageContext) -> float:
 				moving_platform.request_destination(not moving_platform.is_targeting_end())
 			DestinationMode.ADVANCE_ROUTE:
 				moving_platform.request_route_steps(route_step_count)
+			DestinationMode.TOGGLE_ROUTE_LOOP:
+				moving_platform.toggle_route_motion()
 	_lever_sprite.stop()
 	_lever_sprite.play(&"active")
 	return damage.amount_hp
