@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/quiz_shuttle_platform.tscn" id="shuttle_platform"]
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="reward_chest"]
 
 [sub_resource type="Environment" id="Environment_4clvr"]
 resource_local_to_scene = true
@@ -190,6 +191,10 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 
 [node name="MovingPlatform" parent="." unique_id=458186369 instance=ExtResource("shuttle_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.612848, -0.03991985, 0.5544797)
+
+[node name="TreasureChest" parent="." instance=ExtResource("reward_chest")]
+position = Vector3(54.96114925, 0.21008015, 0.58610969)
+editor_description = "Center of the right Quiz island."
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

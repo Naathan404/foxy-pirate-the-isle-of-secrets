@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="center_lever"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/quiz_orbit_platform.tscn" id="orbit_platform"]
 [ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="platform_texture"]
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="reward_chest"]
 
 [sub_resource type="BoxShape3D" id="PlatformShape"]
 size = Vector3(4, 0.5, 4)
@@ -213,6 +214,10 @@ destination_mode = 4
 [node name="MovingPlatform" parent="." index="8" unique_id=190808785 instance=ExtResource("orbit_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.612848, -0.03991985, 0.5544797)
 route_autoplay = true
+
+[node name="TreasureChest" parent="." instance=ExtResource("reward_chest")]
+position = Vector3(54.96114925, 0.21008015, 0.58610969)
+editor_description = "Center of the right Quiz island."
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
