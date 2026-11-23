@@ -87,6 +87,7 @@ func _save_pickup(index: int) -> void:
 	else:
 		items[index] = {
 			"item": pickup.item,
+			"note": pickup.note,
 			"quantity": pickup.quantity,
 			"position": pickup.position,
 		}
@@ -109,6 +110,7 @@ func _restore_reward() -> void:
 		var entry: Dictionary = items[index]
 		var pickup := ITEM_PICKUP.instantiate() as ItemPickup
 		pickup.item = entry.item
+		pickup.note = entry.get("note") as MonsterNote
 		pickup.quantity = entry.quantity
 		_room.add_child(pickup)
 		pickup.position = entry.position

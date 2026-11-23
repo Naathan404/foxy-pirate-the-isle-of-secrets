@@ -162,9 +162,11 @@ Boss `room_08` contains Captain Blubberbeard at
 existing player boundary and scene-change exit via `BaseRoom.set_exits_locked()`.
 The exit reopens on `fight_finished`; the boss's existing death sequence creates
 his configured reward chest at his death position. There is no preplaced chest,
-extra barrier or collapsing bridge. The existing boss reward scene and its loot
-are retained. Defeat, chest-open state and uncollected reward items are restored
+extra barrier or collapsing bridge. The boss reward scene guarantees 10–20 gold, one Tide Grapple Charm and
+one boss note (`Diary of Tide`); the old key/material rewards are removed. Defeat, chest-open state and uncollected reward items are restored
 by the existing encounter persistence when returning during the same run.
+Tracked reward pickups now retain their `MonsterNote` reference as well as item,
+quantity and position, so an uncollected boss diary restores as an actual note.
 The optional room/activation-area references default to empty, leaving the old
 boss test scene's custom bridge lock unchanged.
 
