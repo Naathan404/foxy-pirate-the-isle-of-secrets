@@ -7,6 +7,43 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="reward_chest"]
 
+[ext_resource type="PackedScene" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="raid_tide"]
+[ext_resource type="Script" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone"]
+[ext_resource type="Script" path="res://world/gimmick/flat_tide/raid_enemy_spawner.gd" id="raid_spawner"]
+[ext_resource type="Script" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="enemy_entry"]
+[ext_resource type="Script" path="res://world/components/raid_encounter.gd" id="raid_encounter"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/starfish.tscn" id="starfish"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="elite_starfish"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/crab.tscn" id="crab"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/elite_crab.tscn" id="elite_crab"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="coral_skeleton"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="elite_coral_skeleton"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/barrel.tscn" id="barrel"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="elite_barrel"]
+
+[sub_resource type="Resource" id="Entry_starfish"]
+script = ExtResource("enemy_entry")
+normal_scene = ExtResource("starfish")
+elite_scene = ExtResource("elite_starfish")
+
+[sub_resource type="Resource" id="Entry_crab"]
+script = ExtResource("enemy_entry")
+normal_scene = ExtResource("crab")
+elite_scene = ExtResource("elite_crab")
+
+[sub_resource type="Resource" id="Entry_coral_skeleton"]
+script = ExtResource("enemy_entry")
+normal_scene = ExtResource("coral_skeleton")
+elite_scene = ExtResource("elite_coral_skeleton")
+
+[sub_resource type="Resource" id="Entry_barrel"]
+script = ExtResource("enemy_entry")
+normal_scene = ExtResource("barrel")
+elite_scene = ExtResource("elite_barrel")
+
+[sub_resource type="BoxShape3D" id="RaidEntryArea"]
+size = Vector3(24, 5, 26)
+
 [node name="room_07" instance=ExtResource("1_base")]
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_08.tscn"
@@ -21,3 +58,94 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [node name="TreasureChest" parent="." instance=ExtResource("reward_chest")]
 position = Vector3(0, 0.25209618, 0.45244434)
 editor_description = "Center of the Raid room."
+
+[node name="FlatTide" parent="." node_paths=PackedStringArray("player", "zones") instance=ExtResource("raid_tide")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+player = NodePath("../Foxy")
+zones = [NodePath("LeftShallows"), NodePath("UpShallows"), NodePath("RightShallows"), NodePath("DownShallows")]
+sequential_zones = true
+externally_advanced = true
+low_duration = 8.0
+rise_duration = 6.0
+high_duration = 4.0
+fall_duration = 6.0
+flooded_move_multiplier = 0.5
+
+[node name="RightShallows" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.200718, 0.25, -4.5999727)
+size = Vector2(45, 66)
+volume_depth = 2.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+
+[node name="LeftShallows" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
+script = ExtResource("tide_zone")
+flow_direction = 1
+size = Vector2(45, 66)
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
+
+[node name="UpShallows" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -15.0999727)
+script = ExtResource("tide_zone")
+rise_duration = 6.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+flow_direction = 3
+size = Vector2(78, 45)
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
+
+[node name="DownShallows" type="MeshInstance3D" parent="FlatTide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, 5.9000273)
+script = ExtResource("tide_zone")
+rise_duration = 6.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+flow_direction = 2
+size = Vector2(78, 45)
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
+
+[node name="WaterFootsteps" parent="FlatTide" node_paths=PackedStringArray("player")]
+player = NodePath("../../Foxy")
+
+[node name="EnemySpawner" parent="FlatTide" node_paths=PackedStringArray("spawn_ground")]
+script = ExtResource("raid_spawner")
+spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
+minimum_spacing = 3.0
+minimum_player_distance = 3.0
+attempts_per_enemy = 80
+
+[node name="RaidEncounter" type="Node3D" parent="." node_paths=PackedStringArray("controller", "spawner", "activation_area", "room")]
+script = ExtResource("raid_encounter")
+controller = NodePath("../FlatTide")
+spawner = NodePath("../FlatTide/EnemySpawner")
+activation_area = NodePath("EntryArea")
+room = NodePath("..")
+first_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_starfish"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton")])
+later_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_starfish"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton"), SubResource("Entry_barrel")])
+
+[node name="EntryArea" type="Area3D" parent="RaidEncounter"]
+position = Vector3(0, 1.5, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RaidEncounter/EntryArea"]
+shape = SubResource("RaidEntryArea")

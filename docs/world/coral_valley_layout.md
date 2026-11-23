@@ -128,6 +128,30 @@ External paths attach to the islands shown in the final diagram:
 
 Six standard `treasure_chest.tscn` instances are placed as room rewards: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` and Boss `08` at their room centers. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` and Boss `08` use the chest defaults (10–20 gold, no item/note entries). All six are present when entering the room; no encounter or puzzle gate is attached.
 
+Raid `room_07` starts when Foxy enters the interior activation area. During combat, `BaseRoom.set_exits_locked(true)` closes the existing player
+boundary across the exits and disables their scene-change triggers. The paths
+stay visible; no separate barriers or barrier visuals are created.
+It reuses the Mobs 4 directional tide layout: left → up → right → down. Each tide
+rises, holds, and falls with the existing surge/water interactions. New enemies
+appear on exposed ground as it recedes. The tide then stays LOW until all requested
+enemies have spawned and died; the next tide starts after a 2-second pause.
+
+| Raid wave | Total | Normal | Elite | Random enemy pool |
+| --- | --- | --- | --- | --- |
+| 1 | 3 | 3 | 0 | Starfish, Crab, Coral Skeleton |
+| 2 | 4 | 4 | 0 | Starfish, Crab, Coral Skeleton, Barrel |
+| 3 | 4 | 3 | 1 | Same four types, corresponding elite variants |
+| 4 | 5 | 3 | 2 | Same four types, corresponding elite variants |
+
+Types may repeat. Counts are exact, not probability-based; blocked spawns retry
+instead of silently losing an enemy. The last clear leaves the water LOW and
+opens both exits. Completion is kept in `GameManager.story_flags` for the current
+run, so revisiting does not restart the raid; New Game resets it. The existing
+center chest remains available throughout, with its existing loot configuration.
+`FlatTideController.externally_advanced` defaults to false, preserving automatic
+cycles in Mobs rooms. The finite spawner subclasses the existing tide spawner,
+whose `_spawn()` now reports success as a boolean without changing its old callers.
+
 ## Scene identity
 
 The map contains 25 rooms, numbered `room_00`–`room_24`. The former single-island
