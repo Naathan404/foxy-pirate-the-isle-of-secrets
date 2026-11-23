@@ -207,21 +207,43 @@ The groups use ten and five distinct candidate positions respectively, with
 at least 3.6 units between groups and 3.3 units from seaweed candidates.
 Both use `random_props.gd`; its Inspector count range now starts at 1.
 
-All non-Materials rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
+All rooms except Materials and Empty rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
 
 | Layout | Rooms | Seaweed per visit |
 | --- | --- | --- |
 | Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22`, `room_24` | 20 per room |
-| Small, one island | `room_01`, `room_03`, `room_06`, `room_11`, `room_15`, `room_17`, `room_19`, `room_21` | 15 per room |
+| Small, one island | `room_19` | 15 per room |
 | Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 15 on each island, 30 per room |
 
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
-Coral and coconut palms do not appear in any other Coral Valley room. The old
-mixed shell, stone and octopus pool is no longer used by any room, including
-the removed unused spawner in `room_00`. Only Materials and Mobs rooms use
-the explicit prop pools described above. Seaweed spawners retain their
-existing setup.
+Empty rooms `01`, `03`, `06`, `11`, `15`, `17` and `21` choose exactly one
+population layout per visit, with equal 50% probabilities. `RandomEmptyType`
+uses `random_props.gd` to instantiate one of two PackedScenes at the origin;
+only the selected branch's populations exist. The previous simultaneous groups,
+fixed enemies, Scenery and old seaweed configuration are removed. Floor artwork,
+water/atmosphere, camera and exit wiring remain unchanged.
+
+| Empty layout | Enemies | Before Checkpoint 2 | After Checkpoint 2 |
+| --- | --- | --- | --- |
+| Combat / obstacles | Exactly 4, each 10% elite | 5–7 stone/wood props total | 5–7 shell/wood props total |
+| Resources only | None | 5–7 coconut palms total + 23 seaweed | 5–7 coral props total + 23 seaweed |
+
+Before Checkpoint 2 means rooms `01`, `03`, `11`, `17`; after it means `06`,
+`15`, `21`. Combat picks Starfish, Crab, Coral Skeleton and Barrel equally;
+types may repeat. Each type contributes nine normal slots and one elite slot
+to the weighted pool, giving every enemy an independent 10% elite probability.
+Resource-only layouts use three palm or coral variants with equal probability.
+Seaweed count is rounded from the Small-room baseline of 15 × 1.5 = 22.5 to 23,
+selected without replacement from 31 candidates on the actual ground polygon,
+inset 2.5 units with gaps at the four approaches. Resource plants use a separate
+interior candidate set; combat enemies and obstacles also have separate sets.
+
+The four reusable layout scenes are `objects/empty_combat_before_checkpoint.tscn`,
+`empty_combat_after_checkpoint.tscn`, `empty_resources_before_checkpoint.tscn`
+and `empty_resources_after_checkpoint.tscn`. All selection and population groups
+reuse `random_props.gd`; no GDScript changes are required. Counts refer to
+objects, not material quantities dropped. Materials and Mobs keep their own pools.
 
 ## Tide enemy pools
 
