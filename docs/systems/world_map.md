@@ -9,6 +9,7 @@ thập; chọn một biome đã mở để zoom vào lưới phòng của nó.
 | Enter / click | Zoom vào biome | — |
 | Esc / chuột phải | Đóng bản đồ | Quay lại tầng thế giới |
 | M | Đóng bản đồ | Đóng bản đồ |
+| Lăn chuột / kéo chuột | — | Zoom tại con trỏ (1x–4x) / kéo để di chuyển |
 
 ## Thêm biome hoặc phòng mới
 
@@ -43,7 +44,8 @@ Sync chỉ chạy trong editor (đọc thư mục `res://`); game chỉ đọc f
 - Lối đi sang biome khác tạo đường nối giữa hai đảo và mũi tên màu biome kia ở cửa phòng.
 
 Lưới là ô vuông đều, nhưng phòng nối nhau không bắt buộc nằm sát nhau: đường nối đi thẳng
-ra khỏi cửa, chạy trong khe giữa các ô rồi vào phòng kia. Khi ô mong muốn đã có phòng,
+ra khỏi cửa, trượt ngang dọc khe giữa các ô (chỉ gấp khúc vuông góc, không bao giờ chéo)
+rồi vào phòng kia. Khi ô mong muốn đã có phòng,
 sync đặt phòng mới lệch sang bên hoặc xa thêm một ô.
 
 ## Trạng thái hiển thị

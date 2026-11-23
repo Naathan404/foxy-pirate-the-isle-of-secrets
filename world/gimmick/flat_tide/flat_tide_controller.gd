@@ -18,6 +18,19 @@ const SHOCKWAVE_DURATION := 0.3
 const SHOCKWAVE_STRENGTH := 0.005
 const SHOCKWAVE_COLOR := Color("78dfff")
 const SHOCKWAVE_RADIUS_PIXELS := 110.0
+const RIDE_SHOCKWAVE_COLOR := Color("e8fff4")
+const RIDE_SHOCKWAVE_RADIUS_PIXELS := 160.0
+## Higher than ordinary hits so a sweep interrupts attacks, below charm grapple (60).
+const ENEMY_SWEEP_STATE_PRIORITY := 55
+const BOSS_GROUP := &"boss"
+const ENEMY_GROUP := &"enemy"
+## Share of the warning used to fade the screen overlay in.
+const WARNING_FADE_IN_PROGRESS := 0.15
+## Speed of the bands drifting inward on the overlay, relative to the pulse rate.
+const WARNING_FLOW_SPEED_RATIO := 0.5
+## Zones whose screen directions are this aligned (cosine) share one warning edge.
+const WARNING_SAME_SIDE_DOT := 0.9
+
 # //NLVP sửa: Giữ mỗi pha có thời lượng hợp lệ.
 const MIN_PHASE_DURATION_SECONDS := 0.1
 
@@ -97,6 +110,11 @@ var _warned: bool = false
 var _visual_time: float = 0.0
 var _wave_hit_player: bool = false
 var _wave_previous_wet: Dictionary[int, bool] = {}
+var _swept_enemies: Dictionary[int, bool] = {}
+var _last_dash_time: float = -INF
+var _last_dash_direction: Vector3 = Vector3.ZERO
+var _warning_overlay: FlatTideWarningOverlay
+
 # //NLVP sửa: Vùng đang chạy hoặc vừa kết thúc trước khoảng nghỉ.
 var _active_zone_index := 0
 
@@ -117,6 +135,13 @@ func _ready() -> void:
 			assigned_zones.append(zone)
 		state = State.RISING
 		state_changed.emit(state)
+	if is_instance_valid(player) and not player.dash_started.is_connected(_on_player_dash_started):
+		player.dash_started.connect(_on_player_dash_started)
+	if warning_overlay_enabled:
+		_warning_overlay = FlatTideWarningOverlay.new()
+		_warning_overlay.name = "WarningOverlay"
+		add_child(_warning_overlay)
+		_warning_overlay.configure(warning_color, warning_edge_width)
 	_apply_coverage()
 	_update_player()
 
@@ -143,11 +168,7 @@ func is_point_flooded(point: Vector3) -> bool:
 
 func get_flooded_zone(point: Vector3) -> FlatTideZone:
 	for zone in zones:
-		if (
-			is_instance_valid(zone)
-			and _is_zone_active(zone)
-			and zone.contains_flooded_point(point)
-		):
+		if is_instance_valid(zone) and _is_zone_active(zone) and zone.contains_flooded_point(point):
 			return zone
 	return null
 
@@ -217,39 +238,35 @@ func _apply_coverage() -> void:
 	if rising and sweep_enemies:
 		enemies = _sweep_candidates()
 	for zone in zones:
-		if is_instance_valid(zone):
-			# //NLVP sửa: Vùng chưa tới lượt luôn khô, chỉ báo trước cho vùng kế tiếp.
-			var zone_warning := warning and _is_warning_zone(zone)
-			if not _is_zone_active(zone):
-				zone.set_coverage(0.0, zone_warning, _visual_time, warning_strength)
+		if not is_instance_valid(zone):
+			continue
+		if not _is_zone_active(zone):
+			zone.set_coverage(0.0, _visual_time)
+			continue
+		var check_wave := rising and not _wave_hit_player and is_instance_valid(player)
+		var ground_point := Vector3.ZERO
+		var was_wet := false
+		if check_wave:
+			ground_point = player.global_position + Vector3.DOWN * player_ground_offset
+			was_wet = zone.is_point_in_advancing_wave(ground_point)
+		var enemies_wet_before: Array[bool] = []
+		for enemy: EnemyBase in enemies:
+			enemies_wet_before.append(zone.is_point_in_advancing_wave(_enemy_ground(enemy)))
+		zone.set_coverage(coverage, _visual_time, rising, state == State.FALLING)
+		if check_wave:
+			var wet_now := zone.is_point_in_advancing_wave(ground_point)
+			var previously_wet: bool = _wave_previous_wet.get(zone.get_instance_id(), false)
+			_wave_previous_wet[zone.get_instance_id()] = wet_now
+			if wet_now and (not was_wet or not previously_wet):
+				_wave_hit_player = true
+				_hit_player(zone.get_flow_direction())
+		for index in range(enemies.size()):
+			var enemy: EnemyBase = enemies[index]
+			# Overlapping zones must not sweep the same enemy twice in one rise.
+			if enemies_wet_before[index] or _swept_enemies.has(enemy.get_instance_id()):
 				continue
-			var ground_point := Vector3.ZERO
-			var was_wet := false
-			var check_wave := state == State.RISING and not _wave_hit_player and is_instance_valid(player)
-			if check_wave:
-				ground_point = player.global_position + Vector3.DOWN * player_ground_offset
-				was_wet = zone.is_point_in_advancing_wave(ground_point)
-			zone.set_coverage(
-				coverage, zone_warning, _visual_time, warning_strength,
-				state == State.RISING, state == State.FALLING
-			)
-			if check_wave:
-				var wet_now := zone.is_point_in_advancing_wave(ground_point)
-				var previously_wet: bool = _wave_previous_wet.get(zone.get_instance_id(), false)
-				_wave_previous_wet[zone.get_instance_id()] = wet_now
-				if wet_now and (not was_wet or not previously_wet):
-					_wave_hit_player = true
-					player.apply_environment_knockback(
-						zone.get_flow_direction(), wave_knockback_speed, wave_knockback_duration
-					)
-					if wave_knockback_speed > 0.0:
-						get_node("/root/ShockwaveController").request_world(
-							player.global_position + Vector3.UP,
-							SHOCKWAVE_DURATION,
-							SHOCKWAVE_STRENGTH,
-							SHOCKWAVE_COLOR,
-							SHOCKWAVE_RADIUS_PIXELS
-						)
+			if zone.is_point_in_advancing_wave(_enemy_ground(enemy)):
+				_sweep_enemy(enemy, zone.get_flow_direction())
 	coverage_changed.emit(coverage)
 
 
@@ -342,9 +359,6 @@ func _check_warning() -> void:
 	var remaining := _phase_duration() - _elapsed
 	if remaining <= warning_seconds:
 		_warned = true
-		for zone in zones:
-			if is_instance_valid(zone):
-				zone.set_coverage(coverage, _is_warning_zone(zone), _visual_time)
 		rising_warned.emit(remaining)
 
 
@@ -359,6 +373,79 @@ func _is_warning_zone(zone: FlatTideZone) -> bool:
 		return true
 	var next_index := (_active_zone_index + 1) % zones.size()
 	return zone == zones[next_index]
+
+
+## 0..1 strength of the screen warning: fades in after the warning starts and out once the
+## water is already rising. `_warned` stays set until the next low tide begins.
+func _warning_overlay_amount() -> float:
+	if not _warned:
+		return 0.0
+	if state == State.LOW:
+		return smoothstep(0.0, WARNING_FADE_IN_PROGRESS, _warning_progress())
+	if state == State.RISING and warning_fade_duration > 0.0:
+		return clampf(1.0 - _elapsed / warning_fade_duration, 0.0, 1.0)
+	return 0.0
+
+
+func _update_warning_overlay(delta: float) -> void:
+	if not is_instance_valid(_warning_overlay):
+		return
+	var amount := _warning_overlay_amount()
+	var directions := PackedVector2Array()
+	var strengths := PackedFloat32Array()
+	if amount > 0.0:
+		_collect_warning_directions(directions, strengths)
+	if directions.is_empty():
+		_warning_overlay.hide_warning()
+		return
+	for index in range(strengths.size()):
+		strengths[index] *= amount * warning_overlay_strength
+	var progress := 1.0 if state == State.RISING else _warning_progress()
+	var pulse_hz := lerpf(warning_pulse_start_hz, warning_pulse_end_hz, progress)
+	_warning_overlay.show_warning(
+		directions, strengths, pulse_hz, pulse_hz * WARNING_FLOW_SPEED_RATIO, delta
+	)
+
+
+## One screen direction (y down) toward the sea side of each zone near the player, with a
+## strength that grows as the player gets closer. Zones whose water comes from the same side
+## share one edge glow. Empty when the player is far from every zone or there is no camera.
+func _collect_warning_directions(
+	directions: PackedVector2Array, strengths: PackedFloat32Array
+) -> void:
+	if not is_instance_valid(player) or player.dead:
+		return
+	var camera := get_viewport().get_camera_3d()
+	if camera == null or camera.is_position_behind(player.global_position):
+		return
+	var origin := player.global_position
+	for zone in zones:
+		if not is_instance_valid(zone):
+			continue
+		if state == State.LOW and not _is_warning_zone(zone):
+			continue
+		if state == State.RISING and not _is_zone_active(zone):
+			continue
+		var distance := zone.get_distance_to_area(origin)
+		if distance > warning_player_margin:
+			continue
+		var weight := 1.0 - distance / maxf(warning_player_margin, 1.0)
+		var sea_point := origin - zone.get_flow_direction()
+		if camera.is_position_behind(sea_point):
+			continue
+		var screen := camera.unproject_position(sea_point) - camera.unproject_position(origin)
+		if screen.is_zero_approx():
+			continue
+		screen = screen.normalized()
+		var merged := false
+		for index in range(directions.size()):
+			if directions[index].dot(screen) >= WARNING_SAME_SIDE_DOT:
+				strengths[index] = maxf(strengths[index], weight)
+				merged = true
+				break
+		if not merged:
+			directions.append(screen)
+			strengths.append(weight)
 
 
 func _update_player() -> void:

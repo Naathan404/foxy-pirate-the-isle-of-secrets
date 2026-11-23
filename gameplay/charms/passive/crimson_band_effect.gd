@@ -25,7 +25,7 @@ func on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> 
 func _physics_process(delta: float) -> void:
 	for id: int in _ticks_left.keys():
 		var target := instance_from_id(id) as Node3D if is_instance_id_valid(id) else null
-		if is_instance_valid(target) and not bool(target.get("dead")):
+		if is_instance_valid(target) and target.get("dead") != true:
 			_until_tick[id] -= delta
 			if _until_tick[id] > 0.00001:
 				continue
