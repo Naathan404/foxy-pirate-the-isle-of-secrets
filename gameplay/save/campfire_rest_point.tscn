@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/save/campfire_rest_point.gd" id="1_script"]
+[ext_resource type="Script" path="res://gameplay/npcs/base/npc_interaction_area.gd" id="2_interaction"]
+[ext_resource type="PackedScene" path="res://gameplay/save/rest_menu.tscn" id="3_menu"]
+
+[sub_resource type="CylinderShape3D" id="interaction_shape"]
+height = 2.0
+radius = 3.4
+
+[node name="CampfireRestPoint" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="InteractionArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("2_interaction")
+prompt_height = 3.2
+prompt_text = "Rest"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("interaction_shape")
+
+[node name="Spawn" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 2.8)
+
+[node name="RestMenu" parent="." instance=ExtResource("3_menu")]

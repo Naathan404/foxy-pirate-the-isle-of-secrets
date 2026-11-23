@@ -1,5 +1,6 @@
 extends Node
-## Standalone persistence until a game-wide save system is available.
+## Unlocked monster notes. Its own file keeps the latest state between launches; the game
+## save slot is the authority on New Game (reset) and Continue (restore).
 signal changed(note_id: StringName)
 
 const SAVE_VERSION := 1
@@ -24,6 +25,28 @@ func set_unlocked(note_id: StringName, unlocked: bool) -> bool:
 	_states[key] = unlocked
 	changed.emit(note_id)
 	return save_progress()
+
+
+func get_save_data() -> Dictionary:
+	return {"unlocked": _states.duplicate()}
+
+
+## Expects data already checked by GameSaveSnapshot.
+func apply_save_data(saved: Dictionary) -> bool:
+	var previous := _states.duplicate()
+	_states.clear()
+	var unlocked: Dictionary = saved.get("unlocked", {})
+	for key: Variant in unlocked:
+		if key is String and not String(key).is_empty() and unlocked[key] is bool:
+			_states[key] = unlocked[key]
+	for key: String in _merged_keys(previous, _states):
+		if previous.get(key) != _states.get(key):
+			changed.emit(StringName(key))
+	return save_progress()
+
+
+func reset_progress() -> bool:
+	return apply_save_data({})
 
 
 func load_progress() -> bool:
@@ -51,3 +74,11 @@ func save_progress() -> bool:
 		return false
 	file.store_var({"version": SAVE_VERSION, "states": _states}, false)
 	return true
+
+
+func _merged_keys(first: Dictionary, second: Dictionary) -> Array[String]:
+	var keys: Array[String] = []
+	for key: Variant in first.keys() + second.keys():
+		if not keys.has(String(key)):
+			keys.append(String(key))
+	return keys

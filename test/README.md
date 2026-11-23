@@ -4,6 +4,8 @@ Các file `*_test.gd` là bài kiểm tra chạy độc lập bằng Godot. Danh
 `.github/godot-tests.txt` hiện trống; chạy thủ công các test liên quan khi sửa
 gameplay. Xem [hướng dẫn kiểm thử](../docs/project/testing.md) để biết lệnh chạy.
 
-`fixtures/` chứa scene cho `scene_transition_test.gd`. `elite_enemy_test.gd`
+`fixtures/` chứa scene cho `scene_transition_test.gd` và `save_test_sandbox.gd`, phần
+dùng chung của hai test Save/Load (thư mục save riêng, so sánh trạng thái, kiểm tra
+save thật không đổi). Chạy chúng bằng `run_save_load_tests.ps1`. `elite_enemy_test.gd`
 kiểm tra enemy elite. Probe `mocks/silas_animation_probe.gd` còn lại từ test
 animation Silas cũ; hiện không có test nào tham chiếu tới probe này.

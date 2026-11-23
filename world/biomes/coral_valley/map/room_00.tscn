@@ -265,8 +265,8 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.252, 0)
 ground_shadow = true
 
 [node name="FireLight" parent="Campfire" index="4" unique_id=994038413]
-light_color = Color(1, 0.58147097, 0.2276473, 1)
-light_energy = 7.9408464
+light_color = Color(1, 0.6104868, 0.24699122, 1)
+light_energy = 8.427208
 omni_range = 14.0
 base_energy = 8.0
 

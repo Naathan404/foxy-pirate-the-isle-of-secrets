@@ -62,6 +62,19 @@ foreach ($testScript in Get-ChildItem test, gameplay/charms -Recurse -Filter '*_
 }
 ~~~
 
+### Save/Load
+
+Chạy riêng hai bộ test Save/Load, với cùng điều kiện fail như job CI (mã thoát khác 0,
+`SCRIPT ERROR:`/`ERROR:` trong log, quá thời gian):
+
+~~~powershell
+./test/run_save_load_tests.ps1 -Godot 'C:/path/to/Godot_v4.7.2-stable_win64_console.exe'
+~~~
+
+Thêm `-Import` với checkout sạch. Test chỉ ghi vào `user://test_saves/`, tự dọn và fail
+nếu save thật của người chơi thay đổi. Chưa đưa vào `.github/godot-tests.txt`; xem
+[Save/Load](../systems/save_system.md#kiểm-thử).
+
 ### Lỗi shutdown đang theo dõi trên Windows
 
 `test/silas_panel_autowire_test.gd` hiện có thể in `PASS` rồi tiến trình Godot
@@ -88,6 +101,8 @@ Xem thêm [vai trò của fixture](../../test/README.md).
 | [charm_passive_test.gd](../../gameplay/charms/passive/charm_passive_test.gd) | Passive Charm thay đổi chỉ số |
 | [charm_event_passive_test.gd](../../gameplay/charms/passive/charm_event_passive_test.gd) | Passive Charm theo sự kiện và điều kiện |
 | [charm_progression_test.gd](../../gameplay/charms/progression/charm_progression_test.gd) | Safe location, socket economy, acquisition và snapshot |
+| [save_load_flow_test.gd](../../test/save_load_flow_test.gd) | Save/Load đầu-cuối qua menu chính, lửa trại và Continue |
+| [save_load_edge_test.gd](../../test/save_load_edge_test.gd) | Save hỏng, version, thiếu scene/lửa trại, lỗi ghi, từng nhóm dữ liệu, spawn ở mọi lửa trại |
 
 `test/chaos_test.gd` không có trong repository hiện tại. Các test ở trên không
 thay thế kiểm thử đầy đủ contract CP và vòng đời dagger boomerang; cần bổ sung
