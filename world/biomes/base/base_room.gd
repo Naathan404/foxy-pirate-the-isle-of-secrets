@@ -1,4 +1,5 @@
 @tool
+class_name BaseRoom
 extends Node3D
 
 ## Configure the four paths and choose destination exits from this room's Inspector.
@@ -24,7 +25,8 @@ const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 
 @export_group("Safe room")
 ## Charms can be changed anywhere in this room (the hub, campfire rests). Checkpoints still
-## add their own safe area in rooms without this flag.
+## add their own safe area in rooms without this flag. A campfire in this room can save the
+## game only while this flag is on.
 @export var safe_room: bool = false
 
 @export_group("Ground boundaries")

@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="BaseItem" format=3]
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://bb1tn7cyp6uvj"]
 
-[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/charms/crimson_band.png" id="2"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/crimson_band.tres" id="3"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dsohpuq70n5sd" path="res://assets/sprites/charms/crimson_band.png" id="2"]
+[ext_resource type="Resource" uid="uid://b4o5sihmlck" path="res://gameplay/charms/charm_data/crimson_band.tres" id="3"]
 
 [resource]
 script = ExtResource("1")

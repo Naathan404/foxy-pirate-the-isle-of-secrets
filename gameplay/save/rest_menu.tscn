@@ -1,0 +1,111 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/save/rest_menu.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="panel_style"]
+content_margin_left = 40.0
+content_margin_top = 32.0
+content_margin_right = 40.0
+content_margin_bottom = 32.0
+bg_color = Color(0.09, 0.06, 0.07, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.62, 0.13, 0.17, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="RestMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 30
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.01, 0.015, 0.55)
+
+[node name="Center" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Root/Center"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("panel_style")
+
+[node name="Content" type="VBoxContainer" parent="Root/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Root/Center/Panel/Content"]
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+text = "Campfire"
+horizontal_alignment = 1
+
+[node name="Message" type="Label" parent="Root/Center/Panel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Slot" type="Label" parent="Root/Center/Panel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Result" type="Label" parent="Root/Center/Panel/Content"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Root/Center/Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="SaveButton" type="Button" parent="Root/Center/Panel/Content/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 2
+theme_type_variation = &"ActionButton"
+text = "Save game"
+
+[node name="LeaveButton" type="Button" parent="Root/Center/Panel/Content/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 2
+theme_type_variation = &"ActionButton"
+text = "Leave"

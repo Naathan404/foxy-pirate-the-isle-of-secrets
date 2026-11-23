@@ -25,6 +25,17 @@ func can_afford(amount: int) -> bool:
 	return amount >= 0 and _balance >= amount
 
 
+## Sets the balance from a validated save; not a reward or purchase path.
+func restore_balance(balance: int) -> bool:
+	if balance < 0:
+		return false
+	var change := balance - _balance
+	_balance = balance
+	if change != 0:
+		balance_changed.emit(_balance, change)
+	return true
+
+
 func try_spend(amount: int) -> bool:
 	if not can_afford(amount):
 		return false

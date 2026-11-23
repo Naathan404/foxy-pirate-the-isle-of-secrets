@@ -216,14 +216,24 @@ layout_mode = 2
 theme_override_constants/separation = 14
 alignment = 1
 
-[node name="PlayButton" type="Button" parent="Center/Buttons" unique_id=727685548]
+[node name="ContinueButton" type="Button" parent="Center/Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 68)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_type_variation = &"ActionButton"
 theme_override_font_sizes/font_size = 32
-text = "Play"
+disabled = true
+text = "Continue"
+
+[node name="NewGameButton" type="Button" parent="Center/Buttons" unique_id=727685548]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"ActionButton"
+theme_override_font_sizes/font_size = 32
+text = "New Game"
 
 [node name="QuitButton" type="Button" parent="Center/Buttons" unique_id=1296569642]
 unique_name_in_owner = true
@@ -233,6 +243,14 @@ size_flags_horizontal = 4
 theme_type_variation = &"ActionButton"
 theme_override_font_sizes/font_size = 32
 text = "Quit"
+
+[node name="SaveStatus" type="Label" parent="Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="FxLayer" type="Control" parent="." unique_id=2047370408 groups=["inventory_menu_fx"]]
 layout_mode = 1

@@ -18,9 +18,9 @@ acquisition_source = &"merchant_or_enemy_drop"
 drop_chance = 0.05
 tags = Array[StringName]([&"active", &"projectile", &"radial"])
 effect_params = {
-"windup_seconds": 0.18,
 "damage_percent": 0.5,
 "projectile_count": 8,
 "projectile_speed": 14.0,
-"range_units": 8.0
+"range_units": 8.0,
+"windup_seconds": 0.18
 }

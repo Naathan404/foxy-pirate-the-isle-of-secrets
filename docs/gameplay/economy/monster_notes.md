@@ -38,7 +38,7 @@ Rương có thể rơi vàng, nhiều loại item và nhiều note cùng lúc. C
 
 Note sử dụng icon item Note và popup nhặt item thông thường, nhưng không chiếm ô túi và có thể nhặt khi túi đầy. Note trùng vẫn được nhặt, hiện popup và không làm mất trạng thái đã mở. Một `ItemPickup` đặt trực tiếp trong scene cũng có thể gán trường `note` vào một resource `MonsterNote` để hoạt động như vậy.
 
-`NoteProgress` lưu các trạng thái ghi đè theo `note_id` vào `user://monster_notes.save`. Khi chưa có ghi đè, checkbox `unlocked` trong resource quyết định trạng thái mặc định. Không đổi ID của note đã phát hành nếu chưa có bước chuyển đổi dữ liệu lưu. Đây là file lưu độc lập trong khi dự án chưa có hệ thống save chung; trạng thái mở rương chưa được lưu bởi tính năng này.
+`NoteProgress` lưu các trạng thái ghi đè theo `note_id` vào `user://monster_notes.save`. Khi chưa có ghi đè, checkbox `unlocked` trong resource quyết định trạng thái mặc định. Không đổi ID của note đã phát hành nếu chưa có bước chuyển đổi dữ liệu lưu. File này vẫn được ghi ngay khi mở note; [save slot](../../systems/save_system.md) giữ bản sao trong section `notes`, New Game reset và Continue ghi đè trạng thái theo save. Trạng thái mở rương chưa được lưu.
 
 Có thể mở hoặc khóa qua API:
 

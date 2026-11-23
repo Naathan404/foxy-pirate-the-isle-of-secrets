@@ -74,8 +74,9 @@ thăm thì chỉ thấy khung tối; `hidden` chưa thăm thì không vẽ, kể
   cờ này; gameplay mở hướng mới (nguyên liệu, cốt truyện) cần gọi `set_story_flag`.
 - Bản đồ chỉ **đọc** cờ. Nó không chặn lối đi trong thế giới; cổng ở Hub cần cơ chế
   gameplay riêng.
-- Chưa có save/load: tiến trình và cờ nằm trong bộ nhớ, `reset_session()` (khi về menu
-  chính) xóa chúng như ví vàng.
+- Room đã vào và cờ nằm trong bộ nhớ; `reset_session()` (khi về menu chính) xóa
+  chúng như ví vàng. Lưu ở lửa trại sẽ ghi chúng vào save, Continue khôi phục lại
+  (`MapProgress.get_visited_rooms()` / `restore()`); xem [Save/Load](save_system.md).
 
 ## Pause và input
 

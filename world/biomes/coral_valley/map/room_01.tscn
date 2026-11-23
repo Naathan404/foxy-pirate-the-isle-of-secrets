@@ -224,21 +224,21 @@ transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 6.8, 0, -4.4)
 ground_shadow = true
 
 [node name="CoralPinkNorthEast" parent="Scenery" index="6" unique_id=1700001259 instance=ExtResource("coral_pink")]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 4.6, 0, -3.6)
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 4.6, -0.25124645, -2.5182533)
 
 [node name="CoralTurquoiseNorthEast" parent="Scenery" index="7" unique_id=1700001296 instance=ExtResource("coral_turquoise")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -3.8)
 ground_shadow = true
 
 [node name="CoralPinkNorthEastRim" parent="Scenery" index="8" unique_id=1700001333 instance=ExtResource("coral_pink")]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 10.6, 0, -5.8)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 10.6, -0.2156496, -6.7589736)
 
 [node name="CoralTurquoiseSouthWestHeart" parent="Scenery" index="9" unique_id=1700001370 instance=ExtResource("coral_turquoise")]
 transform = Transform3D(1.15, 0, 0, 0, 1.15, 0, 0, 0, 1.15, -6.6, 0, 4.8)
 ground_shadow = true
 
 [node name="CoralPinkSouthWest" parent="Scenery" index="10" unique_id=1700001407 instance=ExtResource("coral_pink")]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -8.8, 0, 4.2)
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -8.8, -0.38750076, 4.2)
 
 [node name="CoralOrangeSouthWest" parent="Scenery" index="11" unique_id=1700001444 instance=ExtResource("coral_orange")]
 transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, -4.8, 0, 3.8)

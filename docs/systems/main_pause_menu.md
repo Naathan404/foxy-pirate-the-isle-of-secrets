@@ -2,17 +2,24 @@
 
 ## Menu chính
 
-`ui/main_menu/main_menu.tscn` là `run/main_scene`. Nút **Play** gọi
-`GameManager.change_scene(gameplay_scene)` (export, mặc định
-`world/biomes/hub/map/castaway_cove.tscn`, Hub trung tâm); **Quit** gọi
-`get_tree().quit()`. Nút bị khóa sau lần bấm đầu để không tạo hai transition.
-Focus ban đầu ở Play; phím lên/xuống di chuyển focus, Enter/Space xác nhận.
+`ui/main_menu/main_menu.tscn` là `run/main_scene`. Ba nút:
 
-Dự án chưa có save/load cho run, nên Play luôn bắt đầu mới: không có Continue.
+- **Continue** gọi `GameManager.load_saved_game()`; chỉ bật khi Slot 1 hợp lệ. Dòng
+  `SaveStatus` dưới nút ghi slot, room và giờ lưu, hoặc lý do không tải được. Nếu load
+  bị từ chối, menu vẫn ở lại, hiện lý do và tắt Continue. Xem [Save/Load](save_system.md).
+- **New Game** gọi `GameManager.start_new_game(gameplay_scene)` (export, mặc định
+  `world/biomes/hub/map/castaway_cove.tscn`, Hub trung tâm): reset phiên, tiến trình
+  Silas và Monster Notes, giữ nguyên file save.
+- **Quit** gọi `get_tree().quit()`.
+
+Các nút bị khóa sau lần bấm đầu để không tạo hai transition. Focus ban đầu ở Continue
+khi có save hợp lệ, nếu không thì ở New Game; phím lên/xuống di chuyển focus,
+Enter/Space xác nhận.
+
 Khi menu chính nạp, `GameManager.reset_session()` bỏ ví vàng, trạng thái boss và cờ
-debug trong bộ nhớ. File lưu (`silas_progress.save`, ghi chú bestiary) không bị
-xóa hay ghi đè. Trạng thái Player khác (túi, charm, vũ khí) chỉ tồn tại trong
-scene Player và được bỏ cùng scene.
+debug trong bộ nhớ; không file nào bị xóa hay ghi đè. Trạng thái Player (túi, charm,
+vũ khí) chỉ tồn tại trong scene Player và được bỏ cùng scene, trừ khi Continue khôi
+phục nó từ save.
 
 ## Menu tạm dừng
 
@@ -40,5 +47,8 @@ lan từ giữa). Đóng chạy ngược lại: mực thu về trái, trang trư
   [bản đồ thế giới](world_map.md) dùng chung `_enter_menu_state()`/`_exit_menu_state()`. Transition thất bại giờ trả
   `state` về giá trị trước đó thay vì luôn `PLAYING`.
 - `GameManager` thêm `main_menu_scene`, `return_to_main_menu()`, `reset_session()`.
+- Save/Load: nút Play thay bằng `ContinueButton` + `NewGameButton`, thêm `SaveStatus`;
+  `GameManager.State` thêm `REST_MENU` cho menu lửa trại, dùng chung
+  `_enter_menu_state()`.
 - `ink_reveal.gdshader` thêm `from_left` (mặc định `false`).
 - `project.godot`: `run/main_scene` trỏ tới menu chính.

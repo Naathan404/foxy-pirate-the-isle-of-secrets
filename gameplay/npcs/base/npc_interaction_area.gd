@@ -7,6 +7,8 @@ extends Area3D
 signal interaction_requested(interactor: Player)
 
 @export_range(0.0, 10.0, 0.1) var prompt_height: float = 2.2
+## Word shown above the object, e.g. "Talk" for NPCs or "Rest" for a campfire.
+@export var prompt_text: String = "Talk"
 
 var _enabled := true
 var _interactors: Array[Player] = []
@@ -48,7 +50,7 @@ func _get_interactor() -> Player:
 func _create_prompt() -> Label3D:
 	var prompt := Label3D.new()
 	prompt.name = "Prompt"
-	prompt.text = "Talk"
+	prompt.text = prompt_text
 	prompt.font_size = 56
 	prompt.outline_size = 12
 	prompt.pixel_size = 0.01
