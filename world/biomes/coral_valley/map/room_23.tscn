@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://3cpadu3ip1cj"]
 
-[ext_resource type="PackedScene" uid="uid://omebdi2g2vcg" path="res://world/biomes/coral_valley/base_scenes/quiz_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ground"]
 [ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://assets/sprites/biomes/coral_valley/coral_valley_ground.png" id="3_ground_texture"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
@@ -9,15 +9,21 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="platform_texture"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/quiz_orbit_platform.tscn" id="orbit_platform"]
+[ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="orbit_lever"]
 
-[sub_resource type="Environment" id="Environment_dqyua"]
+[sub_resource type="BoxShape3D" id="QuizPlatformShape"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="Environment" id="Environment_smj7s"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.012, 0.009, 0.02, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.7, 0.68, 0.72, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_bx5r2"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dqyua"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("5_void")
@@ -26,81 +32,82 @@ shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
 shader_parameter/smoke_strength = 0.48
 shader_parameter/rise_speed = 0.150000007125
 
-[sub_resource type="QuadMesh" id="QuadMesh_2j1fd"]
+[sub_resource type="QuadMesh" id="QuadMesh_bx5r2"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_bx5r2")
+material = SubResource("ShaderMaterial_dqyua")
 size = Vector2(400, 400)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2j1fd"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5q6uy"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dfbyu"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xxrni"]
 resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_alwa0"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_d0g15"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ldcdh"]
 resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mueid"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_qcuv3"]
 resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
+size = Vector3(0.5, 2, 4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8m6da"]
 resource_local_to_scene = true
-size = Vector3(0.5, 2, 4)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pgcs5"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_yp20p"]
-resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1e2ac"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_yp20p"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_23" unique_id=1607608505 instance=ExtResource("1_base")]
-editor_description = "Paired Quiz: 3 platforms rotated 90 degrees around Y. Visual platform width 3.58 units; four 4-unit clearances total 16 empty units. Island center offset 54.96114925 units. Shared CameraBounds."
+editor_description = "Quiz 23: fixed center platform; moving platform confined to 8 surrounding stops. Upper levers advance 3 stops clockwise; lower levers reverse 2 stops. Both islands control the same moving platform."
+boundary_openings = Array[Rect2]([Rect2(12.7, -3.33552031, 2, 5.78), Rect2(40.28614925, -3.33552031, 2, 5.78)])
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_24.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_22.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_dqyua")
+environment = SubResource("Environment_smj7s")
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
-mesh = SubResource("QuadMesh_2j1fd")
+mesh = SubResource("QuadMesh_bx5r2")
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 transform = Transform3D(-2, 0, -3e-07, 0, 2, 0, 3e-07, 0, -2, 58.05313, -0.02048206, 26.479424)
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_5q6uy")
+shape = SubResource("BoxShape3D_2j1fd")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_dfbyu")
+shape = SubResource("BoxShape3D_5q6uy")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
@@ -108,7 +115,7 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_xxrni")
+shape = SubResource("BoxShape3D_dfbyu")
 disabled = true
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
@@ -116,11 +123,11 @@ transform = Transform3D(-2, 0, -3e-07, 0, 2, 0, 3e-07, 0, -2, 58.586147, -0.0291
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_alwa0")
+shape = SubResource("BoxShape3D_xxrni")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_d0g15")
+shape = SubResource("BoxShape3D_alwa0")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
@@ -128,35 +135,35 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_ldcdh")
+shape = SubResource("BoxShape3D_d0g15")
 disabled = true
 
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 82.616005, -0.05280208, 0)
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_mueid")
+shape = SubResource("BoxShape3D_ldcdh")
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_qcuv3")
+shape = SubResource("BoxShape3D_mueid")
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_24.tscn"
 
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_8m6da")
+shape = SubResource("BoxShape3D_qcuv3")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_pgcs5")
+shape = SubResource("BoxShape3D_8m6da")
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_yp20p")
+shape = SubResource("BoxShape3D_pgcs5")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_22.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_1e2ac")
+shape = SubResource("BoxShape3D_yp20p")
 
 [node name="BaseGround2" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=234433943 instance=ExtResource("2_ground")]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 54.96115, 0, -0.19104576)
@@ -172,17 +179,59 @@ shape = ExtResource("ground_shape")
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.50004, 0, -34.597424)
 
-[node name="RandomSeaweed" type="Node3D" parent="." index="8" unique_id=492354858]
+[node name="RandomSeaweed" type="Node3D" parent="." index="5" unique_id=492354858]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-7.176, 0, -9.789, -4.921, 0, -10.654, -2.734, 0, -11.256, -0.626, 0, -11.979, 1.264, 0, -10.98, 3.24, 0, -10.64, 5.177, 0, -11.919, 5.803, 0, -9.816, 9.317, 0, -5.243, 9.478, 0, 5.657, 9.551, 0, 8.175, 8.941, 0, 10.795, 6.826, 0, 11.172, 4.757, 0, 12.841, 2.441, 0, 11.701, -0.468, 0, 12.208, -2.882, 0, 12.619, -5.201, 0, 12.497, -7.21, 0, 12.365, -8.172, 0, 10.605, -9.669, 0, 9.102, -10.02, 0, 7.111, -9.56, 0, 5.016)
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
-[node name="RandomSeaweed2" type="Node3D" parent="." index="9" unique_id=1491933696]
+[node name="RandomSeaweed2" type="Node3D" parent="." index="6" unique_id=1491933696]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(47.78515, 0, -9.789, 50.04015, 0, -10.654, 52.22715, 0, -11.256, 54.335148, 0, -11.979, 56.22515, 0, -10.98, 58.20115, 0, -10.64, 60.13815, 0, -11.919, 60.76415, 0, -9.816, 64.27815, 0, -5.243, 64.43915, 0, 5.657, 64.512146, 0, 8.175, 63.90215, 0, 10.795, 61.787148, 0, 11.172, 59.71815, 0, 12.841, 57.40215, 0, 11.701, 54.49315, 0, 12.208, 52.07915, 0, 12.619, 49.76015, 0, 12.497, 47.75115, 0, 12.365, 46.78915, 0, 10.605, 45.29215, 0, 9.102, 44.94115, 0, 7.111, 45.40115, 0, 5.016)
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+
+[node name="Platform2" type="AnimatableBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 27.61284825, -0.03991985, -0.44552031)
+
+[node name="Sprite3D" type="Sprite3D" parent="Platform2"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("platform_texture")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform2"]
+shape = SubResource("QuizPlatformShape")
+
+[node name="MovingPlatform" parent="." instance=ExtResource("orbit_platform")]
+position = Vector3(27.61284825, -0.03991985, -0.44552031)
+
+[node name="LeftUpperLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 10.7, 0.21008015, -5.44552031)
+editor_description = "Moves the orbit platform forward 3 stops clockwise per player hit."
+target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
+destination_mode = 3
+route_step_count = 3
+
+[node name="LeftLowerLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 10.7, 0.21008015, 4.55447969)
+editor_description = "Moves the orbit platform backward 2 stops counterclockwise per player hit."
+target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
+destination_mode = 3
+route_step_count = -2
+
+[node name="RightUpperLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 44.26114925, 0.21008015, -5.44552031)
+editor_description = "Moves the orbit platform forward 3 stops clockwise per player hit."
+target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
+destination_mode = 3
+route_step_count = 3
+
+[node name="RightLowerLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 44.26114925, 0.21008015, 4.55447969)
+editor_description = "Moves the orbit platform backward 2 stops counterclockwise per player hit."
+target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
+destination_mode = 3
+route_step_count = -2
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

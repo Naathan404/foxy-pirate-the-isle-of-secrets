@@ -6,7 +6,7 @@ extends StaticBody3D
 ## Scene tree into Target Platforms. Built-in docks can use their parent
 ## platform when this list is empty.
 
-enum DestinationMode { START, END, TOGGLE }
+enum DestinationMode { START, END, TOGGLE, ADVANCE_ROUTE }
 
 @export_group("Platform Targets")
 @export var target_platforms: Array[MovingPlatform] = []:
@@ -14,6 +14,8 @@ enum DestinationMode { START, END, TOGGLE }
 		target_platforms = value
 		update_configuration_warnings()
 @export var destination_mode: DestinationMode = DestinationMode.START
+## ADVANCE_ROUTE: positive advances, negative reverses around the closed route.
+@export_range(-8, 8, 1) var route_step_count: int = 1
 @export_storage var use_parent_platform_when_unassigned := false
 @export_group("Scene Preview")
 @export var show_target_links_in_editor := true
@@ -97,6 +99,8 @@ func receive_damage(damage: DamageContext) -> float:
 				moving_platform.request_destination(true)
 			DestinationMode.TOGGLE:
 				moving_platform.request_destination(not moving_platform.is_targeting_end())
+			DestinationMode.ADVANCE_ROUTE:
+				moving_platform.request_route_steps(route_step_count)
 	_lever_sprite.stop()
 	_lever_sprite.play(&"active")
 	return damage.amount_hp
@@ -117,6 +121,8 @@ func _get_targets() -> Array[MovingPlatform]:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
+	if destination_mode == DestinationMode.ADVANCE_ROUTE and route_step_count == 0:
+		warnings.append("Set a nonzero Route Step Count: positive forward, negative backward.")
 	if target_platforms.is_empty() and not use_parent_platform_when_unassigned:
 		warnings.append(
 			"Drag MovingPlatform nodes from the Scene tree into Target Platforms in the Inspector."
