@@ -32,6 +32,17 @@ const MAX_ACROSS_SPACING := 0.5
 ## Sampling step of the debug shoreline drawn with `debug_in_game`.
 const DEBUG_SHORE_STEP := 0.25
 
+# //NLVP sửa: Thời gian riêng khi controller bật Sequential Zones.
+@export_group("Cycle Timing")
+## Thời gian nước dâng.
+@export_range(0.1, 30.0, 0.1, "suffix:s") var rise_duration: float = 6.0
+## Thời gian giữ nước ở mức cao.
+@export_range(0.1, 120.0, 0.1, "suffix:s") var high_duration: float = 8.0
+## Thời gian nước rút.
+@export_range(0.1, 30.0, 0.1, "suffix:s") var fall_duration: float = 6.0
+## Thời gian nghỉ trước khi tới lượt vùng tiếp theo.
+@export_range(0.1, 120.0, 0.1, "suffix:s") var rest_duration: float = 8.0
+
 @export_group("Area")
 ## Hướng nước tiến vào, theo trục cục bộ của vùng.
 @export var flow_direction: FlowDirection = FlowDirection.NEGATIVE_X:

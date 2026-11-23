@@ -8,11 +8,12 @@
 script = ExtResource("1_data")
 charm_id = &"dead_mans_anchor"
 display_name = "Dead Man's Anchor"
-description = "Prototype: mark a position, then recast within 5 seconds to return."
+description = "Place an anchor. Press the highlighted charm binding within 5 seconds to recall for free."
 sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
 resource_cost = 300.0
+cooldown_seconds = 8.0
 acquisition_source = &"prototype_debug"
 content_status = 1
 tags = Array[StringName]([&"active", &"prototype", &"recast"])

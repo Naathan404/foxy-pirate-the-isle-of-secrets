@@ -17,7 +17,7 @@ func _ready() -> void:
 	hitbox.hit_confirmed.connect(_on_hit_confirmed)
 
 
-func _on_hit_confirmed(damage: DamageContext, _target: Node, applied_hp: float) -> void:
+func _on_hit_confirmed(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	if applied_hp <= 0.0:
 		return
 	var impact_scale := damage.get_impact_scale()
@@ -28,5 +28,5 @@ func _on_hit_confirmed(damage: DamageContext, _target: Node, applied_hp: float) 
 	# perceptibly weaker even when a scene's baseline already exceeds the controller limit.
 	var base_hitstop := minf(hitstop_duration, float(hitstop.maximum_duration))
 	var base_shake := minf(shake_pixels, float(shake.maximum_pixels))
-	hitstop.request(base_hitstop * impact_scale)
+	hitstop.request(base_hitstop * impact_scale, target)
 	shake.request(base_shake * impact_scale, shake_duration)

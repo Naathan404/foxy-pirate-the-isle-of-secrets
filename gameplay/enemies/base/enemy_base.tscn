@@ -10,6 +10,12 @@
 [ext_resource type="Script" uid="uid://cqq0wtkbbb4b5" path="res://gameplay/enemies/base/states/enemy_hit.gd" id="10_hit"]
 [ext_resource type="Script" uid="uid://fo0rmk0j4cmd" path="res://gameplay/enemies/base/states/enemy_death.gd" id="11_death"]
 
+[ext_resource type="Resource" path="res://data/items/charms/crimson_band.tres" id="item_crimson_band"]
+[ext_resource type="Resource" path="res://data/items/charms/skull_cracker.tres" id="item_skull_cracker"]
+[ext_resource type="Resource" path="res://data/items/charms/momentum_strike.tres" id="item_momentum_strike"]
+[ext_resource type="Resource" path="res://data/items/charms/fortune_leaf.tres" id="item_fortune_leaf"]
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="charm_item_type"]
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_hurtbox"]
 radius = 0.55
 
@@ -19,6 +25,7 @@ height = 1.8
 
 [node name="EnemyBase" type="CharacterBody3D" unique_id=2025135675]
 script = ExtResource("1_enemy_base")
+charm_loot = Array[ExtResource("charm_item_type")]([ExtResource("item_crimson_band"), ExtResource("item_skull_cracker"), ExtResource("item_momentum_strike"), ExtResource("item_fortune_leaf")])
 data = ExtResource("2_enemy_data")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1278788323 node_paths=PackedStringArray("sprite", "animation_player")]

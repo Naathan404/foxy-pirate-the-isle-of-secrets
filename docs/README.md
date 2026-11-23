@@ -24,7 +24,7 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Thế giới · `world/`
 
-[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Collision layers](world/collision_layers.md)
+[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Bố cục Hub](world/hub_layout.md) · [Collision layers](world/collision_layers.md)
 
 ## Hệ thống · `systems/`
 
@@ -32,7 +32,7 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Hình ảnh · `art/`
 
-[Shader nước](art/shaders/water_shader.md) · [Prompt ảnh Foxy cầm cung](art/references/foxy_bow_imagegen_prompt.md)
+[Art direction Coral Valley](art/coral_valley_art_direction.md) · [Shader nước](art/shaders/water_shader.md) · [Prompt ảnh Foxy cầm cung](art/references/foxy_bow_imagegen_prompt.md)
 
 ## Kế hoạch · `plans/`
 

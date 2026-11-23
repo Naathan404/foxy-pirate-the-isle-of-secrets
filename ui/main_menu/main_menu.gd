@@ -17,7 +17,7 @@ const GLOW_MIN_ALPHA := 0.35
 const GLOW_MAX_ALPHA := 0.8
 
 ## First gameplay scene of a run. Progress is kept in memory only, so Play always starts here.
-@export_file("*.tscn") var gameplay_scene: String = "res://world/biomes/hub/map/room_02.tscn"
+@export_file("*.tscn") var gameplay_scene: String = "res://world/biomes/hub/map/castaway_cove.tscn"
 @export_group("Intro")
 @export_range(0.1, 2.0, 0.05, "suffix:s") var ink_open_seconds: float = 0.9
 @export_range(0.05, 1.0, 0.05, "suffix:s") var title_fade_seconds: float = 0.5

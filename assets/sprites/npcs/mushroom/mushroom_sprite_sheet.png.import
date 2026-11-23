@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ewjudx5nvlow"
-path.s3tc="res://.godot/imported/mushroom_sprite_sheet.png-55f594735bec97c47510c834b44fd671.s3tc.ctex"
+path="res://.godot/imported/mushroom_sprite_sheet.png-55f594735bec97c47510c834b44fd671.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/npcs/mushroom/mushroom_sprite_sheet.png"
-dest_files=["res://.godot/imported/mushroom_sprite_sheet.png-55f594735bec97c47510c834b44fd671.s3tc.ctex"]
+dest_files=["res://.godot/imported/mushroom_sprite_sheet.png-55f594735bec97c47510c834b44fd671.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

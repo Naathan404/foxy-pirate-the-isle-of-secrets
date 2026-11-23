@@ -323,7 +323,7 @@ mouse_filter = 2
 texture = ExtResource("avatar_frame")
 
 [node name="Portrait" type="TextureRect" parent="StatControl" unique_id=1664021248]
-texture_filter = 1
+texture_filter = 2
 layout_mode = 0
 offset_left = 16.888893
 offset_top = 39.111115
@@ -513,6 +513,35 @@ scale = Vector2(0.9, 0.9)
 mouse_filter = 2
 script = ExtResource("16_dv5bc")
 
+[node name="RecallBorder" type="Node2D" parent="EquipmentControl"]
+visible = false
+z_index = 1
+
+[node name="Glow" type="Line2D" parent="EquipmentControl/RecallBorder"]
+width = 5.0
+default_color = Color(0.02, 0.67, 0.92, 0.84)
+joint_mode = 2
+
+[node name="Rim" type="Line2D" parent="EquipmentControl/RecallBorder"]
+points = PackedVector2Array(32, 2, 62, 32, 32, 62, 2, 32, 32, 2)
+width = 2.4
+default_color = Color(0.78, 1, 1, 1)
+joint_mode = 2
+
+[node name="RecallHint" type="Label" parent="EquipmentControl"]
+visible = false
+layout_mode = 0
+offset_left = 144.0
+offset_top = 91.0
+offset_right = 337.0
+offset_bottom = 126.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.65, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.1, 0.14, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+vertical_alignment = 1
+
 [node name="Q_socket" type="TextureRect" parent="EquipmentControl" unique_id=451445646]
 texture_filter = 1
 layout_mode = 0
@@ -534,6 +563,7 @@ offset_bottom = 56.80005
 mouse_filter = 2
 
 [node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/Q_socket" unique_id=1013245374]
+texture_filter = 1
 visible = false
 layout_mode = 0
 offset_right = 64.0
@@ -542,6 +572,7 @@ mouse_filter = 2
 max_value = 1.0
 step = 0.0
 fill_mode = 4
+nine_patch_stretch = true
 tint_progress = Color(0, 0, 0, 0.75)
 
 [node name="CooldownLabel" type="Label" parent="EquipmentControl/Q_socket" unique_id=160201000]
@@ -578,6 +609,7 @@ offset_bottom = 57.200024
 mouse_filter = 2
 
 [node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/SPACE_socket" unique_id=560352290]
+texture_filter = 1
 visible = false
 layout_mode = 0
 offset_right = 64.0
@@ -586,6 +618,7 @@ mouse_filter = 2
 max_value = 1.0
 step = 0.0
 fill_mode = 4
+nine_patch_stretch = true
 tint_progress = Color(0, 0, 0, 0.75)
 
 [node name="CooldownLabel" type="Label" parent="EquipmentControl/SPACE_socket" unique_id=926883227]
@@ -622,6 +655,7 @@ offset_bottom = 57.6
 mouse_filter = 2
 
 [node name="Cooldown" type="TextureProgressBar" parent="EquipmentControl/E_socket" unique_id=490836128]
+texture_filter = 1
 visible = false
 layout_mode = 0
 offset_right = 64.0
@@ -630,6 +664,7 @@ mouse_filter = 2
 max_value = 1.0
 step = 0.0
 fill_mode = 4
+nine_patch_stretch = true
 tint_progress = Color(0, 0, 0, 0.75)
 
 [node name="CooldownLabel" type="Label" parent="EquipmentControl/E_socket" unique_id=1915906249]

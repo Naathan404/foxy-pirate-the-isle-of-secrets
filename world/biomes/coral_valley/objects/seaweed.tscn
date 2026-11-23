@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://imw31yqwmatq"]
+
+[ext_resource type="PackedScene" uid="uid://c0y1euj63gk4x" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1tmf2"]
+size = Vector3(3.1, 2, 0.9)
+
+[node name="Seaweed" unique_id=1345475948 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.15
+fragment_source = NodePath("Visual/Sprite3D")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(881353462) index="0" unique_id=300997710]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+
+[node name="CollisionShape3D" parent="HurtBox" parent_id_path=PackedInt32Array(9422287) index="0" unique_id=137273012]
+shape = SubResource("BoxShape3D_1tmf2")
+
+[node name="MovementBody" parent="." index="3" unique_id=1343867957]
+collision_layer = 0

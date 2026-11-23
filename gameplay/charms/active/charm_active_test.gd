@@ -6,6 +6,7 @@ const CRESCENT_CLEAVE: CharmData = preload("res://gameplay/charms/charm_data/cre
 const TIDE_GRAPPLE: CharmData = preload("res://gameplay/charms/charm_data/tide_grapple.tres")
 const CRESCENT_ATTACK_SCENE = preload("res://gameplay/charms/active/crescent_cleave_attack.tscn")
 const TIDE_ATTACK_SCENE = preload("res://gameplay/charms/active/tide_grapple_attack.tscn")
+const BASE_ATTACK_DAMAGE_HP := 100.0
 
 var _failures: int = 0
 var _arrow_launch_count: int = 0
@@ -26,7 +27,7 @@ func _run_tests() -> void:
 	# Fund the whole scenario from authored costs so balance tuning cannot starve later cases.
 	var total_cost := ARROW_RAIN.resource_cost * 2.0
 	total_cost += CRESCENT_CLEAVE.resource_cost + TIDE_GRAPPLE.resource_cost
-	actor.setup_stats_and_weapon(total_cost, 100)
+	actor.setup_stats_and_weapon(total_cost, BASE_ATTACK_DAMAGE_HP)
 	var manager := CharmSocketManager.new()
 	var registry := CharmRegistry.new()
 	registry.definitions = [ARROW_RAIN, CRESCENT_CLEAVE, TIDE_GRAPPLE]
@@ -55,7 +56,7 @@ func _test_data() -> void:
 	var definitions: Array[CharmData] = [ARROW_RAIN, CRESCENT_CLEAVE, TIDE_GRAPPLE]
 	_assert_equal(CharmValidator.validate_catalog(definitions).size(), 0, "valid catalog")
 	_assert_equal(ARROW_RAIN.get_param_int(&"projectile_count"), 8, "Arrow Rain count")
-	_assert_near(ARROW_RAIN.get_param_float(&"damage_percent"), 0.35, "Arrow damage")
+	_assert_true(ARROW_RAIN.get_param_float(&"damage_percent") > 0.0, "Arrow has positive damage")
 	var volley_duration := ARROW_RAIN.get_param_float(&"volley_duration_seconds")
 	_assert_true(volley_duration >= 1.0 and volley_duration <= 1.5, "Arrow volley data")
 	_assert_true(ARROW_RAIN.resource_cost > 0.0, "Arrow has a positive cost")
@@ -91,9 +92,13 @@ func _test_arrow_rain(
 	await create_timer(1.8).timeout
 	_assert_equal(_arrow_launch_count, 8, "Arrow launches eight projectiles")
 	_assert_true(
-		_arrow_first_direction.is_equal_approx(Vector3.BACK), "Arrow impact uses stable facing"
+		_arrow_first_direction.dot(Vector3.RIGHT) > 0.9, "Arrow recoil points toward impact"
 	)
-	_assert_equal(_arrow_last_damage_hp, 35, "Arrow projectile damage")
+	_assert_near(
+		_arrow_last_damage_hp,
+		BASE_ATTACK_DAMAGE_HP * ARROW_RAIN.get_param_float(&"damage_percent"),
+		"Arrow projectile applies the authored damage percentage"
+	)
 	runtime.reset_cooldown()
 	_assert_true(manager.activate_socket(CharmConstants.SocketId.Q), "reactivate Arrow Rain")
 	_assert_near(

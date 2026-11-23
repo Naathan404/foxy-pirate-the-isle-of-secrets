@@ -1,23 +1,27 @@
 [gd_scene format=3 uid="uid://2jqhf2ew8c63"]
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_xdmpo"]
-[ext_resource type="Texture2D" uid="uid://cs5pt0b1wog7u" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_40 PM-5.png" id="2_blwiy"]
-[ext_resource type="Texture2D" uid="uid://ca2aih3832nn8" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_37 PM-3.png" id="3_p48t0"]
-[ext_resource type="Texture2D" uid="uid://dhi68ukq6st5f" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_36 PM-2.png" id="4_it2ow"]
-[ext_resource type="Texture2D" uid="uid://bhbqjhvvkvd3r" path="res://assets/sprites/biomes/coral_valley/ChatGPT Image Nov 11, 2026, 01_16_38 PM-4.png" id="5_q2jnd"]
+[ext_resource type="Texture2D" uid="uid://pev7oyau8bln" path="res://assets/sprites/biomes/coral_valley/harbor_path_down_warm_sand.png" id="2_blwiy"]
+[ext_resource type="Texture2D" uid="uid://bwxwjtx83amol" path="res://assets/sprites/biomes/coral_valley/harbor_path_up_warm_sand.png" id="3_p48t0"]
+[ext_resource type="Texture2D" uid="uid://yvpod5um0yc8" path="res://assets/sprites/biomes/coral_valley/harbor_path_right_warm_sand.png" id="4_it2ow"]
+[ext_resource type="Texture2D" uid="uid://uexrx1p2ci64" path="res://assets/sprites/biomes/coral_valley/harbor_path_left_warm_sand.png" id="5_q2jnd"]
 [ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://assets/sprites/biomes/coral_valley/coral_valley_ground.png" id="6_8m7ht"]
 [ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="7_ground_shape"]
+[ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="8_boat"]
 
 [node name="BaseSmallRoom" unique_id=525086743 instance=ExtResource("1_xdmpo")]
+enemy_boundary_enabled = true
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -0.53301895, -0.02048206, 24.479424)
 
 [node name="Sprite3D" parent="Exits/DownPath" index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 6.314535e-08, -1.4445972)
+pixel_size = 0.0093
 texture = ExtResource("2_blwiy")
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 3.0071125)
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 3.0071125)
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
 trigger_id = &"down"
@@ -29,14 +33,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -6.6359587)
 [node name="ExitPosition" parent="Exits/DownPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6731589, -5.5109587)
 
+[node name="HarborBoat" parent="Exits/DownPath" index="3" unique_id=83692461 instance=ExtResource("8_boat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, -0.18, 1.22)
+
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -1.509958e-06, -0.02918672, -28.124086)
 
 [node name="Sprite3D" parent="Exits/UpPath" index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.55)
+pixel_size = 0.0089
 texture = ExtResource("3_p48t0")
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, -5.4155645)
+transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, -5.4155645)
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
 trigger_id = &"up"
@@ -48,18 +57,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4.987197)
 [node name="ExitPosition" parent="Exits/UpPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6731589, -6.112197)
 
+[node name="HarborBoat" parent="Exits/UpPath" index="3" unique_id=1624374396 instance=ExtResource("8_boat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.25, -0.18, -5)
+
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 27.654852, -0.05280208, 0)
 
 [node name="Sprite3D" parent="Exits/RightPath" index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1, 0, 0)
+pixel_size = 0.00865
 texture = ExtResource("4_it2ow")
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, 1.0459671)
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-transform = Transform3D(0.8, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 6.0071125)
+transform = Transform3D(0.71999997, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 6.0071125)
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
 trigger_id = &"right"
@@ -71,18 +84,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5584259, 1, -4.5629807)
 [node name="ExitPosition" parent="Exits/RightPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5665741, 0.6731589, -4.89767)
 
+[node name="HarborBoat" parent="Exits/RightPath" index="3" unique_id=2061371335 instance=ExtResource("8_boat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, -0.18, 3.35)
+
 [node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -27.819382, -0.13826466, 0)
 
 [node name="Sprite3D" parent="Exits/LeftPath" index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0, 0)
+pixel_size = 0.00865
 texture = ExtResource("5_q2jnd")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, 1.0459671)
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
-transform = Transform3D(0.7, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 6.0071125)
+transform = Transform3D(0.63, 0, 0, 0, 1, 0, 0, 0, 1, -0.035751343, -0.38388157, 6.0071125)
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" index="2" unique_id=219025603]
 trigger_id = &"left"
@@ -93,6 +110,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4988899, 1.1086969, -5.1329
 
 [node name="ExitPosition" parent="Exits/LeftPath/SceneChangeTrigger" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.62389, 0.6731589, -5.3314714)
+
+[node name="HarborBoat" parent="Exits/LeftPath" index="3" unique_id=506023602 instance=ExtResource("8_boat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.71, -0.18, 3.6)
 
 [node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -0.19104576)

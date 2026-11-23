@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://76tadlwktby0"
-path.s3tc="res://.godot/imported/Sword Spinning 03.png-2086314de9e23523af8d581b460b2ebe.s3tc.ctex"
+path="res://.godot/imported/Sword Spinning 03.png-2086314de9e23523af8d581b460b2ebe.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://assets/sprites/weapons/dagger_spinning/Sword Spinning 03.png"
-dest_files=["res://.godot/imported/Sword Spinning 03.png-2086314de9e23523af8d581b460b2ebe.s3tc.ctex"]
+dest_files=["res://.godot/imported/Sword Spinning 03.png-2086314de9e23523af8d581b460b2ebe.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -1,8 +1,11 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
 
 
@@ -76,7 +79,11 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_05" instance=ExtResource("1_base")]
-open_exits = 8
+safe_room = true
+open_exits = 15
+up_destination_scene = "res://world/biomes/coral_valley/map/room_13.tscn"
+right_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+down_destination_scene = "res://world/biomes/coral_valley/map/room_22.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_04.tscn"
 
 [node name="WorldEnvironment" parent="General" index="0" unique_id=212262502 parent_id_path=PackedInt32Array(461960862)]
@@ -124,11 +131,13 @@ shape = SubResource("BoxShape3D_left_trigger")
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.0626488, 0)
 
-[node name="RandomProps" type="Node3D" parent="."]
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-8, 0, -5, -6, 0, 8, 6, 0, -8, 8, 0, 4, -3, 0, -10, 4, 0, 10)
-
 [node name="Campfire" parent="." instance=ExtResource("campfire")]
+
+[node name="RandomSeaweed" type="Node3D" parent="."]
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(-12.434, 0, -5.42, -12.721, 0, -7.632, -10.651, 0, -8.188, -10.708, 0, -10.302, -9.35, 0, -11.943, -7.103, 0, -12.685, -5.593, 0, -14.506, 5.153, 0, -15.226, 7.516, 0, -14.576, 8.385, 0, -12.284, 10.942, 0, -9.731, 11.481, 0, -7.568, 12.907, 0, -5.893, 12.337, 0, 6.398, 12.151, 0, 8.476, 12.624, 0, 10.667, 10.618, 0, 11.556, 10.082, 0, 14.146, 7.148, 0, 15.603, 5.038, 0, 15.027, -5.156, 0, 15.123, -7.199, 0, 15.922, -9.182, 0, 14.391, -9.765, 0, 12.454, -11.732, 0, 11.973, -13.13, 0, 10.13, -12.138, 0, 8.152, -12.767, 0, 5.688)
+fixed_spawn_count = 20
+prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
 [editable path="Environment/BaseGround"]
 [editable path="Exits/DownPath"]

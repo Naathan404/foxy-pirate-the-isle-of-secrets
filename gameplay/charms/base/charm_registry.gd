@@ -185,6 +185,8 @@ func input_pressed(socket_id: int, context: CharmActivationContext) -> bool:
 	var runtime := get_equipped(socket_id)
 	if runtime == null or context == null or not runtime.can_receive_input():
 		return false
+	if context.actor is Player and (context.actor as Player).is_charm_casting():
+		return false
 	if runtime.cooldown_remaining > 0.0 and not runtime.effect.can_bypass_cooldown(context):
 		return false
 	if runtime.effect.get_cooldown_policy() == &"on_activate" and not runtime.can_activate():

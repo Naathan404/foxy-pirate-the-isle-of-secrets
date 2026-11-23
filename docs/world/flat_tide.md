@@ -2,7 +2,13 @@
 
 `world/gimmick/flat_tide/flat_tide.tscn` gồm `FlatTideController` và các `FlatTideZone`. Các phòng `coral_valley/map/room_02`, `room_09`, `room_14` và `world/tests/beach_test` dùng scene này. `flat_tide_playground.tscn` (cùng thư mục) là phòng thử tự chứa với hai vùng chồng nhau, một vùng xoay và vài enemy; dùng nó để thử mà không phải mở hay lưu scene map.
 
-## Hình ảnh
+## Thiết lập vùng
+
+- Trong Inspector của `LeftShallows` hoặc `RightShallows`, chỉnh `Size`, `Volume Depth` và vị trí node. Điểm gốc Y của node là đáy vùng nước, gần cao độ mặt đất; mặt nước nằm cao hơn một khoảng `Volume Depth`.
+- `Start Coverage` và `Full Coverage` quyết định ngưỡng bắt đầu và kết thúc ngập của vùng theo mức triều chung. `Full Coverage` cần lớn hơn `Start Coverage`.
+- `Shore Wave Amplitude/Length/Speed` và `Shore Detail Amplitude/Length/Speed` chỉnh hai lớp sóng ở mép nước. `Surface Wave Height/Length/Speed` và `Surface Detail Height/Length/Speed` chỉnh độ nhấp nhô mặt trên. Mép sóng dùng cùng thông số và thời gian cho hình ảnh lẫn kiểm tra ngập.
+- `Surface Segments X/Z` chỉnh độ mịn mesh; tăng số đoạn theo chiều Z để mép sóng cong mượt hơn, đổi lại tăng số đỉnh. `Floor Tolerance` giới hạn độ cao của điểm được xem là nằm trên nền vùng nước.
+- `Water Material` là resource `flat_tide_volume_material.tres`. Mở resource này để chỉnh màu nông, màu sâu, màu mặt bên, bọt, độ đục và cường độ vân sáng. Material được sao chép khi chạy để mỗi vùng nhận mức triều riêng. Muốn một vùng có màu khác, tạo bản sao material rồi gán cho vùng đó.
 
 Mỗi vùng là **một tấm nước bám nền**, không còn khối hộp có mặt bên hay đáy. Nước tiến từ cạnh **X dương về X âm trong tọa độ của vùng** (hoặc theo `Flow Direction`):
 
@@ -19,7 +25,26 @@ Hai cạnh bên và phía biển được làm mờ có nhiễu (`Side Fade Leng
 
 Khi gần ngập hết, mép lùi vào trong vùng một khoảng bằng biên độ sóng bờ, để mép vẫn uốn lượn thay vì nằm thẳng trên cạnh vùng. Vì vậy khi triều cao, dải sát cạnh trong cùng (tối đa `Shore Wave Amplitude + Shore Detail Amplitude`) có thể khô xen kẽ.
 
-## Thiết lập vùng
+Bật `Sequential Zones` trên `FlatTide` để các vùng chạy lần lượt theo thứ tự
+trong mảng `Zones`. Vùng đầu tiên dâng ngay khi vào phòng; mỗi vùng dâng, giữ,
+rút và nghỉ xong mới chuyển sang vùng tiếp theo. Các vùng chưa tới lượt luôn
+khô; cảnh báo xuất hiện ở vùng sắp tới lượt. Hết danh sách thì quay lại đầu.
+
+Chọn từng node vùng nước để chỉnh `Cycle Timing`: `Rise Duration`,
+`High Duration`, `Fall Duration` và `Rest Duration`. Các giá trị này chỉ dùng
+khi chạy lần lượt; nhóm `Shared Timing` trên controller dùng cho chế độ đồng
+thời cũ. Mobs 1–3 chạy Trái → Phải; Mobs 4–6 chạy theo chiều kim đồng hồ:
+Trái → Trên → Phải → Dưới. Mỗi vùng dâng 6s, giữ 6s, rút 6s và nghỉ 6s;
+một vòng mất 48s với hai hướng hoặc 96s với bốn hướng.
+
+Muốn chạy theo chiều kim đồng hồ, đặt tên các vùng là `LeftShallows`,
+`UpShallows`, `RightShallows`, `DownShallows`; chỉnh hướng và vị trí từng
+node, rồi kéo chúng vào `Zones` theo đúng thứ tự. Mỗi vùng có
+thể dùng thời gian riêng. Danh sách không được chứa node trống hoặc trùng nhau.
+Player, dấu chân và spawner vẫn dùng chung một controller; mỗi lần một vùng
+bắt đầu rút vẫn là một đợt spawn.
+
+Khi mép sóng đang dâng chạm Player, hoặc Player đi vào phần sóng đang tiến, sóng đẩy Player theo hướng dòng nước một lần mỗi đợt dâng. `Wave Knockback Speed` mặc định là 14 m/s và `Wave Knockback Duration` là 0,65 giây; cả hai chỉnh được trên `FlatTideController`. Lực đẩy được áp dụng sau vận tốc của trạng thái Player, nên đi hoặc dash ngược chiều không triệt tiêu được lực trong thời gian tác dụng. Va chạm với tường và vật cản vẫn giới hạn chuyển động.
 
 - **Area:** `Flow Direction`, `Size` (kích thước tối đa trên X/Z), `Start/Full Coverage` (ngưỡng ngập theo mức triều chung; `Full` phải lớn hơn `Start`), `Floor Tolerance`.
 - **Tide shape:**
@@ -86,9 +111,23 @@ Tắt từng phần bằng `Ride Enabled` hoặc `Sweep Enemies` trên `FlatTide
 
 - `Enemies Per Tide`: số enemy tối đa mỗi đợt, mặc định 1.
 - `Wave Chance`: xác suất có đợt spawn, mặc định 100%.
-- `Enemies`: danh sách `FlatTideEnemyEntry` (`Normal Scene` và `Elite Scene`), chọn ngẫu nhiên với xác suất bằng nhau.
-- `Elite Chance`: xác suất chọn bản elite, mặc định 10%.
-- `Minimum Spacing`, `Minimum Player Distance`, `Attempts Per Enemy`, `Ground Collision Mask`, `Ground Search Distance`, `Ground Clearance`: điều chỉnh việc chọn vị trí và kiểm tra nền.
+- `Enemies`: danh sách loại enemy được chọn ngẫu nhiên với xác suất bằng nhau. Mỗi phần tử là một `FlatTideEnemyEntry` gồm `Normal Scene` và `Elite Scene` tương ứng; để trống elite nếu loại đó chỉ có bản thường.
+- `Elite Chance`: xác suất chọn bản elite của loại enemy đã chọn, mặc định 10%.
+- `Minimum Spacing`: khoảng cách ngang tối thiểu giữa các vị trí trong cùng đợt. `Minimum Player Distance` tránh spawn sát Foxy.
+- `Attempts Per Enemy` giới hạn số lần tìm vị trí. `Ground Collision Mask`, `Ground Search Distance` và `Ground Clearance` điều chỉnh kiểm tra nền.
+- `Edge Clearance`: khoảng lùi khỏi mép vực theo đơn vị world, mặc định 2; chỉnh
+  trong Inspector của `EnemySpawner`. Đặt 0 để bỏ kiểm tra khoảng lùi.
+
+`Spawn Ground` chọn nền `StaticBody3D` được phép sinh quái. Trong Inspector của
+`FlatTide/EnemySpawner`, kéo `Environment/BaseGround/StaticBody3D` từ Scene tree
+vào ô này. Sáu phòng Mobs của Coral Valley đã được gán sẵn; không cần dùng group.
+Raycast chỉ nhận đúng collider được gán, giúp loại cầu gỗ và các vật thể khác.
+
+Kiểm tra mép dùng tám tia xuống quanh điểm spawn và yêu cầu chúng chạm cùng
+collider nền, với mặt đủ phẳng. Các điểm dò không cần đang ngập; khoảng lùi
+được tính theo mép nền, không theo mép nước. Vòng dò được nới nhẹ để bảo toàn
+khoảng lùi ở hướng chéo trên nền đảo lồi hiện tại. Đây là kiểm tra lấy mẫu,
+không phải đo khoảng cách chính xác cho mọi hình dạng nền có khe nhỏ hoặc lõm.
 
 Nếu không tìm đủ nền hợp lệ, hoặc vị trí bị chiếm khi nước rút đến, đợt đó có thể ít enemy hơn cấu hình. Hiệu ứng xuất hiện dùng `flat_tide_spawn_effect.tscn` (`Spawn Effect Scene`, để trống để tắt).
 

@@ -1,0 +1,47 @@
+[gd_resource type="ShaderMaterial" format=4 uid="uid://b05eemsvxvbvq"]
+
+[ext_resource type="Shader" uid="uid://dslq2xxfegbrt" path="res://world/biomes/hub/ground/hub_terrain.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://dgvvj2dq6ssh5" path="res://assets/sprites/biomes/hub/ground/hub_grass_ground.png" id="2_texture"]
+[ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="3_cloud"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_edge"]
+seed = 41
+frequency = 0.03
+fractal_octaves = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_edge"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_edge")
+seamless = true
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/surface_texture = ExtResource("2_texture")
+shader_parameter/edge_noise = SubResource("NoiseTexture2D_edge")
+shader_parameter/texture_world_size_meters = 9.0
+shader_parameter/edge_noise_world_size_meters = 7.0
+shader_parameter/fringe_meters = 0.9
+shader_parameter/edge_outline_meters = 0.16
+shader_parameter/edge_outline_color = Color(0.17, 0.14, 0.1, 1)
+shader_parameter/edge_shade_meters = 1.2
+shader_parameter/edge_shade_strength = 0.25
+shader_parameter/overgrowth_texture_world_size_meters = 9.0
+shader_parameter/overgrowth_noise_world_size_meters = 12.0
+shader_parameter/overgrowth_coverage = 0.0
+shader_parameter/overgrowth_edge_reach_meters = 1.6
+shader_parameter/overgrowth_edge_bias = 0.3
+shader_parameter/overgrowth_rim_width = 0.05
+shader_parameter/overgrowth_rim_shade = 0.55
+shader_parameter/overgrowth_outline_width = 0.012
+shader_parameter/cloud_noise = ExtResource("3_cloud")
+shader_parameter/cloud_world_size_meters = 48.0
+shader_parameter/cloud_velocity_meters_per_second = Vector2(0.9, 0.35)
+shader_parameter/cloud_coverage = 0.45
+shader_parameter/cloud_softness = 0.18
+shader_parameter/cloud_shadow_strength = 0.5
+shader_parameter/rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/rect_count = 0
+shader_parameter/underlay_rects = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/underlay_count = 0

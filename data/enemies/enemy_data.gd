@@ -29,6 +29,7 @@ extends Resource
 @export_range(0.0, 10.0, 0.05) var stagger_immunity_duration: float = 1.0
 
 @export_group("Loot")
+@export var elite_charm_drops := false
 @export var drop_item: BaseItem
 @export_range(1, 99, 1) var drop_quantity: int = 1
 @export_range(0.0, 1.0, 0.01) var drop_chance: float = 0.5

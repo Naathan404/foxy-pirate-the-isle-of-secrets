@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/sprites/biomes/hub/foliage/pine_tree_wide.png" id="2_texture"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hit"]
+resource_local_to_scene = true
+size = Vector3(1.40, 3.00, 1.0)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_move"]
+resource_local_to_scene = true
+height = 0.8
+radius = 0.5
+
+[node name="PineTreeWide" node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+max_hp = 8.0
+visual_root = NodePath("Visual/Sprite3D")
+hit_scale = 1.08
+swingable = true
+upright_depth = true
+ground_shadow = true
+wind_amplitude = 0.06
+wind_root_height = 0.3
+fragment_source = NodePath("Visual/Sprite3D")
+drop_chance = 0.0
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+offset = Vector2(-7.5, 677.0)
+pixel_size = 0.00461
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape3D" parent="HurtBox" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.50, 0)
+shape = SubResource("BoxShape3D_hit")
+
+[node name="CollisionShape3D" parent="MovementBody" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("CylinderShape3D_move")
+disabled = false

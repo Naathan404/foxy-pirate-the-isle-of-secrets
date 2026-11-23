@@ -1,6 +1,8 @@
 extends Node3D
 ## Animation and a single area damage sample for one meteor.
 
+signal landed(position: Vector3, hit_target: bool)
+
 const SHOCKWAVE_DURATION := 0.38
 const SHOCKWAVE_STRENGTH := 0.012
 const SHOCKWAVE_COLOR := Color("ff9a4d")
@@ -14,6 +16,8 @@ const SHOCKWAVE_RADIUS_PIXELS := 150.0
 @export var impact_sound: AudioStream
 @export_range(-80.0, 6.0, 1.0, "suffix:dB") var impact_volume_db: float = -8.0
 
+var charm_impact := false
+var _hit_target := false
 var _context: AttackContext
 var _impacted := false
 
@@ -45,18 +49,27 @@ func _physics_process(_delta: float) -> void:
 	if _hitbox.begin_attack_with_context(_context.create_damage_context()):
 		_hitbox.sample_shape()
 		_hitbox.end_attack()
-	get_node("/root/HitstopController").request(hitstop_seconds)
-	get_node("/root/ScreenShakeController").request(shake_pixels, shake_seconds)
+	landed.emit(global_position, _hit_target)
+	if not charm_impact:
+		get_node("/root/HitstopController").request(hitstop_seconds)
+		get_node("/root/ScreenShakeController").request(shake_pixels, shake_seconds)
 	get_node("/root/ShockwaveController").request_world(
-		global_position, SHOCKWAVE_DURATION, SHOCKWAVE_STRENGTH, SHOCKWAVE_COLOR, SHOCKWAVE_RADIUS_PIXELS
+		global_position,
+		SHOCKWAVE_DURATION,
+		SHOCKWAVE_STRENGTH,
+		SHOCKWAVE_COLOR,
+		SHOCKWAVE_RADIUS_PIXELS
 	)
 	if impact_sound != null:
 		get_node("/root/AudioManager").play_sfx_3d(impact_sound, global_position, impact_volume_db)
 
 
 func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
+	if charm_impact and target is Node3D:
+		damage.direction = global_position.direction_to((target as Node3D).global_position)
 	_context.damage_prepared.emit(damage, target)
 
 
 func _on_damage_applied(damage: DamageContext, target: Node, applied_hp: float) -> void:
+	_hit_target = _hit_target or applied_hp > 0.0
 	_context.damage_applied.emit(damage, target, applied_hp)

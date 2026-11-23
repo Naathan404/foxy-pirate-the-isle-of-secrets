@@ -25,7 +25,7 @@ const UNCHARTED_TEXT := "Uncharted waters"
 const UNCHARTED_NAME := "???"
 const SUBTITLE_FORMAT := "%s  -  %s"
 const WORLD_HINT := "Arrows  Select      Enter  Explore      M / Esc  Close"
-const BIOME_HINT := "Esc / Right click  Back      M  Close"
+const BIOME_HINT := "Wheel  Zoom      Drag  Pan      Esc / Right click  Back      M  Close"
 const DENIED_SHAKE_COUNT := 2.0
 ## Keyboard focus prefers islands straight ahead over ones off to the side.
 const SIDEWAYS_COST_WEIGHT := 2

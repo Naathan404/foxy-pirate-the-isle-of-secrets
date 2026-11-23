@@ -4,7 +4,7 @@
 
 `ui/main_menu/main_menu.tscn` là `run/main_scene`. Nút **Play** gọi
 `GameManager.change_scene(gameplay_scene)` (export, mặc định
-`world/biomes/hub/map/room_02.tscn`, scene khởi đầu trước đây); **Quit** gọi
+`world/biomes/hub/map/castaway_cove.tscn`, Hub trung tâm); **Quit** gọi
 `get_tree().quit()`. Nút bị khóa sau lần bấm đầu để không tạo hai transition.
 Focus ban đầu ở Play; phím lên/xuống di chuyển focus, Enter/Space xác nhận.
 

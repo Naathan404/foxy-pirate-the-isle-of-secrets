@@ -6,7 +6,7 @@ const ARROW: BaseItem = preload("res://data/items/consumables/wooden_arrow.tres"
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
 const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
-const NPC_TEST_SCENE_PATH := "res://world/hub/scenes/hub.tscn"
+const NPC_TEST_SCENE_PATH := "res://world/biomes/hub/map/silas_tent.tscn"
 const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
 const SHOP_PANEL_SCENE: PackedScene = preload("res://gameplay/merchant/silas_shop_panel.tscn")
@@ -34,7 +34,7 @@ func _initialize() -> void:
 
 func _test_purchase_rejections() -> void:
 	var service := MerchantTransactionService.new(CATALOG)
-	var wallet := GoldWallet.new()
+	var wallet := _make_empty_wallet()
 	var inventory := _make_inventory(1)
 	_assert_equal(
 		service.purchase(&"wooden_arrow", inventory, wallet, null),
@@ -55,11 +55,11 @@ func _test_purchase_rejections() -> void:
 	var potion_inventory := _make_inventory(3)
 	potion_inventory.default_potion_capacity = 0
 	_assert_equal(
-		service.purchase(&"small_healing_potion", potion_inventory, GoldWallet.new(), null),
+		service.purchase(&"small_healing_potion", potion_inventory, _make_empty_wallet(), null),
 		MerchantTransactionService.Result.INSUFFICIENT_GOLD,
 		"potion test begins with insufficient gold"
 	)
-	var potion_wallet := GoldWallet.new()
+	var potion_wallet := _make_empty_wallet()
 	potion_wallet.add_gold(25)
 	_assert_equal(
 		service.purchase(&"small_healing_potion", potion_inventory, potion_wallet, null),
@@ -74,7 +74,7 @@ func _test_purchase_rejections() -> void:
 func _test_successful_item_trade() -> void:
 	var service := MerchantTransactionService.new(CATALOG)
 	var inventory := _make_inventory(4)
-	var wallet := GoldWallet.new()
+	var wallet := _make_empty_wallet()
 	wallet.add_gold(12)
 	_assert_equal(
 		service.purchase(&"wooden_arrow", inventory, wallet, null),
@@ -115,7 +115,7 @@ func _test_configured_trade_amount() -> void:
 	_assert_true(bundled_catalog.validate().is_empty(), "one item can have multiple buy offers")
 	var service := MerchantTransactionService.new(bundled_catalog)
 	var inventory := _make_inventory(2)
-	var wallet := GoldWallet.new()
+	var wallet := _make_empty_wallet()
 	wallet.add_gold(6)
 	_assert_equal(
 		service.purchase(&"arrow_bundle", inventory, wallet, null),
@@ -132,16 +132,14 @@ func _test_configured_trade_amount() -> void:
 	_assert_equal(inventory.count_item(ARROW.item_id), 0, "sale removes configured trade amount")
 	_assert_equal(wallet.get_balance(), 3, "bundle sale uses configured price once")
 	single_offer.sell_price = 1
-	_assert_false(
-		bundled_catalog.validate().is_empty(), "one item cannot have two sell offers"
-	)
+	_assert_false(bundled_catalog.validate().is_empty(), "one item cannot have two sell offers")
 	inventory.free()
 
 
 func _test_multiple_trade_quantities() -> void:
 	var service := MerchantTransactionService.new(CATALOG)
 	var inventory := _make_inventory(4)
-	var wallet := GoldWallet.new()
+	var wallet := _make_empty_wallet()
 	wallet.add_gold(10)
 	_assert_equal(
 		service.purchase(&"wooden_arrow", inventory, wallet, null, 3),
@@ -172,8 +170,8 @@ func _test_random_buy_stock() -> void:
 	random.seed = 42
 	var source_count := CATALOG.get_buy_offers().size()
 	var fixed_count := CATALOG.guaranteed_buy_offer_ids.size()
-	var expected_count := fixed_count + mini(
-		CATALOG.random_buy_offer_count, source_count - fixed_count
+	var expected_count := (
+		fixed_count + mini(CATALOG.random_buy_offer_count, source_count - fixed_count)
 	)
 	var stock := CATALOG.roll_buy_stock(random)
 	_assert_equal(stock.get_buy_offers().size(), expected_count, "stock has fixed and drawn offers")
@@ -188,7 +186,9 @@ func _test_random_buy_stock() -> void:
 	for offer: MerchantOffer in CATALOG.get_buy_offers():
 		if stock.get_offer(offer.offer_id).buy_price == 0:
 			hidden_count += 1
-			_assert_true(service._get_buy_offer(offer.offer_id) == null, "hidden offer cannot be bought")
+			_assert_true(
+				service._get_buy_offer(offer.offer_id) == null, "hidden offer cannot be bought"
+			)
 	_assert_equal(hidden_count, source_count - expected_count, "undrawn offers are hidden")
 	_assert_true(
 		stock.get_sell_offer_for_item(&"starfish_core") != null,
@@ -196,14 +196,13 @@ func _test_random_buy_stock() -> void:
 	)
 	var store := SilasProgressStore.new()
 	var before := store.get_shop_stock(CATALOG)
-	_assert_true(
-		before == store.get_shop_stock(CATALOG), "stock stays fixed during a play session"
-	)
+	_assert_true(before == store.get_shop_stock(CATALOG), "stock stays fixed during a play session")
 	var after := store.reroll_shop_stock(CATALOG)
 	var changed := false
 	for offer: MerchantOffer in CATALOG.get_buy_offers():
-		if (before.get_offer(offer.offer_id).buy_price > 0) != (
-			after.get_offer(offer.offer_id).buy_price > 0
+		if (
+			(before.get_offer(offer.offer_id).buy_price > 0)
+			!= (after.get_offer(offer.offer_id).buy_price > 0)
 		):
 			changed = true
 			break
@@ -220,7 +219,7 @@ func _test_catalog_prices_and_sales() -> void:
 		return
 	var service := MerchantTransactionService.new(CATALOG)
 	var inventory := _make_inventory(2)
-	var wallet := GoldWallet.new()
+	var wallet := _make_empty_wallet()
 	inventory.add_item(HEALING, 1)
 	_assert_equal(
 		service.sell(potion_sell_offer.offer_id, inventory, wallet),
@@ -246,7 +245,7 @@ func _test_weapon_is_one_time_purchase() -> void:
 	entry.definition = BOW
 	weapons.collection = [entry]
 	weapons._initialize_collection()
-	var wallet := GoldWallet.new()
+	var wallet := _make_empty_wallet()
 	wallet.add_gold(100)
 	var inventory := _make_inventory(2)
 	_assert_equal(
@@ -360,13 +359,9 @@ func _test_npc_scene_smoke() -> void:
 			(npc.get_node("Visual/Sprite3D") as Sprite3D).visible, "legacy art stays hidden"
 		)
 		npc.free()
-	if not ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"):
-		print("Silas Hub integration test skipped: Hub scene has been removed")
-		return
 	if DisplayServer.get_name() == "headless":
 		_assert_true(
-			ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"),
-			"Silas Hub scene is present"
+			ResourceLoader.exists(NPC_TEST_SCENE_PATH, "PackedScene"), "Silas Hub scene is present"
 		)
 		# GridMap physics/render RIDs from the complete Hub cannot be torn down
 		# cleanly by Godot's headless script runner. Gameplay smoke coverage still
@@ -381,7 +376,7 @@ func _test_npc_scene_smoke() -> void:
 	await process_frame
 	await process_frame
 	var silas := scene.get_node_or_null("Silas") as SilasNpc
-	var panel := scene.get_node_or_null("SilasShopPanel") as SilasShopPanel
+	var panel := scene.find_child("SilasShopPanel", true, false) as SilasShopPanel
 	var player := _get_game_manager_player()
 	_assert_true(silas != null, "npc test scene contains Silas")
 	_assert_true(panel != null, "npc test scene contains shop panel")
@@ -402,7 +397,8 @@ func _test_npc_scene_smoke() -> void:
 		panel.reroll_button.pressed.emit()
 		var session_stock := panel._catalog
 		_assert_equal(
-			panel.grid.get_child_count(), session_stock.get_buy_offers().size(),
+			panel.grid.get_child_count(),
+			session_stock.get_buy_offers().size(),
 			"debug reroll updates the open shop"
 		)
 		panel.reroll_button.pressed.emit()
@@ -410,7 +406,7 @@ func _test_npc_scene_smoke() -> void:
 		_assert_equal(panel.grid_columns, 4, "shop grid uses the mockup's four columns")
 		var first_buy_slot := panel.grid.get_child(0) as SilasShopSlot
 		_assert_true(first_buy_slot != null, "shop uses the Silas slot art")
-		_assert_true(panel.buy_tab is TextureButton, "buy tab uses the supplied texture")
+		_assert_true(panel.buy_tab is InventoryMenuTabButton, "buy tab uses the inventory UI")
 		panel._set_tab(SilasShopPanel.Tab.SELL)
 		var inventory := player.get_node_or_null("Inventory") as Inventory
 		if inventory != null:
@@ -419,7 +415,7 @@ func _test_npc_scene_smoke() -> void:
 				"sell tab renders occupied inventory slots"
 			)
 		panel.close_shop()
-		await create_timer(panel.close_duration + 0.05, true).timeout
+		await panel.shop_closed
 		_assert_false(panel.visible, "shop panel closes")
 		_assert_true(
 			ResourceLoader.exists(silas.data.dialogue_timeline), "first-meeting timeline exists"
@@ -457,6 +453,13 @@ func _test_stationary(silas: SilasNpc, location: String) -> void:
 func _get_game_manager_player() -> Player:
 	var manager := root.get_node_or_null("GameManager")
 	return manager.get("player") as Player if manager != null else null
+
+
+func _make_empty_wallet() -> GoldWallet:
+	var wallet := GoldWallet.new()
+	# Transaction scenarios start empty regardless of the game's starting gold.
+	wallet.try_spend(wallet.get_balance())
+	return wallet
 
 
 func _make_inventory(capacity: int) -> Inventory:

@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/effects/charms/dead_mans_anchor_marker.png" id="1_anchor"]
+
+[node name="DeadMansAnchorMarker" type="Sprite3D"]
+texture = ExtResource("1_anchor")
+billboard = 1
+texture_filter = 0
+cast_shadow = 0
+pixel_size = 0.018
+offset = Vector2(0, 46)

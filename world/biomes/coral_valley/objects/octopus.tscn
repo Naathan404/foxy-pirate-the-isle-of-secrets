@@ -13,6 +13,7 @@ size = Vector3(1.75, 0.8, 1.15)
 [node name="Octopus" unique_id=635249029 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
 script = ExtResource("3_script")
 max_hp = 3.0
+receives_enemy_attacks = true
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
 swingable = true

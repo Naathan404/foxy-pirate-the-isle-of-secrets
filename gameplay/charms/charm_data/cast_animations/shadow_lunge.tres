@@ -1,16 +1,18 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
 [ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/shadow_lunge.png" id="2_sheet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/shadow_lunge_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"shadow_lunge"
 texture = ExtResource("2_sheet")
+vertical_texture = ExtResource("3_vertical")
 foot_anchors = PackedVector2Array(0.4414, 0.8906, 0.4316, 0.8906, 0.375, 0.8906, 0.3887, 0.8906, 0.3574, 0.8828, 0.3965, 0.8828, 0.4355, 0.8828, 0.4648, 0.8789)
 standing_height_fraction = 0.73
 phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"active": PackedInt32Array(2, 3, 4),
 &"recover": PackedInt32Array(5, 6, 7)
 })
-looping_phases = Array[StringName]([&"active"])
+held_phases = Array[StringName]([&"active"])

@@ -9,6 +9,9 @@ const RIGHT := 2
 const DOWN := 4
 const LEFT := 8
 const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
+# //NLVP sửa: Tách biên người chơi và biên quái.
+const PLAYER_BOUNDARIES_NAME := &"GroundBoundaries"
+const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 
 @export_tool_button("Refresh destination exits", "Reload") var refresh_destination_exits: Callable:
 	get:
@@ -19,10 +22,18 @@ const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
 @export var void_reload_enabled: bool = true
 @export var void_height: float = -6.0
 
+@export_group("Safe room")
+## Charms can be changed anywhere in this room (the hub, campfire rests). Checkpoints still
+## add their own safe area in rooms without this flag.
+@export var safe_room: bool = false
+
 @export_group("Ground boundaries")
 ## Openings in room-local X/Z coordinates, for example at moving platform docks.
 @export var boundary_openings: Array[Rect2] = []
 @export var boundary_enabled: bool = true
+# //NLVP sửa: Bật biên kín cho quái trong Inspector.
+## Chặn quái ra khỏi nền đảo và đi lên các path.
+@export var enemy_boundary_enabled: bool = false
 
 @export_group("Exits")
 @export_flags("Up", "Right", "Down", "Left") var open_exits: int = UP | RIGHT | DOWN | LEFT:
@@ -96,6 +107,7 @@ func _ready() -> void:
 	_refresh_exits()
 	if not Engine.is_editor_hint():
 		_rebuild_ground_boundaries()
+		_grant_safe_room()
 	if Engine.is_editor_hint():
 		set_physics_process(false)
 		update_configuration_warnings()
@@ -110,6 +122,18 @@ func _physics_process(_delta: float) -> void:
 		return
 	if to_local(active_player.global_position).y < void_height:
 		manager.reload_current_scene()
+
+
+## Foxy is a child of the room, so it has registered with GameManager before the room is
+## ready. The room is the safe source: leaving the room frees it and ends the permission.
+func _grant_safe_room() -> void:
+	if not safe_room:
+		return
+	var active_player := get_node("/root/GameManager").player as Player
+	if not is_instance_valid(active_player) or not is_ancestor_of(active_player):
+		return
+	if is_instance_valid(active_player.charm_socket_manager):
+		active_player.charm_socket_manager.enter_safe_location(self)
 
 
 func _queue_refresh() -> void:
@@ -176,11 +200,13 @@ func _refresh_exits() -> void:
 ## Generate walls along the exposed edges of the floors. Paths are
 ## included only while open, so their overlap with the ground remains walkable.
 func _rebuild_ground_boundaries() -> void:
-	var old := get_node_or_null("GroundBoundaries")
-	if old:
-		remove_child(old)
-		old.queue_free()
-	if not boundary_enabled:
+	# //NLVP sửa: Dọn cả hai lớp biên trước khi dựng lại.
+	for boundary_name in [PLAYER_BOUNDARIES_NAME, ENEMY_BOUNDARIES_NAME]:
+		var old := get_node_or_null(NodePath(boundary_name))
+		if old:
+			remove_child(old)
+			old.queue_free()
+	if not boundary_enabled and not enemy_boundary_enabled:
 		return
 	var floors: Array[Dictionary] = []
 	var environment := get_node_or_null("Environment")
@@ -188,19 +214,35 @@ func _rebuild_ground_boundaries() -> void:
 		for child in environment.get_children():
 			if String(child.name).begins_with("BaseGround"):
 				_collect_floors(child.get_node_or_null("StaticBody3D"), floors)
+	# //NLVP sửa: Biên quái chỉ theo nền đảo, không mở cửa ra path.
+	if enemy_boundary_enabled:
+		_create_ground_boundaries(ENEMY_BOUNDARIES_NAME, CombatLayers.ENEMY_BOUNDARY, floors, [])
+	if not boundary_enabled:
+		return
 	for entry in [["UpPath", UP], ["RightPath", RIGHT], ["DownPath", DOWN], ["LeftPath", LEFT]]:
 		if open_exits & entry[1]:
 			_collect_floors(get_node_or_null("Exits/%s/StaticBody3D" % entry[0]), floors)
+	_create_ground_boundaries(
+		PLAYER_BOUNDARIES_NAME, CombatLayers.PLAYER_BOUNDARY, floors, boundary_openings
+	)
+
+
+# //NLVP sửa: Dùng chung cách dựng vách cho người chơi và quái.
+func _create_ground_boundaries(
+	boundary_name: StringName,
+	layer: int,
+	floors: Array[Dictionary],
+	openings: Array[Rect2]
+) -> void:
 	var walls := StaticBody3D.new()
-	walls.name = "GroundBoundaries"
-	# Only Foxy's body uses this layer; combat and other actors ignore the walls.
-	walls.collision_layer = 1 << 8
+	walls.name = boundary_name
+	walls.collision_layer = layer
 	walls.collision_mask = 0
 	add_child(walls)
 	for floor_data: Dictionary in floors:
 		var outline: PackedVector2Array = floor_data.outline
 		for i in range(outline.size() - 1):
-			_add_floor_edge(walls, floors, outline[i], outline[i + 1], floor_data.top)
+			_add_floor_edge(walls, floors, outline[i], outline[i + 1], floor_data.top, openings)
 
 
 func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
@@ -240,8 +282,14 @@ func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
 			floors.append({"outline": outline, "top": top})
 
 
+# //NLVP sửa: Mỗi lớp biên nhận danh sách cửa mở riêng.
 func _add_floor_edge(
-	walls: StaticBody3D, floors: Array[Dictionary], start: Vector2, end: Vector2, top: float
+	walls: StaticBody3D,
+	floors: Array[Dictionary],
+	start: Vector2,
+	end: Vector2,
+	top: float,
+	openings: Array[Rect2]
 ) -> void:
 	var edge := end - start
 	if edge.length_squared() < 0.0001:
@@ -250,7 +298,7 @@ func _add_floor_edge(
 	for other: Dictionary in floors:
 		if absf(float(other.top) - top) < 0.5:
 			_split_edge(start, end, other.outline, cuts)
-	for opening: Rect2 in boundary_openings:
+	for opening: Rect2 in openings:
 		var outline := PackedVector2Array(
 			[
 				opening.position,
@@ -264,7 +312,9 @@ func _add_floor_edge(
 	cuts.sort()
 	var outward := Vector2(edge.y, -edge.x).normalized()
 	for i in range(cuts.size() - 1):
-		_add_boundary(walls, floors, start + edge * cuts[i], start + edge * cuts[i + 1], outward, top)
+		_add_boundary(
+			walls, floors, start + edge * cuts[i], start + edge * cuts[i + 1], outward, top, openings
+		)
 
 
 func _split_edge(
@@ -279,18 +329,20 @@ func _split_edge(
 			cuts.append(clampf((intersection - start).dot(edge) / edge.length_squared(), 0.0, 1.0))
 
 
+# //NLVP sửa: Biên quái không bỏ trống các cửa dành cho người chơi.
 func _add_boundary(
 	walls: StaticBody3D,
 	floors: Array[Dictionary],
 	start: Vector2,
 	end: Vector2,
 	outward: Vector2,
-	top: float
+	top: float,
+	openings: Array[Rect2]
 ) -> void:
 	if start.distance_to(end) < 0.01:
 		return
 	var midpoint := (start + end) * 0.5
-	for opening: Rect2 in boundary_openings:
+	for opening: Rect2 in openings:
 		if opening.has_point(midpoint):
 			return
 	for other: Dictionary in floors:

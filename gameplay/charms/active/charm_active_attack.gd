@@ -47,7 +47,7 @@ func activate() -> void:
 	hitbox.scale = hitbox_scale * context.hitbox_multiplier
 	hitbox.actor = context.actor
 	hitbox.team = context.team
-	if not hitbox.begin_attack(context.damage_hp, context.attack_id, context.action):
+	if not hitbox.begin_attack_with_context(context.create_damage_context()):
 		deactivate()
 		return
 	_travelled_distance = 0.0
@@ -113,7 +113,7 @@ func _apply_impact_feedback(target: Node) -> void:
 	if local_hitstop:
 		hitstop.request_local(null, target as Node3D, hitstop_seconds)
 	else:
-		hitstop.request(hitstop_seconds)
+		hitstop.request(hitstop_seconds, target)
 	get_node("/root/ScreenShakeController").request(shake_pixels, 0.14)
 
 

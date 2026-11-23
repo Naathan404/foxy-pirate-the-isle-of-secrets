@@ -1,5 +1,8 @@
 # Foxy bow spritesheet provenance
 
+Historical bow prototype. For current gameplay artwork, use the Foxy rig in
+`assets/spine/foxy_anim_spine/` or its render in `assets/sprites/foxy/charm_casts/foxy_reference.png`.
+
 - Tool: built-in ImageGen, transparent-background generation from an existing reference.
 - Reference: `assets/sprites/foxy/foxy_hat_sprite_sheet.png`.
 - Saved image: `assets/sprites/foxy/foxy_bow_sprite_sheet.png`.

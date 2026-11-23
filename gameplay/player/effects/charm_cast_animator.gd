@@ -4,6 +4,11 @@ extends Node3D
 
 signal finished
 
+enum View { SIDE, BACK, FRONT }
+
+const VERTICAL_FOOT := Vector2(0.5, 0.9)
+const VERTICAL_BODY_FRACTION := 0.72
+
 @export var actor: Node3D
 @export var clips: Array[CharmCastClip] = []
 @export_range(0.5, 6.0, 0.05) var body_height_units: float = 3.0
@@ -14,8 +19,12 @@ var _sequence: PackedInt32Array
 var _sequence_index: int = 0
 var _frame_elapsed: float = 0.0
 var _loop_sequence: PackedInt32Array
+var _hold_final_pose: bool
+var _phase_start_tick: int
 var _playback_rate: float = 1.0
 var _material: ShaderMaterial
+var _cast_direction: Vector3
+var _view: View
 
 @onready var _sprite: Sprite3D = $Sprite3D
 
@@ -30,6 +39,7 @@ func _ready() -> void:
 		_catalog[clip.charm_id] = clip
 	_sprite.hide()
 	set_process(false)
+	set_physics_process(false)
 
 
 func play(
@@ -50,27 +60,16 @@ func play(
 		_loop_sequence = clip.channel_loop_frames
 	elif phase in clip.looping_phases:
 		_loop_sequence = sequence
+	_hold_final_pose = phase in clip.held_phases
+	_phase_start_tick = Engine.get_physics_frames()
 	_playback_rate = (
 		clip.get_sequence_seconds(sequence) / duration_seconds if duration_seconds > 0.0 else 1.0
 	)
-	_sprite.texture = clip.texture
-	_sprite.hframes = clip.grid.x
-	_sprite.vframes = clip.grid.y
-	_sprite.pixel_size = (
-		body_height_units
-		/ (float(clip.texture.get_height()) / clip.grid.y * clip.standing_height_fraction)
-	)
-	_material.set_shader_parameter("atlas_texture", clip.texture)
-	_material.set_shader_parameter("grid", Vector2(clip.grid))
-	var camera := get_viewport().get_camera_3d()
-	if is_instance_valid(camera):
-		var horizontal := direction.dot(camera.global_basis.x)
-		if not is_zero_approx(horizontal):
-			_sprite.flip_h = horizontal < 0.0
-	_update_frame()
-	_face_camera()
+	_cast_direction = direction
+	_update_view(true)
 	_sprite.show()
 	set_process(true)
+	set_physics_process(true)
 	return true
 
 
@@ -81,6 +80,7 @@ func stop(charm_id: StringName = &"") -> void:
 	_loop_sequence = PackedInt32Array()
 	_sprite.hide()
 	set_process(false)
+	set_physics_process(false)
 	finished.emit()
 
 
@@ -92,11 +92,17 @@ func is_playing_charm(charm_id: StringName) -> bool:
 	return _clip != null and _clip.charm_id == charm_id
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
+	_update_view()
+
+
+func _physics_process(delta: float) -> void:
 	if is_instance_valid(actor) and bool(actor.get("dead")):
 		stop()
 		return
-	_face_camera()
+	# Events set the first pose immediately, regardless of node order within this tick.
+	if Engine.get_physics_frames() == _phase_start_tick or _playback_rate == 0.0:
+		return
 	if get_node("/root/HitstopController").is_frozen(actor):
 		return
 	_frame_elapsed += maxf(0.0, delta) * _playback_rate
@@ -104,6 +110,11 @@ func _process(delta: float) -> void:
 		_frame_elapsed -= _clip.frame_seconds[_sequence[_sequence_index]]
 		_sequence_index += 1
 		if _sequence_index >= _sequence.size():
+			if _hold_final_pose:
+				_sequence_index -= 1
+				_frame_elapsed = 0.0
+				_playback_rate = 0.0
+				break
 			if _loop_sequence.is_empty():
 				stop()
 				return
@@ -114,25 +125,49 @@ func _process(delta: float) -> void:
 
 func _update_frame() -> void:
 	var frame_index := _sequence[_sequence_index]
-	_sprite.frame = frame_index
+	var vertical := _view != View.SIDE
+	var front_offset := _clip.grid.x * _clip.grid.y if _view == View.FRONT else 0
+	_sprite.frame = frame_index + front_offset
 	var region := Rect2(0.0, 0.0, 1.0, 1.0)
-	if not _clip.frame_regions.is_empty():
+	if not vertical and not _clip.frame_regions.is_empty():
 		region = _clip.frame_regions[frame_index]
 	_material.set_shader_parameter(
 		"frame_region", Vector4(region.position.x, region.position.y, region.end.x, region.end.y)
 	)
-	var anchor := _clip.foot_anchors[frame_index]
-	var frame_size := Vector2(_clip.texture.get_size()) / Vector2(_clip.grid)
+	var anchor := VERTICAL_FOOT if vertical else _clip.foot_anchors[frame_index]
+	var frame_size := _sprite.texture.get_size() / Vector2(_sprite.hframes, _sprite.vframes)
 	var horizontal_offset := (0.5 - anchor.x) * frame_size.x
 	_sprite.offset = Vector2(
 		-horizontal_offset if _sprite.flip_h else horizontal_offset, (anchor.y - 0.5) * frame_size.y
 	)
 
 
-func _face_camera() -> void:
+func _update_view(force: bool = false) -> void:
 	var camera := get_viewport().get_camera_3d()
-	if not is_instance_valid(camera):
+	var screen_direction := _cast_direction
+	if is_instance_valid(camera):
+		var visual_root := get_parent() as Node3D
+		var toward_camera := visual_root.global_basis.inverse() * camera.global_basis.z
+		rotation.y = atan2(toward_camera.x, toward_camera.z)
+		var right := camera.global_basis.x.slide(Vector3.UP).normalized()
+		var back := camera.global_basis.z.slide(Vector3.UP).normalized()
+		screen_direction = Vector3(_cast_direction.dot(right), 0.0, _cast_direction.dot(back))
+	var view := View.SIDE
+	if absf(screen_direction.z) >= absf(screen_direction.x):
+		view = View.BACK if screen_direction.z < 0.0 else View.FRONT
+	var flip := view == View.SIDE and screen_direction.x < 0.0
+	if not force and view == _view and flip == _sprite.flip_h:
 		return
-	var visual_root := get_parent() as Node3D
-	var toward_camera := visual_root.global_basis.inverse() * camera.global_basis.z
-	rotation.y = atan2(toward_camera.x, toward_camera.z)
+	_view = view
+	_sprite.flip_h = flip
+	var vertical := view != View.SIDE
+	var sheet := _clip.vertical_texture if vertical else _clip.texture
+	var grid := Vector2i(_clip.grid.x, _clip.grid.y * 2) if vertical else _clip.grid
+	var height := VERTICAL_BODY_FRACTION if vertical else _clip.standing_height_fraction
+	_sprite.texture = sheet
+	_sprite.hframes = grid.x
+	_sprite.vframes = grid.y
+	_sprite.pixel_size = body_height_units / (float(sheet.get_height()) / grid.y * height)
+	_material.set_shader_parameter("atlas_texture", sheet)
+	_material.set_shader_parameter("grid", Vector2(grid))
+	_update_frame()

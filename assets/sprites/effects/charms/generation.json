@@ -66,6 +66,20 @@
       ],
       "facing": "right",
       "prompt": "Use case: stylized-concept. Production 2D VFX sprite atlas for BUCKSHOT SALVO, a radial pirate flintlock shotgun volley. The supplied image is STYLE, palette and lighting reference only. Output NO FOX, no person, no pistol or character: only separate PROJECTILE and IMPACT sprites. Exactly TWELVE distinct isolated frames in a strict FOUR-COLUMN by THREE-ROW grid, 4:3 canvas, equal SQUARE cells, genuinely transparent alpha background. Identical center pivot within every cell, generous 14% padding, no effects may cross cell edges. TOP ROW, four animation frames of ONE tangible fast buckshot pellet FACING RIGHT: a clearly visible round metallic bronze/lead BALL at the front, white-ivory highlight and warm orange rim, with a short broad tapered orange-gold flame wake trailing LEFT and two tiny ember fragments. The solid round bullet head must remain readable and substantial in every frame; NOT a thin laser beam, not a straight yellow line, not an arrow, not a missile. The four frames vary the flame flicker and trailing embers without changing the pellet scale. MIDDLE ROW, four HIT frames: compact hot ivory/gold contact flash at center, then jagged orange spark fan and tiny metal debris, then cooling golden ember fragments, then a few fading warm sparks. BOTTOM ROW, four MUZZLE frames: short punchy ivory-core orange/gold powder burst, round warm smoke curls expanding, dissipating gray-gold smoke and a couple of falling embers, then very faint final powder wisps. Use clean dark ink outlines on metal, cel-shaded amber/brass/ivory forms, matching the reference's hand-drawn game VFX. Bright but compact effects with transparent gaps. No text, no labels, no frame numbers, no frame border, no background, no giant explosion covering the whole grid."
+    },
+    {
+      "file": "dead_mans_anchor_marker.png",
+      "source": "exec-b2c32e70-fea6-4319-9d0a-f8d4f45dfcca.png",
+      "source_size": [
+        1159,
+        1358
+      ],
+      "size": [
+        96,
+        96
+      ],
+      "processing": "Transparent sprite, tight alpha crop, uniform downsample and bottom-center pivot.",
+      "prompt": "One standalone in-world sprite, true transparent alpha channel: an upright squat pirate ship anchor, front three-quarter view, black naval steel and deep cyan with seafoam highlights and antique brass crossbar. O-ring at top and two broad upward hooked flukes, minimal chain. Weight planted at a single bottom-center pivot. Chunky clean dark outline, game pixel art readable at only 48 pixels high. Tall object fills the canvas. No floor, halo, rings, plaques, lettering, glow cloud, no other objects."
     }
   ]
 }

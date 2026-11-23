@@ -4,9 +4,9 @@ extends RefCounted
 ### Context chứa ngồn đánh, hướng, mục tiêu, damage
 
 # Lượng máu thật sự mất
-@warning_ignore("unused_signal") # Emitted by attack implementations.
+@warning_ignore("unused_signal")  # Emitted by attack implementations.
 signal damage_applied(damage: DamageContext, target: Node, applied_hp: float)
-@warning_ignore("unused_signal") # Emitted by attack implementations.
+@warning_ignore("unused_signal")  # Emitted by attack implementations.
 signal damage_prepared(damage: DamageContext, target: Node)
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
@@ -36,6 +36,7 @@ var projectile_speed_multiplier: float = 1.0
 var range_units: float = 1.5
 var hitbox_multiplier: float = 1.0
 ## Forge snapshot; the combo step's authored knockback is applied when building damage.
+var charm_push: bool = false
 var knockback_multiplier: float = 1.0
 var combo_index: int = 0
 var combo_step: MeleeComboStep
@@ -60,6 +61,7 @@ func create_damage_context() -> DamageContext:
 	damage.delivery_type = delivery_type
 	damage.origin = origin
 	damage.direction = direction
+	damage.charm_push = charm_push
 	damage.knockback_multiplier = knockback_multiplier
 	if combo_step != null:
 		damage.knockback_multiplier *= combo_step.knockback_multiplier

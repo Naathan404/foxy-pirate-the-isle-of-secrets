@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://b87qv8ygshhkn"]
+
+[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://coyndecmyvfvp" path="res://assets/sprites/biomes/beach/harbor_boat.png" id="2_boat"]
+[ext_resource type="Script" uid="uid://bqp6x7ew0hqb4" path="res://world/biomes/coral_valley/objects/harbor_boat.gd" id="3_script"]
+
+[sub_resource type="BoxShape3D" id="HullHurtShape"]
+size = Vector3(2.65, 1.28, 0.9)
+
+[node name="HarborBoat" unique_id=1898424040 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+script = ExtResource("3_script")
+max_hp = 100000.0
+visual_root = NodePath("Visual/Sprite3D")
+fragment_source = NodePath("Visual/Sprite3D")
+
+[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0" unique_id=974470162]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.285, 0)
+pixel_size = 0.0025
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_boat")
+
+[node name="CollisionShape3D" parent="HurtBox" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+shape = SubResource("HullHurtShape")
+
+[node name="CollisionShape3D" parent="MovementBody" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)

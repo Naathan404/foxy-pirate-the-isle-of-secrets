@@ -382,11 +382,9 @@ func _update_directional_animation(restart: bool = false) -> bool:
 	if not _play(animation_name, restart):
 		return false
 
-	# Sprite side vẽ sang phải, muốn nhìn trái thì lật ảnh
+	# The baked body shares the Spine rig's facing, including its three-quarter idle.
 	if is_instance_valid(_active_sprite):
-		_active_sprite.flip_h = false
-		if suffix == "side":
-			_active_sprite.flip_h = _last_facing_left
+		_active_sprite.flip_h = _last_facing_left and (_active_sprite == sprite or suffix == "side")
 	return true
 
 

@@ -7,6 +7,7 @@
 size = Vector3(2.15, 1.55, 0.8)
 
 [node name="Stone" node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_base")]
+scale = Vector3(1.5, 1.5, 1.5)
 max_hp = 3.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
