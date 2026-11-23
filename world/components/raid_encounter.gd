@@ -10,17 +10,20 @@ signal raid_cleared
 @export var spawner: RaidEnemySpawner
 @export var activation_area: Area3D
 @export var room: BaseRoom
+@export var reward_chest_scene: PackedScene
+## Spawn position in room-local coordinates.
+@export var reward_position := Vector3.ZERO
 @export var first_wave_enemies: Array[FlatTideEnemyEntry] = []
 @export var later_wave_enemies: Array[FlatTideEnemyEntry] = []
 @export var wave_counts: Array[int] = [3, 4, 4, 5]
 @export var wave_elites: Array[int] = [0, 0, 1, 2]
-@export_range(0.0, 5.0, 0.1, "suffix:s") var between_waves_seconds := 2.0
 
 var _wave_index := -1
 var _active := false
 var _spawn_complete := false
 var _advancing := false
 var _living: Dictionary[int, EnemyBase] = {}
+var _reward_chest: TreasureChest
 
 
 func _ready() -> void:
@@ -47,6 +50,7 @@ func _ready() -> void:
 			return
 	room.set_exits_locked(false)
 	if get_node("/root/GameManager").story_flags.get(encounter_id, false):
+		_spawn_reward.call_deferred()
 		return
 	activation_area.body_entered.connect(_on_body_entered)
 	spawner.enemy_spawned.connect(_on_enemy_spawned)
@@ -103,16 +107,27 @@ func _on_tide_state_changed(_state: FlatTideController.State) -> void:
 func _try_advance() -> void:
 	if not _active or _advancing or not _spawn_complete or not _living.is_empty():
 		return
-	if controller.state != FlatTideController.State.LOW:
-		return
 	_advancing = true
+	controller.finish_cycle()
 	if _wave_index + 1 >= wave_counts.size():
 		_active = false
 		get_node("/root/GameManager").story_flags[encounter_id] = true
 		room.set_exits_locked(false)
 		activation_area.set_deferred("monitoring", false)
+		_spawn_reward()
 		raid_cleared.emit()
 		return
-	await get_tree().create_timer(between_waves_seconds, false).timeout
-	if is_inside_tree():
-		_begin_next_wave()
+	_begin_next_wave()
+
+
+func _spawn_reward() -> void:
+	if is_instance_valid(_reward_chest) or reward_chest_scene == null:
+		return
+	var instance := reward_chest_scene.instantiate()
+	_reward_chest = instance as TreasureChest
+	if _reward_chest == null:
+		instance.free()
+		push_error("RaidEncounter: reward scene must have a TreasureChest root.")
+		return
+	_reward_chest.position = reward_position
+	room.add_child(_reward_chest)

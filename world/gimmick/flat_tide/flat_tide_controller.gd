@@ -181,6 +181,16 @@ func request_cycle() -> bool:
 	return true
 
 
+## Finish a controlled tide immediately so a cleared encounter can advance or end.
+func finish_cycle() -> void:
+	if not externally_advanced:
+		return
+	_enter_state(State.LOW)
+	_apply_coverage()
+	_update_warning_overlay(0.0)
+	_update_player()
+
+
 func get_flooded_zone(point: Vector3) -> FlatTideZone:
 	for zone in zones:
 		if is_instance_valid(zone) and _is_zone_active(zone) and zone.contains_flooded_point(point):

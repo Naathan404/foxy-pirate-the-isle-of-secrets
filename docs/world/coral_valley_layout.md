@@ -126,15 +126,16 @@ External paths attach to the islands shown in the final diagram:
 | room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
 | room_24 | Bottom | Farm | Medium | left: room_23 |
 
-Six standard `treasure_chest.tscn` instances are placed as room rewards: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` and Boss `08` at their room centers. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` and Boss `08` use the chest defaults (10–20 gold, no item/note entries). All six are present when entering the room; no encounter or puzzle gate is attached.
+Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` and Boss `08` at their room centers. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses the chest defaults (10–20 gold, no item/note entries). The other five chests are present on entry.
 
 Raid `room_07` starts when Foxy enters the interior activation area. During combat, `BaseRoom.set_exits_locked(true)` closes the existing player
 boundary across the exits and disables their scene-change triggers. The paths
 stay visible; no separate barriers or barrier visuals are created.
 It reuses the Mobs 4 directional tide layout: left → up → right → down. Each tide
 rises, holds, and falls with the existing surge/water interactions. New enemies
-appear on exposed ground as it recedes. The tide then stays LOW until all requested
-enemies have spawned and died; the next tide starts after a 2-second pause.
+appear on exposed ground as it recedes. The next tide starts as soon as all requested enemies have spawned and died,
+without a timer or waiting for the outgoing tide to finish receding.
+`FlatTideController.finish_cycle()` clears that tide before the next direction starts.
 
 | Raid wave | Total | Normal | Elite | Random enemy pool |
 | --- | --- | --- | --- | --- |
@@ -146,8 +147,11 @@ enemies have spawned and died; the next tide starts after a 2-second pause.
 Types may repeat. Counts are exact, not probability-based; blocked spawns retry
 instead of silently losing an enemy. The last clear leaves the water LOW and
 opens both exits. Completion is kept in `GameManager.story_flags` for the current
-run, so revisiting does not restart the raid; New Game resets it. The existing
-center chest remains available throughout, with its existing loot configuration.
+run, so revisiting does not restart the raid; New Game resets it. After the fourth clear, `RaidEncounter` instantiates `raid_reward_chest.tscn`
+at room-local `Vector3(0, 0.25209618, 0.45244434)`. It guarantees 10–20 gold and
+one Harpoon blueprint. There is no chest instance before the raid is cleared.
+Revisiting a cleared raid creates the configured chest without replaying waves;
+its opened/loot state currently resets like the other normal chests.
 `FlatTideController.externally_advanced` defaults to false, preserving automatic
 cycles in Mobs rooms. The finite spawner subclasses the existing tide spawner,
 whose `_spawn()` now reports success as a boolean without changing its old callers.
