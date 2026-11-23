@@ -4,12 +4,12 @@ Numbering follows the final reference diagram: middle row left to right (`room_0
 
 ![Numbered room and path diagram](coral_valley_layout.svg)
 
-Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz rooms `04` and `09` have three stationary platforms; Quiz `18` has one lever-operated shuttle; Quiz `23` has a fixed center and an eight-stop orbit platform controlled from both shores.
+Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `04` has three stationary platforms; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `23` has a fixed center and an eight-stop orbit platform controlled from both shores.
 
 All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
 collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`.
 Each contains two Small islands, one room root and one shared CameraBounds.
-Rooms `04` and `09` inherit `quiz_room.tscn`. Rooms `18` and `23` use the Small
+Room `04` inherits `quiz_room.tscn`. Rooms `09`, `18` and `23` use the Small
 room template with their own platform layouts.
 
 Spacing uses the visible sprite edges (alpha >= 0.5), rather than the platform's
@@ -24,11 +24,27 @@ The ground artwork spans `1134 × 0.01 × 0.995455 × 2.5 = 28.22114925` units a
 so the right island center is offset `54.96114925` units. Its paths, seaweed and
 shared CameraBounds move with it.
 
-`quiz_room.tscn` supplies `Platform`, `Platform2` and `Platform3` to rooms `04` and `09`.
+`quiz_room.tscn` supplies `Platform`, `Platform2` and `Platform3` to room `04`.
 Their X coordinates are `20.03284825`, `27.61284825`, and `35.19284825`; all use
 Y `-0.03991985` and Z `0.55447969`. Their collider top surfaces match the island
 floor height. The existing sprite and `4 × 0.5 × 4` colliders are retained.
-These two rooms have no levers, call docks or movement.
+This room has no levers, call docks or movement.
+
+Quiz `room_09` replaces all three stationary platforms with one `MovingPlatform`
+using two-endpoint mode with `start_at_center = true`. It initially rests at
+Center (X `27.61284825`); the first hit sends it to the right stop
+(X `35.19284825`). Subsequent hits toggle directly between right and left
+(X `20.03284825`), passing the center without stopping. Its speed is 6 units/second.
+An onboard `platform_puzzle_lever.tscn` instance is a child of the moving body,
+so it rides with the platform. It and the two hidden shore levers target the
+same `MovingPlatform` in `TOGGLE` mode. The left island's lever sits at its upper-right corner
+(`Vector3(9, 0.21008015, -10)`); the right island's lever sits at its upper-left
+corner (`Vector3(45.96114925, 0.21008015, -10)`). Each has one hand-placed
+`seaweed_3.tscn` instance 0.9 units in front of it, scaled to 1.25, concealing
+the lever independently of random seaweed generation. The seaweed retains its
+existing destructible behavior. Paths, ground spacing and shared CameraBounds
+stay as before. `MovingPlatform.start_at_center` only changes initial placement;
+it defaults to false and does not enable intermediate stops.
 
 Quiz `room_18` removes both side platforms and places
 `objects/quiz_shuttle_platform.tscn` at the former center position. Its onboard

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c548sl61x5ea6"]
 
-[ext_resource type="PackedScene" uid="uid://omebdi2g2vcg" path="res://world/biomes/coral_valley/base_scenes/quiz_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ground"]
 [ext_resource type="Texture2D" uid="uid://rn2f4o8hpvby" path="res://assets/sprites/biomes/coral_valley/coral_valley_ground.png" id="3_ground_texture"]
 [ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="ground_shape"]
@@ -9,6 +9,12 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
+[ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="platform_movement"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="platform_texture"]
+[ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="shore_lever"]
+
+[sub_resource type="BoxShape3D" id="PlatformShape"]
+size = Vector3(4, 0.5, 4)
 
 [sub_resource type="Environment" id="Environment_u07ny"]
 resource_local_to_scene = true
@@ -80,7 +86,8 @@ resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
 [node name="room_09" unique_id=1931917380 instance=ExtResource("1_base")]
-editor_description = "Paired Quiz: 3 platforms rotated 90 degrees around Y. Visual platform width 3.58 units; four 4-unit clearances total 16 empty units. Island center offset 54.96114925 units. Shared CameraBounds."
+editor_description = "Paired Quiz: one ferry starts at center, then toggles directly between the left and right stops. One onboard lever and two shore levers concealed by fixed-position seaweed control the same platform. Shared CameraBounds."
+boundary_openings = Array[Rect2]([Rect2(12.7, -2.33552031, 29.58614925, 5.78)])
 open_exits = 6
 right_destination_scene = "res://world/biomes/coral_valley/map/room_10.tscn"
 down_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
@@ -158,6 +165,59 @@ script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(45.11614925, 0, -0.882, 45.29214925, 0, -3.466, 44.65014925, 0, -5.401, 48.72914925, 0, -9.266, 49.02214925, 0, -11.431, 51.26314925, 0, -12.027, 52.81914925, 0, -10.594, 56.22314925, 0, -11.727, 58.06714925, 0, -10.884, 59.84314925, 0, -11.822, 60.47514925, 0, -9.653, 64.79014925, 0, -5.644, 64.74614925, 0, 5.32, 65.51014925, 0, 7.628, 64.29214925, 0, 9.625, 62.22914925, 0, 11.098, 60.26614925, 0, 11.848, 49.68714925, 0, 12.043, 46.70714925, 0, 11.169, 45.40414925, 0, 9.606, 44.89814925, 0, 7.535, 45.59414925, 0, 5.528, 44.66514925, 0, 3.735, 44.32614925, 0, 1.571)
 fixed_spawn_count = 15
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+
+[node name="MovingPlatform" type="Node3D" parent="."]
+position = Vector3(27.61284825, -0.03991985, 0.55447969)
+script = ExtResource("platform_movement")
+move_speed = 6.0
+start_at_center = true
+
+[node name="Platform" type="AnimatableBody3D" parent="MovingPlatform"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 0)
+
+[node name="Sprite3D" type="Sprite3D" parent="MovingPlatform/Platform"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("platform_texture")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MovingPlatform/Platform"]
+shape = SubResource("PlatformShape")
+
+[node name="OnboardLever" parent="MovingPlatform/Platform" node_paths=PackedStringArray("target_platforms") instance=ExtResource("shore_lever")]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 1.05, 0)
+editor_description = "Rides on the ferry; each hit toggles its destination between the two shores."
+target_platforms = Array[NodePath]([NodePath("../..")])
+destination_mode = 2
+
+[node name="Start" type="Marker3D" parent="MovingPlatform"]
+position = Vector3(-7.58, 0, 0)
+
+[node name="Center" type="Marker3D" parent="MovingPlatform"]
+
+[node name="End" type="Marker3D" parent="MovingPlatform"]
+position = Vector3(7.58, 0, 0)
+
+[node name="LeftHiddenLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("shore_lever")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 9, 0.21008015, -10)
+editor_description = "Upper-right corner of the left island. Each hit toggles the ferry's destination."
+target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
+destination_mode = 2
+
+[node name="RightHiddenLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("shore_lever")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 45.96114925, 0.21008015, -10)
+editor_description = "Upper-left corner of the right island. Each hit toggles the same ferry's destination."
+target_platforms = Array[NodePath]([NodePath("../MovingPlatform")])
+destination_mode = 2
+
+[node name="LeftLeverSeaweed" parent="." instance=ExtResource("seaweed_3")]
+position = Vector3(9, 0.21008015, -9.1)
+scale = Vector3(1.25, 1.25, 1.25)
+editor_description = "Hand-placed seaweed in front of LeftHiddenLever, separate from random props."
+
+[node name="RightLeverSeaweed" parent="." instance=ExtResource("seaweed_3")]
+position = Vector3(45.96114925, 0.21008015, -9.1)
+scale = Vector3(1.25, 1.25, 1.25)
+editor_description = "Hand-placed seaweed in front of RightHiddenLever, separate from random props."
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

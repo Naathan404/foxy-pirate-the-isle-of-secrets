@@ -9,6 +9,8 @@ signal destination_reached(at_end: bool)
 @export_range(0.1, 30.0, 0.1, "suffix:m/s") var move_speed := 3.0
 ## Start at Center; each lever hit advances the four-step route.
 @export var center_stop_enabled: bool = false
+## Start at Center once, then toggle directly between Start and End.
+@export var start_at_center: bool = false
 ## Ordered closed route. The first marker is the initial stop; overrides endpoint modes.
 @export var route_marker_paths: Array[NodePath] = []
 
@@ -47,9 +49,13 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 	else:
-		_target_marker = _center_marker if center_stop_enabled else start_marker
-	if _route_markers.is_empty() and center_stop_enabled and _center_marker == null:
-		push_error("MovingPlatform: center_stop_enabled requires a Center marker.")
+		_target_marker = _center_marker if center_stop_enabled or start_at_center else start_marker
+	if (
+		_route_markers.is_empty()
+		and (center_stop_enabled or start_at_center)
+		and _center_marker == null
+	):
+		push_error("MovingPlatform: starting or stopping at Center requires a Center marker.")
 		set_physics_process(false)
 		return
 	platform.position = _target_marker.position
