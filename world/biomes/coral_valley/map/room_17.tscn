@@ -149,10 +149,6 @@ enabled = false
 shape = SubResource("BoxShape3D_j2dbx")
 disabled = true
 
-[node name="RandomProps" type="Node3D" parent="."]
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-7.5, 0, -4.791, -5, 0, 6.042, 5.833, 0, -8.124, 7.5, 0, 5.209, -3.333, 0, -8.958, 3.333, 0, 9.376)
-
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-10.437, 0, -0.07, -9.911, 0, -3.132, -10.355, 0, -5.192, -8.021, 0, -8.015, -6.102, 0, -9.547, -5.537, 0, -11.521, 5.131, 0, -11.294, 9.408, 0, -6.03, 10.653, 0, 5.158, 9.01, 0, 8.397, 9.138, 0, 10.543, 7.072, 0, 10.832, 5.388, 0, 13.032, 3.118, 0, 12.657, 0.625, 0, 11.858, -1.402, 0, 12.71, -3.4, 0, 12.849, -6.19, 0, 11.536, -8.145, 0, 11.062, -8.681, 0, 9.033, -10.557, 0, 8.179, -9.498, 0, 6.233, -10.641, 0, 4.531, -9.309, 0, 2.204)

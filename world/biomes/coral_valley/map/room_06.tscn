@@ -125,10 +125,6 @@ shape = SubResource("BoxShape3D_left_join")
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259 parent_id_path=PackedInt32Array(192273160, 219025603)]
 shape = SubResource("BoxShape3D_left_trigger")
 
-[node name="RandomProps" type="Node3D" parent="."]
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-7.5, 0, -6.458, -5.833, 0, 6.042, 5, 0, -7.291, 8.333, 0, 4.376, -3.333, 0, -8.958, 4.167, 0, 9.376)
-
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-10.152, 0, -5.299, -6.949, 0, -9.499, -5.014, 0, -12.01, 5.807, 0, -11.627, 6.611, 0, -9.582, 7.813, 0, -6.467, 10.107, 0, -5.611, 10.687, 0, 5.95, 10.644, 0, 8.064, 8.675, 0, 9.029, 7.995, 0, 10.914, 6.311, 0, 12.536, 4.038, 0, 12.222, 1.821, 0, 13.114, 0.154, 0, 11.833, -2.139, 0, 12.266, -4.46, 0, 12.449, -6.825, 0, 12.064, -8.921, 0, 9.159, -10.17, 0, 7.463, -9.979, 0, 4.981)

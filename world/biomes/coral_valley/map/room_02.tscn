@@ -11,15 +11,18 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="tide_elite_skeleton"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="tide_skeleton"]
+[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
 
-[sub_resource type="Environment" id="Environment_vphl5"]
+[sub_resource type="Environment" id="Environment_spjh6"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.012, 0.009, 0.02, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.7, 0.68, 0.72, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5ic1t"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_avom7"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("5_void")
@@ -28,22 +31,10 @@ shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
 shader_parameter/smoke_strength = 0.48
 shader_parameter/rise_speed = 0.150000007125
 
-[sub_resource type="QuadMesh" id="QuadMesh_70a5f"]
+[sub_resource type="QuadMesh" id="QuadMesh_1s8xf"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_5ic1t")
+material = SubResource("ShaderMaterial_avom7")
 size = Vector2(400, 400)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_spjh6"]
-resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_avom7"]
-resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_1s8xf"]
-resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_um2gv"]
 resource_local_to_scene = true
@@ -67,7 +58,7 @@ size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_r0tu0"]
 resource_local_to_scene = true
-size = Vector3(0.5, 2, 4)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_daesg"]
 resource_local_to_scene = true
@@ -81,10 +72,27 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_l44ck"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q6sa4"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_s84p0"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
 [sub_resource type="Resource" id="Resource_lx4jg"]
 script = ExtResource("4_8k8c3")
 normal_scene = ExtResource("5_8k8c3")
 metadata/_custom_type_script = "uid://juar8i43t1me"
+
+[sub_resource type="Resource" id="Resource_tide_skeleton"]
+script = ExtResource("4_8k8c3")
+normal_scene = ExtResource("tide_skeleton")
+elite_scene = ExtResource("tide_elite_skeleton")
 
 [node name="room_02" unique_id=1362667654 instance=ExtResource("1_base")]
 open_exits = 14
@@ -93,35 +101,35 @@ down_destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_vphl5")
+environment = SubResource("Environment_spjh6")
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
-mesh = SubResource("QuadMesh_70a5f")
+mesh = SubResource("QuadMesh_1s8xf")
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 transform = Transform3D(-2, 0, -3.019916e-07, 0, 2, 0, 3.019916e-07, 0, -2, -0.53301895, 0.021534923, 27.418144)
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_spjh6")
+shape = SubResource("BoxShape3D_um2gv")
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_avom7")
+shape = SubResource("BoxShape3D_bhbww")
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 
 [node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_1s8xf")
+shape = SubResource("BoxShape3D_a3o3a")
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_um2gv")
+shape = SubResource("BoxShape3D_nsij6")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_bhbww")
+shape = SubResource("BoxShape3D_wihqu")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
@@ -129,55 +137,76 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_a3o3a")
+shape = SubResource("BoxShape3D_r0tu0")
 disabled = true
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_nsij6")
+shape = SubResource("BoxShape3D_daesg")
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_wihqu")
+shape = SubResource("BoxShape3D_rp78o")
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
 
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_r0tu0")
+shape = SubResource("BoxShape3D_38ghd")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_daesg")
+shape = SubResource("BoxShape3D_l44ck")
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_rp78o")
+shape = SubResource("BoxShape3D_q6sa4")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_38ghd")
+shape = SubResource("BoxShape3D_s84p0")
 
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.0626488, 0)
 
-[node name="FlatTide" parent="." index="5" unique_id=607415664 node_paths=PackedStringArray("player") instance=ExtResource("2_flat_tide")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+[node name="FlatTide" parent="." index="5" unique_id=607415664 node_paths=PackedStringArray("player", "zones") instance=ExtResource("2_flat_tide")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 player = NodePath("../Foxy")
+zones = [NodePath("LeftShallows"), NodePath("RightShallows")]
+sequential_zones = true
 low_duration = 8.0
+rise_duration = 6.0
 high_duration = 4.0
+fall_duration = 6.0
 flooded_move_multiplier = 0.5
 
-[node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.200718, 0.25, 0.40002728)
-size = Vector2(20, 40)
+[node name="RightShallows" parent="FlatTide" index="0" unique_id=928133442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.200718, 0.25, -4.5999727)
+size = Vector2(45, 66)
 volume_depth = 2.0
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
 
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
 
-[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207]
-enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg")])
+[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
+spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
+enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg"), SubResource("Resource_tide_skeleton")])
 enemies_per_tide = 3
-elite_chance = 0.0
+
+[node name="LeftShallows" type="MeshInstance3D" parent="FlatTide" index="3" unique_id=336057266]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
+script = ExtResource("tide_zone_script")
+flow_direction = 1
+size = Vector2(45, 66)
+high_duration = 6.0
+fall_duration = 6.0
+rest_duration = 6.0
+full_coverage = 0.78
+volume_depth = 2.0
+surface_segments_x = 30
+surface_segments_z = 30
+debug_color = Color(1, 0, 1, 1)
 
 [node name="RandomProps" type="Node3D" parent="." index="6" unique_id=2042189859]
 script = ExtResource("random_props")

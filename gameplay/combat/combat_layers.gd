@@ -16,8 +16,11 @@ const PLAYER_ATTACK: int = 1 << 5
 const ENEMY_ATTACK: int = 1 << 6
 const TARGET_DETECTOR: int = 1 << 7
 const PLAYER_BOUNDARY: int = 1 << 8
+# //NLVP sửa: Biên di chuyển riêng cho thân quái.
+const ENEMY_BOUNDARY: int = 1 << 9
 
 const PLAYER_BODY_MASK: int = WORLD | ENEMY_BODY
 ## Enemy bodies block one another, preventing simultaneous charges from stacking on Foxy.
-const ENEMY_BODY_MASK: int = WORLD | PLAYER_BODY | ENEMY_BODY
-const ENEMY_FRONT_OBSTACLE_MASK: int = WORLD | ENEMY_BODY
+# //NLVP sửa: Quái và tia dò phía trước nhận biết biên nền.
+const ENEMY_BODY_MASK: int = WORLD | PLAYER_BODY | ENEMY_BODY | ENEMY_BOUNDARY
+const ENEMY_FRONT_OBSTACLE_MASK: int = WORLD | ENEMY_BODY | ENEMY_BOUNDARY

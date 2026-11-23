@@ -16,13 +16,13 @@ elite_scene = ExtResource("6_g1fdm")
 [node name="FlatTide" type="Node3D" unique_id=477601140 node_paths=PackedStringArray("player", "zones")]
 script = ExtResource("1_nkn8q")
 player = NodePath("")
-zones = [NodePath("NorthShallows")]
+zones = [NodePath("RightShallows")]
 low_duration = 6.0
 high_duration = 6.0
 flooded_move_multiplier = 0.3
 player_ground_offset = 0.5
 
-[node name="NorthShallows" type="MeshInstance3D" parent="." unique_id=928133442]
+[node name="RightShallows" type="MeshInstance3D" parent="." unique_id=928133442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.200718, 0.08, 0.40002728)
 script = ExtResource("2_rybyk")
 size = Vector2(20, 28)

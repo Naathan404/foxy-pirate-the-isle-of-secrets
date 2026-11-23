@@ -207,6 +207,7 @@ open_world_map={
 3d_physics/layer_7="EnemyAttack"
 3d_physics/layer_8="TargetDetector"
 3d_physics/layer_9="PlayerBoundary"
+3d_physics/layer_10="EnemyBoundary"
 
 [physics]
 

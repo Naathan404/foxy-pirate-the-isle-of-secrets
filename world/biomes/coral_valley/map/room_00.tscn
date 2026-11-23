@@ -154,11 +154,6 @@ shape = SubResource("BoxShape3D_tpgxu")
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.0626488, 0)
 
-[node name="RandomProps" type="Node3D" parent="." index="5" unique_id=766796052]
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-8, 0, -7, -5, 0, 7, 7, 0, -8, 9, 0, 6, -9, 0, 2, 4, 0, 10)
-prop_scenes = Array[PackedScene]([])
-
 [node name="Campfire" parent="." index="6" unique_id=225127932 instance=ExtResource("campfire")]
 
 [node name="RandomSeaweed" type="Node3D" parent="."]
