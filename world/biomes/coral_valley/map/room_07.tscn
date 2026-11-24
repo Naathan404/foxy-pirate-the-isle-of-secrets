@@ -1,25 +1,23 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://br0v5kdad5ptr"]
 
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/base_scenes/raid_room.tscn" id="1_base"]
-[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" uid="uid://dcwn2dbcin646" path="res://world/biomes/coral_valley/base_scenes/raid_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="barrel"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="coral_skeleton"]
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="crab"]
+[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="elite_barrel"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="elite_coral_skeleton"]
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="elite_crab"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="elite_starfish"]
+[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="enemy_entry"]
+[ext_resource type="Script" uid="uid://mrfqqau18jks" path="res://world/components/raid_encounter.gd" id="raid_encounter"]
+[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="raid_tide"]
+[ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_reward_chest.tscn" id="reward_chest"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_reward_chest.tscn" id="reward_chest"]
-
-[ext_resource type="PackedScene" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="raid_tide"]
-[ext_resource type="Script" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone"]
-[ext_resource type="Script" path="res://world/gimmick/flat_tide/raid_enemy_spawner.gd" id="raid_spawner"]
-[ext_resource type="Script" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="enemy_entry"]
-[ext_resource type="Script" path="res://world/components/raid_encounter.gd" id="raid_encounter"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/starfish.tscn" id="starfish"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="elite_starfish"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/crab.tscn" id="crab"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/elite_crab.tscn" id="elite_crab"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="coral_skeleton"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="elite_coral_skeleton"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/barrel.tscn" id="barrel"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="elite_barrel"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="starfish"]
+[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone"]
 
 [sub_resource type="Resource" id="Entry_starfish"]
 script = ExtResource("enemy_entry")
@@ -44,18 +42,56 @@ elite_scene = ExtResource("elite_barrel")
 [sub_resource type="BoxShape3D" id="RaidEntryArea"]
 size = Vector3(24, 5, 26)
 
-[node name="room_07" instance=ExtResource("1_base")]
+[node name="room_07" unique_id=1371471342 instance=ExtResource("1_base")]
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_08.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
 
-[node name="RandomSeaweed" type="Node3D" parent="."]
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_08.tscn"
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+
+[node name="RandomSeaweed" type="Node3D" parent="." index="5" unique_id=772875388]
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-12.329, 0, -6.99, -8.585, 0, -10.874, -7.938, 0, -13.093, -5.945, 0, -14.496, -2.784, 0, -15.007, -0.071, 0, -14.914, 1.952, 0, -15.003, 4.316, 0, -15.141, 6.288, 0, -14.71, 8.686, 0, -12, 10.182, 0, -10.351, 11.766, 0, -7.269, 12.861, 0, -5.316, 12.48, 0, 6.647, 13.05, 0, 8.797, 12.122, 0, 11.516, 9.513, 0, 13.512, 7.573, 0, 15.265, 4.19, 0, 14.892, 2.117, 0, 15.887, -0.167, 0, 15.745, -2.893, 0, 14.928, -5.085, 0, 15.676, -8.572, 0, 15.758, -9.36, 0, 13.073, -11.395, 0, 12.504, -12.074, 0, 10.397, -13.353, 0, 8.849, -12.075, 0, 6.938, -12.624, 0, 4.862)
 fixed_spawn_count = 20
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
-[node name="FlatTide" parent="." node_paths=PackedStringArray("player", "zones") instance=ExtResource("raid_tide")]
+[node name="FlatTide" parent="." index="6" unique_id=431354037 node_paths=PackedStringArray("player", "zones") instance=ExtResource("raid_tide")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 player = NodePath("../Foxy")
 zones = [NodePath("LeftShallows"), NodePath("UpShallows"), NodePath("RightShallows"), NodePath("DownShallows")]
@@ -67,34 +103,23 @@ high_duration = 4.0
 fall_duration = 6.0
 flooded_move_multiplier = 0.5
 
-[node name="RightShallows" parent="FlatTide"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.200718, 0.25, -4.5999727)
-size = Vector2(45, 66)
-volume_depth = 2.0
-high_duration = 6.0
-fall_duration = 6.0
-rest_duration = 6.0
-
-[node name="LeftShallows" type="MeshInstance3D" parent="FlatTide"]
+[node name="LeftShallows" type="MeshInstance3D" parent="FlatTide" index="3" unique_id=734718333]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
 script = ExtResource("tide_zone")
+high_duration = 6.0
+rest_duration = 6.0
 flow_direction = 1
 size = Vector2(45, 66)
-high_duration = 6.0
-fall_duration = 6.0
-rest_duration = 6.0
 full_coverage = 0.78
 volume_depth = 2.0
 surface_segments_x = 30
 surface_segments_z = 30
 debug_color = Color(1, 0, 1, 1)
 
-[node name="UpShallows" type="MeshInstance3D" parent="FlatTide"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -15.0999727)
+[node name="UpShallows" type="MeshInstance3D" parent="FlatTide" index="4" unique_id=810122935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -15.099973)
 script = ExtResource("tide_zone")
-rise_duration = 6.0
 high_duration = 6.0
-fall_duration = 6.0
 rest_duration = 6.0
 flow_direction = 3
 size = Vector2(78, 45)
@@ -104,12 +129,10 @@ surface_segments_x = 30
 surface_segments_z = 30
 debug_color = Color(1, 0, 1, 1)
 
-[node name="DownShallows" type="MeshInstance3D" parent="FlatTide"]
+[node name="DownShallows" type="MeshInstance3D" parent="FlatTide" index="5" unique_id=1522752685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, 5.9000273)
 script = ExtResource("tide_zone")
-rise_duration = 6.0
 high_duration = 6.0
-fall_duration = 6.0
 rest_duration = 6.0
 flow_direction = 2
 size = Vector2(78, 45)
@@ -119,17 +142,7 @@ surface_segments_x = 30
 surface_segments_z = 30
 debug_color = Color(1, 0, 1, 1)
 
-[node name="WaterFootsteps" parent="FlatTide" node_paths=PackedStringArray("player")]
-player = NodePath("../../Foxy")
-
-[node name="EnemySpawner" parent="FlatTide" node_paths=PackedStringArray("spawn_ground")]
-script = ExtResource("raid_spawner")
-spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
-minimum_spacing = 3.0
-minimum_player_distance = 3.0
-attempts_per_enemy = 80
-
-[node name="RaidEncounter" type="Node3D" parent="." node_paths=PackedStringArray("controller", "spawner", "activation_area", "room")]
+[node name="RaidEncounter" type="Node3D" parent="." index="7" unique_id=929600285 node_paths=PackedStringArray("controller", "spawner", "activation_area", "room")]
 script = ExtResource("raid_encounter")
 controller = NodePath("../FlatTide")
 spawner = NodePath("../FlatTide/EnemySpawner")
@@ -140,10 +153,20 @@ reward_position = Vector3(0, 0.25209618, 0.45244434)
 first_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_starfish"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton")])
 later_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_starfish"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton"), SubResource("Entry_barrel")])
 
-[node name="EntryArea" type="Area3D" parent="RaidEncounter"]
-position = Vector3(0, 1.5, 0)
+[node name="EntryArea" type="Area3D" parent="RaidEncounter" index="0" unique_id=1028896001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RaidEncounter/EntryArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RaidEncounter/EntryArea" index="0" unique_id=858901201]
 shape = SubResource("RaidEntryArea")
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

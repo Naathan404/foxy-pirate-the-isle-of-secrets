@@ -1,293 +1,540 @@
-# Coral Valley room layout
+# Bố cục và danh sách phòng Coral Valley
 
-Numbering follows the final reference diagram: middle row left to right (`room_00`–`room_08`), then top row (`room_09`–`room_16`), then bottom row (`room_17`–`room_24`). Quiz left/right counts as one room.
+Tài liệu mô tả các phòng hiện có trong `world/biomes/coral_valley/map/`,
+đối chiếu với scene và các scene được kế thừa. Tên file, node, thuộc tính và loại quái
+giữ theo dự án để tiện tra cứu; phần giải thích dùng tiếng Việt.
 
-![Numbered room and path diagram](coral_valley_layout.svg)
+## 1. Tổng quan
 
-Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `23` has a fixed center lever and an automatically orbiting platform; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `04` has a fixed center and an eight-stop orbit platform controlled from both shores.
+- **25 phòng**, đánh số từ `room_00` đến `room_24`.
+- **14 phòng dùng Small**, gồm 7 Empty, 4 Quiz, 2 Materials và 1 NPC.
+- **11 phòng dùng Medium**, gồm 6 Mobs, 2 Checkpoint, 1 Raid, 1 Boss và 1 Farm.
+- Bốn phòng Quiz `room_04`, `room_09`, `room_18`, `room_23` có **hai đảo/phòng**,
+  nhưng mỗi phòng vẫn chỉ là một scene, một node gốc và một CameraBounds dùng chung.
+- Đánh số hàng giữa từ trái sang phải (00–08), rồi hàng trên (09–16), rồi hàng dưới (17–24).
 
-All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
-collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`.
-Each contains two Small islands, one room root and one shared CameraBounds.
-All four Quiz rooms use the Small room template with their own platform layouts.
+![Sơ đồ đánh số phòng và các đường nối](coral_valley_layout.svg)
 
-Spacing uses the visible sprite edges (alpha >= 0.5), rather than the platform's
-4-unit collision box. Each platform is rotated 90 degrees around Y, keeping its
-surface horizontal. At the existing sprite scale, the rotated visible width along
-X is `716 × 0.01 × 0.5 = 3.58` units.
+### Các phòng kế thừa Small / Medium
 
-Three platforms create four gaps: island–platform, platform–platform,
-platform–platform, platform–island. Each gap is 4 units, giving **16 empty units**
-and a total visible island gap of `3 × 3.58 + 4 × 4 = 26.74` units.
-The ground artwork spans `1134 × 0.01 × 0.995455 × 2.5 = 28.22114925` units along X,
-so the right island center is offset `54.96114925` units. Its paths, seaweed and
-shared CameraBounds move with it.
-
-Quiz `room_04` keeps `Platform2` fixed at
-`Vector3(27.61284825, -0.03991985, -0.44552031)`. Its other platform begins directly
-right of it, and can stop only at eight surrounding markers: **E → SE → S → SW →
-W → NW → N → NE**, clockwise. The center is never a moving-platform stop.
-Horizontal pitch is 7.58 units; vertical pitch is 9.78 units, preserving 4 units
-between the platform sprites. Travel follows neighboring markers around the
-perimeter in either direction, without crossing the fixed platform.
-
-Each shore has two attack-operated `platform_puzzle_lever.tscn` instances. All
-four target the same `MovingPlatform`. Upper levers request **+3 stops clockwise**;
-lower levers request **−2 stops counterclockwise**. Steps wrap modulo eight.
-Hits during movement queue their signed steps after the existing travel; turns
-remain on the perimeter. No lever is attached to either platform.
-The existing `MovingPlatform` script exposes `route_marker_paths` and
-`request_route_steps(count)`; `PlatformLever.DestinationMode.ADVANCE_ROUTE` uses
-its signed `route_step_count`. Existing endpoint and Quiz 18 center-stop modes
-remain supported. Both inward island openings follow the fixed center's Z,
-and remain 5.78 units wide.
-
-Quiz `room_09` replaces all three stationary platforms with one `MovingPlatform`
-using two-endpoint mode with `start_at_center = true`. It initially rests at
-Center (X `27.61284825`); the first hit sends it to the right stop
-(X `35.19284825`). Subsequent hits toggle directly between right and left
-(X `20.03284825`), passing the center without stopping. Its speed is 6 units/second.
-An onboard `platform_puzzle_lever.tscn` instance is a child of the moving body,
-so it rides with the platform. It and the two hidden shore levers target the
-same `MovingPlatform` in `TOGGLE` mode. The left island's lever sits at its upper-right corner
-(`Vector3(9, 0.21008015, -10)`); the right island's lever sits at its upper-left
-corner (`Vector3(45.96114925, 0.21008015, -10)`). Each has one hand-placed
-`seaweed_3.tscn` instance 0.9 units in front of it, scaled to 1.25, concealing
-the lever independently of random seaweed generation. The seaweed retains its
-existing destructible behavior. Paths, ground spacing and shared CameraBounds
-stay as before. `MovingPlatform.start_at_center` only changes initial placement;
-it defaults to false and does not enable intermediate stops.
-
-Quiz `room_18` removes both side platforms and places
-`objects/quiz_shuttle_platform.tscn` at the former center position. Its onboard
-lever uses the existing attack HurtBox and `MovingPlatform.receive_damage`.
-The platform starts at Center. Each valid player hit requests the next stop:
-**Left → Center → Right → Center**, repeating even if hit during travel.
-The former platform positions remain the stop coordinates: X `20.03284825`,
-`27.61284825` and `35.19284825`. Speed is 3 units/second. No shore call levers
-are added. The existing two-stop platform behavior remains the default; this
-scene enables `center_stop_enabled` and supplies a `Center` marker.
-
-Quiz `room_23` has a fixed center platform at
-`Vector3(27.61284825, -0.03991985, 0.55447969)` and one moving platform using
-`objects/quiz_orbit_platform.tscn`, the same eight surrounding stops as Quiz 04.
-It starts east and automatically loops clockwise at 6 units/second, without
-pauses at markers or crossing the center. One attack-operated lever sits on the
-fixed center platform; there are no shore or remote-room levers.
-On a player hit, `PlatformLever.DestinationMode.TOGGLE_ROUTE_LOOP` calls
-`MovingPlatform.toggle_route_motion()`: finish the current edge and stop exactly
-at its destination marker. The next hit resumes clockwise travel, alternating
-stop/resume on every hit. A hit during a pending stop cancels that stop and keeps
-the platform moving. This state resets when the scene is reloaded.
-Only Quiz 23 enables `route_autoplay`; Quiz 04
-keeps its manual +3/-2 controls. Island spacing, paths and CameraBounds are retained.
-
-Rooms `23`, `09` and `18` open the player boundary at both island edges facing the
-platforms using `boundary_openings`: `Rect2(12.7, -2.33552031, 29.58614925, 5.78)`.
-The 5.78-unit-wide passage follows the platforms' visible sprite width along Z, centered
-at `0.55447969`. Other island edges retain their player boundaries, and enemy
-boundaries stay closed. The existing gaps between islands and platforms remain.
-
-External paths attach to the islands shown in the final diagram:
-
-- `room_04`: left, up (Empty `room_11`) and down (NPC `room_19`) on the left
-  island; right (Checkpoint 2 `room_05`) on the right island.
-- `room_09`: down (Empty `room_01`) and right (Materials `room_10`) on the
-  right island.
-- `room_18`: left (Empty `room_17`) on the left island; no other external exit.
-- `room_23`: left (Mobs 4 `room_22`) on the left island; right (Farm
-  `room_24`) on the right island.
-
-| Room | Row | Type | Layout | Exits |
-| --- | --- | --- | --- | --- |
-| room_00 | Middle | Checkpoint | Medium | right: room_01, left: Hub `castaway_cove` (east gate) |
-| room_01 | Middle | Empty | Small | left: room_00, right: room_02, up: room_09 |
-| room_02 | Middle | Mobs 1 | Medium | left: room_01, right: room_03, down: room_17 |
-| room_03 | Middle | Empty | Small | left: room_02, right: room_04, up: room_10 |
-| room_04 | Middle | Quiz (2 islands) | Small, 2 islands | left: room_03, right: room_05, up: room_11, down: room_19 |
-| room_05 | Middle | Checkpoint 2 | Medium | left: room_04, right: room_06, up: room_13, down: room_21 |
-| room_06 | Middle | Empty | Small | left: room_05, right: room_07, up: room_14 |
-| room_07 | Middle | Raid | Medium | left: room_06, right: room_08 |
-| room_08 | Middle | Boss | Medium | left: room_07 |
-| room_09 | Top | Quiz (2 islands) | Small, 2 islands | right: room_10, down: room_01 |
-| room_10 | Top | Materials | Small | left: room_09, down: room_03 |
-| room_11 | Top | Empty | Small | right: room_12, down: room_04 |
-| room_12 | Top | Mobs 2 | Medium | left: room_11 |
-| room_13 | Top | Mobs 5 | Medium | down: room_05 |
-| room_14 | Top | Materials | Small | right: room_15, down: room_06 |
-| room_15 | Top | Empty | Small | left: room_14, right: room_16 |
-| room_16 | Top | Mobs 6 | Medium | left: room_15 |
-| room_17 | Bottom | Empty | Small | right: room_18, up: room_02 |
-| room_18 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_17 |
-| room_19 | Bottom | NPC | Small | right: room_20, up: room_04 |
-| room_20 | Bottom | Mobs 3 | Medium | left: room_19 |
-| room_21 | Bottom | Empty | Small | right: room_22, up: room_05 |
-| room_22 | Bottom | Mobs 4 | Medium | left: room_21, right: room_23 |
-| room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
-| room_24 | Bottom | Farm | Medium | left: room_23 |
-
-Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
-
-Quiz `09` retains four Elite Barrels around its chest at local X/Z `(±5, ±5)`,
-forming a square with four 10-unit sides. Quiz `04`, `18` and `23` retain only
-the two right-side Elite Barrels: TopRight `(5, -5)` and BottomRight `(5, 5)`;
-TopLeft and BottomLeft have been removed. Groups remain centered on their chests,
-and the remaining guards keep their positions and heights. No new scripts or
-changes to loot, puzzle controls, island spacing or paths are introduced.
-
-Raid `room_07` starts when Foxy enters the interior activation area. During combat, `BaseRoom.set_exits_locked(true)` closes the existing player
-boundary across the exits and disables their scene-change triggers. The paths
-stay visible; no separate barriers or barrier visuals are created.
-It reuses the Mobs 4 directional tide layout: left → up → right → down. Each tide
-rises, holds, and falls with the existing surge/water interactions. New enemies
-appear on exposed ground as it recedes. The next tide starts as soon as all requested enemies have spawned and died,
-without a timer or waiting for the outgoing tide to finish receding.
-`FlatTideController.finish_cycle()` clears that tide before the next direction starts.
-
-| Raid wave | Total | Normal | Elite | Random enemy pool |
-| --- | --- | --- | --- | --- |
-| 1 | 3 | 3 | 0 | Starfish, Crab, Coral Skeleton |
-| 2 | 4 | 4 | 0 | Starfish, Crab, Coral Skeleton, Barrel |
-| 3 | 4 | 3 | 1 | Same four types, corresponding elite variants |
-| 4 | 5 | 3 | 2 | Same four types, corresponding elite variants |
-
-Types may repeat. Counts are exact, not probability-based; blocked spawns retry
-instead of silently losing an enemy. The last clear leaves the water LOW and
-opens both exits. Completion is kept in `GameManager.story_flags` for the current
-run, so revisiting does not restart the raid; New Game resets it. After the fourth clear, `RaidEncounter` instantiates `raid_reward_chest.tscn`
-at room-local `Vector3(0, 0.25209618, 0.45244434)`. It guarantees 10–20 gold and
-one Harpoon blueprint. There is no chest instance before the raid is cleared.
-Revisiting a cleared raid creates the configured chest without replaying waves;
-its opened/loot state currently resets like the other normal chests.
-`FlatTideController.externally_advanced` defaults to false, preserving automatic
-cycles in Mobs rooms. The finite spawner subclasses the existing tide spawner,
-whose `_spawn()` now reports success as a boolean without changing its old callers.
-
-Boss `room_08` contains Captain Blubberbeard at
-`Vector3(6, 0.25209618, 0.45244434)` and reuses `BossEncounter` with the
-`captain_blubberbeard` encounter ID. Entering the island's interior locks the
-existing player boundary and scene-change exit via `BaseRoom.set_exits_locked()`.
-The exit reopens on `fight_finished`; the boss's existing death sequence creates
-his configured reward chest at his death position. There is no preplaced chest,
-extra barrier or collapsing bridge. The boss reward scene guarantees 10–20 gold, one Tide Grapple Charm and
-one boss note (`Diary of Tide`); the old key/material rewards are removed. Defeat, chest-open state and uncollected reward items are restored
-by the existing encounter persistence when returning during the same run.
-Tracked reward pickups now retain their `MonsterNote` reference as well as item,
-quantity and position, so an uncollected boss diary restores as an actual note.
-The optional room/activation-area references default to empty, leaving the old
-boss test scene's custom bridge lock unchanged.
-
-## Scene identity
-
-The map contains 25 rooms, numbered `room_00`–`room_24`. The former single-island
-Quiz `room_18` and Chest `room_19` are replaced by one paired Quiz `room_18`;
-the Chest room and its scene transition are removed. Former rooms `20`–`25`
-move to `19`–`24` (NPC, Mobs 3, Empty, Mobs 4, paired Quiz, Farm).
-Retained scenes keep their authored content and scene UIDs. Every scene root
-matches its filename. All path destinations and the Silas room fixture use the
-new IDs; the Hub connection through `hub/map/room_04.tscn` stays the same.
-Raid, Boss and Farm instantiate their room templates; their gameplay encounters
-are not authored by this layout change. Ground artwork is unchanged.
-
-## Random destructible props
-
-The two Materials rooms use the Small room template, with spawn positions pulled inward to fit the smaller ground, and have separate resource pools:
-
-- The left Materials room (`room_10`) spawns only orange, pink and turquoise coral.
-- The right Materials room (`room_14`) spawns only leaning, short and tall coconut palms.
-
-Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
-
-Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_20`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
-
-Mobs 4, 5 and 6 (`room_22`, `room_13`, `room_16`) spawn two independent
-groups per visit: `RandomProps` chooses 5–7 props total, each equally likely
-to be wood log or shell; `RandomOctopus` chooses 1–3 destructible octopus props.
-The groups use ten and five distinct candidate positions respectively, with
-at least 3.6 units between groups and 3.3 units from seaweed candidates.
-Both use `random_props.gd`; its Inspector count range now starts at 1.
-
-All rooms except Materials and Empty rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
-
-| Layout | Rooms | Seaweed per visit |
+| Mẫu nền | Số phòng | Các phòng |
 | --- | --- | --- |
-| Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22`, `room_24` | 20 per room |
-| Small, one island | `room_19` | 15 per room |
-| Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 15 on each island, 30 per room |
+| Small | 14 | [room_01](../../world/biomes/coral_valley/map/room_01.tscn), [room_03](../../world/biomes/coral_valley/map/room_03.tscn), [room_04](../../world/biomes/coral_valley/map/room_04.tscn), [room_06](../../world/biomes/coral_valley/map/room_06.tscn), [room_09](../../world/biomes/coral_valley/map/room_09.tscn), [room_10](../../world/biomes/coral_valley/map/room_10.tscn), [room_11](../../world/biomes/coral_valley/map/room_11.tscn), [room_14](../../world/biomes/coral_valley/map/room_14.tscn), [room_15](../../world/biomes/coral_valley/map/room_15.tscn), [room_17](../../world/biomes/coral_valley/map/room_17.tscn), [room_18](../../world/biomes/coral_valley/map/room_18.tscn), [room_19](../../world/biomes/coral_valley/map/room_19.tscn), [room_21](../../world/biomes/coral_valley/map/room_21.tscn), [room_23](../../world/biomes/coral_valley/map/room_23.tscn) |
+| Medium | 11 | [room_00](../../world/biomes/coral_valley/map/room_00.tscn), [room_02](../../world/biomes/coral_valley/map/room_02.tscn), [room_05](../../world/biomes/coral_valley/map/room_05.tscn), [room_07](../../world/biomes/coral_valley/map/room_07.tscn), [room_08](../../world/biomes/coral_valley/map/room_08.tscn), [room_12](../../world/biomes/coral_valley/map/room_12.tscn), [room_13](../../world/biomes/coral_valley/map/room_13.tscn), [room_16](../../world/biomes/coral_valley/map/room_16.tscn), [room_20](../../world/biomes/coral_valley/map/room_20.tscn), [room_22](../../world/biomes/coral_valley/map/room_22.tscn), [room_24](../../world/biomes/coral_valley/map/room_24.tscn) |
 
-Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
+Các phòng Small kế thừa trực tiếp `base_small_room.tscn`.
+Trong nhóm Medium, 00, 02, 05, 12, 13, 16, 20, 22 kế thừa trực tiếp
+`base_medium_room.tscn`; ba phòng còn lại kế thừa gián tiếp:
 
-Empty rooms `01`, `03`, `06`, `11`, `15`, `17` and `21` choose exactly one
-population layout per visit: 10% resources, 20% combat and 70% scenery only.
-`RandomEmptyType` uses `random_props.gd` with ten equally likely scene slots:
-one resources slot, two combat slots and seven scenery slots. It instantiates
-exactly one selected PackedScene at the origin; only that branch's populations
-exist. Floor artwork, water/atmosphere, camera and exit wiring remain unchanged.
+- `room_07` → `raid_room.tscn` → `base_medium_room.tscn`.
+- `room_08` → `boss_room.tscn` → `base_medium_room.tscn`.
+- `room_24` → `farm_room.tscn` → `base_medium_room.tscn`.
 
-| Empty layout | Chance | Enemies | Before Checkpoint 2 | After Checkpoint 2 |
+### Thành phần dùng chung
+
+Hai mẫu Small/Medium cùng kế thừa `world/biomes/base/base_room.tscn`, có Foxy,
+nền đảo, môi trường/ánh sáng, khói vực, CameraBounds và bốn nhánh đường đi.
+Chỉ các lối được cấu hình mở mới dùng để chuyển phòng.
+Nền Coral Valley có góc vát và hình va chạm dạng lồi.
+Số lượng vật thể ngẫu nhiên tính theo **vật thể sinh ra**, không phải lượng nguyên liệu rơi.
+
+### Bảng tra nhanh từng phòng
+
+| Phòng | Hàng | Loại | Mẫu nền | Kế thừa trực tiếp | Lối nối |
+| --- | --- | --- | --- | --- | --- |
+| [room_00](../../world/biomes/coral_valley/map/room_00.tscn) (*) | giữa | Checkpoint 1 | Medium | `base_medium_room.tscn` | phải: room_01, trái: Hub `castaway_cove` (cổng Đông) |
+| [room_01](../../world/biomes/coral_valley/map/room_01.tscn) (*) | giữa | Empty trước Checkpoint 2 | Small | `base_small_room.tscn` | trái: room_00, phải: room_02, trên: room_09 |
+| [room_02](../../world/biomes/coral_valley/map/room_02.tscn) | giữa | Mobs 1 | Medium | `base_medium_room.tscn` | trái: room_01, phải: room_03, dưới: room_17 |
+| [room_03](../../world/biomes/coral_valley/map/room_03.tscn) | giữa | Empty trước Checkpoint 2 | Small | `base_small_room.tscn` | trái: room_02, phải: room_04, trên: room_10 |
+| [room_04](../../world/biomes/coral_valley/map/room_04.tscn) | giữa | Quiz — bệ chạy vòng điều khiển từ hai bờ | Small | `base_small_room.tscn` | trái: room_03, phải: room_05, trên: room_11, dưới: room_19 |
+| [room_05](../../world/biomes/coral_valley/map/room_05.tscn) | giữa | Checkpoint 2 | Medium | `base_medium_room.tscn` | trái: room_04, phải: room_06, trên: room_13, dưới: room_21 |
+| [room_06](../../world/biomes/coral_valley/map/room_06.tscn) | giữa | Empty sau Checkpoint 2 | Small | `base_small_room.tscn` | trái: room_05, phải: room_07, trên: room_14 |
+| [room_07](../../world/biomes/coral_valley/map/room_07.tscn) | giữa | Raid — chiến đấu bốn đợt | Medium | `raid_room.tscn` | trái: room_06, phải: room_08 |
+| [room_08](../../world/biomes/coral_valley/map/room_08.tscn) | giữa | Boss — Captain Blubberbeard | Medium | `boss_room.tscn` | trái: room_07 |
+| [room_09](../../world/biomes/coral_valley/map/room_09.tscn) | trên | Quiz — bệ qua lại và cần gạt ẩn | Small | `base_small_room.tscn` | phải: room_10, dưới: room_01 |
+| [room_10](../../world/biomes/coral_valley/map/room_10.tscn) | trên | Materials — cây dừa | Small | `base_small_room.tscn` | trái: room_09, dưới: room_03 |
+| [room_11](../../world/biomes/coral_valley/map/room_11.tscn) | trên | Empty trước Checkpoint 2 | Small | `base_small_room.tscn` | phải: room_12, dưới: room_04 |
+| [room_12](../../world/biomes/coral_valley/map/room_12.tscn) | trên | Mobs 2 | Medium | `base_medium_room.tscn` | trái: room_11 |
+| [room_13](../../world/biomes/coral_valley/map/room_13.tscn) | trên | Mobs 5 | Medium | `base_medium_room.tscn` | dưới: room_05 |
+| [room_14](../../world/biomes/coral_valley/map/room_14.tscn) | trên | Materials — san hô | Small | `base_small_room.tscn` | phải: room_15, dưới: room_06 |
+| [room_15](../../world/biomes/coral_valley/map/room_15.tscn) | trên | Empty sau Checkpoint 2 | Small | `base_small_room.tscn` | trái: room_14, phải: room_16 |
+| [room_16](../../world/biomes/coral_valley/map/room_16.tscn) | trên | Mobs 6 | Medium | `base_medium_room.tscn` | trái: room_15 |
+| [room_17](../../world/biomes/coral_valley/map/room_17.tscn) | dưới | Empty trước Checkpoint 2 | Small | `base_small_room.tscn` | phải: room_18, trên: room_02 |
+| [room_18](../../world/biomes/coral_valley/map/room_18.tscn) | dưới | Quiz — bệ trung chuyển ba điểm | Small | `base_small_room.tscn` | trái: room_17 |
+| [room_19](../../world/biomes/coral_valley/map/room_19.tscn) | dưới | NPC — Silas | Small | `base_small_room.tscn` | phải: room_20, trên: room_04 |
+| [room_20](../../world/biomes/coral_valley/map/room_20.tscn) | dưới | Mobs 3 | Medium | `base_medium_room.tscn` | trái: room_19 |
+| [room_21](../../world/biomes/coral_valley/map/room_21.tscn) | dưới | Empty sau Checkpoint 2 | Small | `base_small_room.tscn` | phải: room_22, trên: room_05 |
+| [room_22](../../world/biomes/coral_valley/map/room_22.tscn) | dưới | Mobs 4 | Medium | `base_medium_room.tscn` | trái: room_21, phải: room_23 |
+| [room_23](../../world/biomes/coral_valley/map/room_23.tscn) | dưới | Quiz — bệ tự chạy vòng | Small | `base_small_room.tscn` | trái: room_22, phải: room_24 |
+| [room_24](../../world/biomes/coral_valley/map/room_24.tscn) | dưới | Farm | Medium | `farm_room.tscn` | trái: room_23 |
+
+(*) `room_00` và `room_01`: chỉ liệt kê để đối chiếu tổng số và kết nối, không rà soát chi tiết.
+
+## 2. Nội dung từng phòng
+
+Mỗi mục ghi rõ mẫu kế thừa, cơ chế, quái, vật thể/phần thưởng và các lối nối.
+Các mục Empty, Mobs và Quiz có thêm quy tắc chung ở phần 3–5.
+
+### room_02 — Mobs 1
+
+- **Scene:** [room_02](../../world/biomes/coral_valley/map/room_02.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Thủy triều hai hướng: `LeftShallows` → `RightShallows`; sinh tối đa 3 quái mỗi lần nước rút.
+- **Quái:** Chọn Starfish hoặc Coral Skeleton với xác suất bằng nhau; chỉ Skeleton có biến thể elite với xác suất 10%.
+- **Vật thể / phần thưởng:** 7–10 đá/khúc gỗ ngẫu nhiên, tỉ lệ hai loại bằng nhau; 20 rong.
+- **Lối nối:** trái: room_01, phải: room_03, dưới: room_17.
+
+### room_03 — Empty trước Checkpoint 2
+
+- **Scene:** [room_03](../../world/biomes/coral_valley/map/room_03.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** `RandomEmptyType` chọn một nhánh 10% tài nguyên / 20% chiến đấu / 70% trang trí mỗi lượt.
+- **Quái:** Chỉ nhánh 20% có đúng 4 quái; mỗi con 10% elite.
+- **Vật thể / phần thưởng:** Tài nguyên: 5–7 cây dừa + 23 rong. Chiến đấu: 5–7 đá/gỗ. Trang trí: tổng 5–7 san hô/đá/gỗ.
+- **Lối nối:** trái: room_02, phải: room_04, trên: room_10.
+
+### room_04 — Quiz — bệ chạy vòng điều khiển từ hai bờ
+
+- **Scene:** [room_04](../../world/biomes/coral_valley/map/room_04.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Hai đảo; `Platform2` cố định giữa, một `MovingPlatform` chạy qua 8 điểm bao quanh. Bốn cần ở hai bờ: cần trên tiến 3 điểm theo chiều kim đồng hồ, cần dưới lùi 2 điểm; đánh khi đang chạy sẽ xếp thêm bước.
+- **Quái:** 2 Elite Barrel phía phải rương, tại TopRight và BottomRight.
+- **Vật thể / phần thưởng:** 30 rong ngẫu nhiên (15 mỗi đảo). Rương ở tâm đảo phải: 10–20 vàng và 1 ghi chép Barrel.
+- **Lối nối:** trái: room_03, phải: room_05, trên: room_11, dưới: room_19.
+
+### room_05 — Checkpoint 2
+
+- **Scene:** [room_05](../../world/biomes/coral_valley/map/room_05.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Lửa trại `Campfire`, `safe_room = true`; nghỉ, lưu tiến trình và đổi Charm. Là điểm phân chia nhóm Empty trước/sau Checkpoint 2.
+- **Quái:** Không có quái đặt sẵn hay bộ sinh quái.
+- **Vật thể / phần thưởng:** 20 rong ngẫu nhiên.
+- **Lối nối:** trái: room_04, phải: room_06, trên: room_13, dưới: room_21.
+
+### room_06 — Empty sau Checkpoint 2
+
+- **Scene:** [room_06](../../world/biomes/coral_valley/map/room_06.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** `RandomEmptyType` chọn một nhánh 10% tài nguyên / 20% chiến đấu / 70% trang trí mỗi lượt.
+- **Quái:** Chỉ nhánh 20% có đúng 4 quái; mỗi con 10% elite.
+- **Vật thể / phần thưởng:** Tài nguyên: 5–7 san hô + 23 rong. Chiến đấu: 5–7 vỏ sò/gỗ. Trang trí: tổng 5–7 san hô/vỏ sò/gỗ.
+- **Lối nối:** trái: room_05, phải: room_07, trên: room_14.
+
+### room_07 — Raid — chiến đấu bốn đợt
+
+- **Scene:** [room_07](../../world/biomes/coral_valley/map/room_07.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `raid_room.tscn`.
+- **Cơ chế / thành phần:** Kế thừa trực tiếp `raid_room.tscn`, rồi tới Medium. `RaidEncounter` kích hoạt khi Foxy vào trong đảo; khóa lối ra, điều khiển triều trái → trên → phải → dưới và mở lại sau đợt 4.
+- **Quái:** Bốn đợt lần lượt 3, 4, 4, 5 quái. Đợt 3 có đúng 1 elite; đợt 4 có đúng 2 elite. Xem bảng Raid bên dưới.
+- **Vật thể / phần thưởng:** 20 rong. Sau khi thắng mới sinh `raid_reward_chest.tscn` tại tâm phòng: 10–20 vàng + 1 bản thiết kế Harpoon.
+- **Lối nối:** trái: room_06, phải: room_08.
+
+### room_08 — Boss — Captain Blubberbeard
+
+- **Scene:** [room_08](../../world/biomes/coral_valley/map/room_08.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `boss_room.tscn`.
+- **Cơ chế / thành phần:** Kế thừa trực tiếp `boss_room.tscn`, rồi tới Medium. `BossEntryArea` kích hoạt `BossEncounter`; vào đảo thì khóa lối ra, `fight_finished` mở lại.
+- **Quái:** Captain Blubberbeard đặt tại `Vector3(6, 0.25209618, 0.45244434)`.
+- **Vật thể / phần thưởng:** 20 rong. Rương xuất hiện tại vị trí trùm chết sau hoạt ảnh chết: 10–20 vàng + Tide Grapple Charm + ghi chép trùm `Diary of Tide`.
+- **Lối nối:** trái: room_07.
+
+### room_09 — Quiz — bệ qua lại và cần gạt ẩn
+
+- **Scene:** [room_09](../../world/biomes/coral_valley/map/room_09.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Hai đảo; một `MovingPlatform` bắt đầu giữa. Đòn đầu đưa sang phải, sau đó luân phiên phải ↔ trái, qua giữa không dừng. Có 1 cần trên bệ và 2 cần ẩn ở bờ; mỗi cần bờ được che bởi 1 rong đặt tay.
+- **Quái:** 4 Elite Barrel quanh rương tại các góc X/Z `(±5, ±5)`; cạnh hình vuông dài 10 đơn vị.
+- **Vật thể / phần thưởng:** 30 rong ngẫu nhiên + 2 rong `seaweed_3.tscn` đặt sẵn che cần. Rương ở tâm đảo trái: 10–20 vàng + 1 bản thiết kế Bow + 1 ghi chép Coral Skeleton.
+- **Lối nối:** phải: room_10, dưới: room_01.
+
+### room_10 — Materials — cây dừa
+
+- **Scene:** [room_10](../../world/biomes/coral_valley/map/room_10.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Phòng nguyên liệu một đảo, dùng `RandomProps`.
+- **Quái:** 3 Crab đặt sẵn: `Crab`, `Crab2`, `Crab3`.
+- **Vật thể / phần thưởng:** Sinh 5–10 cây dừa nghiêng/thấp/cao, mỗi biến thể có xác suất 1/3. Không có bộ sinh rong.
+- **Lối nối:** trái: room_09, dưới: room_03.
+
+### room_11 — Empty trước Checkpoint 2
+
+- **Scene:** [room_11](../../world/biomes/coral_valley/map/room_11.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** `RandomEmptyType` chọn một nhánh 10% tài nguyên / 20% chiến đấu / 70% trang trí mỗi lượt.
+- **Quái:** Chỉ nhánh 20% có đúng 4 quái; mỗi con 10% elite.
+- **Vật thể / phần thưởng:** Tài nguyên: 5–7 cây dừa + 23 rong. Chiến đấu: 5–7 đá/gỗ. Trang trí: tổng 5–7 san hô/đá/gỗ.
+- **Lối nối:** phải: room_12, dưới: room_04.
+
+### room_12 — Mobs 2
+
+- **Scene:** [room_12](../../world/biomes/coral_valley/map/room_12.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Thủy triều hai hướng: `LeftShallows` → `RightShallows`; sinh tối đa 3 quái mỗi lần nước rút.
+- **Quái:** Chọn Barrel hoặc Coral Skeleton với xác suất bằng nhau; chỉ Skeleton có biến thể elite với xác suất 10%.
+- **Vật thể / phần thưởng:** 7–10 đá/khúc gỗ ngẫu nhiên, tỉ lệ hai loại bằng nhau; 20 rong.
+- **Lối nối:** trái: room_11.
+
+### room_13 — Mobs 5
+
+- **Scene:** [room_13](../../world/biomes/coral_valley/map/room_13.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Thủy triều bốn hướng: trái → trên → phải → dưới; sinh tối đa 3 quái mỗi lần nước rút.
+- **Quái:** Chỉ Starfish; mỗi con độc lập có 10% khả năng là Elite Starfish.
+- **Vật thể / phần thưởng:** 5–7 khúc gỗ/vỏ sò ngẫu nhiên, tỉ lệ hai loại bằng nhau; nhóm riêng 1–3 bạch tuộc có thể phá; 20 rong.
+- **Lối nối:** dưới: room_05.
+
+### room_14 — Materials — san hô
+
+- **Scene:** [room_14](../../world/biomes/coral_valley/map/room_14.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Phòng nguyên liệu một đảo, dùng `RandomProps`.
+- **Quái:** 3 Starfish đặt sẵn: `Starfish`, `Starfish2`, `Starfish3`.
+- **Vật thể / phần thưởng:** Sinh 5–10 san hô cam/hồng/xanh ngọc, mỗi biến thể có xác suất 1/3. Không có bộ sinh rong.
+- **Lối nối:** phải: room_15, dưới: room_06.
+
+### room_15 — Empty sau Checkpoint 2
+
+- **Scene:** [room_15](../../world/biomes/coral_valley/map/room_15.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** `RandomEmptyType` chọn một nhánh 10% tài nguyên / 20% chiến đấu / 70% trang trí mỗi lượt.
+- **Quái:** Chỉ nhánh 20% có đúng 4 quái; mỗi con 10% elite.
+- **Vật thể / phần thưởng:** Tài nguyên: 5–7 san hô + 23 rong. Chiến đấu: 5–7 vỏ sò/gỗ. Trang trí: tổng 5–7 san hô/vỏ sò/gỗ.
+- **Lối nối:** trái: room_14, phải: room_16.
+
+### room_16 — Mobs 6
+
+- **Scene:** [room_16](../../world/biomes/coral_valley/map/room_16.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Thủy triều bốn hướng: trái → trên → phải → dưới; sinh tối đa 3 quái mỗi lần nước rút.
+- **Quái:** Chỉ Crab; mỗi con độc lập có 10% khả năng là Elite Crab.
+- **Vật thể / phần thưởng:** 5–7 khúc gỗ/vỏ sò ngẫu nhiên, tỉ lệ hai loại bằng nhau; nhóm riêng 1–3 bạch tuộc có thể phá; 20 rong.
+- **Lối nối:** trái: room_15.
+
+### room_17 — Empty trước Checkpoint 2
+
+- **Scene:** [room_17](../../world/biomes/coral_valley/map/room_17.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** `RandomEmptyType` chọn một nhánh 10% tài nguyên / 20% chiến đấu / 70% trang trí mỗi lượt.
+- **Quái:** Chỉ nhánh 20% có đúng 4 quái; mỗi con 10% elite.
+- **Vật thể / phần thưởng:** Tài nguyên: 5–7 cây dừa + 23 rong. Chiến đấu: 5–7 đá/gỗ. Trang trí: tổng 5–7 san hô/đá/gỗ.
+- **Lối nối:** phải: room_18, trên: room_02.
+
+### room_18 — Quiz — bệ trung chuyển ba điểm
+
+- **Scene:** [room_18](../../world/biomes/coral_valley/map/room_18.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Hai đảo; `objects/quiz_shuttle_platform.tscn` thay ba bệ cũ. Cần trên bệ nhận đòn đánh và yêu cầu tuyến Trái → Giữa → Phải → Giữa, lặp lại; đánh khi đang chạy vẫn thêm yêu cầu. Không có cần ở bờ.
+- **Quái:** 2 Elite Barrel phía phải rương, tại TopRight và BottomRight.
+- **Vật thể / phần thưởng:** 30 rong ngẫu nhiên (15 mỗi đảo). Rương ở tâm đảo phải: 10–20 vàng + 1 ghi chép Starfish.
+- **Lối nối:** trái: room_17.
+
+### room_19 — NPC — Silas
+
+- **Scene:** [room_19](../../world/biomes/coral_valley/map/room_19.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Có NPC `Silas` từ `gameplay/npcs/silas/silas_npc.tscn`, phục vụ tương tác và cửa hàng của Silas.
+- **Quái:** Không có quái đặt sẵn hay bộ sinh quái.
+- **Vật thể / phần thưởng:** 15 rong ngẫu nhiên.
+- **Lối nối:** phải: room_20, trên: room_04.
+
+### room_20 — Mobs 3
+
+- **Scene:** [room_20](../../world/biomes/coral_valley/map/room_20.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Thủy triều hai hướng: `LeftShallows` → `RightShallows`; sinh tối đa 3 quái mỗi lần nước rút.
+- **Quái:** Chọn Crab hoặc Coral Skeleton với xác suất bằng nhau; chỉ Skeleton có biến thể elite với xác suất 10%.
+- **Vật thể / phần thưởng:** 7–10 đá/khúc gỗ ngẫu nhiên, tỉ lệ hai loại bằng nhau; 20 rong.
+- **Lối nối:** trái: room_19.
+
+### room_21 — Empty sau Checkpoint 2
+
+- **Scene:** [room_21](../../world/biomes/coral_valley/map/room_21.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** `RandomEmptyType` chọn một nhánh 10% tài nguyên / 20% chiến đấu / 70% trang trí mỗi lượt.
+- **Quái:** Chỉ nhánh 20% có đúng 4 quái; mỗi con 10% elite.
+- **Vật thể / phần thưởng:** Tài nguyên: 5–7 san hô + 23 rong. Chiến đấu: 5–7 vỏ sò/gỗ. Trang trí: tổng 5–7 san hô/vỏ sò/gỗ.
+- **Lối nối:** phải: room_22, trên: room_05.
+
+### room_22 — Mobs 4
+
+- **Scene:** [room_22](../../world/biomes/coral_valley/map/room_22.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `base_medium_room.tscn`.
+- **Cơ chế / thành phần:** Thủy triều bốn hướng: trái → trên → phải → dưới; sinh tối đa 3 quái mỗi lần nước rút.
+- **Quái:** Chỉ Barrel; mỗi con độc lập có 10% khả năng là Elite Barrel.
+- **Vật thể / phần thưởng:** 5–7 khúc gỗ/vỏ sò ngẫu nhiên, tỉ lệ hai loại bằng nhau; nhóm riêng 1–3 bạch tuộc có thể phá; 20 rong.
+- **Lối nối:** trái: room_21, phải: room_23.
+
+### room_23 — Quiz — bệ tự chạy vòng
+
+- **Scene:** [room_23](../../world/biomes/coral_valley/map/room_23.tscn).
+- **Mẫu nền:** Small; kế thừa trực tiếp `base_small_room.tscn`.
+- **Cơ chế / thành phần:** Hai đảo; `CenterPlatform` cố định có `StopLever`, một `MovingPlatform` tự chạy vòng qua 8 điểm theo chiều kim đồng hồ. Đánh cần: đi hết cạnh rồi dừng tại marker; đánh tiếp cho chạy lại. Đánh lúc chờ dừng sẽ hủy yêu cầu dừng.
+- **Quái:** 2 Elite Barrel phía phải rương, tại TopRight và BottomRight.
+- **Vật thể / phần thưởng:** 30 rong ngẫu nhiên (15 mỗi đảo). Rương ở tâm đảo phải: 10–20 vàng + 1 ghi chép Crab.
+- **Lối nối:** trái: room_22, phải: room_24.
+
+### room_24 — Farm
+
+- **Scene:** [room_24](../../world/biomes/coral_valley/map/room_24.tscn).
+- **Mẫu nền:** Medium; kế thừa trực tiếp `farm_room.tscn`.
+- **Cơ chế / thành phần:** Kế thừa trực tiếp `farm_room.tscn`, rồi tới Medium. Hiện là mẫu phòng với nhóm rong; chưa có cơ chế thu hoạch riêng được đặt trong scene.
+- **Quái:** Không có quái đặt sẵn hay bộ sinh quái.
+- **Vật thể / phần thưởng:** 20 rong ngẫu nhiên.
+- **Lối nối:** trái: room_23.
+
+## 3. Quy tắc ngẫu nhiên của phòng Empty
+
+Nhóm trước Checkpoint 2: 01, 03, 11, 17; nhóm sau: 06, 15, 21.
+Đây là vị trí trong bản đồ, không phải kiểm tra trạng thái đã kích hoạt checkpoint.
+
+| Nhánh được chọn | Xác suất | Quái | Trước Checkpoint 2 | Sau Checkpoint 2 |
 | --- | --- | --- | --- | --- |
-| Resources only | 10% | None | 5–7 coconut palms total + 23 seaweed | 5–7 coral props total + 23 seaweed |
-| Combat / obstacles | 20% | Exactly 4, each 10% elite | 5–7 stone/wood props total | 5–7 shell/wood props total |
-| Scenery only | 70% | None | 5–7 coral/stone/wood props total | 5–7 coral/shell/wood props total |
+| Tài nguyên | 10% | Không | 5–7 cây dừa + 23 rong | 5–7 san hô + 23 rong |
+| Chiến đấu | 20% | Đúng 4; mỗi con 10% elite | 5–7 đá/gỗ | 5–7 vỏ sò/gỗ |
+| Chỉ trang trí | 70% | Không | Tổng 5–7 san hô/đá/gỗ | Tổng 5–7 san hô/vỏ sò/gỗ |
 
-Before Checkpoint 2 means rooms `01`, `03`, `11`, `17`; after it means `06`,
-`15`, `21`. Combat picks Starfish, Crab, Coral Skeleton and Barrel equally;
-types may repeat. Each type contributes nine normal slots and one elite slot
-to the weighted pool, giving every enemy an independent 10% elite probability.
-Resource-only layouts use three palm or coral variants with equal probability.
-Scenery-only layouts contain no enemies, coconut palms or seaweed. Their five
-equally likely prop variants are orange, pink and turquoise coral, wood log,
-and stone before Checkpoint 2 or shell after it. The 5–7 count is the total
-across the whole scenery pool; a visit does not guarantee every variant.
-Seaweed count is rounded from the Small-room baseline of 15 × 1.5 = 22.5 to 23,
-selected without replacement from 31 candidates on the actual ground polygon,
-inset 2.5 units with gaps at the four approaches. Resource plants use a separate
-interior candidate set; combat enemies and obstacles also have separate sets.
+`RandomEmptyType` dùng `random_props.gd` và mười ô có xác suất bằng nhau:
+một tài nguyên, hai chiến đấu, bảy trang trí. Mỗi lượt chỉ tạo **một** PackedScene tại
+gốc tọa độ; chỉ quái và vật thể thuộc nhánh được chọn xuất hiện.
 
-The six reusable layout scenes are `objects/empty_combat_before_checkpoint.tscn`,
-`empty_combat_after_checkpoint.tscn`, `empty_resources_before_checkpoint.tscn`,
-`empty_resources_after_checkpoint.tscn`, `empty_scenery_before_checkpoint.tscn`
-and `empty_scenery_after_checkpoint.tscn`. All selection and population groups
-reuse `random_props.gd`; no GDScript changes are required. Counts refer to
-objects, not material quantities dropped. Materials and Mobs keep their own pools.
+Nhánh chiến đấu chọn Starfish, Crab, Coral Skeleton và Barrel với xác suất bằng nhau;
+loại quái có thể lặp. Mỗi loại góp chín ô thường và một ô elite vào nhóm chọn,
+tạo xác suất elite độc lập 10% cho mỗi con.
 
-## Tide enemy pools
+Nhánh tài nguyên chọn ba biến thể cây dừa hoặc san hô với xác suất bằng nhau.
+Nhánh trang trí không có cây dừa, rong hoặc quái; năm lựa chọn có xác suất bằng nhau là
+san hô cam, hồng, xanh ngọc, khúc gỗ và đá (trước CP2) hoặc vỏ sò (sau CP2).
+Số 5–7 là tổng cả nhóm, không đảm bảo một lượt có đủ các biến thể.
 
-The Small, Medium and Large Coral Valley base scenes enable
-`Enemy Boundary Enabled` under Ground boundaries.
-The existing floor-boundary builder generates `EnemyGroundBoundaries` from
-island floors only, keeping the outline closed across all four path entrances
-and player-only openings. Enemy bodies and their forward obstacle rays use
-the `EnemyBoundary` layer; player movement and attacks ignore it. Player
-boundaries keep their existing open-path behavior. Rooms outside these Coral
-Valley templates retain the default disabled setting.
+23 rong của nhánh tài nguyên được làm tròn từ 15 × 1.5 = 22.5, chọn không lặp trong
+31 vị trí trên nền thực tế, lùi vào trong 2.5 đơn vị và chừa bốn lối vào.
+Cây tài nguyên, quái và vật cản có tập vị trí riêng.
 
-All six Mobs rooms inherit the same CameraBounds from `base_medium_room.tscn`.
-Mobs 1–3 use two mirrored `Vector2(45, 66)` water zones, running
-`LeftShallows` → `RightShallows`. Mobs 4–6 (`room_22`, `room_13`, `room_16`)
-run clockwise: `LeftShallows` → `UpShallows` → `RightShallows` →
-`DownShallows`. The added upper/lower zones use `Vector2(78, 45)` to span
-the room's width while keeping the same 45-unit travel depth.
-Each zone rises for 6 seconds, stays high for 6, falls for 6 and rests for 6
-before the next zone starts. A full cycle takes 48 seconds for Mobs 1–3
-or 96 seconds for Mobs 4–6. Timing is configured under `Cycle Timing`;
-the controller's `Zones` array controls order. Only one zone floods at a time.
+Sáu scene bố trí nằm trong `world/biomes/coral_valley/objects/`:
 
-Mobs 1–3 select up to three enemies per falling tide. Each enemy independently
-chooses either entry in its room's pool with equal probability; a wave can contain
-three of the same type. All three spawners use `elite_chance = 10.0`, and only
-the Coral Skeleton entry has an elite scene assigned. A selected skeleton has
-a 10% chance to use its elite variant; starfish, barrel and crab remain normal.
+| Nhánh | Trước Checkpoint 2 | Sau Checkpoint 2 |
+| --- | --- | --- |
+| Chiến đấu | `empty_combat_before_checkpoint.tscn` | `empty_combat_after_checkpoint.tscn` |
+| Tài nguyên | `empty_resources_before_checkpoint.tscn` | `empty_resources_after_checkpoint.tscn` |
+| Trang trí | `empty_scenery_before_checkpoint.tscn` | `empty_scenery_after_checkpoint.tscn` |
 
-Mobs 4–6 each select up to three enemies of a single species per falling tide.
-Each enemy independently has a 10% chance to use that species' elite variant.
-These three rooms have no skeleton entries.
+Các nhóm chọn và sinh đối tượng dùng lại `random_props.gd`.
+Nhóm vật thể của Materials và Mobs độc lập với các scene Empty này.
 
-| Room | Type | Tide enemy pool |
+## 4. Phòng nguyên liệu, Mobs và rong
+
+### Phòng nguyên liệu
+
+- `room_10`: 5–10 cây dừa nghiêng/thấp/cao + 3 Crab đặt sẵn.
+- `room_14`: 5–10 san hô cam/hồng/xanh ngọc + 3 Starfish đặt sẵn.
+- Mỗi biến thể cây/san hô có xác suất 1/3 cho mỗi vật thể.
+- `min_spawn_count = 5`, `max_spawn_count = 10`; không có bộ sinh rong.
+- Cả hai dùng Small; các vị trí sinh được đưa vào trong để vừa nền.
+
+### Vật thể trong phòng Mobs
+
+Mobs 1–3 có mười vị trí ứng viên, sinh 7–10 đá/khúc gỗ, tỉ lệ hai loại bằng nhau.
+Mobs 4–6 có hai nhóm độc lập: `RandomProps` sinh tổng 5–7 khúc gỗ/vỏ sò;
+`RandomOctopus` sinh 1–3 bạch tuộc có thể phá.
+Hai nhóm có lần lượt mười và năm vị trí, cách nhau ít nhất 3.6 đơn vị
+và cách vị trí rong ít nhất 3.3 đơn vị.
+Cả hai dùng `random_props.gd`; giới hạn trong Inspector bắt đầu từ 1.
+
+### Rong ngẫu nhiên
+
+| Nhóm phòng đã rà soát | Phòng | Số rong mỗi lượt |
+| --- | --- | --- |
+| Medium | 02, 05, 07, 08, 12, 13, 16, 20, 22, 24 | 20 mỗi phòng |
+| Small một đảo | 19 | 15 |
+| Small hai đảo | 04, 09, 18, 23 | 15 mỗi đảo, tổng 30 |
+| Materials | 10, 14 | Không có bộ sinh rong |
+| Empty | 03, 06, 11, 15, 17, 21 | Chỉ nhánh tài nguyên sinh 23 rong |
+
+Bảng này bỏ qua 00 và 01 theo phạm vi yêu cầu.
+Phòng 09 còn có hai rong đặt sẵn che cần, ngoài số rong ngẫu nhiên.
+
+Mỗi đảo dùng `RandomSeaweed` và `random_props.gd`. Các vị trí được chọn không lặp,
+khớp hình va chạm/tỉ lệ nền, lùi vào 3–4.5 đơn vị, chừa lối vào mở và vị trí bến cũ,
+cách vị trí vật thể có sẵn ít nhất 2.8 đơn vị.
+Mobs 1–3 giữ các vị trí rìa đã duyệt.
+Mỗi rong chọn độc lập `seaweed_1`, `seaweed_2` hoặc `seaweed_3` với xác suất bằng nhau.
+Rong của Empty dùng bộ vị trí riêng ở phần 3.
+
+### Thủy triều của Mobs
+
+Cả sáu phòng kế thừa CameraBounds của `base_medium_room.tscn`.
+Mobs 1–3 dùng hai vùng `Vector2(45, 66)` đối xứng:
+`LeftShallows` → `RightShallows`.
+Mobs 4–6 chạy `LeftShallows` → `UpShallows` → `RightShallows` → `DownShallows`;
+vùng trên/dưới dùng `Vector2(78, 45)`, giữ chiều sâu nước di chuyển 45 đơn vị.
+
+Mỗi vùng dâng 6 giây, giữ cao 6 giây, rút 6 giây, nghỉ 6 giây rồi chuyển vùng.
+Chu kỳ đầy đủ: 48 giây cho Mobs 1–3, 96 giây cho Mobs 4–6.
+Chỉnh thời gian trong `Cycle Timing`, thứ tự trong mảng `Zones`.
+Chỉ một vùng ngập tại một thời điểm.
+
+Mỗi lần nước rút sinh tối đa ba quái; từng lựa chọn độc lập nên có thể trùng loại.
+Mobs 1–3 đặt `elite_chance = 10.0` nhưng chỉ Coral Skeleton có scene elite;
+Starfish/Barrel/Crab ở ba phòng này là thường.
+Mobs 4–6 mỗi phòng chỉ có một loài, mỗi con độc lập có 10% xác suất elite, không có Skeleton.
+
+| Phòng | Nhãn | Nhóm quái |
 | --- | --- | --- |
 | `room_02` | Mobs 1 | Starfish, Coral Skeleton |
 | `room_12` | Mobs 2 | Barrel, Coral Skeleton |
 | `room_20` | Mobs 3 | Crab, Coral Skeleton |
-| `room_22` | Mobs 4 | Barrel (normal or elite) |
-| `room_13` | Mobs 5 | Starfish (normal or elite) |
-| `room_16` | Mobs 6 | Crab (normal or elite) |
+| `room_22` | Mobs 4 | Barrel thường/elite |
+| `room_13` | Mobs 5 | Starfish thường/elite |
+| `room_16` | Mobs 6 | Crab thường/elite |
+
+## 5. Thông số và điều khiển bệ giải đố
+
+### Khoảng cách nền và bệ
+
+Khoảng cách tính theo mép sprite có alpha >= 0.5, thay vì hộp va chạm 4 đơn vị.
+Bệ xoay 90 độ quanh Y, mặt bệ nằm ngang; chiều rộng nhìn thấy theo X là
+`716 × 0.01 × 0.5 = 3.58` đơn vị.
+
+Bố trí tham chiếu ba bệ tạo bốn khoảng hở, mỗi khoảng 4 đơn vị, tổng **16 đơn vị trống**.
+Khoảng giữa mép hai đảo là `3 × 3.58 + 4 × 4 = 26.74` đơn vị.
+Chiều rộng hình nền là `1134 × 0.01 × 0.995455 × 2.5 = 28.22114925`;
+tâm đảo phải lệch `54.96114925` đơn vị. Đường đi, rong và CameraBounds dịch theo đảo.
+Các Quiz thay đổi số bệ nhưng giữ khoảng cách đảo này.
+
+### Phòng 04
+
+`Platform2` cố định tại `Vector3(27.61284825, -0.03991985, -0.44552031)`.
+Bệ di chuyển bắt đầu bên phải, qua tám marker theo chu vi:
+Đông → Đông Nam → Nam → Tây Nam → Tây → Tây Bắc → Bắc → Đông Bắc
+(E → SE → S → SW → W → NW → N → NE). Tâm không phải điểm dừng.
+Bước ngang 7.58, bước dọc 9.78, giữ hở 4 đơn vị giữa sprite bệ.
+Bệ đi qua marker liền kề theo cả hai chiều, không xuyên bệ giữa.
+
+Mỗi bờ có hai `platform_puzzle_lever.tscn`, cùng điều khiển một `MovingPlatform`.
+Cần trên tiến +3 điểm theo chiều kim đồng hồ; cần dưới lùi −2 điểm; quay vòng modulo tám.
+Đòn đánh lúc đang chạy xếp thêm bước có dấu sau hành trình hiện tại; đổi hướng vẫn bám chu vi.
+Không có cần trên bệ. Script cung cấp `route_marker_paths`, `request_route_steps(count)`;
+`PlatformLever.DestinationMode.ADVANCE_ROUTE` dùng `route_step_count` có dấu.
+Chế độ hai đầu và dừng giữa của Quiz 18 vẫn được hỗ trợ.
+Hai khoảng mở hướng vào trong bám Z của bệ cố định và rộng 5.78 đơn vị.
+
+### Phòng 09
+
+`MovingPlatform` dùng `start_at_center = true`, bắt đầu tại X `27.61284825`.
+Đòn đầu sang phải X `35.19284825`; các đòn sau đổi giữa phải và trái X `20.03284825`,
+đi qua giữa không dừng, tốc độ 6 đơn vị/giây.
+Cần `platform_puzzle_lever.tscn` trên bệ là node con của thân di chuyển.
+Cần này và hai cần bờ cùng dùng `TOGGLE`.
+
+Cần trái ở `Vector3(9, 0.21008015, -10)`;
+cần phải ở `Vector3(45.96114925, 0.21008015, -10)`.
+Mỗi cần có một `seaweed_3.tscn` đặt trước 0.9 đơn vị, tỉ lệ 1.25, vẫn phá được.
+Chúng không phụ thuộc sinh rong ngẫu nhiên.
+`MovingPlatform.start_at_center` chỉ đổi vị trí đầu, mặc định false,
+không bật dừng trung gian. Đường đi, khoảng cách nền và CameraBounds giữ nguyên.
+
+### Phòng 18
+
+`objects/quiz_shuttle_platform.tscn` ở vị trí bệ giữa cũ, bỏ hai bệ bên.
+Cần trên bệ dùng HurtBox và `MovingPlatform.receive_damage`.
+Tuyến Trái → Giữa → Phải → Giữa đi qua X `20.03284825`, `27.61284825`, `35.19284825`,
+tốc độ 3 đơn vị/giây. Không thêm cần gọi từ bờ.
+Chế độ hai điểm vẫn là mặc định; scene này bật `center_stop_enabled` và có marker `Center`.
+
+### Phòng 23
+
+Bệ cố định tại `Vector3(27.61284825, -0.03991985, 0.55447969)`.
+`objects/quiz_orbit_platform.tscn` dùng tám điểm như Quiz 04, bắt đầu phía Đông,
+tự chạy theo chiều kim đồng hồ ở 6 đơn vị/giây, không nghỉ tại marker, không đi qua tâm.
+Chỉ có cần trên bệ cố định.
+
+`PlatformLever.DestinationMode.TOGGLE_ROUTE_LOOP` gọi `MovingPlatform.toggle_route_motion()`:
+đi hết cạnh rồi dừng đúng marker đích; đòn sau tiếp tục chạy; đánh lúc chờ dừng thì hủy dừng.
+Tải lại scene đặt lại trạng thái. Chỉ Quiz 23 bật `route_autoplay`;
+Quiz 04 vẫn điều khiển thủ công +3/-2.
+
+### Khoảng mở và vị trí lối nối trên hai đảo
+
+Các phòng 23, 09, 18 dùng `boundary_openings`:
+`Rect2(12.7, -2.33552031, 29.58614925, 5.78)`.
+Lối rộng 5.78 đơn vị theo Z của sprite, tâm `0.55447969`.
+Các mép khác giữ biên người chơi, biên quái kín, khoảng hở đảo–bệ giữ nguyên.
+
+- 04: lối trái, trên tới 11, dưới tới 19 ở đảo trái; lối phải tới Checkpoint 2 ở đảo phải.
+- 09: cả lối dưới tới 01 và phải tới 10 ở đảo phải.
+- 18: chỉ lối trái tới 17, nằm trên đảo trái.
+- 23: lối trái tới 22 ở đảo trái; lối phải tới 24 ở đảo phải.
+
+## 6. Raid, Boss và phần thưởng
+
+### Bốn đợt Raid
+
+| Đợt | Tổng quái | Thường | Elite | Nhóm chọn |
+| --- | --- | --- | --- | --- |
+| 1 | 3 | 3 | 0 | Starfish, Crab, Coral Skeleton |
+| 2 | 4 | 4 | 0 | Starfish, Crab, Coral Skeleton, Barrel |
+| 3 | 4 | 3 | 1 | Bốn loại trên và elite tương ứng |
+| 4 | 5 | 3 | 2 | Bốn loại trên và elite tương ứng |
+
+Loại có thể trùng; số lượng thường/elite là chính xác, không phải tỉ lệ ngẫu nhiên.
+Sinh bị chặn sẽ thử lại, không bỏ quái.
+Sau khi tất cả quái yêu cầu đã sinh và bị hạ, chuyển ngay sang hướng triều tiếp theo,
+không dùng bộ đếm hay chờ nước rút hết.
+`FlatTideController.finish_cycle()` kết thúc triều cũ trước khi chuyển.
+`FlatTideController.externally_advanced` mặc định false ở các phòng Mobs;
+Raid dùng điều khiển từ encounter. Bộ sinh hữu hạn kế thừa bộ sinh triều,
+với `_spawn()` trả kết quả boolean, giữ tương thích nơi gọi cũ.
+
+`BaseRoom.set_exits_locked(true)` đóng biên người chơi ngang lối ra và tắt trigger chuyển scene;
+đường vẫn hiển thị, không tạo rào chắn riêng. Dọn xong đợt 4 đưa nước về LOW và mở cả hai lối.
+Hoàn thành lưu trong `GameManager.story_flags` của lượt chơi; quay lại không đánh lại,
+New Game đặt lại. `RaidEncounter` sinh `raid_reward_chest.tscn` tại
+`Vector3(0, 0.25209618, 0.45244434)`, thưởng 10–20 vàng và bản thiết kế Harpoon.
+Quay lại Raid đã hoàn thành sẽ tạo rương; trạng thái mở/đồ rơi hiện đặt lại như rương thường.
+
+### Trạng thái Boss
+
+`BossEncounter` dùng ID `captain_blubberbeard`, khóa phòng qua `BaseRoom.set_exits_locked()`,
+mở lại ở `fight_finished`. Rương chỉ sinh sau chuỗi chết của trùm, tại vị trí chết;
+không có rương đặt sẵn, rào riêng hay cầu sập.
+Rương đảm bảo 10–20 vàng, Tide Grapple và `Diary of Tide`; đã bỏ chìa khóa/nguyên liệu cũ.
+Trạng thái hạ trùm, mở rương và thưởng chưa nhặt được khôi phục trong cùng lượt chơi.
+Vật phẩm thưởng giữ tham chiếu `MonsterNote`, vật phẩm, số lượng và vị trí,
+để nhật ký chưa nhặt khôi phục đúng thành ghi chép.
+Các tham chiếu phòng/vùng kích hoạt tùy chọn mặc định trống,
+giữ cơ chế khóa cầu riêng của scene thử trùm cũ.
+
+### Tổng hợp sáu rương
+
+| Phòng | Vị trí / thời điểm | Phần thưởng đảm bảo | Bảo vệ đặt sẵn |
+| --- | --- | --- | --- |
+| 04 | Tâm đảo phải, có ngay khi vào | 10–20 vàng + ghi chép Barrel | 2 Elite Barrel |
+| 09 | Tâm đảo trái, có ngay khi vào | 10–20 vàng + bản thiết kế Bow + ghi chép Coral Skeleton | 4 Elite Barrel |
+| 18 | Tâm đảo phải, có ngay khi vào | 10–20 vàng + ghi chép Starfish | 2 Elite Barrel |
+| 23 | Tâm đảo phải, có ngay khi vào | 10–20 vàng + ghi chép Crab | 2 Elite Barrel |
+| 07 | Tâm phòng, sau đợt Raid 4 | 10–20 vàng + bản thiết kế Harpoon | Quái của Raid |
+| 08 | Vị trí trùm chết, sau hoạt ảnh chết | 10–20 vàng + Tide Grapple + nhật ký trùm | Captain Blubberbeard |
+
+Quiz 09 có bốn Elite Barrel quanh rương ở X/Z `(±5, ±5)`, cạnh vuông 10 đơn vị.
+Quiz 04, 18, 23 chỉ giữ TopRight `(5, -5)` và BottomRight `(5, 5)`;
+đã bỏ TopLeft và BottomLeft. Nhóm lấy rương làm tâm, giữ vị trí/độ cao các quái còn lại.
+
+## 7. Biên nền và lịch sử đánh số
+
+### Biên quái
+
+Các mẫu Small, Medium và Large của Coral Valley bật `Enemy Boundary Enabled`
+trong Ground boundaries. Bộ dựng biên tạo `EnemyGroundBoundaries` chỉ từ nền đảo,
+đóng kín cả bốn cửa đường đi và các khoảng mở riêng cho người chơi.
+Thân quái và tia kiểm tra vật cản trước mặt dùng lớp `EnemyBoundary`;
+chuyển động/đòn đánh của người chơi bỏ qua lớp này.
+Biên người chơi giữ quy tắc lối mở. Các phòng ngoài các mẫu Coral Valley mặc định tắt tùy chọn.
+
+### Lịch sử định danh
+
+Quiz một đảo 18 cũ và phòng rương 19 cũ được thay bằng Quiz hai đảo 18.
+Phòng rương và lối chuyển scene của nó đã bỏ.
+Các phòng 20–25 cũ chuyển thành 19–24, lần lượt NPC, Mobs 3, Empty, Mobs 4, Quiz hai đảo, Farm.
+Scene được giữ vẫn giữ nội dung bố trí và UID; node gốc khớp tên file.
+Các đích đường đi và fixture phòng Silas dùng ID mới.
+Bảng lối nối và sơ đồ phía trên mô tả kết nối hiện tại.
