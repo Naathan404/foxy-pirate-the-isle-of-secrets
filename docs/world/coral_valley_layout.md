@@ -196,6 +196,11 @@ The two Materials rooms use the Small room template, with spawn positions pulled
 - The left Materials room (`room_10`) spawns only orange, pink and turquoise coral.
 - The right Materials room (`room_14`) spawns only leaning, short and tall coconut palms.
 
+"Per visit" below now means per world cycle: random spawns are seeded from the
+cycle, so a room keeps the same layout (and remembers killed enemies and broken props)
+until the next campfire rest or death reshuffles it. See
+[room state](../systems/room_state.md).
+
 Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
 
 Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_20`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.

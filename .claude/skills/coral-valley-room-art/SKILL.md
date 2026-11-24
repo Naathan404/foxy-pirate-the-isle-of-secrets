@@ -139,7 +139,12 @@ Chép từ room_00 sang phòng đích, chỉ trong scene phòng; không sửa `b
 - **Dòng `[editable path]`:** thêm cho mọi instance có override trên node con (`RoomAtmosphere`,
   `Campfire`, …). Override phải có `parent_id_path` và `unique_id` giống room_00.
 - **Phòng có `RandomProps`** (sinh prop ngẫu nhiên lúc chạy): thay bằng prop đặt tay dưới
-  `Scenery`. Prop ngẫu nhiên không giữ được hành lang đường mòn, cụm và ngân sách.
+  `Scenery`. Prop ngẫu nhiên không giữ được hành lang đường mòn, cụm và ngân sách. Muốn trang
+  trí đổi theo mỗi lần nghỉ/chết thì dùng `PropSlot` + `PropPool` theo AD quy tắc 32–34, thay
+  vì `RandomProps`. Không đụng `RandomEnemies`/`RandomEmptyType`: đó là gameplay.
+- **Không đổi tên hoặc xóa** node `Campfire`, rương và node cha của chúng: save, điểm hồi
+  sinh và trạng thái phòng trỏ tới đường dẫn node
+  ([docs/systems/room_state.md](../../../docs/systems/room_state.md)). Dời vị trí thì được.
 
 Sửa file `.tscn` bằng văn bản là được. Nếu người dùng đang mở scene trong editor, dặn họ
 "Reload Saved Scene" trước khi sửa tiếp, nếu không editor có thể ghi đè bằng bản cũ.
@@ -174,6 +179,9 @@ godot --path . --resolution 1280x720 --script .claude/skills/coral-valley-room-a
 - **`measure_gpu`:**
   - Luôn đo cùng lượt với room_00, vì GPU tích hợp dao động theo nhiệt.
   - Phòng mới không nên vượt room_00 quá khoảng 0,5 ms.
+
+Phòng có lửa trại, hoặc có thay đổi rương/prop phá được: chạy thêm
+`./test/run_save_load_tests.ps1 -Godot <đường dẫn Godot>` (spawn ở mọi lửa trại, trạng thái phòng).
 
 Godot import có thể tự sửa file `.import` của asset dùng chung (thường gặp là `shell.png.import`).
 Trả lại bằng `git checkout --` những thay đổi không thuộc phạm vi việc đang làm.

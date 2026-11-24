@@ -109,6 +109,17 @@ func receive_damage(damage: DamageContext) -> float:
 	return applied
 
 
+## Restore the opened appearance without replaying rewards or camera effects. Used when a
+## room is rebuilt after the chest was opened earlier in the run.
+func restore_opened() -> void:
+	_destroyed = true
+	_health.set_current_hp(0.0)
+	_hurtbox.enabled = false
+	_hurtbox.set_deferred("monitorable", false)
+	if visual_root is Sprite3D and depleted_texture != null:
+		(visual_root as Sprite3D).texture = depleted_texture
+
+
 func _play_wobble(angle_degrees: float) -> void:
 	if not is_instance_valid(visual_root):
 		return

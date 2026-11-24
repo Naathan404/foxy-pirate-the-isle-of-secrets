@@ -7,8 +7,10 @@ extends RefCounted
 ## removed item cannot crash a load.
 
 const FORMAT_ID := "foxy_pirate_save"
-## Bump when the layout changes, and convert older payloads before `validate()`.
-const VERSION := 1
+## Bump when the layout changes, and convert older payloads in `migrate()`.
+## 2: world.rooms (cycle seed and permanent room changes such as opened chests).
+const VERSION := 2
+const VERSION_WITHOUT_ROOMS := 1
 ## JSON numbers are doubles; larger integers would silently lose precision.
 const MAX_JSON_INTEGER := 9007199254740991
 const VECTOR_COMPONENTS := 3
@@ -31,6 +33,20 @@ static func capture(
 		"merchant": merchant.get_save_data(),
 		"notes": notes.get_save_data(),
 	}
+
+
+## Brings an older valid layout up to VERSION in place; unknown data is left for
+## `validate()` to reject.
+static func migrate(payload: Dictionary) -> void:
+	var world: Variant = payload.get("world")
+	if (
+		_is_integer(payload.get("version"), VERSION_WITHOUT_ROOMS, VERSION_WITHOUT_ROOMS)
+		and world is Dictionary
+		and not world.has("rooms")
+	):
+		# Rooms were rebuilt fresh on every visit before version 2, so nothing was kept.
+		world["rooms"] = {"seed": 0, "permanent": {}}
+		payload["version"] = VERSION
 
 
 static func is_unsupported_version(payload: Dictionary) -> bool:
@@ -88,6 +104,8 @@ static func restore_world(
 		if ResourceLoader.exists(String(scene_path), "PackedScene"):
 			visited.append(String(scene_path))
 	session.map_progress.restore(visited, String(world.current_room))
+	# The save was written right after resting here, so this is also the respawn point.
+	session.room_states.restore_save_data(world.rooms, payload.location)
 	for flag: Variant in world.story_flags:
 		session.set_story_flag(StringName(String(flag)))
 	for encounter_id: String in world.boss_encounters:
@@ -192,6 +210,7 @@ static func _capture_world(session: Node) -> Dictionary:
 		"current_room": session.map_progress.current_room,
 		"story_flags": flags,
 		"boss_encounters": encounters,
+		"rooms": session.room_states.get_save_data(),
 	}
 
 
@@ -413,6 +432,20 @@ static func _validate_world(value: Variant) -> String:
 		or not world.get("boss_encounters") is Dictionary
 	):
 		return "World progress is invalid."
+	var rooms: Variant = world.get("rooms")
+	if (
+		not rooms is Dictionary
+		or not _is_integer(rooms.get("seed"), 0, RoomStateRegistry.MAX_SEED)
+		or not rooms.get("permanent") is Dictionary
+	):
+		return "Room progress is invalid."
+	for scene_path: Variant in rooms.permanent:
+		if (
+			not _is_text(scene_path)
+			or not String(scene_path).begins_with("res://")
+			or not _is_text_array(rooms.permanent[scene_path])
+		):
+			return "Room progress is invalid."
 	for encounter: Variant in world.boss_encounters.values():
 		if (
 			not encounter is Dictionary

@@ -15,6 +15,9 @@ const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 const SAVE_SLOT_PATH := "user://saves/slot_1.json"
 
 @export_file("*.tscn") var main_menu_scene: String = "res://ui/main_menu/main_menu.tscn"
+## Where Foxy respawns before resting at any campfire: its first campfire.
+@export_file("*.tscn")
+var fallback_rest_scene: String = "res://world/biomes/hub/map/castaway_cove.tscn"
 @export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.4
 @export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.45
 
@@ -32,9 +35,13 @@ var story_flags: Dictionary[StringName, bool] = {}
 var debug_all_charms_granted: bool = false
 ## The single save slot. Tests point its path at their own directory.
 var save_slot: SaveGameFile = SaveGameFile.new(SAVE_SLOT_PATH)
+## Visited-room changes and the campfire of the latest rest; see RoomStateRegistry.
+var room_states: RoomStateRegistry = RoomStateRegistry.new()
 var _transition_pending: bool = false
 ## Validated save payload consumed by the next scene transition (Continue).
 var _pending_load: Dictionary = {}
+## Campfire the next transition places Foxy at after a death (empty path: first one).
+var _pending_respawn_point: Variant = null
 var _transition_overlay: CanvasLayer
 var _fade_rect: ColorRect
 
@@ -140,10 +147,7 @@ func save_game(rest_point: CampfireRestPoint) -> Error:
 		return ERR_UNAVAILABLE
 	if room.scene_file_path.is_empty():
 		return ERR_UNCONFIGURED
-	var location := {
-		"scene": room.scene_file_path,
-		"rest_point": String(room.get_path_to(rest_point)),
-	}
+	var location := rest_point.get_location()
 	var payload := GameSaveSnapshot.capture(
 		player, location, self, _get_merchant_progress(), _get_note_progress()
 	)
@@ -219,24 +223,36 @@ func return_to_main_menu() -> bool:
 	return change_scene(main_menu_scene)
 
 
-## Forgets the in-memory run (wallet, explored rooms, story flags, boss encounters, debug
-## grants). Saved files are untouched.
+## Forgets the in-memory run (wallet, explored rooms, room changes, latest rest, story
+## flags, boss encounters, debug grants). Saved files are untouched.
 func reset_session() -> void:
 	gold_wallet = GoldWallet.new()
 	map_progress = MapProgress.new()
+	room_states = RoomStateRegistry.new()
 	story_flags.clear()
 	boss_encounters.clear()
 	debug_all_charms_granted = false
 
 
-func reload_current_scene() -> void:
+## Death works like resting: the rooms start a new cycle and Foxy comes back beside the
+## campfire of the latest rest (the first campfire before any rest) with full HP and SP,
+## keeping all progress. Returns whether the transition was accepted.
+func respawn_at_last_rest() -> bool:
 	if _transition_pending:
-		return
-	var scene: Node = get_tree().current_scene
-	if not is_instance_valid(scene) or scene.scene_file_path.is_empty():
-		push_warning("GameManager: không có scene đã lưu để reload.")
-		return
-	_request_scene_transition(scene.scene_file_path, true)
+		return false
+	var location := room_states.rest_location
+	var scene_path := String(location.get("scene", ""))
+	var rest_point := NodePath(String(location.get("rest_point", "")))
+	if not ResourceLoader.exists(scene_path, "PackedScene"):
+		scene_path = fallback_rest_scene
+		rest_point = NodePath()
+	if not ResourceLoader.exists(scene_path, "PackedScene"):
+		push_error("GameManager: không có scene lửa trại để hồi sinh.")
+		return false
+	room_states.begin_new_cycle(location)
+	_pending_respawn_point = rest_point
+	_request_scene_transition(scene_path, true)
+	return true
 
 
 ## Returns whether the request was accepted; completion is signalled after fade-in.
@@ -247,19 +263,22 @@ func change_scene(scene_path: String, destination_trigger_id: StringName = &"") 
 	return true
 
 
+## `respawn` restores progress but starts the new Player at full health and stamina.
 func _request_scene_transition(
-	scene_path: String, reload_scene: bool, destination_trigger_id: StringName = &""
+	scene_path: String, respawn: bool, destination_trigger_id: StringName = &""
 ) -> void:
 	_transition_pending = true
 	# Leave the current physics/animation callback before pausing or freeing its scene.
-	_transition_scene.call_deferred(scene_path, reload_scene, destination_trigger_id)
+	_transition_scene.call_deferred(scene_path, respawn, destination_trigger_id)
 
 
 func _transition_scene(
-	scene_path: String, reload_scene: bool, destination_trigger_id: StringName
+	scene_path: String, respawn: bool, destination_trigger_id: StringName
 ) -> void:
 	var load_payload := _pending_load
 	_pending_load = {}
+	var respawn_point: Variant = _pending_respawn_point
+	_pending_respawn_point = null
 	if is_instance_valid(player) and is_instance_valid(player.inventory_ui):
 		player.inventory_ui.close_inventory(true)
 	exit_inventory()
@@ -305,7 +324,9 @@ func _transition_scene(
 		if not load_payload.is_empty():
 			error = _arrive_at_saved_rest_point(load_payload)
 		elif player_state != null and is_instance_valid(player):
-			player_state.restore(player, not reload_scene)
+			player_state.restore(player, not respawn)
+		if respawn_point != null:
+			_place_player_at_rest_point(_find_rest_point(get_tree().current_scene, respawn_point))
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
 		# _ready/process_frame do not mean rendering has finished. Keep the first
@@ -361,10 +382,29 @@ func _arrive_at_saved_rest_point(payload: Dictionary) -> Error:
 	if rest_point == null or not is_instance_valid(player) or not scene.is_ancestor_of(player):
 		return ERR_DOES_NOT_EXIST
 	GameSaveSnapshot.restore_player(payload, player)
+	_place_player_at_rest_point(rest_point)
+	return OK
+
+
+## An empty path or a campfire that no longer exists falls back to the room's first one.
+func _find_rest_point(scene: Node, path: NodePath) -> CampfireRestPoint:
+	if not path.is_empty():
+		var found := scene.get_node_or_null(path) as CampfireRestPoint
+		if found != null:
+			return found
+	for node: Node in scene.find_children("*", "", true, false):
+		if node is CampfireRestPoint:
+			return node as CampfireRestPoint
+	return null
+
+
+func _place_player_at_rest_point(rest_point: CampfireRestPoint) -> void:
+	if rest_point == null or not is_instance_valid(player):
+		push_warning("GameManager: không tìm thấy lửa trại để đặt Player.")
+		return
 	player.global_position = rest_point.get_spawn_position()
 	player.velocity = Vector3.ZERO
 	player.reset_physics_interpolation()
-	return OK
 
 
 func _contains_player(node: Node) -> bool:

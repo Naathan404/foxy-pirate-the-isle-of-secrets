@@ -28,7 +28,7 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Hệ thống · `systems/`
 
-[AudioManager](systems/audio_manager.md) · [Save/Load](systems/save_system.md) · [Menu chính và tạm dừng](systems/main_pause_menu.md) · [Bản đồ thế giới](systems/world_map.md)
+[AudioManager](systems/audio_manager.md) · [Save/Load](systems/save_system.md) · [Trạng thái phòng và hồi sinh](systems/room_state.md) · [Menu chính và tạm dừng](systems/main_pause_menu.md) · [Bản đồ thế giới](systems/world_map.md)
 
 ## Hình ảnh · `art/`
 

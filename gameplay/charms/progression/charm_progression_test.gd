@@ -42,7 +42,6 @@ func _run_tests() -> void:
 	await process_frame
 
 	_test_safe_location_sources(manager)
-	_test_checkpoint_safe_location(manager)
 	_test_socket_economy(manager)
 	await _test_runtime_debug_inspector(manager, registry)
 	_test_acquisition(registry)
@@ -74,18 +73,6 @@ func _test_safe_location_sources(manager: CharmSocketManager) -> void:
 	manager.enter_safe_location(transient)
 	transient.free()
 	_assert_false(manager.can_change_loadout(), "freed safe source removes permission")
-
-
-func _test_checkpoint_safe_location(manager: CharmSocketManager) -> void:
-	var player := Player.new()
-	player.charm_socket_manager = manager
-	var checkpoint := Checkpoint.new()
-	checkpoint.call("_on_body_entered", player)
-	_assert_true(manager.can_change_loadout(), "checkpoint entry enables loadout")
-	checkpoint.call("_on_body_exited", player)
-	_assert_false(manager.can_change_loadout(), "checkpoint exit disables loadout")
-	checkpoint.free()
-	player.free()
 
 
 func _test_socket_economy(manager: CharmSocketManager) -> void:

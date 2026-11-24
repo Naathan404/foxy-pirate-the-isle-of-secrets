@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Runs the Save/Load test suites headless and fails like the CI Godot job does.
+Runs the Save/Load and room-state test suites headless and fails like the CI Godot job does.
 
 .DESCRIPTION
 A suite fails when Godot exits non-zero, prints "SCRIPT ERROR:" or "ERROR:" (except the
@@ -25,7 +25,11 @@ if (-not $Godot -or -not (Test-Path $Godot)) {
     throw 'Pass -Godot or set $env:GODOT to the Godot 4.7.2 console executable.'
 }
 $project = Split-Path -Parent $PSScriptRoot
-$tests = @('res://test/save_load_flow_test.gd', 'res://test/save_load_edge_test.gd')
+$tests = @(
+    'res://test/save_load_flow_test.gd',
+    'res://test/save_load_edge_test.gd',
+    'res://test/room_state_test.gd'
+)
 $errorPattern = 'SCRIPT ERROR:|ERROR:'
 $ignoredError = '^ERROR: Plugin is not attached to debugger\.$'
 $logDirectory = Join-Path ([System.IO.Path]::GetTempPath()) 'foxy_save_load_tests'

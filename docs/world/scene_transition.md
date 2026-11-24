@@ -4,7 +4,8 @@ Gọi `GameManager.change_scene("res://world/.../map.tscn")` để chuyển map.
 Truyền thêm ID cổng đích nếu cần chọn chỗ xuất hiện:
 `GameManager.change_scene("res://world/.../map.tscn", &"from_hub")`.
 Hàm trả `true` khi nhận yêu cầu, `false` nếu đang chuyển hoặc đường dẫn không phải scene.
-`GameManager.reload_current_scene()` dùng cùng transition; hồi sinh đã gọi hàm này.
+`GameManager.respawn_at_last_rest()` dùng cùng transition để hồi sinh cạnh lửa trại nghỉ gần
+nhất; xem [Trạng thái phòng và hồi sinh](../systems/room_state.md).
 
 Luồng: dừng gameplay, đóng inventory và xóa input → fade out đen → đổi scene.
 Tài nguyên phòng đích được tải bằng `ResourceLoader.load_threaded_request` trong lúc fade out.
@@ -52,7 +53,7 @@ Ví dụ nối hai chiều:
 Mặc định marker cách tâm cổng 2 đơn vị theo trục Z cục bộ; điều chỉnh theo lối đi.
 Player được xóa vận tốc khi đặt vào marker. Để trống `Destination Trigger Id` sẽ giữ
 spawn mặc định của map. ID không tồn tại hoặc bị trùng sẽ báo warning và giữ spawn
-mặc định, transition vẫn hoàn tất. Reload/hồi sinh không dùng lại ID cổng vừa đi qua.
+mặc định, transition vẫn hoàn tất. Hồi sinh không dùng ID cổng mà đặt Player tại `Spawn` của lửa trại.
 
 Trigger chỉ dò layer PlayerBody, bỏ qua enemy, vật thể và Player đã chết.
 GameManager chặn yêu cầu chuyển trùng. Đặt `ExitPosition` ở map đích ngoài vùng

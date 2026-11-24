@@ -193,6 +193,19 @@ Phòng đã áp dụng: room_00 `ripple`, room_01 `ripple`.
 Một pattern mới phải nêu: vật chủ đạo và số lượng, cách nhóm, khoảng cách tới đường mòn, chỉnh môi
 trường (trong khoảng an toàn), loại phòng phù hợp. Thêm vào mục này trước khi dựng phòng.
 
+### Biến thể theo chu kỳ (PropSlot)
+
+Mỗi lần nghỉ hoặc chết, prop đặt bằng `PropSlot` được bốc và dịch lại
+([Trạng thái phòng](../systems/room_state.md)). Bố cục tay vẫn là gốc; slot chỉ thêm biến thể.
+
+32. Chỉ dùng PropSlot cho trang trí nhỏ và vật phá được nhỏ. Cọ, tảng đá lớn và mọi vật tạo
+    nên đường đi giữ là prop cố định.
+33. Một `PropPool` chỉ chứa prop cùng cỡ, cùng kiểu va chạm (quy tắc 11–12) và cùng pattern
+    phòng, với điểm ngân sách (quy tắc 20) gần nhau. Tính ngân sách theo prop đắt nhất trong pool.
+34. Cả vòng `jitter_radius_meters` của slot phải nằm ngoài hành lang đường mòn, sân lửa trại,
+    cửa ra vào và mép nước (quy tắc 14). Đặt slot cạnh nhau bằng pool khác nhau để giữ
+    quy tắc 10.
+
 ## 4. Bảng màu
 
 ### Cát

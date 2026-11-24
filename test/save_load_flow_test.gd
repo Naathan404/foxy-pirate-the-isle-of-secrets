@@ -43,7 +43,7 @@ func _run() -> void:
 	_check(not FileAccess.file_exists(sandbox.slot_path), "entering a safe room never saves")
 	var rest_point := _hub_rest_point()
 	_make_progress()
-	await _interact(rest_point)
+	_check(await _interact(rest_point), "resting fades the screen to black first")
 	var player: Player = sandbox.manager.player
 	_check(rest_point.is_menu_open() and paused, "interact opens the rest menu and pauses")
 	_check(sandbox.manager.state == sandbox.manager.State.REST_MENU, "rest menu owns the pause")
@@ -228,13 +228,16 @@ func _continue_from_menu(expected: Dictionary, label: String) -> void:
 	_check(not paused and sandbox.manager.state == sandbox.manager.State.PLAYING, label + ": play")
 
 
-func _interact(rest_point: CampfireRestPoint) -> void:
+## Returns whether the screen was fading to black before the menu opened.
+func _interact(rest_point: CampfireRestPoint) -> bool:
 	var player: Player = sandbox.manager.player
 	player.global_position = rest_point.get_spawn_position()
 	player.velocity = Vector3.ZERO
 	await sandbox.frames(4)
 	await sandbox.press_action(SANDBOX.ACTION_INTERACT)
-	await sandbox.frames(1)
+	var faded: bool = (rest_point.get_node("RestMenu") as RestMenu).is_fading()
+	await sandbox.wait_rest_menu(rest_point)
+	return faded
 
 
 func _hub_rest_point() -> CampfireRestPoint:
