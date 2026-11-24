@@ -1,11 +1,10 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/empty_combat_after_checkpoint.tscn" id="empty_combat"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/empty_resources_after_checkpoint.tscn" id="empty_resources"]
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 
 
 [sub_resource type="Environment" id="Environment_void"]
@@ -124,11 +123,12 @@ shape = SubResource("BoxShape3D_left_join")
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259 parent_id_path=PackedInt32Array(192273160, 219025603)]
 shape = SubResource("BoxShape3D_left_trigger")
 
-[node name="RandomSeaweed" type="Node3D" parent="."]
+[node name="RandomEmptyType" type="Node3D" parent="."]
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-7.304, 0, -9.449, -5.511, 0, -11.58, -3.354, 0, -11.863, -0.909, 0, -11.589, 0.984, 0, -10.732, 2.665, 0, -11.939, 4.634, 0, -11.408, 6.917, 0, -9.568, 8.187, 0, -7.989, 9.826, 0, -5.455, 10.159, 0, 7.215, 8.537, 0, 8.99, 8.62, 0, 11.142, 6.618, 0, 11.733, 3.79, 0, 13.037, 1.922, 0, 12.149, -0.434, 0, 12.926, -3.763, 0, 12.37, -6.013, 0, 12.788, -6.764, 0, 10.843, -8.2, 0, 9.442, -10.286, 0, 8.576, -9.464, 0, 6.694, -10.623, 0, 4.941)
-fixed_spawn_count = 15
-prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+editor_description = "Choose exactly one layout per visit: 50% combat/obstacles, 50% resources."
+spawn_positions = PackedVector3Array(0, 0, 0)
+fixed_spawn_count = 1
+prop_scenes = Array[PackedScene]([ExtResource("empty_combat"), ExtResource("empty_resources")])
 
 [editable path="Environment/BaseGround"]
 [editable path="Exits/DownPath"]

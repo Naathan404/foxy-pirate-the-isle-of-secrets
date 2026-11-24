@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="movement"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="texture"]
+
+[sub_resource type="BoxShape3D" id="PlatformShape"]
+size = Vector3(4, 0.5, 4)
+
+[node name="QuizOrbitPlatform" type="Node3D"]
+script = ExtResource("movement")
+move_speed = 6.0
+route_marker_paths = Array[NodePath]([NodePath("Route/East"), NodePath("Route/SouthEast"), NodePath("Route/South"), NodePath("Route/SouthWest"), NodePath("Route/West"), NodePath("Route/NorthWest"), NodePath("Route/North"), NodePath("Route/NorthEast")])
+
+[node name="Platform" type="AnimatableBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 7.58, 0, 0)
+
+[node name="Sprite3D" type="Sprite3D" parent="Platform"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("texture")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform"]
+shape = SubResource("PlatformShape")
+
+[node name="Route" type="Node3D" parent="."]
+
+[node name="East" type="Marker3D" parent="Route"]
+position = Vector3(7.58, 0, 0)
+
+[node name="SouthEast" type="Marker3D" parent="Route"]
+position = Vector3(7.58, 0, 9.78)
+
+[node name="South" type="Marker3D" parent="Route"]
+position = Vector3(0, 0, 9.78)
+
+[node name="SouthWest" type="Marker3D" parent="Route"]
+position = Vector3(-7.58, 0, 9.78)
+
+[node name="West" type="Marker3D" parent="Route"]
+position = Vector3(-7.58, 0, 0)
+
+[node name="NorthWest" type="Marker3D" parent="Route"]
+position = Vector3(-7.58, 0, -9.78)
+
+[node name="North" type="Marker3D" parent="Route"]
+position = Vector3(0, 0, -9.78)
+
+[node name="NorthEast" type="Marker3D" parent="Route"]
+position = Vector3(7.58, 0, -9.78)
