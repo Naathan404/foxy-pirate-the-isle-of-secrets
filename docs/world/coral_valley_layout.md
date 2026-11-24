@@ -218,30 +218,36 @@ All rooms except Materials and Empty rooms spawn seaweed around their island rim
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
 Empty rooms `01`, `03`, `06`, `11`, `15`, `17` and `21` choose exactly one
-population layout per visit, with equal 50% probabilities. `RandomEmptyType`
-uses `random_props.gd` to instantiate one of two PackedScenes at the origin;
-only the selected branch's populations exist. The previous simultaneous groups,
-fixed enemies, Scenery and old seaweed configuration are removed. Floor artwork,
-water/atmosphere, camera and exit wiring remain unchanged.
+population layout per visit: 10% resources, 20% combat and 70% scenery only.
+`RandomEmptyType` uses `random_props.gd` with ten equally likely scene slots:
+one resources slot, two combat slots and seven scenery slots. It instantiates
+exactly one selected PackedScene at the origin; only that branch's populations
+exist. Floor artwork, water/atmosphere, camera and exit wiring remain unchanged.
 
-| Empty layout | Enemies | Before Checkpoint 2 | After Checkpoint 2 |
-| --- | --- | --- | --- |
-| Combat / obstacles | Exactly 4, each 10% elite | 5–7 stone/wood props total | 5–7 shell/wood props total |
-| Resources only | None | 5–7 coconut palms total + 23 seaweed | 5–7 coral props total + 23 seaweed |
+| Empty layout | Chance | Enemies | Before Checkpoint 2 | After Checkpoint 2 |
+| --- | --- | --- | --- | --- |
+| Resources only | 10% | None | 5–7 coconut palms total + 23 seaweed | 5–7 coral props total + 23 seaweed |
+| Combat / obstacles | 20% | Exactly 4, each 10% elite | 5–7 stone/wood props total | 5–7 shell/wood props total |
+| Scenery only | 70% | None | 5–7 coral/stone/wood props total | 5–7 coral/shell/wood props total |
 
 Before Checkpoint 2 means rooms `01`, `03`, `11`, `17`; after it means `06`,
 `15`, `21`. Combat picks Starfish, Crab, Coral Skeleton and Barrel equally;
 types may repeat. Each type contributes nine normal slots and one elite slot
 to the weighted pool, giving every enemy an independent 10% elite probability.
 Resource-only layouts use three palm or coral variants with equal probability.
+Scenery-only layouts contain no enemies, coconut palms or seaweed. Their five
+equally likely prop variants are orange, pink and turquoise coral, wood log,
+and stone before Checkpoint 2 or shell after it. The 5–7 count is the total
+across the whole scenery pool; a visit does not guarantee every variant.
 Seaweed count is rounded from the Small-room baseline of 15 × 1.5 = 22.5 to 23,
 selected without replacement from 31 candidates on the actual ground polygon,
 inset 2.5 units with gaps at the four approaches. Resource plants use a separate
 interior candidate set; combat enemies and obstacles also have separate sets.
 
-The four reusable layout scenes are `objects/empty_combat_before_checkpoint.tscn`,
-`empty_combat_after_checkpoint.tscn`, `empty_resources_before_checkpoint.tscn`
-and `empty_resources_after_checkpoint.tscn`. All selection and population groups
+The six reusable layout scenes are `objects/empty_combat_before_checkpoint.tscn`,
+`empty_combat_after_checkpoint.tscn`, `empty_resources_before_checkpoint.tscn`,
+`empty_resources_after_checkpoint.tscn`, `empty_scenery_before_checkpoint.tscn`
+and `empty_scenery_after_checkpoint.tscn`. All selection and population groups
 reuse `random_props.gd`; no GDScript changes are required. Counts refer to
 objects, not material quantities dropped. Materials and Mobs keep their own pools.
 

@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="coral_orange"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="coral_pink"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="coral_turquoise"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="shell"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="wood_log"]
+
+[node name="EmptySceneryAfter" type="Node3D"]
+
+[node name="RandomScenery" type="Node3D" parent="."]
+script = ExtResource("random_props")
+editor_description = "5-7 coral/shell/wood props total; no enemies, palms or seaweed."
+spawn_positions = PackedVector3Array(-8, 0.21008015, -8, 0, 0.21008015, -10, 8, 0.21008015, -8, -9, 0.21008015, 0, 9, 0.21008015, 0, -8, 0.21008015, 8, 0, 0.21008015, 10, 8, 0.21008015, 8)
+min_spawn_count = 5
+max_spawn_count = 7
+prop_scenes = Array[PackedScene]([ExtResource("coral_orange"), ExtResource("coral_pink"), ExtResource("coral_turquoise"), ExtResource("shell"), ExtResource("wood_log")])
