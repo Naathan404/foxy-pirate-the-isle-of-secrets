@@ -1,8 +1,49 @@
 [gd_scene format=3 uid="uid://omebdi2g2vcg"]
 
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_xrbjm"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="2_platform"]
+
+[sub_resource type="BoxShape3D" id="PlatformShape"]
+size = Vector3(4, 0.5, 4)
 
 [node name="QuizRoom" unique_id=525086743 instance=ExtResource("1_xrbjm")]
+boundary_openings = Array[Rect2]([Rect2(12.7, -2.33552031, 29.58614925, 5.78)])
+
+[node name="Platform" type="AnimatableBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 20.03284825, -0.03991985, 0.55447969)
+editor_description = "Platform 1 of 3; yaw 90 degrees. Four 4-unit visual gaps between the islands and platforms total 16 empty units."
+
+[node name="Sprite3D" type="Sprite3D" parent="Platform"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("2_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform"]
+shape = SubResource("PlatformShape")
+
+[node name="Platform2" type="AnimatableBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 27.61284825, -0.03991985, 0.55447969)
+editor_description = "Platform 2 of 3; yaw 90 degrees. Four 4-unit visual gaps between the islands and platforms total 16 empty units."
+
+[node name="Sprite3D" type="Sprite3D" parent="Platform2"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("2_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform2"]
+shape = SubResource("PlatformShape")
+
+[node name="Platform3" type="AnimatableBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 35.19284825, -0.03991985, 0.55447969)
+editor_description = "Platform 3 of 3; yaw 90 degrees. Four 4-unit visual gaps between the islands and platforms total 16 empty units."
+
+[node name="Sprite3D" type="Sprite3D" parent="Platform3"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("2_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform3"]
+shape = SubResource("PlatformShape")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

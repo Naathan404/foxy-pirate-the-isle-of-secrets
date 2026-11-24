@@ -1,7 +1,9 @@
 class_name SilasProgressStore
 extends Node
 
-## Narrow persistence for the merchant while the project has no game-wide save system.
+## Merchant progress. Its own file keeps the latest state between launches; the game save
+## slot is the authority on New Game (reset) and Continue (restore), so a loaded game never
+## keeps a purchase made after that save.
 const DEFAULT_SAVE_PATH := "user://silas_progress.save"
 const SAVE_VERSION := 1
 
@@ -59,6 +61,22 @@ func mark_bow_purchased() -> bool:
 	return save_progress()
 
 
+func get_save_data() -> Dictionary:
+	return {"met_silas": _met_silas, "bow_purchased": _bow_purchased}
+
+
+## Expects data already checked by GameSaveSnapshot. Stock is rerolled on the next visit.
+func apply_save_data(saved: Dictionary) -> bool:
+	_met_silas = bool(saved.get("met_silas", false))
+	_bow_purchased = bool(saved.get("bow_purchased", false))
+	_clear_shop_stock()
+	return save_progress()
+
+
+func reset_progress() -> bool:
+	return apply_save_data({})
+
+
 func load_progress() -> bool:
 	_met_silas = false
 	_bow_purchased = false
@@ -91,3 +109,8 @@ func save_progress() -> bool:
 		false
 	)
 	return true
+
+
+func _clear_shop_stock() -> void:
+	_shop_stock = null
+	_stock_source = null

@@ -1,4 +1,5 @@
 @tool
+class_name BaseRoom
 extends Node3D
 
 ## Configure the four paths and choose destination exits from this room's Inspector.
@@ -24,7 +25,8 @@ const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 
 @export_group("Safe room")
 ## Charms can be changed anywhere in this room (the hub, campfire rests). Checkpoints still
-## add their own safe area in rooms without this flag.
+## add their own safe area in rooms without this flag. A campfire in this room can save the
+## game only while this flag is on.
 @export var safe_room: bool = false
 
 @export_group("Ground boundaries")
@@ -100,6 +102,8 @@ const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 		left_destination_trigger_id = value
 		_queue_refresh()
 
+var _exits_locked := false
+
 
 func _ready() -> void:
 	# Arrival placement can run as soon as scene_changed fires. Set trigger IDs
@@ -122,6 +126,14 @@ func _physics_process(_delta: float) -> void:
 		return
 	if to_local(active_player.global_position).y < void_height:
 		manager.reload_current_scene()
+
+
+## Close the island's player boundary and disable transitions without hiding paths.
+func set_exits_locked(locked: bool) -> void:
+	if _exits_locked == locked:
+		return
+	_exits_locked = locked
+	_queue_refresh()
 
 
 ## Foxy is a child of the room, so it has registered with GameManager before the room is
@@ -220,7 +232,7 @@ func _rebuild_ground_boundaries() -> void:
 	if not boundary_enabled:
 		return
 	for entry in [["UpPath", UP], ["RightPath", RIGHT], ["DownPath", DOWN], ["LeftPath", LEFT]]:
-		if open_exits & entry[1]:
+		if not _exits_locked and (open_exits & entry[1]):
 			_collect_floors(get_node_or_null("Exits/%s/StaticBody3D" % entry[0]), floors)
 	_create_ground_boundaries(
 		PLAYER_BOUNDARIES_NAME, CombatLayers.PLAYER_BOUNDARY, floors, boundary_openings
@@ -229,10 +241,7 @@ func _rebuild_ground_boundaries() -> void:
 
 # //NLVP sửa: Dùng chung cách dựng vách cho người chơi và quái.
 func _create_ground_boundaries(
-	boundary_name: StringName,
-	layer: int,
-	floors: Array[Dictionary],
-	openings: Array[Rect2]
+	boundary_name: StringName, layer: int, floors: Array[Dictionary], openings: Array[Rect2]
 ) -> void:
 	var walls := StaticBody3D.new()
 	walls.name = boundary_name
@@ -313,7 +322,13 @@ func _add_floor_edge(
 	var outward := Vector2(edge.y, -edge.x).normalized()
 	for i in range(cuts.size() - 1):
 		_add_boundary(
-			walls, floors, start + edge * cuts[i], start + edge * cuts[i + 1], outward, top, openings
+			walls,
+			floors,
+			start + edge * cuts[i],
+			start + edge * cuts[i + 1],
+			outward,
+			top,
+			openings
 		)
 
 
@@ -384,11 +399,12 @@ func _apply_exit(
 	trigger.set("trigger_id", local_id)
 	trigger.set("destination_scene", destination_scene)
 	trigger.set("destination_trigger_id", destination_id)
-	trigger.set("enabled", is_open)
-	trigger.monitoring = is_open
+	var can_transition := is_open and not _exits_locked
+	trigger.set("enabled", can_transition)
+	trigger.monitoring = can_transition
 	var shape := trigger.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if shape != null:
-		shape.disabled = not is_open
+		shape.disabled = not can_transition
 
 
 func _get_configuration_warnings() -> PackedStringArray:

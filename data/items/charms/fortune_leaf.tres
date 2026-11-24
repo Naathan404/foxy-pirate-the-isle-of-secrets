@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="BaseItem" format=3]
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://h6jaifkfs1yl"]
 
-[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/charms/fortune_leaf.png" id="2"]
-[ext_resource type="Resource" path="res://gameplay/charms/charm_data/fortune_leaf.tres" id="3"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cbrjowlg5x4kk" path="res://assets/sprites/charms/fortune_leaf.png" id="2"]
+[ext_resource type="Resource" uid="uid://f7nqpy7cxckc" path="res://gameplay/charms/charm_data/fortune_leaf.tres" id="3"]
 
 [resource]
 script = ExtResource("1")

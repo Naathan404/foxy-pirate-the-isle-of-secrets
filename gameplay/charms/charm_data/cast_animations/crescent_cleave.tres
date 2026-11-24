@@ -1,18 +1,23 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" format=3 uid="uid://dhr5fln2fl2pt"]
 
-[ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
-[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/crescent_cleave.png" id="2_sheet"]
-[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/crescent_cleave_vertical.png" id="3_vertical"]
+[ext_resource type="Script" uid="uid://c6ksneei08ge8" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
+[ext_resource type="Texture2D" uid="uid://cuy0vkdgqxl58" path="res://assets/sprites/foxy/charm_casts/crescent_cleave.png" id="2_sheet"]
+[ext_resource type="Texture2D" uid="uid://smg6gs4x3q5p" path="res://assets/sprites/foxy/charm_casts/crescent_cleave_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"crescent_cleave"
 texture = ExtResource("2_sheet")
 vertical_texture = ExtResource("3_vertical")
+frame_seconds = null
 foot_anchors = PackedVector2Array(0.4688, 0.8906, 0.4355, 0.8906, 0.3848, 0.8906, 0.3164, 0.8906, 0.3574, 0.875, 0.3711, 0.875, 0.4121, 0.875, 0.4531, 0.875)
 standing_height_fraction = 0.73
+cast_frames = null
+channel_loop_frames = null
+held_phases = Array[StringName]([&"active"])
+release_frames = null
+recall_frames = null
 phase_frames = Dictionary[StringName, PackedInt32Array]({
 &"active": PackedInt32Array(2, 3, 4),
 &"recover": PackedInt32Array(5, 6, 7)
 })
-held_phases = Array[StringName]([&"active"])

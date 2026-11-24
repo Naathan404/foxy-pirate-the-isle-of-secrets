@@ -41,6 +41,8 @@ const MIN_PHASE_DURATION_SECONDS := 0.1
 # //NLVP sửa: Chạy lần lượt bao nhiêu vùng tùy thứ tự Inspector.
 ## Chạy từng vùng lần lượt theo thứ tự Zones.
 @export var sequential_zones: bool = false
+## Let an encounter start each tide explicitly, holding LOW between waves.
+@export var externally_advanced: bool = false
 @export_group("Shared Timing")
 ## Thời gian giữ triều thấp, tính bằng giây.
 @export_range(0.1, 120.0, 0.1) var low_duration: float = 12.0
@@ -117,6 +119,7 @@ var _warning_overlay: FlatTideWarningOverlay
 
 # //NLVP sửa: Vùng đang chạy hoặc vừa kết thúc trước khoảng nghỉ.
 var _active_zone_index := 0
+var _cycle_waiting := false
 
 
 func _ready() -> void:
@@ -133,7 +136,10 @@ func _ready() -> void:
 				set_physics_process(false)
 				return
 			assigned_zones.append(zone)
-		state = State.RISING
+		state = State.LOW if externally_advanced else State.RISING
+		if externally_advanced:
+			_active_zone_index = zones.size() - 1
+			_cycle_waiting = true
 		state_changed.emit(state)
 	if is_instance_valid(player) and not player.dash_started.is_connected(_on_player_dash_started):
 		player.dash_started.connect(_on_player_dash_started)
@@ -149,7 +155,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_visual_time += delta
 	var remaining := delta
-	while remaining > 0.0:
+	while remaining > 0.0 and not _cycle_waiting:
 		var duration := _phase_duration()
 		var step := minf(remaining, duration - _elapsed)
 		_elapsed += step
@@ -164,6 +170,25 @@ func _physics_process(delta: float) -> void:
 
 func is_point_flooded(point: Vector3) -> bool:
 	return get_flooded_zone(point) != null
+
+
+## Start exactly one tide; after falling it stays dry until requested again.
+func request_cycle() -> bool:
+	if not externally_advanced or state != State.LOW or not _cycle_waiting:
+		return false
+	_cycle_waiting = false
+	_enter_state(State.RISING)
+	return true
+
+
+## Finish a controlled tide immediately so a cleared encounter can advance or end.
+func finish_cycle() -> void:
+	if not externally_advanced:
+		return
+	_enter_state(State.LOW)
+	_apply_coverage()
+	_update_warning_overlay(0.0)
+	_update_player()
 
 
 func get_flooded_zone(point: Vector3) -> FlatTideZone:
@@ -214,6 +239,7 @@ func _enter_state(next_state: State) -> void:
 	_elapsed = 0.0
 	if state == State.LOW:
 		_warned = false
+		_cycle_waiting = externally_advanced
 	if state == State.RISING:
 		_wave_hit_player = false
 		_wave_previous_wet.clear()
@@ -354,7 +380,7 @@ func _warning_progress() -> float:
 
 
 func _check_warning() -> void:
-	if state != State.LOW or _warned or warning_seconds <= 0.0:
+	if _cycle_waiting or state != State.LOW or _warned or warning_seconds <= 0.0:
 		return
 	var remaining := _phase_duration() - _elapsed
 	if remaining <= warning_seconds:

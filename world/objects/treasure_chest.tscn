@@ -8,6 +8,9 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_4ttts"]
 size = Vector3(2, 2, 0.8)
 
+[sub_resource type="BoxShape3D" id="ChestBody"]
+size = Vector3(1.5, 1.5, 0.6)
+
 [node name="TreasureChest" type="Node3D" unique_id=1708090331 node_paths=PackedStringArray("visual_root")]
 script = ExtResource("4_chest")
 open_shake = 8.0
@@ -40,3 +43,11 @@ shape = SubResource("BoxShape3D_4ttts")
 [node name="HealthComponent" type="Node" parent="." unique_id=1412330017]
 script = ExtResource("3_prqp1")
 metadata/_custom_type_script = "uid://dsiiopnlfqio7"
+
+[node name="MovementBody" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MovementBody"]
+position = Vector3(0, 0.75, 0)
+shape = SubResource("ChestBody")

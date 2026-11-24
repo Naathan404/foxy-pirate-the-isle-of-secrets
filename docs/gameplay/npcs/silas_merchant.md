@@ -147,10 +147,10 @@ nên gọi API reset rõ ràng của SaveManager, không truy cập field privat
 
 ## 6. Những việc chưa giải quyết
 
-1. **Save system toàn game:** cần một `SaveManager` có schema/version/migration,
-   slot save, atomic write và ownership rõ ràng cho Player, inventory, wallet,
-   quest và world state. Khi có nó, migrate hai flag của Silas vào payload chung
-   và đọc file cũ một lần để tương thích save hiện tại.
+1. **Save system toàn game:** đã có ([Save/Load](../../systems/save_system.md)). Hai
+   flag của Silas nằm trong section `merchant` của save; New Game reset và Continue
+   ghi đè chúng qua `reset_progress()` / `apply_save_data()`. `silas_progress.save`
+   vẫn được ghi ngay khi đổi để giữ tương thích; chưa có bước bỏ hẳn file riêng này.
 2. **Stock và economy:** bể hàng được rút một lần mỗi lượt chơi và có thể đổi
    bằng hàm hoặc nút debug; chưa có giới hạn số lượng, restock theo ngày,
    price modifier, buyback hoặc state riêng cho từng offer.

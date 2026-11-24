@@ -42,7 +42,7 @@ flowchart LR
 	Input[Q / Space / E] --> Manager
 	Combat[Combat, HP, SP, Dash, Death] <--> Runtime
 	Safe[Checkpoint / Hub] --> Manager
-	Save[Save system tương lai] <--> Snapshot[CharmProgressionSnapshot]
+	Save[GameSaveSnapshot] <--> Snapshot[CharmProgressionSnapshot]
 	Snapshot <--> Ownership
 	Snapshot <--> Loadout
 ```
@@ -263,7 +263,8 @@ Quy tắc restore:
 - duplicate equip chỉ giữ entry hợp lệ đầu tiên theo thứ tự socket;
 - payload rỗng hoặc dependency không hợp lệ làm restore thất bại an toàn.
 
-Snapshot là adapter cho save system tương lai; module này không tự ghi file và không tạo autoload.
+Snapshot là adapter mà [save system](../../systems/save_system.md) dùng cho nhóm Charm;
+module này không tự ghi file và không tạo autoload.
 
 ## 12. Signal và rejection reason cho UI
 

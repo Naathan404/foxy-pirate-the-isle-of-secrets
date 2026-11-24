@@ -1,19 +1,24 @@
-[gd_resource type="Resource" script_class="CharmCastClip" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CharmCastClip" format=3 uid="uid://cxka0icw12s40"]
 
-[ext_resource type="Script" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
-[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/meteor_strike.png" id="2_sheet"]
-[ext_resource type="Texture2D" path="res://assets/sprites/foxy/charm_casts/meteor_strike_vertical.png" id="3_vertical"]
+[ext_resource type="Script" uid="uid://c6ksneei08ge8" path="res://gameplay/player/effects/charm_cast_clip.gd" id="1_clip"]
+[ext_resource type="Texture2D" uid="uid://cy8riaicxn8dn" path="res://assets/sprites/foxy/charm_casts/meteor_strike.png" id="2_sheet"]
+[ext_resource type="Texture2D" uid="uid://dajhs2lfljijr" path="res://assets/sprites/foxy/charm_casts/meteor_strike_vertical.png" id="3_vertical"]
 
 [resource]
 script = ExtResource("1_clip")
 charm_id = &"meteor_strike"
 texture = ExtResource("2_sheet")
 vertical_texture = ExtResource("3_vertical")
+frame_seconds = null
 foot_anchors = PackedVector2Array(0.4961, 0.9102, 0.4961, 0.9085, 0.502, 0.9069, 0.4961, 0.9102, 0.4609, 0.8945, 0.4609, 0.8945, 0.4707, 0.8945, 0.4922, 0.8945)
 standing_height_fraction = 0.758
+cast_frames = null
+channel_loop_frames = null
 held_phases = Array[StringName]([&"windup", &"release"])
+release_frames = null
+recall_frames = null
 phase_frames = Dictionary[StringName, PackedInt32Array]({
-&"windup": PackedInt32Array(0, 1, 2, 3),
+&"recover": PackedInt32Array(5, 6, 7),
 &"release": PackedInt32Array(4, 5),
-&"recover": PackedInt32Array(5, 6, 7)
+&"windup": PackedInt32Array(0, 1, 2, 3)
 })
