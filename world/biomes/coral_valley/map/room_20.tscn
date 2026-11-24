@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://ch3vxl7byv7r8"]
+[gd_scene format=3 uid="uid://bp8mlrns7bmbc"]
 
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="3_qogha"]

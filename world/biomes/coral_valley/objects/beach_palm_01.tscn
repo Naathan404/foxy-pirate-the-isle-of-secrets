@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://d4kfj61xo7nds"]
+[gd_scene format=3 uid="uid://d0ygcokpmdb3n"]
 
 [ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_kbs7a"]
 [ext_resource type="Resource" uid="uid://os3iull80808" path="res://data/items/materials/coconut.tres" id="2_kbs7a"]
