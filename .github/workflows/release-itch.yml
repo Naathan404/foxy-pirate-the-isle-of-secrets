@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: |
           python -m pip install scons
-          tools/web/build_web_template.sh "$GODOT_VERSION" build/web_template.zip "$RUNNER_TEMP/godot-src"
+          bash tools/web/build_web_template.sh "$GODOT_VERSION" build/web_template.zip "$RUNNER_TEMP/godot-src"
 
       - uses: actions/upload-artifact@v4
         if: env.BUILD_WEB == 'true'
