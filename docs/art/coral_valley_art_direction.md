@@ -249,7 +249,7 @@ Bộ nguyên liệu có sẵn để ghép dấu ấn:
 | room_22 | Bãi thường, `rock_shelf` | Cổng đá: hai cặp đá lớn đứng hai bên lối vào trái và phải |
 | room_04 | Quiz, `tide_flats` + `wrack_line` | Hàng 3 cọ nghiêng ở góc đông bắc đảo trái, lá cọ rụng dưới tán |
 | room_09 | Quiz, `tide_flats` | Bãi sao biển: 12 sao biển vẽ trên nền quanh một hồ ở đảo phải (phòng không có quái sao biển) |
-| room_18 | Quiz, `coral_rubble`, nước rạn chìm | Rừng rong khổng lồ: 4 rong scale 1,4–1,6 ở góc tây bắc đảo trái |
+| room_18 | Raid (hai đảo), `coral_rubble`, nước rạn chìm | Rừng rong khổng lồ: 4 rong scale 1,4–1,6 ở góc tây bắc đảo trái |
 | room_23 | Quiz, `ripple` + `wrack_line` | Tảng đá phủ san hô: đá lớn không phá được, hai khóm san hô mọc trên đỉnh |
 | room_07 | Raid, Bãi thường, `tide_flats` | Vòng đá đấu trường: 6 tảng đá lớn quanh mép đảo, giữa đảo để trống cho các đợt thủy triều |
 | room_08 | Boss, Bãi thường, `rock_shelf` + `wrack_line` | Đấu trường giữa biển: hai vòng cột đá, tảng đá và rêu khổng lồ vẽ tay đứng dưới nước bao quanh đảo, cầu gãy khi vào trận, biển đổi màu theo phase |

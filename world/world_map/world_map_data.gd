@@ -15,6 +15,11 @@ func find_biome(biome_id: StringName) -> BiomeMapData:
 	return null
 
 
+func find_room(scene_path: String) -> RoomMapData:
+	var biome := find_biome_of_room(scene_path)
+	return null if biome == null else biome.find_room(scene_path)
+
+
 func find_biome_of_room(scene_path: String) -> BiomeMapData:
 	for biome: BiomeMapData in biomes:
 		if biome.find_room(scene_path) != null:
@@ -35,3 +40,33 @@ func get_biome_links() -> Array[Vector2i]:
 				if not links.has(link):
 					links.append(link)
 	return links
+
+
+## Rooms the player has not entered but knows about: a door of an entered room leads there
+## (or one of their own doors leads to an entered room). Hidden rooms never qualify, and
+## rooms further away are unknown, so the explored area is wrapped in a single ring.
+func get_frontier_rooms(progress: MapProgress) -> Dictionary[String, bool]:
+	var frontier: Dictionary[String, bool] = {}
+	for biome: BiomeMapData in biomes:
+		for room: RoomMapData in biome.rooms:
+			for destination: String in room.exits.values():
+				var other := find_room(destination)
+				if other == null:
+					continue
+				_mark_if_frontier(room, other, progress, frontier)
+				_mark_if_frontier(other, room, progress, frontier)
+	return frontier
+
+
+func _mark_if_frontier(
+	visited: RoomMapData,
+	candidate: RoomMapData,
+	progress: MapProgress,
+	frontier: Dictionary[String, bool]
+) -> void:
+	if (
+		progress.has_visited(visited.scene_path)
+		and not progress.has_visited(candidate.scene_path)
+		and not candidate.hidden
+	):
+		frontier[candidate.scene_path] = true

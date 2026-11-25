@@ -211,8 +211,9 @@ Nội dung theo loại phòng (chi tiết và số lượng lấy từ tài li�
 | Empty (`01`, `03`, `06`, `11`, `15`, `17`, `21`) | `RandomEmptyType` chọn một trong hai bố cục dùng chung; dấu ấn riêng trong `Scenery` của phòng | Vị trí ứng viên trong bố cục dùng chung, kiểm cho **mọi** phòng dùng nó; dấu ấn tránh mọi ứng viên của cả hai nhánh | Tỉ lệ 50/50, số quái, pool quái |
 | Mobs 1–6 | `FlatTide` với các vùng và pool quái theo bảng tide; vật cản ngẫu nhiên | Vị trí ứng viên vật cản, rong | Pool, số lượng, `elite_chance`; không đặt tay quái |
 | Materials (`10` cua và dừa, `14` sao biển và san hô) | Pool tài nguyên và 3 quái đặt tay | Vị trí ứng viên tài nguyên | Thêm quái khi tài liệu không ghi; đổi loại tài nguyên |
-| Quiz (`04`, `09`, `18`, `23`) | Bệ, cần gạt, rương, Elite Barrel canh rương | Prop trang trí | Khoảng cách đảo/bệ, vị trí cần gạt, cụm Elite Barrel |
-| Raid (`07`) | `RaidEncounter`, `EntryArea`, `FlatTide` | Prop ngoài vùng thủy triều | Quái đặt tay, rương (encounter tự sinh) |
+| Quiz (`04`, `09`, `23`) | Bệ, cần gạt, rương, Elite Barrel canh rương | Prop trang trí | Khoảng cách đảo/bệ, vị trí cần gạt, cụm Elite Barrel |
+| Raid hệ mới (`18`) | `RaidStage`, `RaidGroundSpawner`, `RaidLockdown`, cổng đá (dựng theo skill `raid-room`) | Prop không chắn cổng đá và vùng spawn | Đợt quái, rương (lockdown tự sinh) |
+| Raid hệ cũ (`07`) | `RaidEncounter`, `EntryArea`, `FlatTide` | Prop ngoài vùng thủy triều | Quái đặt tay, rương (encounter tự sinh) |
 | Boss (`08`) | Blubberbeard và `BossEncounter` | Prop ngoài vùng đánh boss | Quái khác |
 | NPC (`19`) | NPC, không quái | Prop | Vị trí NPC |
 | Farm (`24`) | Chưa chốt nội dung | — | Hỏi designer trước khi thêm gì |

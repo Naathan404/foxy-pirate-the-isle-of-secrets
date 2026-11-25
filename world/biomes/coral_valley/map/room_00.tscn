@@ -77,6 +77,9 @@ shader_parameter/swash_speed = 0.9
 shader_parameter/ring_spacing_meters = 2.6
 shader_parameter/ring_speed_meters_per_second = 0.45
 shader_parameter/ring_strength = 0.22
+shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
+shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
+shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
 
 [sub_resource type="QuadMesh" id="QuadMesh_5jg43"]
 resource_local_to_scene = true
@@ -265,8 +268,8 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.252, 0)
 ground_shadow = true
 
 [node name="FireLight" parent="Campfire" index="4" unique_id=994038413]
-light_color = Color(1, 0.58736086, 0.23157391, 1)
-light_energy = 8.039573
+light_color = Color(1, 0.5983986, 0.23893243, 1)
+light_energy = 8.2245865
 omni_range = 14.0
 base_energy = 8.0
 

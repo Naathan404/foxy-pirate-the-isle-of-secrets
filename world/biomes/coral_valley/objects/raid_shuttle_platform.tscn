@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://lu3usf0v5eyp"]
+
+[ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="2_platform"]
+
+[sub_resource type="BoxShape3D" id="PlatformShape"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="BoardingShape"]
+size = Vector3(3.4, 3, 3.4)
+
+[node name="RaidShuttlePlatform" type="Node3D" unique_id=1215741568]
+script = ExtResource("1_script")
+center_stop_enabled = true
+
+[node name="Platform" type="AnimatableBody3D" parent="." unique_id=1424259]
+
+[node name="Sprite3D" type="Sprite3D" parent="Platform" unique_id=741978238]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("2_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform" unique_id=920622840]
+shape = SubResource("PlatformShape")
+
+[node name="BoardingArea" type="Area3D" parent="Platform"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform/BoardingArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+shape = SubResource("BoardingShape")
+
+[node name="Start" type="Marker3D" parent="." unique_id=1065037156]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.58, 0, 0)
+
+[node name="Center" type="Marker3D" parent="." unique_id=1288057249]
+
+[node name="End" type="Marker3D" parent="." unique_id=1876683113]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.58, 0, 0)
