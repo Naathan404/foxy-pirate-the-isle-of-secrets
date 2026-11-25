@@ -34,12 +34,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Exclude Windows-only Spine assets on Linux
+      - name: Exclude Spine assets during validation
         shell: bash
         run: |
-          # The native SpineBridge library is currently shipped only for Windows.
+          # Keeps validation independent of the spine-godot import.
           # Foxy's preview already falls back to sprites when Spine is unavailable.
-          touch addons/spine_bridge/.gdignore assets/spine/.gdignore
+          touch assets/spine/.gdignore
       - name: Remove local Godot AI configuration
         shell: bash
         run: |
