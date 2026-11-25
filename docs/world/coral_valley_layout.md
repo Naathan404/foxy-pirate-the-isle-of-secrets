@@ -237,12 +237,14 @@ All rooms except Materials and Empty rooms spawn seaweed around their island rim
 | Layout | Rooms | Seaweed per visit |
 | --- | --- | --- |
 | Medium | `room_07` | 20 per room |
-| Boss arena | `room_08` | 16, from 27 candidates along the arena rim |
+| Boss arena | `room_08` | 16, from 27 candidates along the arena rim, plus 8 from 12 candidates inside the arena (`ArenaSeaweed`) |
 | Medium, split islands | `room_24` | 12, from 29 candidates along the island rims |
 | Medium, Checkpoint | `room_00` (hand-placed), `room_05` | 6 and 8 |
 | Medium, Mobs | `room_02`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22` | 14 per room |
 | Small, one island | `room_19` | 15 per room |
 | Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 10 on each island, 20 per room (was 15; lowered for the 30-point prop budget and each room's landmark) |
+
+In `room_08` both seaweed spawners set `props_receive_enemy_attacks`, so Blubberbeard's attacks (charge, slam, whirlwind, barrels, venom) break seaweed as well as Foxy's. The inner candidates sit 11.5 and 15.5 units from the arena centre and leave the western entrance from the bridge clear. Boss shake and flash play only when an attack hits Foxy.
 
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 

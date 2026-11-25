@@ -717,6 +717,9 @@ func _drop_loot() -> void:
 func _drop_charms() -> void:
 	if data == null or not is_inside_tree() or charm_loot.is_empty():
 		return
+	var room := _find_room()
+	if room != null and not room.enemy_charm_drops:
+		return
 	var player := get_tree().get_first_node_in_group(&"player") as Player
 	if not is_instance_valid(player) or not is_instance_valid(player.charm_registry):
 		return
@@ -730,6 +733,14 @@ func _drop_charms() -> void:
 		if charm.tags.has(&"elite_drop") and not data.elite_charm_drops:
 			continue
 		_roll_item_pickup(item, 1, charm.drop_chance, multiplier)
+
+
+## The room this enemy belongs to, also when it is spawned under an encounter or spawner node.
+func _find_room() -> BaseRoom:
+	var node := get_parent()
+	while node != null and not node is BaseRoom:
+		node = node.get_parent()
+	return node as BaseRoom
 
 
 func _loot_multiplier(player: Player) -> float:

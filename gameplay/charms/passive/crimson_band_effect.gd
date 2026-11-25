@@ -10,7 +10,8 @@ func on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> 
 		applied_hp <= 0.0
 		or damage.source != actor
 		or not damage.is_normal_attack()
-		or not target is Node3D
+		# Only creatures bleed: grass and other destructibles are left alone.
+		or not (target is EnemyBase or target is BossBase)
 		or damage.target_defeated
 	):
 		return

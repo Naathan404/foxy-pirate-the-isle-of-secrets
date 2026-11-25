@@ -261,6 +261,7 @@ script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(20.04, 0, 11.15, 18.48, 0, 13.77, 16.59, 0, 16.18, 14.43, 0, 18.29, 12.01, 0, 20.11, 6.6, 0, 22.67, 0.74, 0, 23.68, -5.17, 0, 23.07, -10.73, 0, 20.88, -15.54, 0, 17.27, -17.57, 0, 15.01, -19.3, 0, 12.49, -20.69, 0, 9.76, -21.26, 0, -8.32, -20.04, 0, -11.15, -18.48, 0, -13.77, -16.59, 0, -16.18, -14.43, 0, -18.29, -12.01, 0, -20.11, -6.6, 0, -22.67, -0.74, 0, -23.68, 5.17, 0, -23.07, 10.73, 0, -20.88, 15.54, 0, -17.27, 17.57, 0, -15.01, 19.3, 0, -12.49, 20.69, 0, -9.76)
 fixed_spawn_count = 16
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+props_receive_enemy_attacks = true
 
 [node name="CaptainBlubberbeard" parent="." index="6" unique_id=1939593340 instance=ExtResource("boss")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25209618, 0.45244434)
@@ -1027,3 +1028,11 @@ mesh = SubResource("ArenaDarknessQuad")
 [editable path="Environment/BaseGround"]
 [editable path="GrapplePostIsland"]
 [editable path="RoomAtmosphere"]
+
+[node name="ArenaSeaweed" type="Node3D" parent="." unique_id=1831000]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
+script = ExtResource("random_props")
+spawn_positions = PackedVector3Array(11.25, 0, 2.84, 12.54, 0, 9.56, 5.75, 0, 10.41, 1.62, 0, 15.87, -3.55, 0, 11.39, -10.37, 0, 11.97, -7.7, 0, -8.1, -4.79, 0, -14.29, 1.2, 0, -10.99, 7.75, 0, -12.97, 9.3, 0, -6.31, 15.16, 0, -2.77)
+fixed_spawn_count = 8
+prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+props_receive_enemy_attacks = true
