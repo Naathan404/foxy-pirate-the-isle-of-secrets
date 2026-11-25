@@ -1,8 +1,107 @@
 # Coral Valley room layout
 
-Numbering follows the reference diagram: middle row left to right, then top row, then bottom row.
+Numbering follows the final reference diagram: middle row left to right (`room_00`–`room_08`), then top row (`room_09`–`room_16`), then bottom row (`room_17`–`room_24`). Quiz left/right counts as one room.
 
-Mobs, Raid, Chest, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (12 Medium and 14 Small rooms). Two-island rooms keep both islands and their moving-platform connections.
+![Numbered room and path diagram](coral_valley_layout.svg)
+
+Where and how enemies are placed inside a room follows
+[enemy placement](coral_valley_enemy_placement.md); this document decides which enemies each
+room has. Wonder rooms (split islands, coloured seas, reef rings) are described in
+[wonder rooms](coral_valley_wonder_rooms.md).
+
+Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `23` has a fixed center lever and an automatically orbiting platform; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `04` has a fixed center and an eight-stop orbit platform controlled from both shores.
+
+All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
+collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`.
+Each contains two Small islands, one room root and one shared CameraBounds.
+All four Quiz rooms use the Small room template with their own platform layouts.
+
+Spacing uses the visible sprite edges (alpha >= 0.5), rather than the platform's
+4-unit collision box. Each platform is rotated 90 degrees around Y, keeping its
+surface horizontal. At the existing sprite scale, the rotated visible width along
+X is `716 × 0.01 × 0.5 = 3.58` units.
+
+Three platforms create four gaps: island–platform, platform–platform,
+platform–platform, platform–island. Each gap is 4 units, giving **16 empty units**
+and a total visible island gap of `3 × 3.58 + 4 × 4 = 26.74` units.
+The ground artwork spans `1134 × 0.01 × 0.995455 × 2.5 = 28.22114925` units along X,
+so the right island center is offset `54.96114925` units. Its paths, seaweed and
+shared CameraBounds move with it.
+
+Quiz `room_04` keeps `Platform2` fixed at
+`Vector3(27.61284825, -0.03991985, -0.44552031)`. Its other platform begins directly
+right of it, and can stop only at eight surrounding markers: **E → SE → S → SW →
+W → NW → N → NE**, clockwise. The center is never a moving-platform stop.
+Horizontal pitch is 7.58 units; vertical pitch is 9.78 units, preserving 4 units
+between the platform sprites. Travel follows neighboring markers around the
+perimeter in either direction, without crossing the fixed platform.
+
+Each shore has two attack-operated `platform_puzzle_lever.tscn` instances. All
+four target the same `MovingPlatform`. Upper levers request **+3 stops clockwise**;
+lower levers request **−2 stops counterclockwise**. Steps wrap modulo eight.
+Hits during movement queue their signed steps after the existing travel; turns
+remain on the perimeter. No lever is attached to either platform.
+The existing `MovingPlatform` script exposes `route_marker_paths` and
+`request_route_steps(count)`; `PlatformLever.DestinationMode.ADVANCE_ROUTE` uses
+its signed `route_step_count`. Existing endpoint and Quiz 18 center-stop modes
+remain supported. Both inward island openings follow the fixed center's Z,
+and remain 5.78 units wide.
+
+Quiz `room_09` replaces all three stationary platforms with one `MovingPlatform`
+using two-endpoint mode with `start_at_center = true`. It initially rests at
+Center (X `27.61284825`); the first hit sends it to the right stop
+(X `35.19284825`). Subsequent hits toggle directly between right and left
+(X `20.03284825`), passing the center without stopping. Its speed is 6 units/second.
+An onboard `platform_puzzle_lever.tscn` instance is a child of the moving body,
+so it rides with the platform. It and the two hidden shore levers target the
+same `MovingPlatform` in `TOGGLE` mode. The left island's lever sits at its upper-right corner
+(`Vector3(9, 0.21008015, -10)`); the right island's lever sits at its upper-left
+corner (`Vector3(45.96114925, 0.21008015, -10)`). Each has one hand-placed
+`seaweed_3.tscn` instance 0.9 units in front of it, scaled to 1.25, concealing
+the lever independently of random seaweed generation. The seaweed retains its
+existing destructible behavior. Paths, ground spacing and shared CameraBounds
+stay as before. `MovingPlatform.start_at_center` only changes initial placement;
+it defaults to false and does not enable intermediate stops.
+
+Quiz `room_18` removes both side platforms and places
+`objects/quiz_shuttle_platform.tscn` at the former center position. Its onboard
+lever uses the existing attack HurtBox and `MovingPlatform.receive_damage`.
+The platform starts at Center. Each valid player hit requests the next stop:
+**Left → Center → Right → Center**, repeating even if hit during travel.
+The former platform positions remain the stop coordinates: X `20.03284825`,
+`27.61284825` and `35.19284825`. Speed is 3 units/second. No shore call levers
+are added. The existing two-stop platform behavior remains the default; this
+scene enables `center_stop_enabled` and supplies a `Center` marker.
+
+Quiz `room_23` has a fixed center platform at
+`Vector3(27.61284825, -0.03991985, 0.55447969)` and one moving platform using
+`objects/quiz_orbit_platform.tscn`, the same eight surrounding stops as Quiz 04.
+It starts east and automatically loops clockwise at 6 units/second, without
+pauses at markers or crossing the center. One attack-operated lever sits on the
+fixed center platform; there are no shore or remote-room levers.
+On a player hit, `PlatformLever.DestinationMode.TOGGLE_ROUTE_LOOP` calls
+`MovingPlatform.toggle_route_motion()`: finish the current edge and stop exactly
+at its destination marker. The next hit resumes clockwise travel, alternating
+stop/resume on every hit. A hit during a pending stop cancels that stop and keeps
+the platform moving. This state resets when the scene is reloaded.
+Only Quiz 23 enables `route_autoplay`; Quiz 04
+keeps its manual +3/-2 controls. Island spacing, paths and CameraBounds are retained.
+
+Rooms `23`, `09` and `18` open the player boundary at both island edges facing the
+platforms using `boundary_openings`: `Rect2(12.7, -2.33552031, 29.58614925, 5.78)`.
+The 5.78-unit-wide passage follows the platforms' visible sprite width along Z, centered
+at `0.55447969`. Other island edges retain their player boundaries, and enemy
+boundaries stay closed. The existing gaps between islands and platforms remain.
+
+External paths attach to the islands shown in the final diagram:
+
+- `room_04`: left, up (Empty `room_11`) and down (NPC `room_19`) on the left
+  island; right (Checkpoint 2 `room_05`) on the right island.
+- `room_09`: down (Empty `room_01`) and right (Materials `room_10`) on the
+  right island.
+- `room_18`: left (Empty `room_17`) on the left island; no other external exit.
+- `room_23`: left (Mobs 4 `room_22`) on the left island; right (Farm
+  `room_24`) on the right island.
 
 | Room | Row | Type | Layout | Exits |
 | --- | --- | --- | --- | --- |
@@ -10,12 +109,12 @@ Mobs, Raid, Chest, Boss, Farm and Checkpoint rooms use Medium layouts; all other
 | room_01 | Middle | Empty | Small | left: room_00, right: room_02, up: room_09 |
 | room_02 | Middle | Mobs 1 | Medium | left: room_01, right: room_03, down: room_17 |
 | room_03 | Middle | Empty | Small | left: room_02, right: room_04, up: room_10 |
-| room_04 | Middle | Quiz (2 islands) | Small, 2 islands | left: room_03, right: room_05, up: room_11, down: room_20 |
-| room_05 | Middle | Checkpoint 2 | Medium | left: room_04, right: room_06, up: room_13, down: room_22 |
+| room_04 | Middle | Quiz (2 islands) | Small, 2 islands | left: room_03, right: room_05, up: room_11, down: room_19 |
+| room_05 | Middle | Checkpoint 2 | Medium | left: room_04, right: room_06, up: room_13, down: room_21 |
 | room_06 | Middle | Empty | Small | left: room_05, right: room_07, up: room_14 |
 | room_07 | Middle | Raid | Medium | left: room_06, right: room_08 |
-| room_08 | Middle | Boss | Medium | left: room_07 |
-| room_09 | Top | Empty (2 islands) | Small, 2 islands | right: room_10, down: room_01 |
+| room_08 | Middle | Boss | Large arena (about 1.6× a Medium island) | left: room_07 |
+| room_09 | Top | Quiz (2 islands) | Small, 2 islands | right: room_10, down: room_01 |
 | room_10 | Top | Materials | Small | left: room_09, down: room_03 |
 | room_11 | Top | Empty | Small | right: room_12, down: room_04 |
 | room_12 | Top | Mobs 2 | Medium | left: room_11 |
@@ -24,54 +123,166 @@ Mobs, Raid, Chest, Boss, Farm and Checkpoint rooms use Medium layouts; all other
 | room_15 | Top | Empty | Small | left: room_14, right: room_16 |
 | room_16 | Top | Mobs 6 | Medium | left: room_15 |
 | room_17 | Bottom | Empty | Small | right: room_18, up: room_02 |
-| room_18 | Bottom | Quiz | Small | left: room_17, right: room_19 |
-| room_19 | Bottom | Chest | Medium | left: room_18 |
-| room_20 | Bottom | NPC | Small | right: room_21, up: room_04 |
-| room_21 | Bottom | Mobs 3 | Medium | left: room_20 |
-| room_22 | Bottom | Empty | Small | right: room_23, up: room_05 |
-| room_23 | Bottom | Mobs 4 | Medium | left: room_22, right: room_24 |
-| room_24 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_23, right: room_25 |
-| room_25 | Bottom | Farm | Medium | left: room_24 |
+| room_18 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_17 |
+| room_19 | Bottom | NPC | Small | right: room_20, up: room_04 |
+| room_20 | Bottom | Mobs 3 | Medium | left: room_19 |
+| room_21 | Bottom | Empty | Small | right: room_22, up: room_05 |
+| room_22 | Bottom | Mobs 4 | Medium | left: room_21, right: room_23 |
+| room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
+| room_24 | Bottom | Farm (wonder: split islands) | Medium | left: room_23 |
 
-## Existing scene renumbering
+Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
 
-00 -> 00, 01 -> 01, 02 -> 02, 03 -> 03, 04 -> 04, 05 -> 05, 06 -> 09, 07 -> 10, 08 -> 11, 09 -> 12, 10 -> 17, 11 -> 18, 12 -> 19, 13 -> 20, 14 -> 21
+Quiz `09` retains four Elite Barrels around its chest at local X/Z `(±5, ±5)`,
+forming a square with four 10-unit sides. Quiz `04`, `18` and `23` retain only
+the two right-side Elite Barrels: TopRight `(5, -5)` and BottomRight `(5, 5)`;
+TopLeft and BottomLeft have been removed. Groups remain centered on their chests,
+and the remaining guards keep their positions and heights. No new scripts or
+changes to loot, puzzle controls, island spacing or paths are introduced.
 
-The 15 existing scenes keep their authored contents and scene UIDs. New materials, mobs, empty and two-island quiz rooms reuse their existing counterparts. Raid, Boss and Farm instantiate their room templates; their gameplay encounters are not authored by this layout change. Ground artwork is unchanged.
+Raid `room_07` starts when Foxy enters the interior activation area. During combat, `BaseRoom.set_exits_locked(true)` closes the existing player
+boundary across the exits and disables their scene-change triggers. The paths
+stay visible; no separate barriers or barrier visuals are created.
+It reuses the Mobs 4 directional tide layout: left → up → right → down. Each tide
+rises, holds, and falls with the existing surge/water interactions. New enemies
+appear on exposed ground as it recedes. The next tide starts as soon as all requested enemies have spawned and died,
+without a timer or waiting for the outgoing tide to finish receding.
+`FlatTideController.finish_cycle()` clears that tide before the next direction starts.
+
+| Raid wave | Total | Normal | Elite | Random enemy pool |
+| --- | --- | --- | --- | --- |
+| 1 | 3 | 3 | 0 | Starfish, Crab, Coral Skeleton |
+| 2 | 4 | 4 | 0 | Starfish, Crab, Coral Skeleton, Barrel |
+| 3 | 4 | 3 | 1 | Same four types, corresponding elite variants |
+| 4 | 5 | 3 | 2 | Same four types, corresponding elite variants |
+
+Types may repeat. Counts are exact, not probability-based; blocked spawns retry
+instead of silently losing an enemy. The last clear leaves the water LOW and
+opens both exits. Completion is kept in `GameManager.story_flags` for the current
+run, so revisiting does not restart the raid; New Game resets it. After the fourth clear, `RaidEncounter` instantiates `raid_reward_chest.tscn`
+at room-local `Vector3(0, 0.25209618, 0.45244434)`. It guarantees 10–20 gold and
+one Harpoon blueprint. There is no chest instance before the raid is cleared.
+Revisiting a cleared raid creates the configured chest without replaying waves;
+once opened it stays open for the run ([room state](../systems/room_state.md)).
+`FlatTideController.externally_advanced` defaults to false, preserving automatic
+cycles in Mobs rooms. The finite spawner subclasses the existing tide spawner,
+whose `_spawn()` now reports success as a boolean without changing its old callers.
+
+Boss `room_08` is a round arena island about 1.6× the size of a Medium island
+(`BlubberbeardArenaRoom`, [blubberbeard_arena_room.gd](../../world/biomes/coral_valley/blubberbeard_arena_room.gd)).
+Captain Blubberbeard stands at the centre, `Vector3(0, 0.252, 0.452)`, and reuses
+`BossEncounter` with the `captain_blubberbeard` encounter ID. A short bridge joins
+the left pier to the island. Entering the island's interior locks the exit via
+`BaseRoom.set_exits_locked()` and starts the fight; at that moment the bridge
+breaks (spans fall into the sea, splash, shake) and its floor is removed, so the
+island boundary closes the gap. The bridge never comes back while the boss stays
+defeated: Foxy leaves with the Tide Grapple he has just won, using the grapple
+posts on both sides of the gap (`GrapplePostIsland`, `GrapplePostPier`). If Foxy
+dies, the next visit reloads the room with the bridge whole. The exit reopens on
+`fight_finished`; the boss's existing death sequence creates his configured
+reward chest at his death position. There is no preplaced chest or extra barrier.
+The sea follows the fight through `SeaMood`: calm at first, `violet_glow` from
+phase two, and `red_tide` while Sky Dive or Anchor Whirlwind winds up and plays
+out, then back. The boss reward scene guarantees 10–20 gold, one Tide Grapple Charm and
+one boss note (`Diary of Tide`); the old key/material rewards are removed. Defeat, chest-open state and uncollected reward items are restored
+by the existing encounter persistence when returning during the same run.
+Tracked reward pickups now retain their `MonsterNote` reference as well as item,
+quantity and position, so an uncollected boss diary restores as an actual note.
+The optional room/activation-area references default to empty, leaving the old
+boss test scene's custom bridge lock unchanged.
+
+## Scene identity
+
+The map contains 25 rooms, numbered `room_00`–`room_24`. The former single-island
+Quiz `room_18` and Chest `room_19` are replaced by one paired Quiz `room_18`;
+the Chest room and its scene transition are removed. Former rooms `20`–`25`
+move to `19`–`24` (NPC, Mobs 3, Empty, Mobs 4, paired Quiz, Farm).
+Retained scenes keep their authored content and scene UIDs. Every scene root
+matches its filename. All path destinations and the Silas room fixture use the
+new IDs; the Hub connection through `hub/map/room_04.tscn` stays the same.
+Raid, Boss and Farm instantiate their room templates; their gameplay encounters
+are not authored by this layout change. Ground artwork is unchanged.
 
 ## Random destructible props
 
 The two Materials rooms use the Small room template, with spawn positions pulled inward to fit the smaller ground, and have separate resource pools:
 
-- The left Materials room (`room_10`) spawns only orange, pink and turquoise coral.
-- The right Materials room (`room_14`) spawns only leaning, short and tall coconut palms.
+- `room_10` is the Crab and coconut area: it spawns only leaning, short and tall
+  coconut palms, and has three hand-placed Crabs.
+- `room_14` is the Starfish and coral area: it spawns only orange, pink and
+  turquoise coral, and has three hand-placed Starfish.
+
+`room_10`'s palm candidates keep the north half and the sides clear of the paths;
+south of the island centre they sit only on the rim, away from the down path, so a
+crown never hides Foxy. `room_14`'s coral candidates stay off the path surface.
+
+"Per visit" below now means per world cycle: random spawns are seeded from the
+cycle, so a room keeps the same layout (and remembers killed enemies and broken props)
+until the next campfire rest or death reshuffles it. See
+[room state](../systems/room_state.md).
 
 Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
 
-Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_21`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
+Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_20`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions. In every Mobs room the obstacle candidates sit at least about 4 units off the path axes, so no prop can block an exit; the counts and pools are unchanged.
 
-Mobs 4, 5 and 6 (`room_23`, `room_13`, `room_16`) spawn two independent
+Mobs 4, 5 and 6 (`room_22`, `room_13`, `room_16`) spawn two independent
 groups per visit: `RandomProps` chooses 5–7 props total, each equally likely
 to be wood log or shell; `RandomOctopus` chooses 1–3 destructible octopus props.
 The groups use ten and five distinct candidate positions respectively, with
 at least 3.6 units between groups and 3.3 units from seaweed candidates.
 Both use `random_props.gd`; its Inspector count range now starts at 1.
 
-All non-Materials rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
+All rooms except Materials and Empty rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed, except where hand-placed props need part of the 30-point prop budget of the [art direction](../art/coral_valley_art_direction.md): the six Mobs rooms spawn 14, Checkpoint 2 spawns 8, and Checkpoint `room_00` has 6 hand-placed seaweed instead of a spawner. Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
 
 | Layout | Rooms | Seaweed per visit |
 | --- | --- | --- |
-| Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_19`, `room_21`, `room_23`, `room_25` | 20 per room |
-| Small, one island | `room_01`, `room_03`, `room_06`, `room_11`, `room_15`, `room_17`, `room_18`, `room_20`, `room_22` | 15 per room |
-| Small, two islands | `room_04`, `room_09`, `room_24` | 15 on each island, 30 per room |
+| Medium | `room_07` | 20 per room |
+| Boss arena | `room_08` | 16, from 27 candidates along the arena rim |
+| Medium, split islands | `room_24` | 12, from 29 candidates along the island rims |
+| Medium, Checkpoint | `room_00` (hand-placed), `room_05` | 6 and 8 |
+| Medium, Mobs | `room_02`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22` | 14 per room |
+| Small, one island | `room_19` | 15 per room |
+| Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 10 on each island, 20 per room (was 15; lowered for the 30-point prop budget and each room's landmark) |
 
-Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and moving-platform docks and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
+Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
-Coral and coconut palms do not appear in any other Coral Valley room. The old
-mixed shell, stone and octopus pool is no longer used by any room, including
-the removed unused spawner in `room_00`. Only Materials and Mobs rooms use
-the explicit prop pools described above. Seaweed spawners retain their
-existing setup.
+Empty rooms `01`, `03`, `06`, `11`, `15`, `17` and `21` choose exactly one
+population layout per visit, with equal 50% probabilities. `RandomEmptyType`
+uses `random_props.gd` to instantiate one of two PackedScenes at the origin;
+only the selected branch's populations exist. The previous simultaneous groups,
+fixed enemies, Scenery and old seaweed configuration are removed. Floor artwork,
+water/atmosphere, camera and exit wiring remain unchanged.
+
+| Empty layout | Enemies | Before Checkpoint 2 | After Checkpoint 2 |
+| --- | --- | --- | --- |
+| Combat / obstacles | Exactly 4, each 10% elite | 5–7 stone/wood props total | 5–7 shell/wood props total |
+| Resources only | None | 5–7 coconut palms total + 6 seaweed | 5–7 coral props total + 10 seaweed |
+
+Before Checkpoint 2 means rooms `01`, `03`, `11`, `17`; after it means `06`,
+`15`, `21`. Combat picks Starfish, Crab, Coral Skeleton and Barrel equally;
+types may repeat. Each type contributes nine normal slots and one elite slot
+to the weighted pool, giving every enemy an independent 10% elite probability.
+Resource-only layouts use three palm or coral variants with equal probability.
+Seaweed was 23 (the Small-room baseline 15 × 1.5); it is now 6 before
+Checkpoint 2 and 10 after it, so the palms or coral, each room's fixed palms and
+its landmark fit the 30-point prop budget of the
+[art direction](../art/coral_valley_art_direction.md). The rooms before
+Checkpoint 2 always keep two fixed palms, so they read as a palm grove even when
+the combat layout is picked. It is selected without
+replacement from 31 candidates on the actual ground polygon, inset 2.5 units with
+gaps at the four approaches. Resource plants use a separate interior candidate set;
+combat enemies and obstacles also have separate sets. Obstacle, palm and coral
+candidates stay at least about 4 units off the path axes so no exit is blocked, and
+palm candidates sit only in the north half and on the sides, where their crowns
+cannot hide Foxy. Each Empty room also has a fixed landmark of its own in its
+`Scenery` node (see the art direction's landmark table); it is not part of the
+shared layouts.
+
+The four reusable layout scenes are `objects/empty_combat_before_checkpoint.tscn`,
+`empty_combat_after_checkpoint.tscn`, `empty_resources_before_checkpoint.tscn`
+and `empty_resources_after_checkpoint.tscn`. All selection and population groups
+reuse `random_props.gd`; no GDScript changes are required. Counts refer to
+objects, not material quantities dropped. Materials and Mobs keep their own pools.
 
 ## Tide enemy pools
 
@@ -86,7 +297,7 @@ Valley templates retain the default disabled setting.
 
 All six Mobs rooms inherit the same CameraBounds from `base_medium_room.tscn`.
 Mobs 1–3 use two mirrored `Vector2(45, 66)` water zones, running
-`LeftShallows` → `RightShallows`. Mobs 4–6 (`room_23`, `room_13`, `room_16`)
+`LeftShallows` → `RightShallows`. Mobs 4–6 (`room_22`, `room_13`, `room_16`)
 run clockwise: `LeftShallows` → `UpShallows` → `RightShallows` →
 `DownShallows`. The added upper/lower zones use `Vector2(78, 45)` to span
 the room's width while keeping the same 45-unit travel depth.
@@ -109,7 +320,7 @@ These three rooms have no skeleton entries.
 | --- | --- | --- |
 | `room_02` | Mobs 1 | Starfish, Coral Skeleton |
 | `room_12` | Mobs 2 | Barrel, Coral Skeleton |
-| `room_21` | Mobs 3 | Crab, Coral Skeleton |
-| `room_23` | Mobs 4 | Barrel (normal or elite) |
+| `room_20` | Mobs 3 | Crab, Coral Skeleton |
+| `room_22` | Mobs 4 | Barrel (normal or elite) |
 | `room_13` | Mobs 5 | Starfish (normal or elite) |
 | `room_16` | Mobs 6 | Crab (normal or elite) |

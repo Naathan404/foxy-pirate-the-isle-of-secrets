@@ -1,17 +1,1029 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cndkbfhqp65jb"]
 
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/base_scenes/boss_room.tscn" id="1_base"]
-[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" uid="uid://bbauj40amsqe3" path="res://world/biomes/coral_valley/base_scenes/boss_room.tscn" id="1_base"]
+[ext_resource type="Texture2D" uid="uid://juwn5uhu522c" path="res://assets/sprites/biomes/coral_valley/boss/boss_bridge_1.png" id="20_wvupq"]
+[ext_resource type="Texture2D" uid="uid://c1526agcxx516" path="res://assets/sprites/biomes/coral_valley/boss/boss_bridge_2.png" id="21_3v6ob"]
+[ext_resource type="Shader" uid="uid://cql5r6tv66hni" path="res://world/components/arena_darkness.gdshader" id="arena_darkness_shader"]
+[ext_resource type="Script" uid="uid://cyxx63ydhrqle" path="res://world/biomes/coral_valley/blubberbeard_arena_room.gd" id="arena_script"]
+[ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
+[ext_resource type="Script" uid="uid://3rsp6bolleng" path="res://world/components/backdrop_sprite.gd" id="backdrop_sprite"]
+[ext_resource type="PackedScene" uid="uid://c60eka7xvsqh8" path="res://gameplay/bosses/blubberbeard/blubberbeard.tscn" id="boss"]
+[ext_resource type="Script" uid="uid://t35p4modmvrv" path="res://gameplay/bosses/boss_encounter.gd" id="boss_encounter"]
+[ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
+[ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
+[ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
+[ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
+[ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/calm.tres" id="palette_calm"]
+[ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/red_tide.tres" id="palette_red"]
+[ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/violet_glow.tres" id="palette_violet"]
+[ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
+[ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="Texture2D" uid="uid://j11paf5xescd" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_08_rocks.png" id="reef_rocks"]
+[ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
+[ext_resource type="Texture2D" uid="uid://sobs5f2fhslr" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_08_ground.png" id="sand_texture"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
+[ext_resource type="Script" uid="uid://dfbaxth50m3eq" path="res://world/components/sea_mood.gd" id="sea_mood"]
+[ext_resource type="Texture2D" uid="uid://b7v3d0r74ntfc" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_08_shore.png" id="shore_texture"]
+[ext_resource type="Texture2D" uid="uid://0sy3y08me4e" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_7.png" id="tex_moss_1"]
+[ext_resource type="Texture2D" uid="uid://dm3s56prnu4sk" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_8.png" id="tex_moss_2"]
+[ext_resource type="Texture2D" uid="uid://dh60f05e7k2v6" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_10.png" id="tex_moss_3"]
+[ext_resource type="Texture2D" uid="uid://b642rmm6hcss4" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_4.png" id="tex_pillar_1"]
+[ext_resource type="Texture2D" uid="uid://b8te3l0y81jrc" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_5.png" id="tex_pillar_2"]
+[ext_resource type="Texture2D" uid="uid://er52avtjdk4u" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_6.png" id="tex_pillar_3"]
+[ext_resource type="Texture2D" uid="uid://478m52utxkq0" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_1.png" id="tex_rock_1"]
+[ext_resource type="Texture2D" uid="uid://cq6xymhhukdf5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_3.png" id="tex_rock_2"]
+[ext_resource type="Texture2D" uid="uid://byj65ay5nx1u5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_2.png" id="tex_rock_3"]
 
-[node name="room_08" instance=ExtResource("1_base")]
+[sub_resource type="Environment" id="Environment_3v6ob"]
+resource_local_to_scene = true
+background_mode = 1
+background_color = Color(0.02, 0.07, 0.11, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.62, 0.66, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.6
+glow_strength = 0.9
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_water"]
+seed = 77
+frequency = 0.02
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_water")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_d0qrq"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("lagoon_shader")
+shader_parameter/shore_distance = ExtResource("shore_texture")
+shader_parameter/shore_rect = Vector4(-37.792, -43.113, 75.918, 92.154)
+shader_parameter/shore_reach_meters = 8.0
+shader_parameter/surface_height_meters = 0.252
+shader_parameter/water_noise = SubResource("NoiseTexture2D_water")
+shader_parameter/deep_color = Color(0.02, 0.07, 0.11, 1)
+shader_parameter/lagoon_color = Color(0.04, 0.23, 0.28, 1)
+shader_parameter/shallow_color = Color(0.14, 0.47, 0.47, 1)
+shader_parameter/reef_color = Color(0.28, 0.22, 0.32, 1)
+shader_parameter/caustic_color = Color(0.62, 0.95, 0.88, 1)
+shader_parameter/foam_color = Color(0.9, 0.95, 0.9, 1)
+shader_parameter/caustic_world_size_meters = 9.0
+shader_parameter/caustic_speed = 0.05
+shader_parameter/caustic_strength = 0.2
+shader_parameter/reef_world_size_meters = 26.0
+shader_parameter/reef_coverage = 0.32
+shader_parameter/reef_strength = 0.35
+shader_parameter/foam_width_meters = 0.3
+shader_parameter/swash_meters = 0.25
+shader_parameter/swash_speed = 0.9
+shader_parameter/ring_spacing_meters = 2.6
+shader_parameter/ring_speed_meters_per_second = 0.45
+shader_parameter/ring_strength = 0.22
+shader_parameter/reef_rocks = ExtResource("reef_rocks")
+shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
+shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
+shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_hg7go"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_d0qrq")
+size = Vector2(400, 400)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
+render_priority = 0
+shader = ExtResource("sand_shader")
+shader_parameter/sand_texture = ExtResource("sand_texture")
+shader_parameter/alpha_cutoff = 0.5
+shader_parameter/cloud_noise = ExtResource("cloud_noise")
+shader_parameter/cloud_world_size_meters = 48.0
+shader_parameter/cloud_velocity_meters_per_second = Vector2(0.9, 0.35)
+shader_parameter/cloud_coverage = 0.45
+shader_parameter/cloud_softness = 0.18
+shader_parameter/cloud_shadow_strength = 0.35
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandArena"]
+points = PackedVector3Array(23.94, 0.252, 2.45, 23.94, -0.6, 2.45, 23.43, 0.252, 5.688, 23.43, -0.6, 5.688, 22.518, 0.252, 8.815, 22.518, -0.6, 8.815, 21.218, 0.252, 11.805, 21.218, -0.6, 11.805, 19.558, 0.252, 14.581, 19.558, -0.6, 14.581, 17.555, 0.252, 17.118, 17.555, -0.6, 17.118, 15.264, 0.252, 19.353, 15.264, -0.6, 19.353, 12.703, 0.252, 21.265, 12.703, -0.6, 21.265, 9.934, 0.252, 22.807, 9.934, -0.6, 22.807, 6.982, 0.252, 23.966, 6.982, -0.6, 23.966, 3.924, 0.252, 24.709, 3.924, -0.6, 24.709, 0.784, 0.252, 25.032, 0.784, -0.6, 25.032, -2.353, 0.252, 24.925, -2.353, -0.6, 24.925, -5.466, 0.252, 24.39, -5.466, -0.6, 24.39, -8.471, 0.252, 23.439, -8.471, -0.6, 23.439, -11.345, 0.252, 22.083, -11.345, -0.6, 22.083, -14.009, 0.252, 20.355, -14.009, -0.6, 20.355, -16.446, 0.252, 18.273, -16.446, -0.6, 18.273, -18.592, 0.252, 15.888, -18.592, -0.6, 15.888, -20.432, 0.252, 13.22, -20.432, -0.6, 13.22, -21.913, 0.252, 10.337, -21.913, -0.6, 10.337, -23.024, 0.252, 7.266, -23.024, -0.6, 7.266, -23.735, 0.252, 4.083, -23.735, -0.6, 4.083, -24.043, 0.252, 0.817, -24.043, -0.6, 0.817, -23.94, 0.252, -2.45, -23.94, -0.6, -2.45, -23.43, 0.252, -5.688, -23.43, -0.6, -5.688, -22.518, 0.252, -8.815, -22.518, -0.6, -8.815, -21.218, 0.252, -11.805, -21.218, -0.6, -11.805, -19.558, 0.252, -14.581, -19.558, -0.6, -14.581, -17.555, 0.252, -17.118, -17.555, -0.6, -17.118, -15.264, 0.252, -19.353, -15.264, -0.6, -19.353, -12.703, 0.252, -21.265, -12.703, -0.6, -21.265, -9.934, 0.252, -22.807, -9.934, -0.6, -22.807, -6.982, 0.252, -23.966, -6.982, -0.6, -23.966, -3.924, 0.252, -24.709, -3.924, -0.6, -24.709, -0.784, 0.252, -25.032, -0.784, -0.6, -25.032, 2.353, 0.252, -24.925, 2.353, -0.6, -24.925, 5.466, 0.252, -24.39, 5.466, -0.6, -24.39, 8.471, 0.252, -23.439, 8.471, -0.6, -23.439, 11.345, 0.252, -22.083, 11.345, -0.6, -22.083, 14.009, 0.252, -20.355, 14.009, -0.6, -20.355, 16.446, 0.252, -18.273, 16.446, -0.6, -18.273, 18.592, 0.252, -15.888, 18.592, -0.6, -15.888, 20.432, 0.252, -13.22, 20.432, -0.6, -13.22, 21.913, 0.252, -10.337, 21.913, -0.6, -10.337, 23.024, 0.252, -7.266, 23.024, -0.6, -7.266, 23.735, 0.252, -4.083, 23.735, -0.6, -4.083, 24.043, 0.252, -0.817, 24.043, -0.6, -0.817)
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandLanding"]
+points = PackedVector3Array(-25.176, 0.252, -4.836, -25.176, -0.6, -4.836, -23.938, 0.252, -5.275, -23.938, -0.6, -5.275, -22.887, 0.252, -5.228, -22.887, -0.6, -5.228, -22.033, 0.252, -4.689, -22.033, -0.6, -4.689, -21.383, 0.252, -3.663, -21.383, -0.6, -3.663, -20.946, 0.252, -2.17, -20.946, -0.6, -2.17, -20.743, 0.252, -0.716, -20.743, -0.6, -0.716, -20.743, 0.252, 0.716, -20.743, -0.6, 0.716, -20.946, 0.252, 2.17, -20.946, -0.6, 2.17, -21.383, 0.252, 3.663, -21.383, -0.6, 3.663, -22.033, 0.252, 4.689, -22.033, -0.6, 4.689, -22.887, 0.252, 5.228, -22.887, -0.6, 5.228, -23.938, 0.252, 5.275, -23.938, -0.6, 5.275, -25.176, 0.252, 4.836, -25.176, -0.6, 4.836, -26.095, 0.252, 3.974, -26.095, -0.6, 3.974, -26.689, 0.252, 2.696, -26.689, -0.6, 2.696, -26.961, 0.252, 1.025, -26.961, -0.6, 1.025, -26.961, 0.252, -1.025, -26.961, -0.6, -1.025, -26.689, 0.252, -2.696, -26.689, -0.6, -2.696, -26.095, 0.252, -3.974, -26.095, -0.6, -3.974)
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandApse"]
+points = PackedVector3Array(23.846, 0.252, -6.245, 23.846, -0.6, -6.245, 25.314, 0.252, -5.562, 25.314, -0.6, -5.562, 26.463, 0.252, -4.762, 26.463, -0.6, -4.762, 27.294, 0.252, -3.846, 27.294, -0.6, -3.846, 27.811, 0.252, -2.812, 27.811, -0.6, -2.812, 28.013, 0.252, -1.667, 28.013, -0.6, -1.667, 28.105, 0.252, -0.551, 28.105, -0.6, -0.551, 28.105, 0.252, 0.551, 28.105, -0.6, 0.551, 28.013, 0.252, 1.667, 28.013, -0.6, 1.667, 27.811, 0.252, 2.812, 27.811, -0.6, 2.812, 27.294, 0.252, 3.846, 27.294, -0.6, 3.846, 26.463, 0.252, 4.762, 26.463, -0.6, 4.762, 25.314, 0.252, 5.562, 25.314, -0.6, 5.562, 23.846, 0.252, 6.245, 23.846, -0.6, 6.245, 22.746, 0.252, 5.828, 22.746, -0.6, 5.828, 22.034, 0.252, 4.321, 22.034, -0.6, 4.321, 21.725, 0.252, 1.766, 21.725, -0.6, 1.766, 21.725, 0.252, -1.766, 21.725, -0.6, -1.766, 22.034, 0.252, -4.321, 22.034, -0.6, -4.321, 22.746, 0.252, -5.828, 22.746, -0.6, -5.828)
+
+[sub_resource type="BoxShape3D" id="BridgeFloorShape"]
+size = Vector3(5.3, 1, 4.4)
+
+[sub_resource type="BoxShape3D" id="BossEntryShape"]
+size = Vector3(50, 5, 52)
+
+[sub_resource type="StandardMaterial3D" id="SplashMaterial"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="BoxMesh" id="SplashMesh"]
+material = SubResource("SplashMaterial")
+size = Vector3(0.28, 0.22, 0.28)
+
+[sub_resource type="Gradient" id="SplashColors"]
+colors = PackedColorArray(0.85, 0.96, 1, 0.95, 0.62, 0.52, 0.42, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xaok0"]
+resource_local_to_scene = true
+shader = ExtResource("grade_shader")
+shader_parameter/exposure = 1.0
+shader_parameter/saturation = 0.98
+shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
+shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
+shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
+shader_parameter/vignette_strength = 0.3
+
+[sub_resource type="ShaderMaterial" id="ArenaDarknessMaterial"]
+render_priority = 100
+shader = ExtResource("arena_darkness_shader")
+shader_parameter/darkness_color = Color(0.01, 0.02, 0.035, 1)
+shader_parameter/center = Vector2(0.7, 0)
+shader_parameter/inner_radii = Vector2(26.5, 27)
+shader_parameter/fade_meters = 5.5
+shader_parameter/fade_curve = 0.6
+shader_parameter/max_darkness = 0.94
+shader_parameter/clear_corridor = Vector4(-62, -4, -25, 4)
+shader_parameter/corridor_feather = 2.5
+shader_parameter/corridor_darkness = 0.3
+
+[sub_resource type="QuadMesh" id="ArenaDarknessQuad"]
+
+[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "bridge_spans", "bridge_floor", "bridge_splash", "mood") instance=ExtResource("1_base")]
+editor_description = "Boss arena (wonder room). The bridge breaks when the fight starts and never comes back; after the win Foxy leaves with the Tide Grapple (posts on both sides of the gap). The sea turns violet in phase two and red during Sky Dive and Anchor Whirlwind."
+script = ExtResource("arena_script")
+boss = NodePath("CaptainBlubberbeard")
+encounter = NodePath("BossEncounter")
+bridge_spans = [NodePath("Bridge/SpanWest"), NodePath("Bridge/SpanEast")]
+bridge_floor = NodePath("Environment/BaseGroundBridge/StaticBody3D/CollisionShape3D")
+bridge_splash = NodePath("Bridge/Splash")
+collapse_seconds = 0.6
+collapse_drop_meters = 3.2
+collapse_tilt = 0.6
+mood = NodePath("SeaMood")
+calm_palette = ExtResource("palette_calm")
+phase_two_palette = ExtResource("palette_violet")
+fury_palette = ExtResource("palette_red")
+fury_skills = Array[int]([1, 4])
+fury_blend_seconds = 0.35
+mood_blend_seconds = 1.2
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
 
-[node name="RandomSeaweed" type="Node3D" parent="."]
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
+environment = SubResource("Environment_3v6ob")
+
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
+transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
+light_color = Color(1, 0.92, 0.84, 1)
+light_energy = 1.15
+shadow_enabled = true
+shadow_opacity = 0.65
+directional_shadow_mode = 0
+directional_shadow_max_distance = 60.0
+
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.023241043, -1.2184002, 0.012901783)
+mesh = SubResource("QuadMesh_hg7go")
+
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -46.8032, -0.09624863, 0)
+
+[node name="Sprite3D" parent="Exits/LeftPath" index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
+shaded = true
+texture = ExtResource("pier_left")
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+
+[node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
+transform = Transform3D(4.8, 0, 0, 0, 4.8, 0, 0, 0, 4.8, 0, 0, -0.19104576)
+
+[node name="Sprite3D" parent="Environment/BaseGround" index="0" unique_id=516185212]
+transform = Transform3D(0.9954549, 0, 0, 0, 0, 0.9999998, 0, -1.265182, 0, 0.035625346, 0.055871427, 0.6551711)
+material_override = SubResource("ShaderMaterial_sand")
+pixel_size = 0.006123
+texture = ExtResource("sand_texture")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+disabled = true
+
+[node name="IslandArena" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="1" unique_id=1830100]
+transform = Transform3D(0.208333, 0, 0, 0, 0.208333, 0, 0, 0, 0.208333, 0, 0, 0.039801)
+shape = SubResource("IslandArena")
+
+[node name="IslandLanding" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="2" unique_id=1830101]
+transform = Transform3D(0.208333, 0, 0, 0, 0.208333, 0, 0, 0, 0.208333, 0, 0, 0.039801)
+shape = SubResource("IslandLanding")
+
+[node name="IslandApse" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="3" unique_id=1830102]
+transform = Transform3D(0.208333, 0, 0, 0, 0.208333, 0, 0, 0, 0.208333, 0, 0, 0.039801)
+shape = SubResource("IslandApse")
+
+[node name="BaseGroundBridge" type="Node3D" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="1" unique_id=1830200]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/BaseGroundBridge" index="0" unique_id=1830201]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/BaseGroundBridge/StaticBody3D" index="0" unique_id=1830202]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.45, -0.3, 0)
+shape = SubResource("BridgeFloorShape")
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 2.0626488, 0)
+
+[node name="SeaGlints" parent="Foxy" index="23" unique_id=1830400 instance=ExtResource("sea_glints")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
+
+[node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62, -6.9159203, 46)
+
+[node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, -48)
+
+[node name="RandomSeaweed" type="Node3D" parent="." index="5" unique_id=1417922145]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-11.962, 0, -5.651, -8.156, 0, -11.247, -8.021, 0, -13.415, -6.316, 0, -14.463, -2.868, 0, -15.207, -0.636, 0, -14.61, 1.276, 0, -13.873, 3.934, 0, -14.642, 5.932, 0, -14.353, 8.967, 0, -11.72, 11.197, 0, -9.515, 11.236, 0, -7.113, 11.991, 0, -5.034, 13.403, 0, -3.476, 12.786, 0, -0.687, 11.976, 0, 2.473, 13.092, 0, 5.843, 12.263, 0, 9.885, 10.397, 0, 12.136, 8.9, 0, 14.312, 5.218, 0, 14.757, 1.508, 0, 15.282, -1.117, 0, 15.796, -3.457, 0, 15.382, -5.543, 0, 14.768, -8.242, 0, 14.737, -10.271, 0, 12.734, -11.646, 0, 10.368, -13.4, 0, 8.956, -12.265, 0, 5.854)
-fixed_spawn_count = 20
+spawn_positions = PackedVector3Array(20.04, 0, 11.15, 18.48, 0, 13.77, 16.59, 0, 16.18, 14.43, 0, 18.29, 12.01, 0, 20.11, 6.6, 0, 22.67, 0.74, 0, 23.68, -5.17, 0, 23.07, -10.73, 0, 20.88, -15.54, 0, 17.27, -17.57, 0, 15.01, -19.3, 0, 12.49, -20.69, 0, 9.76, -21.26, 0, -8.32, -20.04, 0, -11.15, -18.48, 0, -13.77, -16.59, 0, -16.18, -14.43, 0, -18.29, -12.01, 0, -20.11, -6.6, 0, -22.67, -0.74, 0, -23.68, 5.17, 0, -23.07, 10.73, 0, -20.88, 15.54, 0, -17.27, 17.57, 0, -15.01, 19.3, 0, -12.49, 20.69, 0, -9.76)
+fixed_spawn_count = 16
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+
+[node name="CaptainBlubberbeard" parent="." index="6" unique_id=1939593340 instance=ExtResource("boss")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25209618, 0.45244434)
+boss_size_scale = 1.3
+hits_before_counter = 6
+counter_cooldown = 7.5
+
+[node name="BossEncounter" type="Node" parent="." index="7" unique_id=873786783 node_paths=PackedStringArray("boss", "room", "activation_area")]
+script = ExtResource("boss_encounter")
+encounter_id = &"captain_blubberbeard"
+boss = NodePath("../CaptainBlubberbeard")
+room = NodePath("..")
+activation_area = NodePath("../BossEntryArea")
+
+[node name="BossEntryArea" type="Area3D" parent="." index="8" unique_id=1490596503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossEntryArea" index="0" unique_id=526393089]
+shape = SubResource("BossEntryShape")
+
+[node name="Bridge" type="Node3D" parent="." index="9" unique_id=1830500]
+
+[node name="SpanWest" type="Node3D" parent="Bridge" index="0" unique_id=1830501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.9, 0.21, 0)
+
+[node name="Sprite3D" type="Sprite3D" parent="Bridge/SpanWest" index="0" unique_id=1830502]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1.012846, -0.11346811, 0)
+pixel_size = 0.00625
+shaded = true
+alpha_cut = 1
+texture = ExtResource("20_wvupq")
+region_rect = Rect2(0, 0, 165, 285)
+
+[node name="SpanEast" type="Node3D" parent="Bridge" index="1" unique_id=1830503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, 0.21, 0)
+
+[node name="Sprite3D" type="Sprite3D" parent="Bridge/SpanEast" index="0" unique_id=1830504]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1.0016308, 0, 0)
+pixel_size = 0.00625
+shaded = true
+alpha_cut = 1
+texture = ExtResource("21_3v6ob")
+region_rect = Rect2(165, 0, 165, 285)
+
+[node name="Splash" type="CPUParticles3D" parent="Bridge" index="2" unique_id=1830505]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.45, 0.3, 0)
+emitting = false
+amount = 36
+lifetime = 0.85
+one_shot = true
+explosiveness = 0.9
+mesh = SubResource("SplashMesh")
+emission_shape = 3
+emission_box_extents = Vector3(2.4, 0.2, 2)
+direction = Vector3(0, 1, 0)
+spread = 65.0
+gravity = Vector3(0, -12, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 7.5
+scale_amount_min = 0.35
+scale_amount_max = 0.9
+color_ramp = SubResource("SplashColors")
+
+[node name="GrapplePostIsland" parent="." index="10" unique_id=1830600 instance=ExtResource("grapple_post")]
+editor_description = "Tide Grapple anchor on the island side of the broken bridge."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.6, 0.252, 2.00098)
+
+[node name="Sprite3D" parent="GrapplePostIsland" index="0" unique_id=2090673705]
+flip_h = true
+
+[node name="GrapplePostPier" parent="." index="11" unique_id=1830601 instance=ExtResource("grapple_post")]
+editor_description = "Tide Grapple anchor on the pier side of the broken bridge."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.6, 0.136, -2.9)
+
+[node name="Backdrop" type="Node3D" parent="." index="12" unique_id=1830700]
+
+[node name="Rock01" type="Sprite3D" parent="Backdrop" index="0" unique_id=1830300]
+transform = Transform3D(0.83, 0, 0, 0, 0.83, 0, 0, 0, 0.83, 33.6, -0.25, -0.4)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss02" type="Sprite3D" parent="Backdrop" index="1" unique_id=1830301]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, 32.05, -0.25, 6.99)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_3")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Rock03" type="Sprite3D" parent="Backdrop" index="2" unique_id=1830302]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 27.6, -0.25, 11.25)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock04" type="Sprite3D" parent="Backdrop" index="3" unique_id=1830303]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 24.54, -0.25, 16.55)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock05" type="Sprite3D" parent="Backdrop" index="4" unique_id=1830304]
+transform = Transform3D(0.62, 0, 0, 0, 0.62, 0, 0, 0, 0.62, 20.8, -0.25, 21.62)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock06" type="Sprite3D" parent="Backdrop" index="5" unique_id=1830305]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 16.84, -0.25, 24.1)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock07" type="Sprite3D" parent="Backdrop" index="6" unique_id=1830306]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 11.85, -0.25, 28)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock08" type="Sprite3D" parent="Backdrop" index="7" unique_id=1830307]
+transform = Transform3D(0.48, 0, 0, 0, 0.48, 0, 0, 0, 0.48, 6.18, -0.25, 29.97)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock09" type="Sprite3D" parent="Backdrop" index="8" unique_id=1830308]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0.27, -0.25, 30.8)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock10" type="Sprite3D" parent="Backdrop" index="9" unique_id=1830309]
+transform = Transform3D(0.62, 0, 0, 0, 0.62, 0, 0, 0, 0.62, -5.13, -0.25, 30.37)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock11" type="Sprite3D" parent="Backdrop" index="10" unique_id=1830310]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, -9.77, -0.25, 28.15)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock12" type="Sprite3D" parent="Backdrop" index="11" unique_id=1830311]
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, -15.68, -0.25, 25.81)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock13" type="Sprite3D" parent="Backdrop" index="12" unique_id=1830312]
+transform = Transform3D(0.48, 0, 0, 0, 0.48, 0, 0, 0, 0.48, -19.09, -0.25, 23.14)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss14" type="Sprite3D" parent="Backdrop" index="13" unique_id=1830313]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -22.91, -0.25, 18.42)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Rock15" type="Sprite3D" parent="Backdrop" index="14" unique_id=1830314]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -27.11, -0.25, 12.38)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock16" type="Sprite3D" parent="Backdrop" index="15" unique_id=1830315]
+transform = Transform3D(1.01, 0, 0, 0, 1.01, 0, 0, 0, 1.01, -28.68, 0.44732046, -8.79)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss17" type="Sprite3D" parent="Backdrop" index="16" unique_id=1830316]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, -25.65, 2.1427855, -13.96)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Pillar18" type="Sprite3D" parent="Backdrop" index="17" unique_id=1830317]
+transform = Transform3D(0.91, 0, 0, 0, 0.91, 0, 0, 0, 0.91, -22.68, -0.25, -18.39)
+cast_shadow = 0
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Pillar19" type="Sprite3D" parent="Backdrop" index="18" unique_id=1830318]
+transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, -18.87, -0.25, -23.58)
+cast_shadow = 0
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss20" type="Sprite3D" parent="Backdrop" index="19" unique_id=1830319]
+transform = Transform3D(0.91, 0, 0, 0, 0.91, 0, 0, 0, 0.91, -14.46, -0.25, -26.29)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Rock21" type="Sprite3D" parent="Backdrop" index="20" unique_id=1830320]
+transform = Transform3D(1.03, 0, 0, 0, 1.03, 0, 0, 0, 1.03, -9.85, 1.5081549, -28.55)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Pillar22" type="Sprite3D" parent="Backdrop" index="21" unique_id=1830321]
+transform = Transform3D(0.95, 0, 0, 0, 0.95, 0, 0, 0, 0.95, -2.65, 3.5076056, -30.69)
+cast_shadow = 0
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock23" type="Sprite3D" parent="Backdrop" index="22" unique_id=1830322]
+transform = Transform3D(1.06, 0, 0, 0, 1.06, 0, 0, 0, 1.06, 3.15, -0.25, -29.63)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss24" type="Sprite3D" parent="Backdrop" index="23" unique_id=1830323]
+transform = Transform3D(0.99, 0, 0, 0, 0.99, 0, 0, 0, 0.99, 8.29, 2.082508, -28.83)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Moss25" type="Sprite3D" parent="Backdrop" index="24" unique_id=1830324]
+transform = Transform3D(1.14, 0, 0, 0, 1.14, 0, 0, 0, 1.14, 14.33, -0.25, -26.35)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_3")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Moss26" type="Sprite3D" parent="Backdrop" index="25" unique_id=1830325]
+transform = Transform3D(0.98, 0, 0, 0, 0.98, 0, 0, 0, 0.98, 18.76, -0.25, -23.67)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_2")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Moss27" type="Sprite3D" parent="Backdrop" index="26" unique_id=1830326]
+transform = Transform3D(1.02, 0, 0, 0, 1.02, 0, 0, 0, 1.02, 22.87, 2.133956, -19.73)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_3")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Moss28" type="Sprite3D" parent="Backdrop" index="27" unique_id=1830327]
+transform = Transform3D(0.94, 0, 0, 0, 0.94, 0, 0, 0, 0.94, 25.42, -0.25, -15.93)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Pillar29" type="Sprite3D" parent="Backdrop" index="28" unique_id=1830328]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.256796, 2.9373865, -10.92)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock30" type="Sprite3D" parent="Backdrop" index="29" unique_id=1830329]
+transform = Transform3D(0.86, 0, 0, 0, 0.86, 0, 0, 0, 0.86, 33.02, -0.25, -3.49)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss31" type="Sprite3D" parent="Backdrop" index="30" unique_id=1830330]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 29.54, -0.25, 19.14)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Rock32" type="Sprite3D" parent="Backdrop" index="31" unique_id=1830331]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 25.3, -0.25, 24.76)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock33" type="Sprite3D" parent="Backdrop" index="32" unique_id=1830332]
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, 19.94, -0.25, 29.97)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock34" type="Sprite3D" parent="Backdrop" index="33" unique_id=1830333]
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, 11.45, -0.25, 34.76)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock35" type="Sprite3D" parent="Backdrop" index="34" unique_id=1830334]
+transform = Transform3D(0.62, 0, 0, 0, 0.62, 0, 0, 0, 0.62, 2.31, -0.25, 36.33)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock36" type="Sprite3D" parent="Backdrop" index="35" unique_id=1830335]
+transform = Transform3D(0.48, 0, 0, 0, 0.48, 0, 0, 0, 0.48, -3.12, -0.25, 36.27)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock37" type="Sprite3D" parent="Backdrop" index="36" unique_id=1830336]
+transform = Transform3D(0.48, 0, 0, 0, 0.48, 0, 0, 0, 0.48, -12.33, -0.25, 33.4)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_3")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock38" type="Sprite3D" parent="Backdrop" index="37" unique_id=1830337]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, -19.88, -0.25, 29.53)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss39" type="Sprite3D" parent="Backdrop" index="38" unique_id=1830338]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -25.29, -0.25, 24.49)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Rock40" type="Sprite3D" parent="Backdrop" index="39" unique_id=1830339]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -26.01285, 0.95547867, 18.44)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss41" type="Sprite3D" parent="Backdrop" index="40" unique_id=1830340]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -27.221819, 1.2486873, 13.229245)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_3")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Moss42" type="Sprite3D" parent="Backdrop" index="41" unique_id=1830341]
+transform = Transform3D(1.29, 0, 0, 0, 1.29, 0, 0, 0, 1.29, -29.377388, 3.2949653, -16.22388)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Moss43" type="Sprite3D" parent="Backdrop" index="42" unique_id=1830342]
+transform = Transform3D(1.27, 0, 0, 0, 1.27, 0, 0, 0, 1.27, -30.11, -0.25, -18.61)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_2")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Pillar44" type="Sprite3D" parent="Backdrop" index="43" unique_id=1830343]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -23.62, -0.25, -26.37)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss45" type="Sprite3D" parent="Backdrop" index="44" unique_id=1830344]
+transform = Transform3D(1.29, 0, 0, 0, 1.29, 0, 0, 0, 1.29, -17.78, -0.25, -31.53)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_1")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Pillar46" type="Sprite3D" parent="Backdrop" index="45" unique_id=1830345]
+transform = Transform3D(1.24, 0, 0, 0, 1.24, 0, 0, 0, 1.24, -10.92, 4.9137087, -33.88)
+cast_shadow = 0
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock47" type="Sprite3D" parent="Backdrop" index="46" unique_id=1830346]
+transform = Transform3D(1.45, 0, 0, 0, 1.45, 0, 0, 0, 1.45, -1.13, -0.25, -35.58)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Rock48" type="Sprite3D" parent="Backdrop" index="47" unique_id=1830347]
+transform = Transform3D(1.36, 0, 0, 0, 1.36, 0, 0, 0, 1.36, 6.42, 1.7513151, -35.42)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_2")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss49" type="Sprite3D" parent="Backdrop" index="48" unique_id=1830348]
+transform = Transform3D(1.46, 0, 0, 0, 1.46, 0, 0, 0, 1.46, 12.81, -0.25, -33.43)
+cast_shadow = 0
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_3")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Pillar50" type="Sprite3D" parent="Backdrop" index="49" unique_id=1830349]
+transform = Transform3D(1.39, 0, 0, 0, 1.39, 0, 0, 0, 1.39, 20.03, 5.2091055, -28.95)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.007161
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_pillar_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="Moss51" type="Sprite3D" parent="Backdrop" index="50" unique_id=1830350]
+transform = Transform3D(1.49, 0, 0, 0, 1.49, 0, 0, 0, 1.49, 25.53, -0.25, -25.09)
+cast_shadow = 0
+flip_h = true
+pixel_size = 0.005859
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_moss_3")
+script = ExtResource("backdrop_sprite")
+sway = true
+sway_amplitude = 0.07
+sway_speed = 1.2
+
+[node name="Rock52" type="Sprite3D" parent="Backdrop" index="51" unique_id=1830351]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 31.47, -0.25, -16.21)
+cast_shadow = 0
+pixel_size = 0.005582
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("tex_rock_1")
+script = ExtResource("backdrop_sprite")
+
+[node name="SeaMood" type="Node" parent="." index="13" unique_id=1830800 node_paths=PackedStringArray("lagoon", "world_environment", "sun", "grade")]
+script = ExtResource("sea_mood")
+lagoon = NodePath("../General/VoidSmoke")
+world_environment = NodePath("../General/WorldEnvironment")
+sun = NodePath("../General/DirectionalLight3D")
+grade = NodePath("../RoomAtmosphere/Overlay/Vintage")
+start_palette = ExtResource("palette_calm")
+
+[node name="RoomAtmosphere" parent="." index="14" unique_id=1633403622 instance=ExtResource("atmosphere")]
+
+[node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1633403622, 1300233738) index="0" unique_id=1611482802]
+material = SubResource("ShaderMaterial_xaok0")
+
+[node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1633403622, 1300233738) index="1" unique_id=1448896067]
+leaf_count = 14
+leaf_color = Color(0.95, 0.97, 0.94, 0.5)
+leaf_size = 7.0
+leaf_width_ratio = 0.85
+leaf_rotation_speed = 0.3
+trail_count = 6
+trail_color = Color(0.78, 0.95, 0.94, 0.4)
+
+[node name="ArenaDarkness" type="MeshInstance3D" parent="." index="15" unique_id=1830900]
+editor_description = "Darkness closing in around the island: a full-screen pass that darkens every pixel by its world distance from the island, so the backdrop pillars, rocks and moss sink into the dark. Tune it on the material (inner_radii, fade_meters, max_darkness). The pier corridor stays lit."
+material_override = SubResource("ArenaDarknessMaterial")
+cast_shadow = 0
+custom_aabb = AABB(-500, -500, -500, 1000, 1000, 1000)
+mesh = SubResource("ArenaDarknessQuad")
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
+[editable path="GrapplePostIsland"]
+[editable path="RoomAtmosphere"]

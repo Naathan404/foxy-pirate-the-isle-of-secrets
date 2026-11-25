@@ -109,3 +109,14 @@ custom_minimum_size = Vector2(220, 60)
 layout_mode = 2
 theme_type_variation = &"ActionButton"
 text = "Leave"
+
+[node name="Fade" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

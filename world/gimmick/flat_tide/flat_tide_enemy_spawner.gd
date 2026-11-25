@@ -155,11 +155,7 @@ func _has_edge_clearance(point: Vector3, ground_body: StaticBody3D) -> bool:
 		var angle := TAU * index / EDGE_PROBE_COUNT
 		var offset := Vector3(cos(angle), 0.0, sin(angle)) * probe_radius
 		var hit := _raycast_ground(point + offset)
-		if (
-			hit.is_empty()
-			or hit.collider != ground_body
-			or hit.normal.y < MINIMUM_GROUND_NORMAL_Y
-		):
+		if hit.is_empty() or hit.collider != ground_body or hit.normal.y < MINIMUM_GROUND_NORMAL_Y:
 			return false
 	return true
 
@@ -192,18 +188,18 @@ func _away_from_player(point: Vector3) -> bool:
 	)
 
 
-func _spawn(point: Vector3, scene: PackedScene, is_elite: bool) -> void:
+func _spawn(point: Vector3, scene: PackedScene, is_elite: bool) -> bool:
 	if not _away_from_player(point):
-		return
+		return false
 	var spawn_position := point + Vector3.UP * ground_clearance
 	if scene == null or not scene.can_instantiate():
-		return
+		return false
 	var instance := scene.instantiate()
 	var enemy := instance as EnemyBase
 	if enemy == null:
 		instance.free()
 		push_warning("FlatTideEnemySpawner: scene enemy phải có root là EnemyBase.")
-		return
+		return false
 	for child in enemy.get_children():
 		var collider := child as CollisionShape3D
 		if collider == null or collider.disabled or collider.shape == null:
@@ -216,12 +212,13 @@ func _spawn(point: Vector3, scene: PackedScene, is_elite: bool) -> void:
 		)
 		if not get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
 			enemy.free()
-			return
+			return false
 	enemy.position = to_local(spawn_position)
 	enemy.destroy_on_death = true
 	add_child(enemy)
 	_spawn_effect(point, is_elite)
 	enemy_spawned.emit(enemy, is_elite)
+	return true
 
 
 func _spawn_effect(point: Vector3, is_elite: bool) -> void:

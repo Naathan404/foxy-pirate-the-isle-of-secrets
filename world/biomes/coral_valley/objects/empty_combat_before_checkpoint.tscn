@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/starfish.tscn" id="starfish"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="elite_starfish"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/crab.tscn" id="crab"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/crab/elite_crab.tscn" id="elite_crab"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="coral_skeleton"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="elite_coral_skeleton"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/barrel.tscn" id="barrel"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="elite_barrel"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="stone"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="wood_log"]
+
+[node name="EmptyCombatBefore" type="Node3D"]
+
+[node name="RandomEnemies" type="Node3D" parent="."]
+script = ExtResource("random_props")
+editor_description = "Four enemies, four equally likely types. Nine normal slots and one elite per type: 10% elite independently."
+spawn_positions = PackedVector3Array(-6, 0.26008015, -4, 0, 0.26008015, -6, 6, 0.26008015, -4, -6, 0.26008015, 4, 0, 0.26008015, 6, 6, 0.26008015, 4)
+fixed_spawn_count = 4
+prop_scenes = Array[PackedScene]([ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("starfish"), ExtResource("elite_starfish"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("crab"), ExtResource("elite_crab"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("coral_skeleton"), ExtResource("elite_coral_skeleton"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("barrel"), ExtResource("elite_barrel")])
+
+[node name="RandomObstacles" type="Node3D" parent="."]
+script = ExtResource("random_props")
+editor_description = "5-7 total stone/wood or shell/wood obstacles."
+spawn_positions = PackedVector3Array(-8, 0.21008015, -8, -4.5, 0.21008015, -11, 8, 0.21008015, -8, -10.5, 0.21008015, -4.2, 10.5, 0.21008015, 4.2, -8, 0.21008015, 8, 4.5, 0.21008015, 11.5, 8, 0.21008015, 8)
+min_spawn_count = 5
+max_spawn_count = 7
+prop_scenes = Array[PackedScene]([ExtResource("stone"), ExtResource("wood_log")])

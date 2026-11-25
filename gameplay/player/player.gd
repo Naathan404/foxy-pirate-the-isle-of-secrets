@@ -97,6 +97,7 @@ var _suppress_next_hit_reaction: bool = false
 @onready var stamina_label: Label = get_node_or_null("TestHUD/SP")
 @onready var hp_label: Label = get_node_or_null("TestHUD/HP")
 @onready var debug_grant_charms_button: Button = get_node_or_null("TestHUD/DebugGrantAllCharms")
+@onready var debug_scene_label: Label = get_node_or_null("TestHUD/Scene")
 
 
 func _ready() -> void:
@@ -118,6 +119,7 @@ func _ready() -> void:
 	# GameManager applies the debug grant before the button reads its state. This
 	# keeps the label correct after entering a new map.
 	_setup_debug_charm_button()
+	_setup_debug_scene_label()
 
 
 func _setup_debug_charm_button() -> void:
@@ -134,6 +136,35 @@ func _setup_debug_charm_button() -> void:
 		and not debug_grant_charms_button.pressed.is_connected(_on_debug_grant_all_charms_pressed)
 	):
 		debug_grant_charms_button.pressed.connect(_on_debug_grant_all_charms_pressed)
+
+
+## Debug builds show which scene Foxy is standing in, under the debug charm button.
+func _setup_debug_scene_label() -> void:
+	if not is_instance_valid(debug_scene_label):
+		return
+	debug_scene_label.visible = OS.is_debug_build()
+	if not OS.is_debug_build():
+		return
+	if not get_tree().scene_changed.is_connected(_update_debug_scene_label):
+		get_tree().scene_changed.connect(_update_debug_scene_label)
+	# current_scene is assigned after the new room's _ready, so read it on the next idle step.
+	_update_debug_scene_label.call_deferred()
+
+
+func _update_debug_scene_label() -> void:
+	if not is_instance_valid(debug_scene_label):
+		return
+	var scene := get_tree().current_scene
+	if scene == null:
+		scene = owner
+	var scene_name := "-"
+	if scene != null:
+		scene_name = (
+			scene.scene_file_path.get_file().get_basename()
+			if not scene.scene_file_path.is_empty()
+			else String(scene.name)
+		)
+	debug_scene_label.text = "Scene: %s" % scene_name
 
 
 func _on_debug_grant_all_charms_pressed() -> void:
@@ -676,7 +707,8 @@ func apply_charm_grapple_pull(
 		global_position = destination
 		return true
 	var duration := travel_distance / maxf(0.01, pull_speed_units_per_second)
-	_charm_grapple_tween = create_tween()
+	# Physics steps keep the pull in step with physics interpolation (no judder mid-pull).
+	_charm_grapple_tween = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	_charm_grapple_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_charm_grapple_tween.tween_property(self, "global_position", destination, duration)
 	_charm_grapple_tween.tween_callback(_on_charm_grapple_finished)

@@ -8,9 +8,76 @@ const ATTACK_PLAYBACK_WINDOWS := {
 }
 const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
 const RUN_SIZE_MULTIPLIERS := {"D_Run": 1.1, "U_Run": 1.08}
+## Frames of a run clip averaged into its fixed anchor (about one stride at 60-120 fps).
+const RUN_ANCHOR_SAMPLES := 60
+## The up and down runs key the hip and neck with large, uneven hops (hold, then a sharp drop;
+## the neck bobs 18 Spine units per stride and the hip 15, against 5 and 0 in S_Run). The hip
+## is held at its average height and the neck follows an even wave timed to the clip's own
+## stride. The feet are IK targets, so they stay planted.
+const RUN_BOB_BONES := {"U_Run": ["center_U", "Neck_U"], "D_Run": ["center_D", "Neck_D"]}
+## Neck bob per stride (Spine units): the clip's own stride strength (fitted 18), played as an
+## even wave. With the hip held, the head travels about 40 units, against 68 in S_Run.
+const RUN_BOB_AMPLITUDE := 18.0
+## Every run clip is 0.7 s long with two strides.
+const RUN_CLIP_SECONDS := 0.7
+const RUN_STRIDES_PER_CLIP := 2.0
 const STRAY_EYE_SLOT := "Eyes/Eyes_01"
 ## Some Spine 3.8 dash clips are exposed by name but not as animation objects.
 const DASH_CLIP_DURATION := 0.5
+## spine-godot (GDExtension). Builds without it keep the sprite-sheet Foxy.
+const SPINE_SPRITE_CLASS := "SpineSprite3D"
+## SpineSprite3D.update_mode values.
+const SPINE_UPDATE_PROCESS := 0
+const SPINE_UPDATE_MANUAL := 2
+## SpineSprite3D.shadow_casting: Double-Sided.
+const SPINE_SHADOW_DOUBLE_SIDED := 2
+## Multiplied into the skeleton colour at full hit tint (red flash).
+const HIT_TINT_COLOR := Color(1.0, 0.25, 0.25)
+const SPINE_SLOT_NODE_CLASS := "SpineSlotNode3D"
+## Skeleton.update_world_transform(physics): Foxy has no physics constraints.
+const SPINE_PHYSICS_NONE := 0
+## Slash slot material: spine-godot's generated normal-blend shader, drawn without depth testing.
+const SLASH_SHADER_HEAD := """shader_type spatial;
+render_mode unshaded, depth_draw_never, depth_test_disabled, blend_mix, cull_disabled;
+"""
+const SLASH_SHADER_BODY := """
+uniform sampler2D spine_texture : repeat_disable;
+uniform bool spine_premultiplied_alpha = false;
+varying vec4 spine_light_color;
+varying vec3 spine_dark_color;
+vec3 spine_srgb_to_linear(vec3 color) {
+	return mix(pow((color + vec3(0.055)) / 1.055, vec3(2.4)), color / 12.92,
+		lessThanEqual(color, vec3(0.04045)));
+}
+void vertex() {
+	VERTEX = spine_apply_camera_depth(VERTEX, MODEL_MATRIX[3].xyz, MODEL_NORMAL_MATRIX[2],
+		INV_VIEW_MATRIX[3].xyz);
+	spine_light_color = CUSTOM0;
+	spine_dark_color = CUSTOM1.rgb;
+	if (!OUTPUT_IS_SRGB) {
+		spine_light_color.rgb = spine_srgb_to_linear(spine_light_color.rgb);
+		spine_dark_color = spine_srgb_to_linear(spine_dark_color);
+	}
+}
+void fragment() {
+	vec4 tex = texture(spine_texture, UV);
+	if (spine_premultiplied_alpha) tex.rgb = tex.a > 0.000001 ? tex.rgb / tex.a : vec3(0.0);
+	if (!OUTPUT_IS_SRGB) tex.rgb = spine_srgb_to_linear(tex.rgb);
+	ALBEDO = tex.rgb * spine_light_color.rgb + (vec3(1.0) - tex.rgb) * spine_dark_color;
+	ALPHA = tex.a * spine_light_color.a;
+	spine_apply_alpha_cutoff(ALPHA);
+}
+"""
+
+## Skeleton data by path, kept across rooms. Every room instances a new Foxy; loading the data
+## again meant decoding and uploading all twelve atlas pages, a ~0.4 s stall on each arrival.
+static var _skeleton_data_cache: Dictionary[String, Resource] = {}
+## Per run clip: Vector3(sum of bounds centre x, lowest bounds bottom, sample count). Shared by
+## every Foxy so the anchor is settled after the first stride of the session.
+static var _run_anchors: Dictionary[String, Vector3] = {}
+## Per run clip in RUN_BOB_BONES, measured over its first play of the session: time-weighted
+## sums of the hip height, the neck height and the neck's stride wave (cos and sin parts).
+static var _run_bob_fits: Dictionary[String, Dictionary] = {}
 
 @export var enabled: bool = true
 @export_file("*.tres")
@@ -28,29 +95,23 @@ var _active: bool = false
 var _fitted_transform: Transform3D = Transform3D.IDENTITY
 var _reference_height: float = 0.0
 var _reference_bottom: Vector3 = Vector3.ZERO
-var _idle_spine_height: float = 0.0
 var _fit_ready: bool = false
 var _current_spine_animation: String = ""
 var _current_spine_skin: String = ""
 var _dagger_combo_index: int = 0
 var _attack_spine_animation: String = ""
 var _attack_spine_skin: String = ""
-var _slash_overlay_shaders: Dictionary = {}
 var _attack_duration: float = 0.0
 var _dash_duration: float = 0.0
 var _run_playback_speed: float = 1.0
 var _hit_tint_strength: float = 0.0
-var _hit_overlay: StandardMaterial3D
+var _run_bob_last_time: float = -1.0
 
 
 func _ready() -> void:
 	visible = false
-	# Let the Spine node rebuild its draw meshes before updating the slash material.
+	# Run after the Spine node has advanced its clip this frame (its bounds are current).
 	process_priority = 100
-	_hit_overlay = StandardMaterial3D.new()
-	_hit_overlay.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_hit_overlay.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_hit_overlay.albedo_color = Color(1.0, 0.04, 0.04, 0.0)
 
 
 func set_hit_tint(strength: float) -> void:
@@ -59,12 +120,9 @@ func set_hit_tint(strength: float) -> void:
 
 
 func _update_hit_tint() -> void:
-	if not is_instance_valid(_spine) or _hit_overlay == null:
+	if not _is_spine_loaded():
 		return
-	_hit_overlay.albedo_color = Color(1.0, 0.04, 0.04, _hit_tint_strength)
-	for child in _spine.get_children():
-		if child is MeshInstance3D and String(child.name).begins_with("_SpineDraw3D_"):
-			(child as MeshInstance3D).material_overlay = _hit_overlay if _hit_tint_strength > 0.0 else null
+	_spine.get_skeleton().set_color(Color.WHITE.lerp(HIT_TINT_COLOR, _hit_tint_strength))
 
 
 ## Capture the authored idle pose before dash stretch, recoil and animation frames modify it.
@@ -119,14 +177,9 @@ func _process(_delta: float) -> void:
 	if not is_instance_valid(_spine) or not _active:
 		return
 	var hitstop := get_node_or_null("/root/HitstopController")
-	if hitstop != null and hitstop.is_frozen(get_parent().get_parent()):
-		_spine.pause()
-	else:
-		_spine.resume()
-	_update_slash_overlay()
+	_set_spine_paused(hitstop != null and hitstop.is_frozen(get_parent().get_parent()))
 	if _hit_tint_strength > 0.0:
 		_update_hit_tint()
-	_stabilize_dash_size()
 	_stabilize_run_size()
 
 
@@ -134,87 +187,36 @@ func _stabilize_run_size() -> void:
 	var factor: float = RUN_SIZE_MULTIPLIERS.get(_current_spine_animation, 1.0)
 	if factor == 1.0:
 		return
-	var bounds: AABB = _spine.get_aabb()
-	if bounds.size.x <= 0.01 or bounds.size.y <= 0.01:
+	# Centre and ground the enlarged clip on an anchor averaged over its first stride, then keep
+	# it fixed. Re-anchoring on each frame's bounds slid the whole body with every arm swing.
+	var anchor: Vector3 = _run_anchors.get(_current_spine_animation, Vector3(0.0, INF, 0.0))
+	if anchor.z < RUN_ANCHOR_SAMPLES:
+		var bounds: AABB = _spine_bounds()
+		if bounds.size.x > 0.01 and bounds.size.y > 0.01:
+			anchor.x += bounds.get_center().x
+			anchor.y = minf(anchor.y, bounds.position.y)
+			anchor.z += 1.0
+			_run_anchors[_current_spine_animation] = anchor
+	if anchor.z <= 0.0:
 		return
 	var pose := _spine.transform
 	var mirrored := signf(pose.basis.x.x) != signf(_fitted_transform.basis.x.x)
 	pose.basis.x = _fitted_transform.basis.x * (-factor if mirrored else factor)
 	pose.basis.y = _fitted_transform.basis.y * factor
-	pose.origin.x = _reference_bottom.x - pose.basis.x.x * bounds.get_center().x
-	pose.origin.y = _reference_bottom.y - pose.basis.y.y * bounds.position.y
+	pose.origin.x = _reference_bottom.x - pose.basis.x.x * anchor.x / anchor.z
+	pose.origin.y = _reference_bottom.y - pose.basis.y.y * anchor.y
 	_spine.transform = pose
 
 
-func _stabilize_dash_size() -> void:
-	if not _current_spine_animation.ends_with("_Dash") or _idle_spine_height <= 0.0:
+## This export leaves a setup-pose eye attachment near the feet, and its clips can restore it
+## every frame, so it is cleared after each pose update.
+func _hide_stray_eye() -> void:
+	if not _is_spine_loaded():
 		return
-	var bounds: AABB = _spine.get_aabb()
-	if bounds.size.y <= 0.01:
-		return
-	# The exported dash poses shrink vertically. Keep the previous foot anchoring
-	# and limit the side clip's correction so it cannot become long and thin.
-	var factor := maxf(1.0, _idle_spine_height / bounds.size.y)
-	if _current_spine_animation == "G1_Dash":
-		factor = minf(factor, 1.35)
-	var pose := _spine.transform
-	pose.basis.y = _fitted_transform.basis.y * factor
-	pose.origin.y = _reference_bottom.y - pose.basis.y.y * bounds.position.y
-	_spine.transform = pose
-
-
-func _update_slash_overlay() -> void:
-	var core := _spine.get_node_or_null("_SpineSpriteCore3D")
-	if core == null:
-		return
-	var commands: Array = core._get_render_commands_for_external_consumer()
-	var rows: Array = core._get_slot_render_rows_for_external_consumer()
-	for row in rows:
-		var slot_name := str(row.get("slot_name", ""))
-		var stray_eye := slot_name == STRAY_EYE_SLOT
-		if not stray_eye and not slot_name.to_lower().contains("slash"):
-			continue
-		if not row.has("command"):
-			continue
-		var slot_command: Dictionary = row["command"]
-		# Spine draw commands omit slot_name, so identify the matching mesh by geometry.
-		var index := -1
-		for command_index in commands.size():
-			var command: Dictionary = commands[command_index]
-			if command.get("page_index") == slot_command.get("page_index") \
-					and command.get("positions") == slot_command.get("positions") \
-					and command.get("uvs") == slot_command.get("uvs"):
-				index = command_index
-				break
-		if index < 0:
-			continue
-		var draw := _spine.get_node_or_null("_SpineDraw3D_%d" % index) as MeshInstance3D
-		if draw == null or not draw.visible:
-			continue
-		if stray_eye:
-			# This export leaves a setup-pose eye attachment near the feet.
-			# Its animation can restore the attachment every frame, so hide the draw.
-			draw.visible = false
-			var shadow := _spine.get_node_or_null("_SpineShadow3D_%d" % index) as MeshInstance3D
-			if shadow != null:
-				shadow.visible = false
-			continue
-		var material := draw.material_override as ShaderMaterial
-		if material == null or material.shader == null:
-			continue
-		var code := material.shader.code
-		if code.contains("depth_test_disabled"):
-			continue
-		var overlay_code := code.replace("depth_draw_always", "depth_draw_never, depth_test_disabled")
-		if overlay_code == code:
-			overlay_code = code.replace("depth_draw_never", "depth_draw_never, depth_test_disabled")
-		if overlay_code == code:
-			continue
-		if not _slash_overlay_shaders.has(code):
-			var shader := Shader.new()
-			shader.code = overlay_code
-			_slash_overlay_shaders[code] = shader
-		material.shader = _slash_overlay_shaders[code]
+	var slot = _spine.get_skeleton().find_slot(STRAY_EYE_SLOT)
+	if slot != null:
+		slot.get_pose().set_attachment(null)
+		slot.get_applied_pose().set_attachment(null)
 
 
 func set_dagger_combo_index(index: int) -> void:
@@ -255,7 +257,7 @@ func _apply_attack_speed() -> void:
 		playback_speed = window / _attack_duration
 	elif _current_spine_animation.ends_with("_Dash") and _dash_duration > 0.0:
 		var skeleton_data = _spine.get("skeleton_data_res")
-		var animation = skeleton_data.get_animation_object(_current_spine_animation)
+		var animation = skeleton_data.find_animation(_current_spine_animation)
 		var clip_duration := (
 			float(animation.get_duration()) if animation != null else DASH_CLIP_DURATION
 		)
@@ -266,7 +268,8 @@ func _apply_attack_speed() -> void:
 	_spine.set("time_scale", playback_speed)
 
 
-## The dash effect snapshots the meshes currently drawn by Spine.
+## The dash effect snapshots the meshes drawn by Spine; spine-godot draws without child meshes,
+## so the effect falls back to its sprite ghosts.
 func get_afterimage_source() -> Node3D:
 	return _spine if _active and visible and is_instance_valid(_spine) else null
 
@@ -332,38 +335,19 @@ func sync_animation(
 		if not _attack_spine_skin.is_empty():
 			target_skin = _attack_spine_skin
 	var show_preview := enabled and not target_animation.is_empty()
-	if show_preview and is_instance_valid(_spine) and (
-		restart
-		or _current_spine_animation != target_animation
-		or _current_spine_skin != target_skin
-	):
-		# Spine 3.8 cannot restore setup pose after a skin/clip change.
-		# A fresh instance prevents leftover bone and attachment state.
-		_spine.visible = false
-		_spine.set_process(false)
-		_spine.set_physics_process(false)
-		_spine.queue_free()
-		_spine = null
-		_load_attempted = false
+	# One Spine node serves every clip: rebuilding it on each change drew a frame of the setup
+	# pose (a visible flicker). _set_spine_skin returns the skeleton to its setup pose instead.
 	if show_preview:
 		show_preview = _ensure_spine()
 	if show_preview and not _fit_ready:
-		var calibration_core = _spine.get_node("_SpineSpriteCore3D")
 		if not spine_skin.is_empty():
-			show_preview = calibration_core.set_skin(spine_skin)
+			show_preview = _set_spine_skin(spine_skin)
 		if show_preview:
-			show_preview = bool(_spine.set_animation(spine_animation, true, 0))
+			show_preview = _play_spine(spine_animation, true)
 		if show_preview:
 			_fit_to_sprite()
 			show_preview = _fit_ready
-		if show_preview:
-			_spine.visible = false
-			_spine.set_process(false)
-			_spine.set_physics_process(false)
-			_spine.queue_free()
-			_spine = null
-			_load_attempted = false
-			show_preview = _ensure_spine()
+			_current_spine_animation = ""
 	if show_preview and (
 		not _active
 		or restart
@@ -371,12 +355,12 @@ func sync_animation(
 		or _current_spine_skin != target_skin
 	):
 		if not target_skin.is_empty():
-			var core = _spine.get_node("_SpineSpriteCore3D")
-			show_preview = core.set_skin(target_skin)
+			show_preview = _set_spine_skin(target_skin)
 		if show_preview:
 			var loop := not (String(animation_name).begins_with("attack_dagger_")
 				or String(animation_name).begins_with("dash_"))
-			show_preview = bool(_spine.set_animation(target_animation, loop, 0))
+			_run_bob_last_time = -1.0
+			show_preview = _play_spine(target_animation, loop)
 		if show_preview:
 			_current_spine_animation = target_animation
 			_current_spine_skin = target_skin
@@ -386,7 +370,7 @@ func sync_animation(
 	if not is_instance_valid(_spine):
 		return
 	if not _active:
-		_spine.pause()
+		_set_spine_paused(true)
 		return
 	_apply_attack_speed()
 	# Mirror the artwork and its fitted offset together.
@@ -407,41 +391,150 @@ func sync_animation(
 		rotation.y = atan2(direction.x, direction.z)
 
 
+## Runs after the clip is applied and before bone world transforms are built.
+func _on_spine_pose_applied(_sprite: Node) -> void:
+	if RUN_BOB_BONES.has(_current_spine_animation):
+		_even_out_run_bob(_current_spine_animation)
+
+
+func _even_out_run_bob(animation_name: String) -> void:
+	if not is_instance_valid(_spine):
+		return
+	var track = _spine.get_animation_state().get_track(0)
+	if track == null:
+		return
+	var time := float(track.get_track_time())
+	var step := time - _run_bob_last_time
+	_run_bob_last_time = time
+	var skeleton = _spine.get_skeleton()
+	var hip = skeleton.find_bone(RUN_BOB_BONES[animation_name][0]).get_pose()
+	var neck = skeleton.find_bone(RUN_BOB_BONES[animation_name][1]).get_pose()
+	var stride := TAU * RUN_STRIDES_PER_CLIP / RUN_CLIP_SECONDS * time
+	var fit: Dictionary = _run_bob_fits.get(
+		animation_name, {"hip": 0.0, "neck": 0.0, "cos": 0.0, "sin": 0.0, "time": 0.0}
+	)
+	# Learn the authored averages and stride timing over the first play of the session.
+	if float(fit.time) < RUN_CLIP_SECONDS and step > 0.0 and step < RUN_CLIP_SECONDS * 0.5:
+		fit.hip += float(hip.get_y()) * step
+		fit.neck += float(neck.get_y()) * step
+		fit.cos += float(neck.get_y()) * cos(stride) * step
+		fit.sin += float(neck.get_y()) * sin(stride) * step
+		fit.time += step
+		_run_bob_fits[animation_name] = fit
+	if float(fit.time) <= 0.0:
+		return
+	hip.set_y(fit.hip / fit.time)
+	neck.set_y(fit.neck / fit.time + RUN_BOB_AMPLITUDE * cos(stride - atan2(fit.sin, fit.cos)))
+
+
 func _ensure_spine() -> bool:
 	if is_instance_valid(_spine):
-		return _spine.is_loaded()
+		return _is_spine_loaded()
 	if _load_attempted:
 		return false
 	_load_attempted = true
-	# Avoid a hard native-resource dependency on platforms without this Windows addon.
-	if not ClassDB.class_exists("SpineBridge"):
+	# Avoid a hard dependency on the extension: builds without it keep the sprite sheet.
+	if not ClassDB.class_exists(SPINE_SPRITE_CLASS) or not ResourceLoader.exists(skeleton_data_path):
 		return false
-	var script_path := "res://addons/spine_bridge/scripts/spine_sprite_3d.gd"
-	if not ResourceLoader.exists(script_path) or not ResourceLoader.exists(skeleton_data_path):
-		return false
-	var spine_script := load(script_path) as Script
-	_spine = spine_script.new() as Node3D
-	if not _spine.has_method("set_animation"):
-		_spine.free()
-		_spine = null
-		push_warning("Spine idle preview needs the SpineBridge 3.8 playback patch")
-		return false
+	_spine = ClassDB.instantiate(SPINE_SPRITE_CLASS) as Node3D
 	add_child(_spine)
-	_spine.set("shadow_casting", 2)  # Double Sided
-	var skeleton_data = load(skeleton_data_path)
+	_spine.set("shadow_casting", SPINE_SHADOW_DOUBLE_SIDED)
+	var skeleton_data: Resource = _skeleton_data_cache.get(skeleton_data_path)
+	if skeleton_data == null:
+		skeleton_data = load(skeleton_data_path)
+		_skeleton_data_cache[skeleton_data_path] = skeleton_data
 	_spine.set("skeleton_data_res", skeleton_data)
-	_spine.pause()
-	return _spine.is_loaded()
+	_set_spine_paused(true)
+	if not _is_spine_loaded():
+		return false
+	_spine.world_transforms_changed.connect(_hide_stray_eye.unbind(1))
+	_spine.before_world_transforms_change.connect(_on_spine_pose_applied)
+	_add_slash_overlays()
+	return true
+
+
+## Skeleton bounds in the Spine node's space. Computed from the bones, so it also works while
+## the preview is hidden (SpineSprite3D only measures what it has drawn).
+func _spine_bounds() -> AABB:
+	var rect: Rect2 = _spine.get_skeleton().get_bounds()
+	var pixel_size: float = _spine.get("pixel_size")
+	return AABB(
+		Vector3(rect.position.x, -rect.end.y, 0.0) * pixel_size,
+		Vector3(rect.size.x, rect.size.y, 0.0) * pixel_size
+	)
+
+
+func _is_spine_loaded() -> bool:
+	return is_instance_valid(_spine) and _spine.get_skeleton() != null
+
+
+func _set_spine_paused(paused: bool) -> void:
+	if is_instance_valid(_spine):
+		_spine.set("update_mode", SPINE_UPDATE_MANUAL if paused else SPINE_UPDATE_PROCESS)
+
+
+func _set_spine_skin(skin_name: String) -> bool:
+	var skeleton_data = _spine.get("skeleton_data_res")
+	if skeleton_data == null or skeleton_data.find_skin(skin_name) == null:
+		return false
+	var skeleton = _spine.get_skeleton()
+	skeleton.set_skin_by_name(skin_name)
+	skeleton.set_to_setup_pose()
+	# Some default-skin meshes are weighted to bones of other skins (Eyes/Eyes_08 to the side
+	# skin's "bone"). Those bones are inactive and never updated, so they would keep the last
+	# pose of the previous skin and draw the mesh floating there. A never-posed bone has a zero
+	# matrix, which collapses such meshes out of sight, as a fresh 3.8 instance did.
+	for bone in skeleton.get_bones():
+		if not bone.is_active():
+			var pose = bone.get_applied_pose()
+			pose.set_a(0.0)
+			pose.set_b(0.0)
+			pose.set_c(0.0)
+			pose.set_d(0.0)
+	return true
+
+
+## Starts `animation_name` and poses the skeleton on its first frame right away, so the next
+## draw and any bounds read this frame already show the new clip.
+func _play_spine(animation_name: String, loop: bool) -> bool:
+	if _spine.get_animation_state().set_animation(animation_name, loop, 0) == null:
+		return false
+	_pose_spine_now()
+	return true
+
+
+## SpineSprite3D skips update_skeleton() while it is hidden (as during calibration), so the
+## clip is applied and the world transforms rebuilt directly.
+func _pose_spine_now() -> void:
+	var skeleton = _spine.get_skeleton()
+	_spine.get_animation_state().apply(skeleton)
+	_hide_stray_eye()
+	skeleton.update_world_transform(SPINE_PHYSICS_NONE)
+
+
+## Draws the slash slots over the terrain, as the dagger trail did with SpineBridge: the trail
+## lies in the sprite's tilted plane and would otherwise sink into the ground.
+func _add_slash_overlays() -> void:
+	var material := ShaderMaterial.new()
+	material.shader = Shader.new()
+	material.shader.code = SLASH_SHADER_HEAD + _spine.get_depth_shader_code() + SLASH_SHADER_BODY
+	for slot in _spine.get_skeleton().get_slots():
+		var slot_name: String = slot.get_data().get_name()
+		if not slot_name.to_lower().contains("slash"):
+			continue
+		var overlay := ClassDB.instantiate(SPINE_SLOT_NODE_CLASS) as Node3D
+		overlay.set("slot_name", slot_name)
+		overlay.set("normal_material", material)
+		_spine.add_child(overlay)
 
 
 func _fit_to_sprite() -> void:
 	# Calibrate once against the authored idle pose. Action clips can start compressed.
 	_spine.transform = Transform3D.IDENTITY
-	_spine.update_skeleton(0.0)
-	var bounds: AABB = _spine.get_aabb()
+	_pose_spine_now()
+	var bounds: AABB = _spine_bounds()
 	if bounds.size.y <= 0.0 or _reference_height <= 0.0:
 		return
-	_idle_spine_height = bounds.size.y
 	var factor := _reference_height / bounds.size.y * size_multiplier
 	_spine.scale = Vector3.ONE * factor
 	_spine.position = (

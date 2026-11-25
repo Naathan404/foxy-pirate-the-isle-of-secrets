@@ -1,0 +1,20 @@
+{
+  "source": "assets/sprites/biomes/coral_valley/coral_valley_ground.png",
+  "out_ground": "assets/sprites/biomes/coral_valley/coral_valley_room_23_west_ground.png",
+  "out_shore": "assets/sprites/biomes/coral_valley/coral_valley_room_23_shore.png",
+  "ground_rect": [-15.5166, -18.13858, 31.20751, 39.66346],
+  "seed": 1923,
+  "ground_style": "ripple",
+  "ripple_angle_degrees": 24.0,
+  "wrack_line": true,
+  "paths": [
+    [[-15.0, -0.4], [-10.0, -0.6], [-5.0, 1.0], [0.0, 0.6]],
+    [[0.0, 0.6], [5.0, 0.9545], [10.0, 0.2545], [15.0, 0.5545]]
+  ],
+  "path_half_width": 1.6,
+  "plaza": null,
+  "tide_pools": [[8.4, 9.6, 1.0, 0.6], [-6.6, -9.6, 0.9, 0.55]],
+  "starfish": [],
+  "speckle_count": 2600,
+  "paw_prints": true
+}

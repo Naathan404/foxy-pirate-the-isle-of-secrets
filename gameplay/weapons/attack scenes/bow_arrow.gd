@@ -92,6 +92,8 @@ var _had_homing_target: bool = false
 
 
 func _ready() -> void:
+	# The sprite already interpolates itself between physics steps in _process.
+	_sprite.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	hide()
 	set_physics_process(false)
 	hitbox.damage_prepared.connect(_on_damage_prepared)

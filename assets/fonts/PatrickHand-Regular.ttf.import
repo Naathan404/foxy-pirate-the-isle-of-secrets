@@ -12,7 +12,6 @@ dest_files=["res://.godot/imported/PatrickHand-Regular.ttf-576f5715074e983a25a9c
 
 [params]
 
-Rendering=null
 antialiasing=1
 generate_mipmaps=false
 disable_embedded_bitmaps=true
@@ -26,9 +25,7 @@ hinting=3
 subpixel_positioning=4
 keep_rounding_remainders=true
 oversampling=0.0
-Fallbacks=null
 fallbacks=[]
-Compress=null
 compress=true
 preload=[]
 language_support={}

@@ -93,6 +93,7 @@ func _read_file(file_path: String) -> ReadResult:
 	if json.parse(text) != OK or not json.data is Dictionary:
 		return ReadResult.failed(ERR_PARSE_ERROR, "The save file is damaged.")
 	var payload := json.data as Dictionary
+	GameSaveSnapshot.migrate(payload)
 	var problem := GameSaveSnapshot.validate(payload)
 	if not problem.is_empty():
 		var error := (

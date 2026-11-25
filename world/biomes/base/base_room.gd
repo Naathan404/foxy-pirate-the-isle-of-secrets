@@ -13,20 +13,22 @@ const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
 # //NLVP sửa: Tách biên người chơi và biên quái.
 const PLAYER_BOUNDARIES_NAME := &"GroundBoundaries"
 const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
+## Slack around floor bounds so edges that merely touch another floor are still tested.
+const EDGE_BOUNDS_MARGIN := 0.01
 
 @export_tool_button("Refresh destination exits", "Reload") var refresh_destination_exits: Callable:
 	get:
 		return _refresh_destination_inspector
 
 @export_group("Void")
-## Reload when Foxy falls below this height relative to the room origin.
+## Falling below this height relative to the room origin kills Foxy, who then respawns at
+## the campfire of the latest rest like any other death.
 @export var void_reload_enabled: bool = true
 @export var void_height: float = -6.0
 
 @export_group("Safe room")
-## Charms can be changed anywhere in this room (the hub, campfire rests). Checkpoints still
-## add their own safe area in rooms without this flag. A campfire in this room can save the
-## game only while this flag is on.
+## Charms can be changed anywhere in this room (the hub, campfire rests). A campfire in this
+## room can be rested at and save the game only while this flag is on.
 @export var safe_room: bool = false
 
 @export_group("Ground boundaries")
@@ -102,6 +104,36 @@ const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 		left_destination_trigger_id = value
 		_queue_refresh()
 
+var _exits_locked := false
+var _boundary_rebuild_queued := false
+## World cycle this room was built in; its records are ignored once a rest starts a new one.
+var _state_cycle: int = -1
+
+
+## The room that owns `node`, or null when it is not inside one (tests, tool scenes).
+static func find_room(node: Node) -> BaseRoom:
+	var current := node.get_parent() if node != null else null
+	while current != null:
+		if current is BaseRoom:
+			return current as BaseRoom
+		current = current.get_parent()
+	return null
+
+
+## A random source for `source` that repeats within a world cycle and changes on each rest,
+## so the room keeps its layout between visits. Outside a game it is simply randomized.
+static func create_random(source: Node) -> RandomNumberGenerator:
+	var random := RandomNumberGenerator.new()
+	var room := find_room(source)
+	var manager := source.get_node_or_null("/root/GameManager") if source.is_inside_tree() else null
+	if room == null or manager == null or room.scene_file_path.is_empty():
+		random.randomize()
+		return random
+	random.seed = manager.room_states.seed_for(
+		room.scene_file_path, String(room.get_path_to(source))
+	)
+	return random
+
 
 func _ready() -> void:
 	# Arrival placement can run as soon as scene_changed fires. Set trigger IDs
@@ -110,6 +142,7 @@ func _ready() -> void:
 	if not Engine.is_editor_hint():
 		_rebuild_ground_boundaries()
 		_grant_safe_room()
+		_apply_room_state()
 	if Engine.is_editor_hint():
 		set_physics_process(false)
 		update_configuration_warnings()
@@ -122,8 +155,49 @@ func _physics_process(_delta: float) -> void:
 	var active_player := manager.player as Node3D
 	if not is_instance_valid(active_player) or not is_ancestor_of(active_player):
 		return
+	var falling_player := active_player as Player
+	if falling_player.dead:
+		return
 	if to_local(active_player.global_position).y < void_height:
-		manager.reload_current_scene()
+		falling_player.die()
+
+
+## Restores and starts recording one stateful object. Objects present when the room becomes
+## ready are tracked automatically; call this for stateful objects spawned later, after they
+## are added under the room with a stable name.
+## - Enemies and breakable props stay gone until the next rest.
+## - Treasure chests stay open for the whole run.
+func track_object(node: Node) -> void:
+	if Engine.is_editor_hint() or scene_file_path.is_empty() or not is_ancestor_of(node):
+		return
+	var registry: RoomStateRegistry = get_node("/root/GameManager").room_states
+	var key := String(get_path_to(node))
+	if node is TreasureChest:
+		var chest := node as TreasureChest
+		if registry.is_permanent(scene_file_path, key):
+			chest.restore_opened()
+		else:
+			chest.destroyed.connect(registry.mark_permanent.bind(scene_file_path, key))
+	elif node is DestructibleProp:
+		var prop := node as DestructibleProp
+		if registry.is_cleared(scene_file_path, key):
+			_remove_cleared(prop)
+		else:
+			prop.destroyed.connect(registry.mark_cleared.bind(scene_file_path, key, _state_cycle))
+	elif node is EnemyBase:
+		var enemy := node as EnemyBase
+		if registry.is_cleared(scene_file_path, key):
+			_remove_cleared(enemy)
+		else:
+			enemy.died.connect(registry.mark_cleared.bind(scene_file_path, key, _state_cycle))
+
+
+## Close the island's player boundary and disable transitions without hiding paths.
+func set_exits_locked(locked: bool) -> void:
+	if _exits_locked == locked:
+		return
+	_exits_locked = locked
+	_queue_refresh()
 
 
 ## Foxy is a child of the room, so it has registered with GameManager before the room is
@@ -136,6 +210,23 @@ func _grant_safe_room() -> void:
 		return
 	if is_instance_valid(active_player.charm_socket_manager):
 		active_player.charm_socket_manager.enter_safe_location(self)
+
+
+## Children are ready first, including enemies and props spawned by random sources, so
+## the whole room can be matched against the records of this cycle here.
+func _apply_room_state() -> void:
+	if scene_file_path.is_empty():
+		return
+	_state_cycle = get_node("/root/GameManager").room_states.cycle
+	for node: Node in find_children("*", "", true, false):
+		track_object(node)
+
+
+## Removed before it can act; it never reappears until the next rest.
+func _remove_cleared(node: Node3D) -> void:
+	node.process_mode = Node.PROCESS_MODE_DISABLED
+	node.hide()
+	node.queue_free()
 
 
 func _queue_refresh() -> void:
@@ -196,12 +287,22 @@ func _refresh_exits() -> void:
 		left_destination_trigger_id
 	)
 	if is_inside_tree() and is_node_ready() and not Engine.is_editor_hint():
-		_rebuild_ground_boundaries.call_deferred()
+		queue_boundary_rebuild()
+
+
+## Rebuilds the boundaries once at the end of the frame, however many changes asked for it
+## (an exit lock and a floor switched off by the same event cost one rebuild).
+func queue_boundary_rebuild() -> void:
+	if _boundary_rebuild_queued:
+		return
+	_boundary_rebuild_queued = true
+	_rebuild_ground_boundaries.call_deferred()
 
 
 ## Generate walls along the exposed edges of the floors. Paths are
 ## included only while open, so their overlap with the ground remains walkable.
 func _rebuild_ground_boundaries() -> void:
+	_boundary_rebuild_queued = false
 	# //NLVP sửa: Dọn cả hai lớp biên trước khi dựng lại.
 	for boundary_name in [PLAYER_BOUNDARIES_NAME, ENEMY_BOUNDARIES_NAME]:
 		var old := get_node_or_null(NodePath(boundary_name))
@@ -222,7 +323,7 @@ func _rebuild_ground_boundaries() -> void:
 	if not boundary_enabled:
 		return
 	for entry in [["UpPath", UP], ["RightPath", RIGHT], ["DownPath", DOWN], ["LeftPath", LEFT]]:
-		if open_exits & entry[1]:
+		if not _exits_locked and (open_exits & entry[1]):
 			_collect_floors(get_node_or_null("Exits/%s/StaticBody3D" % entry[0]), floors)
 	_create_ground_boundaries(
 		PLAYER_BOUNDARIES_NAME, CombatLayers.PLAYER_BOUNDARY, floors, boundary_openings
@@ -231,20 +332,19 @@ func _rebuild_ground_boundaries() -> void:
 
 # //NLVP sửa: Dùng chung cách dựng vách cho người chơi và quái.
 func _create_ground_boundaries(
-	boundary_name: StringName,
-	layer: int,
-	floors: Array[Dictionary],
-	openings: Array[Rect2]
+	boundary_name: StringName, layer: int, floors: Array[Dictionary], openings: Array[Rect2]
 ) -> void:
 	var walls := StaticBody3D.new()
 	walls.name = boundary_name
 	walls.collision_layer = layer
 	walls.collision_mask = 0
-	add_child(walls)
 	for floor_data: Dictionary in floors:
 		var outline: PackedVector2Array = floor_data.outline
 		for i in range(outline.size() - 1):
 			_add_floor_edge(walls, floors, outline[i], outline[i + 1], floor_data.top, openings)
+	# Shapes go in before the body enters the tree: a body already in the physics space rebuilds
+	# its compound shape on every added wall, which made a rebuild cost tens of milliseconds.
+	add_child(walls)
 
 
 func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
@@ -281,7 +381,14 @@ func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
 		# The hull is counterclockwise and repeats the first point at the end.
 		var outline := Geometry2D.convex_hull(projected)
 		if outline.size() >= 4:
-			floors.append({"outline": outline, "top": top})
+			floors.append({"outline": outline, "top": top, "bounds": _outline_bounds(outline)})
+
+
+func _outline_bounds(outline: PackedVector2Array) -> Rect2:
+	var bounds := Rect2(outline[0], Vector2.ZERO)
+	for point: Vector2 in outline:
+		bounds = bounds.expand(point)
+	return bounds
 
 
 # //NLVP sửa: Mỗi lớp biên nhận danh sách cửa mở riêng.
@@ -297,8 +404,10 @@ func _add_floor_edge(
 	if edge.length_squared() < 0.0001:
 		return
 	var cuts: Array[float] = [0.0, 1.0]
+	# Only floors whose bounds touch the edge can cut it; skipping the rest keeps a rebuild cheap.
+	var edge_bounds := Rect2(start, Vector2.ZERO).expand(end).grow(EDGE_BOUNDS_MARGIN)
 	for other: Dictionary in floors:
-		if absf(float(other.top) - top) < 0.5:
+		if absf(float(other.top) - top) < 0.5 and edge_bounds.intersects(other.bounds):
 			_split_edge(start, end, other.outline, cuts)
 	for opening: Rect2 in openings:
 		var outline := PackedVector2Array(
@@ -315,7 +424,13 @@ func _add_floor_edge(
 	var outward := Vector2(edge.y, -edge.x).normalized()
 	for i in range(cuts.size() - 1):
 		_add_boundary(
-			walls, floors, start + edge * cuts[i], start + edge * cuts[i + 1], outward, top, openings
+			walls,
+			floors,
+			start + edge * cuts[i],
+			start + edge * cuts[i + 1],
+			outward,
+			top,
+			openings
 		)
 
 
@@ -347,10 +462,12 @@ func _add_boundary(
 	for opening: Rect2 in openings:
 		if opening.has_point(midpoint):
 			return
+	var probe := midpoint + outward * 0.01
 	for other: Dictionary in floors:
 		if (
 			absf(float(other.top) - top) < 0.5
-			and Geometry2D.is_point_in_polygon(midpoint + outward * 0.01, other.outline)
+			and (other.bounds as Rect2).grow(EDGE_BOUNDS_MARGIN).has_point(probe)
+			and Geometry2D.is_point_in_polygon(probe, other.outline)
 		):
 			return
 	var wall := CollisionShape3D.new()
@@ -386,11 +503,12 @@ func _apply_exit(
 	trigger.set("trigger_id", local_id)
 	trigger.set("destination_scene", destination_scene)
 	trigger.set("destination_trigger_id", destination_id)
-	trigger.set("enabled", is_open)
-	trigger.monitoring = is_open
+	var can_transition := is_open and not _exits_locked
+	trigger.set("enabled", can_transition)
+	trigger.monitoring = can_transition
 	var shape := trigger.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if shape != null:
-		shape.disabled = not is_open
+		shape.disabled = not can_transition
 
 
 func _get_configuration_warnings() -> PackedStringArray:

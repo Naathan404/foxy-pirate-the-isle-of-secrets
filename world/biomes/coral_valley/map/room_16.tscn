@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="3_enemy_entry"]
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="4_tide_enemy"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="5_6kymb"]
-[ext_resource type="Shader" uid="uid://dre6s5uyye8cg" path="res://world/biomes/base/void_smoke.gdshader" id="5_void"]
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="prop_wood_log"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="prop_shell"]
@@ -15,21 +14,70 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 
+[ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
+[ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
+[ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
+[ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
+[ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
+[ext_resource type="Texture2D" uid="uid://2j5tmy8nnsem" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_16_ground.png" id="sand_texture"]
+[ext_resource type="Texture2D" uid="uid://dobs2p6tqoeuv" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_16_shore.png" id="shore_texture"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
+[ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
+[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="lm_beach_coral_orange"]
+[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="lm_beach_coral_pink"]
+[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="lm_beach_coral_turquoise"]
+[ext_resource type="Shader" uid="uid://ddkgna0vceam3" path="res://world/gimmick/flat_tide/flat_tide_volume.gdshader" id="tide_volume_shader"]
 [sub_resource type="Environment" id="Environment_pr0q3"]
 resource_local_to_scene = true
 background_mode = 1
-background_color = Color(0.012, 0.009, 0.02, 1)
+background_color = Color(0.1, 0.02, 0.03, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.7, 0.68, 0.72, 1)
+ambient_light_color = Color(0.68, 0.5, 0.48, 1)
+ambient_light_energy = 0.62
+tonemap_mode = 2
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.6
+glow_strength = 0.9
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_water"]
+seed = 77
+frequency = 0.02
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_water")
+seamless = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rw33m"]
 resource_local_to_scene = true
 render_priority = 0
-shader = ExtResource("5_void")
-shader_parameter/void_color = Color(0.012, 0.009, 0.02, 1)
-shader_parameter/smoke_color = Color(0.15, 0.12, 0.18, 1)
-shader_parameter/smoke_strength = 0.48
-shader_parameter/rise_speed = 0.150000007125
+shader = ExtResource("lagoon_shader")
+shader_parameter/shore_distance = ExtResource("shore_texture")
+shader_parameter/shore_rect = Vector4(-26.6199, -30.0172, 53.449, 63.5962)
+shader_parameter/shore_reach_meters = 8.0
+shader_parameter/surface_height_meters = 0.252
+shader_parameter/water_noise = SubResource("NoiseTexture2D_water")
+shader_parameter/deep_color = Color(0.1, 0.02, 0.03, 1)
+shader_parameter/lagoon_color = Color(0.38, 0.06, 0.07, 1)
+shader_parameter/shallow_color = Color(0.72, 0.2, 0.16, 1)
+shader_parameter/reef_color = Color(0.25, 0.06, 0.1, 1)
+shader_parameter/caustic_color = Color(1, 0.62, 0.42, 1)
+shader_parameter/foam_color = Color(1, 0.88, 0.8, 1)
+shader_parameter/caustic_world_size_meters = 9.0
+shader_parameter/caustic_speed = 0.05
+shader_parameter/caustic_strength = 0.26
+shader_parameter/reef_world_size_meters = 26.0
+shader_parameter/reef_coverage = 0.32
+shader_parameter/reef_strength = 0.35
+shader_parameter/foam_width_meters = 0.3
+shader_parameter/swash_meters = 0.25
+shader_parameter/swash_speed = 0.9
+shader_parameter/ring_spacing_meters = 2.6
+shader_parameter/ring_speed_meters_per_second = 0.45
+shader_parameter/ring_strength = 0.22
 
 [sub_resource type="QuadMesh" id="QuadMesh_fl7io"]
 resource_local_to_scene = true
@@ -74,7 +122,7 @@ size = Vector3(0.5, 2, 4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_u5lf7"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
+size = Vector3(3.1524658, 1, 14.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hta8j"]
 resource_local_to_scene = true
@@ -90,12 +138,95 @@ script = ExtResource("3_enemy_entry")
 normal_scene = ExtResource("4_tide_enemy")
 elite_scene = ExtResource("5_6kymb")
 
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
+render_priority = 0
+shader = ExtResource("sand_shader")
+shader_parameter/sand_texture = ExtResource("sand_texture")
+shader_parameter/alpha_cutoff = 0.5
+shader_parameter/cloud_noise = ExtResource("cloud_noise")
+shader_parameter/cloud_world_size_meters = 48.0
+shader_parameter/cloud_velocity_meters_per_second = Vector2(0.9, 0.35)
+shader_parameter/cloud_coverage = 0.45
+shader_parameter/cloud_softness = 0.18
+shader_parameter/cloud_shadow_strength = 0.48
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_grade"]
+resource_local_to_scene = true
+shader = ExtResource("grade_shader")
+shader_parameter/exposure = 1.0
+shader_parameter/saturation = 1.02
+shader_parameter/shadow_tint = Color(1, 0.9, 0.92, 1)
+shader_parameter/highlight_tint = Color(1.1, 0.95, 0.86, 1)
+shader_parameter/vignette_color = Color(0.14, 0.02, 0.03, 1)
+shader_parameter/vignette_strength = 0.36
+[sub_resource type="FastNoiseLite" id="TideNoiseSource"]
+noise_type = 3
+frequency = 0.02
+fractal_octaves = 3
+
+[sub_resource type="NoiseTexture2D" id="TideNoise"]
+width = 256
+height = 256
+noise = SubResource("TideNoiseSource")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="TideWonderMaterial"]
+render_priority = 0
+shader = ExtResource("tide_volume_shader")
+shader_parameter/zone_size = Vector2(12, 12)
+shader_parameter/shore_wave_amplitude = 0.3
+shader_parameter/shore_wave_length = 5.0
+shader_parameter/shore_wave_speed = 1.1
+shader_parameter/shore_detail_amplitude = 0.08
+shader_parameter/shore_detail_length = 2.4
+shader_parameter/shore_detail_speed = 0.7
+shader_parameter/surface_wave_height = 0.035
+shader_parameter/surface_wave_length = 4.0
+shader_parameter/surface_wave_speed = 1.2
+shader_parameter/surface_detail_height = 0.015
+shader_parameter/surface_detail_length = 2.5
+shader_parameter/surface_detail_speed = 0.8
+shader_parameter/rest_height = 0.16
+shader_parameter/crest_height = 0.55
+shader_parameter/crest_rise_length = 0.9
+shader_parameter/crest_tail_length = 3.2
+shader_parameter/rest_ramp_length = 1.2
+shader_parameter/side_fade_length = 1.5
+shader_parameter/source_fade_length = 2.5
+shader_parameter/front_density = 1.7
+shader_parameter/color_shallow = Color(0.95, 0.42, 0.34, 1)
+shader_parameter/color_deep = Color(0.5, 0.06, 0.08, 1)
+shader_parameter/color_foam = Color(1, 0.9, 0.86, 1)
+shader_parameter/depth_gradient_length = 9.0
+shader_parameter/surface_opacity = 0.42
+shader_parameter/deep_opacity = 0.62
+shader_parameter/foam_width = 0.7
+shader_parameter/foam_strength = 0.85
+shader_parameter/crest_foam_strength = 0.7
+shader_parameter/caustic_strength = 0.22
+shader_parameter/highlight_strength = 0.12
+shader_parameter/streak_strength = 0.35
+shader_parameter/edge_softness = 0.22
+shader_parameter/edge_breakup = 0.3
+shader_parameter/noise_scale = 0.12
+shader_parameter/noise_texture = SubResource("TideNoise")
+
 [node name="room_16" unique_id=2133176597 instance=ExtResource("1_base")]
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_15.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_pr0q3")
+
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
+transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
+light_color = Color(1, 0.82, 0.68, 1)
+light_energy = 1.1
+shadow_enabled = true
+shadow_opacity = 0.65
+directional_shadow_mode = 0
+directional_shadow_max_distance = 45.0
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
 mesh = SubResource("QuadMesh_fl7io")
@@ -157,7 +288,13 @@ enabled = false
 shape = SubResource("BoxShape3D_gowti")
 disabled = true
 
+[node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
+shaded = true
+texture = ExtResource("pier_left")
+
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, -0.9540329)
 shape = SubResource("BoxShape3D_u5lf7")
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
@@ -181,6 +318,7 @@ fall_duration = 6.0
 flooded_move_multiplier = 0.5
 
 [node name="RightShallows" parent="FlatTide" index="0" unique_id=928133442]
+water_material = SubResource("TideWonderMaterial")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.200718, 0.25, -4.5999727)
 size = Vector2(45, 66)
 volume_depth = 2.0
@@ -191,6 +329,7 @@ rest_duration = 6.0
 [node name="LeftShallows" type="MeshInstance3D" parent="FlatTide"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
 script = ExtResource("tide_zone_script")
+water_material = SubResource("TideWonderMaterial")
 flow_direction = 1
 size = Vector2(45, 66)
 high_duration = 6.0
@@ -205,6 +344,7 @@ debug_color = Color(1, 0, 1, 1)
 [node name="UpShallows" type="MeshInstance3D" parent="FlatTide"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -15.0999727)
 script = ExtResource("tide_zone_script")
+water_material = SubResource("TideWonderMaterial")
 rise_duration = 6.0
 high_duration = 6.0
 fall_duration = 6.0
@@ -220,6 +360,7 @@ debug_color = Color(1, 0, 1, 1)
 [node name="DownShallows" type="MeshInstance3D" parent="FlatTide"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, 5.9000273)
 script = ExtResource("tide_zone_script")
+water_material = SubResource("TideWonderMaterial")
 rise_duration = 6.0
 high_duration = 6.0
 fall_duration = 6.0
@@ -243,13 +384,15 @@ enemies_per_tide = 3
 elite_chance = 10.0
 
 [node name="RandomProps" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-7, 0, -9, -8, 0, -2, -5, 0, 8, 7, 0, -8, 8, 0, 0, 8, 0, 8, -3, 0, -6, -2, 0, 3, 4, 0, -2, 1, 0, 10)
+spawn_positions = PackedVector3Array(-7, 0, -9, -8, 0, -4.2, -5, 0, 8, 7, 0, -8, 8, 0, 0, 8, 0, 8, -3, 0, -6, -2.2, 0, 4.6, 4, 0, -2, 1, 0, 10)
 prop_scenes = Array[PackedScene]([ExtResource("prop_wood_log"), ExtResource("prop_shell")])
 min_spawn_count = 5
 max_spawn_count = 7
 
 [node name="RandomOctopus" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-7, 0, 4, -2, 0, -10, 3, 0, 4, 7, 0, -4, 3, 0, -8)
 prop_scenes = Array[PackedScene]([ExtResource("prop_octopus")])
@@ -257,10 +400,56 @@ min_spawn_count = 1
 max_spawn_count = 3
 
 [node name="RandomSeaweed" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-12.844, 0, -7.193, -10.803, 0, -9.247, -8.059, 0, -13.804, -6.416, 0, -15.066, -3.718, 0, -14.638, -1.044, 0, -15, 2.819, 0, -14.317, 4.97, 0, -14.773, 7.461, 0, -14.067, 9.71, 0, -10.995, 11.185, 0, -8.756, 11.886, 0, -6.674, 12.523, 0, -3.805, 12.563, 0, -1.476, 12.979, 0, 0.491, 12.322, 0, 7.415, 13.208, 0, 9.271, 11.625, 0, 10.566, 11.169, 0, 12.822, 9.332, 0, 14.61, 6.105, 0, 15.859, 2.467, 0, 14.782, -0.304, 0, 15.734, -4.305, 0, 14.746, -6.374, 0, 15.778, -8.432, 0, 15.918, -10.087, 0, 13.519, -11.519, 0, 12.104, -11.876, 0, 9.93, -13.21, 0, 6.351)
-fixed_spawn_count = 20
+fixed_spawn_count = 14
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+
+[node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
+transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.65731)
+material_override = SubResource("ShaderMaterial_sand")
+texture = ExtResource("sand_texture")
+
+[node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1690024563 instance=ExtResource("sea_glints")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
+
+[node name="RoomAtmosphere" parent="." unique_id=1937553306 instance=ExtResource("atmosphere")]
+
+[node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1937553306, 1300233738) index="0" unique_id=1611482802]
+material = SubResource("ShaderMaterial_grade")
+
+[node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1937553306, 1300233738) index="1" unique_id=1448896067]
+leaf_count = 14
+leaf_color = Color(1, 0.86, 0.82, 0.5)
+leaf_size = 7.0
+leaf_width_ratio = 0.85
+leaf_rotation_speed = 0.3
+trail_count = 6
+trail_color = Color(1, 0.72, 0.66, 0.35)
+
+[node name="Scenery" type="Node3D" parent="." unique_id=1546357246]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
+
+[node name="CoralWallPink" parent="Scenery" index="0" unique_id=1746053656 instance=ExtResource("lm_beach_coral_pink")]
+transform = Transform3D(1.15, 0, 0, 0, 1.15, 0, 0, 0, 1.15, -5.6, 0.0, -12.6)
+ground_shadow = true
+
+[node name="CoralWallOrange" parent="Scenery" index="1" unique_id=1165450384 instance=ExtResource("lm_beach_coral_orange")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -3.2, 0.0, -13.2)
+ground_shadow = true
+
+[node name="CoralWallTurquoise" parent="Scenery" index="2" unique_id=897014222 instance=ExtResource("lm_beach_coral_turquoise")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, -0.8, 0.0, -13.4)
+ground_shadow = true
+
+[node name="CoralWallPinkEast" parent="Scenery" index="3" unique_id=1446290672 instance=ExtResource("lm_beach_coral_pink")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 1.7, 0.0, -13.2)
+ground_shadow = true
+
+[node name="CoralWallOrangeEast" parent="Scenery" index="4" unique_id=601030357 instance=ExtResource("lm_beach_coral_orange")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 4.2, 0.0, -12.6)
+ground_shadow = true
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
@@ -271,4 +460,5 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [editable path="Exits/LeftPath"]
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround"]
+[editable path="RoomAtmosphere"]
 [editable path="FlatTide"]

@@ -45,6 +45,8 @@ func _ready() -> void:
 		snapshot.hide()
 		_spine_ghosts.append(snapshot)
 	dash_particle.local_coords = false
+	# Placed at Foxy's feet every frame in _process, not on physics ticks.
+	dash_particle.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	dash_particle.amount = 12
 	dash_particle.lifetime = 0.15
 	var dust_material := dash_particle.process_material as ParticleProcessMaterial

@@ -411,7 +411,8 @@ func apply_charm_grapple(
 		global_position = destination
 		return &"target_pulled"
 	var duration := travel_distance / maxf(0.01, pull_speed_units_per_second)
-	_charm_grapple_tween = create_tween()
+	# Physics steps keep the pull in step with physics interpolation (no judder mid-pull).
+	_charm_grapple_tween = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	_charm_grapple_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_charm_grapple_tween.tween_property(self, "global_position", destination, duration)
 	_charm_grapple_tween.tween_callback(_on_charm_grapple_finished)

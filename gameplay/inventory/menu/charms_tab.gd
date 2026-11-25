@@ -248,7 +248,7 @@ func _refresh_sockets(animate: bool) -> void:
 	_safe_label.text = (
 		"Safe location: charms can be changed here."
 		if safe
-		else "Not a safe location: rest at a checkpoint or the hub to change charms."
+		else "Not a safe location: go to a campfire room or the hub to change charms."
 	)
 	if not safe and is_instance_valid(charms) and charms.can_debug_change_loadout():
 		_safe_label.text = "Debug: owned charms can be equipped here."

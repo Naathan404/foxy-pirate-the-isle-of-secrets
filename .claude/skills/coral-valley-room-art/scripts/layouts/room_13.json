@@ -1,0 +1,20 @@
+{
+  "source": "assets/sprites/biomes/coral_valley/coral_valley_ground.png",
+  "out_ground": "assets/sprites/biomes/coral_valley/coral_valley_room_13_ground.png",
+  "out_shore": "assets/sprites/biomes/coral_valley/coral_valley_room_13_shore.png",
+  "ground_rect": [-18.61992, -22.01719, 37.44902, 47.59615],
+  "seed": 1813,
+  "ground_style": "rock_shelf",
+  "ripple_angle_degrees": 70.0,
+  "slab_count": 12,
+  "painted_water": {"shallow": [96, 74, 170], "pool": [70, 48, 140], "pool_light": [120, 96, 200], "glint": [200, 250, 240]},
+  "paths": [
+    [[-0.5, 20.4], [-0.1, 14.5], [-1.1, 7.5], [0.0, 0.8]]
+  ],
+  "path_half_width": 1.6,
+  "plaza": null,
+  "tide_pools": [[-8.6, -9.6, 1.2, 0.7], [8.6, 9.2, 1.0, 0.6]],
+  "starfish": [],
+  "speckle_count": 2600,
+  "paw_prints": true
+}

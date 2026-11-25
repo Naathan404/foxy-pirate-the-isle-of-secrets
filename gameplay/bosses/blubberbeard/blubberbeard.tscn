@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c60eka7xvsqh8"]
 
 [ext_resource type="Script" uid="uid://cjqw2opldwekw" path="res://gameplay/bosses/blubberbeard/blubberbeard.gd" id="1"]
-[ext_resource type="Resource" path="res://data/bosses/blubberbeard_data.tres" id="2"]
-[ext_resource type="PackedScene" path="res://gameplay/bosses/blubberbeard/reward_chest.tscn" id="3"]
-[ext_resource type="Texture2D" path="res://assets/sprites/bosses/blubberbeard/blubberbeard_idle_4dir.png" id="4"]
+[ext_resource type="Resource" uid="uid://dbjccauu8smfx" path="res://data/bosses/blubberbeard_data.tres" id="2"]
+[ext_resource type="PackedScene" uid="uid://b5tnehyy8e4r2" path="res://gameplay/bosses/blubberbeard/reward_chest.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://cx651ku6k270v" path="res://assets/sprites/bosses/blubberbeard/blubberbeard_idle_4dir.png" id="4"]
 [ext_resource type="Script" uid="uid://dsiiopnlfqio7" path="res://core/components/health_component.gd" id="5"]
 [ext_resource type="Script" uid="uid://bsdpq5t5mpp25" path="res://core/components/hurtbox_component.gd" id="6"]
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="7"]
@@ -31,6 +31,7 @@ grapple_stop_distance = 1.8
 
 [node name="Feedback" type="Node" parent="." unique_id=1499711967]
 script = ExtResource("12")
+fight_camera_distance_scale = 1.25
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=454030351]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.15, 0)

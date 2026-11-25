@@ -37,6 +37,8 @@ var _has_visual_scale: bool = false
 
 func _ready() -> void:
 	set_process(false)
+	# The flight is placed every frame in _process; physics interpolation would lag it a tick.
+	_pickup.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 
 
 func launch(height: float, duration: float, direction: Vector3 = Vector3.ZERO) -> void:

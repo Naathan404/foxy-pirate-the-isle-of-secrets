@@ -2,21 +2,14 @@
 
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="1"]
 [ext_resource type="Script" uid="uid://dbk4hq5fyxdgf" path="res://gameplay/bosses/boss_reward_chest.gd" id="2"]
-[ext_resource type="Resource" uid="uid://ngxkp0j5jl2b" path="res://data/items/materials/coral.tres" id="3"]
-[ext_resource type="Resource" uid="uid://c8qmnr7cm6o2u" path="res://data/items/materials/gunpowder_bag.tres" id="4"]
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="5"]
-[ext_resource type="Resource" path="res://data/items/quest/ancient_key_of_tides.tres" id="6"]
+[ext_resource type="Resource" path="res://data/notes/diary_tide.tres" id="boss_note"]
+[ext_resource type="Script" path="res://data/notes/monster_note.gd" id="note_type"]
 [ext_resource type="Resource" path="res://data/items/charms/tide_grapple.tres" id="7_khbls"]
-
-[sub_resource type="BoxShape3D" id="ChestBody"]
-size = Vector3(1.5, 1.5, 0.8)
 
 [node name="BossRewardChest" unique_id=609333493 instance=ExtResource("1")]
 script = ExtResource("2")
-rewards = Array[ExtResource("5")]([ExtResource("6"), ExtResource("3"), ExtResource("4"), ExtResource("7_khbls")])
-
-[node name="MovementBody" type="StaticBody3D" parent="." index="3" unique_id=1944663747]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MovementBody" index="0" unique_id=2142360271]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-shape = SubResource("ChestBody")
+gold_min = 10
+gold_max = 20
+rewards = Array[ExtResource("5")]([ExtResource("7_khbls")])
+reward_notes = Array[ExtResource("note_type")]([ExtResource("boss_note")])

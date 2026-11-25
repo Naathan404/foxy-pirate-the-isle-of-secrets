@@ -30,5 +30,5 @@ func _update(delta: float) -> void:
 		return
 	timer = maxf(0.0, timer - delta)
 	if timer <= 0.0:
-		_reload_requested = true
-		get_node("/root/GameManager").reload_current_scene()
+		# Refused while another transition runs; ask again on the next frame.
+		_reload_requested = get_node("/root/GameManager").respawn_at_last_rest()

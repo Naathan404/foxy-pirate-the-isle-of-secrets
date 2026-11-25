@@ -186,12 +186,114 @@ kiểu; hợp phòng Empty và NPC.
 31. Tảng đá của `rock_shelf` là đá phẳng ngang mặt cát. Đá có chiều cao vẫn là prop 3D (quy tắc
     4). Kiểu nền mới phải dùng màu trong bảng màu mục 4, không thêm màu cát mới.
 
-Phòng đã áp dụng: room_00 `ripple`, room_01 `ripple`.
+Phòng đã áp dụng: room_00 `ripple`, room_01 `dunes`, room_02 `rock_shelf` (Bãi thường, Mobs 1),
+room_03 `dunes`, room_05 `ripple` + `wrack_line` (Bãi lửa trại), room_06 `coral_rubble`,
+room_11 `dunes` + `wrack_line`, room_12 `tide_flats` + `wrack_line`, room_13 `rock_shelf`,
+room_15 `coral_rubble`, room_16 `tide_flats`, room_17 `dunes`, room_20 `rock_shelf`,
+room_21 `coral_rubble`, room_22 `rock_shelf`, Quiz room_04 `tide_flats` + `wrack_line`,
+room_09 `tide_flats`, room_18 `coral_rubble`, room_23 `ripple` + `wrack_line`, Raid room_07
+`tide_flats`, Boss room_08 `rock_shelf` + `wrack_line`, NPC room_19 `dunes`, Materials room_10
+`ripple`, room_14 `tide_flats`.
+
+Phòng Materials lấy pattern theo tài nguyên của designer (room_10 dừa nên là Rừng dừa, room_14
+san hô nên là Rạn san hô), nên được trùng pattern đặc biệt với phòng kề (room_03; room_06 và
+room_15). Kiểu nền và dấu ấn vẫn phải khác phòng kề.
+
+### Dấu ấn phòng
+
+Pattern cho biết phòng thuộc loại nào; dấu ấn làm người chơi nhớ phòng đó. Nhiều phòng cùng
+pattern, nên mỗi phòng cần thêm một thứ chỉ nó có.
+
+35. Mỗi phòng có đúng một dấu ấn, không phòng nào trùng. Dấu ấn là một cụm hình khối hoặc chi
+    tiết nền lớn, đủ nổi để người chơi nhận ra phòng ngay khi bước vào.
+36. Đặt dấu ấn ở chỗ thấy được từ lúc vào phòng, ngoài hành lang đường mòn và sân lửa trại
+    (quy tắc 14). Dấu ấn cao (cọ) chỉ ở nửa bắc và hai bên (quy tắc 15); dấu ấn thấp (đá, gỗ,
+    thuyền, sò, san hô) đặt được cả ở bãi nam.
+37. Dấu ấn là bố cục cố định, không dùng PropSlot, và chỉ tốn khoảng 8 điểm ngân sách trở xuống.
+    Nó có thể ghép prop với chi tiết nền bake ở dưới (lá cọ rụng và dừa dưới lùm cọ, hồ đá dưới
+    tán cây). Prop của dấu ấn được vượt bảng scale ở quy tắc 9, tới cỡ vật cản ngẫu nhiên của
+    phòng (đá 1,5), để nó không chìm giữa các vật cản. Prop chồng lên nhau (ụ đá) đặt `max_hp`
+    100000 cho mọi tầng, vì phá tầng dưới sẽ để tầng trên lơ lửng.
+38. Thêm phòng vào bảng dưới khi dựng xong. Trước khi chọn dấu ấn, đọc bảng để không lặp.
+39. Phòng dùng bố cục ngẫu nhiên dùng chung (Empty) đặt dấu ấn trong `Scenery` của chính phòng,
+    không đặt vào bố cục dùng chung, và tránh mọi vị trí ứng viên của các nhánh bố cục đó.
+40. Pattern của phòng phải đúng với mọi nhánh bố cục ngẫu nhiên, vì nhánh được bốc lại mỗi lần
+    nghỉ hoặc chết. Phòng Empty trước Checkpoint 2 (Rừng dừa) luôn có 2 cọ cố định ở mép đảo,
+    cách mọi ứng viên cọ ngẫu nhiên ít nhất 3 m, để vẫn là rừng dừa khi bốc trúng nhánh đánh
+    nhau.
+
+Bộ nguyên liệu có sẵn để ghép dấu ấn:
+
+| Loại | Lựa chọn |
+| --- | --- |
+| Cụm prop | Lùm cọ quanh hồ, ghế gỗ trôi quanh lửa, đống gỗ trôi dạt, vòng đá, vườn san hô ba màu, hàng cọ nghiêng về một phía, cụm đá lớn bên cửa phía bắc |
+| Chi tiết nền | Hồ đá lớn (`tide_pools`), vệt rong dạt (`wrack_line`), lá cọ rụng và dừa (`fallen_fronds`, `coconuts`), tảng đá phẳng (`rock_shelf`), hướng gợn cát (`ripple_angle_degrees`), bãi sao biển (chỉ phòng không có quái sao biển), dấu chân |
+| Môi trường | `cloud_shadow_strength`, `reef_coverage` trong khoảng ghi ở các pattern |
+
+| Phòng | Pattern, kiểu nền | Dấu ấn |
+| --- | --- | --- |
+| room_00 | Bãi lửa trại, `ripple` | Trại đầu tiên: sân lửa trại có vòng đá, cọ ở hai góc bắc |
+| room_01 | Rừng dừa, `dunes` | Thuyền mắc cạn trên bãi nam (cọ cố định: đông bắc, đông) |
+| room_02 | Bãi thường, `rock_shelf` | Lùm 3 cọ ôm hồ đá lớn ở bờ bắc, lá cọ rụng và dừa dưới tán |
+| room_05 | Bãi lửa trại, `ripple` + `wrack_line` | Trại ngã tư: đường mòn chữ thập, 4 ghế gỗ trôi đặt chéo quanh lửa |
+| room_03 | Rừng dừa, `dunes` | Vòng đá cổ: 5 tảng đá xếp vòng ở bãi nam (cọ cố định: hai bên cửa bắc) |
+| room_06 | Rạn san hô, `coral_rubble` | Bãi sò hồng: 5 vỏ sò, một tảng đá và san hô hồng ở bãi nam |
+| room_11 | Rừng dừa, `dunes` + `wrack_line` | Đống gỗ trôi dạt ở giữa bờ bắc, vệt rong dạt quanh đảo (cọ cố định: tây, đông bắc) |
+| room_15 | Rạn san hô, `coral_rubble` | Đôi cọ nghiêng giữa bờ bắc, lá cọ rụng và dừa dưới tán |
+| room_17 | Rừng dừa, `dunes` | Ụ đá chồng ba tầng ở bờ tây, có một cọ đứng cạnh (cọ cố định: tây, đông) |
+| room_21 | Rạn san hô, `coral_rubble` | Hồ san hô: hồ thủy triều lớn ở bãi nam, ba khóm san hô ba màu quanh bờ |
+| room_12 | Bãi thường, `tide_flats` + `wrack_line` | Hàng gỗ chắn sóng: 4 khúc gỗ trôi xếp hàng dọc bờ bắc |
+| room_13 | Bãi thường, `rock_shelf` (12 tảng phẳng) | Bãi đá tảng: 3 tảng đá lớn ở góc đông bắc |
+| room_16 | Bãi thường, `tide_flats` | Bức tường san hô: 5 khóm san hô lớn xếp hàng dọc bờ bắc |
+| room_20 | Bãi thường, `rock_shelf` | Cọ đơn trên mỏm đá: một cọ cao giữa hai tảng đá ở bờ bắc, có hồ đá bên cạnh |
+| room_22 | Bãi thường, `rock_shelf` | Cổng đá: hai cặp đá lớn đứng hai bên lối vào trái và phải |
+| room_04 | Quiz, `tide_flats` + `wrack_line` | Hàng 3 cọ nghiêng ở góc đông bắc đảo trái, lá cọ rụng dưới tán |
+| room_09 | Quiz, `tide_flats` | Bãi sao biển: 12 sao biển vẽ trên nền quanh một hồ ở đảo phải (phòng không có quái sao biển) |
+| room_18 | Quiz, `coral_rubble`, nước rạn chìm | Rừng rong khổng lồ: 4 rong scale 1,4–1,6 ở góc tây bắc đảo trái |
+| room_23 | Quiz, `ripple` + `wrack_line` | Tảng đá phủ san hô: đá lớn không phá được, hai khóm san hô mọc trên đỉnh |
+| room_07 | Raid, Bãi thường, `tide_flats` | Vòng đá đấu trường: 6 tảng đá lớn quanh mép đảo, giữa đảo để trống cho các đợt thủy triều |
+| room_08 | Boss, Bãi thường, `rock_shelf` + `wrack_line` | Đấu trường giữa biển: hai vòng cột đá, tảng đá và rêu khổng lồ vẽ tay đứng dưới nước bao quanh đảo, cầu gãy khi vào trận, biển đổi màu theo phase |
+| room_19 | NPC, Rừng dừa, `dunes` | Lùm cọ che chỗ Silas đứng, lá cọ và dừa rụng quanh quầy |
+| room_10 | Materials cua và dừa, Rừng dừa, `ripple` | Đống dừa rụng bên hai khúc gỗ ở góc đông bắc |
+| room_14 | Materials sao biển và san hô, Rạn san hô, `tide_flats` | Cổng san hô khổng lồ: bốn khóm san hô scale 1,4–1,75 hai bên lối ra phải |
+
+### Phòng kỳ quan
+
+Một số phòng cố ý phá các quy tắc trên để tạo bất ngờ. Chi tiết, nhịp và danh sách phòng ở
+[Phòng kỳ quan Coral Valley](../world/coral_valley_wonder_rooms.md).
+
+41. Phòng kỳ quan được dùng bảng màu biển riêng (`red_tide`, `violet_glow`) thay cho bảng màu ở
+    mục 4. Bảng màu phải đổi đồng bộ nước đầm phá, trời, nắng, grade, bọt biển bay, nước thủy
+    triều và nước vẽ trên cát; viền mực, bóng và hướng nắng giữ như mọi phòng.
+42. Đất chia mảnh vẫn theo quy tắc 6: mỗi mảnh có va chạm lồi riêng khớp với hình vẽ (lùi vào
+    0,25 m). Lạch nông vẽ trên nền, không phải mặt nước thật.
+43. Đá ngầm vẽ trong shader đầm phá, không phải prop. Prop đá đặt trên nước không được dùng để
+    làm vành đá.
+44. Phông nền vẽ tay quanh đảo (cột đá, tảng đá, rêu khổng lồ của phòng boss) là `BackdropSprite`
+    đứng dưới nước ngoài mép đảo, không đặt lên cát. Chúng không có va chạm và không tính vào
+    ngân sách prop. Phía nam (gần camera) chỉ đặt đá thấp; cột và rêu cao dồn về phía bắc và hai
+    bên. Chừa trống hành lang cầu tàu. Mỗi cái có một hòn đá ngầm (`reef_rocks` anchor) lùi về
+    phía sau chân để chỉ lộ viền bọt nơi chân chạm nước. Phông nền phải chìm vào bóng tối
+    (`ArenaDarkness`) để không lấn sân đánh: bắt đầu tối ngay sau dải nước nông, vòng ngoài gần
+    như đen.
 
 ### Thêm pattern mới
 
 Một pattern mới phải nêu: vật chủ đạo và số lượng, cách nhóm, khoảng cách tới đường mòn, chỉnh môi
 trường (trong khoảng an toàn), loại phòng phù hợp. Thêm vào mục này trước khi dựng phòng.
+
+### Biến thể theo chu kỳ (PropSlot)
+
+Mỗi lần nghỉ hoặc chết, prop đặt bằng `PropSlot` được bốc và dịch lại
+([Trạng thái phòng](../systems/room_state.md)). Bố cục tay vẫn là gốc; slot chỉ thêm biến thể.
+
+32. Chỉ dùng PropSlot cho trang trí nhỏ và vật phá được nhỏ. Cọ, tảng đá lớn và mọi vật tạo
+    nên đường đi giữ là prop cố định.
+33. Một `PropPool` chỉ chứa prop cùng cỡ, cùng kiểu va chạm (quy tắc 11–12) và cùng pattern
+    phòng, với điểm ngân sách (quy tắc 20) gần nhau. Tính ngân sách theo prop đắt nhất trong pool.
+34. Cả vòng `jitter_radius_meters` của slot phải nằm ngoài hành lang đường mòn, sân lửa trại,
+    cửa ra vào và mép nước (quy tắc 14). Đặt slot cạnh nhau bằng pool khác nhau để giữ
+    quy tắc 10.
 
 ## 4. Bảng màu
 
@@ -247,8 +349,19 @@ trường (trong khoảng an toàn), loại phòng phù hợp. Thêm vào mục 
 | --- | --- |
 | `assets/sprites/biomes/coral_valley/coral_valley_room_00_ground.png` | Nền cát bake sẵn, cùng kích thước và viền với `coral_valley_ground.png` |
 | `assets/sprites/biomes/coral_valley/coral_valley_room_00_shore.png` | Khoảng cách tới bờ (L8, 512²): 0 ở mép cát, 1 ở 8 m |
-| `assets/sprites/biomes/coral_valley/coral_valley_room_01_ground.png`, `..._room_01_shore.png` | Nền và distance field của room_01 (pattern Rạn san hô) |
-| `assets/sprites/biomes/coral_valley/coral_valley_pier_up.png` | Cầu tàu trên, làm cùng cách với cầu trái/phải |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_01_ground.png`, `..._room_01_shore.png` | Nền và distance field của room_01 (Rừng dừa, `dunes`) |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_02_ground.png`, `..._room_02_shore.png` | Nền và distance field của room_02 (Bãi thường, `rock_shelf`) |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_05_ground.png`, `..._room_05_shore.png` | Nền và distance field của room_05 (Bãi lửa trại, ngã tư) |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_{03,06,11,15,17,21}_ground.png`, `..._shore.png` | Nền và distance field của các phòng Empty |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_{12,13,16,20,22}_ground.png`, `..._shore.png` | Nền và distance field của các phòng Mobs |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_{04,09,18,23}_{west,east}_ground.png`, `..._room_XX_shore.png` | Phòng Quiz hai đảo: một nền cho mỗi đảo, một distance field chung phủ cả hai đảo |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_{07,08,19}_ground.png`, `..._shore.png` | Nền và distance field của Raid, Boss, NPC |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_{10,14}_ground.png`, `..._shore.png` | Nền và distance field của hai phòng Materials |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_24_ground.png`, `..._shore.png` | Nền chia 5 mảnh của room_24 (phòng kỳ quan) |
+| `assets/sprites/biomes/coral_valley/coral_valley_room_20_rocks.png` | Mặt nạ đá ngầm của room_20 cho `coral_lagoon` |
+| `assets/sprites/biomes/coral_valley/grapple_post.png`, `world/biomes/coral_valley/objects/grapple_post.tscn` | Cọc neo cho Tide Grapple |
+| `world/components/shallow_water_area.gd` | Lạch nước nông: Foxy đi chậm 0,75× khi lội |
+| `assets/sprites/biomes/coral_valley/coral_valley_pier_up.png`, `..._pier_down.png` | Cầu tàu trên và dưới, làm cùng cách với cầu trái/phải |
 | `assets/sprites/biomes/coral_valley/coral_valley_pier_left.png`, `..._right.png` | Cầu tàu: ảnh vẽ tay gốc đã xóa vật và chuyển sang gỗ bạc nắng |
 | `world/biomes/coral_valley/ground/coral_sand_ground.gdshader` | `material_override` cho sprite nền: cát nhận nắng và lửa, bóng mây gộp trong shader |
 | `world/biomes/coral_valley/ground/coral_lagoon.gdshader` | Void thành đầm phá (xem dưới) |

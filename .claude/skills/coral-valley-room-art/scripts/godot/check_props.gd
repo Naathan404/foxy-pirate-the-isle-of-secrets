@@ -6,7 +6,7 @@ extends SceneTree
 ## godot --headless --path . --script <this> -- res://world/biomes/coral_valley/map/room_XX.tscn
 
 const PASS_THROUGH := ["coral", "seaweed"]
-const BLOCKING := ["palm", "stone", "wood_log", "shell", "campfire"]
+const BLOCKING := ["palm", "stone", "wood_log", "shell", "campfire", "grapple_post"]
 const PROP_FOLDER := "/coral_valley/objects/"
 const PALM_MIN_METERS := 7.0
 const PALM_MAX_METERS := 9.0
@@ -30,7 +30,11 @@ func _initialize() -> void:
 	var palm_heights: Array[float] = []
 	for prop in _room_props(current_scene):
 		var file := String(prop.scene_file_path).get_file()
+		# DestructibleProps keep their sprite under Visual; plain props such as the grapple post
+		# have it at the root.
 		var sprite := prop.get_node_or_null("Visual/Sprite3D") as Sprite3D
+		if sprite == null:
+			sprite = prop.get_node_or_null("Sprite3D") as Sprite3D
 		if sprite == null or sprite.texture == null:
 			continue
 		var height := (
@@ -67,8 +71,9 @@ func _initialize() -> void:
 
 
 func _check_collision(prop: Node, file: String) -> void:
-	var shape := prop.get_node_or_null("MovementBody/CollisionShape3D") as CollisionShape3D
-	var body := prop.get_node_or_null("MovementBody") as CollisionObject3D
+	var body_name := "MovementBody" if prop.has_node("MovementBody") else "StaticBody3D"
+	var shape := prop.get_node_or_null(body_name + "/CollisionShape3D") as CollisionShape3D
+	var body := prop.get_node_or_null(body_name) as CollisionObject3D
 	var blocks := (
 		shape != null and not shape.disabled and body != null and body.collision_layer != 0
 	)
