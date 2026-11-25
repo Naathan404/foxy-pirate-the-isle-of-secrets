@@ -10,7 +10,7 @@ const CORAL_ROOM := "res://world/biomes/coral_valley/map/room_00.tscn"
 ## Every room that currently places a campfire.
 const CAMPFIRE_ROOMS: Array[String] = [
 	"res://world/biomes/hub/map/castaway_cove.tscn",
-	"res://world/biomes/hub/map/room_02.tscn",
+	"res://world/biomes/hub/legacy/room_02.tscn",
 	"res://world/biomes/coral_valley/map/room_00.tscn",
 	"res://world/biomes/coral_valley/map/room_05.tscn",
 ]
@@ -65,8 +65,7 @@ func _create_good_save() -> Dictionary:
 	var rest_point := _only_rest_point()
 	_check(rest_point.is_save_allowed(), "room_00 is a safe room")
 	_check(rest_point.rest(sandbox.manager.player), "rest at the room_00 campfire")
-	await sandbox.wait_rest_menu(rest_point)
-	_check(rest_point.request_save() == OK, "save at the room_00 campfire")
+	await sandbox.choose_rest_and_wait(rest_point, true)
 	rest_point.close_menu()
 	var payload: Dictionary = sandbox.read_slot_payload()
 	_check(not payload.is_empty() and GameSaveSnapshot.validate(payload).is_empty(), "valid save")
@@ -183,10 +182,9 @@ func _check_write_failure() -> void:
 	DirAccess.make_dir_recursive_absolute(blocker)
 	manager.player.hp.take_damage(manager.player.hp.get_max_hp() * DAMAGE_RATIO)
 	_check(rest_point.rest(manager.player), "write failure: rest")
-	await sandbox.wait_rest_menu(rest_point)
-	_check(rest_point.request_save() != OK, "write failure: save reports an error")
+	await sandbox.choose_rest_and_wait(rest_point, true)
 	_check(
-		rest_point.get_node("RestMenu").get_result().begins_with("Save failed"),
+		rest_point.get_node("RestMenu").get_message().begins_with("Save failed"),
 		"write failure: the menu says the save failed"
 	)
 	_check(sandbox.read_slot_text() == good_text, "write failure: previous save is unchanged")
@@ -240,9 +238,9 @@ func _check_unsafe_campfire() -> void:
 	var menu := rest_point.get_node("RestMenu") as RestMenu
 	_check(rest_point.is_menu_open(), "unsafe room: interacting explains the campfire")
 	_check(menu.get_message() == rest_point.unsafe_message, "unsafe room: message is shown")
-	_check(not menu.is_save_available(), "unsafe room: no Save choice")
+	_check(not menu.are_rest_choices_available(), "unsafe room: no rest choices")
 	_check(player.hp.get_current_hp() == damaged_hp, "unsafe room: no rest bonus")
-	_check(rest_point.request_save() == ERR_UNAVAILABLE, "unsafe room: request_save is refused")
+	_check(not rest_point.choose_rest(true), "unsafe room: choosing to rest is refused")
 	_check(manager.save_game(rest_point) == ERR_UNAUTHORIZED, "unsafe room: save_game is refused")
 	_check(sandbox.read_slot_text() == good_text, "unsafe room: slot unchanged")
 	rest_point.close_menu()
@@ -395,8 +393,7 @@ func _check_spawn(room_path: String, index: int, label: String) -> void:
 	var rest_point: CampfireRestPoint = sandbox.find_rest_points(current_scene)[index]
 	_check(rest_point.is_save_allowed(), label + ": room is safe")
 	_check(rest_point.rest(manager.player), label + ": rests")
-	await sandbox.wait_rest_menu(rest_point)
-	_check(rest_point.request_save() == OK, label + ": saves")
+	await sandbox.choose_rest_and_wait(rest_point, true)
 	rest_point.close_menu()
 	if not _check(manager.load_saved_game() == OK, label + ": load starts"):
 		return

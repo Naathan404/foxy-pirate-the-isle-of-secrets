@@ -38,7 +38,8 @@ Sync chỉ chạy trong editor (đọc thư mục `res://`); game chỉ đọc f
 - `BiomeMapData`: `biome_id` (trùng tên thư mục), `display_name`, `world_cell`
   (Hub ở `(0, 0)`), `accent`, `unlock_flag`, `rooms`.
 - `RoomMapData`: `scene_path`, `cell` (x sang phải, y xuống dưới), `hidden`, `marker`
-  (`NONE`, `CHECKPOINT`, `NPC`), `exits` (hướng → scene đích, do sync ghi).
+  (`NONE`, `CHECKPOINT`, `NPC`), `exits` (hướng → scene đích) và `safe_room` (theo
+  `BaseRoom.safe_room` của scene); hai trường sau do sync ghi.
 - Phòng mới lấy marker từ metadata `room_role` của scene: `Checkpoint` → checkpoint,
   `NPC...` → NPC. Phòng đã có trên bản đồ giữ marker đã chỉnh.
 - Lối đi sang biome khác tạo đường nối giữa hai đảo và mũi tên màu biome kia ở cửa phòng.
@@ -59,9 +60,25 @@ Biome:
 | Unexplored | Mở, chưa thăm phòng nào | Đảo tối viền màu, lưới phòng tối | Có |
 | Explored | Đã thăm ít nhất một phòng | Đảo màu biome | Có |
 
-Phòng: đã thăm thì sáng theo màu biome, có marker và mũi tên lối sang biome khác; chưa
-thăm thì chỉ thấy khung tối; `hidden` chưa thăm thì không vẽ, kể cả đường nối vào nó.
-Đường nối chỉ vẽ khi ít nhất một đầu đã thăm. Phòng hiện tại có viền nhấp nháy.
+Phòng (sương mù chiến tranh): bản đồ chỉ cho người chơi biết các phòng **nối trực tiếp**
+(theo bất kỳ chiều cửa nào, kể cả sang biome khác) với một phòng đã thăm.
+
+| Trạng thái | Điều kiện | Hiển thị |
+| --- | --- | --- |
+| Đã thăm | Foxy đã vào | Sáng theo màu biome, có đổ bóng, marker, mũi tên lối sang biome khác |
+| Chưa thăm, đã biết | Chưa vào, nhưng kề một phòng đã thăm | Khung tối phủ lớp mây đen mờ trôi nhẹ |
+| Xa hơn | Còn lại | Không vẽ, kể cả đường nối vào |
+| `hidden` chưa thăm | — | Không vẽ, không tính là phòng kề |
+
+Đường nối chỉ vẽ khi ít nhất một đầu đã thăm và đầu kia nằm trên bản đồ. Vào phòng mới thì
+vòng "đã biết" lan thêm một lớp. `WorldMapData.get_frontier_rooms(progress)` tính vòng này.
+Phòng hiện tại có viền nhấp nháy.
+
+**Safe room** (phòng có `safe_room = true`, nơi có lửa trại) hiện huy hiệu ngọn lửa ở góc
+phòng khi đã thăm, và chấm lửa trên đảo thu nhỏ. Cờ này lấy từ scene khi Sync nên không cần
+chỉnh tay. Chú thích (Safe room, You are here, Explored, Unexplored) hiện ở góc dưới trái
+của tầng phòng. Các màu và độ trôi của mây chỉnh trong Inspector của Canvas
+(`safe_room_color`, `cloud_color`, `cloud_drift_*`).
 
 ## Tiến trình và cờ cốt truyện
 

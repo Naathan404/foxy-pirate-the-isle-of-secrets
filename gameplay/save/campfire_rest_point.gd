@@ -1,18 +1,22 @@
 class_name CampfireRestPoint
 extends Node3D
-## Rest interaction of a campfire. In a room whose `safe_room` flag is on, resting refills HP
-## and SP, makes this the respawn point, resets the visited rooms (enemies and breakables
-## return, layouts reshuffle) and offers to save the game; the player may leave without
-## saving. Elsewhere the campfire explains that it cannot be used and changes nothing.
-## Entering a room never saves.
+## Rest interaction of a campfire. Interacting opens a menu with REST, REST and SAVE and
+## QUIT. In a room whose `safe_room` flag is on, resting refills HP and SP, makes this the
+## respawn point and resets the visited rooms (enemies and breakables return, layouts
+## reshuffle); REST and SAVE also writes the save afterwards. Elsewhere the campfire
+## explains that it cannot be used and changes nothing. Entering a room never saves.
 
-## Emitted once the rest fade has finished and the Campfire menu is open.
+## Emitted once the rest fade has finished, before the menu closes or shows a save result.
 signal rested(player: Player)
 signal save_finished(error: Error)
 
-@export var rest_message: String = "You rest by the fire. HP and stamina are restored."
+@export var choice_message: String = "Rest by the fire to restore HP and stamina."
 @export var unsafe_message: String = "This fire is too exposed. You cannot rest or save here."
 @export var saved_message: String = "Game saved."
+
+var _resting_player: Player
+var _saved_requested := false
+var _save_error: Error = OK
 
 @onready var _interaction: NpcInteractionArea = $InteractionArea
 @onready var _spawn: Marker3D = $Spawn
@@ -21,7 +25,8 @@ signal save_finished(error: Error)
 
 func _ready() -> void:
 	_interaction.interaction_requested.connect(_on_interaction_requested)
-	_menu.save_requested.connect(_on_save_requested)
+	_menu.rest_requested.connect(choose_rest.bind(false))
+	_menu.rest_and_save_requested.connect(choose_rest.bind(true))
 	_menu.close_requested.connect(close_menu)
 
 
@@ -60,18 +65,34 @@ func is_menu_open() -> bool:
 	return _menu.is_open()
 
 
-## Same path as pressing the interact key next to the fire.
+## True while the rest fade is running.
+func is_resting() -> bool:
+	return _menu.is_fading()
+
+
+## Same path as pressing the interact key next to the fire: opens the choice menu.
 func rest(player: Player) -> bool:
 	if _menu.is_open() or _menu.is_fading() or not _can_player_interact(player):
 		return false
 	if not get_node("/root/GameManager").enter_rest_menu():
 		return false
 	_interaction.set_interaction_enabled(false)
+	_resting_player = player
 	if not is_save_allowed():
 		_menu.open_unavailable(unsafe_message)
 		return true
-	# The rest itself happens while the screen is black; the menu appears after it brightens.
-	_menu.play_rest_fade(_restore_while_dark.bind(player), _on_rest_finished.bind(player))
+	_menu.open_choices(choice_message, _describe_slot())
+	return true
+
+
+## Picks REST (`save` false) or REST and SAVE (`save` true) from the open menu.
+func choose_rest(save: bool) -> bool:
+	if not _menu.are_rest_choices_available():
+		return false
+	# The rest itself happens while the screen is black.
+	_menu.play_rest_fade(
+		_restore_while_dark.bind(_resting_player, save), _on_rest_finished.bind(_resting_player)
+	)
 	return true
 
 
@@ -79,33 +100,35 @@ func close_menu() -> void:
 	if not _menu.is_open():
 		return
 	_menu.close()
+	_resting_player = null
 	_interaction.set_interaction_enabled(true)
 	get_node("/root/GameManager").exit_rest_menu()
 
 
-## Saves the state after resting. Pressing Save is the only way this campfire writes.
-func request_save() -> Error:
-	if not _menu.is_save_available():
-		return ERR_UNAVAILABLE
-	var error: Error = get_node("/root/GameManager").save_game(self)
-	var message := saved_message
-	if error != OK:
-		message = "Save failed (%s). Your previous save is unchanged." % error_string(error)
-	_menu.show_save_result(error == OK, message, _describe_slot())
-	save_finished.emit(error)
-	return error
-
-
-func _restore_while_dark(player: Player) -> void:
+func _restore_while_dark(player: Player, save: bool) -> void:
 	get_node("/root/GameManager").room_states.begin_new_cycle(get_location())
 	if is_instance_valid(player):
 		player.hp.set_current_hp(player.hp.get_max_hp())
 		player.stamina.set_current_sp(player.stamina.get_max_sp())
+	_save_error = _write_save() if save else OK
+	_saved_requested = save
 
 
 func _on_rest_finished(player: Player) -> void:
-	_menu.open_for_rest(rest_message, _describe_slot())
 	rested.emit(player)
+	if not _saved_requested:
+		close_menu()
+		return
+	var message := saved_message
+	if _save_error != OK:
+		message = "Save failed (%s). Your previous save is unchanged." % error_string(_save_error)
+	_menu.show_save_result(message, _describe_slot())
+	save_finished.emit(_save_error)
+
+
+# Saves the state after the refill, so the file holds the restored HP and SP.
+func _write_save() -> Error:
+	return get_node("/root/GameManager").save_game(self)
 
 
 func _can_player_interact(player: Player) -> bool:
@@ -123,7 +146,3 @@ func _describe_slot() -> String:
 
 func _on_interaction_requested(interactor: Player) -> void:
 	rest(interactor)
-
-
-func _on_save_requested() -> void:
-	request_save()

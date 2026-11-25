@@ -9,10 +9,10 @@ Where and how enemies are placed inside a room follows
 room has. Wonder rooms (split islands, coloured seas, reef rings) are described in
 [wonder rooms](coral_valley_wonder_rooms.md).
 
-Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `23` has a fixed center lever and an automatically orbiting platform; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `04` has a fixed center and an eight-stop orbit platform controlled from both shores.
+Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `23` has a fixed center lever and an automatically orbiting platform; Quiz `09` has one two-stop ferry with hidden shore levers; Raid `18` has one shuttle called from shore levers (see Island Raid below); Quiz `04` has a fixed center and an eight-stop orbit platform controlled from both shores.
 
 All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
-collision. The four paired Quiz rooms are `room_04`, `room_09`, `room_18` and `room_23`.
+collision. The paired island rooms are Quiz `room_04`, `room_09`, `room_23` and Raid `room_18`.
 Each contains two Small islands, one room root and one shared CameraBounds.
 All four Quiz rooms use the Small room template with their own platform layouts.
 
@@ -63,15 +63,12 @@ existing destructible behavior. Paths, ground spacing and shared CameraBounds
 stay as before. `MovingPlatform.start_at_center` only changes initial placement;
 it defaults to false and does not enable intermediate stops.
 
-Quiz `room_18` removes both side platforms and places
-`objects/quiz_shuttle_platform.tscn` at the former center position. Its onboard
-lever uses the existing attack HurtBox and `MovingPlatform.receive_damage`.
-The platform starts at Center. Each valid player hit requests the next stop:
-**Left → Center → Right → Center**, repeating even if hit during travel.
-The former platform positions remain the stop coordinates: X `20.03284825`,
-`27.61284825` and `35.19284825`. Speed is 3 units/second. No shore call levers
-are added. The existing two-stop platform behavior remains the default; this
-scene enables `center_stop_enabled` and supplies a `Center` marker.
+Island Raid `room_18` (was Quiz) uses `objects/raid_shuttle_platform.tscn`, one
+platform that idles at its Center marker (X `27.61`) between the two islands. It has no
+lever of its own; two `shuttle_call_lever.tscn` levers sit on the shores (west
+`(10.5, 0.21, -7)`, east `(44.5, 0.21, -7)`). Stops: Start X `15.5` (west dock), End X
+`38.58` (east dock), speed 3 units/second. Rules and scripts are described in
+[Island Raid](#island-raid-room_18).
 
 Quiz `room_23` has a fixed center platform at
 `Vector3(27.61284825, -0.03991985, 0.55447969)` and one moving platform using
@@ -123,7 +120,7 @@ External paths attach to the islands shown in the final diagram:
 | room_15 | Top | Empty | Small | left: room_14, right: room_16 |
 | room_16 | Top | Mobs 6 | Medium | left: room_15 |
 | room_17 | Bottom | Empty | Small | right: room_18, up: room_02 |
-| room_18 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_17 |
+| room_18 | Bottom | Raid (2 islands, shuttle) | Small, 2 islands | left: room_17 |
 | room_19 | Bottom | NPC | Small | right: room_20, up: room_04 |
 | room_20 | Bottom | Mobs 3 | Medium | left: room_19 |
 | room_21 | Bottom | Empty | Small | right: room_22, up: room_05 |
@@ -131,10 +128,10 @@ External paths attach to the islands shown in the final diagram:
 | room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
 | room_24 | Bottom | Farm (wonder: split islands) | Medium | left: room_23 |
 
-Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
+Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04` and `23` at the right island centers, Raid `18` at its right island center (spawned after the raid); Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Raid `18`, Quiz `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
 
 Quiz `09` retains four Elite Barrels around its chest at local X/Z `(±5, ±5)`,
-forming a square with four 10-unit sides. Quiz `04`, `18` and `23` retain only
+forming a square with four 10-unit sides. Quiz `04` and `23` retain only
 the two right-side Elite Barrels: TopRight `(5, -5)` and BottomRight `(5, 5)`;
 TopLeft and BottomLeft have been removed. Groups remain centered on their chests,
 and the remaining guards keep their positions and heights. No new scripts or
@@ -326,3 +323,48 @@ These three rooms have no skeleton entries.
 | `room_22` | Mobs 4 | Barrel (normal or elite) |
 | `room_13` | Mobs 5 | Starfish (normal or elite) |
 | `room_16` | Mobs 6 | Crab (normal or elite) |
+
+## Island Raid (`room_18`)
+
+Raid with two islands and a shuttle, built on the shared raid system
+([docs/systems/raid_room.md](../systems/raid_room.md), `world/gimmick/raid/`). Nodes live
+under `IslandRaid` in the room scene. Only the shuttle and lever logic is room-specific
+(`world/gimmick/island_raid/`).
+
+| Step | What happens |
+| --- | --- |
+| 1 | Foxy walks about 7 units in from the west pier and stays inside the `WestStage` entry area for `activation_dwell_seconds` (0.25 s). The dwell stops the fight starting during a room arrival, when Foxy appears briefly at the origin before being moved to the door. Boulders (`BoulderGate`) rise over the west pier and `BaseRoom.set_exits_locked(true)` shuts the exit. |
+| 2 | Two scripted waves rise out of the ground (W1 and W2 in the wave table below). |
+| 3 | When the last enemy is gone the boulders sink, the exit opens and `WestLever` rises out of the ground. |
+| 4 | Striking the lever calls the platform from Center to the west dock. Once Foxy has stood on it for 0.5 s it carries him to the east dock, waits until he steps off, then returns to Center. Both levers ignore hits during the whole trip. If nobody boards within 8 s it returns to Center. |
+| 5 | Stepping onto the east island starts `EastStage` and its three scripted waves (E1 to E3). There is no way back until it is cleared. |
+| 6 | `EastLever` rises and the reward chest (`island_raid_reward_chest.tscn`: Starfish note) appears at the island centre. Striking the lever brings the shuttle back to the east dock and carries Foxy west. |
+
+Waves are planned, not random. Each `RaidSpawnSpec` names an enemy, whether it is an
+elite, an anchor (Foxy or the island centre), an offset (x east, y south, in metres) and a
+delay. A wave opens with a ground rumble of `lead_in_seconds`.
+
+| Wave | Intent | Enemies (anchor, offset, delay) |
+| --- | --- | --- |
+| W1 Ambush | Teaches that the island attacks from the ground: a triangle around Foxy. | Starfish (Foxy, 0/−5, 0 s), Crab (Foxy, −4.5/3, 0.35 s), Coral Skeleton (Foxy, 4.5/3, 0.7 s). |
+| W2 Blockade | Barrels fire from the shuttle-side corners, a crab pushes from behind, an elite blocks the way to the shuttle. | Barrel (centre, 8/−8, 0 s), Barrel (centre, 8/8, 0.3 s), Crab (Foxy, −5/0, 0.8 s), **Elite Crab** (centre, 7/0, 1.6 s). |
+| E1 Pincer | Closes both sides: crabs north, then starfish south. | Crab ×2 (Foxy, ∓2/−5, 0 s and 0.15 s), Starfish ×2 (Foxy, ∓2/5, 0.7 s and 0.85 s). |
+| E2 Firing line | Three barrels top to bottom along the far east edge; a skeleton keeps Foxy moving. | Barrel ×3 (centre, 8/−7, 8/0, 8/7; 0, 0.3, 0.6 s), Coral Skeleton (Foxy, 0/5, 1.2 s). |
+| E3 Finale | Long rumble (1.6 s), two elites at the centre, then their escort surrounds Foxy. | **Elite Coral Skeleton** (centre, −3/0, 0 s), **Elite Starfish** (centre, 3/0, 0.5 s), Crab, Coral Skeleton, Starfish (Foxy triangle, 2.0 to 2.6 s). |
+
+The spawn sequence (crack, eruption, emerging enemy) is described in the shared raid doc.
+
+Room configuration:
+
+- `WestStage` (`locks_room = true`) and `EastStage` (`locks_room = false`, since the exits
+  are on the west side) each have their own `RaidGroundSpawner`.
+- `Lockdown` (`RaidLockdown`) locks the exits and raises `BoulderGate` during the west fight.
+  It spawns the reward chest once both islands are cleared.
+- `IslandRaidConductor` raises each island's shuttle lever when that island is cleared.
+- `ShuttleDirector` runs the platform trips; `MovingPlatform` gained `request_center()`,
+  `center_reached` and `is_traveling()` for it. `ShuttleCallLever` only emits `called`.
+- Progress is kept in `GameManager.story_flags` (`coral_valley_room_18_west_cleared`,
+  `coral_valley_room_18_east_cleared`), so it is saved with the run and a cleared island
+  never fights again. Re-entering restores the earned levers and the chest. Dying mid-fight
+  restarts that island's waves. The platform and levers reset when the room is entered.
+- The two static Elite Barrels that guarded the chest were removed.

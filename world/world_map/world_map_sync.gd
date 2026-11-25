@@ -3,7 +3,8 @@ class_name WorldMapSync
 extends RefCounted
 ## Editor-time builder: reads every `<biomes_root>/<biome>/map/*.tscn`, adds new biomes and
 ## rooms, refreshes exits and places new rooms on the grid next to the rooms they connect to.
-## Authored values (room cell, hidden, marker; biome name, position, colour, flag) are kept.
+## Exits and the safe-room flag always follow the scene; authored values (room cell, hidden,
+## marker; biome name, position, colour, flag) are kept.
 
 const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
 const ROOMS_FOLDER := "map"
@@ -42,6 +43,7 @@ static func _sync_biome(
 			room.marker = _marker_for_role(EXIT_CATALOG.get_room_role(scene_path))
 			new_rooms.append(room)
 		room.exits = _read_exits(scene_path)
+		room.safe_room = EXIT_CATALOG.is_safe_room(scene_path)
 		rooms.append(room)
 
 	var removed := biome.rooms.size() - (rooms.size() - new_rooms.size())

@@ -5,6 +5,8 @@ extends Node3D
 ## A hit can change the destination while the platform is moving.
 
 signal destination_reached(at_end: bool)
+## The platform came to rest at its Center marker (see `request_center`).
+signal center_reached
 
 @export_range(0.1, 30.0, 0.1, "suffix:m/s") var move_speed := 3.0
 ## Start at Center; each lever hit advances the four-step route.
@@ -86,7 +88,9 @@ func _physics_process(delta: float) -> void:
 	if platform.position.is_equal_approx(destination):
 		platform.position = destination
 		_moving = false
-		if _target_marker != _center_marker:
+		if _target_marker == _center_marker:
+			center_reached.emit()
+		else:
 			destination_reached.emit(_target_end)
 
 
@@ -109,6 +113,18 @@ func receive_damage(damage: DamageContext) -> float:
 func _on_lever_animation_finished() -> void:
 	if _lever_sprite.animation == &"active":
 		_lever_sprite.play(&"idle")
+
+
+## Sends the platform to its Center marker; endpoint mode with a Center marker only.
+func request_center() -> void:
+	if _center_marker == null or not _route_markers.is_empty():
+		push_error("MovingPlatform: request_center needs a Center marker and endpoint mode.")
+		return
+	_request_stop(_center_marker)
+
+
+func is_traveling() -> bool:
+	return _moving
 
 
 func request_destination(at_end: bool) -> void:

@@ -7,48 +7,9 @@
 [sub_resource type="Resource" id="Resource_sv6s8"]
 script = ExtResource("2_imd3g")
 scene_path = "res://world/biomes/hub/map/castaway_cove.tscn"
-marker = 1
+safe_room = true
 exits = Dictionary[int, String]({
 1: "res://world/biomes/coral_valley/map/room_00.tscn"
-})
-
-[sub_resource type="Resource" id="Resource_jaoir"]
-script = ExtResource("2_imd3g")
-scene_path = "res://world/biomes/hub/map/room_00.tscn"
-cell = Vector2i(2, 0)
-exits = Dictionary[int, String]({
-1: "res://world/biomes/hub/map/room_01.tscn"
-})
-
-[sub_resource type="Resource" id="Resource_1ivbp"]
-script = ExtResource("2_imd3g")
-scene_path = "res://world/biomes/hub/map/room_01.tscn"
-cell = Vector2i(3, 0)
-marker = 2
-exits = Dictionary[int, String]({
-1: "res://world/biomes/hub/map/room_02.tscn",
-3: "res://world/biomes/hub/map/room_00.tscn"
-})
-
-[sub_resource type="Resource" id="Resource_2bfo2"]
-script = ExtResource("2_imd3g")
-scene_path = "res://world/biomes/hub/map/room_02.tscn"
-cell = Vector2i(4, 0)
-marker = 1
-exits = Dictionary[int, String]({
-0: "res://world/biomes/hub/map/room_06.tscn",
-1: "res://world/biomes/hub/map/room_03.tscn",
-2: "res://world/biomes/hub/map/room_09.tscn",
-3: "res://world/biomes/hub/map/room_01.tscn"
-})
-
-[sub_resource type="Resource" id="Resource_4yaxx"]
-script = ExtResource("2_imd3g")
-scene_path = "res://world/biomes/hub/map/room_03.tscn"
-cell = Vector2i(5, 0)
-exits = Dictionary[int, String]({
-1: "res://world/biomes/hub/map/room_04.tscn",
-3: "res://world/biomes/hub/map/room_02.tscn"
 })
 
 [sub_resource type="Resource" id="Resource_4pkn2"]
@@ -56,6 +17,7 @@ script = ExtResource("2_imd3g")
 scene_path = "res://world/biomes/hub/map/silas_tent.tscn"
 cell = Vector2i(0, -1)
 marker = 2
+safe_room = true
 exits = Dictionary[int, String]({
 2: "res://world/biomes/hub/map/castaway_cove.tscn"
 })
@@ -65,11 +27,12 @@ script = ExtResource("2_biome")
 biome_id = &"hub"
 display_name = "Castaway Cove"
 accent = Color(0.86, 0.71, 0.45, 1)
-rooms = Array[ExtResource("2_imd3g")]([SubResource("Resource_sv6s8"), SubResource("Resource_jaoir"), SubResource("Resource_1ivbp"), SubResource("Resource_2bfo2"), SubResource("Resource_4yaxx"), SubResource("Resource_4pkn2")])
+rooms = Array[ExtResource("2_imd3g")]([SubResource("Resource_sv6s8"), SubResource("Resource_4pkn2")])
 
 [sub_resource type="Resource" id="Resource_2wtv7"]
 script = ExtResource("2_imd3g")
 scene_path = "res://world/biomes/coral_valley/map/room_00.tscn"
+safe_room = true
 exits = Dictionary[int, String]({
 1: "res://world/biomes/coral_valley/map/room_01.tscn",
 3: "res://world/biomes/hub/map/castaway_cove.tscn"
@@ -120,6 +83,7 @@ exits = Dictionary[int, String]({
 script = ExtResource("2_imd3g")
 scene_path = "res://world/biomes/coral_valley/map/room_05.tscn"
 cell = Vector2i(10, 0)
+safe_room = true
 exits = Dictionary[int, String]({
 0: "res://world/biomes/coral_valley/map/room_13.tscn",
 1: "res://world/biomes/coral_valley/map/room_06.tscn",

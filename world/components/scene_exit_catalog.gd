@@ -61,6 +61,11 @@ static func get_room_role(scene_path: String) -> String:
 	return String(_room_properties(_read_nodes(scene_path)).get(ROOM_ROLE_PROPERTY, ""))
 
 
+## Whether a BaseRoom scene grants the safe-room rules (`BaseRoom.safe_room`).
+static func is_safe_room(scene_path: String) -> bool:
+	return bool(_room_properties(_read_nodes(scene_path)).get("safe_room", false))
+
+
 static func _read_nodes(scene_path: String) -> Dictionary:
 	var nodes: Dictionary = {}
 	if scene_path.is_empty() or not ResourceLoader.exists(scene_path, "PackedScene"):

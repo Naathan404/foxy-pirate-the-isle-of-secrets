@@ -1,7 +1,7 @@
 # Save/Load
 
 Game có **một slot save** (Slot 1). Người chơi chỉ lưu được bằng cách nghỉ ở lửa trại
-trong room bật `safe_room`, rồi chủ động chọn **Save game**. Menu chính có
+trong room bật `safe_room`, rồi chủ động chọn **REST and SAVE**. Menu chính có
 **Continue** (tải slot) và **New Game** (chơi mới).
 
 ## Luồng người chơi
@@ -9,17 +9,20 @@ trong room bật `safe_room`, rồi chủ động chọn **Save game**. Menu ch�
 1. Đi vào room có `safe_room = true` **không** tự lưu.
 2. Đứng gần lửa trại, nhãn **Rest** hiện lên; nhấn phím tương tác chung với NPC
    (`dialogic_default_action`: Enter, Space, X, chuột trái, nút A của tay cầm).
-3. Trong safe room: game tạm dừng, màn hình tối dần (`RestMenu.fade_out_seconds`), giữ đen
-   (`dark_hold_seconds`). Trong lúc đen, HP và SP hồi đầy, lửa trại này thành điểm hồi sinh
-   và các phòng bắt đầu chu kỳ mới (xem [Trạng thái phòng](room_state.md)). Màn hình sáng
-   lại (`fade_in_seconds`) rồi mới hiện menu **Campfire**; signal `CampfireRestPoint.rested`
-   phát lúc menu mở:
-   - **Save game** ghi trạng thái *sau khi đã hồi* vào Slot 1 và báo "Game saved."
-     hoặc "Save failed (...). Your previous save is unchanged.". Dòng phụ cho biết
-     slot đang trống hay sẽ ghi đè save nào (room, giờ lưu).
-   - **Leave** hoặc Escape đóng menu, không ghi gì.
+3. Trong safe room: game tạm dừng và hiện menu **Campfire** với ba lựa chọn:
+   - **REST**: màn hình tối dần (`RestMenu.fade_out_seconds`), giữ đen
+     (`dark_hold_seconds`). Trong lúc đen, HP và SP hồi đầy, lửa trại này thành điểm hồi sinh
+     và các phòng bắt đầu chu kỳ mới (xem [Trạng thái phòng](room_state.md)). Màn hình sáng
+     lại (`fade_in_seconds`), signal `CampfireRestPoint.rested` phát và menu đóng, không ghi
+     save.
+   - **REST and SAVE**: như REST, và trong lúc đen còn ghi trạng thái *sau khi đã hồi* vào
+     Slot 1. Sau khi sáng lại menu hiện "Game saved." hoặc "Save failed (...). Your
+     previous save is unchanged.", kèm dòng phụ cho biết slot đang trống hay đã ghi đè
+     save nào (room, giờ lưu); `save_finished` phát lúc này.
+   - **QUIT** hoặc Escape đóng menu, không hồi máu và không ghi gì. Escape bị chặn trong
+     lúc đang fade.
 4. Ngoài safe room: menu chỉ báo "This fire is too exposed. You cannot rest or save
-   here." và nút **Leave**; không hồi máu, không ghi save.
+   here." và nút **QUIT**; không hồi máu, không ghi save.
 5. Menu chính: **Continue** chỉ bật khi Slot 1 đọc và kiểm tra hợp lệ; dòng dưới nút
    hiện `Slot 1 · <room> · <giờ lưu>` hoặc lý do không tải được. Continue đưa Foxy về
    cạnh đúng lửa trại đã lưu. **New Game** bắt đầu từ Hub và không giữ gì của lượt
@@ -116,7 +119,7 @@ vàng hay chỉ số Charm.
 | `GameManager.load_saved_game() -> Error` | `OK` khi đã nhận yêu cầu; kết quả cuối qua signal `saved_game_loaded(error)` |
 | `GameManager.start_new_game(scene_path) -> bool` | Reset phiên, Silas, Notes rồi chuyển scene |
 | `GameManager.enter_rest_menu()` / `exit_rest_menu()` | Pause của menu lửa trại (`State.REST_MENU`) |
-| `CampfireRestPoint.rest(player)`, `request_save()`, `close_menu()`, `is_save_allowed()` | Cùng đường đi với phím tương tác |
+| `CampfireRestPoint.rest(player)` (mở menu), `choose_rest(save)`, `close_menu()`, `is_save_allowed()` | Cùng đường đi với phím tương tác và các nút menu |
 
 ## Scene và cấu hình
 
@@ -164,7 +167,7 @@ vàng hay chỉ số Charm.
 
 | Test | Phạm vi |
 | --- | --- |
-| [save_load_flow_test.gd](../../test/save_load_flow_test.gd) | Menu thật → New Game → Hub; safe room không tự lưu; phím tương tác mở menu, hồi HP/SP, Leave/Escape không lưu; Save; đổi tiến trình rồi Continue khôi phục đủ và đúng chỗ; 3 vòng save/load không nhân đôi; New Game sau khi có save chơi mới và giữ slot |
+| [save_load_flow_test.gd](../../test/save_load_flow_test.gd) | Menu thật → New Game → Hub; safe room không tự lưu; phím tương tác mở menu, chọn REST hồi HP/SP mà không lưu, QUIT/Escape không lưu; REST and SAVE; đổi tiến trình rồi Continue khôi phục đủ và đúng chỗ; 3 vòng save/load không nhân đôi; New Game sau khi có save chơi mới và giữ slot |
 | [room_state_test.gd](../../test/room_state_test.gd) | Trạng thái phòng, nghỉ, chết/void, rương giữ vĩnh viễn, migration save v1, PropSlot; xem [Trạng thái phòng](room_state.md) |
 | [save_load_edge_test.gd](../../test/save_load_edge_test.gd) | Chưa có save; file hỏng/rỗng/sai kiểu; version mới hơn; thiếu scene; thiếu lửa trại; lỗi ghi; ghi dở; lửa trại ngoài safe room (kể cả khi có safe location kiểu checkpoint); từng nhóm dữ liệu với giá trị biên và ID không hợp lệ; spawn ở mọi lửa trại không rơi, không kẹt, không chạm trigger chuyển scene |
 
