@@ -5,6 +5,9 @@ const TARGET_SCALE_PROPERTY := &"hitstop_scale"
 
 @export_range(0.001, 0.1, 0.001) var stop_scale: float = 0.01
 @export_range(0.01, 0.3, 0.01) var maximum_duration: float = 0.12
+## Cap for stops that freeze the whole game (`request`). A long global freeze reads as a frame
+## drop; local stops (`request_local`) only hold the actors and keep `maximum_duration`.
+@export_range(0.01, 0.3, 0.01) var global_maximum_duration: float = 0.08
 
 var _active: bool = false
 var _previous_scale: float = 1.0
@@ -29,7 +32,8 @@ func request(duration: float = 0.06, target: Node = null) -> void:
 			_previous_scale = Engine.time_scale
 		_active = true
 
-	var milisec = int(clampf(duration, 0.0, maximum_duration) * 1000.0)
+	var cap := minf(maximum_duration, global_maximum_duration)
+	var milisec = int(clampf(duration, 0.0, cap) * 1000.0)
 
 	_end_at_msec = maxi(_end_at_msec, Time.get_ticks_msec() + milisec)
 

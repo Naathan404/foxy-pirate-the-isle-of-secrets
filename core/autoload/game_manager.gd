@@ -18,8 +18,8 @@ const SAVE_SLOT_PATH := "user://saves/slot_1.json"
 ## Where Foxy respawns before resting at any campfire: its first campfire.
 @export_file("*.tscn")
 var fallback_rest_scene: String = "res://world/biomes/hub/map/castaway_cove.tscn"
-@export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.4
-@export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.45
+@export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.3
+@export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.35
 
 var player: Player
 var inventory: Inventory
@@ -44,6 +44,11 @@ var _pending_load: Dictionary = {}
 var _pending_respawn_point: Variant = null
 var _transition_overlay: CanvasLayer
 var _fade_rect: ColorRect
+## Rooms the current room's exits lead to, loaded in the background after each arrival so
+## walking through an exit does not wait on the disk. Only the current neighbours are kept.
+var _neighbor_scenes: Dictionary[String, PackedScene] = {}
+## Neighbour paths whose threaded load is still running.
+var _neighbor_requests: Array[String] = []
 
 
 func _ready() -> void:
@@ -51,6 +56,29 @@ func _ready() -> void:
 	_transition_overlay = TRANSITION_OVERLAY.instantiate() as CanvasLayer
 	add_child(_transition_overlay)
 	_fade_rect = _transition_overlay.get_node("Fade") as ColorRect
+	set_process(false)
+
+
+## Background loads cut off by quitting fail with parse errors; let them finish first.
+func _exit_tree() -> void:
+	for path: String in _neighbor_requests:
+		ResourceLoader.load_threaded_get(path)
+	_neighbor_requests.clear()
+	_neighbor_scenes.clear()
+
+
+## Collects finished neighbour loads; runs only while some are in flight.
+func _process(_delta: float) -> void:
+	for path: String in _neighbor_requests.duplicate():
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			continue
+		_neighbor_requests.erase(path)
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
+			var scene := ResourceLoader.load_threaded_get(path) as PackedScene
+			if scene != null:
+				_neighbor_scenes[path] = scene
+	set_process(not _neighbor_requests.is_empty())
 
 
 func register_player(active_player: Player) -> void:
@@ -293,8 +321,14 @@ func _transition_scene(
 	get_node("/root/ScreenShakeController").cancel()
 	_transition_overlay.show()
 	state_changed.emit(state)
-	# Read destination resources in parallel with fade-out, without blocking a frame.
-	var load_error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
+	# A neighbour preloaded after the last arrival is ready at once. Otherwise read the
+	# destination in parallel with fade-out, without blocking a frame.
+	var destination: PackedScene = _neighbor_scenes.get(scene_path)
+	var load_error := OK
+	if destination == null and not _neighbor_requests.has(scene_path):
+		load_error = ResourceLoader.load_threaded_request(scene_path, "PackedScene")
+	# A neighbour load still in flight is finished here instead of by _process.
+	_neighbor_requests.erase(scene_path)
 	await _fade_to(1.0, fade_out_seconds)
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
@@ -304,20 +338,21 @@ func _transition_scene(
 		player_state = PLAYER_SCENE_STATE.new()
 		player_state.capture(player)
 	var error: Error = load_error
-	if error == OK:
+	if error == OK and destination == null:
 		while (
 			ResourceLoader.load_threaded_get_status(scene_path)
 			== ResourceLoader.THREAD_LOAD_IN_PROGRESS
 		):
 			await get_tree().process_frame
 		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
-			var destination := ResourceLoader.load_threaded_get(scene_path) as PackedScene
-			if not load_payload.is_empty():
-				error = _prepare_saved_world(destination, load_payload)
-			if error == OK:
-				error = get_tree().change_scene_to_packed(destination)
-		else:
+			destination = ResourceLoader.load_threaded_get(scene_path) as PackedScene
+		if destination == null:
 			error = ERR_CANT_OPEN
+	if error == OK:
+		if not load_payload.is_empty():
+			error = _prepare_saved_world(destination, load_payload)
+		if error == OK:
+			error = get_tree().change_scene_to_packed(destination)
 	if error == OK:
 		# SceneTree signals after the new scene has entered the tree and run _ready().
 		await get_tree().scene_changed
@@ -345,6 +380,8 @@ func _transition_scene(
 	await _fade_to(0.0, fade_in_seconds)
 	_transition_overlay.hide()
 	_transition_pending = false
+	if error == OK:
+		_preload_neighbors()
 	scene_transition_finished.emit()
 	if not load_payload.is_empty():
 		# A rejected save is an expected outcome reported to the menu, not an engine fault.
@@ -422,6 +459,30 @@ func _get_merchant_progress() -> SilasProgressStore:
 
 func _get_note_progress() -> Node:
 	return get_node("/root/NoteProgress")
+
+
+## Starts background loads of the scenes this room's exits lead to and forgets the rest.
+func _preload_neighbors() -> void:
+	var scene := get_tree().current_scene
+	var wanted: Array[String] = []
+	for node: Node in get_tree().get_nodes_in_group("scene_change_triggers"):
+		var trigger := node as SceneChangeTrigger
+		if trigger == null or scene == null or not scene.is_ancestor_of(trigger):
+			continue
+		var path := trigger.destination_scene
+		if path.is_empty() or wanted.has(path) or path == scene.scene_file_path:
+			continue
+		if ResourceLoader.exists(path, "PackedScene"):
+			wanted.append(path)
+	for path: String in _neighbor_scenes.keys():
+		if not wanted.has(path):
+			_neighbor_scenes.erase(path)
+	for path: String in wanted:
+		if _neighbor_scenes.has(path) or _neighbor_requests.has(path):
+			continue
+		if ResourceLoader.load_threaded_request(path, "PackedScene") == OK:
+			_neighbor_requests.append(path)
+	set_process(not _neighbor_requests.is_empty())
 
 
 func _prepare_arrival_render(frame_count: int = 2) -> void:

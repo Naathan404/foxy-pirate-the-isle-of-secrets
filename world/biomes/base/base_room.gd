@@ -13,6 +13,8 @@ const EXIT_CATALOG := preload("res://world/components/scene_exit_catalog.gd")
 # //NLVP sửa: Tách biên người chơi và biên quái.
 const PLAYER_BOUNDARIES_NAME := &"GroundBoundaries"
 const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
+## Slack around floor bounds so edges that merely touch another floor are still tested.
+const EDGE_BOUNDS_MARGIN := 0.01
 
 @export_tool_button("Refresh destination exits", "Reload") var refresh_destination_exits: Callable:
 	get:
@@ -103,6 +105,7 @@ const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 		_queue_refresh()
 
 var _exits_locked := false
+var _boundary_rebuild_queued := false
 ## World cycle this room was built in; its records are ignored once a rest starts a new one.
 var _state_cycle: int = -1
 
@@ -284,12 +287,22 @@ func _refresh_exits() -> void:
 		left_destination_trigger_id
 	)
 	if is_inside_tree() and is_node_ready() and not Engine.is_editor_hint():
-		_rebuild_ground_boundaries.call_deferred()
+		queue_boundary_rebuild()
+
+
+## Rebuilds the boundaries once at the end of the frame, however many changes asked for it
+## (an exit lock and a floor switched off by the same event cost one rebuild).
+func queue_boundary_rebuild() -> void:
+	if _boundary_rebuild_queued:
+		return
+	_boundary_rebuild_queued = true
+	_rebuild_ground_boundaries.call_deferred()
 
 
 ## Generate walls along the exposed edges of the floors. Paths are
 ## included only while open, so their overlap with the ground remains walkable.
 func _rebuild_ground_boundaries() -> void:
+	_boundary_rebuild_queued = false
 	# //NLVP sửa: Dọn cả hai lớp biên trước khi dựng lại.
 	for boundary_name in [PLAYER_BOUNDARIES_NAME, ENEMY_BOUNDARIES_NAME]:
 		var old := get_node_or_null(NodePath(boundary_name))
@@ -325,11 +338,13 @@ func _create_ground_boundaries(
 	walls.name = boundary_name
 	walls.collision_layer = layer
 	walls.collision_mask = 0
-	add_child(walls)
 	for floor_data: Dictionary in floors:
 		var outline: PackedVector2Array = floor_data.outline
 		for i in range(outline.size() - 1):
 			_add_floor_edge(walls, floors, outline[i], outline[i + 1], floor_data.top, openings)
+	# Shapes go in before the body enters the tree: a body already in the physics space rebuilds
+	# its compound shape on every added wall, which made a rebuild cost tens of milliseconds.
+	add_child(walls)
 
 
 func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
@@ -366,7 +381,14 @@ func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:
 		# The hull is counterclockwise and repeats the first point at the end.
 		var outline := Geometry2D.convex_hull(projected)
 		if outline.size() >= 4:
-			floors.append({"outline": outline, "top": top})
+			floors.append({"outline": outline, "top": top, "bounds": _outline_bounds(outline)})
+
+
+func _outline_bounds(outline: PackedVector2Array) -> Rect2:
+	var bounds := Rect2(outline[0], Vector2.ZERO)
+	for point: Vector2 in outline:
+		bounds = bounds.expand(point)
+	return bounds
 
 
 # //NLVP sửa: Mỗi lớp biên nhận danh sách cửa mở riêng.
@@ -382,8 +404,10 @@ func _add_floor_edge(
 	if edge.length_squared() < 0.0001:
 		return
 	var cuts: Array[float] = [0.0, 1.0]
+	# Only floors whose bounds touch the edge can cut it; skipping the rest keeps a rebuild cheap.
+	var edge_bounds := Rect2(start, Vector2.ZERO).expand(end).grow(EDGE_BOUNDS_MARGIN)
 	for other: Dictionary in floors:
-		if absf(float(other.top) - top) < 0.5:
+		if absf(float(other.top) - top) < 0.5 and edge_bounds.intersects(other.bounds):
 			_split_edge(start, end, other.outline, cuts)
 	for opening: Rect2 in openings:
 		var outline := PackedVector2Array(
@@ -438,10 +462,12 @@ func _add_boundary(
 	for opening: Rect2 in openings:
 		if opening.has_point(midpoint):
 			return
+	var probe := midpoint + outward * 0.01
 	for other: Dictionary in floors:
 		if (
 			absf(float(other.top) - top) < 0.5
-			and Geometry2D.is_point_in_polygon(midpoint + outward * 0.01, other.outline)
+			and (other.bounds as Rect2).grow(EDGE_BOUNDS_MARGIN).has_point(probe)
+			and Geometry2D.is_point_in_polygon(probe, other.outline)
 		):
 			return
 	var wall := CollisionShape3D.new()

@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="SeaPalette" format=3]
+
+[ext_resource type="Script" uid="uid://b2i34yvw5vcoy" path="res://world/components/sea_palette.gd" id="1_palette"]
+
+[resource]
+script = ExtResource("1_palette")

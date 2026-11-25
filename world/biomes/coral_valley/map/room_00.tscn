@@ -213,7 +213,7 @@ shape = SubResource("BoxShape3D_oicq1")
 disabled = true
 
 [node name="Sprite3D" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="0" unique_id=1887481611]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1, 0.116, 0)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1.2321129, 0.116, 0)
 shaded = true
 texture = ExtResource("pier_right")
 
@@ -265,8 +265,8 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.252, 0)
 ground_shadow = true
 
 [node name="FireLight" parent="Campfire" index="4" unique_id=994038413]
-light_color = Color(1, 0.63282007, 0.26188007, 1)
-light_energy = 8.801556
+light_color = Color(1, 0.58736086, 0.23157391, 1)
+light_energy = 8.039573
 omni_range = 14.0
 base_energy = 8.0
 

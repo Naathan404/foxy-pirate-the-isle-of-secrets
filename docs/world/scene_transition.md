@@ -16,8 +16,14 @@ chuyển phòng tiếp theo vẫn bị chặn cho đến khi fade in kết thúc
 `GameManager.scene_transition_finished` phát sau khi fade in hoàn tất, kể cả khi
 đổi scene thất bại và màn hình đã được mở lại. Lỗi đổi scene được ghi bằng `push_error`.
 
-Thời gian mặc định: fade out 0,4 giây, fade in 0,45 giây. Chỉnh
-`fade_out_seconds` / `fade_in_seconds` trên GameManager. Tween chạy khi pause và
+Thời gian mặc định: fade out 0,3 giây, fade in 0,35 giây. Chỉnh
+`fade_out_seconds` / `fade_in_seconds` trên GameManager.
+
+Sau mỗi lần vào phòng, GameManager tải nền các scene mà trigger của phòng hiện tại dẫn tới
+(phòng kề, kể cả phòng vừa rời) và giữ chúng tới lần chuyển sau; phòng không còn kề bị bỏ.
+Bước qua cửa tới phòng đã tải xong thì không phải chờ đọc đĩa; nếu đang tải dở, transition
+chờ chính lượt tải đó thay vì mở lượt mới. Khi thoát game, các lượt tải nền được chờ xong
+để không sinh lỗi parse. Tween chạy khi pause và
 không phụ thuộc `Engine.time_scale`. Overlay nằm trong autoload nên tồn tại qua scene.
 
 ## Trigger chuyển map

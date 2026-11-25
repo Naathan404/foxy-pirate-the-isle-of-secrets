@@ -44,6 +44,9 @@ func _ready() -> void:
 		detection_shape.shape = sphere
 	if is_instance_valid(detector):
 		detector.body_entered.connect(_on_body_entered)
+	if is_instance_valid(moving_root):
+		# Pulled towards Foxy every frame in _process; physics interpolation would lag it.
+		moving_root.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	reset()
 
 

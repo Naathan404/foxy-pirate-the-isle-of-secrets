@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cmp8k4pnenasl"]
 
-[ext_resource type="PackedScene" path="res://world/objects/destructible_prop.tscn" id="1_p65ir"]
+[ext_resource type="PackedScene" uid="uid://c0y1euj63gk4x" path="res://world/objects/destructible_prop.tscn" id="1_p65ir"]
 [ext_resource type="Resource" uid="uid://os3iull80808" path="res://data/items/materials/coconut.tres" id="2_p65ir"]
 [ext_resource type="Texture2D" uid="uid://cxu75vft4ydpl" path="res://assets/sprites/biomes/beach/Coconut_Tree_Short.png" id="3_p65ir"]
 
@@ -12,8 +12,8 @@ height = 0.8
 radius = 0.3
 
 [node name="BeachPalm02" unique_id=917493758 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_p65ir")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-max_hp = 3.0
+transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, 0, 0, 0)
+max_hp = 8.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
 swingable = true
@@ -26,7 +26,7 @@ wind_bend_power = 2.0
 fragment_source = NodePath("Visual/Sprite3D")
 drop_item = ExtResource("2_p65ir")
 
-[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0" unique_id=495232427]
+[node name="Sprite3D" type="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(881353462) index="0" unique_id=495232427]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 offset = Vector2(27, 563.5)
 pixel_size = 0.0025
@@ -36,11 +36,10 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("3_p65ir")
 
-[node name="CollisionShape3D" parent="HurtBox" index="0"]
+[node name="CollisionShape3D" parent="HurtBox" parent_id_path=PackedInt32Array(9422287) index="0" unique_id=137273012]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.003709, 0.20576172)
 shape = SubResource("BoxShape3D_p65ir")
 
-[node name="CollisionShape3D" parent="MovementBody" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+[node name="CollisionShape3D" parent="MovementBody" parent_id_path=PackedInt32Array(1343867957) index="0" unique_id=1194784799]
 shape = SubResource("TrunkShape")
 disabled = false

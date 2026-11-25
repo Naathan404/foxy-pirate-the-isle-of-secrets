@@ -24,7 +24,7 @@ prop_scenes = Array[PackedScene]([ExtResource("starfish"), ExtResource("starfish
 [node name="RandomObstacles" type="Node3D" parent="."]
 script = ExtResource("random_props")
 editor_description = "5-7 total stone/wood or shell/wood obstacles."
-spawn_positions = PackedVector3Array(-8, 0.21008015, -8, 0, 0.21008015, -10, 8, 0.21008015, -8, -9, 0.21008015, 0, 9, 0.21008015, 0, -8, 0.21008015, 8, 0, 0.21008015, 10, 8, 0.21008015, 8)
+spawn_positions = PackedVector3Array(-8, 0.21008015, -8, -4.5, 0.21008015, -11, 8, 0.21008015, -8, -10.5, 0.21008015, -4.2, 10.5, 0.21008015, 4.2, -8, 0.21008015, 8, 4.5, 0.21008015, 11.5, 8, 0.21008015, 8)
 min_spawn_count = 5
 max_spawn_count = 7
 prop_scenes = Array[PackedScene]([ExtResource("stone"), ExtResource("wood_log")])

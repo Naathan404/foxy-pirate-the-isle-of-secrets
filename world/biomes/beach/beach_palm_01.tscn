@@ -9,13 +9,13 @@ size = Vector3(0.8, 2, 1.0095093)
 
 [node name="BeachPalm01" unique_id=917493758 node_paths=PackedStringArray("visual_root", "fragment_source") instance=ExtResource("1_kbs7a")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-max_hp = 3.0
+max_hp = 8.0
 visual_root = NodePath("Visual/Sprite3D")
 hit_scale = 1.15
 fragment_source = NodePath("Visual/Sprite3D")
 drop_item = ExtResource("2_kbs7a")
 
-[node name="Sprite3D" type="Sprite3D" parent="Visual" index="0" unique_id=495232427]
+[node name="Sprite3D" type="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(881353462) index="0" unique_id=495232427]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5025986, 0)
 pixel_size = 0.0025
 billboard = 1
@@ -24,9 +24,9 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("3_kbs7a")
 
-[node name="CollisionShape3D" parent="HurtBox" index="0"]
+[node name="CollisionShape3D" parent="HurtBox" parent_id_path=PackedInt32Array(9422287) index="0" unique_id=137273012]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62250257, 1.0003922, 0.10475467)
 shape = SubResource("BoxShape3D_kbs7a")
 
-[node name="MovementBody" parent="." index="3"]
+[node name="MovementBody" parent="." index="3" unique_id=1343867957]
 collision_layer = 256

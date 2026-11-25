@@ -8,9 +8,32 @@ const ATTACK_PLAYBACK_WINDOWS := {
 }
 const DAGGER_COMBO_ANIMATIONS := ["Attack_1", "Attack_2", "Attack_1", "Attack_3"]
 const RUN_SIZE_MULTIPLIERS := {"D_Run": 1.1, "U_Run": 1.08}
+## Frames of a run clip averaged into its fixed anchor (about one stride at 60-120 fps).
+const RUN_ANCHOR_SAMPLES := 60
+## The up and down runs key the hip and neck with large, uneven hops (hold, then a sharp drop;
+## the neck bobs 18 Spine units per stride and the hip 15, against 5 and 0 in S_Run). The hip
+## is held at its average height and the neck follows an even wave timed to the clip's own
+## stride. The feet are IK targets, so they stay planted.
+const RUN_BOB_BONES := {"U_Run": ["center_U", "Neck_U"], "D_Run": ["center_D", "Neck_D"]}
+## Neck bob per stride (Spine units): the clip's own stride strength (fitted 18), played as an
+## even wave. With the hip held, the head travels about 40 units, against 68 in S_Run.
+const RUN_BOB_AMPLITUDE := 18.0
+## Every run clip is 0.7 s long with two strides.
+const RUN_CLIP_SECONDS := 0.7
+const RUN_STRIDES_PER_CLIP := 2.0
 const STRAY_EYE_SLOT := "Eyes/Eyes_01"
 ## Some Spine 3.8 dash clips are exposed by name but not as animation objects.
 const DASH_CLIP_DURATION := 0.5
+
+## Skeleton data by path, kept across rooms. Every room instances a new Foxy; loading the data
+## again meant decoding and uploading all twelve atlas pages, a ~0.4 s stall on each arrival.
+static var _skeleton_data_cache: Dictionary[String, Resource] = {}
+## Per run clip: Vector3(sum of bounds centre x, lowest bounds bottom, sample count). Shared by
+## every Foxy so the anchor is settled after the first stride of the session.
+static var _run_anchors: Dictionary[String, Vector3] = {}
+## Per run clip in RUN_BOB_BONES, measured over its first play of the session: time-weighted
+## sums of the hip height, the neck height and the neck's stride wave (cos and sin parts).
+static var _run_bob_fits: Dictionary[String, Dictionary] = {}
 
 @export var enabled: bool = true
 @export_file("*.tres")
@@ -28,7 +51,6 @@ var _active: bool = false
 var _fitted_transform: Transform3D = Transform3D.IDENTITY
 var _reference_height: float = 0.0
 var _reference_bottom: Vector3 = Vector3.ZERO
-var _idle_spine_height: float = 0.0
 var _fit_ready: bool = false
 var _current_spine_animation: String = ""
 var _current_spine_skin: String = ""
@@ -41,6 +63,7 @@ var _dash_duration: float = 0.0
 var _run_playback_speed: float = 1.0
 var _hit_tint_strength: float = 0.0
 var _hit_overlay: StandardMaterial3D
+var _run_bob_last_time: float = -1.0
 
 
 func _ready() -> void:
@@ -126,7 +149,6 @@ func _process(_delta: float) -> void:
 	_update_slash_overlay()
 	if _hit_tint_strength > 0.0:
 		_update_hit_tint()
-	_stabilize_dash_size()
 	_stabilize_run_size()
 
 
@@ -134,32 +156,24 @@ func _stabilize_run_size() -> void:
 	var factor: float = RUN_SIZE_MULTIPLIERS.get(_current_spine_animation, 1.0)
 	if factor == 1.0:
 		return
-	var bounds: AABB = _spine.get_aabb()
-	if bounds.size.x <= 0.01 or bounds.size.y <= 0.01:
+	# Centre and ground the enlarged clip on an anchor averaged over its first stride, then keep
+	# it fixed. Re-anchoring on each frame's bounds slid the whole body with every arm swing.
+	var anchor: Vector3 = _run_anchors.get(_current_spine_animation, Vector3(0.0, INF, 0.0))
+	if anchor.z < RUN_ANCHOR_SAMPLES:
+		var bounds: AABB = _spine.get_aabb()
+		if bounds.size.x > 0.01 and bounds.size.y > 0.01:
+			anchor.x += bounds.get_center().x
+			anchor.y = minf(anchor.y, bounds.position.y)
+			anchor.z += 1.0
+			_run_anchors[_current_spine_animation] = anchor
+	if anchor.z <= 0.0:
 		return
 	var pose := _spine.transform
 	var mirrored := signf(pose.basis.x.x) != signf(_fitted_transform.basis.x.x)
 	pose.basis.x = _fitted_transform.basis.x * (-factor if mirrored else factor)
 	pose.basis.y = _fitted_transform.basis.y * factor
-	pose.origin.x = _reference_bottom.x - pose.basis.x.x * bounds.get_center().x
-	pose.origin.y = _reference_bottom.y - pose.basis.y.y * bounds.position.y
-	_spine.transform = pose
-
-
-func _stabilize_dash_size() -> void:
-	if not _current_spine_animation.ends_with("_Dash") or _idle_spine_height <= 0.0:
-		return
-	var bounds: AABB = _spine.get_aabb()
-	if bounds.size.y <= 0.01:
-		return
-	# The exported dash poses shrink vertically. Keep the previous foot anchoring
-	# and limit the side clip's correction so it cannot become long and thin.
-	var factor := maxf(1.0, _idle_spine_height / bounds.size.y)
-	if _current_spine_animation == "G1_Dash":
-		factor = minf(factor, 1.35)
-	var pose := _spine.transform
-	pose.basis.y = _fitted_transform.basis.y * factor
-	pose.origin.y = _reference_bottom.y - pose.basis.y.y * bounds.position.y
+	pose.origin.x = _reference_bottom.x - pose.basis.x.x * anchor.x / anchor.z
+	pose.origin.y = _reference_bottom.y - pose.basis.y.y * anchor.y
 	_spine.transform = pose
 
 
@@ -376,6 +390,11 @@ func sync_animation(
 		if show_preview:
 			var loop := not (String(animation_name).begins_with("attack_dagger_")
 				or String(animation_name).begins_with("dash_"))
+			if RUN_BOB_BONES.has(target_animation):
+				_run_bob_last_time = -1.0
+				_spine.before_world_transforms_change.connect(
+					_even_out_run_bob.bind(target_animation)
+				)
 			show_preview = bool(_spine.set_animation(target_animation, loop, 0))
 		if show_preview:
 			_current_spine_animation = target_animation
@@ -407,6 +426,38 @@ func sync_animation(
 		rotation.y = atan2(direction.x, direction.z)
 
 
+## Runs after the clip is applied and before bone world transforms are built.
+func _even_out_run_bob(_sprite: Node, animation_name: String) -> void:
+	if not is_instance_valid(_spine):
+		return
+	var core = _spine.get_node("_SpineSpriteCore3D")
+	var time := float(core.get_current(0).get("track_time", 0.0))
+	var step := time - _run_bob_last_time
+	_run_bob_last_time = time
+	var hip_bone: String = RUN_BOB_BONES[animation_name][0]
+	var neck_bone: String = RUN_BOB_BONES[animation_name][1]
+	var hip: Dictionary = core.get_bone_pose(hip_bone)
+	var neck: Dictionary = core.get_bone_pose(neck_bone)
+	var stride := TAU * RUN_STRIDES_PER_CLIP / RUN_CLIP_SECONDS * time
+	var fit: Dictionary = _run_bob_fits.get(
+		animation_name, {"hip": 0.0, "neck": 0.0, "cos": 0.0, "sin": 0.0, "time": 0.0}
+	)
+	# Learn the authored averages and stride timing over the first play of the session.
+	if float(fit.time) < RUN_CLIP_SECONDS and step > 0.0 and step < RUN_CLIP_SECONDS * 0.5:
+		fit.hip += float(hip.y) * step
+		fit.neck += float(neck.y) * step
+		fit.cos += float(neck.y) * cos(stride) * step
+		fit.sin += float(neck.y) * sin(stride) * step
+		fit.time += step
+		_run_bob_fits[animation_name] = fit
+	if float(fit.time) <= 0.0:
+		return
+	hip.y = fit.hip / fit.time
+	neck.y = fit.neck / fit.time + RUN_BOB_AMPLITUDE * cos(stride - atan2(fit.sin, fit.cos))
+	core.set_bone_pose(hip_bone, hip)
+	core.set_bone_pose(neck_bone, neck)
+
+
 func _ensure_spine() -> bool:
 	if is_instance_valid(_spine):
 		return _spine.is_loaded()
@@ -428,7 +479,10 @@ func _ensure_spine() -> bool:
 		return false
 	add_child(_spine)
 	_spine.set("shadow_casting", 2)  # Double Sided
-	var skeleton_data = load(skeleton_data_path)
+	var skeleton_data: Resource = _skeleton_data_cache.get(skeleton_data_path)
+	if skeleton_data == null:
+		skeleton_data = load(skeleton_data_path)
+		_skeleton_data_cache[skeleton_data_path] = skeleton_data
 	_spine.set("skeleton_data_res", skeleton_data)
 	_spine.pause()
 	return _spine.is_loaded()
@@ -441,7 +495,6 @@ func _fit_to_sprite() -> void:
 	var bounds: AABB = _spine.get_aabb()
 	if bounds.size.y <= 0.0 or _reference_height <= 0.0:
 		return
-	_idle_spine_height = bounds.size.y
 	var factor := _reference_height / bounds.size.y * size_multiplier
 	_spine.scale = Vector3.ONE * factor
 	_spine.position = (

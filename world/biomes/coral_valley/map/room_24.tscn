@@ -1,17 +1,247 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://kpvlv3ynpooi"]
 
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/base_scenes/farm_room.tscn" id="1_base"]
-[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="PackedScene" uid="uid://ckrqfv8x6ugc8" path="res://world/biomes/coral_valley/base_scenes/farm_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
+[ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
+[ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
+[ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
+[ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
+[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="palm_tall"]
+[ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
+[ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
+[ext_resource type="Texture2D" uid="uid://c0fdr5jvapghh" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_24_ground.png" id="sand_texture"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
+[ext_resource type="Script" uid="uid://b7g1bvgwmkaf" path="res://world/components/shallow_water_area.gd" id="shallow_water"]
+[ext_resource type="Texture2D" uid="uid://b3pc2s1elykns" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_24_shore.png" id="shore_texture"]
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="treasure_chest"]
 
-[node name="room_24" instance=ExtResource("1_base")]
+[sub_resource type="Environment" id="Environment_a1xlg"]
+resource_local_to_scene = true
+background_mode = 1
+background_color = Color(0.02, 0.07, 0.11, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.62, 0.66, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.6
+glow_strength = 0.9
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_water"]
+seed = 77
+frequency = 0.02
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_water")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vv1vk"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("lagoon_shader")
+shader_parameter/shore_distance = ExtResource("shore_texture")
+shader_parameter/shore_rect = Vector4(-26.6199, -30.0172, 53.449, 63.5962)
+shader_parameter/shore_reach_meters = 8.0
+shader_parameter/surface_height_meters = 0.252
+shader_parameter/water_noise = SubResource("NoiseTexture2D_water")
+shader_parameter/deep_color = Color(0.02, 0.07, 0.11, 1)
+shader_parameter/lagoon_color = Color(0.04, 0.23, 0.28, 1)
+shader_parameter/shallow_color = Color(0.14, 0.47, 0.47, 1)
+shader_parameter/reef_color = Color(0.28, 0.22, 0.32, 1)
+shader_parameter/caustic_color = Color(0.62, 0.95, 0.88, 1)
+shader_parameter/foam_color = Color(0.9, 0.95, 0.9, 1)
+shader_parameter/caustic_world_size_meters = 9.0
+shader_parameter/caustic_speed = 0.05
+shader_parameter/caustic_strength = 0.2
+shader_parameter/reef_world_size_meters = 26.0
+shader_parameter/reef_coverage = 0.32
+shader_parameter/reef_strength = 0.35
+shader_parameter/foam_width_meters = 0.3
+shader_parameter/swash_meters = 0.25
+shader_parameter/swash_speed = 0.9
+shader_parameter/ring_spacing_meters = 2.6
+shader_parameter/ring_speed_meters_per_second = 0.45
+shader_parameter/ring_strength = 0.22
+shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
+shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
+shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_1rcqa"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_vv1vk")
+size = Vector2(400, 400)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
+render_priority = 0
+shader = ExtResource("sand_shader")
+shader_parameter/sand_texture = ExtResource("sand_texture")
+shader_parameter/alpha_cutoff = 0.5
+shader_parameter/cloud_noise = ExtResource("cloud_noise")
+shader_parameter/cloud_world_size_meters = 48.0
+shader_parameter/cloud_velocity_meters_per_second = Vector2(0.9, 0.35)
+shader_parameter/cloud_coverage = 0.45
+shader_parameter/cloud_softness = 0.18
+shader_parameter/cloud_shadow_strength = 0.35
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandW"]
+points = PackedVector3Array(-16.4, 0.252, -5.451, -16.4, -0.6, -5.451, -16.024, 0.252, -6.623, -16.024, -0.6, -6.623, -15.438, 0.252, -7.65, -15.438, -0.6, -7.65, -14.641, 0.252, -8.531, -14.641, -0.6, -8.531, -13.636, 0.252, -9.267, -13.636, -0.6, -9.267, -12.421, 0.252, -9.856, -12.421, -0.6, -9.856, -11.206, 0.252, -10.214, -11.206, -0.6, -10.214, -9.988, 0.252, -10.338, -9.988, -0.6, -10.338, -8.771, 0.252, -10.229, -8.771, -0.6, -10.229, -7.554, 0.252, -9.888, -7.554, -0.6, -9.888, -6.52, 0.252, -9.287, -6.52, -0.6, -9.287, -5.674, 0.252, -8.428, -5.674, -0.6, -8.428, -5.014, 0.252, -7.312, -5.014, -0.6, -7.312, -4.543, 0.252, -5.941, -4.543, -0.6, -5.941, -4.208, 0.252, -4.395, -4.208, -0.6, -4.395, -4.005, 0.252, -2.677, -4.005, -0.6, -2.677, -3.925, 0.252, -0.785, -3.925, -0.6, -0.785, -3.96, 0.252, 1.291, -3.96, -0.6, 1.291, -4.208, 0.252, 3.161, -4.208, -0.6, 3.161, -4.676, 0.252, 4.822, -4.676, -0.6, 4.822, -5.368, 0.252, 6.27, -5.368, -0.6, 6.27, -6.285, 0.252, 7.501, -6.285, -0.6, 7.501, -7.329, 0.252, 8.4, -7.329, -0.6, 8.4, -8.499, 0.252, 8.968, -8.499, -0.6, 8.968, -9.792, 0.252, 9.201, -9.792, -0.6, 9.201, -11.207, 0.252, 9.101, -11.207, -0.6, 9.101, -12.488, 0.252, 8.717, -12.488, -0.6, 8.717, -13.631, 0.252, 8.051, -13.631, -0.6, 8.051, -14.637, 0.252, 7.102, -14.637, -0.6, 7.102, -15.503, 0.252, 5.873, -15.503, -0.6, 5.873, -16.159, 0.252, 4.464, -16.159, -0.6, 4.464, -16.602, 0.252, 2.878, -16.602, -0.6, 2.878, -16.838, 0.252, 1.119, -16.838, -0.6, 1.119, -16.875, 0.252, -0.809, -16.875, -0.6, -0.809, -16.819, 0.252, -2.542, -16.819, -0.6, -2.542, -16.663, 0.252, -4.089, -16.663, -0.6, -4.089)
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandC"]
+points = PackedVector3Array(-4.949, 0.252, -9.622, -4.949, -0.6, -9.622, -4.131, 0.252, -10.796, -4.131, -0.6, -10.796, -3.151, 0.252, -11.701, -3.151, -0.6, -11.701, -2.009, 0.252, -12.337, -2.009, -0.6, -12.337, -0.709, 0.252, -12.703, -0.709, -0.6, -12.703, 0.751, 0.252, -12.8, 0.751, -0.6, -12.8, 2.075, 0.252, -12.628, 2.075, -0.6, -12.628, 3.267, 0.252, -12.185, 3.267, -0.6, -12.185, 4.32, 0.252, -11.473, 4.32, -0.6, -11.473, 5.236, 0.252, -10.492, 5.236, -0.6, -10.492, 5.941, 0.252, -9.318, 5.941, -0.6, -9.318, 6.435, 0.252, -7.953, 6.435, -0.6, -7.953, 6.721, 0.252, -6.401, 6.721, -0.6, -6.401, 6.802, 0.252, -4.665, 6.802, -0.6, -4.665, 6.753, 0.252, -2.961, 6.753, -0.6, -2.961, 6.571, 0.252, -1.276, 6.571, -0.6, -1.276, 6.252, 0.252, 0.397, 6.252, -0.6, 0.397, 5.788, 0.252, 2.06, 5.788, -0.6, 2.06, 5.072, 0.252, 3.422, 5.072, -0.6, 3.422, 4.107, 0.252, 4.481, 4.107, -0.6, 4.481, 2.893, 0.252, 5.232, 2.893, -0.6, 5.232, 1.433, 0.252, 5.676, 1.433, -0.6, 5.676, 0.031, 0.252, 5.801, 0.031, -0.6, 5.801, -1.308, 0.252, 5.606, -1.308, -0.6, 5.606, -2.587, 0.252, 5.091, -2.587, -0.6, 5.091, -3.802, 0.252, 4.257, -3.802, -0.6, 4.257, -4.742, 0.252, 2.944, -4.742, -0.6, 2.944, -5.405, 0.252, 1.156, -5.405, -0.6, 1.156, -5.794, 0.252, -1.096, -5.794, -0.6, -1.096, -5.925, 0.252, -3.801, -5.925, -0.6, -3.801, -5.839, 0.252, -6.118, -5.839, -0.6, -6.118, -5.518, 0.252, -8.06, -5.518, -0.6, -8.06)
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandS"]
+points = PackedVector3Array(1.988, 0.252, 3.809, 1.988, -0.6, 3.809, 3.441, 0.252, 3.433, 3.441, -0.6, 3.433, 4.89, 0.252, 3.334, 4.89, -0.6, 3.334, 6.334, 0.252, 3.513, 6.334, -0.6, 3.513, 7.775, 0.252, 3.964, 7.775, -0.6, 3.964, 9.215, 0.252, 4.686, 9.215, -0.6, 4.686, 10.406, 0.252, 5.535, 10.406, -0.6, 5.535, 11.348, 0.252, 6.517, 11.348, -0.6, 6.517, 12.039, 0.252, 7.634, 12.039, -0.6, 7.634, 12.477, 0.252, 8.885, 12.477, -0.6, 8.885, 12.6, 0.252, 10.137, 12.6, -0.6, 10.137, 12.407, 0.252, 11.39, 12.407, -0.6, 11.39, 11.899, 0.252, 12.642, 11.899, -0.6, 12.642, 11.08, 0.252, 13.894, 11.08, -0.6, 13.894, 10.043, 0.252, 14.88, 10.043, -0.6, 14.88, 8.79, 0.252, 15.601, 8.79, -0.6, 15.601, 7.321, 0.252, 16.056, 7.321, -0.6, 16.056, 5.637, 0.252, 16.25, 5.637, -0.6, 16.25, 4.095, 0.252, 16.148, 4.095, -0.6, 16.148, 2.695, 0.252, 15.744, 2.695, -0.6, 15.744, 1.438, 0.252, 15.035, 1.438, -0.6, 15.035, 0.325, 0.252, 14.025, 0.325, -0.6, 14.025, -0.436, 0.252, 12.757, -0.436, -0.6, 12.757, -0.843, 0.252, 11.235, -0.843, -0.6, 11.235, -0.9, 0.252, 9.462, -0.9, -0.6, 9.462, -0.615, 0.252, 7.435, -0.615, -0.6, 7.435, -0.042, 0.252, 5.814, -0.042, -0.6, 5.814, 0.825, 0.252, 4.603, 0.825, -0.6, 4.603)
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandE"]
+points = PackedVector3Array(12.423, 0.252, -9.561, 12.423, -0.6, -9.561, 13.275, 0.252, -9.951, 13.275, -0.6, -9.951, 14.071, 0.252, -9.975, 14.071, -0.6, -9.975, 14.807, 0.252, -9.631, 14.807, -0.6, -9.631, 15.472, 0.252, -8.922, 15.472, -0.6, -8.922, 16.064, 0.252, -7.859, 16.064, -0.6, -7.859, 16.461, 0.252, -6.759, 16.461, -0.6, -6.759, 16.678, 0.252, -5.622, 16.678, -0.6, -5.622, 16.732, 0.252, -4.433, 16.732, -0.6, -4.433, 16.619, 0.252, -3.167, 16.619, -0.6, -3.167, 16.29, 0.252, -2.105, 16.29, -0.6, -2.105, 15.737, 0.252, -1.261, 15.737, -0.6, -1.261, 14.961, 0.252, -0.642, 14.961, -0.6, -0.642, 13.965, 0.252, -0.25, 13.965, -0.6, -0.25, 13.121, 0.252, -0.236, 13.121, -0.6, -0.236, 12.434, 0.252, -0.603, 12.434, -0.6, -0.603, 11.91, 0.252, -1.349, 11.91, -0.6, -1.349, 11.559, 0.252, -2.468, 11.559, -0.6, -2.468, 11.325, 0.252, -3.596, 11.325, -0.6, -3.596, 11.185, 0.252, -4.727, 11.185, -0.6, -4.727, 11.116, 0.252, -5.882, 11.116, -0.6, -5.882, 11.126, 0.252, -7.101, 11.126, -0.6, -7.101, 11.344, 0.252, -8.131, 11.344, -0.6, -8.131, 11.778, 0.252, -8.953, 11.778, -0.6, -8.953)
+
+[sub_resource type="ConvexPolygonShape3D" id="IslandN"]
+points = PackedVector3Array(-3.65, 0.252, -18.424, -3.65, -0.6, -18.424, -3.056, 0.252, -19.322, -3.056, -0.6, -19.322, -2.261, 0.252, -20.007, -2.261, -0.6, -20.007, -1.272, 0.252, -20.476, -1.272, -0.6, -20.476, -0.105, 0.252, -20.731, -0.105, -0.6, -20.731, 1.22, 0.252, -20.8, 1.22, -0.6, -20.8, 2.395, 0.252, -20.729, 2.395, -0.6, -20.729, 3.452, 0.252, -20.482, 3.452, -0.6, -20.482, 4.377, 0.252, -20.036, 4.377, -0.6, -20.036, 5.157, 0.252, -19.39, 5.157, -0.6, -19.39, 5.601, 0.252, -18.79, 5.601, -0.6, -18.79, 5.7, 0.252, -18.246, 5.7, -0.6, -18.246, 5.453, 0.252, -17.762, 5.453, -0.6, -17.762, 4.86, 0.252, -17.344, 4.86, -0.6, -17.344, 4.161, 0.252, -17.029, 4.161, -0.6, -17.029, 3.36, 0.252, -16.821, 3.36, -0.6, -16.821, 2.472, 0.252, -16.722, 2.472, -0.6, -16.722, 1.523, 0.252, -16.72, 1.523, -0.6, -16.72, 0.571, 0.252, -16.711, 0.571, -0.6, -16.711, -0.464, 0.252, -16.705, -0.464, -0.6, -16.705, -1.585, 0.252, -16.753, -1.585, -0.6, -16.753, -2.767, 0.252, -16.866, -2.767, -0.6, -16.866, -3.508, 0.252, -17.188, -3.508, -0.6, -17.188, -3.802, 0.252, -17.709, -3.802, -0.6, -17.709)
+
+[sub_resource type="BoxShape3D" id="Channel0"]
+size = Vector3(17, 2, 2.1)
+
+[sub_resource type="BoxShape3D" id="Channel1"]
+size = Vector3(6.923, 2, 2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2tj51"]
+resource_local_to_scene = true
+shader = ExtResource("grade_shader")
+shader_parameter/exposure = 1.0
+shader_parameter/saturation = 0.98
+shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
+shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
+shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
+shader_parameter/vignette_strength = 0.3
+
+[node name="room_24" unique_id=1755732746 instance=ExtResource("1_base")]
+editor_description = "Wonder room: split-island farm. W, C and S are joined by wadeable channels; the E and N islets are cut off by water and reached only with the Tide Grapple Charm (posts on both sides of each gap)."
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
 
-[node name="RandomSeaweed" type="Node3D" parent="."]
+[node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
+environment = SubResource("Environment_a1xlg")
+
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
+transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
+light_color = Color(1, 0.92, 0.84, 1)
+light_energy = 1.15
+shadow_enabled = true
+shadow_opacity = 0.65
+directional_shadow_mode = 0
+directional_shadow_max_distance = 45.0
+
+[node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
+mesh = SubResource("QuadMesh_1rcqa")
+
+[node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
+shaded = true
+texture = ExtResource("pier_left")
+
+[node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
+transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.65731)
+material_override = SubResource("ShaderMaterial_sand")
+texture = ExtResource("sand_texture")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+disabled = true
+
+[node name="IslandW" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="1" unique_id=1824300]
+transform = Transform3D(0.333333, 0, 0, 0, 0.333333, 0, 0, 0, 0.333333, 0, 0, 0.063682)
+shape = SubResource("IslandW")
+
+[node name="IslandC" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="2" unique_id=1824301]
+transform = Transform3D(0.333333, 0, 0, 0, 0.333333, 0, 0, 0, 0.333333, 0, 0, 0.063682)
+shape = SubResource("IslandC")
+
+[node name="IslandS" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="3" unique_id=1824302]
+transform = Transform3D(0.333333, 0, 0, 0, 0.333333, 0, 0, 0, 0.333333, 0, 0, 0.063682)
+shape = SubResource("IslandS")
+
+[node name="IslandE" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="4" unique_id=1824303]
+transform = Transform3D(0.333333, 0, 0, 0, 0.333333, 0, 0, 0, 0.333333, 0, 0, 0.063682)
+shape = SubResource("IslandE")
+
+[node name="IslandN" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="5" unique_id=1824304]
+transform = Transform3D(0.333333, 0, 0, 0, 0.333333, 0, 0, 0, 0.333333, 0, 0, 0.063682)
+shape = SubResource("IslandN")
+
+[node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1824700 instance=ExtResource("sea_glints")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
+
+[node name="RandomSeaweed" type="Node3D" parent="." index="5" unique_id=139254622]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-12.832, 0, -6.495, -10.204, 0, -10.775, -8.438, 0, -11.987, -6.758, 0, -14.65, -3.601, 0, -15.25, -1.494, 0, -15.243, 0.411, 0, -14.121, 2.604, 0, -14.37, 5.24, 0, -15.228, 7.882, 0, -13.402, 9.598, 0, -11.533, 10.749, 0, -8.521, 12.515, 0, -4.826, 12.209, 0, -2.781, 12.141, 0, 0.835, 13.417, 0, 4.437, 13.095, 0, 9.434, 12.096, 0, 11.196, 10.284, 0, 13.267, 8.271, 0, 16.001, 5.521, 0, 14.876, 0.534, 0, 15.869, -3.433, 0, 15.811, -5.977, 0, 15.129, -8.031, 0, 16.009, -8.745, 0, 13.961, -11.408, 0, 12.562, -12.596, 0, 10.726, -12.03, 0, 8.186, -12.789, 0, 5.922)
-fixed_spawn_count = 20
+spawn_positions = PackedVector3Array(-15.36, 0, -4.67, -14.32, 0, -7.02, -12.24, 0, -8.53, -9.72, 0, -9.01, -7.28, 0, -8.24, -9.1, 0, 7.76, -11.66, 0, 7.63, -13.79, 0, 6.21, -15.07, 0, 3.97, -2.37, 0, -10.65, 4.53, 0, -9.38, 5.41, 0, -6.95, 5.38, 0, -1.76, 4.99, 0, 0.81, 7.75, 0, 5.39, 9.89, 0, 6.85, 11.19, 0, 9.06, 10.93, 0, 11.6, 9.43, 0, 13.68, 7.1, 0, 14.77, 4.51, 0, 14.9, 2.14, 0, 13.92, 0.65, 0, 11.85, 0.43, 0, 9.29, 0.97, 0, 6.75, 12.8, 0, -8.32, 13.94, 0, -1.56, -2.35, 0, -18.42, 2.8, 0, -17.57)
+fixed_spawn_count = 12
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+
+[node name="ShallowWater" type="Area3D" parent="." index="6" unique_id=1824800]
+script = ExtResource("shallow_water")
+
+[node name="Channel0" type="CollisionShape3D" parent="ShallowWater" index="0" unique_id=1824400]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -4.8, 1.252, -1.8)
+shape = SubResource("Channel0")
+
+[node name="Channel1" type="CollisionShape3D" parent="ShallowWater" index="1" unique_id=1824401]
+transform = Transform3D(0.97926, 0, -0.20261, 0, 1, 0, 0.20261, 0, 0.97926, 2.5, 1.252, 4.1)
+shape = SubResource("Channel1")
+
+[node name="Scenery" type="Node3D" parent="." index="7" unique_id=1824900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
+
+[node name="GrapplePostEastIslet" parent="Scenery" index="0" unique_id=1824500 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.895666, 0, -7.765879)
+
+[node name="GrapplePostEastReturn" parent="Scenery" index="1" unique_id=1824501 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 0, -4.5)
+
+[node name="GrapplePostNorthIslet" parent="Scenery" index="2" unique_id=1824502 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9917853, 0, -18.65918)
+
+[node name="GrapplePostNorthReturn" parent="Scenery" index="3" unique_id=1824503 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5614755, 0, -11.360321)
+
+[node name="LonePalmNorthIslet" parent="Scenery" index="4" unique_id=1824600 instance=ExtResource("palm_tall")]
+transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 3, 0, -19.8)
+ground_shadow = true
+
+[node name="TreasureChest" parent="." index="8" unique_id=1825000 instance=ExtResource("treasure_chest")]
+editor_description = "Secret reward on the east islet, reachable only with the Tide Grapple."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 0.252, -3.9404807)
+gold_min = 30
+gold_max = 50
+
+[node name="RoomAtmosphere" parent="." index="9" unique_id=1825100 instance=ExtResource("atmosphere")]
+
+[node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1825100, 1300233738) index="0" unique_id=1611482802]
+material = SubResource("ShaderMaterial_2tj51")
+
+[node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1825100, 1300233738) index="1" unique_id=1448896067]
+leaf_count = 14
+leaf_color = Color(0.95, 0.97, 0.94, 0.5)
+leaf_size = 7.0
+leaf_width_ratio = 0.85
+leaf_rotation_speed = 0.3
+trail_count = 6
+trail_color = Color(0.78, 0.95, 0.94, 0.4)
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]
+[editable path="RoomAtmosphere"]

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SeaPalette" format=3]
+
+[ext_resource type="Script" uid="uid://b2i34yvw5vcoy" path="res://world/components/sea_palette.gd" id="1_palette"]
+
+[resource]
+script = ExtResource("1_palette")
+deep_color = Color(0.1, 0.02, 0.03, 1)
+lagoon_color = Color(0.38, 0.06, 0.07, 1)
+shallow_color = Color(0.72, 0.2, 0.16, 1)
+reef_color = Color(0.25, 0.06, 0.1, 1)
+caustic_color = Color(1, 0.62, 0.42, 1)
+foam_color = Color(1, 0.88, 0.8, 1)
+caustic_strength = 0.26
+background_color = Color(0.1, 0.02, 0.03, 1)
+ambient_color = Color(0.68, 0.5, 0.48, 1)
+ambient_energy = 0.62
+sun_color = Color(1, 0.82, 0.68, 1)
+sun_energy = 1.1
+shadow_tint = Color(1, 0.9, 0.92, 1)
+highlight_tint = Color(1.1, 0.95, 0.86, 1)
+saturation = 1.02
+vignette_color = Color(0.14, 0.02, 0.03, 1)
+vignette_strength = 0.36

@@ -234,10 +234,16 @@ func _interact(rest_point: CampfireRestPoint) -> bool:
 	player.global_position = rest_point.get_spawn_position()
 	player.velocity = Vector3.ZERO
 	await sandbox.frames(4)
+	# Listen for the black overlay appearing instead of sampling is_fading(): under load one
+	# long frame can run the whole fade before the test looks.
+	var fade := (rest_point.get_node("RestMenu") as RestMenu).get_node("%Fade") as CanvasItem
+	var shown: Array[bool] = [false]
+	var on_shown := func() -> void: shown[0] = shown[0] or fade.visible
+	fade.visibility_changed.connect(on_shown)
 	await sandbox.press_action(SANDBOX.ACTION_INTERACT)
-	var faded: bool = (rest_point.get_node("RestMenu") as RestMenu).is_fading()
 	await sandbox.wait_rest_menu(rest_point)
-	return faded
+	fade.visibility_changed.disconnect(on_shown)
+	return shown[0]
 
 
 func _hub_rest_point() -> CampfireRestPoint:
