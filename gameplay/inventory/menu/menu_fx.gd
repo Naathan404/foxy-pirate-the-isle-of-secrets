@@ -87,8 +87,12 @@ static func burst(anchor: Control) -> void:
 	if host == null:
 		return
 	var particles := SPARKLE_SCENE.instantiate() as CPUParticles2D
+	# The scene uses local_coords and a host-local position: with global coordinates the Web
+	# export emits from the canvas origin (top-left) instead of the anchor.
+	particles.position = (
+		host.get_global_transform().affine_inverse() * anchor.get_global_rect().get_center()
+	)
 	host.add_child(particles)
-	particles.global_position = anchor.get_global_rect().get_center()
 	particles.finished.connect(particles.queue_free)
 	particles.emitting = true
 
