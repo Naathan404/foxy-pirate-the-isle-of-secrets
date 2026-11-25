@@ -951,12 +951,15 @@ func _on_venom_splashed(at: Vector3, pool_radius: float) -> void:
 		feedback.emit_skill_cue(&"venom_splash", at, pool_radius)
 
 
+## Shake and flash only when Foxy is hit; attacks also break seaweed and other props.
 func _on_attack_damage_applied(_damage: DamageContext, hit_target: Node, _amount: float) -> void:
-	feedback.aoe_hit(hit_target)
+	if hit_target is Player:
+		feedback.aoe_hit(hit_target)
 
 
 func _on_whirlwind_hit(hit_target: Node) -> void:
-	feedback.emit_skill_cue(&"whirlwind_hit", global_position, 0.0, hit_target)
+	if hit_target is Player:
+		feedback.emit_skill_cue(&"whirlwind_hit", global_position, 0.0, hit_target)
 
 
 func _play_sound(pitch: float) -> void:

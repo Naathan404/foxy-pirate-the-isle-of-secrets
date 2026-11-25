@@ -68,7 +68,6 @@ void fragment() {
 	spine_apply_alpha_cutoff(ALPHA);
 }
 """
-
 ## Skeleton data by path, kept across rooms. Every room instances a new Foxy; loading the data
 ## again meant decoding and uploading all twelve atlas pages, a ~0.4 s stall on each arrival.
 static var _skeleton_data_cache: Dictionary[String, Resource] = {}
@@ -211,9 +210,12 @@ func _stabilize_run_size() -> void:
 ## This export leaves a setup-pose eye attachment near the feet, and its clips can restore it
 ## every frame, so it is cleared after each pose update.
 func _hide_stray_eye() -> void:
-	if not _is_spine_loaded():
-		return
-	var slot = _spine.get_skeleton().find_slot(STRAY_EYE_SLOT)
+	if _is_spine_loaded():
+		_clear_stray_eye(_spine)
+
+
+func _clear_stray_eye(sprite: Node) -> void:
+	var slot = sprite.get_skeleton().find_slot(STRAY_EYE_SLOT)
 	if slot != null:
 		slot.get_pose().set_attachment(null)
 		slot.get_applied_pose().set_attachment(null)
@@ -266,12 +268,6 @@ func _apply_attack_speed() -> void:
 	elif _current_spine_animation.ends_with("_Run"):
 		playback_speed = _run_playback_speed
 	_spine.set("time_scale", playback_speed)
-
-
-## The dash effect snapshots the meshes drawn by Spine; spine-godot draws without child meshes,
-## so the effect falls back to its sprite ghosts.
-func get_afterimage_source() -> Node3D:
-	return _spine if _active and visible and is_instance_valid(_spine) else null
 
 
 ## Stable idle dimensions in PlayerVisual space, shared by temporary cast artwork.
@@ -447,7 +443,7 @@ func _ensure_spine() -> bool:
 	_set_spine_paused(true)
 	if not _is_spine_loaded():
 		return false
-	_spine.world_transforms_changed.connect(_hide_stray_eye.unbind(1))
+	_spine.world_transforms_changed.connect(_clear_stray_eye)
 	_spine.before_world_transforms_change.connect(_on_spine_pose_applied)
 	_add_slash_overlays()
 	return true
@@ -477,7 +473,12 @@ func _set_spine_skin(skin_name: String) -> bool:
 	var skeleton_data = _spine.get("skeleton_data_res")
 	if skeleton_data == null or skeleton_data.find_skin(skin_name) == null:
 		return false
-	var skeleton = _spine.get_skeleton()
+	_prepare_skin(_spine.get_skeleton(), skin_name)
+	return true
+
+
+## Switches `skeleton` to `skin_name` in its setup pose.
+func _prepare_skin(skeleton: Object, skin_name: String) -> void:
 	skeleton.set_skin_by_name(skin_name)
 	skeleton.set_to_setup_pose()
 	# Some default-skin meshes are weighted to bones of other skins (Eyes/Eyes_08 to the side
@@ -491,7 +492,6 @@ func _set_spine_skin(skin_name: String) -> bool:
 			pose.set_b(0.0)
 			pose.set_c(0.0)
 			pose.set_d(0.0)
-	return true
 
 
 ## Starts `animation_name` and poses the skeleton on its first frame right away, so the next
