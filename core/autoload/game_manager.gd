@@ -15,8 +15,11 @@ const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 const SAVE_SLOT_PATH := "user://saves/slot_1.json"
 
 @export_file("*.tscn") var main_menu_scene: String = "res://ui/main_menu/main_menu.tscn"
-@export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.4
-@export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.45
+## Where Foxy respawns before resting at any campfire: its first campfire.
+@export_file("*.tscn")
+var fallback_rest_scene: String = "res://world/biomes/hub/map/castaway_cove.tscn"
+@export_range(0.01, 2.0, 0.01) var fade_out_seconds: float = 0.3
+@export_range(0.01, 2.0, 0.01) var fade_in_seconds: float = 0.35
 
 var player: Player
 var inventory: Inventory
@@ -32,11 +35,20 @@ var story_flags: Dictionary[StringName, bool] = {}
 var debug_all_charms_granted: bool = false
 ## The single save slot. Tests point its path at their own directory.
 var save_slot: SaveGameFile = SaveGameFile.new(SAVE_SLOT_PATH)
+## Visited-room changes and the campfire of the latest rest; see RoomStateRegistry.
+var room_states: RoomStateRegistry = RoomStateRegistry.new()
 var _transition_pending: bool = false
 ## Validated save payload consumed by the next scene transition (Continue).
 var _pending_load: Dictionary = {}
+## Campfire the next transition places Foxy at after a death (empty path: first one).
+var _pending_respawn_point: Variant = null
 var _transition_overlay: CanvasLayer
 var _fade_rect: ColorRect
+## Rooms the current room's exits lead to, loaded in the background after each arrival so
+## walking through an exit does not wait on the disk. Only the current neighbours are kept.
+var _neighbor_scenes: Dictionary[String, PackedScene] = {}
+## Neighbour paths whose threaded load is still running.
+var _neighbor_requests: Array[String] = []
 
 
 func _ready() -> void:
@@ -44,6 +56,29 @@ func _ready() -> void:
 	_transition_overlay = TRANSITION_OVERLAY.instantiate() as CanvasLayer
 	add_child(_transition_overlay)
 	_fade_rect = _transition_overlay.get_node("Fade") as ColorRect
+	set_process(false)
+
+
+## Background loads cut off by quitting fail with parse errors; let them finish first.
+func _exit_tree() -> void:
+	for path: String in _neighbor_requests:
+		ResourceLoader.load_threaded_get(path)
+	_neighbor_requests.clear()
+	_neighbor_scenes.clear()
+
+
+## Collects finished neighbour loads; runs only while some are in flight.
+func _process(_delta: float) -> void:
+	for path: String in _neighbor_requests.duplicate():
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			continue
+		_neighbor_requests.erase(path)
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
+			var scene := ResourceLoader.load_threaded_get(path) as PackedScene
+			if scene != null:
+				_neighbor_scenes[path] = scene
+	set_process(not _neighbor_requests.is_empty())
 
 
 func register_player(active_player: Player) -> void:
@@ -140,10 +175,7 @@ func save_game(rest_point: CampfireRestPoint) -> Error:
 		return ERR_UNAVAILABLE
 	if room.scene_file_path.is_empty():
 		return ERR_UNCONFIGURED
-	var location := {
-		"scene": room.scene_file_path,
-		"rest_point": String(room.get_path_to(rest_point)),
-	}
+	var location := rest_point.get_location()
 	var payload := GameSaveSnapshot.capture(
 		player, location, self, _get_merchant_progress(), _get_note_progress()
 	)
@@ -219,24 +251,36 @@ func return_to_main_menu() -> bool:
 	return change_scene(main_menu_scene)
 
 
-## Forgets the in-memory run (wallet, explored rooms, story flags, boss encounters, debug
-## grants). Saved files are untouched.
+## Forgets the in-memory run (wallet, explored rooms, room changes, latest rest, story
+## flags, boss encounters, debug grants). Saved files are untouched.
 func reset_session() -> void:
 	gold_wallet = GoldWallet.new()
 	map_progress = MapProgress.new()
+	room_states = RoomStateRegistry.new()
 	story_flags.clear()
 	boss_encounters.clear()
 	debug_all_charms_granted = false
 
 
-func reload_current_scene() -> void:
+## Death works like resting: the rooms start a new cycle and Foxy comes back beside the
+## campfire of the latest rest (the first campfire before any rest) with full HP and SP,
+## keeping all progress. Returns whether the transition was accepted.
+func respawn_at_last_rest() -> bool:
 	if _transition_pending:
-		return
-	var scene: Node = get_tree().current_scene
-	if not is_instance_valid(scene) or scene.scene_file_path.is_empty():
-		push_warning("GameManager: không có scene đã lưu để reload.")
-		return
-	_request_scene_transition(scene.scene_file_path, true)
+		return false
+	var location := room_states.rest_location
+	var scene_path := String(location.get("scene", ""))
+	var rest_point := NodePath(String(location.get("rest_point", "")))
+	if not ResourceLoader.exists(scene_path, "PackedScene"):
+		scene_path = fallback_rest_scene
+		rest_point = NodePath()
+	if not ResourceLoader.exists(scene_path, "PackedScene"):
+		push_error("GameManager: không có scene lửa trại để hồi sinh.")
+		return false
+	room_states.begin_new_cycle(location)
+	_pending_respawn_point = rest_point
+	_request_scene_transition(scene_path, true)
+	return true
 
 
 ## Returns whether the request was accepted; completion is signalled after fade-in.
@@ -247,19 +291,22 @@ func change_scene(scene_path: String, destination_trigger_id: StringName = &"") 
 	return true
 
 
+## `respawn` restores progress but starts the new Player at full health and stamina.
 func _request_scene_transition(
-	scene_path: String, reload_scene: bool, destination_trigger_id: StringName = &""
+	scene_path: String, respawn: bool, destination_trigger_id: StringName = &""
 ) -> void:
 	_transition_pending = true
 	# Leave the current physics/animation callback before pausing or freeing its scene.
-	_transition_scene.call_deferred(scene_path, reload_scene, destination_trigger_id)
+	_transition_scene.call_deferred(scene_path, respawn, destination_trigger_id)
 
 
 func _transition_scene(
-	scene_path: String, reload_scene: bool, destination_trigger_id: StringName
+	scene_path: String, respawn: bool, destination_trigger_id: StringName
 ) -> void:
 	var load_payload := _pending_load
 	_pending_load = {}
+	var respawn_point: Variant = _pending_respawn_point
+	_pending_respawn_point = null
 	if is_instance_valid(player) and is_instance_valid(player.inventory_ui):
 		player.inventory_ui.close_inventory(true)
 	exit_inventory()
@@ -274,8 +321,14 @@ func _transition_scene(
 	get_node("/root/ScreenShakeController").cancel()
 	_transition_overlay.show()
 	state_changed.emit(state)
-	# Read destination resources in parallel with fade-out, without blocking a frame.
-	var load_error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
+	# A neighbour preloaded after the last arrival is ready at once. Otherwise read the
+	# destination in parallel with fade-out, without blocking a frame.
+	var destination: PackedScene = _neighbor_scenes.get(scene_path)
+	var load_error := OK
+	if destination == null and not _neighbor_requests.has(scene_path):
+		load_error = ResourceLoader.load_threaded_request(scene_path, "PackedScene")
+	# A neighbour load still in flight is finished here instead of by _process.
+	_neighbor_requests.erase(scene_path)
 	await _fade_to(1.0, fade_out_seconds)
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
@@ -285,27 +338,30 @@ func _transition_scene(
 		player_state = PLAYER_SCENE_STATE.new()
 		player_state.capture(player)
 	var error: Error = load_error
-	if error == OK:
+	if error == OK and destination == null:
 		while (
 			ResourceLoader.load_threaded_get_status(scene_path)
 			== ResourceLoader.THREAD_LOAD_IN_PROGRESS
 		):
 			await get_tree().process_frame
 		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
-			var destination := ResourceLoader.load_threaded_get(scene_path) as PackedScene
-			if not load_payload.is_empty():
-				error = _prepare_saved_world(destination, load_payload)
-			if error == OK:
-				error = get_tree().change_scene_to_packed(destination)
-		else:
+			destination = ResourceLoader.load_threaded_get(scene_path) as PackedScene
+		if destination == null:
 			error = ERR_CANT_OPEN
+	if error == OK:
+		if not load_payload.is_empty():
+			error = _prepare_saved_world(destination, load_payload)
+		if error == OK:
+			error = get_tree().change_scene_to_packed(destination)
 	if error == OK:
 		# SceneTree signals after the new scene has entered the tree and run _ready().
 		await get_tree().scene_changed
 		if not load_payload.is_empty():
 			error = _arrive_at_saved_rest_point(load_payload)
 		elif player_state != null and is_instance_valid(player):
-			player_state.restore(player, not reload_scene)
+			player_state.restore(player, not respawn)
+		if respawn_point != null:
+			_place_player_at_rest_point(_find_rest_point(get_tree().current_scene, respawn_point))
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
 		# _ready/process_frame do not mean rendering has finished. Keep the first
@@ -324,6 +380,8 @@ func _transition_scene(
 	await _fade_to(0.0, fade_in_seconds)
 	_transition_overlay.hide()
 	_transition_pending = false
+	if error == OK:
+		_preload_neighbors()
 	scene_transition_finished.emit()
 	if not load_payload.is_empty():
 		# A rejected save is an expected outcome reported to the menu, not an engine fault.
@@ -361,10 +419,29 @@ func _arrive_at_saved_rest_point(payload: Dictionary) -> Error:
 	if rest_point == null or not is_instance_valid(player) or not scene.is_ancestor_of(player):
 		return ERR_DOES_NOT_EXIST
 	GameSaveSnapshot.restore_player(payload, player)
+	_place_player_at_rest_point(rest_point)
+	return OK
+
+
+## An empty path or a campfire that no longer exists falls back to the room's first one.
+func _find_rest_point(scene: Node, path: NodePath) -> CampfireRestPoint:
+	if not path.is_empty():
+		var found := scene.get_node_or_null(path) as CampfireRestPoint
+		if found != null:
+			return found
+	for node: Node in scene.find_children("*", "", true, false):
+		if node is CampfireRestPoint:
+			return node as CampfireRestPoint
+	return null
+
+
+func _place_player_at_rest_point(rest_point: CampfireRestPoint) -> void:
+	if rest_point == null or not is_instance_valid(player):
+		push_warning("GameManager: không tìm thấy lửa trại để đặt Player.")
+		return
 	player.global_position = rest_point.get_spawn_position()
 	player.velocity = Vector3.ZERO
 	player.reset_physics_interpolation()
-	return OK
 
 
 func _contains_player(node: Node) -> bool:
@@ -382,6 +459,30 @@ func _get_merchant_progress() -> SilasProgressStore:
 
 func _get_note_progress() -> Node:
 	return get_node("/root/NoteProgress")
+
+
+## Starts background loads of the scenes this room's exits lead to and forgets the rest.
+func _preload_neighbors() -> void:
+	var scene := get_tree().current_scene
+	var wanted: Array[String] = []
+	for node: Node in get_tree().get_nodes_in_group("scene_change_triggers"):
+		var trigger := node as SceneChangeTrigger
+		if trigger == null or scene == null or not scene.is_ancestor_of(trigger):
+			continue
+		var path := trigger.destination_scene
+		if path.is_empty() or wanted.has(path) or path == scene.scene_file_path:
+			continue
+		if ResourceLoader.exists(path, "PackedScene"):
+			wanted.append(path)
+	for path: String in _neighbor_scenes.keys():
+		if not wanted.has(path):
+			_neighbor_scenes.erase(path)
+	for path: String in wanted:
+		if _neighbor_scenes.has(path) or _neighbor_requests.has(path):
+			continue
+		if ResourceLoader.load_threaded_request(path, "PackedScene") == OK:
+			_neighbor_requests.append(path)
+	set_process(not _neighbor_requests.is_empty())
 
 
 func _prepare_arrival_render(frame_count: int = 2) -> void:

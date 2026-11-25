@@ -48,12 +48,12 @@ một `SceneChangeTrigger` tại vị trí cổng rồi gỡ placeholder.
 ## Chức năng thực sự hoạt động
 
 - Safe room cho toàn Hub và lều Silas (`safe_room = true`): đổi Charm ở mọi nơi trong Hub.
-- Checkpoint `hub_checkpoint` cạnh lửa trại (hành vi Checkpoint cũ, gồm safe location).
+- Lửa trại để nghỉ, lưu game và làm điểm hồi sinh (hệ Checkpoint cũ đã bỏ).
 - Master Tortuga (Craft/Forge) trước nhà rèn; Silas trong lều.
 - 6 training dummy giữ nguyên scene và hành vi.
 - Cây cỏ phá hủy được (`world/biomes/hub/objects/foliage/*.tscn`), dùng `DestructibleProp`;
-  `drop_chance = 0` như cỏ Hub cũ, không rơi đồ, không respawn trong phòng, mọc lại khi tải
-  lại scene vì chưa có lưu trạng thái.
+  `drop_chance = 0` như cỏ Hub cũ, không rơi đồ; cây đã phá vẫn mất khi quay lại phòng và
+  mọc lại sau lần nghỉ hoặc chết ([Trạng thái phòng](../systems/room_state.md)).
 
 ## Chỉ dành chỗ (placeholder)
 

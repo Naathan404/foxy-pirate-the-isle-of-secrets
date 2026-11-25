@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="beach_coral_orange"]
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="beach_coral_pink"]
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="beach_coral_turquoise"]
-[ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="beach_palm_01"]
+[ext_resource type="PackedScene" uid="uid://d0ygcokpmdb3n" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="beach_palm_01"]
 [ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="beach_palm_02"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="beach_palm_03"]
 [ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
@@ -213,7 +213,7 @@ shape = SubResource("BoxShape3D_oicq1")
 disabled = true
 
 [node name="Sprite3D" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="0" unique_id=1887481611]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1, 0.116, 0)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1.2321129, 0.116, 0)
 shaded = true
 texture = ExtResource("pier_right")
 
@@ -265,8 +265,8 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.252, 0)
 ground_shadow = true
 
 [node name="FireLight" parent="Campfire" index="4" unique_id=994038413]
-light_color = Color(1, 0.63282007, 0.26188007, 1)
-light_energy = 8.801556
+light_color = Color(1, 0.58736086, 0.23157391, 1)
+light_energy = 8.039573
 omni_range = 14.0
 base_energy = 8.0
 

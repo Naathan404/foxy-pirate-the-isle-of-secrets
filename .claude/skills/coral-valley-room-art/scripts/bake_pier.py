@@ -1,4 +1,4 @@
-"""Bakes the Coral Valley piers (left/right exits) from the hand-painted harbor_path_* art.
+"""Bakes the Coral Valley piers (left/right/up/down exits) from the hand-painted harbor_path_* art.
 
 Usage (from the project root):
     python .claude/skills/coral-valley-room-art/scripts/bake_pier.py [left|right ...]
@@ -10,7 +10,7 @@ Usage (from the project root):
 2. Regrades only the orange wood into sun-bleached driftwood (palette "Gỗ trôi dạt").
 
 The deck body keeps its alpha, so the seam with the island and the floor collision do not move.
-Prop boxes were picked by hand for these two images; new pier art needs its own boxes.
+Prop boxes were picked by hand for each image; new pier art needs its own boxes.
 """
 
 import sys
@@ -54,6 +54,18 @@ BOXES = {
         (682, 1118, 852, 1332), (622, 1278, 748, 1348), (678, 1328, 818, 1412),
         (802, 1342, 882, 1402), (832, 1292, 902, 1348), (770, 1400, 805, 1420),
         (655, 1425, 720, 1460),
+    ],
+    "down": [
+        (100, 150, 215, 290), (195, 115, 295, 295), (270, 172, 318, 208), (18, 278, 168, 382),
+        (42, 318, 102, 412), (68, 412, 162, 538), (148, 502, 228, 558), (112, 532, 182, 608),
+        (688, 100, 778, 212), (692, 178, 842, 312), (648, 252, 752, 338), (798, 308, 878, 378),
+        (858, 352, 908, 388), (842, 398, 908, 502), (742, 432, 862, 542), (698, 532, 772, 622),
+        (542, 668, 592, 698), (222, 698, 308, 848), (288, 792, 338, 858), (298, 848, 358, 892),
+        (522, 872, 588, 928), (562, 928, 602, 952), (472, 1178, 612, 1312),
+        (238, 1238, 302, 1322), (262, 1272, 352, 1352), (292, 1248, 332, 1282),
+        (298, 1352, 342, 1382), (502, 1322, 568, 1412), (278, 1452, 342, 1548),
+        (58, 246, 102, 284), (866, 326, 910, 364), (664, 174, 704, 208), (626, 266, 676, 316),
+        (556, 676, 598, 708), (520, 908, 604, 960), (532, 1408, 570, 1430),
     ],
 }
 

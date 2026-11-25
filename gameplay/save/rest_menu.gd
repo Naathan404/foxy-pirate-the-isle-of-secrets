@@ -9,8 +9,14 @@ signal close_requested
 const CANCEL_ACTION := &"ui_cancel"
 
 @export_range(1.0, 1.3, 0.01) var button_lift: float = 1.06
+@export_group("Rest fade")
+@export_range(0.05, 2.0, 0.05, "suffix:s") var fade_out_seconds: float = 0.6
+## How long the screen stays black while the island resets.
+@export_range(0.0, 2.0, 0.05, "suffix:s") var dark_hold_seconds: float = 0.4
+@export_range(0.05, 2.0, 0.05, "suffix:s") var fade_in_seconds: float = 0.6
 
 var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
+var _fade_tween: Tween
 
 @onready var _root: Control = %Root
 @onready var _message: Label = %Message
@@ -18,11 +24,13 @@ var _previous_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 @onready var _result: Label = %Result
 @onready var _save_button: Button = %SaveButton
 @onready var _leave_button: Button = %LeaveButton
+@onready var _fade: ColorRect = %Fade
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_root.hide()
+	_fade.hide()
 	_save_button.pressed.connect(save_requested.emit)
 	_leave_button.pressed.connect(close_requested.emit)
 	for button: Button in [_save_button, _leave_button]:
@@ -44,6 +52,27 @@ func _exit_tree() -> void:
 
 func is_open() -> bool:
 	return is_node_ready() and _root.visible
+
+
+func is_fading() -> bool:
+	return _fade_tween != null and _fade_tween.is_valid()
+
+
+## Darkens the screen, calls `on_dark` while it is fully black, brightens it again, then
+## calls `on_finished`. The tree stays paused by the caller, so this runs on real time.
+func play_rest_fade(on_dark: Callable, on_finished: Callable) -> void:
+	if is_fading():
+		_fade_tween.kill()
+	_fade.modulate.a = 0.0
+	_fade.show()
+	_fade_tween = create_tween()
+	_fade_tween.set_ignore_time_scale(true)
+	_fade_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_fade_tween.tween_property(_fade, "modulate:a", 1.0, fade_out_seconds)
+	_fade_tween.tween_callback(on_dark)
+	_fade_tween.tween_interval(dark_hold_seconds)
+	_fade_tween.tween_property(_fade, "modulate:a", 0.0, fade_in_seconds)
+	_fade_tween.tween_callback(_finish_fade.bind(on_finished))
 
 
 ## `slot_text` names the save that Save will overwrite.
@@ -75,6 +104,10 @@ func show_save_result(saved: bool, message: String, slot_text: String) -> void:
 
 
 func close() -> void:
+	if is_fading():
+		_fade_tween.kill()
+		_fade_tween = null
+		_fade.hide()
 	if not is_open():
 		return
 	_root.hide()
@@ -91,6 +124,12 @@ func get_message() -> String:
 
 func get_result() -> String:
 	return _result.text if _result.visible else ""
+
+
+func _finish_fade(on_finished: Callable) -> void:
+	_fade.hide()
+	_fade_tween = null
+	on_finished.call()
 
 
 func _show(message: String) -> void:

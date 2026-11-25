@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://6tqubbc0642b"]
 
 [ext_resource type="Script" uid="uid://b0ax222xqtdu7" path="res://world/objects/moving_platform.gd" id="movement"]
 [ext_resource type="Texture2D" uid="uid://bhw6tgjqy1eqh" path="res://assets/sprites/objects/moving_platform.png" id="texture"]
@@ -6,44 +6,44 @@
 [sub_resource type="BoxShape3D" id="PlatformShape"]
 size = Vector3(4, 0.5, 4)
 
-[node name="QuizOrbitPlatform" type="Node3D"]
+[node name="QuizOrbitPlatform" type="Node3D" unique_id=1395391821]
 script = ExtResource("movement")
 move_speed = 6.0
 route_marker_paths = Array[NodePath]([NodePath("Route/East"), NodePath("Route/SouthEast"), NodePath("Route/South"), NodePath("Route/SouthWest"), NodePath("Route/West"), NodePath("Route/NorthWest"), NodePath("Route/North"), NodePath("Route/NorthEast")])
 
-[node name="Platform" type="AnimatableBody3D" parent="."]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 7.58, 0, 0)
+[node name="Platform" type="AnimatableBody3D" parent="." unique_id=1307088057]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.58, 0, 0)
 
-[node name="Sprite3D" type="Sprite3D" parent="Platform"]
+[node name="Sprite3D" type="Sprite3D" parent="Platform" unique_id=1446524975]
 transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
 alpha_cut = 1
 texture = ExtResource("texture")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platform" unique_id=1092497437]
 shape = SubResource("PlatformShape")
 
-[node name="Route" type="Node3D" parent="."]
+[node name="Route" type="Node3D" parent="." unique_id=1133305213]
 
-[node name="East" type="Marker3D" parent="Route"]
-position = Vector3(7.58, 0, 0)
+[node name="East" type="Marker3D" parent="Route" unique_id=7772362]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.58, 0, 0)
 
-[node name="SouthEast" type="Marker3D" parent="Route"]
-position = Vector3(7.58, 0, 9.78)
+[node name="SouthEast" type="Marker3D" parent="Route" unique_id=690603986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.58, 0, 9.78)
 
-[node name="South" type="Marker3D" parent="Route"]
-position = Vector3(0, 0, 9.78)
+[node name="South" type="Marker3D" parent="Route" unique_id=1845138764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.78)
 
-[node name="SouthWest" type="Marker3D" parent="Route"]
-position = Vector3(-7.58, 0, 9.78)
+[node name="SouthWest" type="Marker3D" parent="Route" unique_id=750040955]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.58, 0, 9.78)
 
-[node name="West" type="Marker3D" parent="Route"]
-position = Vector3(-7.58, 0, 0)
+[node name="West" type="Marker3D" parent="Route" unique_id=1087263449]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.58, 0, 0)
 
-[node name="NorthWest" type="Marker3D" parent="Route"]
-position = Vector3(-7.58, 0, -9.78)
+[node name="NorthWest" type="Marker3D" parent="Route" unique_id=1138936679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.58, 0, -9.78)
 
-[node name="North" type="Marker3D" parent="Route"]
-position = Vector3(0, 0, -9.78)
+[node name="North" type="Marker3D" parent="Route" unique_id=2067207119]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9.78)
 
-[node name="NorthEast" type="Marker3D" parent="Route"]
-position = Vector3(7.58, 0, -9.78)
+[node name="NorthEast" type="Marker3D" parent="Route" unique_id=1649251868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.58, 0, -9.78)

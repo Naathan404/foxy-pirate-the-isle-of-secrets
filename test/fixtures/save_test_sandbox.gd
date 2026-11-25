@@ -8,6 +8,7 @@ const REAL_MERCHANT_PATH := "user://silas_progress.save"
 const REAL_NOTES_PATH := "user://monster_notes.save"
 const TEST_FADE_SECONDS := 0.01
 const ACTION_INTERACT := &"dialogic_default_action"
+const REST_MENU_TIMEOUT_MSEC := 5000
 
 var directory: String
 var slot_path: String
@@ -98,6 +99,14 @@ func press_action(action: StringName) -> void:
 		event.pressed = pressed
 		_tree.root.push_input(event)
 		await _tree.process_frame
+
+
+## Resting fades to black before the Campfire menu opens. Returns whether it opened.
+func wait_rest_menu(rest_point: CampfireRestPoint) -> bool:
+	var deadline := Time.get_ticks_msec() + REST_MENU_TIMEOUT_MSEC
+	while not rest_point.is_menu_open() and Time.get_ticks_msec() < deadline:
+		await _tree.process_frame
+	return rest_point.is_menu_open()
 
 
 func frames(count: int) -> void:

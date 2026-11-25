@@ -3,7 +3,7 @@ render_mode unshaded, cull_disabled, depth_draw_opaque, shadows_disabled, fog_di
 
 // The sea around a Coral Valley island, drawn on the void quad below the room. Everything is
 // sampled where the camera ray meets the sand surface (`surface_height_meters`), so the shallows
-// and foam hug the sand edge even though the quad sits lower. Cost per pixel: four texture
+// and foam hug the sand edge even though the quad sits lower. Cost per pixel: six texture
 // reads, no loops.
 
 // Distance to the shore, 0 at the sand edge and 1 at `shore_rect` margin, baked per room.
@@ -35,6 +35,13 @@ uniform float swash_speed = 0.9;
 uniform float ring_spacing_meters = 2.6;
 uniform float ring_speed_meters_per_second = 0.45;
 uniform float ring_strength : hint_range(0.0, 1.0) = 0.22;
+
+// Awash reef rocks around the island (wonder rooms), baked by bake_reef_rocks.py over the same
+// `shore_rect`: 1 inside a rock, falling to 0 about a metre outside it. Black means no rocks.
+uniform sampler2D reef_rocks : filter_linear, repeat_disable, hint_default_black;
+uniform vec4 rock_color : source_color = vec4(0.3, 0.27, 0.32, 1.0);
+uniform vec4 rock_light_color : source_color = vec4(0.56, 0.5, 0.53, 1.0);
+uniform vec4 rock_ink_color : source_color = vec4(0.21, 0.13, 0.15, 1.0);
 
 varying vec3 world_position;
 
@@ -78,6 +85,17 @@ void fragment() {
 	float ring = smoothstep(0.86, 0.94, rings) * (1.0 - smoothstep(0.94, 1.0, rings));
 	ring *= (1.0 - smoothstep(0.1, 0.55, shore)) * ring_strength;
 	color = mix(color, foam_color.rgb, clamp(foam * 0.85 + ring, 0.0, 1.0));
+
+	// Reef rocks: a breathing foam collar, an ink edge and a top lit from the north-west.
+	float rock = texture(reef_rocks, shore_uv).r;
+	float rock_lit = texture(reef_rocks, shore_uv + vec2(0.0025, 0.003)).r;
+	float collar = smoothstep(0.12 + swash * 0.25, 0.4, rock) * (1.0 - smoothstep(0.45, 0.55, rock));
+	color = mix(color, foam_color.rgb, collar * 0.75);
+	float rock_body = smoothstep(0.6, 0.66, rock);
+	vec3 rock_top = mix(rock_color.rgb, rock_light_color.rgb,
+		clamp((rock - rock_lit) * 18.0 + 0.25, 0.0, 1.0));
+	color = mix(color, rock_ink_color.rgb, smoothstep(0.5, 0.56, rock) * (1.0 - rock_body));
+	color = mix(color, rock_top, rock_body);
 
 	ALBEDO = color;
 }

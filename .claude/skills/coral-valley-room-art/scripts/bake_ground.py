@@ -8,7 +8,16 @@ Everything is placed in world metres (x right, z toward the camera). `ground_rec
 rect of the ground sprite; get it with scripts/godot/probe_room.gd. See layouts/room_00.json.
 
 Optional keys: "ground_style" (one of STYLES, default "ripple"), "wrack_line" (bool),
-"slab_count" (rock_shelf), "fallen_fronds", "coconuts", "ripple_angle_degrees".
+"slab_count" (rock_shelf), "fallen_fronds", "coconuts", "ripple_angle_degrees",
+"painted_water" ({"shallow", "pool", "pool_light", "glint"} RGB lists: water drawn on the sand
+for rooms whose sea has a wonder palette).
+
+Split ground (wonder rooms): "islands" is a list of convex polygons in world metres; their union
+replaces the silhouette of `source`, so the pieces are separated by real water. "channels" is a
+list of [[x1, z1], [x2, z2], half_width] strips of shallow water painted across land where two
+pieces overlap. "canvas_size" (pixels) bakes on a blank square canvas instead of `source`,
+for rooms whose ground is larger than the shared art. "out_islands" names a JSON file that receives the smoothed outline of every
+island, which the room's floor collision must use (one ConvexPolygonShape3D per island).
 """
 
 import json
@@ -30,6 +39,9 @@ SCORCH = (150, 104, 96)
 INK = (54, 34, 38)
 SPECKLES = [(250, 240, 228, 230), (244, 186, 186, 230), (236, 140, 112, 220), (210, 200, 230, 200)]
 SHALLOW_WATER = (88, 152, 150)
+POOL_DEEP = (58, 140, 142)
+POOL_LIGHT = (92, 178, 172)
+POOL_GLINT = (214, 240, 232)
 SLAB_LIGHT = (196, 164, 150)
 SLAB_DARK = (158, 126, 118)
 RUBBLE = [(246, 222, 212, 255), (240, 176, 172, 255), (232, 140, 112, 255), (252, 244, 232, 255)]
@@ -57,6 +69,19 @@ STYLES = {
 }
 
 
+def island_outline(points, iterations=2):
+    """Chaikin-smoothed closed outline; stays convex when the input is convex."""
+    pts = [tuple(map(float, p)) for p in points]
+    for _ in range(iterations):
+        out = []
+        for i, a in enumerate(pts):
+            b = pts[(i + 1) % len(pts)]
+            out.append((a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25))
+            out.append((a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75))
+        pts = out
+    return pts
+
+
 def col(rgb):
     return np.array(rgb[:3], np.float32) / 255.0
 
@@ -75,6 +100,56 @@ def bezier(ctrl, n=80):
     p0, p1, p2, p3 = (np.array(c, np.float32) for c in ctrl)
     t = np.linspace(0, 1, n)[:, None]
     return ((1 - t) ** 3) * p0 + 3 * ((1 - t) ** 2) * t * p1 + 3 * (1 - t) * t * t * p2 + t ** 3 * p3
+
+
+def _island_alpha(cfg, islands, W, H):
+    """Union of the island polygons, drawn at 2x with a gently wobbling shore."""
+    gx0, gz0, gw, gd = cfg["ground_rect"]
+    scale = 2
+    canvas = Image.new("L", (W * scale, H * scale), 0)
+    draw = ImageDraw.Draw(canvas)
+    wobble_rng = np.random.default_rng(cfg.get("seed", 1207) + 913)
+    for poly in islands:
+        outline = island_outline(poly, 3)
+        cx = sum(p[0] for p in outline) / len(outline)
+        cz = sum(p[1] for p in outline) / len(outline)
+        phase = wobble_rng.random(3) * math.tau
+        pixels = []
+        for i, (x, z) in enumerate(outline):
+            t = i / len(outline) * math.tau
+            # Small bumps along the shore so pieces read as hand-drawn islands, not polygons.
+            bump = (0.18 * math.sin(t * 5 + phase[0]) + 0.12 * math.sin(t * 9 + phase[1])
+                    + 0.08 * math.sin(t * 15 + phase[2]))
+            dx, dz = x - cx, z - cz
+            length = max(math.hypot(dx, dz), 0.001)
+            x, z = x + dx / length * bump, z + dz / length * bump
+            pixels.append(((x - gx0) / gw * W * scale, (z - gz0) / gd * H * scale))
+        draw.polygon(pixels, fill=255)
+    return np.asarray(canvas.resize((W, H), Image.LANCZOS), np.float32) / 255.0
+
+
+def _paint_channels(channels, color, X, Z, noise, along_wind):
+    """Shallow water across land: walkable, slower (ShallowWaterArea in the scene)."""
+    if not channels:
+        return color
+    depth = np.zeros(X.shape, np.float32)
+    ragged = noise(2.0, 37, 2) - 0.5
+    for (x1, z1), (x2, z2), half in channels:
+        ax, az = X - x1, Z - z1
+        bx, bz = x2 - x1, z2 - z1
+        t = np.clip((ax * bx + az * bz) / max(bx * bx + bz * bz, 1e-6), 0.0, 1.0)
+        d = np.sqrt((ax - bx * t) ** 2 + (az - bz * t) ** 2)
+        width = half + ragged * 0.6
+        depth = np.maximum(depth, 1.0 - smoothstep(width - 0.35, width + 0.35, d))
+    wet = smoothstep(0.0, 0.25, depth)
+    water = smoothstep(0.35, 0.6, depth)
+    color = mix(color, col(SAND_WET), wet * 0.8)
+    rim = smoothstep(0.28, 0.36, depth) * (1.0 - water)
+    color = mix(color, col(INK), rim * 0.35)
+    shallow = mix(col(SHALLOW_WATER), col(SHALLOW_WATER) * 1.2, smoothstep(0.6, 1.0, depth))
+    color = mix(color, shallow, water * 0.82)
+    ripple = smoothstep(0.92, 0.99, np.sin(along_wind * 6.0 + ragged * 4.0)) * water
+    return mix(color, col(SALT), ripple * 0.35)
 
 
 def _style_surface(style_name, color, X, Z, along_wind, noise, shore_d, trod, mid):
@@ -149,7 +224,7 @@ def _draw_slabs(cfg, draw, P, blob, ellipse, on_free_sand, gx0, gz0, gw, gd, hal
                     (224, 214, 204, 255))
         # Some slabs hold a rock pool.
         if rng.random() < 0.4:
-            draw.polygon(blob(x, z, rx * 0.38, rz * 0.34, seed + 3), fill=(58, 140, 142, 255),
+            draw.polygon(blob(x, z, rx * 0.38, rz * 0.34, seed + 3), fill=POOL_DEEP + (255,),
                          outline=ink, width=3)
 
 
@@ -219,14 +294,37 @@ def _draw_wrack(draw, P, ellipse, on_free_sand, shore_d, wet_width, gx0, gz0, gw
             draw.line([P(*p0), P(*p1)], fill=(176, 140, 104, 255), width=4)
 
 
+def _apply_water_palette(cfg):
+    """Wonder rooms with a coloured sea repaint the water drawn on the sand to match it."""
+    global SHALLOW_WATER, POOL_DEEP, POOL_LIGHT, POOL_GLINT
+    water = cfg.get("painted_water")
+    if not water:
+        return
+    SHALLOW_WATER = tuple(water["shallow"])
+    POOL_DEEP = tuple(water["pool"])
+    POOL_LIGHT = tuple(water["pool_light"])
+    POOL_GLINT = tuple(water["glint"])
+
+
 def main(layout_path: str) -> None:
     cfg = json.load(open(layout_path, encoding="utf8"))
+    _apply_water_palette(cfg)
     gx0, gz0, gw, gd = cfg["ground_rect"]
-    src = Image.open(cfg["source"]).convert("RGBA")
+    islands = cfg.get("islands")
+    if islands and cfg.get("canvas_size"):
+        # Islands replace the silhouette, so a larger room can bake on a bigger, blank canvas.
+        src = Image.new("RGBA", (cfg["canvas_size"], cfg["canvas_size"]), (0, 0, 0, 0))
+    else:
+        src = Image.open(cfg["source"]).convert("RGBA")
     W, H = src.size
     alpha = np.asarray(src)[:, :, 3].astype(np.float32) / 255.0
+    if islands:
+        alpha = _island_alpha(cfg, islands, W, H)
     inside = alpha > 0.5
     rng = np.random.default_rng(cfg.get("seed", 1207))
+    # Shifts every noise field by the room's seed, so rooms do not share the same sand patches,
+    # dunes and puddles. room_00 (seed 1207) keeps an offset of 0 and stays byte-identical.
+    noise_offset = cfg.get("seed", 1207) - 1207
     px_x, px_z = W / gw, H / gd
     X = (gx0 + (np.arange(W, dtype=np.float32) + 0.5) / W * gw)[None, :].repeat(H, 0)
     Z = (gz0 + (np.arange(H, dtype=np.float32) + 0.5) / H * gd)[:, None].repeat(W, 1)
@@ -234,7 +332,7 @@ def main(layout_path: str) -> None:
     def noise(scale_m, seed, octaves=1):
         total = np.zeros((H, W), np.float32)
         amp, norm, scale = 1.0, 0.0, scale_m
-        local = np.random.default_rng(seed)
+        local = np.random.default_rng(seed + noise_offset)
         for _ in range(octaves):
             grid = (local.random((int(gd / scale) + 3, int(gw / scale) + 3)) * 255).astype(np.uint8)
             img = Image.fromarray(grid, "L").resize((W, H), Image.BICUBIC)
@@ -319,6 +417,8 @@ def main(layout_path: str) -> None:
     wet_edge = style["wet_width"] + (mid - 0.5)
     color = mix(color, col(SAND_WET), (1.0 - smoothstep(wet_edge - 0.5, wet_edge, shore_d)) * 0.75)
     color = mix(color, col(SALT), smoothstep(0.18, 0.0, np.abs(shore_d - wet_edge - 0.08)) * 0.6)
+    # After the wet rim, so a channel that reaches the coast stays water all the way to the sea.
+    color = _paint_channels(cfg.get("channels", []), color, X, Z, noise, along_wind)
     color *= 1.0 + (rng.random((H, W)).astype(np.float32)[..., None] - 0.5) * 0.045
     outline = 1.0 - smoothstep(0.08, 0.16, shore_d)
     color = mix(color, col(INK), outline)
@@ -358,12 +458,12 @@ def main(layout_path: str) -> None:
     for i, (x, z, rx, rz) in enumerate(cfg.get("tide_pools", [])):
         seed = 5 + i
         draw.polygon(blob(x, z, rx * 1.35, rz * 1.4, seed), fill=(168, 134, 132, 150))
-        draw.polygon(blob(x, z, rx, rz, seed), fill=(58, 140, 142, 255), outline=ink, width=4)
+        draw.polygon(blob(x, z, rx, rz, seed), fill=POOL_DEEP + (255,), outline=ink, width=4)
         draw.polygon(blob(x - rx * 0.1, z - rz * 0.08, rx * 0.72, rz * 0.62, seed + 50),
-                     fill=(92, 178, 172, 255))
+                     fill=POOL_LIGHT + (255,))
         hx, hz = P(x - rx * 0.35, z - rz * 0.35)
         draw.arc([hx - rx * px_x * 0.6, hz - rz * px_z * 0.35, hx + rx * px_x * 0.6,
-                  hz + rz * px_z * 0.35], 200, 320, fill=(214, 240, 232, 255), width=5)
+                  hz + rz * px_z * 0.35], 200, 320, fill=POOL_GLINT + (255,), width=5)
 
     for x, z, r, rot, rgb in cfg.get("starfish", []):
         pts = []
@@ -493,6 +593,10 @@ def main(layout_path: str) -> None:
     field = np.clip(np.where(island > 0.5, 0.0, field) / margin, 0.0, 1.0)
     Image.fromarray((field * 255).astype(np.uint8), "L").save(cfg["out_shore"], optimize=True)
 
+    if islands and cfg.get("out_islands"):
+        outlines = [[[round(x, 3), round(z, 3)] for x, z in island_outline(poly)] for poly in islands]
+        json.dump(outlines, open(cfg["out_islands"], "w", encoding="utf-8"), indent=1)
+        print("wrote", cfg["out_islands"])
     print("wrote", cfg["out_ground"], "and", cfg["out_shore"])
     print("shore_rect for the lagoon material: Vector4(%g, %g, %g, %g)" % (sx0, sz0, sw, sd))
 

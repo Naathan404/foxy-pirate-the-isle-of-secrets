@@ -275,8 +275,10 @@ knockback, cú nhấc lên hay animation. Hit không có khoảng miễn nhiễm
 Đòn làm HP về 0 đi thẳng vào luồng chết. `die()` lập tức đặt `dead`, tắt HurtBox,
 xóa yêu cầu hành động, ngừng hồi SP, hủy đòn và dừng vận tốc ngang. Death được áp
 dụng ở lần cập nhật FSM tiếp theo. Nhân vật vẫn chịu gravity. Sau ít nhất
-`reload_delay` và đủ thời lượng animation, Death yêu cầu GameManager reload scene
-qua fade; chưa có luồng hồi sinh riêng tại checkpoint.
+`reload_delay` và đủ thời lượng animation, Death gọi
+`GameManager.respawn_at_last_rest()`: Foxy hồi sinh cạnh lửa trại nghỉ gần nhất, đầy HP/SP,
+giữ tiến trình, và các phòng bắt đầu chu kỳ mới. Rơi xuống void cũng gọi `die()`. Xem
+[Trạng thái phòng và hồi sinh](../../systems/room_state.md).
 
 ## Chỉ số và hiển thị
 

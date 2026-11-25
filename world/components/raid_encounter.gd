@@ -131,3 +131,5 @@ func _spawn_reward() -> void:
 		return
 	_reward_chest.position = reward_position
 	room.add_child(_reward_chest)
+	# Spawned after the room was built, so it registers itself; once opened it stays open.
+	room.track_object(_reward_chest)

@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/biomes/base/base_room.gd" id="1_room"]
+[ext_resource type="Script" path="res://world/components/prop_slot.gd" id="2_slot"]
+[ext_resource type="Script" path="res://world/components/prop_pool.gd" id="3_pool"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="4_shell"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="5_stone"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed.tscn" id="6_seaweed"]
+[ext_resource type="Resource" path="res://data/items/materials/coral.tres" id="7_coral"]
+
+[sub_resource type="Resource" id="decor_pool"]
+script = ExtResource("3_pool")
+scenes = Array[PackedScene]([ExtResource("4_shell"), ExtResource("5_stone"), ExtResource("6_seaweed")])
+
+[sub_resource type="Resource" id="empty_pool"]
+script = ExtResource("3_pool")
+scenes = Array[PackedScene]([ExtResource("4_shell")])
+empty_chance = 1.0
+
+[node name="PropSlotRoom" type="Node3D"]
+script = ExtResource("1_room")
+void_reload_enabled = false
+boundary_enabled = false
+open_exits = 1
+
+[node name="Slots" type="Node3D" parent="."]
+
+[node name="SlotA" type="Node3D" parent="Slots"]
+script = ExtResource("2_slot")
+pool = SubResource("decor_pool")
+jitter_radius_meters = 1.5
+scale_variance = 0.2
+drop_item = ExtResource("7_coral")
+drop_chance = 1.0
+drop_quantity = 2
+
+[node name="SlotB" type="Node3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+script = ExtResource("2_slot")
+pool = SubResource("decor_pool")
+jitter_radius_meters = 1.5
+scale_variance = 0.2
+drop_item = ExtResource("7_coral")
+drop_chance = 1.0
+drop_quantity = 2
+
+[node name="SlotC" type="Node3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+script = ExtResource("2_slot")
+pool = SubResource("decor_pool")
+jitter_radius_meters = 1.5
+scale_variance = 0.2
+
+[node name="SlotD" type="Node3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
+script = ExtResource("2_slot")
+pool = SubResource("decor_pool")
+jitter_radius_meters = 1.5
+scale_variance = 0.2
+
+[node name="EmptySlot" type="Node3D" parent="Slots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+script = ExtResource("2_slot")
+pool = SubResource("empty_pool")

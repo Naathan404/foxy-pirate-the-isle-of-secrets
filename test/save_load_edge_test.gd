@@ -65,6 +65,7 @@ func _create_good_save() -> Dictionary:
 	var rest_point := _only_rest_point()
 	_check(rest_point.is_save_allowed(), "room_00 is a safe room")
 	_check(rest_point.rest(sandbox.manager.player), "rest at the room_00 campfire")
+	await sandbox.wait_rest_menu(rest_point)
 	_check(rest_point.request_save() == OK, "save at the room_00 campfire")
 	rest_point.close_menu()
 	var payload: Dictionary = sandbox.read_slot_payload()
@@ -182,6 +183,7 @@ func _check_write_failure() -> void:
 	DirAccess.make_dir_recursive_absolute(blocker)
 	manager.player.hp.take_damage(manager.player.hp.get_max_hp() * DAMAGE_RATIO)
 	_check(rest_point.rest(manager.player), "write failure: rest")
+	await sandbox.wait_rest_menu(rest_point)
 	_check(rest_point.request_save() != OK, "write failure: save reports an error")
 	_check(
 		rest_point.get_node("RestMenu").get_result().begins_with("Save failed"),
@@ -225,7 +227,7 @@ func _check_unsafe_campfire() -> void:
 	await sandbox.frames(3)
 	var player: Player = manager.player
 	var rest_point := _only_rest_point()
-	# A checkpoint-style safe area allows Charm swaps but never grants the save permission.
+	# A safe location for Charm swaps never grants the save permission by itself.
 	player.charm_socket_manager.enter_safe_location(rest_point)
 	_check(not rest_point.is_save_allowed(), "unsafe room: save is not allowed")
 	player.hp.take_damage(player.hp.get_max_hp() * DAMAGE_RATIO)
@@ -392,7 +394,9 @@ func _check_spawn(room_path: String, index: int, label: String) -> void:
 	var manager := sandbox.manager
 	var rest_point: CampfireRestPoint = sandbox.find_rest_points(current_scene)[index]
 	_check(rest_point.is_save_allowed(), label + ": room is safe")
-	_check(rest_point.rest(manager.player) and rest_point.request_save() == OK, label + ": saves")
+	_check(rest_point.rest(manager.player), label + ": rests")
+	await sandbox.wait_rest_menu(rest_point)
+	_check(rest_point.request_save() == OK, label + ": saves")
 	rest_point.close_menu()
 	if not _check(manager.load_saved_game() == OK, label + ": load starts"):
 		return

@@ -24,11 +24,11 @@ Tài liệu nhóm: [Google Drive dự án](https://drive.google.com/drive/folder
 
 ## Thế giới · `world/`
 
-[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Bố cục Hub](world/hub_layout.md) · [Collision layers](world/collision_layers.md)
+[Chuyển scene](world/scene_transition.md) · [Thiết kế màn chơi](world/level_design.md) · [Bố cục Hub](world/hub_layout.md) · [Bố cục Coral Valley](world/coral_valley_layout.md) · [Đặt quái Coral Valley](world/coral_valley_enemy_placement.md) · [Phòng kỳ quan Coral Valley](world/coral_valley_wonder_rooms.md) · [Collision layers](world/collision_layers.md)
 
 ## Hệ thống · `systems/`
 
-[AudioManager](systems/audio_manager.md) · [Save/Load](systems/save_system.md) · [Menu chính và tạm dừng](systems/main_pause_menu.md) · [Bản đồ thế giới](systems/world_map.md)
+[AudioManager](systems/audio_manager.md) · [Save/Load](systems/save_system.md) · [Trạng thái phòng và hồi sinh](systems/room_state.md) · [Menu chính và tạm dừng](systems/main_pause_menu.md) · [Bản đồ thế giới](systems/world_map.md) · [Camera và độ mượt](systems/camera_and_motion.md)
 
 ## Hình ảnh · `art/`
 

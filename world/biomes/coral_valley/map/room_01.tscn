@@ -15,7 +15,10 @@
 [ext_resource type="Texture2D" uid="uid://dgi2nvchbdd1v" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_01_shore.png" id="shore_texture"]
 [ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
+[ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="lm_harbor_boat"]
 
+[ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="fixed_palm_02"]
+[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="fixed_palm_03"]
 [sub_resource type="Environment" id="Environment_8eoyb"]
 resource_local_to_scene = true
 background_mode = 1
@@ -59,8 +62,8 @@ shader_parameter/caustic_world_size_meters = 9.0
 shader_parameter/caustic_speed = 0.05
 shader_parameter/caustic_strength = 0.2
 shader_parameter/reef_world_size_meters = 26.0
-shader_parameter/reef_coverage = 0.48
-shader_parameter/reef_strength = 0.5
+shader_parameter/reef_coverage = 0.32
+shader_parameter/reef_strength = 0.35
 shader_parameter/foam_width_meters = 0.3
 shader_parameter/swash_meters = 0.25
 shader_parameter/swash_speed = 0.9
@@ -83,7 +86,7 @@ shader_parameter/cloud_world_size_meters = 48.0
 shader_parameter/cloud_velocity_meters_per_second = Vector2(0.9, 0.35)
 shader_parameter/cloud_coverage = 0.45
 shader_parameter/cloud_softness = 0.18
-shader_parameter/cloud_shadow_strength = 0.35
+shader_parameter/cloud_shadow_strength = 0.48
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k0xt7"]
 resource_local_to_scene = true
@@ -184,6 +187,21 @@ leaf_width_ratio = 0.85
 leaf_rotation_speed = 0.3
 trail_count = 6
 trail_color = Color(0.78, 0.95, 0.94, 0.4)
+
+[node name="Scenery" type="Node3D" parent="." unique_id=1301776201]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+
+[node name="BeachedBoat" parent="Scenery" index="0" unique_id=1301776202 instance=ExtResource("lm_harbor_boat")]
+transform = Transform3D(1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, -0.6, 0, 12.2)
+ground_shadow = true
+
+[node name="PalmTallNorthEast" parent="Scenery" index="1" unique_id=1473259301 instance=ExtResource("fixed_palm_03")]
+transform = Transform3D(2.0, 0, 0, 0, 2.0, 0, 0, 0, 2.0, 5.0, 0, -13.4)
+ground_shadow = true
+
+[node name="PalmShortEast" parent="Scenery" index="2" unique_id=1004363353 instance=ExtResource("fixed_palm_02")]
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 11.8, 0, -5.2)
+ground_shadow = true
 
 [node name="RandomEmptyType" type="Node3D" parent="."]
 script = ExtResource("random_props")

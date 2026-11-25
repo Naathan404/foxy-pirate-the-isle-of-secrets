@@ -18,6 +18,9 @@ extends Camera3D
 
 ## Temporary world-space framing offset; still clamped by camera bounds.
 var combat_focus_offset: Vector3 = Vector3.ZERO
+## How far the camera sits from Foxy along its follow offset (1 = normal). Zooming by distance
+## keeps the field of view, so the 2.5D look of sprites and ground does not change.
+var follow_distance_scale: float = 1.0
 var _follow_offset: Vector3
 var _bounds: CameraBounds3D
 var _player: Player
@@ -28,11 +31,17 @@ var _dash_follow_active := false
 var _dash_hold_remaining := 0.0
 var _dash_camera_position := Vector3.ZERO
 var _cinematic_tween: Tween
+var _distance_tween: Tween
 
 
 func _ready() -> void:
 	_follow_offset = position
 	process_priority = 100
+	# Foxy moves on physics ticks and is drawn interpolated between them. The camera follows
+	# that drawn position every frame instead, so it must neither inherit Foxy's transform nor
+	# be interpolated itself: either would make it lag a tick behind and judder.
+	top_level = true
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_player = get_parent() as Player
 	if is_instance_valid(_player):
 		_player.dash_started.connect(_on_dash_started)
@@ -42,10 +51,11 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if not _dialogue_override:
-		# A boundary clamp changes a child camera's local position. Rebuild the
-		# desired follow offset each frame so it follows when Foxy moves back.
-		position = _follow_offset + _get_movement_bob(delta)
-		var follow_position := _update_dash_follow(global_position, delta)
+		# Rebuilt every frame from Foxy's drawn position, so a boundary clamp never sticks.
+		var desired := _follow_point(
+			_follow_offset * follow_distance_scale + _get_movement_bob(delta)
+		)
+		var follow_position := _update_dash_follow(desired, delta)
 		global_position = follow_position + combat_focus_offset
 	set_bounded_global_position(global_position)
 
@@ -126,8 +136,7 @@ func snap_to_follow() -> void:
 	_dialogue_override = false
 	_reset_dash_follow()
 	_bob_weight = 0.0
-	position = _follow_offset
-	set_bounded_global_position(global_position)
+	set_bounded_global_position(get_follow_world_position())
 	reset_physics_interpolation()
 
 
@@ -141,10 +150,21 @@ func end_dialogue_override() -> void:
 	_dialogue_override = false
 	_reset_dash_follow()
 	_bob_weight = 0.0
-	position = _follow_offset
-	set_bounded_global_position(global_position)
+	set_bounded_global_position(get_follow_world_position())
 
 
+## Moves the camera to `scale` times its normal follow distance over `duration_seconds`.
+func zoom_follow_distance(scale: float, duration_seconds: float = 0.0) -> void:
+	if _distance_tween != null and _distance_tween.is_valid():
+		_distance_tween.kill()
+	if duration_seconds <= 0.0 or not is_inside_tree():
+		follow_distance_scale = scale
+		return
+	_distance_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_distance_tween.tween_property(self, "follow_distance_scale", scale, duration_seconds)
+
+
+## The focus shot always frames from the normal follow distance; a distance zoom is dropped.
 func play_focus_cinematic(
 	world_target: Vector3,
 	target_fov: float,
@@ -156,6 +176,7 @@ func play_focus_cinematic(
 	if _cinematic_tween != null and _cinematic_tween.is_valid():
 		_cinematic_tween.kill()
 	begin_dialogue_override()
+	zoom_follow_distance(1.0, in_seconds)
 	_cinematic_tween = create_tween()
 	_cinematic_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_cinematic_tween.tween_property(self, "fov", target_fov, maxf(0.05, in_seconds))
@@ -169,9 +190,11 @@ func play_focus_cinematic(
 	_cinematic_tween.tween_callback(restore_cinematic.bind(restore_fov, out_seconds))
 
 
+## Returns to the normal follow: `restore_fov` and the normal follow distance.
 func restore_cinematic(restore_fov: float, duration_seconds: float = 0.0) -> void:
 	if _cinematic_tween != null and _cinematic_tween.is_valid():
 		_cinematic_tween.kill()
+	zoom_follow_distance(1.0, duration_seconds)
 	if duration_seconds <= 0.0 or not is_inside_tree():
 		fov = restore_fov
 		end_dialogue_override()
@@ -193,9 +216,15 @@ func restore_cinematic(restore_fov: float, duration_seconds: float = 0.0) -> voi
 
 
 func get_follow_world_position() -> Vector3:
-	if is_instance_valid(_player):
-		return _player.global_position + _follow_offset
-	return global_position
+	return _follow_point(_follow_offset * follow_distance_scale)
+
+
+## `offset` (in Foxy's space) from where Foxy is drawn this frame.
+func _follow_point(offset: Vector3) -> Vector3:
+	var anchor := get_parent() as Node3D
+	if anchor == null:
+		return offset
+	return anchor.get_global_transform_interpolated() * offset
 
 
 func get_target_follow_position(world_target: Vector3) -> Vector3:

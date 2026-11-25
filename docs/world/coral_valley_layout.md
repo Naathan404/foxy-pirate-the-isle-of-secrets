@@ -4,6 +4,11 @@ Numbering follows the final reference diagram: middle row left to right (`room_0
 
 ![Numbered room and path diagram](coral_valley_layout.svg)
 
+Where and how enemies are placed inside a room follows
+[enemy placement](coral_valley_enemy_placement.md); this document decides which enemies each
+room has. Wonder rooms (split islands, coloured seas, reef rings) are described in
+[wonder rooms](coral_valley_wonder_rooms.md).
+
 Mobs, Raid, Boss, Farm and Checkpoint rooms use Medium layouts; all other room types use Small layouts (11 Medium and 14 Small rooms). Quiz `23` has a fixed center lever and an automatically orbiting platform; Quiz `09` has one two-stop ferry with hidden shore levers; Quiz `18` has one lever-operated shuttle; Quiz `04` has a fixed center and an eight-stop orbit platform controlled from both shores.
 
 All 25 map rooms use the clipped-corner Coral Valley ground and convex ground
@@ -108,7 +113,7 @@ External paths attach to the islands shown in the final diagram:
 | room_05 | Middle | Checkpoint 2 | Medium | left: room_04, right: room_06, up: room_13, down: room_21 |
 | room_06 | Middle | Empty | Small | left: room_05, right: room_07, up: room_14 |
 | room_07 | Middle | Raid | Medium | left: room_06, right: room_08 |
-| room_08 | Middle | Boss | Medium | left: room_07 |
+| room_08 | Middle | Boss | Large arena (about 1.6× a Medium island) | left: room_07 |
 | room_09 | Top | Quiz (2 islands) | Small, 2 islands | right: room_10, down: room_01 |
 | room_10 | Top | Materials | Small | left: room_09, down: room_03 |
 | room_11 | Top | Empty | Small | right: room_12, down: room_04 |
@@ -124,7 +129,7 @@ External paths attach to the islands shown in the final diagram:
 | room_21 | Bottom | Empty | Small | right: room_22, up: room_05 |
 | room_22 | Bottom | Mobs 4 | Medium | left: room_21, right: room_23 |
 | room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
-| room_24 | Bottom | Farm | Medium | left: room_23 |
+| room_24 | Bottom | Farm (wonder: split islands) | Medium | left: room_23 |
 
 Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04`, `18` and `23` at the right island centers; Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Quiz `18`, `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
 
@@ -158,18 +163,27 @@ run, so revisiting does not restart the raid; New Game resets it. After the four
 at room-local `Vector3(0, 0.25209618, 0.45244434)`. It guarantees 10–20 gold and
 one Harpoon blueprint. There is no chest instance before the raid is cleared.
 Revisiting a cleared raid creates the configured chest without replaying waves;
-its opened/loot state currently resets like the other normal chests.
+once opened it stays open for the run ([room state](../systems/room_state.md)).
 `FlatTideController.externally_advanced` defaults to false, preserving automatic
 cycles in Mobs rooms. The finite spawner subclasses the existing tide spawner,
 whose `_spawn()` now reports success as a boolean without changing its old callers.
 
-Boss `room_08` contains Captain Blubberbeard at
-`Vector3(6, 0.25209618, 0.45244434)` and reuses `BossEncounter` with the
-`captain_blubberbeard` encounter ID. Entering the island's interior locks the
-existing player boundary and scene-change exit via `BaseRoom.set_exits_locked()`.
-The exit reopens on `fight_finished`; the boss's existing death sequence creates
-his configured reward chest at his death position. There is no preplaced chest,
-extra barrier or collapsing bridge. The boss reward scene guarantees 10–20 gold, one Tide Grapple Charm and
+Boss `room_08` is a round arena island about 1.6× the size of a Medium island
+(`BlubberbeardArenaRoom`, [blubberbeard_arena_room.gd](../../world/biomes/coral_valley/blubberbeard_arena_room.gd)).
+Captain Blubberbeard stands at the centre, `Vector3(0, 0.252, 0.452)`, and reuses
+`BossEncounter` with the `captain_blubberbeard` encounter ID. A short bridge joins
+the left pier to the island. Entering the island's interior locks the exit via
+`BaseRoom.set_exits_locked()` and starts the fight; at that moment the bridge
+breaks (spans fall into the sea, splash, shake) and its floor is removed, so the
+island boundary closes the gap. The bridge never comes back while the boss stays
+defeated: Foxy leaves with the Tide Grapple he has just won, using the grapple
+posts on both sides of the gap (`GrapplePostIsland`, `GrapplePostPier`). If Foxy
+dies, the next visit reloads the room with the bridge whole. The exit reopens on
+`fight_finished`; the boss's existing death sequence creates his configured
+reward chest at his death position. There is no preplaced chest or extra barrier.
+The sea follows the fight through `SeaMood`: calm at first, `violet_glow` from
+phase two, and `red_tide` while Sky Dive or Anchor Whirlwind winds up and plays
+out, then back. The boss reward scene guarantees 10–20 gold, one Tide Grapple Charm and
 one boss note (`Diary of Tide`); the old key/material rewards are removed. Defeat, chest-open state and uncollected reward items are restored
 by the existing encounter persistence when returning during the same run.
 Tracked reward pickups now retain their `MonsterNote` reference as well as item,
@@ -193,12 +207,23 @@ are not authored by this layout change. Ground artwork is unchanged.
 
 The two Materials rooms use the Small room template, with spawn positions pulled inward to fit the smaller ground, and have separate resource pools:
 
-- The left Materials room (`room_10`) spawns only orange, pink and turquoise coral.
-- The right Materials room (`room_14`) spawns only leaning, short and tall coconut palms.
+- `room_10` is the Crab and coconut area: it spawns only leaning, short and tall
+  coconut palms, and has three hand-placed Crabs.
+- `room_14` is the Starfish and coral area: it spawns only orange, pink and
+  turquoise coral, and has three hand-placed Starfish.
+
+`room_10`'s palm candidates keep the north half and the sides clear of the paths;
+south of the island centre they sit only on the rim, away from the down path, so a
+crown never hides Foxy. `room_14`'s coral candidates stay off the path surface.
+
+"Per visit" below now means per world cycle: random spawns are seeded from the
+cycle, so a room keeps the same layout (and remembers killed enemies and broken props)
+until the next campfire rest or death reshuffles it. See
+[room state](../systems/room_state.md).
 
 Each Materials room uses its existing spawn positions and randomly spawns 5–10 props per visit (`min_spawn_count = 5`, `max_spawn_count = 10`). Each of its three variants has an equal 1/3 chance per spawned prop; all three variants are available, but a visit does not guarantee every variant.
 
-Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_20`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions.
+Mobs 1, 2 and 3 (`room_02`, `room_12`, `room_20`) randomly spawn 7–10 props per visit. Each prop has an equal chance to be stone or wood log. Each room has ten spawn positions. In every Mobs room the obstacle candidates sit at least about 4 units off the path axes, so no prop can block an exit; the counts and pools are unchanged.
 
 Mobs 4, 5 and 6 (`room_22`, `room_13`, `room_16`) spawn two independent
 groups per visit: `RandomProps` chooses 5–7 props total, each equally likely
@@ -207,13 +232,17 @@ The groups use ten and five distinct candidate positions respectively, with
 at least 3.6 units between groups and 3.3 units from seaweed candidates.
 Both use `random_props.gd`; its Inspector count range now starts at 1.
 
-All rooms except Materials and Empty rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed; Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
+All rooms except Materials and Empty rooms spawn seaweed around their island rims on each visit. Medium rooms spawn 20 seaweed, except where hand-placed props need part of the 30-point prop budget of the [art direction](../art/coral_valley_art_direction.md): the six Mobs rooms spawn 14, Checkpoint 2 spawns 8, and Checkpoint `room_00` has 6 hand-placed seaweed instead of a spawner. Small rooms spawn 15 per island. The two Materials rooms (`room_10`, `room_14`) have no seaweed spawner.
 
 | Layout | Rooms | Seaweed per visit |
 | --- | --- | --- |
-| Medium | `room_00`, `room_02`, `room_05`, `room_07`, `room_08`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22`, `room_24` | 20 per room |
+| Medium | `room_07` | 20 per room |
+| Boss arena | `room_08` | 16, from 27 candidates along the arena rim |
+| Medium, split islands | `room_24` | 12, from 29 candidates along the island rims |
+| Medium, Checkpoint | `room_00` (hand-placed), `room_05` | 6 and 8 |
+| Medium, Mobs | `room_02`, `room_12`, `room_13`, `room_16`, `room_20`, `room_22` | 14 per room |
 | Small, one island | `room_19` | 15 per room |
-| Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 15 on each island, 30 per room |
+| Small, two islands | `room_04`, `room_09`, `room_18`, `room_23` | 10 on each island, 20 per room (was 15; lowered for the 30-point prop budget and each room's landmark) |
 
 Each island has its own `RandomSeaweed` spawner using the existing `random_props.gd`, with candidate positions fitted to its actual ground collision shape and scale. Positions are selected without replacement and inset 3–4.5 world units from the ground collision outline, with gaps at open entrances and former dock locations and at least 2.8 units of clearance from existing prop spawn positions. Mobs 1–3 retain their approved rim positions. Each seaweed independently chooses `seaweed_1`, `seaweed_2` or `seaweed_3` with equal probability.
 
@@ -227,17 +256,27 @@ water/atmosphere, camera and exit wiring remain unchanged.
 | Empty layout | Enemies | Before Checkpoint 2 | After Checkpoint 2 |
 | --- | --- | --- | --- |
 | Combat / obstacles | Exactly 4, each 10% elite | 5–7 stone/wood props total | 5–7 shell/wood props total |
-| Resources only | None | 5–7 coconut palms total + 23 seaweed | 5–7 coral props total + 23 seaweed |
+| Resources only | None | 5–7 coconut palms total + 6 seaweed | 5–7 coral props total + 10 seaweed |
 
 Before Checkpoint 2 means rooms `01`, `03`, `11`, `17`; after it means `06`,
 `15`, `21`. Combat picks Starfish, Crab, Coral Skeleton and Barrel equally;
 types may repeat. Each type contributes nine normal slots and one elite slot
 to the weighted pool, giving every enemy an independent 10% elite probability.
 Resource-only layouts use three palm or coral variants with equal probability.
-Seaweed count is rounded from the Small-room baseline of 15 × 1.5 = 22.5 to 23,
-selected without replacement from 31 candidates on the actual ground polygon,
-inset 2.5 units with gaps at the four approaches. Resource plants use a separate
-interior candidate set; combat enemies and obstacles also have separate sets.
+Seaweed was 23 (the Small-room baseline 15 × 1.5); it is now 6 before
+Checkpoint 2 and 10 after it, so the palms or coral, each room's fixed palms and
+its landmark fit the 30-point prop budget of the
+[art direction](../art/coral_valley_art_direction.md). The rooms before
+Checkpoint 2 always keep two fixed palms, so they read as a palm grove even when
+the combat layout is picked. It is selected without
+replacement from 31 candidates on the actual ground polygon, inset 2.5 units with
+gaps at the four approaches. Resource plants use a separate interior candidate set;
+combat enemies and obstacles also have separate sets. Obstacle, palm and coral
+candidates stay at least about 4 units off the path axes so no exit is blocked, and
+palm candidates sit only in the north half and on the sides, where their crowns
+cannot hide Foxy. Each Empty room also has a fixed landmark of its own in its
+`Scenery` node (see the art direction's landmark table); it is not part of the
+shared layouts.
 
 The four reusable layout scenes are `objects/empty_combat_before_checkpoint.tscn`,
 `empty_combat_after_checkpoint.tscn`, `empty_resources_before_checkpoint.tscn`

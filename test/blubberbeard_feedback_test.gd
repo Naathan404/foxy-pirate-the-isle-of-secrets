@@ -17,9 +17,10 @@ func _run() -> void:
 	player.add_to_group("player")
 	player.position = Vector3(8, 0, 0)
 	arena.add_child(player)
-	var camera := Camera3D.new()
-	player.add_child(camera)
+	var camera := BoundedFollowCamera3D.new()
+	camera.position = Vector3(0, 24, 28)
 	camera.fov = 30.0
+	player.add_child(camera)
 	camera.make_current()
 	var boss := BOSS_SCENE.instantiate() as BlubberbeardBoss
 	arena.add_child(boss)
@@ -28,7 +29,13 @@ func _run() -> void:
 	var behavior := boss
 	var feedback := behavior.feedback
 	await create_timer(0.75).timeout
-	_check(is_equal_approx(camera.fov, feedback.fight_camera_fov), "Fight camera did not zoom out")
+	_check(
+		(
+			is_equal_approx(camera.follow_distance_scale, feedback.fight_camera_distance_scale)
+			and is_equal_approx(camera.fov, 30.0)
+		),
+		"Fight camera should back off without widening the field of view"
+	)
 	behavior.timer = 0.05
 	boss.take_damage(1.0)
 	behavior.fight_tick(0.3)

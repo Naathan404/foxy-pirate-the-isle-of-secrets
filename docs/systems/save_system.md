@@ -9,7 +9,11 @@ trong room bật `safe_room`, rồi chủ động chọn **Save game**. Menu ch�
 1. Đi vào room có `safe_room = true` **không** tự lưu.
 2. Đứng gần lửa trại, nhãn **Rest** hiện lên; nhấn phím tương tác chung với NPC
    (`dialogic_default_action`: Enter, Space, X, chuột trái, nút A của tay cầm).
-3. Trong safe room: HP và SP hồi đầy, game tạm dừng và hiện menu **Campfire**:
+3. Trong safe room: game tạm dừng, màn hình tối dần (`RestMenu.fade_out_seconds`), giữ đen
+   (`dark_hold_seconds`). Trong lúc đen, HP và SP hồi đầy, lửa trại này thành điểm hồi sinh
+   và các phòng bắt đầu chu kỳ mới (xem [Trạng thái phòng](room_state.md)). Màn hình sáng
+   lại (`fade_in_seconds`) rồi mới hiện menu **Campfire**; signal `CampfireRestPoint.rested`
+   phát lúc menu mở:
    - **Save game** ghi trạng thái *sau khi đã hồi* vào Slot 1 và báo "Game saved."
      hoặc "Save failed (...). Your previous save is unchanged.". Dòng phụ cho biết
      slot đang trống hay sẽ ghi đè save nào (room, giờ lưu).
@@ -40,11 +44,12 @@ safe location của Charm, metadata, tên scene hay tên node không cấp quy�
 | Boss đã hạ | `GameManager.boss_encounters` | boss đã chết, rương đã mở, vị trí rương, phần thưởng chưa nhặt (`item_id`) |
 | Silas | `SilasProgress` | đã gặp, đã mua cung |
 | Monster Notes | `NoteProgress` | trạng thái mở theo `note_id` |
+| Phòng | `GameManager.room_states` | `world.rooms`: seed của chu kỳ và đối tượng giữ vĩnh viễn (rương đã mở) theo scene + NodePath; lửa trại đã lưu cũng là điểm hồi sinh |
 
 ### Chưa hỗ trợ (hệ thống chưa tồn tại hoặc chưa có trạng thái bền)
 
-- Rương thường, vật phẩm đặt sẵn trong room, quái đã giết: room dựng lại mỗi lần vào,
-  hiện cũng không giữ giữa các lần chuyển scene trong cùng lượt chơi.
+- Quái đã giết và vật đã vỡ: chỉ nhớ trong chu kỳ hiện tại, mà save luôn ghi ngay sau khi
+  nghỉ (đầu chu kỳ), nên không cần lưu.
 - Nhiệm vụ, nâng cấp khác ngoài socket Charm và sức chứa potion: chưa có hệ thống.
 - Nhiều slot, autosave, cloud save.
 
@@ -59,7 +64,8 @@ safe location của Charm, metadata, tên scene hay tên node không cấp quy�
 
 - Slot: `user://saves/slot_1.json` (`GameManager.SAVE_SLOT_PATH`). Trên Windows là
   `%APPDATA%/Godot/app_userdata/foxy-pirate-the-isle-of-secret/saves/`.
-- JSON, `format = "foxy_pirate_save"`, `version = 1` (`GameSaveSnapshot.VERSION`).
+- JSON, `format = "foxy_pirate_save"`, `version = 2` (`GameSaveSnapshot.VERSION`).
+  Save version 1 (chưa có `world.rooms`) được `GameSaveSnapshot.migrate()` nâng lên khi đọc.
 - Chỉ lưu ID ổn định và giá trị thuần; không lưu node, resource hay instance ID.
   Item và forge được tra lại qua `SaveContentCatalog` (quét `res://data/items` và
   `res://data/weapon/forges`, dùng `ResourceLoader.list_directory` nên chạy được trong
@@ -92,7 +98,8 @@ cùng toàn bộ trạng thái hiện tại. Menu chính hiện lý do và khôn
 1. Đọc + kiểm tra file, kiểm tra scene tồn tại (trước transition).
 2. Sau màn đen: kiểm tra lửa trại và Player trong room đích.
 3. Khôi phục trạng thái phiên **trước** khi room vào tree (`reset_session()`, vàng,
-   map, cờ, boss, Silas, Notes) vì room đọc chúng trong `_ready` (ví dụ boss đã hạ).
+   map, trạng thái phòng và điểm hồi sinh, cờ, boss, Silas, Notes) vì room đọc chúng trong
+   `_ready` (ví dụ boss đã hạ, rương đã mở, seed bố cục).
 4. Sau `scene_changed`: vũ khí → inventory → potion → Charm (có thể đổi max HP/SP) →
    HP/SP → đặt Foxy tại `Spawn` của lửa trại.
 
@@ -120,12 +127,13 @@ vàng hay chỉ số Charm.
 - `Spawn` nằm 2.8 m phía trước tâm lửa trại, ngoài `MovementBody` (bán kính 2 m) và
   trong vùng tương tác (bán kính 3.4 m). Test kiểm tra điểm này ở cả 4 room có lửa trại.
 - Lửa trại vẫn là `DestructibleProp` với 100000 HP. Nếu bị phá hết máu, nó và điểm lưu
-  biến mất tới khi room được dựng lại (đổi room, chết, Continue); save cũ vẫn tải được
-  vì room dựng lại có lửa trại.
+  biến mất tới lần nghỉ hoặc chết sau (xem [Trạng thái phòng](room_state.md)); save cũ
+  vẫn tải được vì Continue dựng phòng ở chu kỳ mới.
 - Thay đổi contract: `base_room.gd` có `class_name BaseRoom`; `GameManager.State` thêm
   `REST_MENU` (cuối enum); signal `GameManager.saved_game_loaded`;
   `NpcInteractionArea.prompt_text` (mặc định "Talk"); `GoldWallet.restore_balance()`;
-  `MapProgress.get_visited_rooms()` / `restore()`; `get_save_data()` /
+  `MapProgress.get_visited_rooms()` / `restore()`; `CampfireRestPoint.get_location()`;
+  `GameManager.room_states`; `get_save_data()` /
   `apply_save_data()` / `reset_progress()` cho `SilasProgress` và `NoteProgress`. Không
   thêm autoload hay input action.
 - `SilasProgress` và `NoteProgress` vẫn ghi file riêng ngay khi đổi (tương thích test và
@@ -157,6 +165,7 @@ vàng hay chỉ số Charm.
 | Test | Phạm vi |
 | --- | --- |
 | [save_load_flow_test.gd](../../test/save_load_flow_test.gd) | Menu thật → New Game → Hub; safe room không tự lưu; phím tương tác mở menu, hồi HP/SP, Leave/Escape không lưu; Save; đổi tiến trình rồi Continue khôi phục đủ và đúng chỗ; 3 vòng save/load không nhân đôi; New Game sau khi có save chơi mới và giữ slot |
+| [room_state_test.gd](../../test/room_state_test.gd) | Trạng thái phòng, nghỉ, chết/void, rương giữ vĩnh viễn, migration save v1, PropSlot; xem [Trạng thái phòng](room_state.md) |
 | [save_load_edge_test.gd](../../test/save_load_edge_test.gd) | Chưa có save; file hỏng/rỗng/sai kiểu; version mới hơn; thiếu scene; thiếu lửa trại; lỗi ghi; ghi dở; lửa trại ngoài safe room (kể cả khi có safe location kiểu checkpoint); từng nhóm dữ liệu với giá trị biên và ID không hợp lệ; spawn ở mọi lửa trại không rơi, không kẹt, không chạm trigger chuyển scene |
 
 Test ghi vào `user://test_saves/<tên>_<thời gian>/`, xóa thư mục đó khi xong và fail nếu

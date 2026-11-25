@@ -4,6 +4,9 @@ extends Node
 @export_range(0.0, 20.0, 0.5) var maximum_pixels: float = 14.0
 @export_range(0.01, 1.0, 0.01) var maximum_duration: float = 0.3
 @export_range(1.0, 60.0, 1.0) var frequency: float = 35.0
+## Nhân biên độ rung hiển thị của mọi yêu cầu. Rung mạnh mỗi đòn (dao 9,5 px) làm khung hình
+## trông như giật; giá trị yêu cầu giữ nguyên để các hệ thống vẫn so sánh lực rung như cũ.
+@export_range(0.0, 2.0, 0.05) var intensity_scale: float = 0.6
 ## Dùng khi camera không có cha Node3D làm mốc quy đổi pixel sang khoảng cách thế giới.
 @export_range(0.1, 100.0, 0.1) var fallback_depth: float = 28.0
 
@@ -40,7 +43,7 @@ func _apply_shake(now: int) -> void:
 	# Noise chooses direction; the envelope sets the requested pixel amplitude.
 	# Raw simplex magnitudes made small melee requests nearly invisible.
 	jitter = jitter.normalized() if not jitter.is_zero_approx() else Vector2.RIGHT
-	var displacement := jitter * _current_strength(now) * _world_units_per_pixel()
+	var displacement := jitter * _current_strength(now) * intensity_scale * _world_units_per_pixel()
 	# Chỉ đổi offset dựng hình; camera vẫn theo cha Foxy, HUD CanvasLayer không bị rung.
 	_camera.h_offset = _base_offset.x + displacement.x
 	_camera.v_offset = _base_offset.y + displacement.y

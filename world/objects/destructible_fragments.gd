@@ -18,6 +18,11 @@ var _elapsed: float = 0.0
 var _fade_start: float
 
 
+func _ready() -> void:
+	# Pieces are animated every frame in _process, not on physics ticks.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
+
 func burst_from_sprite(source: Sprite3D, settings: FragmentSettings) -> void:
 	if source == null or source.texture == null:
 		queue_free()

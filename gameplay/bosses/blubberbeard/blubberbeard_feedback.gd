@@ -20,9 +20,11 @@ const DEATH_SHOCKWAVE_STRENGTH := 0.022
 const DEATH_SHOCKWAVE_COLOR := Color("ffb25f")
 const DEATH_SHOCKWAVE_RADIUS_PIXELS := 240.0
 const DEATH_SHOCKWAVE_HEIGHT := 2.0
+const FIGHT_CAMERA_ZOOM_SECONDS := 0.6
 
 @export_range(0.0, 2.0, 0.1) var intensity: float = 1.0
-@export_range(30.0, 75.0, 1.0, "degrees") var fight_camera_fov: float = 45.0
+## The fight pulls Foxy's camera back by this factor of its follow distance (field of view kept).
+@export_range(1.0, 2.5, 0.05) var fight_camera_distance_scale: float = 1.5
 
 var boss: BossBase
 var visual: BlubberbeardVisual
@@ -564,10 +566,11 @@ func _begin_camera() -> void:
 		return
 	_camera = camera
 	_camera_fov = camera.fov
-	_camera_tween = camera.create_tween()
-	_camera_tween.tween_property(camera, "fov", maxf(camera.fov, fight_camera_fov), 0.6).set_trans(
-		Tween.TRANS_SINE
-	)
+	# Widening the field of view would bend the 2.5D view; the follow camera backs off instead.
+	if camera is BoundedFollowCamera3D:
+		(camera as BoundedFollowCamera3D).zoom_follow_distance(
+			fight_camera_distance_scale, FIGHT_CAMERA_ZOOM_SECONDS
+		)
 
 
 func _restore_camera(animated: bool) -> void:

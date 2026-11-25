@@ -13,14 +13,14 @@
 [node name="RandomResources" type="Node3D" parent="."]
 script = ExtResource("random_props")
 editor_description = "5-7 coconut palms before CP2, or coral after CP2. No enemies."
-spawn_positions = PackedVector3Array(-6, 0.21008015, -6, 0, 0.21008015, -8, 6, 0.21008015, -6, -7, 0.21008015, 0, 7, 0.21008015, 0, -6, 0.21008015, 7, 0, 0.21008015, 9, 6, 0.21008015, 7)
+spawn_positions = PackedVector3Array(-6, 0.21008015, -6, -3.6, 0.21008015, -10, 6, 0.21008015, -6, -8.8, 0.21008015, -3.2, 8.8, 0.21008015, -3.2, -9.6, 0.21008015, -11, 3.6, 0.21008015, -10, 9.8, 0.21008015, -11.2)
 min_spawn_count = 5
 max_spawn_count = 7
 prop_scenes = Array[PackedScene]([ExtResource("beach_palm_01"), ExtResource("beach_palm_02"), ExtResource("beach_palm_03")])
 
 [node name="RandomSeaweed" type="Node3D" parent="."]
 script = ExtResource("random_props")
-editor_description = "23 seaweed: rounded from the Small-room baseline 15 x 1.5; entrances kept clear."
+editor_description = "6 seaweed, so the random palms, each room's fixed palms and its landmark fit the 30-point prop budget; entrances kept clear."
 spawn_positions = PackedVector3Array(-4.6852, 0.21008015, -12.53889, -2.58105, 0.21008015, -12.53889, 3.7314, 0.21008015, -12.53889, 5.82225, 0.21008015, -12.50021, 7.088, 0.21008015, -10.82464, 8.3304, 0.21008015, -9.12644, 9.57279, 0.21008015, -7.42823, 10.71581, 0.21008015, -5.68596, 11.14014, 0.21008015, -3.62504, 11.2, 0.21008015, 4.78547, 11.2, 0.21008015, 6.88962, 10.92803, 0.21008015, 8.93355, 9.72335, 0.21008015, 10.65593, 8.35142, 0.21008015, 12.24835, 6.79909, 0.21008015, 13.64785, 4.69494, 0.21008015, 13.64785, 2.59079, 0.21008015, 13.64785, -3.72167, 0.21008015, 13.64785, -5.82582, 0.21008015, 13.64785, -7.60051, 0.21008015, 12.89925, -8.98865, 0.21008015, 11.31795, -10.3306, 0.21008015, 9.70233, -11.175, 0.21008015, 7.81748, -11.175, 0.21008015, 5.71333, -11.175, 0.21008015, 3.60917, -11.175, 0.21008015, -2.70328, -10.94537, 0.21008015, -4.78947, -10.22006, 0.21008015, -6.69822, -8.94641, 0.21008015, -8.37311, -7.67276, 0.21008015, -10.04801, -6.39576, 0.21008015, -11.72034)
-fixed_spawn_count = 23
+fixed_spawn_count = 6
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
