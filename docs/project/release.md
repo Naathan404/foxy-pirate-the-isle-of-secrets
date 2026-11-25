@@ -8,18 +8,31 @@ Windows và bản Web bằng Godot 4.7.2, rồi đẩy lên itch.io bằng
 
 | Job | Runner | Việc làm |
 | --- | --- | --- |
-| `build` | `windows-latest` | Import project hai lượt, export preset `Windows Desktop` và `Web`, lưu artifact `windows-build`, `web-build` trong 14 ngày. |
+| `build` | `windows-latest` | Import project hai lượt, export preset `Windows Desktop`; giảm texture cho Web, import lại, export preset `Web` và nén thành `foxy_pirate_web.zip`. Lưu artifact `windows-build`, `web-build`, `web-zip` trong 14 ngày. |
 | `publish-itch` | `ubuntu-latest` | Tải artifact, cài butler, đẩy bản Windows vào channel `windows` và bản Web vào channel `html5`. |
 
-Build chạy trên Windows vì SpineBridge chỉ có thư viện native cho Windows.
+Spine chạy bằng GDExtension spine-godot (`bin/`), có thư viện cho mọi nền tảng.
+Đặt `BUILD_WEB: "false"` trong workflow để bỏ bản Web.
 
-> **Bản Web đang tạm tắt** (`BUILD_WEB: "false"` trong workflow): trên Web
-> Foxy mất Spine và game còn giật. Workflow chỉ build và upload bản Windows; đặt
-> `BUILD_WEB: "true"` để bật lại. Các phần về Web bên dưới áp dụng khi bật lại.
+Preset `Web` bật **Extensions Support** để nạp spine-godot; Godot dùng template
+`web_dlink_nothreads_release.zip` có sẵn trong bộ export template chính thức. Bản Web
+dùng renderer Compatibility và tắt thread, nên không cần bật SharedArrayBuffer trên itch.io.
 
-Preset `Web` loại `addons/spine_bridge/` và `assets/spine/`; trên web Foxy
-dùng sprite thay cho Spine (xem `spine_idle_preview.gd`). Bản Web dùng
-renderer Compatibility và tắt thread, nên không cần bật SharedArrayBuffer trên itch.io.
+Godot 4.7.2 có lỗi cập nhật index buffer trên WebGL: khi Foxy đổi attachment
+(dash, chém) hình Spine có thể vỡ tam giác. Bản Windows không bị.
+
+### Giảm dung lượng bản Web
+
+Sau khi export Windows, workflow chạy
+[`tools/web/prepare_web_textures.py`](../../tools/web/prepare_web_textures.py) trên bản
+checkout của runner rồi import lại:
+
+- Ảnh lossless đổi sang WebP lossy (chất lượng 0,85), trừ distance field `*_shore.png`.
+- Ảnh Basis Universal bật RDO.
+
+Repo và bản Windows giữ thiết lập gốc. Muốn tự build Web ở máy, chạy script trên một
+bản sao project, không chạy trên repo đang làm việc. File `foxy_pirate_web.zip` trong
+artifact `web-zip` tải thẳng lên itch.io được (giải nén artifact của GitHub trước).
 
 | Cách kích hoạt | Build | Upload itch.io | Phiên bản hiển thị |
 | --- | --- | --- | --- |
@@ -62,8 +75,8 @@ Các lần sau butler chỉ tải phần thay đổi; cấu hình trên itch.io 
 
 - Workflow dùng đường dẫn export riêng (`build/windows/foxy_pirate_tios.exe`);
   `export_path` trong `export_presets.cfg` chỉ áp dụng khi export trong editor.
-- itch.io giới hạn mỗi file của game HTML5 khoảng 200 MB. Workflow cảnh báo
-  khi file trong bản Web vượt mức này; khi đó bản Web sẽ không chạy trên itch.io.
+- itch.io giới hạn mỗi file của game HTML5 khoảng 200 MB. Workflow báo lỗi khi
+  file trong bản Web vượt mức này.
 - Ảnh dùng cho 3D (Sprite3D, material) import với **Compress Mode: Basis Universal**,
   không dùng **VRAM Compressed**. BC3 luôn tốn khoảng 1 byte/pixel trên đĩa (ảnh
   1254×1254 ≈ 2.1 MB), còn Basis thường nhỏ hơn 2–10 lần và vẫn được nén trên GPU.
@@ -71,6 +84,6 @@ Các lần sau butler chỉ tải phần thay đổi; cấu hình trên itch.io 
   chuyển sang Basis.
 - `docs/` bị loại khỏi mọi bản export; không đặt resource game trong thư mục này.
 - Khi thêm preset mới (Linux, macOS…), cần thêm bước export và channel butler
-  tương ứng; SpineBridge hiện chưa có thư viện cho các nền tảng đó.
+  tương ứng.
 - Build lỗi khi Godot trả mã khác 0, log có `ERROR:`/`SCRIPT ERROR:` hoặc không
   tạo ra file `.exe`, giống quy tắc của job CI.

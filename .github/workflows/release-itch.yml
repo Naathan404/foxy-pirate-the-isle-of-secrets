@@ -25,9 +25,8 @@ env:
   WINDOWS_PRESET: Windows Desktop
   WINDOWS_DIR: build/windows
   WINDOWS_EXECUTABLE: foxy_pirate_tios.exe
-  # Web build is paused: SpineBridge has no Web library and the Web build
-  # stutters. Set to "true" to export and upload the html5 channel again.
-  BUILD_WEB: "false"
+  # Set to "false" to skip the html5 channel.
+  BUILD_WEB: "true"
   WEB_PRESET: Web
   WEB_DIR: build/web
   # itch.io rejects HTML5 uploads containing a single file above this size.
@@ -36,8 +35,7 @@ env:
 jobs:
   build:
     name: Export builds
-    # SpineBridge ships native libraries only for Windows, so the export must
-    # run on a Windows host for the extension to load during import.
+    # A Windows host keeps the Windows export identical to local builds.
     runs-on: windows-latest
     timeout-minutes: 45
     outputs:
@@ -105,8 +103,8 @@ jobs:
             fi
           }
 
-          # A clean Windows checkout needs two imports: the first detects the
-          # SpineBridge GDExtension, the second registers its native importers.
+          # A clean checkout needs two imports: the first detects the spine-godot
+          # GDExtension, the second registers its native importers.
           run_godot 300s --editor --import --quit
           run_godot 300s --editor --import --quit
 
@@ -119,15 +117,25 @@ jobs:
             echo "Web build is disabled (BUILD_WEB=$BUILD_WEB)."
             exit 0
           fi
+          # The Web build uses smaller texture imports so index.pck fits the
+          # itch.io per-file limit; the Windows export above keeps the originals.
+          python tools/web/prepare_web_textures.py .
+          run_godot 900s --editor --import --quit
+
           mkdir -p "$WEB_DIR"
           # itch.io serves the HTML5 build from index.html at the archive root.
           run_godot 600s --export-release "$WEB_PRESET" "$WEB_DIR/index.html"
           require_file "$WEB_DIR/index.html"
           ls -la "$WEB_DIR"
-          find "$WEB_DIR" -type f -size +"${ITCH_WEB_FILE_LIMIT_BYTES}"c -print0 \
-            | while IFS= read -r -d '' oversized; do
-                echo "::warning file=$oversized::Web file exceeds the itch.io per-file limit"
-              done
+          oversized=$(find "$WEB_DIR" -type f -size +"${ITCH_WEB_FILE_LIMIT_BYTES}"c)
+          if [[ -n "$oversized" ]]; then
+            echo "::error::Web files exceed the itch.io per-file limit: $oversized"
+            exit 1
+          fi
+
+          # Ready for a manual upload to itch.io: index.html at the archive root.
+          (cd "$WEB_DIR" && 7z a -tzip -mx=9 "$GITHUB_WORKSPACE/build/foxy_pirate_web.zip" . > /dev/null)
+          ls -la build/foxy_pirate_web.zip
 
       - uses: actions/upload-artifact@v4
         with:
@@ -141,6 +149,15 @@ jobs:
         with:
           name: web-build
           path: ${{ env.WEB_DIR }}
+          if-no-files-found: error
+          retention-days: 14
+
+      # The upload-ready zip (GitHub wraps every artifact in its own zip).
+      - uses: actions/upload-artifact@v4
+        if: env.BUILD_WEB == 'true'
+        with:
+          name: web-zip
+          path: build/foxy_pirate_web.zip
           if-no-files-found: error
           retention-days: 14
 
