@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://cpkdfvnflfrcg"
+path="res://.godot/imported/foxy.spine-json-357e6c39df62253af796fe0743f9ae9a.spjson"
+
+[deps]
+
+source_file="res://assets/spine/foxy_anim_spine/foxy.spine-json"
+dest_files=["res://.godot/imported/foxy.spine-json-357e6c39df62253af796fe0743f9ae9a.spjson"]
+
+[params]
+
