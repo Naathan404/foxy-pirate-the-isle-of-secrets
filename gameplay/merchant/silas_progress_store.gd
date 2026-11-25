@@ -8,6 +8,11 @@ const DEFAULT_SAVE_PATH := "user://silas_progress.save"
 const SAVE_VERSION := 1
 
 @export var save_path := DEFAULT_SAVE_PATH
+@export_group("Restock")
+## Play time (menus and loading excluded) after which the stock changes; each wait is drawn
+## at random between the two values and never shown to the player.
+@export_range(30.0, 3600.0, 5.0, "suffix:s") var restock_min_seconds := 360.0
+@export_range(30.0, 3600.0, 5.0, "suffix:s") var restock_max_seconds := 720.0
 
 var _met_silas := false
 var _bow_purchased := false
@@ -15,10 +20,21 @@ var _shop_stock: MerchantCatalog
 var _stock_source: MerchantCatalog
 var _stock_random := RandomNumberGenerator.new()
 var _stock_random_ready := false
+## Set by a restock trigger; the stock is only redrawn on the next visit, when it can be seen.
+var _stock_stale := false
+var _restock_schedule := SilasRestockSchedule.new(restock_min_seconds, restock_max_seconds)
 
 
 func _ready() -> void:
+	# Apply the Inspector values; nothing has been recorded yet.
+	_restock_schedule = SilasRestockSchedule.new(restock_min_seconds, restock_max_seconds)
 	load_progress()
+
+
+func _process(delta: float) -> void:
+	# The tree is paused during menus and scene transitions, so only real play time counts.
+	if _restock_schedule.advance(delta, _get_stock_random()):
+		_stock_stale = true
 
 
 func has_met_silas() -> bool:
@@ -29,22 +45,32 @@ func has_bow_purchase() -> bool:
 	return _bow_purchased
 
 
-func get_shop_stock(source: MerchantCatalog) -> MerchantCatalog:
-	if _shop_stock == null or _stock_source != source:
-		return reroll_shop_stock(source)
+## Returns the session stock, drawing a new one first if none exists yet or a restock trigger
+## fired. `excluded_offer_ids` only matters when a new stock is drawn.
+func get_shop_stock(
+	source: MerchantCatalog, excluded_offer_ids: Array[StringName] = []
+) -> MerchantCatalog:
+	if _shop_stock == null or _stock_source != source or _stock_stale:
+		return reroll_shop_stock(source, excluded_offer_ids)
 	return _shop_stock
 
 
-func reroll_shop_stock(source: MerchantCatalog) -> MerchantCatalog:
+func reroll_shop_stock(
+	source: MerchantCatalog, excluded_offer_ids: Array[StringName] = []
+) -> MerchantCatalog:
 	if source == null or not source.validate().is_empty():
 		return null
-	if not _stock_random_ready:
-		_stock_random.randomize()
-		_stock_random_ready = true
 	var previous := _shop_stock if _stock_source == source else null
-	_shop_stock = source.roll_buy_stock(_stock_random, previous)
+	_shop_stock = source.roll_buy_stock(_get_stock_random(), previous, excluded_offer_ids)
 	_stock_source = source
+	_stock_stale = false
 	return _shop_stock
+
+
+## Silas restocks the first time Foxy reaches each area of the run.
+func note_area_entered(area_id: StringName) -> void:
+	if _restock_schedule.note_area_entered(area_id):
+		_stock_stale = true
 
 
 func mark_met_silas() -> bool:
@@ -114,3 +140,12 @@ func save_progress() -> bool:
 func _clear_shop_stock() -> void:
 	_shop_stock = null
 	_stock_source = null
+	_stock_stale = false
+	_restock_schedule.reset()
+
+
+func _get_stock_random() -> RandomNumberGenerator:
+	if not _stock_random_ready:
+		_stock_random.randomize()
+		_stock_random_ready = true
+	return _stock_random

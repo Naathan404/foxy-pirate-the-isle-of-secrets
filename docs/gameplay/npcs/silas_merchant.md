@@ -104,18 +104,35 @@ eligible for the Buy tab. `guaranteed_buy_offer_ids` lists offers that appear on
 every visit. `random_buy_offer_count` draws that many distinct offers from the
 remaining pool once per play session; a value of `0` keeps the old behavior and
 shows every buy offer. The current setup always shows Wooden Arrow, its five-arrow
-bundle and the two small potions, then draws three of the seven other offers.
+bundle and the two small potions, then draws 12 of the 35 other offers. The pool includes the 11 sellable Passive Charms
+(Gale Pace, Turtle Shell, Endurance Vessel, Life Steal, Double Strike, Chaos Collector,
+Backstabber, Crimson Band, Skull Cracker, Momentum Strike, Fortune Leaf), priced 100–200 G.
 
 The roll creates a temporary catalog. Hidden offers have `buy_price = 0` in that
 catalog, so the transaction service rejects purchases even if their IDs are
 passed directly. Their `sell_price` stays intact: the Sell tab still accepts
 configured items held by the player. Stock is unlimited for visible items; the
-roll changes availability, not quantity. `SilasProgressStore` holds this stock
-in memory for the play session, so closing and reopening the shop keeps the same
-selection. It is not written to `silas_progress.save`; restarting the game rolls
-again. Call `SilasNpc.reroll_shop_stock()` to change it explicitly. The shop's
-`Debug: Reroll Stock` button calls this function in debug builds and updates the
-open Buy tab. The source resource is never modified.
+roll changes availability, not quantity. The source resource is never modified.
+
+**Owned charms are skipped.** Charms are one-time purchases, so `SilasNpc` passes the offer
+IDs of every charm Foxy already owns to `roll_buy_stock(..., excluded_offer_ids)`. They never
+take one of the drawn slots; guaranteed offers are unaffected. The filter applies when a stock
+is drawn, so a charm gained afterwards still shows as owned until the next restock.
+
+### Restock: when the stock changes
+
+`SilasProgressStore` holds the stock in memory for the play session and it is not written to
+`silas_progress.save`. The stock never changes while it is on screen; a restock trigger only
+marks it stale and the next visit draws a new one (`SilasRestockSchedule` decides the triggers):
+
+| Trigger | Rule |
+| --- | --- |
+| New area | First arrival in each biome folder (`res://world/biomes/<area>/`) of the run, reported by `GameManager` after a scene transition. Returning to an area already visited does not count, so crossing between two areas cannot farm rerolls. |
+| Play time | After a random stretch of real play time, drawn between `restock_min_seconds` (360) and `restock_max_seconds` (720) on the store, then drawn again. Menus, the shop and scene loading pause the tree, so they do not count. No timer is shown. |
+
+Between triggers the stock stays the same however often the player returns, so the player has
+to keep checking on Silas to catch new goods. New Game and Continue clear the stock and the
+visited areas. `SilasNpc.reroll_shop_stock()` and the debug button still force a redraw.
 
 ## 5. Lưu hiện tại và cách reset
 

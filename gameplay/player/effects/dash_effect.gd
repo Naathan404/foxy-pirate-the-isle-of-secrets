@@ -5,12 +5,14 @@ const STREAK_POOL_SIZE: int = 8
 const STREAK_INTERVAL_SECONDS: float = 0.035
 const STREAK_LENGTH_MIN: float = 1.6
 const STREAK_LENGTH_MAX: float = 2.8
-const STREAK_WIDTH: float = 0.16
+const STREAK_WIDTH: float = 0.2
 const STREAK_LATERAL_SPREAD: float = 0.45
 const STREAK_HEIGHT_MIN: float = 0.15
 const STREAK_HEIGHT_MAX: float = 1.1
-const STREAK_LIFETIME_SECONDS: float = 0.22
-const STREAK_COLOR := Color(0.45, 0.88, 1.0, 0.95)
+const STREAK_LIFETIME_SECONDS: float = 0.3
+const STREAK_COLOR := Color(0.55, 0.9, 1.0, 0.8)
+## Projected dash direction shorter than this (unit vector length) is treated as degenerate.
+const MIN_PROJECTED_DIRECTION_LENGTH: float = 0.05
 
 @export var player: Player
 
@@ -110,11 +112,15 @@ func _create_streaks() -> void:
 		_streaks.append(streak)
 
 
-## A fading speed line trailing behind Foxy, lying in the ground plane along the dash direction.
+## A fading speed line trailing behind Foxy. It faces the camera and runs along the dash
+## direction as seen on screen, so it stays readable when dashing toward or away from the camera.
 func _spawn_streak() -> void:
 	var direction := player.last_facing_direction
 	direction.y = 0.0
 	if direction.is_zero_approx():
+		return
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
 		return
 	direction = direction.normalized()
 	var index := _next_streak
@@ -123,11 +129,21 @@ func _spawn_streak() -> void:
 	if _streak_tweens[index] != null and _streak_tweens[index].is_valid():
 		_streak_tweens[index].kill()
 	var length := randf_range(STREAK_LENGTH_MIN, STREAK_LENGTH_MAX)
-	var side := direction.cross(Vector3.UP)
-	var offset := side * randf_range(-STREAK_LATERAL_SPREAD, STREAK_LATERAL_SPREAD)
+	var view_normal := camera.global_basis.z
+	# Dash direction flattened onto the screen plane; a dash straight along the view axis has
+	# no screen direction, so the streak falls back to the screen's vertical.
+	var along := direction - view_normal * direction.dot(view_normal)
+	if along.length() < MIN_PROJECTED_DIRECTION_LENGTH:
+		along = camera.global_basis.y
+	else:
+		along = along.normalized()
+	var across := view_normal.cross(along)
+	var offset := (
+		direction.cross(Vector3.UP) * randf_range(-STREAK_LATERAL_SPREAD, STREAK_LATERAL_SPREAD)
+	)
 	offset.y = randf_range(STREAK_HEIGHT_MIN, STREAK_HEIGHT_MAX)
-	var basis := Basis(direction * length, Vector3.UP * STREAK_WIDTH, side)
-	# The quad's head sits at the dash direction end: its centre trails Foxy by half a length.
+	var basis := Basis(along * length, across * STREAK_WIDTH, view_normal)
+	# The quad's head sits at the dash direction end: its centre trails Foxy by 0.4 lengths.
 	streak.global_transform = Transform3D(
 		basis, _get_foot_position() + offset - direction * length * 0.4
 	)
@@ -136,6 +152,7 @@ func _spawn_streak() -> void:
 	streak.show()
 	var tween := streak.create_tween().set_parallel()
 	_streak_tweens[index] = tween
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(material, "shader_parameter/strength", 0.0, STREAK_LIFETIME_SECONDS)
 	tween.tween_property(
 		streak, "global_position", streak.global_position - direction * 0.8, STREAK_LIFETIME_SECONDS

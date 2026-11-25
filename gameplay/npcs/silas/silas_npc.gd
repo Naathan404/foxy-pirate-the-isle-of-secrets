@@ -185,8 +185,11 @@ func _open_shop(interactor: Player) -> void:
 	_active_interactor = interactor
 	interaction_area.set_interaction_enabled(false)
 	var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
+	var excluded := _get_owned_charm_offer_ids(interactor)
 	var stock := (
-		progress.get_shop_stock(catalog) if progress != null else catalog.roll_buy_stock(_stock_random)
+		progress.get_shop_stock(catalog, excluded)
+		if progress != null
+		else catalog.roll_buy_stock(_stock_random, null, excluded)
 	)
 	if not _shop_panel.open_for(interactor, stock):
 		_begin_close()
@@ -196,7 +199,7 @@ func reroll_shop_stock() -> void:
 	var progress := get_node_or_null("/root/SilasProgress") as SilasProgressStore
 	if progress == null:
 		return
-	var stock := progress.reroll_shop_stock(catalog)
+	var stock := progress.reroll_shop_stock(catalog, _get_owned_charm_offer_ids(_active_interactor))
 	if _shop_panel != null and _shop_panel.visible and stock != null:
 		_shop_panel.update_stock(stock)
 
@@ -237,3 +240,16 @@ func _exit_tree() -> void:
 	if _presentation_state == PresentationState.OPENING:
 		_restore_opening_player_control()
 	super()
+
+
+## Charms are one-time purchases, so ones Foxy already owns must not take a slot in the stock.
+func _get_owned_charm_offer_ids(interactor: Player) -> Array[StringName]:
+	var owned: Array[StringName] = []
+	if not is_instance_valid(interactor) or interactor.charm_registry == null:
+		return owned
+	for offer: MerchantOffer in catalog.get_buy_offers():
+		if offer.item == null or offer.item.charm == null:
+			continue
+		if interactor.charm_registry.is_owned(offer.item.charm.charm_id):
+			owned.append(offer.offer_id)
+	return owned

@@ -1,0 +1,17 @@
+--- a/drivers/gles3/storage/mesh_storage.cpp
++++ b/drivers/gles3/storage/mesh_storage.cpp
+@@ -591,9 +591,11 @@
+ 	ERR_FAIL_COND(p_offset + data_size > mesh->surfaces[p_surface]->index_buffer_size);
+ 	const uint8_t *r = p_data.ptr();
+ 
+-	glBindBuffer(GL_ARRAY_BUFFER, mesh->surfaces[p_surface]->index_buffer);
+-	glBufferSubData(GL_ARRAY_BUFFER, p_offset, data_size, r);
+-	glBindBuffer(GL_ARRAY_BUFFER, 0);
++	// Unbind the VAO first: the element buffer binding is VAO state and must not be replaced.
++	glBindVertexArray(0);
++	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->surfaces[p_surface]->index_buffer);
++	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, p_offset, data_size, r);
++	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+ }
+ 
+ void MeshStorage::mesh_surface_set_material(RID p_mesh, int p_surface, RID p_material) {

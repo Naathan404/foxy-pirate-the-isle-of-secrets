@@ -8,18 +8,39 @@ Windows và bản Web bằng Godot 4.7.2, rồi đẩy lên itch.io bằng
 
 | Job | Runner | Việc làm |
 | --- | --- | --- |
-| `build` | `windows-latest` | Import project hai lượt, export preset `Windows Desktop`; giảm texture cho Web, import lại, export preset `Web` và nén thành `foxy_pirate_web.zip`. Lưu artifact `windows-build`, `web-build`, `web-zip` trong 14 ngày. |
+| `web-template` | `ubuntu-24.04` | Build template Web của Godot 4.7.2 kèm bản vá trong `tools/web/godot_patches` (xem bên dưới). Kết quả được cache theo phiên bản Godot, Emscripten, bản vá và script, nên chỉ lần đầu (hoặc khi đổi bản vá) mới biên dịch, khoảng 30–60 phút. |
+| `build` | `windows-latest` | Import project hai lượt, export preset `Windows Desktop`; giảm texture cho Web, trỏ preset `Web` tới template đã vá, import lại, export preset `Web` và nén thành `foxy_pirate_web.zip`. Lưu artifact `windows-build`, `web-build`, `web-zip` trong 14 ngày. |
 | `publish-itch` | `ubuntu-latest` | Tải artifact, cài butler, đẩy bản Windows vào channel `windows` và bản Web vào channel `html5`. |
 
 Spine chạy bằng GDExtension spine-godot (`bin/`), có thư viện cho mọi nền tảng.
 Đặt `BUILD_WEB: "false"` trong workflow để bỏ bản Web.
 
-Preset `Web` bật **Extensions Support** để nạp spine-godot; Godot dùng template
-`web_dlink_nothreads_release.zip` có sẵn trong bộ export template chính thức. Bản Web
-dùng renderer Compatibility và tắt thread, nên không cần bật SharedArrayBuffer trên itch.io.
+Preset `Web` bật **Extensions Support** để nạp spine-godot. Bản Web dùng renderer
+Compatibility và tắt thread, nên không cần bật SharedArrayBuffer trên itch.io.
 
-Godot 4.7.2 có lỗi cập nhật index buffer trên WebGL: khi Foxy đổi attachment
-(dash, chém) hình Spine có thể vỡ tam giác. Bản Windows không bị.
+### Template Web đã vá
+
+Godot 4.7.2 gắn index buffer vào `GL_ARRAY_BUFFER` trong
+`MeshStorage::mesh_surface_update_index_region()` (renderer GLES3). WebGL2 từ chối thao
+tác này nên index không bao giờ được cập nhật: khi Foxy đổi attachment (chớp mắt, dash,
+chém), hình Spine vỡ tam giác. Bản Windows không bị. Lỗi đã sửa trên master (4.8) nhưng
+chưa có trong 4.7.2: [godot#124726](https://github.com/godotengine/godot/issues/124726).
+
+Vì vậy bản Web dùng template tự build, không dùng template chính thức:
+
+- [`tools/web/godot_patches/0001-gles3-index-buffer-target.patch`](../../tools/web/godot_patches/0001-gles3-index-buffer-target.patch):
+  bind `GL_ELEMENT_ARRAY_BUFFER` (và bỏ VAO trước khi bind). Chỉ áp dụng cho 4.7.2.
+- [`tools/web/build_web_template.sh`](../../tools/web/build_web_template.sh): clone Godot
+  theo tag, áp dụng mọi `*.patch`, build `template_release` với `dlink_enabled=yes
+  threads=no arch=wasm32` (tương đương `web_dlink_nothreads_release.zip`). Cần Emscripten
+  4.0.11, Python và SCons; chạy trên Linux/WSL.
+- Workflow ghi đường dẫn template vào `custom_template/release` của preset Web ngay trong
+  checkout CI; `export_presets.cfg` trong repo giữ nguyên để export trong editor vẫn dùng
+  template chính thức.
+
+Khi nâng `GODOT_VERSION`, kiểm tra bản vá đã có trong bản mới chưa. Nếu có rồi thì xóa
+bản vá, job `web-template` và bước ghi `custom_template/release` trong workflow, để Web
+quay lại template chính thức.
 
 ### Giảm dung lượng bản Web
 

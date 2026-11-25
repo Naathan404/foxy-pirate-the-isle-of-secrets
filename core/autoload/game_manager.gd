@@ -13,6 +13,7 @@ enum State { PLAYING, INVENTORY, TRANSITION, PAUSE_MENU, WORLD_MAP, REST_MENU }
 const TRANSITION_OVERLAY := preload("res://ui/scene_transition.tscn")
 const PLAYER_SCENE_STATE := preload("res://core/autoload/player_scene_state.gd")
 const SAVE_SLOT_PATH := "user://saves/slot_1.json"
+const BIOMES_ROOT := "res://world/biomes/"
 
 @export_file("*.tscn") var main_menu_scene: String = "res://ui/main_menu/main_menu.tscn"
 ## Where Foxy respawns before resting at any campfire: its first campfire.
@@ -381,6 +382,7 @@ func _transition_scene(
 	_transition_overlay.hide()
 	_transition_pending = false
 	if error == OK:
+		_get_merchant_progress().note_area_entered(_get_area_id(scene_path))
 		_preload_neighbors()
 	scene_transition_finished.emit()
 	if not load_payload.is_empty():
@@ -451,6 +453,13 @@ func _contains_player(node: Node) -> bool:
 		if _contains_player(child):
 			return true
 	return false
+
+
+## The biome folder of a room scene (`res://world/biomes/<area>/...`); empty for other scenes.
+func _get_area_id(scene_path: String) -> StringName:
+	if not scene_path.begins_with(BIOMES_ROOT):
+		return &""
+	return StringName(scene_path.trim_prefix(BIOMES_ROOT).get_slice("/", 0))
 
 
 func _get_merchant_progress() -> SilasProgressStore:

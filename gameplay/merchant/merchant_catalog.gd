@@ -40,8 +40,12 @@ func get_sell_offer_for_item(item_id: StringName) -> MerchantOffer:
 	return null
 
 
+## `excluded_offer_ids` never enter the draw (e.g. charms the player already owns); they stay
+## hidden in the returned stock. Guaranteed offers are not affected.
 func roll_buy_stock(
-	random: RandomNumberGenerator, previous_stock: MerchantCatalog = null
+	random: RandomNumberGenerator,
+	previous_stock: MerchantCatalog = null,
+	excluded_offer_ids: Array[StringName] = []
 ) -> MerchantCatalog:
 	if random_buy_offer_count == 0:
 		return self
@@ -50,7 +54,7 @@ func roll_buy_stock(
 		selected[offer_id] = true
 	var pool := get_buy_offers()
 	for index in range(pool.size() - 1, -1, -1):
-		if selected.has(pool[index].offer_id):
+		if selected.has(pool[index].offer_id) or excluded_offer_ids.has(pool[index].offer_id):
 			pool.remove_at(index)
 	for _draw in range(mini(random_buy_offer_count, pool.size())):
 		var picked: MerchantOffer = pool.pop_at(random.randi_range(0, pool.size() - 1))
