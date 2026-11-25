@@ -22,6 +22,8 @@ concurrency:
 
 env:
   GODOT_VERSION: 4.7.2-stable
+  # Same Emscripten version Godot's own CI uses for the 4.7.2 Web template.
+  EMSCRIPTEN_VERSION: 4.0.11
   WINDOWS_PRESET: Windows Desktop
   WINDOWS_DIR: build/windows
   WINDOWS_EXECUTABLE: foxy_pirate_tios.exe
@@ -33,8 +35,54 @@ env:
   ITCH_WEB_FILE_LIMIT_BYTES: 200000000
 
 jobs:
+  web-template:
+    # Stock Godot 4.7.2 never uploads mesh indices on WebGL2 (godotengine/godot#124726), which
+    # breaks spine-godot meshes. This job builds the Web template with the fix; the result is
+    # cached by Godot version, patches and script, so only the first run compiles.
+    name: Patched Web template
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore patched template
+        id: cache
+        if: env.BUILD_WEB == 'true'
+        uses: actions/cache@v4
+        with:
+          path: build/web_template.zip
+          key: web-template-${{ env.GODOT_VERSION }}-em${{ env.EMSCRIPTEN_VERSION }}-${{ hashFiles('tools/web/godot_patches/*.patch', 'tools/web/build_web_template.sh') }}
+
+      - name: Set up Emscripten
+        if: env.BUILD_WEB == 'true' && steps.cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v16
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
+          no-cache: true
+
+      - uses: actions/setup-python@v5
+        if: env.BUILD_WEB == 'true' && steps.cache.outputs.cache-hit != 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Build template
+        if: env.BUILD_WEB == 'true' && steps.cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          python -m pip install scons
+          tools/web/build_web_template.sh "$GODOT_VERSION" build/web_template.zip "$RUNNER_TEMP/godot-src"
+
+      - uses: actions/upload-artifact@v4
+        if: env.BUILD_WEB == 'true'
+        with:
+          name: web-template
+          path: build/web_template.zip
+          if-no-files-found: error
+          retention-days: 14
+
   build:
     name: Export builds
+    needs: web-template
     # A Windows host keeps the Windows export identical to local builds.
     runs-on: windows-latest
     timeout-minutes: 45
@@ -42,6 +90,12 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        if: env.BUILD_WEB == 'true'
+        with:
+          name: web-template
+          path: build/web_template
 
       - name: Resolve build version
         id: version
@@ -120,6 +174,16 @@ jobs:
           # The Web build uses smaller texture imports so index.pck fits the
           # itch.io per-file limit; the Windows export above keeps the originals.
           python tools/web/prepare_web_textures.py .
+          # Use the patched template instead of the stock one (see the web-template job).
+          # Absolute path in Windows form: godot.exe cannot read the MSYS /d/a/... form.
+          require_file "build/web_template/web_template.zip"
+          template="$(cygpath -m "$PWD/build/web_template/web_template.zip")"
+          # Only the Web preset's options (preset.1) may change; Windows keeps its template.
+          sed -i "/^\[preset\.1\.options\]/,/^\[/ s|^custom_template/release=.*|custom_template/release=\"$template\"|" export_presets.cfg
+          if ! grep -q "^custom_template/release=\"$template\"" export_presets.cfg; then
+            echo "::error::Could not set the Web preset's custom template."
+            exit 1
+          fi
           run_godot 900s --editor --import --quit
 
           mkdir -p "$WEB_DIR"

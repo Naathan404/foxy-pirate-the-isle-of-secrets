@@ -421,7 +421,7 @@ func _show_buy_details(offer: MerchantOffer) -> void:
 		_owned_banner.text = "Owned" if owned > 0 else "Not owned"
 	else:
 		_owned_banner.text = "Have %d" % owned
-	_set_description(offer.weapon.description if is_weapon else offer.item.description)
+	_set_description(offer.weapon.description if is_weapon else _item_description(offer.item))
 	_set_effect(_offer_effect(offer))
 
 	var maximum := MIN_TRADE_QUANTITY if unique_purchase else _max_buy_quantity(offer)
@@ -453,7 +453,7 @@ func _show_sell_details(entry: SellEntry) -> void:
 	_set_name(entry.item.display_name)
 	_type_banner.text = _item_category(entry.item)
 	_owned_banner.text = "Have %d" % entry.count
-	_set_description(entry.item.description)
+	_set_description(_item_description(entry.item))
 	_set_effect(_item_effect(entry.item))
 	if entry.offer == null:
 		_trade_row.hide()
@@ -761,7 +761,26 @@ func _is_ammunition(item: BaseItem) -> bool:
 	return false
 
 
+## A charm item's own text is a generic "Unlocks the X Charm"; what the charm does lives on
+## its CharmData, which is what a buyer needs to see.
+func _item_description(item: BaseItem) -> String:
+	if item.charm != null and not item.charm.description.strip_edges().is_empty():
+		return item.charm.description
+	return item.description
+
+
+func _charm_effect(charm: CharmData) -> String:
+	if charm.is_passive():
+		return "✦ Passive charm: works while equipped"
+	var effect := "✦ Active charm  ·  %s SP" % InventoryMenuFormat.number(charm.resource_cost)
+	if charm.cooldown_seconds > 0.0:
+		effect += "  ·  %s s cooldown" % InventoryMenuFormat.number(charm.cooldown_seconds)
+	return effect
+
+
 func _item_effect(item: BaseItem) -> String:
+	if item.charm != null:
+		return _charm_effect(item.charm)
 	if item is DualEssencePotion:
 		var dual := item as DualEssencePotion
 		return (
