@@ -54,9 +54,8 @@ particles_anim_loop = false
 material = SubResource("StandardMaterial3D_oo1e7")
 size = Vector2(0.3, 0.3)
 
-[node name="DashEffect" type="Node3D" unique_id=292962664 node_paths=PackedStringArray("ghosts")]
+[node name="DashEffect" type="Node3D" unique_id=292962664]
 script = ExtResource("1_68m4i")
-ghosts = [NodePath("Ghost_1"), NodePath("Ghost_2"), NodePath("Ghost_3"), NodePath("Ghost_4"), NodePath("Ghost_5"), NodePath("Ghost_6"), NodePath("Ghost_7"), NodePath("Ghost_8")]
 ring_radius = 1.1
 
 [node name="DashParticle" type="GPUParticles3D" parent="." unique_id=555628705]
@@ -71,54 +70,3 @@ visibility_aabb = AABB(-6, -1, -6, 12, 4, 12)
 process_material = SubResource("ParticleProcessMaterial_esbxr")
 draw_pass_1 = SubResource("QuadMesh_qm246")
 
-[node name="Ghost_1" type="Sprite3D" parent="." unique_id=1809366250]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
-visible = false
-offset = Vector2(0, 14)
-pixel_size = 0.0625
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_2" type="Sprite3D" parent="." unique_id=1926805992]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
-visible = false
-offset = Vector2(0, 14)
-pixel_size = 0.0625
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_3" type="Sprite3D" parent="." unique_id=1508247531]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
-visible = false
-offset = Vector2(0, 14)
-pixel_size = 0.0625
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_4" type="Sprite3D" parent="." unique_id=1498229806]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
-visible = false
-offset = Vector2(0, 14)
-pixel_size = 0.0625
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_5" type="Sprite3D" parent="." unique_id=1662031144]
-visible = false
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_6" type="Sprite3D" parent="." unique_id=98014485]
-visible = false
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_7" type="Sprite3D" parent="." unique_id=677470128]
-visible = false
-billboard = 1
-texture_filter = 0
-
-[node name="Ghost_8" type="Sprite3D" parent="." unique_id=1855964865]
-visible = false
-billboard = 1
-texture_filter = 0

@@ -1,22 +1,18 @@
 extends Node3D
 
-const SPINE_GHOST_SHADER: Shader = preload(
-	"res://gameplay/player/effects/spine_dash_ghost.gdshader"
-)
-const SPINE_GHOST_INTERVAL: float = 0.075
-const SPINE_GHOST_LIFETIME: float = 0.12
-const SPINE_GHOST_ALPHA: float = 0.22
+const STREAK_SHADER: Shader = preload("res://gameplay/player/effects/dash_streak.gdshader")
+const STREAK_POOL_SIZE: int = 8
+const STREAK_INTERVAL_SECONDS: float = 0.035
+const STREAK_LENGTH_MIN: float = 1.6
+const STREAK_LENGTH_MAX: float = 2.8
+const STREAK_WIDTH: float = 0.16
+const STREAK_LATERAL_SPREAD: float = 0.45
+const STREAK_HEIGHT_MIN: float = 0.15
+const STREAK_HEIGHT_MAX: float = 1.1
+const STREAK_LIFETIME_SECONDS: float = 0.22
+const STREAK_COLOR := Color(0.45, 0.88, 1.0, 0.95)
 
 @export var player: Player
-@export var sprite: Sprite3D
-@export var spine_preview: Node3D
-
-@export_group("Afterimages")
-@export_range(0.01, 0.1, 0.005) var ghost_interval: float = 0.025
-@export_range(0.05, 0.5, 0.01) var ghost_lifetime: float = 0.24
-@export var ghosts: Array[Sprite3D] = []
-
-@export var ghost_color: Color = Color(0.45, 0.85, 1.0, 0.65)
 
 @export_group("Dash Feedback")
 @export_range(0.0, 3.0, 0.1) var shake_pixels: float = 1.2
@@ -24,26 +20,18 @@ const SPINE_GHOST_ALPHA: float = 0.22
 @export_range(0.2, 2.0, 0.05) var ring_radius: float = 0.9
 
 var _dashing: bool = false
-var _ghost_timer: float = 0.0
-var _next_ghost: int = 0
-var _ghost_tweens: Array[Tween] = []
-var _spine_ghosts: Array[Node3D] = []
 var _rings: Array[MeshInstance3D] = []
 var _ring_tweens: Array[Tween] = []
 var _bursts: Array[GPUParticles3D] = []
+var _streaks: Array[MeshInstance3D] = []
+var _streak_tweens: Array[Tween] = []
+var _next_streak: int = 0
+var _streak_timer: float = 0.0
 
 @onready var dash_particle: GPUParticles3D = $DashParticle
 
 
 func _ready() -> void:
-	_ghost_tweens.resize(ghosts.size())
-	for index in ghosts.size():
-		var snapshot := Node3D.new()
-		snapshot.name = "SpineGhost%d" % index
-		add_child(snapshot)
-		snapshot.top_level = true
-		snapshot.hide()
-		_spine_ghosts.append(snapshot)
 	dash_particle.local_coords = false
 	# Placed at Foxy's feet every frame in _process, not on physics ticks.
 	dash_particle.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -55,17 +43,8 @@ func _ready() -> void:
 		dust_material.initial_velocity_min = 0.55
 		dust_material.initial_velocity_max = 1.15
 	_create_burst_effects()
+	_create_streaks()
 	set_process(false)
-
-	for g in ghosts:
-		if not is_instance_valid(g):
-			continue
-
-		g.top_level = true
-		g.hide()
-		g.shaded = false
-		g.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
-		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _create_burst_effects() -> void:
@@ -109,120 +88,67 @@ func _create_burst_effects() -> void:
 		_bursts.append(burst)
 
 
+func _create_streaks() -> void:
+	var mesh := QuadMesh.new()
+	_streak_tweens.resize(STREAK_POOL_SIZE)
+	for index in STREAK_POOL_SIZE:
+		var streak := MeshInstance3D.new()
+		streak.name = "DashStreak%d" % index
+		streak.mesh = mesh
+		streak.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var material := ShaderMaterial.new()
+		material.shader = STREAK_SHADER
+		material.set_shader_parameter("streak_color", STREAK_COLOR)
+		streak.material_override = material
+		add_child(streak)
+		streak.top_level = true
+		streak.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		streak.hide()
+		_streaks.append(streak)
+
+
+## A fading speed line trailing behind Foxy, lying in the ground plane along the dash direction.
+func _spawn_streak() -> void:
+	var direction := player.last_facing_direction
+	direction.y = 0.0
+	if direction.is_zero_approx():
+		return
+	direction = direction.normalized()
+	var index := _next_streak
+	_next_streak = (_next_streak + 1) % STREAK_POOL_SIZE
+	var streak := _streaks[index]
+	if _streak_tweens[index] != null and _streak_tweens[index].is_valid():
+		_streak_tweens[index].kill()
+	var length := randf_range(STREAK_LENGTH_MIN, STREAK_LENGTH_MAX)
+	var side := direction.cross(Vector3.UP)
+	var offset := side * randf_range(-STREAK_LATERAL_SPREAD, STREAK_LATERAL_SPREAD)
+	offset.y = randf_range(STREAK_HEIGHT_MIN, STREAK_HEIGHT_MAX)
+	var basis := Basis(direction * length, Vector3.UP * STREAK_WIDTH, side)
+	# The quad's head sits at the dash direction end: its centre trails Foxy by half a length.
+	streak.global_transform = Transform3D(
+		basis, _get_foot_position() + offset - direction * length * 0.4
+	)
+	var material := streak.material_override as ShaderMaterial
+	material.set_shader_parameter("strength", 1.0)
+	streak.show()
+	var tween := streak.create_tween().set_parallel()
+	_streak_tweens[index] = tween
+	tween.tween_property(material, "shader_parameter/strength", 0.0, STREAK_LIFETIME_SECONDS)
+	tween.tween_property(
+		streak, "global_position", streak.global_position - direction * 0.8, STREAK_LIFETIME_SECONDS
+	)
+	tween.chain().tween_callback(streak.hide)
+
+
 func _process(delta: float) -> void:
 	if not _dashing:
 		return
+	_streak_timer -= delta
+	if _streak_timer <= 0.0:
+		_spawn_streak()
+		_streak_timer += STREAK_INTERVAL_SECONDS
 	_update_particle_direction(dash_particle)
 	dash_particle.global_position = _get_foot_position() - player.last_facing_direction * 0.15
-	_ghost_timer -= delta
-	if _ghost_timer <= 0.0:
-		_show_next_ghost()
-		var interval := ghost_interval
-		if _get_spine_afterimage_source() != null:
-			interval = maxf(interval, SPINE_GHOST_INTERVAL)
-		_ghost_timer = maxf(0.0, _ghost_timer + maxf(0.01, interval))
-
-
-func _show_next_ghost() -> void:
-	if ghosts.is_empty() or not is_instance_valid(sprite):
-		return
-
-	var index = _next_ghost
-	_next_ghost += 1
-	if _next_ghost >= ghosts.size():
-		_next_ghost = 0
-
-	var g = ghosts[index]
-	if not is_instance_valid(g):
-		return
-
-	var old_tween = _ghost_tweens[index]
-	if old_tween != null and old_tween.is_valid():
-		old_tween.kill()
-	var spine_source := _get_spine_afterimage_source()
-	if is_instance_valid(spine_source) and _snapshot_spine_ghost(index, spine_source):
-		g.hide()
-		return
-	_spine_ghosts[index].hide()
-	# A new Spine clip may still be preparing its first mesh. Snapshot the visible actor.
-	if not sprite.is_visible_in_tree():
-		g.hide()
-		return
-
-	g.texture = sprite.texture
-	g.hframes = sprite.hframes
-	g.vframes = sprite.vframes
-	g.frame = sprite.frame
-	g.pixel_size = sprite.pixel_size
-	g.texture_filter = sprite.texture_filter
-	g.offset = sprite.offset
-	g.centered = sprite.centered
-	g.flip_h = sprite.flip_h
-	g.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	g.global_transform = sprite.global_transform
-
-	g.modulate = Color(0.9, 1.0, 1.0, minf(ghost_color.a, SPINE_GHOST_ALPHA))
-	g.show()
-
-	var tween := g.create_tween().set_parallel()
-	_ghost_tweens[index] = tween
-	tween.tween_property(g, "modulate", Color(ghost_color, 0.0), ghost_lifetime)
-	tween.chain().tween_callback(g.hide)
-
-
-func _get_spine_afterimage_source() -> Node3D:
-	if is_instance_valid(spine_preview) and spine_preview.has_method("get_afterimage_source"):
-		return spine_preview.get_afterimage_source()
-	return null
-
-
-func _snapshot_spine_ghost(index: int, source: Node3D) -> bool:
-	var snapshot := _spine_ghosts[index]
-	for child in snapshot.get_children():
-		child.hide()
-		child.queue_free()
-	var materials: Array[ShaderMaterial] = []
-	for child in source.get_children(true):
-		var draw := child as MeshInstance3D
-		if draw == null or not draw.name.begins_with("_SpineDraw3D_"):
-			continue
-		if not draw.visible or draw.mesh == null or draw.material_override == null:
-			continue
-		var source_material := draw.material_override as ShaderMaterial
-		if source_material == null:
-			continue
-		var material := ShaderMaterial.new()
-		material.shader = SPINE_GHOST_SHADER
-		material.render_priority = source_material.render_priority
-		material.set_shader_parameter(
-			"spine_texture", source_material.get_shader_parameter("spine_texture")
-		)
-		material.set_shader_parameter("spine_camera_relative_depth",
-			source_material.get_shader_parameter("spine_camera_relative_depth"))
-		material.set_shader_parameter("ghost_tint",
-			Color(ghost_color.r, ghost_color.g, ghost_color.b,
-				minf(ghost_color.a, SPINE_GHOST_ALPHA)))
-		var copy := MeshInstance3D.new()
-		copy.mesh = draw.mesh
-		copy.material_override = material
-		copy.transform = draw.transform
-		copy.sorting_offset = draw.sorting_offset
-		copy.sorting_use_aabb_center = false
-		copy.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		snapshot.add_child(copy)
-		materials.append(material)
-	if materials.is_empty():
-		return false
-	snapshot.global_transform = source.global_transform
-	snapshot.show()
-	var tween := snapshot.create_tween().set_parallel()
-	_ghost_tweens[index] = tween
-	for material in materials:
-		tween.tween_property(material, "shader_parameter/ghost_tint",
-			Color(ghost_color.r, ghost_color.g, ghost_color.b, 0.0),
-			minf(ghost_lifetime, SPINE_GHOST_LIFETIME))
-	tween.chain().tween_callback(snapshot.hide)
-	return true
 
 
 func _get_foot_position() -> Vector3:
@@ -276,7 +202,7 @@ func _on_foxy_dash_started() -> void:
 	dash_particle.emitting = true
 
 	_dashing = true
-	_ghost_timer = 0.045
+	_streak_timer = 0.0
 	set_process(true)
 	_play_ground_burst(0)
 	var shake := get_node_or_null("/root/ScreenShakeController")

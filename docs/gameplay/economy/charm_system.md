@@ -217,7 +217,7 @@ Player sở hữu khóa vận theo effect để một effect kết thúc chỉ t
 | Double Strike | Merchant/enemy drop 10% | Hit normal attack hợp lệ thứ 4 roll 50% để nhân đôi damage. |
 | Chaos Collector | Merchant/enemy drop 25% | Mỗi normal attack gây damage thực tế cộng 2 CP. |
 | Backstabber | Merchant/enemy drop 10% | Melee normal attack từ nửa sau hướng nhìn của target gây 150% damage. Không áp dụng cho ranged hoặc skill. |
-| Crimson Band | Silas / quái 10% | Đòn thường gây Bleed 0,5 HP mỗi giây trong 3 nhịp. Đánh tiếp làm mới số nhịp và giữ thời điểm tick kế tiếp. |
+| Crimson Band | Silas / quái 10% | Đòn thường lên quái hoặc boss gây Bleed 0,5 HP mỗi giây trong 3 nhịp; cỏ và vật phá được không chảy máu. Đánh tiếp làm mới số nhịp và giữ thời điểm tick kế tiếp. |
 | Skull Cracker | Silas / quái 10% | Đòn thường thứ tư gây sát thương lên cùng một quái giữ nguyên frame và choáng 0,6 s. Boss miễn choáng. |
 | Momentum Strike | Silas / quái 10% | Hoàn thành dash nạp ×1,5 cho toàn bộ đòn thường kế tiếp. Tiêu lượt khi phát đòn kể cả hụt. |
 | Fortune Leaf | Silas / quái tinh anh 25% | Nhân xác suất rơi vật phẩm của quái với 1,10, tối đa 100%. Vàng, ghi chú và thưởng boss giữ luật riêng. |
@@ -313,6 +313,9 @@ Nó chỉ phục vụ gameplay verification, không phải flow sản phẩm.
 ## 14. Dependency và giới hạn hiện tại
 
 - Silas bán các passive mới bằng `MerchantTransactionService`. Mua charm mở ownership một lần. Fortune Leaf chỉ rơi từ quái tinh anh.
+- Quái không rơi charm trong phòng có `enemy_charm_drops = false` (`BaseRoom`, nhóm Loot). Ba
+  scene phòng gốc của Coral Valley tắt cờ này, nên quái Coral Valley không rơi charm; vật phẩm,
+  vàng, ghi chú và thưởng boss vẫn rơi như cũ.
 - Snapshot lưu ownership và loadout của charm playable. Prototype chỉ dùng qua debug.
 - Borelis, Cinderclaw và Queen Seraphina cần gắn pickup vào encounter khi các scene boss được bổ sung.
 

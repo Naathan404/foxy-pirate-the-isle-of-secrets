@@ -19,6 +19,8 @@ const CORAL_SCENES: Array[PackedScene] = [
 # //NLVP sửa: Cho phép cấu hình nhóm chỉ sinh 1–3 vật thể.
 @export_range(1, 64, 1) var min_spawn_count := 3
 @export_range(1, 64, 1) var max_spawn_count := 6
+## Spawned destructible props also take damage from enemy and boss attacks.
+@export var props_receive_enemy_attacks := false
 
 
 ## Spawns use the room's cycle seed: the same props and enemies appear whenever the room is
@@ -42,6 +44,8 @@ func _ready() -> void:
 		var scene: PackedScene = scenes[random.randi_range(0, scenes.size() - 1)]
 		var prop := scene.instantiate() as Node3D
 		prop.position = positions[index]
+		if props_receive_enemy_attacks and "receives_enemy_attacks" in prop:
+			prop.set("receives_enemy_attacks", true)
 		add_child(prop, true)
 
 

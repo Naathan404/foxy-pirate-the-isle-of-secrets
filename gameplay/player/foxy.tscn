@@ -904,12 +904,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8018878, 0)
 
 [node name="Effects" type="Node3D" parent="." unique_id=2014826237]
 
-[node name="DashEffect" parent="Effects" unique_id=292962664 node_paths=PackedStringArray("player", "sprite", "spine_preview", "ghosts") instance=ExtResource("18_mqob0")]
+[node name="DashEffect" parent="Effects" unique_id=292962664 node_paths=PackedStringArray("player") instance=ExtResource("18_mqob0")]
 player = NodePath("../..")
-sprite = NodePath("../../Visual/Sprite3D")
-spine_preview = NodePath("../../Visual/SpineIdlePreview")
-ghosts = []
-ghost_color = Color(1, 1, 1, 1)
 
 [node name="RunDustEffect" parent="Effects" unique_id=2095352562 node_paths=PackedStringArray("player") instance=ExtResource("19_lqbvs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)

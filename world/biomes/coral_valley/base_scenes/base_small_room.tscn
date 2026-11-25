@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="8_boat"]
 
 [node name="BaseSmallRoom" unique_id=525086743 instance=ExtResource("1_xdmpo")]
+enemy_charm_drops = false
 enemy_boundary_enabled = true
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]

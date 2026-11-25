@@ -31,6 +31,11 @@ const EDGE_BOUNDS_MARGIN := 0.01
 ## room can be rested at and save the game only while this flag is on.
 @export var safe_room: bool = false
 
+@export_group("Loot")
+## Enemies killed in this room may drop their charm loot. Item, gold and note drops are not
+## affected.
+@export var enemy_charm_drops: bool = true
+
 @export_group("Ground boundaries")
 ## Openings in room-local X/Z coordinates, for example at moving platform docks.
 @export var boundary_openings: Array[Rect2] = []
