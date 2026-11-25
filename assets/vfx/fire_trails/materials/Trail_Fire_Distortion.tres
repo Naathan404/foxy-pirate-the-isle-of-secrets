@@ -1,0 +1,35 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://ytttraynqi7n"]
+
+[ext_resource type="Shader" uid="uid://fc4viuphwukg" path="res://Vefects/Fire_Trail/Shaders/Trail_Distortion.gdshader" id="1_6e2ef"]
+[ext_resource type="Texture2D" uid="uid://6xygblp13liu" path="res://Vefects/Fire_Trail/Textures/T_VFX_Perlin_Noise_01.tga" id="2_0fbaf"]
+[ext_resource type="Texture2D" uid="uid://dh3uyuvmafoy7" path="res://Vefects/Fire_Trail/Textures/T_VFX_Noise_08.tga" id="3_ec99f"]
+[ext_resource type="Texture2D" uid="uid://comvctx640dye" path="res://Vefects/Fire_Trail/Textures/T_VFX_Trail_Mask_03.tga" id="4_15a95"]
+
+[resource]
+shader = ExtResource("1_6e2ef")
+shader_parameter/distortion_intensity = 3
+shader_parameter/noise_multiply = 1
+shader_parameter/erosion = 0
+shader_parameter/erosion_smoothness = 1
+shader_parameter/opacity_multiply = 1
+shader_parameter/noise_texture = ExtResource("2_0fbaf")
+shader_parameter/noise_texture_sampling = Vector3i(0, 0, 1)
+shader_parameter/noise01_uvs = Vector4(0.3, 0.5, 0, 0)
+shader_parameter/noise01_uvp = Vector4(-0.5, -0.1, 0, 0)
+shader_parameter/distortion_lerp = 0.1
+shader_parameter/noise01_intensity = 0.1
+shader_parameter/intensity_mask = ExtResource("3_ec99f")
+shader_parameter/intensity_mask_sampling = Vector3i(0, 0, 1)
+shader_parameter/intensity_mask_uvs = Vector4(1, 1.333, 0, 0)
+shader_parameter/intensity_mask_pan_speed = Vector4(-1, 0.113, 0, 0)
+shader_parameter/intensity_mask_offset = Vector4(0, 0, 0, 0)
+shader_parameter/intensity_mask_power = 1
+shader_parameter/intensity_mask_multiply = 1
+shader_parameter/depth_fade = 1
+shader_parameter/camera_depth_fade_length = 3
+shader_parameter/camera_depth_fade_offset = 0.1
+shader_parameter/opacity_mask = ExtResource("4_15a95")
+shader_parameter/opacity_mask_sampling = Vector3i(1, 1, 1)
+shader_parameter/opacity_mask_st = Vector4(1, 1, 0, 0)
+shader_parameter/opacity_mask_power = 1
+shader_parameter/opacity_mask_multiply = 1
