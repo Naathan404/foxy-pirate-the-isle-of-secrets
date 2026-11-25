@@ -67,6 +67,8 @@ func _create_burst_effects() -> void:
 		ring.material_override = material
 		add_child(ring)
 		ring.top_level = true
+		# Placed once per dash on the rendered position; interpolation would slide it in.
+		ring.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		ring.hide()
 		_rings.append(ring)
 
@@ -85,6 +87,7 @@ func _create_burst_effects() -> void:
 		process.initial_velocity_max = 1.15
 		add_child(burst)
 		burst.top_level = true
+		burst.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		_bursts.append(burst)
 
 
@@ -151,12 +154,15 @@ func _process(delta: float) -> void:
 	dash_particle.global_position = _get_foot_position() - player.last_facing_direction * 0.15
 
 
+## Where Foxy's feet are drawn. The body's own position is a physics tick ahead of the
+## interpolated picture, so effects placed from it drift away from the feet while moving.
 func _get_foot_position() -> Vector3:
-	var foot: Vector3 = player.global_position
+	var origin := player.get_global_transform_interpolated().origin
+	var foot := origin
 	var collider := player.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if collider != null and collider.shape is CapsuleShape3D:
 		var capsule := collider.shape as CapsuleShape3D
-		foot = collider.global_position
+		foot = origin + (collider.global_position - player.global_position)
 		foot.y -= capsule.height * collider.global_basis.y.length() * 0.5
 	return foot + Vector3.UP * ground_clearance
 
