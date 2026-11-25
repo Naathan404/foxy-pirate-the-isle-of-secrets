@@ -1,0 +1,32 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cjhsetq2opbwa"]
+
+[ext_resource type="Shader" uid="uid://5vqryer1bud3" path="res://Vefects/Aim_Telegraph/Shaders/Telegraph_Arrow.gdshader" id="1_arrow"]
+[ext_resource type="Texture2D" uid="uid://bwbr8s6gdqts0" path="res://Vefects/Aim_Telegraph/Aim/Arrow_Aim.png" id="2_ybkr3"]
+
+[resource]
+render_priority = 1
+shader = ExtResource("1_arrow")
+shader_parameter/line_half = 0.08
+shader_parameter/head_len = 1.3
+shader_parameter/head_half = 0.85
+shader_parameter/tick1_back = 2.7
+shader_parameter/tick1_half = 0.75
+shader_parameter/tick2_back = 1.9
+shader_parameter/tick2_half = 0.4
+shader_parameter/tick2_offset = -0.1
+shader_parameter/wobble = 0.04
+shader_parameter/wobble_scale = 6.0
+shader_parameter/anim_fps = 30.0
+shader_parameter/use_head_tex = true
+shader_parameter/head_tex = ExtResource("2_ybkr3")
+shader_parameter/head_tex_size = Vector2(5.5, 2.4)
+shader_parameter/sweep_speed = 1.6
+shader_parameter/sweep_strength = 1.2
+shader_parameter/flicker = 0.12
+shader_parameter/flicker_speed = 22.0
+shader_parameter/tip_glow = -0.1
+shader_parameter/core_color = Color(1, 1, 1, 1)
+shader_parameter/core_emission = 2.215
+shader_parameter/halo_color = Color(1, 0.1, 0.2, 1)
+shader_parameter/halo_size = 0.3
+shader_parameter/halo_intensity = 0.8
