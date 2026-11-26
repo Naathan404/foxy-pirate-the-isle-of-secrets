@@ -19,8 +19,8 @@ gameplay/enemies/base/enemy_base.tscn
 
 | Enemy | Hành vi thường | Biến thể elite / lưu ý |
 | --- | --- | --- |
-| **Crab** | Nhận diện và đuổi player theo từng trục X/Z trong vùng hoạt động; tuần tra khi không có mục tiêu. Trúng projectile của player khiến Crab tức giận và tạm mở rộng vùng nhận diện/di chuyển. | **EliteCrab** kế thừa hành vi Crab, giữ telegraph, charge và slam. Một lần khi còn tối đa 50% HP, Elite phóng số trứng ngẫu nhiên; trứng rơi và nở thành Crab thường. |
-| **Hermit Crab** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteHermitCrab** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Hermit Crab thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
+| **Crab** | Nhận diện và đuổi player trong vùng hoạt động, chỉ đi ngang hoặc chéo 45°, không bao giờ đi thẳng lên/xuống; tuần tra khi không có mục tiêu. Khi đuổi, Crab đứng sang bên cạnh Foxy rồi kẹp càng (clip `attack`): rung màn hình 6 px và nứt đất nhỏ đúng lúc càng chạm đất. Trúng projectile của player khiến Crab tức giận và tạm mở rộng vùng nhận diện/di chuyển. | **EliteCrab** kế thừa hành vi Crab, giữ telegraph, charge và slam. Charge gồm các đoạn ngang/chéo (Foxy ở thẳng trên/dưới thì lao hai đoạn chéo hình chữ V). Slam có screenshake mạnh, hitstop ngắn, dư chấn và mặt đất nứt tại chỗ càng đập. Một lần khi còn tối đa 50% HP, Elite phóng số trứng ngẫu nhiên; trứng rơi và nở thành Crab thường. |
+| **Hermit Crab** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Kết thúc mỗi dash phải đứng yên chạy stun (stunned, mặc định 1.6 giây); nếu va người chơi hoặc vật cản thì chạy hit (charge_hit, mặc định 0.84 giây) trước stun. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteHermitCrab** lấy đà một lần, rồi lao ba lần liên tục và khóa lại vị trí Foxy ở đầu mỗi lần; không lấy đà hoặc stun giữa chuỗi. Chỉ sau lần thứ ba mới stun. Trong lúc lao, hitbox phía trước gây damage cho player, phá DestructibleProp và hất enemy khác vuông góc sang bên gần nhất, không gây damage cho enemy. Tường cố định/mép vực ngắt chuỗi an toàn; va tường chạy hit rồi stun. Thân elite xuyên qua player/enemy chỉ trong dash; kết thúc hoặc Hit/Death phải khôi phục va chạm. |
 | **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
 | **Coral Skeleton** | Bắt đầu ngủ; thức dậy khi player vào vùng gần, đuổi và bắn chùm hoặc liên tiếp. Mất mục tiêu thì đi quanh co về vị trí ban đầu, canh gác rồi ngủ lại. | Enemy thường; quy tắc và cấu hình chi tiết trong [business logic Coral Skeleton](./coral_skeleton_business_logic.md). |
 | **Mushroom** | Ngụy trang xen kẽ đi lang thang theo nhịp nhảy; đuổi theo và có thể nhảy xa áp sát, gồng phun mây bào tử độc (tránh sinh chồng lên mây cũ), bật lùi ngắn và phản công khi bị đánh. | **EliteMushroom** giữ toàn bộ chiêu cũ, bổ sung **hai thế đứng chuyển đổi** (`FOOTLESS <-> LEGGED` với bộ bước chân mượt, né đòn/bọc sườn và giữ cự ly), chiêu **Thổi Luồng Khói & Bào Tử Vật Lý** (`SporeStream`) và chiêu cận tử **Đại Bào Tử** (`GreatSpore`: thả bào tử bay lơ lửng đáp xuống thành bãi độc hoặc Trứng Nấm nở ra Mushroom thường). Chi tiết tại [business logic Mushroom](./mushroom_business_logic.md). |
@@ -66,7 +66,9 @@ cao nảy qua nhiều lần chạm đất.
 Crab có thể chỉnh bán kính nhận diện, bán kính hoạt động quanh điểm sinh, độ dài
 đoạn đuổi và thời gian/hệ số mở rộng khi tức giận trong Inspector. Crab chỉ tính
 đòn projectile của player đã gây damage; hit tiếp theo làm mới thời gian tức giận.
-Sau khi gây damage cho player bằng contact hoặc slam, Crab thường và Elite tạm
+Crab thường và Elite Crab không gây damage khi chạm thân, kể cả lúc tuần tra,
+đuổi hoặc lao. Chỉ hitbox đòn kẹp/đập càng gây damage trong active frame.
+Sau khi gây damage cho player bằng đòn kẹp hoặc slam, Crab thường và Elite tạm
 ngừng đuổi player đó và tiếp tục tuần tra. Khi player ra khỏi detector, Crab mới
 có thể nhận diện lại ở lần player đi vào vùng; đòn không gây damage không kích hoạt.
 Tốc độ tuần tra và tốc độ đuổi player của Crab được chỉnh riêng bằng
@@ -74,6 +76,27 @@ Tốc độ tuần tra và tốc độ đuổi player của Crab được chỉn
 Hệ số đuổi mặc định trong script là 1.2; scene Crab thường hiện đặt 1.5. Khi quay
 về vùng hoạt động, Crab dùng tốc độ tuần tra. EliteCrab kế thừa hệ số đuổi từ
 scene Crab và có thể cấu hình riêng.
+Crab không đi dọc: `CrabPatrol` đổi mọi hướng thẳng lên/xuống thành đường chéo
+45°; mục tiêu gần như ở thẳng trên/dưới thì Crab đi zigzag chéo. Sau Hit, Crab
+đổi giữa đi ngang và đi chéo. Mọi hướng đi đều dùng clip Spine bò ngang `walk_left`.
+Slam của EliteCrab (`EliteCrabCharge`, nhóm **Slam** và **Impact Feel**): đòn gây
+damage khi càng chạm đất (`slam_impact_delay` sau khi bắt đầu slam), kèm screenshake
+14 px, hitstop 0,07 giây, một dư chấn 8 px và `crab_slam_impact.tscn` (vết nứt, vòng
+xung kích, bụi, đá văng; vết nứt còn khoảng 1,8 giây). Vết nứt đặt tại bone
+`fx_impact` của Spine lúc chạm đất (`slam_impact_bone`), nên vẫn khớp khi đổi kích
+thước cua. Wind-up rung nhẹ và mỗi bước lao rung 3,5 px. Sau đòn Elite đứng lại
+`slam_recovery_duration` để player phản công. Hitbox slam riêng là cylinder bán
+kính 2,4 m, cao 2 m (`Direction/ActiveHitBox/CollisionShape3D` trong scene Elite).
+Tại frame va đập, hitbox được đặt ở cùng điểm càng với vết nứt, lấy mẫu va chạm
+ngay rồi bật trong `slam_active_duration`. Wind-up, charge và recovery không gây
+damage; Hit/Death ngắt đòn sẽ tắt hitbox và phục hồi transform ban đầu.
+Crab thường kẹp càng bằng state `Attack` (`CrabAttack`): `CrabPatrol` dẫn nó tới điểm
+cách Foxy `attack_spacing_meters` theo chiều ngang (càng chỉ vung ngang), rồi kẹp khi
+hết `attack_cooldown_seconds`. Contact damage luôn tắt theo cấu hình mặc định
+của cả Crab và Elite Crab. Damage, rung và vết nứt
+(`crab_slam_impact.tscn` thu nhỏ) xảy ra ở `impact_delay` (0,7 giây, lúc càng chạm
+đất trong clip) qua `Direction/ActiveHitBox`. EliteCrab kế thừa node này nhưng tắt
+đòn kẹp (`use_claw_attack = false`) và ghi đè kích thước hitbox cho slam.
 Trứng Elite chọn điểm rơi có nền và khoảng trống, có bóng, va chạm và 1 HP.
 Sau khi rơi, trứng chờ ấp và rung cảnh báo trước khi nở thành Crab thường.
 Trứng không nhận sát thương khi đang bay; sau khi rơi, đòn của player có thể phá
@@ -109,8 +132,8 @@ Crab thường được tạo khi khởi tạo. Hermit Crab và Barrel đồng b
 | --- | --- |
 | `crab/crab.gd` | Contact damage, nhận diện, vùng di chuyển và tức giận của Crab. |
 | `crab/elite_crab.gd` | Sinh trứng một lần và cấu hình số lượng/vị trí trứng của EliteCrab. |
-| `hermit_crab/hermit_crab.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector của Hermit Crab và lớp kế thừa elite. |
-| `hermit_crab/elite_hermit_crab.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
+| `hermit_crab/hermit_crab.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector; `dash_impact_duration_seconds` (0.84 giây) và `dash_stun_duration_seconds` (1.6 giây) cho hồi phục sau dash của cả bản thường và elite. |
+| `hermit_crab/elite_hermit_crab.gd` | Patrol đổi trục; `dash_side_push_speed` (14 m/s) và `dash_sweep_padding_meters` (0,15 m) cho quét đường lao. Enemy chỉ nhận một lần hất mỗi dash. |
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
 | `barrel/elite_barrel.gd` | Thông số lượt thường, lượt 360°, tích lũy và cảnh báo. |
 | `coral_skeleton/coral_skeleton.gd` | Vùng nhận diện khi ngủ/thức, thời gian thức và ngủ, di chuyển về nhà và cấu hình đợt bắn. |
@@ -119,6 +142,13 @@ Crab thường được tạo khi khởi tạo. Hermit Crab và Barrel đồng b
 | `mushroom/mushroom_egg.gd` | Thời gian ủ mầm, ngưỡng rung sáng báo sắp nở và nở thành `mushroom.tscn`. |
 | `venom_vine/venom_vine.gd` | Nhận diện 2 vòng cự ly, `direct_aim_chance = 0.3` ném thẳng vừa phải xen kẽ bắn lệch ngẫu nhiên, `Burrow` né combo, bắn parabol đón đầu và hook mở rộng cho Elite. |
 | `venom_vine/elite_venom_vine.gd` | Khởi đầu `Dormant` trên mặt đất, tắt hào quang Elite khi chui đất, **Bramble Pod Split**, **Thorny Snare** tím + hạt sáng tím (`0.28×`), **Smart Keep-Away Tunnel Relocate** không mô trượt trên đất (ẩn thân `1.25s + 2.65s`, nhảy xa `5.4–10.6m` qua `venom_vine_relocate_helper.gd`, đụn chấm & mô nhử chỉ trồi lên/tụt xuống theo `3` nấc HP `> 75%` / `40–75%` / `<= 40%`, trồi thật thấy Player phun độc ngay) và **Lightning Thorn Tendril** (`<= 50% HP`). |
+
+Elite Hermit Crab dùng hitbox gây damage 2,1 × 1,6 × 2,7 m, tâm cao 0,9 m
+và nhô về trước 0,45 m; hurtbox 3 × 2,1 × 2,7 m bám phần thân/vỏ. Query quét
+cả bước di chuyển tiếp theo để tránh bỏ sót props khi lao nhanh. Lực hất dùng
+`EnemyBase.apply_external_push()` và không đổi HP/state của enemy bị hất.
+`DestructibleProp.break_from_impact()` dùng chung luồng vỡ, loot và signal
+`destroyed`, kể cả với props không bật `receives_enemy_attacks`.
 
 Ví dụ, đổi vùng nhận diện EliteCrab chỉ cần sửa `player_detection_radius` trên node root
 EliteCrab; script cập nhật bán kính `CylinderShape3D` của `TargetDetector` trước khi Base quét
@@ -338,7 +368,7 @@ func _exit() -> void:
 ```
 
 - Không viết luật của enemy cụ thể vào `EnemyBase` hay `EnemyPatrol`. Crab đổi
-  trục sau Hit thuộc `CrabPatrol`; Hermit Crab khóa vị trí thuộc `HermitCrabAttack`.
+  giữa đi ngang/chéo sau Hit thuộc `CrabPatrol`; Hermit Crab khóa vị trí thuộc `HermitCrabAttack`.
 - State bật `ActiveHitBox` phải tắt nó trong `_exit()`, kể cả khi Hit/Death
   ngắt giữa đòn. State sở hữu contact damage cũng phải gọi `_stop_contact_damage()`.
 - Không đổi layer/mask hoặc kích thước runtime để biểu đạt active frame; giữ
@@ -359,7 +389,7 @@ func _exit() -> void:
   trong `Direction` sẽ xoay cùng hướng enemy.
 - `EnemyVisual`: gọi animation theo hướng, hiệu ứng flash/pulse khi trúng đòn
   và fade khi chết.
-- FSM, state chung `Idle`, `Hit`, `Death`, và nhãn debug HP.
+- FSM, state chung `Idle`, `Hit`, `Death`, và thanh máu gameplay ẩn mặc định.
 
 Base không quyết định enemy đi tuần ra sao, có đuổi Player hay không, đạn bay
 thế nào, thời điểm bật HitBox hoặc điều kiện chuyển state. Những luật đó thuộc
@@ -389,7 +419,7 @@ EnemyBase (CharacterBody3D)
 │   └── ... state riêng của enemy
 ├── CollisionShape3D                         # body collider
 ├── HealthComponent
-├── DebugHealthLabel
+├── HealthBar (ẩn mặc định; hiện khi bị đánh)
 └── TargetDetector (Area3D)        [tùy chọn]
 	└── CollisionShape3D
 ```
@@ -591,8 +621,23 @@ phải ở dưới `Direction`.
 - `Use Random Axis Changes` để đổi giữa trục trái-phải và lên-xuống.
 - `Use Contact Damage` nếu enemy thực sự gây damage khi chạm.
 
-Bật `Show Debug Health` trên root để hiển thị `HP: current / max` phía trên
-enemy khi test. Đây chỉ là debug, không phải UI gameplay.
+`HealthBar` trên scene base dùng `enemy_health_bar.gd`, thay cho số HP debug cũ.
+Mặc định thanh ẩn; mỗi lần nhận damage thực sẽ hiện rõ, giữ 3 giây rồi fade
+trong 0,6 giây. Đòn tiếp theo đặt lại thời gian và alpha về 1, kể cả giữa lúc
+fade. Hồi máu chỉ cập nhật phần fill, không làm thanh hiện; chết thì ẩn ngay.
+
+Thanh đỏ, viền mực đen có mép vát, lòng tối và vệt sáng ấm. Enemy thường dài
+54 px, elite dài 76 px, cùng cao 11 px trong hệ tọa độ UI; độ dài không phụ
+thuộc max HP, scale model hay khoảng cách camera. Component `EliteFeedback`
+hiện có xác định nhóm elite. Thanh bám đỉnh artwork (sprite hoặc Spine), bỏ
+phần padding trong atlas, không hiển thị số HP và không bắt input chuột.
+
+Các tham số `normal_width_pixels`, `elite_width_pixels`, `hold_seconds`,
+`fade_seconds`, `headroom_pixels`, `minimum_height_meters` và
+`artwork_top_padding_ratio` chỉnh được trên `HealthBar` trong Inspector.
+`EnemyVisual.get_top_position()` trả vị trí neo có tính hướng billboard;
+Spine ghi đè bằng bounds của pose đang vẽ. Các enemy/trứng được sinh mới tự
+kế thừa thanh này, không còn truyền cấu hình `show_debug_health`.
 
 ## 15. Checklist trước khi dùng
 

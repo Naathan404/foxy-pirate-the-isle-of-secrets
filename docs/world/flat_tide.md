@@ -1,6 +1,6 @@
 # Thủy triều cho nền phẳng (Flat Tide)
 
-`world/gimmick/flat_tide/flat_tide.tscn` gồm `FlatTideController` và các `FlatTideZone`. Các phòng `coral_valley/map/room_02`, `room_09`, `room_14` và `world/tests/beach_test` dùng scene này. `flat_tide_playground.tscn` (cùng thư mục) là phòng thử tự chứa với hai vùng chồng nhau, một vùng xoay và vài enemy; dùng nó để thử mà không phải mở hay lưu scene map.
+`world/gimmick/flat_tide/flat_tide.tscn` gồm `FlatTideController` và các `FlatTideZone`. Coral Valley dùng nó ở `room_01`, `room_02`, `room_06`, `room_17`, `room_19`, `room_22` (vai trò của thủy triều trong từng phòng ở [bố cục Coral Valley](coral_valley_layout.md)); `world/tests/beach_test` cũng dùng. `flat_tide_playground.tscn` (cùng thư mục) là phòng thử tự chứa với hai vùng chồng nhau, một vùng xoay và vài enemy; dùng nó để thử mà không phải mở hay lưu scene map.
 
 ## Thiết lập vùng
 
@@ -130,6 +130,49 @@ khoảng lùi ở hướng chéo trên nền đảo lồi hiện tại. Đây l�
 không phải đo khoảng cách chính xác cho mọi hình dạng nền có khe nhỏ hoặc lõm.
 
 Nếu không tìm đủ nền hợp lệ, hoặc vị trí bị chiếm khi nước rút đến, đợt đó có thể ít enemy hơn cấu hình. Hiệu ứng xuất hiện dùng `flat_tide_spawn_effect.tscn` (`Spawn Effect Scene`, để trống để tắt).
+
+## Đợt quái theo kịch bản
+
+`TideWaveDirector` (`tide_wave_director.gd`) cho thủy triều chở quái tới theo kịch bản thay vì
+ngẫu nhiên. Mỗi lần một con nước rút hết (`FALLING` → `LOW`), đợt `RaidWave` kế tiếp trồi lên từ
+cát ướt bằng một `RaidGroundSpawner` (cùng hiệu ứng nứt đất của Raid). Cách viết đợt giống Raid:
+xem [raid_room.md](../systems/raid_room.md#thiết-kế-đợt-quái).
+
+- Đợt sau chỉ tới khi quái của đợt trước đã chết hết, nên quái không dồn đống.
+- `wave_zones` (tùy chọn, một vùng cho mỗi đợt): đợt đó chỉ tới khi đúng vùng ấy vừa rút, vì
+  điểm trồi của nó nằm trên phần cát vùng ấy để lộ.
+- Hết đợt cuối, phòng ghi "đã xong" cho chu kỳ thế giới hiện tại (`RoomStateRegistry`, khóa
+  `<đường dẫn node>:waves_done`): triều vẫn lên xuống nhưng không còn quái tới lần nghỉ hoặc chết
+  sau. Rời phòng giữa chừng thì lần sau làm lại từ đợt 1.
+- Tắt bộ sinh ngẫu nhiên cũ của phòng: `FlatTide/EnemySpawner.enemies_per_tide = 0`.
+
+Phòng mẫu: `room_01` (một vùng, hai đợt), `room_02` (hai vùng, ba đợt gắn vùng).
+
+## Doi cát
+
+`TideSandbar` (`tide_sandbar.gd`): một dải cát giữa hai mảnh đảo, đi được lúc triều rút và biến
+mất lúc triều lên.
+
+- Doi là một `CollisionShape3D` của nền phòng (dưới `Environment/BaseGround/StaticBody3D`), vẽ như
+  một mảnh đảo trong layout. Tắt shape thì tường biên tự khép hai bờ.
+- Doi đóng khi `coverage` của controller vượt `close_coverage` (mặc định 0,55) và mở lại khi xuống
+  dưới `open_coverage` (0,1).
+- Foxy còn trên doi lúc đóng bị đẩy về điểm bờ gần nhất trong `shores` (phản ứng trúng đòn, không
+  mất máu), rồi doi mới đóng. Quái còn trên doi rơi xuống nước.
+- Đặt một vùng triều phủ doi để người chơi thấy nước tràn qua.
+
+Phòng mẫu: `room_17`, `room_19`.
+
+## Cần xả triều
+
+`TideLever` (`tide_lever.tscn`): cần gạt đánh được, xả ngay một vùng triều. Controller phải
+`sequential_zones = true` và `externally_advanced = true`; mỗi cần gán `controller` và `zone`.
+Đánh cần gọi `FlatTideController.request_cycle_for(zone)`: vùng đó dâng, sóng cuốn và làm choáng
+quái trong làn (và đẩy cả Foxy nếu đứng đó), rồi rút. Trong lúc một con nước đang chạy, mọi cần
+đều tối màu và đánh không có tác dụng; về `LOW` thì cần sáng lại. Phòng mẫu: `room_22` (ba làn tây,
+bắc, đông; thời gian dâng 2,5 s, đầy 3 s, rút 3 s).
+
+`FlatTideController` có thêm `request_cycle_for(zone)` và `get_active_zone()`.
 
 ## Thiết lập mà không sửa map
 

@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="5"]
 [ext_resource type="Resource" path="res://data/notes/diary_tide.tres" id="boss_note"]
 [ext_resource type="Script" path="res://data/notes/monster_note.gd" id="note_type"]
-[ext_resource type="Resource" path="res://data/items/charms/tide_grapple.tres" id="7_khbls"]
+[ext_resource type="Resource" uid="uid://kch58xt54vpk" path="res://data/items/quest/key_tide.tres" id="7_khbls"]
 
 [node name="BossRewardChest" unique_id=609333493 instance=ExtResource("1")]
 script = ExtResource("2")

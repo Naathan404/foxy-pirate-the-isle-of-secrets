@@ -123,11 +123,12 @@ func _test_acquisition(registry: CharmRegistry) -> void:
 	random.seed = 7007
 	var offer := service.roll_shop_offer(registry, random)
 	_assert_true(offer != null and offer.is_passive(), "seeded shop offer is playable Passive")
-	_assert_true(
+	_assert_false(
 		service.grant_fixed_boss_reward(registry, TIDE_GRAPPLE.charm_id),
-		"grant fixed Tide Grapple reward"
+		"Tide Grapple comes from a trial altar, not a boss"
 	)
-	_assert_true(registry.is_owned(TIDE_GRAPPLE.charm_id), "fixed boss reward owned")
+	# The altar pickup grants it like any Charm pickup.
+	_assert_true(registry.set_owned(TIDE_GRAPPLE.charm_id, true), "trial reward Tide Grapple owned")
 	_assert_false(
 		service.grant_fixed_boss_reward(registry, ARROW_RAIN.charm_id),
 		"non-boss metadata cannot use fixed reward"

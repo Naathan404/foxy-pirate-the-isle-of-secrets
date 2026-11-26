@@ -869,10 +869,14 @@ metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 [sub_resource type="Resource" id="Collection_harpoon"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_harpoon")
+blueprint_unlocked = true
+owned = true
 
 [sub_resource type="Resource" id="Collection_meteor_staff"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_meteor_staff")
+blueprint_unlocked = true
+owned = true
 
 [sub_resource type="Resource" id="Resource_ieged"]
 script = ExtResource("20_ehmwb")

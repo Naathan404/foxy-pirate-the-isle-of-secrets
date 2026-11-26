@@ -80,8 +80,8 @@ bằng script riêng lúc `_ready`. Không đổi tên node quái sau khi phát 
 `edge_clearance`, `minimum_player_distance`). Chỉ cấu hình pool, số lượng và
 `elite_chance` theo tài liệu bố cục; không đặt tay quái trong vùng thủy triều.
 
-## Khi sửa vị trí quái ngẫu nhiên dùng chung
+## Khi sửa đợt quái
 
-Bốn bố cục phòng Empty (`objects/empty_combat_before_checkpoint.tscn` và các bản cùng bộ)
-được dùng chung bởi nhiều phòng. Đổi `spawn_positions` ở đó ảnh hưởng mọi phòng dùng nó,
-nên chạy `check_enemies.gd` cho **tất cả** các phòng đó, không chỉ phòng đang sửa.
+Coral Valley không còn bộ quái ngẫu nhiên. Quái đặt tay hoặc tới theo đợt có kịch bản (Raid,
+phục kích, `TideWaveDirector`); đợt quái được kiểm bằng `check_raid.gd` (phòng có `RaidLockdown`)
+hoặc chơi thử. `check_enemies.gd` vẫn kiểm mọi quái đặt tay.

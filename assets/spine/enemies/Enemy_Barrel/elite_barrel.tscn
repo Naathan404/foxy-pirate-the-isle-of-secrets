@@ -41,7 +41,8 @@ data = ExtResource("2_data")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-spine_pixel_size = 0.007500000000000001
+spine_pixel_size = 0.0045000000000000005
+clip_faces_left = Dictionary[String, bool]({})
 
 [node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)

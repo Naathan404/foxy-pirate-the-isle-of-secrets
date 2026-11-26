@@ -45,6 +45,3 @@ script = ExtResource("6_incubate")
 [node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.53, 0)
 shape = SubResource("BodyShape")
-
-[node name="DebugHealthLabel" parent="." index="6" unique_id=2012842134]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)

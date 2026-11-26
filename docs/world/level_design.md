@@ -51,7 +51,7 @@
 	 - Có thể đẩy khi nằm trên nền; hành vi thùng nổi cũ đã được gỡ.
 	 - Có **Nút bấm (Button)** để reset vị trí thùng về mặc định.
 
-- **Flow:** `Entrance` ➔ `Bãi biển` ➔ `Khu vực thủy triều` ➔ `Puzzle thùng gỗ` ➔ `Combat Area` ➔ `Checkpoint` ➔ `Boss Approach` ➔ `Boss Room`.
+- **Flow:** `Entrance` ➔ `Bãi biển` (dạy thủy triều, cần gạt) ➔ `Checkpoint 2` ➔ ba thử thách tự chọn thứ tự (Raid, câu đố bệ, Tide Grapple), mỗi thử thách cho một Ngọc Triều ➔ `Cổng Ngọc Triều` ➔ `Boss Approach` ➔ `Trại Cuối Bờ` (lửa trại + Silas) ➔ `Boss Room`. Chi tiết ở [bố cục Coral Valley](coral_valley_layout.md) và [tiến trình](../systems/coral_valley_progression.md).
 
 ### 3.3. Misty Swamp (Mộc)
 

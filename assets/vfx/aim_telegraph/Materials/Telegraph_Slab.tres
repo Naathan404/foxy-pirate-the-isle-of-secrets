@@ -3,5 +3,5 @@
 [ext_resource type="Shader" path="res://assets/vfx/aim_telegraph/Shaders/Telegraph_Slab.gdshader" id="1_slab"]
 
 [resource]
-render_priority = 0
+render_priority = -2
 shader = ExtResource("1_slab")

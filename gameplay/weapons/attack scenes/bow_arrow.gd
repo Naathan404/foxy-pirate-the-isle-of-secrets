@@ -14,6 +14,13 @@ const STORM_PARTICLES: PackedScene = preload(
 @export_range(0.0, 3.0, 0.05) var release_height: float = 0.9
 @export_range(0.1, 10.0, 0.1) var lifetime: float = 4.0
 
+@export_group("Low Destructible Sweep")
+## Breakable props shorter than the flight height are caught by a vertical sweep from the
+## shooter's floor up to the arrow, so grass, logs and shells are never flown over.
+@export_range(0.02, 1.0, 0.01, "suffix:m") var low_sweep_width: float = 0.14
+## Reaches slightly below the shooter's feet for props sitting on a lower patch of floor.
+@export_range(0.0, 1.0, 0.01, "suffix:m") var low_sweep_floor_margin: float = 0.2
+
 @export_group("Stormstring Targeting")
 ## Full horizontal acquisition cone, centered on the arrow's current heading.
 @export_range(1.0, 180.0, 1.0) var homing_cone_degrees: float = 120.0
@@ -78,6 +85,8 @@ var _trail: Node3D
 var _flight_particles: GPUParticles3D
 var _curve_lengths: PackedFloat32Array = []
 var _path_length: float = 0.0
+var _floor_height: float = 0.0
+var _low_sweep_shape := BoxShape3D.new()
 
 var _travelled: float = 0.0
 var _age: float = 0.0
@@ -117,6 +126,7 @@ func activate() -> void:
 	speed *= context.projectile_speed_multiplier
 	show()
 	global_position = context.actor.global_position + Vector3.UP * release_height
+	_floor_height = context.actor.global_position.y - low_sweep_floor_margin
 	look_at(global_position + context.direction, Vector3.UP)
 	_sprite_offset = _sprite.position
 	_update_sprite_angle(context.direction)
@@ -168,6 +178,15 @@ func _physics_process(delta: float) -> void:
 		if context.actor is CollisionObject3D:
 			query.exclude = [(context.actor as CollisionObject3D).get_rid()]
 		var collision := get_world_3d().direct_space_state.intersect_ray(query)
+		var low_prop := _sweep_low_destructible(destination)
+		if not low_prop.is_empty() and (
+			collision.is_empty()
+			or (
+				global_position.distance_squared_to(low_prop.position)
+				< global_position.distance_squared_to(collision.position)
+			)
+		):
+			collision = low_prop
 		if not collision.is_empty():
 			var impact_direction := (destination - global_position).normalized()
 			global_position = collision.position
@@ -190,6 +209,42 @@ func _physics_process(delta: float) -> void:
 	_travelled += distance
 	if _travelled >= _path_length - 0.0001 or _age >= lifetime:
 		_expire_projectile()
+
+
+## Returns {collider, position} for the nearest DestructibleProp HurtBox below this step.
+func _sweep_low_destructible(destination: Vector3) -> Dictionary:
+	var motion := destination - global_position
+	var height := global_position.y - _floor_height
+	var horizontal := Vector3(motion.x, 0.0, motion.z)
+	if height <= 0.0 or horizontal.is_zero_approx():
+		return {}
+	var width := low_sweep_width * context.hitbox_multiplier
+	# One box spanning this frame's step, from the floor up to the arrow.
+	_low_sweep_shape.size = Vector3(width, height, horizontal.length() + width)
+	var center := global_position + motion * 0.5
+	center.y = _floor_height + height * 0.5
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = _low_sweep_shape
+	query.transform = Transform3D(Basis.looking_at(horizontal, Vector3.UP), center)
+	query.collision_mask = CombatLayers.ENEMY_HURTBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var heading := horizontal.normalized()
+	var nearest := {}
+	var nearest_along := INF
+	for result in get_world_3d().direct_space_state.intersect_shape(query):
+		var hurtbox := result.collider as HurtBox
+		if hurtbox == null or not hurtbox.actor is DestructibleProp:
+			continue
+		var along := heading.dot(hurtbox.global_position - global_position)
+		if along < nearest_along:
+			nearest_along = along
+			nearest = {"collider": hurtbox}
+	if nearest.is_empty():
+		return {}
+	var fraction := clampf(nearest_along / horizontal.length(), 0.0, 1.0)
+	nearest["position"] = global_position + motion * fraction
+	return nearest
 
 
 func _build_flight_path() -> void:

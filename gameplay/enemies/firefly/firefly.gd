@@ -660,8 +660,6 @@ func _apply_altitude_transforms() -> void:
 			visual.sprite.render_priority = 4 if is_airborne() else 0
 	if is_instance_valid(hurtbox):
 		hurtbox.position.y = effective_y
-	if is_instance_valid(debug_health_label):
-		debug_health_label.position.y = effective_y + 1.25
 	if is_instance_valid(_ground_shadow):
 		var ratio := clampf(altitude_meters / maxf(0.1, hover_altitude_meters), 0.0, 1.0)
 		var shadow_scale := lerpf(SHADOW_BASE_SCALE, SHADOW_MIN_SCALE, ratio)

@@ -6,12 +6,17 @@ extends BaseRoom
 ## boss is beaten, Foxy crosses the gap with the Tide Grapple he just won (posts on both sides).
 ## Losing the fight sends Foxy to his campfire, and the next visit finds the bridge whole again.
 ##
+## Once the boss is beaten the arena becomes a safe room: a campfire flares up at its centre, so
+## Foxy can rest, save and change Charms (the Tide Grapple is needed to leave).
+##
 ## The sea follows the fight: calm at first, violet from phase two, and red while the boss winds
 ## up or performs one of its signature skills.
 
 const COLLAPSE_SOUND := preload("res://gameplay/bosses/blubberbeard/boss_explosion.wav")
 const COLLAPSE_SHAKE := 8.5
 const COLLAPSE_SHAKE_SECONDS := 0.3
+const CAMPFIRE_FLARE_SECONDS := 0.8
+const CAMPFIRE_FLARE_SHAKE := 4.0
 const FURY_STATES: Array[BlubberbeardBoss.State] = [
 	BlubberbeardBoss.State.WINDUP,
 	BlubberbeardBoss.State.SKYDIVE_LEAP,
@@ -21,6 +26,9 @@ const FURY_STATES: Array[BlubberbeardBoss.State] = [
 @export_group("Fight")
 @export var boss: BlubberbeardBoss
 @export var encounter: BossEncounter
+
+## Hidden until the boss is beaten; then the arena is a safe room with this campfire.
+@export var victory_campfire: Node3D
 
 @export_group("Bridge")
 ## Each span pivots at its outer end; the inner ends drop into the water.
@@ -48,10 +56,15 @@ var _fight_active := false
 
 
 func _ready() -> void:
+	var defeated := not Engine.is_editor_hint() and _is_boss_defeated()
+	# Set before the base class grants the safe-room permission of an already won arena.
+	if defeated:
+		safe_room = true
 	super()
 	if Engine.is_editor_hint():
 		return
-	if _is_boss_defeated():
+	_set_campfire_lit(defeated)
+	if defeated:
 		_break_bridge(false)
 		return
 	if is_instance_valid(boss):
@@ -92,6 +105,31 @@ func _on_fight_started() -> void:
 
 func _on_fight_finished() -> void:
 	_fight_active = false
+	if is_instance_valid(boss) and boss.dead:
+		_become_safe()
+
+
+func _become_safe() -> void:
+	safe_room = true
+	_grant_safe_room()
+	_set_campfire_lit(true)
+	if victory_campfire == null:
+		return
+	var rest_scale := victory_campfire.scale
+	victory_campfire.scale = rest_scale * 0.1
+	var flare := create_tween().tween_property(
+		victory_campfire, "scale", rest_scale, CAMPFIRE_FLARE_SECONDS
+	)
+	flare.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	get_node("/root/ScreenShakeController").request(CAMPFIRE_FLARE_SHAKE, CAMPFIRE_FLARE_SECONDS)
+
+
+func _set_campfire_lit(lit: bool) -> void:
+	if victory_campfire == null:
+		return
+	victory_campfire.visible = lit
+	# Disabled nodes leave the physics space, so the hidden fire blocks and offers nothing.
+	victory_campfire.process_mode = Node.PROCESS_MODE_INHERIT if lit else Node.PROCESS_MODE_DISABLED
 
 
 func _break_bridge(animated: bool) -> void:

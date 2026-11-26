@@ -14,6 +14,8 @@ const SEARCH_RING_POINT_COUNT := 8
 const RUMBLE_PULSE_SECONDS := 0.25
 const EMERGE_SHAKE_SECONDS := 0.2
 const EMERGE_SQUASH_SCALE := Vector3(1.25, 0.55, 1.25)
+## A point whose crack closed unused is avoided by this much for the rest of the wave.
+const BLOCKED_POINT_RADIUS_METERS := 1.5
 
 ## Width (x) and depth (z) of the area searched when a planned point has no free ground near.
 @export var spawn_extents_meters: Vector2 = Vector2(22.0, 26.0)
@@ -37,6 +39,9 @@ const EMERGE_SQUASH_SCALE := Vector3(1.25, 0.55, 1.25)
 @export_group("")
 
 var _unspawned_count: int = 0
+## Points where a crack closed because something kept standing on it (a prop, a body), so the
+## next try picks another spot instead of waiting there forever.
+var _blocked_points: Array[Vector3] = []
 ## Set while placing an enemy at an already telegraphed point, where only overlap matters.
 var _ignore_player_distance: bool = false
 
@@ -56,6 +61,7 @@ func spawn_wave(wave: RaidWave) -> bool:
 			push_error("RaidGroundSpawner: every spawn of a wave needs an enemy scene.")
 			return false
 	_unspawned_count = wave.spawns.size()
+	_blocked_points.clear()
 	_run_wave(wave)
 	return true
 
@@ -97,6 +103,7 @@ func _spawn_planned(spec: RaidSpawnSpec) -> void:
 				effect.close()
 		if spawned:
 			break
+		_blocked_points.append(point)
 	_unspawned_count -= 1
 	if _unspawned_count == 0:
 		wave_spawn_finished.emit()
@@ -163,10 +170,18 @@ func _usable_point(candidate: Vector3) -> Variant:
 	if (
 		_away_from_player(point)
 		and _is_separated(point)
+		and not _is_near_blocked(point)
 		and _has_edge_clearance(point, spawn_ground)
 	):
 		return point
 	return null
+
+
+func _is_near_blocked(point: Vector3) -> bool:
+	for blocked in _blocked_points:
+		if Vector2(point.x - blocked.x, point.z - blocked.z).length() < BLOCKED_POINT_RADIUS_METERS:
+			return true
+	return false
 
 
 func _find_random_point() -> Variant:

@@ -116,7 +116,8 @@ khác vẫn còn hoạt động.
   - Toàn bộ Hub: bật trên ba scene gốc `world/biomes/hub/base_scenes/base_*_room.tscn`, nên
     mọi phòng Hub kế thừa chúng (như `silas_tent.tscn`) đều là safe room. Hub trung tâm
     `castaway_cove.tscn` kế thừa thẳng `hub_room.tscn` nên tự bật cờ trên gốc scene.
-  - Phòng nghỉ có lửa trại: bật trên từng phòng (hiện là Coral Valley `room_00`, `room_05`).
+  - Phòng nghỉ có lửa trại: bật trên từng phòng (hiện là Coral Valley `room_00`, `room_05`,
+    `room_07`). Phòng boss `room_08` bật cờ khi Blubberbeard đã bị hạ.
     Lửa trại chỉ là prop phá được, không tự tạo permission; đặt lửa trại vào phòng mới thì
     bật thêm cờ cho phòng đó.
 - UI visibility không quyết định safe-location state.
@@ -194,7 +195,7 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 | Crescent Cleave | Merchant/enemy drop 5% | 100 | 4 s | Giữ chân qua cú quét 0,12 s, bán nguyệt 180°, bán kính 2,8. Mỗi mục tiêu nhận 2× một lần. |
 | Shadow Lunge | Merchant/enemy drop 5% | 125 | 6 s | Lướt tối đa 5 đơn vị trong 0,18 s, dừng ở địa hình hoặc địch đầu tiên. Đâm 3× và có thể bị ngắt khi nhận đòn. |
 | Buckshot Salvo | Merchant/enemy drop 5% | 150 | 7 s | Giữ chân 0,18 s rồi bắn 8 viên theo 8 hướng, tầm 8 đơn vị, 0,5× mỗi viên. |
-| Tide Grapple | Captain Blubberbeard | 150 | 5 s | Tầm 7 đơn vị, 2,5× khi móc chạm. Kéo quái nhỏ và choáng 1 s. Kéo Foxy tới cách boss, địch lớn hoặc địa hình 1 đơn vị. Cọc neo (`grapple_post.tscn`) là địa hình móc được, dùng để vượt vực ở các [phòng kỳ quan](../../world/coral_valley_wonder_rooms.md). |
+| Tide Grapple | Bệ thử thách Raid `room_16` (Coral Valley) | 150 | 5 s | Tầm 7 đơn vị, 2,5× khi móc chạm. Kéo quái nhỏ và choáng 1 s. Kéo Foxy tới cách boss, địch lớn hoặc địa hình 1 đơn vị. Cọc neo (`grapple_post.tscn`) là địa hình móc được, dùng để vượt vực ở các [phòng kỳ quan](../../world/coral_valley_wonder_rooms.md) và là chìa khóa giữa map Coral Valley ([tiến trình](../../systems/coral_valley_progression.md)). |
 | Glacial Spikes | Borelis | 125 | 7 s | Vận 0,28 s. Chốt hướng nhìn lúc nhấn, chông mọc từ gần ra xa theo ba hàng 1–2–3, cách nhau 0,12 s. Mỗi chông kiểm tra va chạm với hurtbox mục tiêu ngay lúc trồi lên. Mỗi mục tiêu nhận 1,5× một lần, quái thường choáng 1 s. |
 | Meteor Strike | Cinderclaw | 250 | 10 s | Vận 0,38 s, ba thiên thạch 2× mỗi viên. Vùng lửa tồn tại 3 s, mỗi giây gây Bleed bằng 2% HP tối đa. Các vùng giao nhau dùng chung một tick cho mỗi mục tiêu. |
 | Devil Contract | Queen Seraphina | Toàn bộ SP, cần ≥300 | 20 s | Ký khế ước trong 0,32 s. Trong 10 s sau khi ký, tàn lửa đỏ bao quanh Foxy, sát thương và tốc độ chạy đều ×1,3. Hồi SP tự nhiên và từ vật phẩm đều bị khóa. |
@@ -226,7 +227,7 @@ Player sở hữu khóa vận theo effect để một effect kết thúc chỉ t
 
 ### 10.1 Boss reward
 
-Fixed reward dùng definition có nguồn `fixed_boss_reward`. Tide Grapple, Glacial Spikes, Meteor Strike và Devil Contract là bốn thưởng boss 100%. Checkout có encounter Blubberbeard. Ba boss mới chỉ có thể kiểm tra qua đường grant và pickup.
+Fixed reward dùng definition có nguồn `fixed_boss_reward`. Glacial Spikes, Meteor Strike và Devil Contract là thưởng boss 100%. Tide Grapple có nguồn riêng `fixed_trial_reward`: thưởng cố định ở bệ thử thách Raid `room_16` (Coral Valley), nhặt như mọi Charm rơi. Rương boss Blubberbeard giờ cho Chìa khóa Thủy Triều. Checkout có encounter Blubberbeard. Ba boss mới chỉ có thể kiểm tra qua đường grant và pickup.
 
 Năm prototype có gameplay và equip được qua Runtime Charm Debug. Anchor đặt ấn tốn 300 SP, HUD hiện phím gọi về trong 5 s. Hồi chiêu 8 s từ lúc gọi về hoặc hết hạn. Whirlpool vận 1,5 s, kéo quái thường và nổ 2,5×, tốn 300 SP, hồi 8 s. Salute giữ chân và tiêu 100 SP/s, nhả phím hoặc cạn SP thì nổ và bắt đầu hồi 6 s. Death Bloom nổ sau 0,32 s khi hạ quái bằng đòn thường, gây 1 HP cho cả Foxy lẫn địch trong bán kính 2. Shadow Renment để bóng ở điểm bắt đầu dash, nổ 1,5× sau 0,5 s trong bán kính 2. Hai passive chưa có nguồn hoặc tỉ lệ nhận trên Sheet.
 

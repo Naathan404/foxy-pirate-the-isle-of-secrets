@@ -110,6 +110,10 @@ const EDGE_BOUNDS_MARGIN := 0.01
 		_queue_refresh()
 
 var _exits_locked := false
+## Exits (UP/RIGHT/DOWN/LEFT flags) kept shut by a gate or a secret, independent of the lock.
+var _sealed_exits: int = 0
+## Exits whose path is not drawn either, so a secret passage looks like plain shore.
+var _hidden_exits: int = 0
 var _boundary_rebuild_queued := false
 ## World cycle this room was built in; its records are ignored once a rest starts a new one.
 var _state_cycle: int = -1
@@ -205,6 +209,25 @@ func set_exits_locked(locked: bool) -> void:
 	_queue_refresh()
 
 
+## Shuts one exit (`UP`, `RIGHT`, `DOWN` or `LEFT`) on its own, for gates and secret passages:
+## the transition is off and the island boundary closes across the path. With `hide_path`
+## the path is not drawn either. `set_exits_locked` still shuts every exit on top of this.
+func set_exit_sealed(direction: int, sealed: bool, hide_path: bool = false) -> void:
+	var sealed_exits := (_sealed_exits | direction) if sealed else (_sealed_exits & ~direction)
+	var hidden_exits := (
+		(_hidden_exits | direction) if sealed and hide_path else (_hidden_exits & ~direction)
+	)
+	if sealed_exits == _sealed_exits and hidden_exits == _hidden_exits:
+		return
+	_sealed_exits = sealed_exits
+	_hidden_exits = hidden_exits
+	_queue_refresh()
+
+
+func is_exit_sealed(direction: int) -> bool:
+	return bool(_sealed_exits & direction)
+
+
 ## Foxy is a child of the room, so it has registered with GameManager before the room is
 ## ready. The room is the safe source: leaving the room frees it and ends the permission.
 func _grant_safe_room() -> void:
@@ -263,33 +286,15 @@ func _validate_property(property: Dictionary) -> void:
 
 
 func _refresh_exits() -> void:
+	_apply_exit("UpPath", UP, up_trigger_id, up_destination_scene, up_destination_trigger_id)
 	_apply_exit(
-		"UpPath",
-		bool(open_exits & UP),
-		up_trigger_id,
-		up_destination_scene,
-		up_destination_trigger_id
+		"RightPath", RIGHT, right_trigger_id, right_destination_scene, right_destination_trigger_id
 	)
 	_apply_exit(
-		"RightPath",
-		bool(open_exits & RIGHT),
-		right_trigger_id,
-		right_destination_scene,
-		right_destination_trigger_id
+		"DownPath", DOWN, down_trigger_id, down_destination_scene, down_destination_trigger_id
 	)
 	_apply_exit(
-		"DownPath",
-		bool(open_exits & DOWN),
-		down_trigger_id,
-		down_destination_scene,
-		down_destination_trigger_id
-	)
-	_apply_exit(
-		"LeftPath",
-		bool(open_exits & LEFT),
-		left_trigger_id,
-		left_destination_scene,
-		left_destination_trigger_id
+		"LeftPath", LEFT, left_trigger_id, left_destination_scene, left_destination_trigger_id
 	)
 	if is_inside_tree() and is_node_ready() and not Engine.is_editor_hint():
 		queue_boundary_rebuild()
@@ -328,7 +333,7 @@ func _rebuild_ground_boundaries() -> void:
 	if not boundary_enabled:
 		return
 	for entry in [["UpPath", UP], ["RightPath", RIGHT], ["DownPath", DOWN], ["LeftPath", LEFT]]:
-		if not _exits_locked and (open_exits & entry[1]):
+		if not _exits_locked and (open_exits & entry[1]) and not (_sealed_exits & entry[1]):
 			_collect_floors(get_node_or_null("Exits/%s/StaticBody3D" % entry[0]), floors)
 	_create_ground_boundaries(
 		PLAYER_BOUNDARIES_NAME, CombatLayers.PLAYER_BOUNDARY, floors, boundary_openings
@@ -488,7 +493,7 @@ func _add_boundary(
 
 func _apply_exit(
 	path_name: String,
-	is_open: bool,
+	direction: int,
 	local_id: StringName,
 	destination_scene: String,
 	destination_id: StringName
@@ -496,7 +501,8 @@ func _apply_exit(
 	var path := get_node_or_null("Exits/" + path_name) as Node3D
 	if path == null:
 		return
-	path.visible = is_open
+	var is_open := bool(open_exits & direction)
+	path.visible = is_open and not (_hidden_exits & direction)
 	var body := path.get_node_or_null("StaticBody3D") as StaticBody3D
 	if body != null:
 		for child in body.get_children():
@@ -508,7 +514,7 @@ func _apply_exit(
 	trigger.set("trigger_id", local_id)
 	trigger.set("destination_scene", destination_scene)
 	trigger.set("destination_trigger_id", destination_id)
-	var can_transition := is_open and not _exits_locked
+	var can_transition := is_open and not _exits_locked and not (_sealed_exits & direction)
 	trigger.set("enabled", can_transition)
 	trigger.monitoring = can_transition
 	var shape := trigger.get_node_or_null("CollisionShape3D") as CollisionShape3D

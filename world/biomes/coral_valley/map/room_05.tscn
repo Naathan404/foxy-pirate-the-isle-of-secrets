@@ -28,6 +28,10 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="stone"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="wood_log"]
 
+[ext_resource type="PackedScene" path="res://world/gimmick/raid/raid_boulder_gate.tscn" id="boulder_gate"]
+
+[ext_resource type="PackedScene" path="res://world/gimmick/progression/tide_pearl_gate.tscn" id="tide_pearl_gate"]
+
 [sub_resource type="Environment" id="Environment_gdian"]
 resource_local_to_scene = true
 background_mode = 1
@@ -161,6 +165,7 @@ up_destination_scene = "res://world/biomes/coral_valley/map/room_13.tscn"
 right_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
 down_destination_scene = "res://world/biomes/coral_valley/map/room_21.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_04.tscn"
+editor_description = "Checkpoint 2 crossroads: campfire, exits west (room_04), north (room_13), south (room_21); the east exit is the Pearl Gate to the boss approach."
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_gdian")
@@ -342,6 +347,16 @@ ground_shadow = true
 [node name="StoneSouthWestSmall" parent="Scenery" index="12" unique_id=229906231 instance=ExtResource("stone")]
 transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -6.6, 0, 10.4)
 ground_shadow = true
+
+[node name="PearlGateBoulders" parent="." instance=ExtResource("boulder_gate")]
+editor_description = "Stands on the east pier until the three Tide Pearls are set in the shrine."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 0.1, 0)
+
+[node name="TidePearlGate" parent="." node_paths=PackedStringArray("room", "gate") instance=ExtResource("tide_pearl_gate")]
+editor_description = "Pearl shrine beside the east pier. Seals the way to the boss (room_06) until Foxy sets three Tide Pearls (room_13, room_16, room_23)."
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 14, 0.252, -5.2)
+room = NodePath("..")
+gate = NodePath("../PearlGateBoulders")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

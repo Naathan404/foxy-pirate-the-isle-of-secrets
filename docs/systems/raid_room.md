@@ -2,7 +2,7 @@
 
 Phòng Raid là phòng mà khi Foxy đi vào, cửa ra bị chặn và quái trồi từ dưới đất lên theo
 từng đợt có kịch bản. Dọn hết đợt cuối thì cửa mở lại và (tùy chọn) rương thưởng xuất hiện.
-Code nằm trong `world/gimmick/raid/`; phòng mẫu là `room_18` (Coral Valley).
+Code nằm trong `world/gimmick/raid/`. Phòng Raid của Coral Valley: `room_16` (Xác Tàu Neo, 4 đợt), `room_18` (hai đảo và phà), `room_22` (Đập Thủy Triều, có cần xả triều). Cả ba dùng biển đỏ `red_tide` để báo trước "vào là bị nhốt", và rương `raid_chest.tscn` (8–13 vàng) hoặc rương riêng của phòng.
 
 ## Luồng chơi
 
@@ -97,10 +97,15 @@ chắc rằng không stage nào tự bắt đầu. Rồi nó chơi từng stage,
 stage, mở lại và rương, và in vị trí từng con quái so với Foxy và tâm đảo. Trả mã thoát 1
 nếu có lỗi.
 
-## Phòng Raid cũ
+## Phục kích không khóa cửa
 
-`room_07` vẫn dùng `RaidEncounter` (`world/components/raid_encounter.gd`): quái đến theo
-thủy triều, số quái mỗi đợt lấy ngẫu nhiên từ pool. Hệ này chưa được chuyển sang
-`RaidStage`, và có thể còn hai lỗi đã sửa ở hệ mới (chưa chạy để xác nhận):
-- Kích hoạt bằng `body_entered`, nên có thể bắt đầu lúc Foxy vừa vào phòng.
-- Không kiểm tra phòng đã rời scene tree khi Foxy chết.
+Một `RaidStage` với `locks_room = false`, không cần `RaidLockdown`, là một ổ phục kích: bước vào
+vùng thì quái trồi lên theo đợt, nhưng cửa vẫn mở và không có rương thưởng riêng. Coral Valley
+dùng cho `room_12` (lính canh rương) và `room_21` (ốc dưới cát). Đã dọn thì không phục kích lại
+trong lượt chơi.
+
+`RaidLockdown.is_cleared()` cho biết mọi stage của phòng đã dọn chưa (bệ thử thách của `room_16`
+dùng để biết khi nào trồi lên).
+
+Hệ Raid cũ theo thủy triều (`RaidEncounter`, `RaidEnemySpawner`) đã được gỡ khi `room_07` trở
+thành Trại Cuối Bờ. Đợt quái theo triều giờ dùng `TideWaveDirector` ([flat_tide.md](../world/flat_tide.md#đợt-quái-theo-kịch-bản)).

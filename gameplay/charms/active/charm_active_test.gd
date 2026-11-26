@@ -68,7 +68,7 @@ func _test_data() -> void:
 	_assert_near(TIDE_GRAPPLE.get_param_float(&"stun_seconds"), 1.0, "Tide stun")
 	_assert_true(TIDE_GRAPPLE.resource_cost > 0.0, "Tide has a positive cost")
 	_assert_near(TIDE_GRAPPLE.cooldown_seconds, 5.0, "Tide cooldown")
-	_assert_equal(TIDE_GRAPPLE.acquisition_source, &"fixed_boss_reward", "Tide source")
+	_assert_equal(TIDE_GRAPPLE.acquisition_source, &"fixed_trial_reward", "Tide source")
 	_assert_true(InputMap.has_action(&"charm_slot_q"), "Q input exists")
 
 

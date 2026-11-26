@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bwbr8s6gdqts0" path="res://assets/vfx/aim_telegraph/Aim/Arrow_Aim.png" id="2_ybkr3"]
 
 [resource]
-render_priority = 1
+render_priority = -1
 shader = ExtResource("1_arrow")
 shader_parameter/line_half = 0.08
 shader_parameter/head_len = 1.3

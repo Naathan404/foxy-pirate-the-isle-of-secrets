@@ -19,14 +19,12 @@ var _drill_visual: MeshInstance3D
 var _bolt_visual: MeshInstance3D
 var _tip_light: OmniLight3D
 
-@onready var _guide: MeshInstance3D = $Guide
 @onready var _lance: MeshInstance3D = $Lance
 @onready var _tip: MeshInstance3D = $Tip
 @onready var _particles: GPUParticles3D = $Sparks
 
 
 func _ready() -> void:
-	_guide.hide()
 	_lance.hide()
 	_tip.hide()
 	_charge_visual = _make_visual("ChargeElectrons", _charge_mesh)
@@ -58,7 +56,7 @@ func _make_visual(node_name: String, geometry: ImmediateMesh) -> MeshInstance3D:
 	return visual
 
 
-func prepare(reach: float, width: float, skill: bool) -> void:
+func prepare(reach: float, skill: bool) -> void:
 	_reach = reach
 	_charging = skill
 	_skill = skill
@@ -67,21 +65,7 @@ func prepare(reach: float, width: float, skill: bool) -> void:
 	_charge_visual.visible = skill
 	_drill_visual.hide()
 	_bolt_visual.hide()
-	var ground_height: float = 0.04
-	if skill:
-		var origin := global_position + Vector3.UP * 0.4
-		var query := PhysicsRayQueryParameters3D.create(
-			origin, origin + Vector3.DOWN * 3.0, CombatLayers.WORLD
-		)
-		var ground := get_world_3d().direct_space_state.intersect_ray(query)
-		if not ground.is_empty():
-			ground_height = float(ground.position.y) - global_position.y + 0.025
-	var guide_reach := minf(reach, 2.4) if skill else reach
-	var mesh := _guide.mesh.duplicate() as QuadMesh
-	mesh.size = Vector2(maxf(0.4, width), guide_reach)
-	_guide.mesh = mesh
-	_guide.position = Vector3(0.0, ground_height, -guide_reach * 0.5)
-	_guide.visible = skill
+	# The skill's ground direction is drawn by WeaponController's AimTelegraph.
 	_tip.visible = skill
 	_tip.position = Vector3(0.0, 0.82, -1.0)
 	set_charge_progress(0.0)
@@ -96,9 +80,6 @@ func set_charge_progress(progress: float) -> void:
 	(_tip.material_override as ShaderMaterial).set_shader_parameter(
 		"brightness", lerpf(1.2, 3.2, amount)
 	)
-	(_guide.material_override as ShaderMaterial).set_shader_parameter(
-		"opacity", lerpf(0.2, 0.75, amount)
-	)
 
 
 func strike(reach: float) -> void:
@@ -112,7 +93,6 @@ func strike(reach: float) -> void:
 	_bolt_visual.visible = _skill
 	_tip_light.visible = _skill
 	_reach = reach
-	_guide.hide()
 	_lance.show()
 	_tip.show()
 	var mesh := _lance.mesh.duplicate() as QuadMesh
@@ -138,7 +118,6 @@ func finish() -> void:
 	_striking = false
 	_charging = false
 	_skill = false
-	_guide.hide()
 	_lance.hide()
 	_tip.hide()
 	_particles.emitting = false

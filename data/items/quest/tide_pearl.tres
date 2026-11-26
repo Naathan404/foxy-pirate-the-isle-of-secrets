@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/items/Tide_Pearl.png" id="1_icon"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="2_script"]
+
+[resource]
+script = ExtResource("2_script")
+item_id = "tide_pearl"
+display_name = "Tide Pearl"
+icon = ExtResource("1_icon")
+description = "A pearl that hums with the pull of the tide. Three of them open the Pearl Gate of Coral Valley."
+max_stack = 3
+type = 3

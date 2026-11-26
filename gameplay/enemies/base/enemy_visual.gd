@@ -95,11 +95,31 @@ func set_telegraph_pulse(_strength: float, _size_scale: float = 1.0) -> void:
 
 
 ## World height of the top of the artwork, or NAN when it is unknown.
+## Top-center of the visible artwork, including the tilt of a billboard towards the camera.
+func get_top_position() -> Vector3:
+	if not is_instance_valid(sprite) or sprite.texture == null:
+		return Vector3(NAN, NAN, NAN)
+	var bounds := sprite.get_aabb()
+	var camera := get_viewport().get_camera_3d()
+	if sprite.billboard == BaseMaterial3D.BILLBOARD_ENABLED and camera != null:
+		return (
+			sprite.global_position
+			+ camera.global_basis.y.normalized() * bounds.end.y * sprite.global_basis.y.length()
+		)
+	return sprite.to_global(Vector3(0.0, bounds.end.y, 0.0))
+
+
 func get_top_y() -> float:
 	if not is_instance_valid(sprite) or sprite.texture == null:
 		return NAN
 	var bounds := sprite.get_aabb()
 	return sprite.to_global(Vector3(0.0, bounds.end.y, 0.0)).y
+
+
+## World position of a named point of the artwork (a Spine bone) in the current pose, or null
+## when the artwork has no such point.
+func get_bone_position(_bone_name: String) -> Variant:
+	return null
 
 
 func play_hit_feedback() -> void:

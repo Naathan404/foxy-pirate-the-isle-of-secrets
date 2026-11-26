@@ -5,12 +5,6 @@
 [ext_resource type="Shader" path="res://gameplay/weapons/bow_energy.gdshader" id="3_energy"]
 [ext_resource type="Texture2D" path="res://assets/sprites/effects/Dust Particle.png" id="4_spark"]
 
-[sub_resource type="ShaderMaterial" id="GuideMaterial"]
-resource_local_to_scene = true
-shader = ExtResource("2_lane")
-shader_parameter/telegraph = true
-shader_parameter/opacity = 0.7
-
 [sub_resource type="ShaderMaterial" id="LanceMaterial"]
 resource_local_to_scene = true
 shader = ExtResource("2_lane")
@@ -65,12 +59,6 @@ size = Vector2(0.08, 0.18)
 
 [node name="HarpoonThrustVFX" type="Node3D"]
 script = ExtResource("1_script")
-
-[node name="Guide" type="MeshInstance3D" parent="."]
-rotation_degrees = Vector3(-90, 0, 0)
-cast_shadow = 0
-mesh = SubResource("LaneMesh")
-material_override = SubResource("GuideMaterial")
 
 [node name="Lance" type="MeshInstance3D" parent="."]
 rotation_degrees = Vector3(-90, 0, 0)

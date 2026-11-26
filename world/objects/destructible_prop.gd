@@ -218,7 +218,18 @@ func receive_damage(damage: DamageContext) -> float:
 	)
 	if not accepted_team:
 		return 0.0
-	var applied_hp := _health.take_damage(damage.amount_hp)
+	return _apply_damage(damage.amount_hp)
+
+
+## Heavy charges break scenery regardless of its ordinary attack-team filter.
+func break_from_impact() -> void:
+	_apply_damage(max_hp)
+
+
+func _apply_damage(amount_hp: float) -> float:
+	if _destroyed:
+		return 0.0
+	var applied_hp := _health.take_damage(amount_hp)
 	if applied_hp <= 0.0:
 		return 0.0
 	damaged.emit(applied_hp)

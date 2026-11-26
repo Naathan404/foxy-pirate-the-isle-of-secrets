@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="chest"]
+
+[node name="RaidChest" instance=ExtResource("chest")]
+editor_description = "Reward of a Coral Valley raid: spawned by RaidLockdown once every stage is cleared."
+gold_min = 8
+gold_max = 13
