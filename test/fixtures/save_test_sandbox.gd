@@ -101,12 +101,15 @@ func press_action(action: StringName) -> void:
 		await _tree.process_frame
 
 
-## Resting fades to black before the Campfire menu opens. Returns whether it opened.
-func wait_rest_menu(rest_point: CampfireRestPoint) -> bool:
+## Picks REST (`save` false) or REST and SAVE and waits for the fade to finish.
+## Returns whether the rest completed in time.
+func choose_rest_and_wait(rest_point: CampfireRestPoint, save: bool) -> bool:
+	if not rest_point.choose_rest(save):
+		return false
 	var deadline := Time.get_ticks_msec() + REST_MENU_TIMEOUT_MSEC
-	while not rest_point.is_menu_open() and Time.get_ticks_msec() < deadline:
+	while rest_point.is_resting() and Time.get_ticks_msec() < deadline:
 		await _tree.process_frame
-	return rest_point.is_menu_open()
+	return not rest_point.is_resting()
 
 
 func frames(count: int) -> void:

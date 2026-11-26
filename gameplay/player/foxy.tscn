@@ -22,7 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://dqmnkxuwherpm" path="res://gameplay/inventory/inventory_ui.tscn" id="16_nbuib"]
 [ext_resource type="Script" uid="uid://dvaslfpi4s3pd" path="res://gameplay/weapons/weapon_controller.gd" id="16_use70"]
 [ext_resource type="Script" uid="uid://c1ofpsqxwk0l6" path="res://gameplay/charms/base/charm_registry.gd" id="17_charm_registry"]
-[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="17_unfpm"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/hermit_shell.tres" id="17_unfpm"]
 [ext_resource type="Resource" uid="uid://c7pbeev7mghjm" path="res://data/items/consumables/healing_potion.tres" id="18_7war0"]
 [ext_resource type="PackedScene" uid="uid://c5qllhbgd1hnk" path="res://gameplay/player/effects/dash_effect.tscn" id="18_mqob0"]
 [ext_resource type="PackedScene" uid="uid://dgx5c1qlu0dls" path="res://gameplay/player/effects/run_dust_effect.tscn" id="19_lqbvs"]
@@ -862,6 +862,8 @@ metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 [sub_resource type="Resource" id="Resource_34wtv"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("27_86838")
+blueprint_unlocked = true
+owned = true
 metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 
 [sub_resource type="Resource" id="Collection_harpoon"]

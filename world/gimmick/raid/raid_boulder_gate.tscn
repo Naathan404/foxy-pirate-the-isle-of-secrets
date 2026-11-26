@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/gimmick/raid/raid_boulder_gate.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d2n1xyua5t50x" path="res://assets/sprites/biomes/coral_valley/stone.png" id="2_stone"]
+
+[sub_resource type="BoxShape3D" id="BlockerShape"]
+size = Vector3(3.5, 4, 9)
+
+[node name="RaidBoulderGate" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Blocker" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Blocker"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("BlockerShape")
+disabled = true
+
+[node name="BoulderNorth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="Sprite3D" type="Sprite3D" parent="BoulderNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.08, 0)
+pixel_size = 0.0035
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_stone")
+
+[node name="BoulderCenter" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+
+[node name="Sprite3D" type="Sprite3D" parent="BoulderCenter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.29, 0)
+pixel_size = 0.0042
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_stone")
+
+[node name="BoulderSouth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+
+[node name="Sprite3D" type="Sprite3D" parent="BoulderSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.08, 0)
+pixel_size = 0.0035
+billboard = 1
+shaded = true
+alpha_cut = 1
+texture_filter = 0
+texture = ExtResource("2_stone")

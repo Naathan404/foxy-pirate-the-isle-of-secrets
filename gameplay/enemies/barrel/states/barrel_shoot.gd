@@ -77,7 +77,9 @@ func _start_burst() -> void:
 	_shot_remaining = 0.0
 	_phase = AttackPhase.CHARGE
 	_phase_remaining = fire_delay
-	enemy.play_directional_animation(&"idle", true)
+	# Spine barrels open their lid while charging; the sprite sheet has no charge clip.
+	if not enemy.play_directional_animation(&"charge", true):
+		enemy.play_directional_animation(&"idle", true)
 	_start_charge_feedback()
 
 

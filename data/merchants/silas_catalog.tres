@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="4_arrow"]
 [ext_resource type="Resource" uid="uid://ch2ttumamq7po" path="res://data/items/consumables/small_healing_potion.tres" id="5_healing"]
 [ext_resource type="Resource" uid="uid://55f3a575p2bm" path="res://data/items/consumables/small_stamina_potion.tres" id="6_stamina"]
-[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/starfish_core.tres" id="7_starfish"]
+[ext_resource type="Resource" uid="uid://cywjrscuemerx" path="res://data/items/materials/hermit_shell.tres" id="7_hermit_shell"]
 [ext_resource type="Resource" uid="uid://yp4kcso8yfap" path="res://data/items/materials/crab_claw.tres" id="8_crab"]
 [ext_resource type="Resource" uid="uid://c8qmnr7cm6o2u" path="res://data/items/materials/gunpowder_bag.tres" id="9_gunpowder"]
 [ext_resource type="Resource" uid="uid://v35jilyjifwa" path="res://data/items/consumables/small_dual_essence_potion.tres" id="10_fmmac"]
@@ -76,10 +76,10 @@ item = ExtResource("11_large_stamina")
 buy_price = 35
 sell_price = 5
 
-[sub_resource type="Resource" id="Offer_starfish"]
+[sub_resource type="Resource" id="Offer_hermit_shell"]
 script = ExtResource("2_offer")
-offer_id = &"starfish_core"
-item = ExtResource("7_starfish")
+offer_id = &"hermit_shell"
+item = ExtResource("7_hermit_shell")
 buy_price = 50
 sell_price = 5
 
@@ -310,6 +310,6 @@ buy_price = 200
 
 [resource]
 script = ExtResource("1_catalog")
-offers = Array[ExtResource("2_offer")]([SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_large_healing"), SubResource("Offer_large_stamina"), SubResource("Offer_starfish"), SubResource("Offer_crab"), SubResource("Offer_gunpowder"), SubResource("Resource_pgjsf"), SubResource("Resource_a82x4"), SubResource("Resource_bggsi"), SubResource("Resource_yqegw"), SubResource("Resource_1q27o"), SubResource("Resource_xg348"), SubResource("Offer_skeleton_bone"), SubResource("Offer_misty_swamp_weed"), SubResource("Offer_wood_log"), SubResource("Offer_flame"), SubResource("Offer_fire_slime"), SubResource("Offer_cannonball"), SubResource("Offer_red_volcanic_soil"), SubResource("Offer_black_volcanic_soil"), SubResource("Offer_snowball"), SubResource("Offer_hard_stone"), SubResource("Offer_snow_ghost_cloak"), SubResource("Offer_eternal_ice"), SubResource("Offer_snowflake"), SubResource("Offer_curse_stone"), SubResource("Offer_gale_pace"), SubResource("Offer_turtle_shell"), SubResource("Offer_endurance_vessel"), SubResource("Offer_life_steal"), SubResource("Offer_double_strike"), SubResource("Offer_chaos_collector"), SubResource("Offer_backstabber"), SubResource("Offer_crimson_band"), SubResource("Offer_skull_cracker"), SubResource("Offer_momentum_strike"), SubResource("Offer_fortune_leaf")])
+offers = Array[ExtResource("2_offer")]([SubResource("Offer_arrow"), SubResource("Offer_healing"), SubResource("Offer_stamina"), SubResource("Offer_large_healing"), SubResource("Offer_large_stamina"), SubResource("Offer_hermit_shell"), SubResource("Offer_crab"), SubResource("Offer_gunpowder"), SubResource("Resource_pgjsf"), SubResource("Resource_a82x4"), SubResource("Resource_bggsi"), SubResource("Resource_yqegw"), SubResource("Resource_1q27o"), SubResource("Resource_xg348"), SubResource("Offer_skeleton_bone"), SubResource("Offer_misty_swamp_weed"), SubResource("Offer_wood_log"), SubResource("Offer_flame"), SubResource("Offer_fire_slime"), SubResource("Offer_cannonball"), SubResource("Offer_red_volcanic_soil"), SubResource("Offer_black_volcanic_soil"), SubResource("Offer_snowball"), SubResource("Offer_hard_stone"), SubResource("Offer_snow_ghost_cloak"), SubResource("Offer_eternal_ice"), SubResource("Offer_snowflake"), SubResource("Offer_curse_stone"), SubResource("Offer_gale_pace"), SubResource("Offer_turtle_shell"), SubResource("Offer_endurance_vessel"), SubResource("Offer_life_steal"), SubResource("Offer_double_strike"), SubResource("Offer_chaos_collector"), SubResource("Offer_backstabber"), SubResource("Offer_crimson_band"), SubResource("Offer_skull_cracker"), SubResource("Offer_momentum_strike"), SubResource("Offer_fortune_leaf")])
 guaranteed_buy_offer_ids = Array[StringName]([&"wooden_arrow", &"small_healing_potion", &"small_stamina_potion"])
 random_buy_offer_count = 9

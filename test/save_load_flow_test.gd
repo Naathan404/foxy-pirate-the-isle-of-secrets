@@ -43,10 +43,16 @@ func _run() -> void:
 	_check(not FileAccess.file_exists(sandbox.slot_path), "entering a safe room never saves")
 	var rest_point := _hub_rest_point()
 	_make_progress()
-	_check(await _interact(rest_point), "resting fades the screen to black first")
+	await _interact(rest_point)
 	var player: Player = sandbox.manager.player
 	_check(rest_point.is_menu_open() and paused, "interact opens the rest menu and pauses")
 	_check(sandbox.manager.state == sandbox.manager.State.REST_MENU, "rest menu owns the pause")
+	_check(
+		_rest_button(rest_point).visible and _rest_and_save_button(rest_point).visible,
+		"interact offers REST and REST and SAVE instead of resting at once"
+	)
+	_check(not FileAccess.file_exists(sandbox.slot_path), "opening the menu writes nothing")
+	_check(await _choose(rest_point, _rest_button(rest_point)), "REST fades the screen to black")
 	_check(
 		(
 			player.hp.get_current_hp() == player.hp.get_max_hp()
@@ -54,10 +60,13 @@ func _run() -> void:
 		),
 		"resting restores HP and SP"
 	)
-	_leave_button(rest_point).pressed.emit()
+	_check(not rest_point.is_menu_open() and not paused, "REST closes the menu and resumes")
+	_check(not FileAccess.file_exists(sandbox.slot_path), "REST alone writes nothing")
+
+	await _interact(rest_point)
+	_quit_button(rest_point).pressed.emit()
 	await sandbox.frames(2)
-	_check(not rest_point.is_menu_open() and not paused, "Leave closes the menu and resumes")
-	_check(not FileAccess.file_exists(sandbox.slot_path), "leaving without saving writes nothing")
+	_check(not rest_point.is_menu_open() and not paused, "QUIT closes the menu and resumes")
 
 	await _interact(rest_point)
 	await sandbox.press_action(&"ui_cancel")
@@ -69,18 +78,17 @@ func _run() -> void:
 
 	player.hp.take_damage(player.hp.get_max_hp() * DAMAGE_RATIO)
 	await _interact(rest_point)
-	_save_button(rest_point).pressed.emit()
-	await sandbox.frames(1)
+	await _choose(rest_point, _rest_and_save_button(rest_point))
 	var expected: Dictionary = sandbox.fingerprint()
-	_check(FileAccess.file_exists(sandbox.slot_path), "Save writes the slot")
-	_check(rest_point.get_node("RestMenu").get_result() == "Game saved.", "Save reports success")
+	_check(FileAccess.file_exists(sandbox.slot_path), "REST and SAVE writes the slot")
+	_check(rest_point.get_node("RestMenu").get_message() == "Game saved.", "Save reports success")
 	var saved: Dictionary = sandbox.read_slot_payload()
 	_check(
 		is_equal_approx(float(saved.player.hp), player.hp.get_max_hp()),
 		"the save holds the HP after resting"
 	)
 	_check(saved.location.scene == HUB_SCENE, "the save names the hub room")
-	_leave_button(rest_point).pressed.emit()
+	_quit_button(rest_point).pressed.emit()
 	await sandbox.frames(2)
 
 	for cycle: int in REPEAT_CYCLES:
@@ -88,8 +96,7 @@ func _run() -> void:
 		await _continue_from_menu(expected, "load %d" % (cycle + 1))
 		var loaded_rest_point := _hub_rest_point()
 		await _interact(loaded_rest_point)
-		_save_button(loaded_rest_point).pressed.emit()
-		await sandbox.frames(1)
+		await _choose(loaded_rest_point, _rest_and_save_button(loaded_rest_point))
 		_check(
 			sandbox.fingerprint() == expected,
 			(
@@ -97,7 +104,7 @@ func _run() -> void:
 				% [cycle + 1, SANDBOX.describe_difference(expected, sandbox.fingerprint())]
 			)
 		)
-		_leave_button(loaded_rest_point).pressed.emit()
+		_quit_button(loaded_rest_point).pressed.emit()
 		await sandbox.frames(2)
 
 	var slot_before := sandbox.read_slot_text()
@@ -228,20 +235,26 @@ func _continue_from_menu(expected: Dictionary, label: String) -> void:
 	_check(not paused and sandbox.manager.state == sandbox.manager.State.PLAYING, label + ": play")
 
 
-## Returns whether the screen was fading to black before the menu opened.
-func _interact(rest_point: CampfireRestPoint) -> bool:
+func _interact(rest_point: CampfireRestPoint) -> void:
 	var player: Player = sandbox.manager.player
 	player.global_position = rest_point.get_spawn_position()
 	player.velocity = Vector3.ZERO
 	await sandbox.frames(4)
+	await sandbox.press_action(SANDBOX.ACTION_INTERACT)
+	await sandbox.frames(2)
+
+
+## Presses a rest choice and returns whether the screen faded to black while resting.
+func _choose(rest_point: CampfireRestPoint, button: Button) -> bool:
 	# Listen for the black overlay appearing instead of sampling is_fading(): under load one
 	# long frame can run the whole fade before the test looks.
 	var fade := (rest_point.get_node("RestMenu") as RestMenu).get_node("%Fade") as CanvasItem
 	var shown: Array[bool] = [false]
 	var on_shown := func() -> void: shown[0] = shown[0] or fade.visible
 	fade.visibility_changed.connect(on_shown)
-	await sandbox.press_action(SANDBOX.ACTION_INTERACT)
-	await sandbox.wait_rest_menu(rest_point)
+	button.pressed.emit()
+	while rest_point.is_resting():
+		await process_frame
 	fade.visibility_changed.disconnect(on_shown)
 	return shown[0]
 
@@ -260,12 +273,16 @@ func _new_game_button(menu: Node) -> Button:
 	return menu.get_node("%NewGameButton") as Button
 
 
-func _save_button(rest_point: CampfireRestPoint) -> Button:
-	return rest_point.get_node("RestMenu").get_node("%SaveButton") as Button
+func _rest_button(rest_point: CampfireRestPoint) -> Button:
+	return rest_point.get_node("RestMenu").get_node("%RestButton") as Button
 
 
-func _leave_button(rest_point: CampfireRestPoint) -> Button:
-	return rest_point.get_node("RestMenu").get_node("%LeaveButton") as Button
+func _rest_and_save_button(rest_point: CampfireRestPoint) -> Button:
+	return rest_point.get_node("RestMenu").get_node("%RestAndSaveButton") as Button
+
+
+func _quit_button(rest_point: CampfireRestPoint) -> Button:
+	return rest_point.get_node("RestMenu").get_node("%QuitButton") as Button
 
 
 func _check(condition: bool, label: String) -> void:

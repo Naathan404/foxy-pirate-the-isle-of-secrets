@@ -44,8 +44,8 @@ func _ready() -> void:
 			attack_hitbox.hit_confirmed.connect(_on_player_hit_confirmed)
 	if is_instance_valid(target_detector):
 		target_detector.body_exited.connect(_on_ignored_player_exited)
-	if is_instance_valid(visual) and is_instance_valid(visual.sprite):
-		_normal_modulate = visual.sprite.modulate
+	if is_instance_valid(visual):
+		_normal_modulate = visual.get_tint()
 	died.connect(_end_anger)
 
 
@@ -96,12 +96,12 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(_delta: float) -> void:
-	if not is_instance_valid(visual) or not is_instance_valid(visual.sprite):
+	if not is_instance_valid(visual):
 		return
 	if anger_remaining > 0.0 and not dead:
 		var flash := visual._hit_flash_tween
 		if flash == null or not flash.is_running():
-			visual.sprite.modulate = _normal_modulate * anger_color
+			visual.set_tint(_normal_modulate * anger_color)
 
 
 func receive_damage(damage: DamageContext) -> float:
@@ -120,8 +120,8 @@ func receive_damage(damage: DamageContext) -> float:
 
 func _end_anger() -> void:
 	anger_remaining = 0.0
-	if is_instance_valid(visual) and is_instance_valid(visual.sprite):
-		visual.sprite.modulate = _normal_modulate
+	if is_instance_valid(visual):
+		visual.set_tint(_normal_modulate)
 	if not dead:
 		_apply_detection_radius.call_deferred()
 

@@ -1,8 +1,8 @@
 @tool
 class_name RoomMapData
 extends Resource
-## One room on the world map. `exits` is copied from the room scene by WorldMapSync;
-## `cell`, `hidden` and `marker` are authored and survive every sync.
+## One room on the world map. `exits` and `safe_room` are copied from the room scene by
+## WorldMapSync; `cell`, `hidden` and `marker` are authored and survive every sync.
 
 enum Direction { UP, RIGHT, DOWN, LEFT }
 enum Marker { NONE, CHECKPOINT, NPC }
@@ -20,6 +20,8 @@ const DIRECTION_OFFSETS: Dictionary[Direction, Vector2i] = {
 ## Hidden rooms are not drawn at all until the player has entered them.
 @export var hidden: bool = false
 @export var marker: Marker = Marker.NONE
+## Mirrors the scene's `BaseRoom.safe_room`: a place to rest, shown with a campfire badge.
+@export var safe_room: bool = false
 ## Open exits of the scene: direction -> destination scene path.
 @export var exits: Dictionary[Direction, String] = {}
 

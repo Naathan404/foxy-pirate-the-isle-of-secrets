@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://bdd0abfr8wdt0"
+path="res://.godot/imported/barrel_mimic.spine-json-1c1decd1ee425364c04c029c8f301166.spjson"
+
+[deps]
+
+source_file="res://assets/spine/enemies/Enemy_Barrel/barrel_mimic.spine-json"
+dest_files=["res://.godot/imported/barrel_mimic.spine-json-1c1decd1ee425364c04c029c8f301166.spjson"]
+
+[params]
+

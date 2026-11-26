@@ -24,8 +24,8 @@ chọn. Nó đọc tầm phát hiện thật từ scene quái, nên tự cập n
 | --- | --- | --- | --- |
 | Crab | cận chiến, đuổi theo trục X/Z | 4 m | tuần tra trong 12 m quanh điểm sinh |
 | Elite Crab | cận chiến, đẻ trứng nở Crab | 6,7 m | như Crab |
-| Starfish | lao thẳng vào vị trí đã khóa | 6,7 m | tuần tra |
-| Elite Starfish | như Starfish, đổi trục tuần tra | 10,1 m | tuần tra |
+| Hermit Crab | lao thẳng vào vị trí đã khóa | 6,7 m | tuần tra |
+| Elite Hermit Crab | như Hermit Crab, đổi trục tuần tra | 10,1 m | tuần tra |
 | Barrel | đứng yên, bắn loạt, đạn nảy trên tường | 6,5 m | không di chuyển |
 | Elite Barrel | đứng yên, bắn quạt và đợt đặc biệt | 10 m | không di chuyển |
 | Coral Skeleton | bắt đầu **ngủ**, tỉnh khi Foxy tới gần rồi đuổi và bắn | 3,5 m khi ngủ, 8 m khi thức | đi quanh điểm canh 3,5 m |
@@ -54,9 +54,9 @@ kể cả các vị trí ứng viên chỉ được bốc ngẫu nhiên. Spawner
 **E5. Theo vai trò.**
 - Quái bắn (Barrel, Coral Skeleton) đặt ở rìa xa cửa vào, có đường bắn thoáng tới giữa
   phòng. Đừng giấu Barrel sau vật chặn: đạn nảy trên tường sẽ dồn lại một góc.
-- Quái cận chiến (Crab, Starfish) đặt ở giữa đảo hoặc trên hướng người chơi tiến tới. Crab
+- Quái cận chiến (Crab, Hermit Crab) đặt ở giữa đảo hoặc trên hướng người chơi tiến tới. Crab
   tuần tra 12 m quanh điểm sinh, nên đặt gần tâm đảo để nó không lang thang tới cửa.
-- Starfish lao thẳng: chừa khoảng trống thẳng giữa nó và lối người chơi đi.
+- Hermit Crab lao thẳng: chừa khoảng trống thẳng giữa nó và lối người chơi đi.
 - Trộn đánh xa và đánh gần để người chơi phải di chuyển, nhưng không để quái bắn đứng ngay
   sau lưng quái cận chiến ở cự ly người chơi buộc phải chịu cả hai cùng lúc.
 

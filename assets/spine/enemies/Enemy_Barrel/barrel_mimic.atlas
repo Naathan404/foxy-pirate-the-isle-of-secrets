@@ -1,0 +1,97 @@
+
+barrel_mimic.png
+size: 976,536
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Barrel_Body
+  rotate: false
+  xy: 2, 148
+  size: 344, 386
+  orig: 362, 388
+  offset: 9, 1
+  index: -1
+Barrel_Eyes
+  rotate: true
+  xy: 693, 297
+  size: 132, 34
+  orig: 135, 35
+  offset: 2, 0
+  index: -1
+Barrel_Eyes_2
+  rotate: false
+  xy: 735, 9
+  size: 128, 39
+  orig: 137, 39
+  offset: 8, 0
+  index: -1
+Barrel_Lid
+  rotate: false
+  xy: 404, 2
+  size: 329, 157
+  orig: 332, 161
+  offset: 2, 0
+  index: -1
+Barrel_Lid_Open
+  rotate: true
+  xy: 735, 225
+  size: 309, 238
+  orig: 313, 244
+  offset: 2, 2
+  index: -1
+Barrel_Lip
+  rotate: false
+  xy: 616, 431
+  size: 109, 103
+  orig: 109, 104
+  offset: 0, 0
+  index: -1
+Barrel_Mouth
+  rotate: false
+  xy: 616, 357
+  size: 75, 72
+  orig: 76, 73
+  offset: 1, 0
+  index: -1
+Barrel_Octopus_Body
+  rotate: false
+  xy: 616, 166
+  size: 253, 57
+  orig: 255, 58
+  offset: 1, 1
+  index: -1
+Barrel_Octopus_Head
+  rotate: true
+  xy: 348, 161
+  size: 373, 266
+  orig: 373, 302
+  offset: 0, 0
+  index: -1
+Barrel_Tentacles
+  rotate: true
+  xy: 735, 50
+  size: 114, 118
+  orig: 114, 118
+  offset: 0, 0
+  index: -1
+Barrel_Tentacles 2
+  rotate: true
+  xy: 2, 25
+  size: 121, 251
+  orig: 122, 251
+  offset: 1, 0
+  index: -1
+Barrel_Tentacles 3
+  rotate: false
+  xy: 255, 8
+  size: 147, 138
+  orig: 147, 138
+  offset: 0, 0
+  index: -1
+Barrel_Tentacles 4
+  rotate: false
+  xy: 871, 63
+  size: 103, 160
+  orig: 112, 161
+  offset: 0, 0
+  index: -1

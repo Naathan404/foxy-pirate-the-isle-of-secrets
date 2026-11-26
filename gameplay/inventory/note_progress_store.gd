@@ -4,6 +4,11 @@ extends Node
 signal changed(note_id: StringName)
 
 const SAVE_VERSION := 1
+## Note IDs that were renamed, so older saves keep their unlocked notes.
+const RENAMED_NOTE_IDS: Dictionary[String, String] = {
+	"starfish": "hermit_crab",
+	"elite_starfish": "elite_hermit_crab",
+}
 @export var save_path: String = "user://monster_notes.save"
 var _states: Dictionary = {}
 
@@ -38,7 +43,7 @@ func apply_save_data(saved: Dictionary) -> bool:
 	var unlocked: Dictionary = saved.get("unlocked", {})
 	for key: Variant in unlocked:
 		if key is String and not String(key).is_empty() and unlocked[key] is bool:
-			_states[key] = unlocked[key]
+			_store_loaded_state(key, unlocked[key])
 	for key: String in _merged_keys(previous, _states):
 		if previous.get(key) != _states.get(key):
 			changed.emit(StringName(key))
@@ -63,7 +68,7 @@ func load_progress() -> bool:
 		return false
 	for key in payload.states:
 		if key is String and not key.is_empty() and payload.states[key] is bool:
-			_states[key] = payload.states[key]
+			_store_loaded_state(key, payload.states[key])
 	return true
 
 
@@ -74,6 +79,16 @@ func save_progress() -> bool:
 		return false
 	file.store_var({"version": SAVE_VERSION, "states": _states}, false)
 	return true
+
+
+## An entry already stored under the new ID wins over one under its old ID.
+func _store_loaded_state(key: String, unlocked: bool) -> void:
+	if not RENAMED_NOTE_IDS.has(key):
+		_states[key] = unlocked
+		return
+	var renamed := RENAMED_NOTE_IDS[key]
+	if not _states.has(renamed):
+		_states[renamed] = unlocked
 
 
 func _merged_keys(first: Dictionary, second: Dictionary) -> Array[String]:

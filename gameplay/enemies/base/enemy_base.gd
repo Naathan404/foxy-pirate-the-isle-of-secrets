@@ -329,15 +329,9 @@ func receive_damage(damage: DamageContext) -> float:
 
 func _damage_popup_position() -> Vector3:
 	var position := global_position + Vector3.UP * damage_popup_min_height
-	if (
-		is_instance_valid(visual)
-		and is_instance_valid(visual.sprite)
-		and visual.sprite.texture != null
-	):
-		var sprite := visual.sprite
-		var bounds := sprite.get_aabb()
-		var top := sprite.to_global(Vector3(0.0, bounds.end.y, 0.0))
-		position.y = maxf(position.y, top.y + damage_popup_headroom)
+	var top: float = visual.get_top_y() if is_instance_valid(visual) else NAN
+	if not is_nan(top):
+		position.y = maxf(position.y, top + damage_popup_headroom)
 	return position
 
 

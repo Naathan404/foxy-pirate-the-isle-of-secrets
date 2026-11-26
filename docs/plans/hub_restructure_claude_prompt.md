@@ -97,7 +97,7 @@ Mỗi biome có vị trí **điểm tele checkpoint** và **lửa trại checkpo
 | Trụ đá cỏ | Cùng quy tắc trụ. | 10 đuôi đom đóm, 10 dây leo, 10 đầu nấm, 20 xương skeleton, 20 gỗ cây, 20 cỏ dại, 3 đá bị nguyền rủa. |
 | Nhà thợ rèn | Xây xong giảm chi phí thợ rèn 10%. | 10 nguyên liệu mỗi loại từ cây cối của cả bốn map; không gồm nguyên liệu quái. |
 | Lều thương nhân | Xây xong giảm 10% giá mọi sản phẩm. | Tầng 1: 10 nguyên liệu mỗi loại từ cây cối của cả bốn map; không gồm nguyên liệu quái. |
-| Tele checkpoint Coral | Xây lại ở checkpoint, sau đó có thể về Hub. | 5 lõi sao biển, 5 càng cua biển, 5 thùng thuốc súng, 10 xương skeleton, 12 băng vĩnh cửu, 12 hoa tuyết. |
+| Tele checkpoint Coral | Xây lại ở checkpoint, sau đó có thể về Hub. | 5 mảnh vỏ ốc mượn hồn, 5 càng cua biển, 5 thùng thuốc súng, 10 xương skeleton, 12 băng vĩnh cửu, 12 hoa tuyết. |
 | Tele checkpoint Swamp | Như trên. | 5 đuôi đom đóm, 5 dây leo, 5 đầu nấm, 10 xương skeleton, 12 gỗ cây, 12 cỏ dại. |
 | Tele checkpoint Lava | Như trên. | 5 lửa của song sinh, 5 càng cua biển, 5 đạn thuốc súng, 10 xương skeleton, 12 đá đen, 12 đá đỏ. |
 | Tele checkpoint Ice | Như trên. | 5 đuôi đom đóm, 5 dây leo, 5 đầu nấm, 10 xương skeleton, 12 băng vĩnh cửu, 12 hoa tuyết. |

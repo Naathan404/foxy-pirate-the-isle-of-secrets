@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cym3xxiifvnpt"]
 
-[ext_resource type="Script" path="res://gameplay/save/rest_menu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://ceihgisrop34m" path="res://gameplay/save/rest_menu.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
 
 [sub_resource type="StyleBoxFlat" id="panel_style"]
@@ -19,12 +19,12 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[node name="RestMenu" type="CanvasLayer"]
+[node name="RestMenu" type="CanvasLayer" unique_id=1556338765]
 process_mode = 3
 layer = 30
 script = ExtResource("1_script")
 
-[node name="Root" type="Control" parent="."]
+[node name="Root" type="Control" parent="." unique_id=343227595]
 unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
@@ -34,7 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_theme")
 
-[node name="Dim" type="ColorRect" parent="Root"]
+[node name="Dim" type="ColorRect" parent="Root" unique_id=711273555]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,7 +43,8 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.02, 0.01, 0.015, 0.55)
 
-[node name="Center" type="CenterContainer" parent="Root"]
+[node name="Center" type="CenterContainer" parent="Root" unique_id=2016050361]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -51,22 +52,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Root/Center"]
+[node name="Panel" type="PanelContainer" parent="Root/Center" unique_id=1389898420]
 custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("panel_style")
 
-[node name="Content" type="VBoxContainer" parent="Root/Center/Panel"]
+[node name="Content" type="VBoxContainer" parent="Root/Center/Panel" unique_id=725117637]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="Root/Center/Panel/Content"]
+[node name="Title" type="Label" parent="Root/Center/Panel/Content" unique_id=1754196974]
 layout_mode = 2
 theme_type_variation = &"HeadingLabel"
-text = "Campfire"
+text = "CAMPFIRE"
 horizontal_alignment = 1
 
-[node name="Message" type="Label" parent="Root/Center/Panel/Content"]
+[node name="Message" type="Label" parent="Root/Center/Panel/Content" unique_id=2063687701]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
@@ -74,7 +75,7 @@ theme_type_variation = &"BodyLabel"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Slot" type="Label" parent="Root/Center/Panel/Content"]
+[node name="Slot" type="Label" parent="Root/Center/Panel/Content" unique_id=2065964094]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
@@ -82,38 +83,35 @@ theme_type_variation = &"MutedLabel"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Result" type="Label" parent="Root/Center/Panel/Content"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(480, 0)
+[node name="Buttons" type="HBoxContainer" parent="Root/Center/Panel/Content" unique_id=575072503]
 layout_mode = 2
-theme_type_variation = &"BodyLabel"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Buttons" type="HBoxContainer" parent="Root/Center/Panel/Content"]
-layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 alignment = 1
 
-[node name="SaveButton" type="Button" parent="Root/Center/Panel/Content/Buttons"]
+[node name="RestButton" type="Button" parent="Root/Center/Panel/Content/Buttons" unique_id=333081085]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 60)
+custom_minimum_size = Vector2(180, 60)
 layout_mode = 2
 theme_type_variation = &"ActionButton"
-text = "Save game"
+text = "REST"
 
-[node name="LeaveButton" type="Button" parent="Root/Center/Panel/Content/Buttons"]
+[node name="RestAndSaveButton" type="Button" parent="Root/Center/Panel/Content/Buttons" unique_id=1855804222]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 60)
+custom_minimum_size = Vector2(180, 60)
 layout_mode = 2
 theme_type_variation = &"ActionButton"
-text = "Leave"
+text = "SAVE"
 
-[node name="Fade" type="ColorRect" parent="."]
+[node name="QuitButton" type="Button" parent="Root/Center/Panel/Content/Buttons" unique_id=1835493289]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 60)
+layout_mode = 2
+theme_type_variation = &"ActionButton"
+text = "QUIT"
+
+[node name="Fade" type="ColorRect" parent="." unique_id=1221099414]
 unique_name_in_owner = true
 visible = false
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

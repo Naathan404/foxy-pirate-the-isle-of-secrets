@@ -105,8 +105,8 @@ func _check_rest_resets_rooms() -> void:
 	var seed_before := registry.cycle_seed
 	var rest_point: CampfireRestPoint = sandbox.find_rest_points(current_scene)[0]
 	_check(rest_point.rest(sandbox.manager.player), "rest at the hub campfire")
-	_check(await sandbox.wait_rest_menu(rest_point), "rest menu opens after the fade")
-	rest_point.close_menu()
+	_check(await sandbox.choose_rest_and_wait(rest_point, false), "REST finishes after the fade")
+	_check(not rest_point.is_menu_open(), "REST closes the menu")
 	_check(registry.cycle_seed != seed_before, "rest starts a new cycle")
 	_check(registry.rest_location == rest_point.get_location(), "rest sets the respawn point")
 	_check(not FileAccess.file_exists(sandbox.slot_path), "resting alone does not save")
@@ -338,9 +338,8 @@ func _enter_cycle_with_enemy() -> void:
 func _rest_in_hub_and_save() -> void:
 	await _go(HUB)
 	var rest_point: CampfireRestPoint = sandbox.find_rest_points(current_scene)[0]
-	_check(rest_point.rest(sandbox.manager.player), "rest before saving")
-	await sandbox.wait_rest_menu(rest_point)
-	_check(rest_point.request_save() == OK, "save at the hub campfire")
+	_check(rest_point.rest(sandbox.manager.player), "open the hub campfire menu")
+	await sandbox.choose_rest_and_wait(rest_point, true)
 	rest_point.close_menu()
 
 

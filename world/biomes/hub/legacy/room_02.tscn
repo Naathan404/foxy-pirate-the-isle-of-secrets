@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://do11yymjfdkeh"]
+
+[ext_resource type="PackedScene" uid="uid://dvcp054f5fk0n" path="res://world/biomes/hub/base_scenes/base_large_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="3_campfire"]
+
+[node name="room_02" unique_id=1906107977 instance=ExtResource("1_base")]
+up_destination_scene = "res://world/biomes/hub/legacy/room_06.tscn"
+right_destination_scene = "res://world/biomes/hub/legacy/room_03.tscn"
+down_destination_scene = "res://world/biomes/hub/legacy/room_09.tscn"
+left_destination_scene = "res://world/biomes/hub/legacy/room_01.tscn"
+metadata/room_role = "Checkpoint"
+
+[node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
+light_energy = 1.5
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" parent_id_path=PackedInt32Array(872527392) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/hub/legacy/room_09.tscn"
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/hub/legacy/room_06.tscn"
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/hub/legacy/room_03.tscn"
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/hub/legacy/room_01.tscn"
+
+[node name="Foxy" parent="." index="3" unique_id=1350175917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.0626488, 0)
+
+[node name="Campfire" parent="." index="5" unique_id=1319818078 instance=ExtResource("3_campfire")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.2941122, 0)
+
+[editable path="Exits/DownPath"]
+[editable path="Exits/DownPath/SceneChangeTrigger"]
+[editable path="Exits/UpPath"]
+[editable path="Exits/UpPath/SceneChangeTrigger"]
+[editable path="Exits/RightPath"]
+[editable path="Exits/RightPath/SceneChangeTrigger"]
+[editable path="Exits/LeftPath"]
+[editable path="Exits/LeftPath/SceneChangeTrigger"]
+[editable path="Environment/BaseGround"]

@@ -1,0 +1,39 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bs4nc5bt2rn0m"]
+
+[ext_resource type="Shader" uid="uid://c2kd8ahuutccq" path="res://assets/vfx/fire_trails/shaders/Trail_Fire.gdshader" id="1_fff95"]
+[ext_resource type="Texture2D" uid="uid://dh3uyuvmafoy7" path="res://assets/vfx/fire_trails/textures/T_VFX_Noise_08.tga" id="2_cba10"]
+[ext_resource type="Texture2D" uid="uid://6xygblp13liu" path="res://assets/vfx/fire_trails/textures/T_VFX_Perlin_Noise_01.tga" id="3_e1ced"]
+[ext_resource type="Texture2D" uid="uid://diyt8n4sugd0c" path="res://assets/vfx/fire_trails/textures/T_VFX_Noise_04.tga" id="4_16b19"]
+[ext_resource type="Texture2D" uid="uid://ce2qbjmivntan" path="res://assets/vfx/fire_trails/textures/T_VFX_Trail_01.tga" id="5_e4444"]
+
+[resource]
+shader = ExtResource("1_fff95")
+shader_parameter/emissive_intensity = 1
+shader_parameter/alpha_affects_opacity = 1
+shader_parameter/overall_speed = 1
+shader_parameter/color = ExtResource("2_cba10")
+shader_parameter/color_sampling = Vector3i(0, 0, 1)
+shader_parameter/color_uv_scale = Vector4(0.5, 1, 0, 0)
+shader_parameter/color_pan_speed = Vector4(-0.733, 0.113, 0, 0)
+shader_parameter/color01 = Color(1, 1, 1, 0)
+shader_parameter/color02 = Color(1, 1, 1, 0)
+shader_parameter/color_smoothstep = 0
+shader_parameter/color_smoothstep_smoothness = 1
+shader_parameter/distortion = ExtResource("3_e1ced")
+shader_parameter/distortion_sampling = Vector3i(0, 0, 1)
+shader_parameter/distortion_uv_scale = Vector4(0.1, 0.3, 0, 0)
+shader_parameter/distortion_pan_speed = Vector4(-1, 0.05, 0, 0)
+shader_parameter/distortion_amount = 0.2
+shader_parameter/erosion = ExtResource("4_16b19")
+shader_parameter/erosion_sampling = Vector3i(0, 0, 1)
+shader_parameter/erosion_uv_scale = Vector4(0.1, 0.3, 0, 0)
+shader_parameter/erosion_pan_speed = Vector4(-0.337, 0.07, 0, 0)
+shader_parameter/erosion_smoothstep = 0
+shader_parameter/erosion_smoothstep_smoothness = 0.3
+shader_parameter/mask = ExtResource("5_e4444")
+shader_parameter/mask_sampling = Vector3i(0, 1, 1)
+shader_parameter/mask_uv_scale = Vector4(0.25, 1, 0, 0)
+shader_parameter/mask_pan_speed = Vector4(-2.2, 0, 0, 0)
+shader_parameter/mask_distortion_intensity = 1
+shader_parameter/mask_smoothstep = 0
+shader_parameter/mask_smoothstep_smoothness = 1

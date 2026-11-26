@@ -1,0 +1,181 @@
+
+crab_charge_side_adjusted.png
+size: 1294,1046
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+alert
+  rotate: true
+  xy: 376, 508
+  size: 150, 148
+  orig: 150, 148
+  offset: 0, 0
+  index: -1
+body
+  rotate: true
+  xy: 541, 212
+  size: 317, 219
+  orig: 318, 219
+  offset: 0, 0
+  index: -1
+coral
+  rotate: false
+  xy: 742, 729
+  size: 307, 315
+  orig: 309, 319
+  offset: 1, 2
+  index: -1
+crack
+  rotate: false
+  xy: 269, 7
+  size: 302, 110
+  orig: 420, 110
+  offset: 88, 0
+  index: -1
+dust
+  rotate: true
+  xy: 269, 119
+  size: 387, 189
+  orig: 387, 190
+  offset: 0, 1
+  index: -1
+face
+  rotate: true
+  xy: 452, 690
+  size: 354, 288
+  orig: 355, 288
+  offset: 1, 0
+  index: -1
+flap_L
+  rotate: true
+  xy: 762, 26
+  size: 304, 188
+  orig: 304, 188
+  offset: 0, 0
+  index: -1
+flap_R
+  rotate: true
+  xy: 952, 26
+  size: 304, 188
+  orig: 304, 188
+  offset: 0, 0
+  index: -1
+glow
+  rotate: false
+  xy: 1051, 813
+  size: 231, 231
+  orig: 256, 256
+  offset: 13, 12
+  index: -1
+horn_L
+  rotate: true
+  xy: 1142, 223
+  size: 107, 136
+  orig: 107, 136
+  offset: 0, 0
+  index: -1
+horn_R
+  rotate: true
+  xy: 1142, 114
+  size: 107, 136
+  orig: 107, 136
+  offset: 0, 0
+  index: -1
+leg_back_L
+  rotate: false
+  xy: 526, 531
+  size: 136, 157
+  orig: 136, 157
+  offset: 0, 0
+  index: -1
+leg_back_R
+  rotate: false
+  xy: 664, 533
+  size: 136, 155
+  orig: 136, 157
+  offset: 0, 1
+  index: -1
+leg_front_L
+  rotate: false
+  xy: 573, 4
+  size: 187, 206
+  orig: 187, 206
+  offset: 0, 0
+  index: -1
+leg_front_R
+  rotate: true
+  xy: 1051, 624
+  size: 187, 200
+  orig: 187, 206
+  offset: 0, 3
+  index: -1
+leg_mid_L
+  rotate: true
+  xy: 802, 546
+  size: 181, 192
+  orig: 181, 192
+  offset: 0, 0
+  index: -1
+leg_mid_R
+  rotate: true
+  xy: 802, 363
+  size: 181, 192
+  orig: 181, 192
+  offset: 0, 0
+  index: -1
+ring
+  rotate: true
+  xy: 2, 2
+  size: 504, 134
+  orig: 520, 150
+  offset: 8, 8
+  index: -1
+rock
+  rotate: true
+  xy: 460, 120
+  size: 47, 50
+  orig: 60, 60
+  offset: 7, 6
+  index: -1
+shadow
+  rotate: true
+  xy: 376, 660
+  size: 384, 74
+  orig: 388, 77
+  offset: 1, 2
+  index: -1
+shell
+  rotate: true
+  xy: 2, 508
+  size: 536, 372
+  orig: 537, 372
+  offset: 1, 0
+  index: -1
+spark
+  rotate: true
+  xy: 1142, 50
+  size: 62, 61
+  orig: 64, 64
+  offset: 1, 1
+  index: -1
+speed
+  rotate: true
+  xy: 460, 169
+  size: 337, 79
+  orig: 380, 110
+  offset: 40, 18
+  index: -1
+star
+  rotate: false
+  xy: 996, 332
+  size: 296, 290
+  orig: 300, 300
+  offset: 2, 5
+  index: -1
+trail
+  rotate: true
+  xy: 138, 25
+  size: 481, 129
+  orig: 520, 130
+  offset: 39, 0
+  index: -1
