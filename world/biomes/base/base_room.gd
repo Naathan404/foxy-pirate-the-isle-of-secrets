@@ -2,6 +2,9 @@
 class_name BaseRoom
 extends Node3D
 
+## Emitted after the invisible player walls were (re)built, for visuals that follow them.
+signal player_boundaries_rebuilt(walls: StaticBody3D)
+
 ## Configure the four paths and choose destination exits from this room's Inspector.
 ## A room always keeps at least one path open.
 
@@ -355,6 +358,8 @@ func _create_ground_boundaries(
 	# Shapes go in before the body enters the tree: a body already in the physics space rebuilds
 	# its compound shape on every added wall, which made a rebuild cost tens of milliseconds.
 	add_child(walls)
+	if layer == CombatLayers.PLAYER_BOUNDARY:
+		player_boundaries_rebuilt.emit(walls)
 
 
 func _collect_floors(body: Node, floors: Array[Dictionary]) -> void:

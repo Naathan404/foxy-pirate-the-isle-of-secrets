@@ -2,36 +2,27 @@
 
 [ext_resource type="PackedScene" uid="uid://dcwn2dbcin646" path="res://world/biomes/coral_valley/base_scenes/raid_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
+[ext_resource type="PackedScene" uid="uid://d0ygcokpmdb3n" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="beach_palm_01"]
+[ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="beach_palm_02"]
+[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="beach_palm_03"]
+[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
+[ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/camp_lantern.tscn" id="camp_lantern"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
+[ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="harbor_boat"]
 [ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
 [ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
 [ext_resource type="Texture2D" uid="uid://cvcfgrq3fwe6v" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_right.png" id="pier_right"]
 [ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
 [ext_resource type="Texture2D" uid="uid://cm3wjn7fioayj" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_07_ground.png" id="sand_texture"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="shell"]
 [ext_resource type="Texture2D" uid="uid://c1jmw47rhx24n" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_07_shore.png" id="shore_texture"]
-[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
-
-[ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
-
 [ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="silas"]
-
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/camp_lantern.tscn" id="camp_lantern"]
-
-[ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="harbor_boat"]
-
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="wood_log"]
 
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="shell"]
-
-[ext_resource type="PackedScene" uid="uid://d0ygcokpmdb3n" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="beach_palm_01"]
-
-[ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="beach_palm_02"]
-
-[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="beach_palm_03"]
-
-[sub_resource type="Environment" id="Environment_nbdph"]
+[sub_resource type="Environment" id="Environment_7s4be"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.08, 0.05, 0.08, 1)
@@ -55,7 +46,7 @@ height = 256
 noise = SubResource("FastNoiseLite_water")
 seamless = true
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tgifw"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ncph4"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("lagoon_shader")
@@ -86,9 +77,9 @@ shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
 shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
 shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
 
-[sub_resource type="QuadMesh" id="QuadMesh_sjck1"]
+[sub_resource type="QuadMesh" id="QuadMesh_6yyxv"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_tgifw")
+material = SubResource("ShaderMaterial_ncph4")
 size = Vector2(400, 400)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
@@ -103,7 +94,7 @@ shader_parameter/cloud_coverage = 0.45
 shader_parameter/cloud_softness = 0.18
 shader_parameter/cloud_shadow_strength = 0.35
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_iunoe"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_y6cau"]
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
@@ -114,15 +105,15 @@ shader_parameter/vignette_color = Color(0.12, 0.05, 0.04, 1)
 shader_parameter/vignette_strength = 0.38
 
 [node name="room_07" unique_id=1757759230 instance=ExtResource("1_base")]
+editor_description = "Last Camp (checkpoint 3): the only safe room before the boss. A lantern-lit road runs from the west pier to the east pier past the campfire plaza; Silas keeps his stall by the road; two wrecked boats lie on the north beach. Golden-hour light, no enemies, no tide."
+safe_room = true
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_08.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
-editor_description = "Last Camp (checkpoint 3): the only safe room before the boss. A lantern-lit road runs from the west pier to the east pier past the campfire plaza; Silas keeps his stall by the road; two wrecked boats lie on the north beach. Golden-hour light, no enemies, no tide."
-safe_room = true
 metadata/room_role = "Checkpoint"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_nbdph")
+environment = SubResource("Environment_7s4be")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
@@ -134,7 +125,7 @@ directional_shadow_mode = 0
 directional_shadow_max_distance = 45.0
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
-mesh = SubResource("QuadMesh_sjck1")
+mesh = SubResource("QuadMesh_6yyxv")
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 visible = false
@@ -192,10 +183,10 @@ texture = ExtResource("sand_texture")
 [node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1381543041 instance=ExtResource("sea_glints")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
 
-[node name="RoomAtmosphere" parent="." index="8" unique_id=1371893270 instance=ExtResource("atmosphere")]
+[node name="RoomAtmosphere" parent="." index="5" unique_id=1371893270 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1371893270, 1300233738) index="0" unique_id=1611482802]
-material = SubResource("ShaderMaterial_iunoe")
+material = SubResource("ShaderMaterial_y6cau")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1371893270, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
@@ -206,76 +197,73 @@ leaf_rotation_speed = 0.3
 trail_count = 6
 trail_color = Color(0.78, 0.95, 0.94, 0.4)
 
-[node name="Campfire" parent="." instance=ExtResource("campfire")]
+[node name="Campfire" parent="." index="6" unique_id=339291566 instance=ExtResource("campfire")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.252, 0.3)
 ground_shadow = true
 
-[node name="CampfireEmbers" parent="." instance=ExtResource("campfire_embers")]
+[node name="CampfireEmbers" parent="." index="7" unique_id=844001874 instance=ExtResource("campfire_embers")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.652, 1.7)
 
-[node name="Silas" parent="." instance=ExtResource("silas")]
+[node name="Silas" parent="." index="8" unique_id=42462515 instance=ExtResource("silas")]
 editor_description = "Silas waits by the lantern road for a last trade before the boss."
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.6, 0.252, -5.2)
-shop_panel_path = NodePath("")
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.15141487, 0.252, -9.730137)
 
-[node name="Scenery" type="Node3D" parent="."]
+[node name="Scenery" type="Node3D" parent="." index="9" unique_id=684715523]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 
-[node name="LanternWestPier" parent="Scenery" instance=ExtResource("camp_lantern")]
+[node name="LanternWestPier" parent="Scenery" index="0" unique_id=254818799 instance=ExtResource("camp_lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, -2.9)
 
-[node name="LanternWestRoad" parent="Scenery" instance=ExtResource("camp_lantern")]
+[node name="LanternWestRoad" parent="Scenery" index="1" unique_id=1485739848 instance=ExtResource("camp_lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -2.8)
 
-[node name="LanternWestSouth" parent="Scenery" instance=ExtResource("camp_lantern")]
+[node name="LanternWestSouth" parent="Scenery" index="2" unique_id=308685700 instance=ExtResource("camp_lantern")]
 transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -10.2, 0, 3)
 
-[node name="LanternEastRoad" parent="Scenery" instance=ExtResource("camp_lantern")]
+[node name="LanternEastRoad" parent="Scenery" index="3" unique_id=1326410804 instance=ExtResource("camp_lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -2.8)
 
-[node name="LanternEastPier" parent="Scenery" instance=ExtResource("camp_lantern")]
+[node name="LanternEastPier" parent="Scenery" index="4" unique_id=139396299 instance=ExtResource("camp_lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -2.9)
 
-[node name="LanternEastSouth" parent="Scenery" instance=ExtResource("camp_lantern")]
+[node name="LanternEastSouth" parent="Scenery" index="5" unique_id=1090630125 instance=ExtResource("camp_lantern")]
 transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 10.4, 0, 3)
 
-[node name="WreckWest" parent="Scenery" instance=ExtResource("harbor_boat")]
+[node name="WreckWest" parent="Scenery" index="6" unique_id=66923694 instance=ExtResource("harbor_boat")]
 transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, -6, 0, -12.6)
-ground_shadow = false
 
-[node name="WreckEast" parent="Scenery" instance=ExtResource("harbor_boat")]
+[node name="WreckEast" parent="Scenery" index="7" unique_id=188570558 instance=ExtResource("harbor_boat")]
 transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 5.4, 0, -13.6)
-ground_shadow = false
 
-[node name="BenchNorthWest" parent="Scenery" instance=ExtResource("wood_log")]
+[node name="BenchNorthWest" parent="Scenery" index="8" unique_id=756790179 instance=ExtResource("wood_log")]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, -3.7, 0, -3.4)
 ground_shadow = true
 
-[node name="BenchNorthEast" parent="Scenery" instance=ExtResource("wood_log")]
+[node name="BenchNorthEast" parent="Scenery" index="9" unique_id=25793242 instance=ExtResource("wood_log")]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 3.7, 0, -3.4)
 ground_shadow = true
 
-[node name="StallLogs" parent="Scenery" instance=ExtResource("wood_log")]
+[node name="StallLogs" parent="Scenery" index="10" unique_id=688517261 instance=ExtResource("wood_log")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 11, 0, -6.6)
 ground_shadow = true
 
-[node name="StallShell" parent="Scenery" instance=ExtResource("shell")]
+[node name="StallShell" parent="Scenery" index="11" unique_id=1396324470 instance=ExtResource("shell")]
 transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 6.6, 0, -6.8)
 ground_shadow = true
 
-[node name="PalmTallNorthWest" parent="Scenery" instance=ExtResource("beach_palm_03")]
+[node name="PalmTallNorthWest" parent="Scenery" index="12" unique_id=1151446676 instance=ExtResource("beach_palm_03")]
 transform = Transform3D(2.1, 0, 0, 0, 2.1, 0, 0, 0, 2.1, -12.5, 0, -9.5)
 ground_shadow = true
 
-[node name="PalmLeaningNorthEast" parent="Scenery" instance=ExtResource("beach_palm_01")]
+[node name="PalmLeaningNorthEast" parent="Scenery" index="13" unique_id=1490072809 instance=ExtResource("beach_palm_01")]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 12.8, 0, -10.6)
 ground_shadow = true
 
-[node name="PalmShortSouthWest" parent="Scenery" instance=ExtResource("beach_palm_02")]
+[node name="PalmShortSouthWest" parent="Scenery" index="14" unique_id=63907975 instance=ExtResource("beach_palm_02")]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, -11.4, 0, 9)
 ground_shadow = true
 
-[node name="PalmShortSouthEast" parent="Scenery" instance=ExtResource("beach_palm_02")]
+[node name="PalmShortSouthEast" parent="Scenery" index="15" unique_id=926605991 instance=ExtResource("beach_palm_02")]
 transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, 11.6, 0, 9.6)
 ground_shadow = true
 

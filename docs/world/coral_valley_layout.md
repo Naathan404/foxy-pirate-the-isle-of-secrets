@@ -144,7 +144,7 @@ cuối: móc + triều + quái) → `07` Trại Cuối Bờ (lửa trại và Si
 | Phòng ẩn `12` | 30–50 vàng và bản vẽ Harpoon |
 | Phòng ẩn `20` | 30–50 vàng và ghi chép Elite Crab |
 | Phòng ẩn `24` | 30–50 vàng (rương trên đảo móc, giữ nguyên) |
-| Bệ thử thách | 1 Ngọc Triều mỗi bệ; bệ `16` thêm Charm Tide Grapple |
+| Bệ thử thách | 1 Ngọc Triều mỗi bệ; Charm Tide Grapple ở rương thưởng Raid `16` |
 | Boss `08` | 10–20 vàng, Chìa khóa Thủy Triều, Nhật ký Thủy Triều |
 
 Tide Grapple không còn là thưởng boss: nó là chìa khóa giữa map, nên các phòng móc nằm trong

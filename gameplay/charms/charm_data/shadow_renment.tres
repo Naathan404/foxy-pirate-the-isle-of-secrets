@@ -12,7 +12,7 @@ description = "Leave a shadow at the start of a dash. It bursts after half a sec
 sprite = ExtResource("3")
 effect_scene = ExtResource("2")
 acquisition_source = &"prototype_debug"
-content_status = 1
+drop_chance = 0.0
 tags = Array[StringName]([&"passive"])
 effect_params = {
 "damage_multiplier": 1.5,

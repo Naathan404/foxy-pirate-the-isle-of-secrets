@@ -22,6 +22,9 @@ const RUN_BOB_AMPLITUDE := 18.0
 const RUN_CLIP_SECONDS := 0.7
 const RUN_STRIDES_PER_CLIP := 2.0
 const STRAY_EYE_SLOT := "Eyes/Eyes_01"
+## Root bones of the up/down dash clips. Their scale keys squash the whole body to half its
+## height (Y down to 0.5 while X widens), which reads as flattened from the gameplay camera.
+const VERTICAL_DASH_ROOT_BONES := {"U_Dash": "center_U", "D_Dash": "center_D"}
 ## Some Spine 3.8 dash clips are exposed by name but not as animation objects.
 const DASH_CLIP_DURATION := 0.5
 ## spine-godot (GDExtension). Builds without it keep the sprite-sheet Foxy.
@@ -87,6 +90,9 @@ var skeleton_data_path: String = "res://assets/spine/foxy_anim_spine/foxy_skelet
 @export var artwork_faces_left: bool = true
 ## Scale the fitted Spine artwork without moving its feet from the sprite baseline.
 @export_range(0.25, 3.0, 0.05, "or_greater") var size_multiplier: float = 1.0
+## Share of the up/down dash clips' authored squash and stretch that is kept (1 = as animated,
+## 0 = none). The clips stay untouched so a new artist export still converts as is.
+@export_range(0.0, 1.0, 0.05) var vertical_dash_squash: float = 0.4
 
 var _spine: Node3D
 var _load_attempted: bool = false
@@ -391,6 +397,18 @@ func sync_animation(
 func _on_spine_pose_applied(_sprite: Node) -> void:
 	if RUN_BOB_BONES.has(_current_spine_animation):
 		_even_out_run_bob(_current_spine_animation)
+	elif VERTICAL_DASH_ROOT_BONES.has(_current_spine_animation):
+		_soften_dash_squash(_current_spine_animation)
+
+
+func _soften_dash_squash(animation_name: String) -> void:
+	var bone = _spine.get_skeleton().find_bone(VERTICAL_DASH_ROOT_BONES[animation_name])
+	if bone == null:
+		return
+	# The root's setup scale is 1, so blending toward 1 scales the authored squash down.
+	var pose = bone.get_pose()
+	pose.set_scale_x(lerpf(1.0, float(pose.get_scale_x()), vertical_dash_squash))
+	pose.set_scale_y(lerpf(1.0, float(pose.get_scale_y()), vertical_dash_squash))
 
 
 func _even_out_run_bob(animation_name: String) -> void:

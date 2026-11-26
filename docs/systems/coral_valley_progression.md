@@ -16,11 +16,12 @@ phía boss bị **Cổng Ngọc Triều** chặn tới khi người chơi đặt
 
 | Bệ thờ | Phòng | Cờ | Cách tới |
 | --- | --- | --- | --- |
-| Ngọc Dũng Khí | `room_16` | `coral_valley_pearl_courage` | Bệ trồi lên khi Raid của phòng được dọn. Thêm Charm Tide Grapple. |
+| Ngọc Dũng Khí | `room_16` | `coral_valley_pearl_courage` | Bệ trồi lên khi Raid của phòng được dọn. Charm Tide Grapple nằm trong rương thưởng Raid. |
 | Ngọc Trí Tuệ | `room_23` | `coral_valley_pearl_wit` | Dừng bệ quay đúng chỗ rồi nhảy sang bệ ngọc |
 | Ngọc Vực Sâu | `room_13` | `coral_valley_pearl_deep` | Ba cú Tide Grapple qua chuỗi đảo |
 
-Tide Grapple là chìa khóa giữa map: chỉ có ở bệ `room_16` (nguồn dữ liệu `fixed_trial_reward`,
+Tide Grapple là chìa khóa giữa map: chỉ có trong rương thưởng Raid `room_16`
+(`raid_chest_tide_grapple.tscn`; nguồn dữ liệu `fixed_trial_reward`,
 không phải thưởng boss; đường tới `room_16` là `05 → 13 → 14 → 15`, đi bộ được hết), và cần cho `room_13`, `room_06` (đường
 tới boss), đảo rương `room_21` và lối ẩn `room_23` → `room_24`. Charm chỉ gắn được ở phòng an toàn,
 gần nhất là `room_05`.
@@ -30,8 +31,9 @@ gần nhất là `room_05`.
 - Mọi cờ nằm trong `GameManager.story_flags`: lưu cùng lượt chơi ở lửa trại, New Game xóa.
 - Ngọc trong túi đồ được lưu như mọi vật phẩm. Cờ của bệ ghi "đã lấy ngọc ở bệ này", nên bệ
   không cho ngọc lần hai.
-- Charm trên bệ `room_16` không phải loot rơi: chừng nào Foxy chưa sở hữu Tide Grapple, mỗi lần vào
-  phòng nó lại nằm trước bệ. Rời phòng mà chưa nhặt cũng không mất.
+- Charm trong rương `room_16` không phải loot rơi một lần: loot rơi biến mất khi rời phòng, nên
+  chừng nào Foxy chưa sở hữu Tide Grapple, rương đã mở lại đặt nó ra mỗi lần vào phòng
+  (`TreasureChest` làm vậy với mọi charm có `chance = 1`). Rời phòng mà chưa nhặt cũng không mất.
 - Cổng mở rồi thì ở mọi lần vào sau, cửa đã mở sẵn.
 
 ## Thành phần

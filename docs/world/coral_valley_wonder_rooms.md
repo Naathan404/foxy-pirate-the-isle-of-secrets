@@ -81,7 +81,9 @@ phòng Raid, tím cho bí ẩn. Đất chia mảnh là công cụ chính của c
 
 - Đảo đấu trường tròn, to khoảng 1,6 lần đảo phòng Medium, nối với cầu tàu bằng một cây cầu ngắn.
   Cầu gãy ngay khi trận đánh bắt đầu và không có lại; sau khi thắng, Foxy móc Tide Grapple qua
-  hai cọc neo hai bờ để ra.
+  hai cọc neo hai bờ để ra. Trong lúc đánh boss, hai cọc tắt va chạm (`grapple_posts` của
+  `BlubberbeardArenaRoom`), vẫn hiện nhưng móc bay xuyên qua, nên không thể dùng Tide Grapple để
+  bỏ trận. Thắng boss thì cọc móc được trở lại.
 - Biển đổi màu theo trận: thường lúc đầu, `violet_glow` từ phase 2, `red_tide` khi boss vận
   Sky Dive hoặc Anchor Whirlwind rồi trở lại (`SeaMood` + `SeaPalette`).
 - Hai vòng cột đá, tảng đá và rêu khổng lồ đứng dưới nước bao quanh đảo (ảnh vẽ tay

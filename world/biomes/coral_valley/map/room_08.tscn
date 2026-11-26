@@ -166,12 +166,13 @@ shader_parameter/corridor_darkness = 0.3
 
 [sub_resource type="QuadMesh" id="ArenaDarknessQuad"]
 
-[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "victory_campfire", "bridge_spans", "bridge_floor", "bridge_splash", "mood") instance=ExtResource("1_base")]
+[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "victory_campfire", "bridge_spans", "bridge_floor", "bridge_splash", "grapple_posts", "mood") instance=ExtResource("1_base")]
 editor_description = "Boss arena (wonder room). The bridge breaks when the fight starts and never comes back; after the win the arena becomes a safe room (VictoryCamp campfire) and Foxy leaves with the Tide Grapple won in room_16 (posts on both sides of the gap). The sea turns violet in phase two and red during Sky Dive and Anchor Whirlwind."
 script = ExtResource("arena_script")
 boss = NodePath("CaptainBlubberbeard")
 encounter = NodePath("BossEncounter")
 bridge_spans = [NodePath("Bridge/SpanWest"), NodePath("Bridge/SpanEast")]
+grapple_posts = [NodePath("GrapplePostIsland"), NodePath("GrapplePostPier")]
 bridge_floor = NodePath("Environment/BaseGroundBridge/StaticBody3D/CollisionShape3D")
 bridge_splash = NodePath("Bridge/Splash")
 collapse_seconds = 0.6

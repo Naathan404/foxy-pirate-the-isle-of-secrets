@@ -9,6 +9,9 @@ extends BaseRoom
 ## Once the boss is beaten the arena becomes a safe room: a campfire flares up at its centre, so
 ## Foxy can rest, save and change Charms (the Tide Grapple is needed to leave).
 ##
+## The grapple posts stop catching the hook while the fight is on, so the Tide Grapple cannot
+## carry Foxy over the broken bridge before the boss is beaten.
+##
 ## The sea follows the fight: calm at first, violet from phase two, and red while the boss winds
 ## up or performs one of its signature skills.
 
@@ -38,6 +41,8 @@ const FURY_STATES: Array[BlubberbeardBoss.State] = [
 @export_range(0.1, 3.0, 0.05, "suffix:s") var collapse_seconds: float = 0.6
 @export var collapse_drop_meters: float = 3.2
 @export_range(0.0, 1.5, 0.01, "suffix:rad") var collapse_tilt: float = 0.6
+## Tide Grapple anchors across the gap; they only catch the hook outside the fight.
+@export var grapple_posts: Array[Node3D] = []
 
 @export_group("Sea mood")
 @export var mood: SeaMood
@@ -100,12 +105,14 @@ func _is_boss_defeated() -> bool:
 
 func _on_fight_started() -> void:
 	_fight_active = true
+	_set_grapple_posts_enabled(false)
 	_break_bridge(true)
 
 
 func _on_fight_finished() -> void:
 	_fight_active = false
 	if is_instance_valid(boss) and boss.dead:
+		_set_grapple_posts_enabled(true)
 		_become_safe()
 
 
@@ -130,6 +137,15 @@ func _set_campfire_lit(lit: bool) -> void:
 	victory_campfire.visible = lit
 	# Disabled nodes leave the physics space, so the hidden fire blocks and offers nothing.
 	victory_campfire.process_mode = Node.PROCESS_MODE_INHERIT if lit else Node.PROCESS_MODE_DISABLED
+
+
+# Disabled nodes leave the physics space: the post stays in view but the hook passes through.
+func _set_grapple_posts_enabled(enabled: bool) -> void:
+	for post: Node3D in grapple_posts:
+		if is_instance_valid(post):
+			post.process_mode = (
+				Node.PROCESS_MODE_INHERIT if enabled else Node.PROCESS_MODE_DISABLED
+			)
 
 
 func _break_bridge(animated: bool) -> void:

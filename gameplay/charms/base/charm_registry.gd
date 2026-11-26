@@ -81,6 +81,17 @@ func set_owned(charm_id: StringName, owned: bool) -> bool:
 	return true
 
 
+## Makes ownership match `owned_ids` exactly, e.g. when carrying progress into a new scene.
+## Debug builds keep prototype Charms that could only have been granted by debug tools.
+func restore_owned_ids(owned_ids: Array[StringName]) -> void:
+	for charm_id: StringName in get_registered_ids():
+		var owned := owned_ids.has(charm_id)
+		if OS.is_debug_build():
+			_debug_set_owned(charm_id, owned)
+		else:
+			set_owned(charm_id, owned)
+
+
 func is_owned(charm_id: StringName) -> bool:
 	return _owned_ids.has(charm_id)
 

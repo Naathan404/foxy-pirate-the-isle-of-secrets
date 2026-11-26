@@ -31,11 +31,9 @@
 
 [ext_resource type="Script" uid="uid://272oomdwm4lc" path="res://world/gimmick/raid/raid_lockdown.gd" id="raid_lockdown"]
 
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_chest.tscn" id="raid_chest"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_chest_tide_grapple.tscn" id="raid_chest"]
 
 [ext_resource type="PackedScene" path="res://world/gimmick/progression/trial_altar.tscn" id="trial_altar"]
-
-[ext_resource type="Resource" path="res://data/items/charms/tide_grapple.tres" id="tide_grapple_item"]
 
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="cover_stone"]
 
@@ -496,10 +494,9 @@ reward_chest_scene = ExtResource("raid_chest")
 reward_position = Vector3(0, 0.252, 3)
 
 [node name="TrialAltar" parent="." node_paths=PackedStringArray("raid") instance=ExtResource("trial_altar")]
-editor_description = "Rises when the raid is cleared: Pearl of Courage, and the Tide Grapple laid in front until Foxy owns it."
+editor_description = "Rises when the raid is cleared: Pearl of Courage. The Tide Grapple comes from the raid reward chest."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, -9)
 pearl_flag = &"coral_valley_pearl_courage"
-charm_item = ExtResource("tide_grapple_item")
 raid = NodePath("../Raid/Lockdown")
 
 [node name="Cover" type="Node3D" parent="."]

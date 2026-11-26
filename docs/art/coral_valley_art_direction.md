@@ -66,6 +66,9 @@ Coral Valley là bãi cát san hô giữa đầm phá, cùng thế giới với 
 11. Đi xuyên được: rong biển, san hô (mềm, thấp).
 12. Chặn: cọ (trụ nhỏ ở gốc thân, không chặn tán), đá, gỗ trôi, vỏ sò, lửa trại.
 13. Khối chặn phải nằm đúng chỗ người chơi thấy chân vật, đo từ texture, không theo tâm sprite.
+    Mép đảo và mép cầu bị tường vô hình chặn thì hiện rào cọc dây thừng: thêm node `RoomEdgeFence`
+    (`world/objects/room_edge_fence.gd`) và gán `room`. Rào chỉ để nhìn, tự dựng theo đúng tường
+    của phòng nên chỗ mở (cầu bệ, cửa) luôn khớp `boundary_openings`. Hiện dùng ở `room_03`.
     Prop cao (cọ, và mọi cây sau này) phải lấy gốc làm tâm xoay. Billboard nghiêng theo camera 45°,
     nên nếu tâm xoay ở giữa ảnh, gốc hiển thị bị kéo về phía camera và lệch khỏi khối chặn; Foxy
     sẽ đi xuyên qua thân. Cách làm, giống cỏ của Hub:

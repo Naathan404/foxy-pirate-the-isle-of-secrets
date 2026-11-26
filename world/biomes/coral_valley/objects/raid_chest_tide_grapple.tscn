@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_chest.tscn" id="1_chest"]
+[ext_resource type="Script" path="res://world/objects/chest_item_drop.gd" id="2_drop"]
+[ext_resource type="Resource" path="res://data/items/charms/tide_grapple.tres" id="3_tide_grapple"]
+
+[sub_resource type="Resource" id="Drop_tide_grapple"]
+script = ExtResource("2_drop")
+item = ExtResource("3_tide_grapple")
+
+[node name="RaidChestTideGrapple" instance=ExtResource("1_chest")]
+editor_description = "room_16 raid reward: the usual raid gold plus the Tide Grapple Charm. Until Foxy owns the Charm, the opened chest lays it out again on every visit."
+item_drops = Array[ExtResource("2_drop")]([SubResource("Drop_tide_grapple")])

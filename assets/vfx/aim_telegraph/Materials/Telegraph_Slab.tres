@@ -1,7 +1,27 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bw1a6o2dsxqf"]
 
-[ext_resource type="Shader" path="res://assets/vfx/aim_telegraph/Shaders/Telegraph_Slab.gdshader" id="1_slab"]
+[ext_resource type="Shader" uid="uid://ck5c1prwak1pr" path="res://assets/vfx/aim_telegraph/Shaders/Telegraph_Slab.gdshader" id="1_slab"]
 
 [resource]
 render_priority = -2
 shader = ExtResource("1_slab")
+shader_parameter/slab_half = 0.8
+shader_parameter/end_inset = 0.9
+shader_parameter/edge_noise = 0.09
+shader_parameter/edge_noise_scale = 1.1
+shader_parameter/edge_soft = 0.08
+shader_parameter/dark_color = Color(0.1, 0, 0.03, 1)
+shader_parameter/red_color = Color(0.75, 0.06, 0.12, 1)
+shader_parameter/red_falloff = 3.5
+shader_parameter/opacity = 0.85
+shader_parameter/seed = 3.0
+shader_parameter/anim_fps = 15.0
+shader_parameter/flow_speed = 3.5
+shader_parameter/morph_speed = 2.2
+shader_parameter/streak_amount = 0.45
+shader_parameter/rim_amount = 0.6
+shader_parameter/rim_color = Color(1, 0.18, 0.25, 1)
+shader_parameter/unfilled_opacity = 0.35
+shader_parameter/fill_soft = 0.35
+shader_parameter/fill_front_width = 0.5
+shader_parameter/fill_front_strength = 0.8
