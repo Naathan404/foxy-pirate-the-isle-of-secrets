@@ -5,10 +5,10 @@
 [ext_resource type="Script" uid="uid://cqg6kk5dyjbfi" path="res://world/gimmick/flat_tide/flat_tide_footsteps.gd" id="3_ob4lr"]
 [ext_resource type="Script" uid="uid://cy7giyxuyjq4x" path="res://world/gimmick/flat_tide/flat_tide_enemy_spawner.gd" id="4_00omx"]
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="5_awy0v"]
-[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="6_g1fdm"]
-[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="7_wk3c4"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="6_g1fdm"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="7_wk3c4"]
 
-[sub_resource type="Resource" id="Resource_flat_enemy_starfish"]
+[sub_resource type="Resource" id="Resource_flat_enemy_hermit_crab"]
 script = ExtResource("5_awy0v")
 normal_scene = ExtResource("7_wk3c4")
 elite_scene = ExtResource("6_g1fdm")
@@ -41,4 +41,4 @@ step_width = 0.1
 [node name="EnemySpawner" type="Node3D" parent="." unique_id=888280207 node_paths=PackedStringArray("controller")]
 script = ExtResource("4_00omx")
 controller = NodePath("..")
-enemies = Array[ExtResource("5_awy0v")]([SubResource("Resource_flat_enemy_starfish")])
+enemies = Array[ExtResource("5_awy0v")]([SubResource("Resource_flat_enemy_hermit_crab")])

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://jvmeeiitlydf"
+path="res://.godot/imported/crab_charge_side_adjusted.spine-json-4adc6c85a7a962c2adade5f0347b7dee.spjson"
+
+[deps]
+
+source_file="res://assets/spine/enemies/Enemy_HermitCarb/crab_charge_side_adjusted.spine-json"
+dest_files=["res://.godot/imported/crab_charge_side_adjusted.spine-json-4adc6c85a7a962c2adade5f0347b7dee.spjson"]
+
+[params]
+

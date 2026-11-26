@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_2.tscn" id="7_grass2"]
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_3.tscn" id="8_grass3"]
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_4.tscn" id="9_grass4"]
-[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="11_kekfi"]
+[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="11_kekfi"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_exut7"]
 size = Vector3(11.51355, 1, 10.686737)

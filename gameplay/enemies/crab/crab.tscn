@@ -7,9 +7,10 @@
 [ext_resource type="Script" uid="uid://etrxpr68gxyd" path="res://core/components/hitbox_component.gd" id="5_hitbox"]
 [ext_resource type="Script" uid="uid://do0lxthoqo85o" path="res://gameplay/enemies/crab/states/crab_patrol.gd" id="6_patrol"]
 [ext_resource type="Script" uid="uid://dnkkqx0aqleuv" path="res://gameplay/enemies/crab/crab.gd" id="7_crab"]
+[ext_resource type="Script" uid="uid://jvd33wftr8gv" path="res://gameplay/enemies/base/enemy_spine_visual.gd" id="8_spine_visual"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
-size = Vector3(2.4, 1.2, 2.4)
+size = Vector3(2.6, 2, 2.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
 size = Vector3(1.6, 1, 1.6)
@@ -37,13 +38,36 @@ initial_facing = 2
 destroy_on_death = true
 show_debug_health = true
 
-[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+script = ExtResource("8_spine_visual")
+skeleton_data_path = "res://assets/spine/enemies/Enemy_Crab/crab_skeleton.tres"
+clip_map = Dictionary[StringName, String]({
+&"idle": "idle",
+&"idle_up": "up_idle",
+&"run": "walk",
+&"run_left": "walk_left",
+&"run_right": "walk_left",
+&"run_up": "up_idle"
+})
+looping_clips = []
+action_start_seconds = Dictionary[StringName, float]({})
+spine_pixel_size = 0.0045000000000000005
+lift_meters = 0.0
+mix_seconds = 0.15
+artwork_faces_left = true
+mirror_from_facing = true
+clip_faces_left = Dictionary[String, bool]({
+"attack": false,
+"up_attack": false
+})
+
+[node name="Sprite3D" parent="Visual" index="0" unique_id=718327590]
 offset = Vector2(0, 14)
 texture = ExtResource("3_texture")
 hframes = 3
 vframes = 5
 
-[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
+[node name="AnimationPlayer" parent="Visual" index="1" unique_id=1154652120]
 libraries/ = ExtResource("4_anims")
 
 [node name="FrontRayCast3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="0" unique_id=1756313482]

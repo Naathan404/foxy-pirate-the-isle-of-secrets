@@ -64,12 +64,20 @@ func begin_telegraph() -> void:
 
 
 func end_telegraph() -> void:
+	_set_visual_pulse(0.0, 1.0)
 	if _telegraph_active and is_instance_valid(_source_sprite):
 		_source_sprite.modulate = _telegraph_base_modulate
 		_source_sprite.scale = _telegraph_base_scale
 	_telegraph_active = false
 	if is_instance_valid(_telegraph_ring):
 		_telegraph_ring.visible = false
+
+
+## Reaches renderers such as Spine that do not draw the sprite above.
+func _set_visual_pulse(strength: float, size_scale: float) -> void:
+	var enemy := get_parent() as EnemyBase
+	if enemy != null and is_instance_valid(enemy.visual):
+		enemy.visual.set_telegraph_pulse(strength, size_scale)
 
 
 func _setup_elite_sprite_glow() -> void:
@@ -242,6 +250,7 @@ func _update_telegraph_flash(delta: float) -> void:
 		var bright_color := Color(1.35, 1.35, 1.35, _telegraph_base_modulate.a)
 		_source_sprite.modulate = _telegraph_base_modulate.lerp(bright_color, brightness)
 		_source_sprite.scale = _telegraph_base_scale * (1.0 + 0.035 * pulse)
+	_set_visual_pulse(lerpf(0.08, 0.4, pulse), 1.0 + 0.035 * pulse)
 	_update_telegraph_ring(pulse)
 
 

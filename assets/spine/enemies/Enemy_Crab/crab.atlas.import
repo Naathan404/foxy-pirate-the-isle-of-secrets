@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://cne68ot5irhvm"
+path="res://.godot/imported/crab.atlas-cbdca8129e987fd133a877ad3da8802e.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/enemies/Enemy_Crab/crab.atlas"
+dest_files=["res://.godot/imported/crab.atlas-cbdca8129e987fd133a877ad3da8802e.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

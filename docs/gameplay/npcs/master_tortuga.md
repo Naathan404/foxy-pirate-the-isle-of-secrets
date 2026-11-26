@@ -24,8 +24,8 @@ The source for the prototype recipes is the [Weapons tab of the balance sheet](h
 | Weapon | Gold | Materials |
 | --- | ---: | --- |
 | Dagger | 0 | Starter weapon; no materials |
-| Bow | 100 | Starfish Core ×5, Crab Claw ×5 |
-| Harpoon | 250 | Crab Claw ×2, Starfish Core ×1, Coral ×5 |
+| Bow | 100 | Hermit Shell ×5, Crab Claw ×5 |
+| Harpoon | 250 | Crab Claw ×2, Hermit Shell ×1, Coral ×5 |
 
 Storm Bow, Harpoon and Meteor Staff are implemented as craftable non-starter weapons. Dagger is the starter and normally appears as already owned. Their blueprint items unlock the corresponding Craft recipes when collected; see [weapon blueprints](../weapons/weapon_collection.md#blueprint-pickups). Meteor Staff currently costs 250 gold, 5 Fireflies Tails and 5 Coral. The debug-only **Debug: Supplies** button gives sample materials and gold for testing.
 
@@ -35,7 +35,7 @@ The Forge tab lists owned weapons. Pressing **Forge** pays once and draws two di
 
 `close_panel(true)` (used when the NPC leaves the tree, for example on a scene change) cannot wait for a choice. If a paid roll is still open, it calls `TortugaService.refund_forge_roll()` to return that roll's gold and materials before closing, so the payment is never lost.
 
-The GDD specifies gold and materials for each Forge but the balance sheet does not specify their amounts. The temporary values are **75 Gold, 2 Crab Claws, 1 Starfish Core** per roll, editable on `TortugaCatalog` in the Inspector. Payment occurs when the pair is rolled.
+The GDD specifies gold and materials for each Forge but the balance sheet does not specify their amounts. The temporary values are **75 Gold, 2 Crab Claws, 1 Hermit Shell** per roll, editable on `TortugaCatalog` in the Inspector. Payment occurs when the pair is rolled.
 
 Blueprint/weapon ownership, inventory and Forge changes are runtime state. The project still needs its general save system to retain them between launches. Blueprint item resources are available for pickup or drop configuration; their world locations and drop rates are not configured here.
 

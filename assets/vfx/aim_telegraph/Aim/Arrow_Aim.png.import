@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwbr8s6gdqts0"
-path.s3tc="res://.godot/imported/Arrow_Aim.png-a11a9c2d49a1cd2d8b3967b2ac3cdb5b.s3tc.ctex"
+path.s3tc="res://.godot/imported/Arrow_Aim.png-92a020e4c607c1ac06653e24fd518117.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Vefects/Aim_Telegraph/Aim/Arrow_Aim.png"
-dest_files=["res://.godot/imported/Arrow_Aim.png-a11a9c2d49a1cd2d8b3967b2ac3cdb5b.s3tc.ctex"]
+source_file="res://assets/vfx/aim_telegraph/Aim/Arrow_Aim.png"
+dest_files=["res://.godot/imported/Arrow_Aim.png-92a020e4c607c1ac06653e24fd518117.s3tc.ctex"]
 
 [params]
 

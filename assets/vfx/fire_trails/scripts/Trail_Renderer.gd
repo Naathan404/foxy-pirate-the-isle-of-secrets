@@ -1,18 +1,19 @@
 @tool
 extends MeshInstance3D
-## Unity TrailRenderer: a ribbon through the world positions this node passed through during the last `time`
-## seconds, rebuilt every frame.
+## Unity TrailRenderer: a ribbon through the world positions this node passed through during the
+## last `time` seconds, rebuilt every frame.
 ##
-## A point is recorded when the node has moved more than `min_vertex_distance` from the last recorded point; points
-## older than `time` seconds are dropped. The head of the ribbon is always the node's current position. Along the
-## ribbon t runs from 0 at the head to 1 at the tail (by length): width = width * width_samples(t), vertex color =
-## color_samples(t) (linear, like Unity's "Apply Active Color Space"). UV.x follows Unity's Texture Mode (stretch:
-## t, tile: world distance from the head, distribute per segment: segment index / count, repeat per segment: segment
-## index), UV.y = 0 on one edge and 1 on the other; both scaled by texture_scale. UV2 = Unity (0, 0) (a Unity trail
-## has no second UV channel). The ribbon faces the camera
-## (alignment 0, Unity "View") or lies across the node's Z axis (alignment 1, "Transform Z").
-## The vertices are stored in this node's space and recomputed every frame, so the node's own scale does not change
-## the width (Unity trails ignore the transform scale too).
+## A point is recorded when the node has moved more than `min_vertex_distance` from the last
+## recorded point; points older than `time` seconds are dropped. The head of the ribbon is always
+## the node's current position. Along the ribbon t runs from 0 at the head to 1 at the tail (by
+## length): width = width * width_samples(t), vertex color = color_samples(t) (linear, like Unity's
+## "Apply Active Color Space"). UV.x follows Unity's Texture Mode (stretch: t, tile: world distance
+## from the head, distribute per segment: segment index / count, repeat per segment: segment index),
+## UV.y = 0 on one edge and 1 on the other; both scaled by texture_scale. UV2 = Unity (0, 0) (a
+## Unity trail has no second UV channel). The ribbon faces the camera (alignment 0, Unity "View") or
+## lies across the node's Z axis (alignment 1, "Transform Z").
+## The vertices are stored in this node's space and recomputed every frame, so the node's own scale
+## does not change the width (Unity trails ignore the transform scale too).
 
 ## Seconds a point lives (Unity Time).
 @export var time := 5.0
@@ -30,7 +31,8 @@ extends MeshInstance3D
 @export var alignment := 0
 ## New points are only recorded while emitting (the existing ones still fade out).
 @export var emitting := true
-## Frees the parent node once the trail has been idle and empty for `time` seconds (Unity Autodestruct).
+## Frees the parent node once the trail has been idle and empty for `time` seconds
+## (Unity Autodestruct).
 @export var autodestruct := false
 
 var _mesh := ArrayMesh.new()
@@ -112,7 +114,11 @@ func _rebuild(head: Vector3) -> void:
 	_mesh.clear_surfaces()
 	# World positions from the head (newest) to the tail (oldest).
 	var pts := PackedVector3Array()
-	if emitting and is_visible_in_tree() and (_points.is_empty() or not _points[_points.size() - 1].is_equal_approx(head)):
+	if (
+		emitting
+		and is_visible_in_tree()
+		and (_points.is_empty() or not _points[_points.size() - 1].is_equal_approx(head))
+	):
 		pts.append(head)
 	for i in range(_points.size() - 1, -1, -1):
 		pts.append(_points[i])
@@ -170,7 +176,8 @@ func _rebuild(head: Vector3) -> void:
 			cols.append(c)
 		if i > 0:
 			var a := (i - 1) * 2
-			# Clockwise seen from the camera: Godot's front faces (the materials cull back faces like Unity's).
+			# Clockwise seen from the camera: Godot's front faces
+			# (the materials cull back faces like Unity's).
 			idx.append_array([a, a + 2, a + 1, a + 1, a + 2, a + 3])
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)

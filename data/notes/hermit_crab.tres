@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MonsterNote" format=3 uid="uid://c8p2d5sfb87ah"]
+
+[ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/hermit_crab/hermit_crab_portrait.png" id="2"]
+[ext_resource type="Resource" uid="uid://5rciww3j1f7s" path="res://data/enemies/hermit_crab_data.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+note_id = &"hermit_crab"
+display_name = "Hermit Crab"
+unlocked = true
+portrait = ExtResource("2")
+enemy_data = ExtResource("3")
+description = "A hermit crab that carries a coral-crowned shell along the coast."
+behavior = "Moves toward intruders and attacks at close range."
+strategy = "Keep moving and watch for its charge."

@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://b6yyim36l77k3" path="res://assets/sprites/biomes/ruins/ruins_left.png" id="5_52os3"]
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_1.tscn" id="6_grass1"]
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_2.tscn" id="7_grass2"]
-[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="7_nq0xk"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="7_nq0xk"]
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_3.tscn" id="8_grass3"]
 [ext_resource type="PackedScene" path="res://world/biomes/ruins/ruins_grass_4.tscn" id="9_grass4"]
 
@@ -115,10 +115,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 3)
 [node name="CornerA" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="0" unique_id=477795238]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.03756, -6.9159203, 22.620491)
 
-[node name="Starfish" parent="." index="5" unique_id=1294052233 instance=ExtResource("7_nq0xk")]
+[node name="HermitCrab" parent="." index="5" unique_id=1294052233 instance=ExtResource("7_nq0xk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.292696, 1.0287952, -4.6236873)
 
-[node name="Starfish2" parent="." index="6" unique_id=532392440 instance=ExtResource("7_nq0xk")]
+[node name="HermitCrab2" parent="." index="6" unique_id=532392440 instance=ExtResource("7_nq0xk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9829528, 1.2342491, 6.361871)
 
 [editable path="Exits/DownPath"]

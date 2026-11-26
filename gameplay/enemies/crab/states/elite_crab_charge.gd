@@ -27,6 +27,8 @@ func _enter() -> void:
 	_phase = AttackPhase.TELEGRAPH
 	timer = telegraph_duration
 	enemy.stop_movement()
+	if not enemy.play_directional_animation(&"windup", true):
+		enemy.play_directional_animation(&"idle", true)
 	_get_feedback().begin_telegraph()
 
 
@@ -50,7 +52,8 @@ func _update_telegraph(delta: float) -> void:
 	if _timer_finished(delta):
 		_phase = AttackPhase.CHARGE
 		timer = _get_charge_timeout()
-		enemy.play_directional_animation(&"run", true)
+		if not enemy.play_directional_animation(&"charge_run", true):
+			enemy.play_directional_animation(&"run", true)
 		_get_feedback().end_telegraph()
 
 
@@ -74,7 +77,8 @@ func _begin_slam() -> void:
 	_phase = AttackPhase.SLAM
 	timer = slam_active_duration
 	enemy.stop_movement()
-	enemy.play_directional_animation(&"hit", true)
+	if not enemy.play_directional_animation(&"slam", true):
+		enemy.play_directional_animation(&"hit", true)
 	enemy.begin_active_attack(1, &"elite_crab_slam")
 
 

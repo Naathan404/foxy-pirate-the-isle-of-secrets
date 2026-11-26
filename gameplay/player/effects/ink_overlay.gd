@@ -44,7 +44,8 @@ func splash(
 	spread_time: float,
 	hold_time: float,
 	fade_time: float,
-	strength: float
+	strength: float,
+	hit_coverage: float = HIT_COVERAGE
 ) -> void:
 	if _fatal_active and not fatal:
 		return
@@ -58,7 +59,7 @@ func splash(
 	_overlay.show()
 	_tween = create_tween().set_ignore_time_scale(true)
 	_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(self, "coverage", FULL_COVERAGE if fatal else HIT_COVERAGE, spread_time)
+	_tween.tween_property(self, "coverage", FULL_COVERAGE if fatal else hit_coverage, spread_time)
 	_tween.parallel().tween_property(self, "opacity", strength, spread_time)
 	_tween.tween_interval(hold_time)
 	_tween.tween_property(self, "opacity", 0.0, fade_time).set_ease(Tween.EASE_IN_OUT)

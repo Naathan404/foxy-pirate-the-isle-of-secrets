@@ -5,7 +5,7 @@ const BOW: WeaponData = preload("res://data/weapon/weapon_bow.tres")
 const ARROW: BaseItem = preload("res://data/items/consumables/wooden_arrow.tres")
 const HEALING: BaseItem = preload("res://data/items/consumables/small_healing_potion.tres")
 const LARGE_HEALING: BaseItem = preload("res://data/items/consumables/healing_potion.tres")
-const STARFISH_CORE: BaseItem = preload("res://data/items/materials/starfish_core.tres")
+const HERMIT_SHELL: BaseItem = preload("res://data/items/materials/hermit_shell.tres")
 const NPC_TEST_SCENE_PATH := "res://world/biomes/hub/map/silas_tent.tscn"
 const SILAS_SCENE: PackedScene = preload("res://gameplay/npcs/silas/silas_npc.tscn")
 const TOAST_QUEUE_SCENE: PackedScene = preload("res://gameplay/merchant/trade_toast_queue.tscn")
@@ -43,7 +43,7 @@ func _test_purchase_rejections() -> void:
 	)
 	_assert_equal(wallet.get_balance(), 0, "failed purchase keeps gold")
 
-	inventory.add_item(STARFISH_CORE, 1)
+	inventory.add_item(HERMIT_SHELL, 1)
 	wallet.add_gold(2)
 	_assert_equal(
 		service.purchase(&"wooden_arrow", inventory, wallet, null),
@@ -84,17 +84,17 @@ func _test_successful_item_trade() -> void:
 	_assert_equal(inventory.count_item(ARROW.item_id), 1, "purchased arrow enters inventory")
 	_assert_equal(wallet.get_balance(), 10, "purchase spends configured price")
 	_assert_equal(
-		service.sell(&"starfish_core", inventory, wallet),
+		service.sell(&"hermit_shell", inventory, wallet),
 		MerchantTransactionService.Result.NOT_OWNED,
 		"cannot sell an absent item"
 	)
-	inventory.add_item(STARFISH_CORE, 1)
+	inventory.add_item(HERMIT_SHELL, 1)
 	_assert_equal(
-		service.sell(&"starfish_core", inventory, wallet),
+		service.sell(&"hermit_shell", inventory, wallet),
 		MerchantTransactionService.Result.SUCCESS,
 		"enemy drop sells successfully"
 	)
-	_assert_equal(inventory.count_item(STARFISH_CORE.item_id), 0, "sold item is removed")
+	_assert_equal(inventory.count_item(HERMIT_SHELL.item_id), 0, "sold item is removed")
 	_assert_equal(wallet.get_balance(), 15, "sale adds configured gold")
 	inventory.free()
 
@@ -191,7 +191,7 @@ func _test_random_buy_stock() -> void:
 			)
 	_assert_equal(hidden_count, source_count - expected_count, "undrawn offers are hidden")
 	_assert_true(
-		stock.get_sell_offer_for_item(&"starfish_core") != null,
+		stock.get_sell_offer_for_item(&"hermit_shell") != null,
 		"buy selection does not change what Silas buys from the player"
 	)
 	var store := SilasProgressStore.new()

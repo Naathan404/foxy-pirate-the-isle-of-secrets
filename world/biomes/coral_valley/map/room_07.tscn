@@ -6,10 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="coral_skeleton"]
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="crab"]
-[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://gameplay/enemies/barrel/elite_barrel.tscn" id="elite_barrel"]
+[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="elite_barrel"]
 [ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="elite_coral_skeleton"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="elite_crab"]
-[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="elite_starfish"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="elite_hermit_crab"]
 [ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="enemy_entry"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
 [ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
 [ext_resource type="Texture2D" uid="uid://c1jmw47rhx24n" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_07_shore.png" id="shore_texture"]
-[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="starfish"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="hermit_crab"]
 [ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone"]
 
 [sub_resource type="Environment" id="Environment_nbdph"]
@@ -102,10 +102,10 @@ shader_parameter/cloud_coverage = 0.45
 shader_parameter/cloud_softness = 0.18
 shader_parameter/cloud_shadow_strength = 0.35
 
-[sub_resource type="Resource" id="Entry_starfish"]
+[sub_resource type="Resource" id="Entry_hermit_crab"]
 script = ExtResource("enemy_entry")
-normal_scene = ExtResource("starfish")
-elite_scene = ExtResource("elite_starfish")
+normal_scene = ExtResource("hermit_crab")
+elite_scene = ExtResource("elite_hermit_crab")
 
 [sub_resource type="Resource" id="Entry_crab"]
 script = ExtResource("enemy_entry")
@@ -277,8 +277,8 @@ activation_area = NodePath("EntryArea")
 room = NodePath("..")
 reward_chest_scene = ExtResource("reward_chest")
 reward_position = Vector3(0, 0.25209618, 0.45244434)
-first_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_starfish"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton")])
-later_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_starfish"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton"), SubResource("Entry_barrel")])
+first_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_hermit_crab"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton")])
+later_wave_enemies = Array[ExtResource("enemy_entry")]([SubResource("Entry_hermit_crab"), SubResource("Entry_crab"), SubResource("Entry_coral_skeleton"), SubResource("Entry_barrel")])
 
 [node name="EntryArea" type="Area3D" parent="RaidEncounter" index="0" unique_id=2011291135]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)

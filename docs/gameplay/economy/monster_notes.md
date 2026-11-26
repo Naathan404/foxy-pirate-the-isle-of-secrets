@@ -9,7 +9,7 @@ Tab **Journey** của menu Inventory hiển thị các `MonsterNote` thành lư�
 3. Tick `unlocked` nếu muốn mở sẵn mặc định. Bỏ tick để khóa mặc định.
 4. Mở `gameplay/inventory/notes_tab.tscn`, chọn node `Notes`, thêm resource vào mảng `Notes`. Thứ tự trong mảng là thứ tự hiển thị. Lưu scene.
 
-Starfish được mở mặc định. Các mô tả hiện tại là nội dung khởi đầu cần được designer rà soát.
+Hermit Crab được mở mặc định. Các mô tả hiện tại là nội dung khởi đầu cần được designer rà soát.
 
 ## Boss Diary và phần thưởng khi hạ boss
 

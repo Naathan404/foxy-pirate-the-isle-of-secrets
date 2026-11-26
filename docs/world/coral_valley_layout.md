@@ -128,7 +128,7 @@ External paths attach to the islands shown in the final diagram:
 | room_23 | Bottom | Quiz (2 islands) | Small, 2 islands | left: room_22, right: room_24 |
 | room_24 | Bottom | Farm (wonder: split islands) | Medium | left: room_23 |
 
-Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04` and `23` at the right island centers, Raid `18` at its right island center (spawned after the raid); Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Raid `18`, Quiz `04` and `23` each guarantee 10–20 gold plus one Starfish, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
+Six chest reward locations are configured: Quiz `09` at the left island center; Quiz `04` and `23` at the right island centers, Raid `18` at its right island center (spawned after the raid); Raid `07` at its room center; Boss `08` at the defeated boss position. Quiz `09` guarantees 10–20 gold, one Bow blueprint and one Coral Skeleton note. Raid `18`, Quiz `04` and `23` each guarantee 10–20 gold plus one Hermit Crab, Barrel and Crab note respectively. Raid `07` guarantees 10–20 gold and one Harpoon blueprint, with its chest spawned only after clearing wave 4. Boss `08` uses Blubberbeard's existing reward chest after his death animation. Only the four Quiz chests are present on entry.
 
 Quiz `09` retains four Elite Barrels around its chest at local X/Z `(±5, ±5)`,
 forming a square with four 10-unit sides. Quiz `04` and `23` retain only
@@ -148,8 +148,8 @@ without a timer or waiting for the outgoing tide to finish receding.
 
 | Raid wave | Total | Normal | Elite | Random enemy pool |
 | --- | --- | --- | --- | --- |
-| 1 | 3 | 3 | 0 | Starfish, Crab, Coral Skeleton |
-| 2 | 4 | 4 | 0 | Starfish, Crab, Coral Skeleton, Barrel |
+| 1 | 3 | 3 | 0 | Hermit Crab, Crab, Coral Skeleton |
+| 2 | 4 | 4 | 0 | Hermit Crab, Crab, Coral Skeleton, Barrel |
 | 3 | 4 | 3 | 1 | Same four types, corresponding elite variants |
 | 4 | 5 | 3 | 2 | Same four types, corresponding elite variants |
 
@@ -206,8 +206,8 @@ The two Materials rooms use the Small room template, with spawn positions pulled
 
 - `room_10` is the Crab and coconut area: it spawns only leaning, short and tall
   coconut palms, and has three hand-placed Crabs.
-- `room_14` is the Starfish and coral area: it spawns only orange, pink and
-  turquoise coral, and has three hand-placed Starfish.
+- `room_14` is the Hermit Crab and coral area: it spawns only orange, pink and
+  turquoise coral, and has three hand-placed Hermit Crabs.
 
 `room_10`'s palm candidates keep the north half and the sides clear of the paths;
 south of the island centre they sit only on the rim, away from the down path, so a
@@ -258,7 +258,7 @@ water/atmosphere, camera and exit wiring remain unchanged.
 | Resources only | None | 5–7 coconut palms total + 6 seaweed | 5–7 coral props total + 10 seaweed |
 
 Before Checkpoint 2 means rooms `01`, `03`, `11`, `17`; after it means `06`,
-`15`, `21`. Combat picks Starfish, Crab, Coral Skeleton and Barrel equally;
+`15`, `21`. Combat picks Hermit Crab, Crab, Coral Skeleton and Barrel equally;
 types may repeat. Each type contributes nine normal slots and one elite slot
 to the weighted pool, giving every enemy an independent 10% elite probability.
 Resource-only layouts use three palm or coral variants with equal probability.
@@ -309,7 +309,7 @@ Mobs 1–3 select up to three enemies per falling tide. Each enemy independently
 chooses either entry in its room's pool with equal probability; a wave can contain
 three of the same type. All three spawners use `elite_chance = 10.0`, and only
 the Coral Skeleton entry has an elite scene assigned. A selected skeleton has
-a 10% chance to use its elite variant; starfish, barrel and crab remain normal.
+a 10% chance to use its elite variant; hermit crab, barrel and crab remain normal.
 
 Mobs 4–6 each select up to three enemies of a single species per falling tide.
 Each enemy independently has a 10% chance to use that species' elite variant.
@@ -317,11 +317,11 @@ These three rooms have no skeleton entries.
 
 | Room | Type | Tide enemy pool |
 | --- | --- | --- |
-| `room_02` | Mobs 1 | Starfish, Coral Skeleton |
+| `room_02` | Mobs 1 | Hermit Crab, Coral Skeleton |
 | `room_12` | Mobs 2 | Barrel, Coral Skeleton |
 | `room_20` | Mobs 3 | Crab, Coral Skeleton |
 | `room_22` | Mobs 4 | Barrel (normal or elite) |
-| `room_13` | Mobs 5 | Starfish (normal or elite) |
+| `room_13` | Mobs 5 | Hermit Crab (normal or elite) |
 | `room_16` | Mobs 6 | Crab (normal or elite) |
 
 ## Island Raid (`room_18`)
@@ -338,7 +338,7 @@ under `IslandRaid` in the room scene. Only the shuttle and lever logic is room-s
 | 3 | When the last enemy is gone the boulders sink, the exit opens and `WestLever` rises out of the ground. |
 | 4 | Striking the lever calls the platform from Center to the west dock. Once Foxy has stood on it for 0.5 s it carries him to the east dock, waits until he steps off, then returns to Center. Both levers ignore hits during the whole trip. If nobody boards within 8 s it returns to Center. |
 | 5 | Stepping onto the east island starts `EastStage` and its three scripted waves (E1 to E3). There is no way back until it is cleared. |
-| 6 | `EastLever` rises and the reward chest (`island_raid_reward_chest.tscn`: Starfish note) appears at the island centre. Striking the lever brings the shuttle back to the east dock and carries Foxy west. |
+| 6 | `EastLever` rises and the reward chest (`island_raid_reward_chest.tscn`: Hermit Crab note) appears at the island centre. Striking the lever brings the shuttle back to the east dock and carries Foxy west. |
 
 Waves are planned, not random. Each `RaidSpawnSpec` names an enemy, whether it is an
 elite, an anchor (Foxy or the island centre), an offset (x east, y south, in metres) and a
@@ -346,11 +346,11 @@ delay. A wave opens with a ground rumble of `lead_in_seconds`.
 
 | Wave | Intent | Enemies (anchor, offset, delay) |
 | --- | --- | --- |
-| W1 Ambush | Teaches that the island attacks from the ground: a triangle around Foxy. | Starfish (Foxy, 0/−5, 0 s), Crab (Foxy, −4.5/3, 0.35 s), Coral Skeleton (Foxy, 4.5/3, 0.7 s). |
+| W1 Ambush | Teaches that the island attacks from the ground: a triangle around Foxy. | Hermit Crab (Foxy, 0/−5, 0 s), Crab (Foxy, −4.5/3, 0.35 s), Coral Skeleton (Foxy, 4.5/3, 0.7 s). |
 | W2 Blockade | Barrels fire from the shuttle-side corners, a crab pushes from behind, an elite blocks the way to the shuttle. | Barrel (centre, 8/−8, 0 s), Barrel (centre, 8/8, 0.3 s), Crab (Foxy, −5/0, 0.8 s), **Elite Crab** (centre, 7/0, 1.6 s). |
-| E1 Pincer | Closes both sides: crabs north, then starfish south. | Crab ×2 (Foxy, ∓2/−5, 0 s and 0.15 s), Starfish ×2 (Foxy, ∓2/5, 0.7 s and 0.85 s). |
+| E1 Pincer | Closes both sides: crabs north, then hermit crabs south. | Crab ×2 (Foxy, ∓2/−5, 0 s and 0.15 s), Hermit Crab ×2 (Foxy, ∓2/5, 0.7 s and 0.85 s). |
 | E2 Firing line | Three barrels top to bottom along the far east edge; a skeleton keeps Foxy moving. | Barrel ×3 (centre, 8/−7, 8/0, 8/7; 0, 0.3, 0.6 s), Coral Skeleton (Foxy, 0/5, 1.2 s). |
-| E3 Finale | Long rumble (1.6 s), two elites at the centre, then their escort surrounds Foxy. | **Elite Coral Skeleton** (centre, −3/0, 0 s), **Elite Starfish** (centre, 3/0, 0.5 s), Crab, Coral Skeleton, Starfish (Foxy triangle, 2.0 to 2.6 s). |
+| E3 Finale | Long rumble (1.6 s), two elites at the centre, then their escort surrounds Foxy. | **Elite Coral Skeleton** (centre, −3/0, 0 s), **Elite Hermit Crab** (centre, 3/0, 0.5 s), Crab, Coral Skeleton, Hermit Crab (Foxy triangle, 2.0 to 2.6 s). |
 
 The spawn sequence (crack, eruption, emerging enemy) is described in the shared raid doc.
 

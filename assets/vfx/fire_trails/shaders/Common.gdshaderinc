@@ -26,7 +26,7 @@
 //   #define VFX_NO_SCENE_DEPTH  the port never reads the scene depth: no depth texture uniform, so an opaque surface
 //                               stays in Godot's opaque pass and casts shadows.
 
-#include "res://Vefects/Fire_Trail/Shaders/Shuriken_Render.gdshaderinc"
+#include "res://assets/vfx/fire_trails/shaders/Shuriken_Render.gdshaderinc"
 
 #ifndef VFX_NO_SCENE_DEPTH
 uniform sampler2D depth_texture : hint_depth_texture, filter_nearest, repeat_disable;

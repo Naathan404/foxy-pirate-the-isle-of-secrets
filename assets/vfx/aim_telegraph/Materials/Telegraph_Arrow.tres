@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://cjhsetq2opbwa"]
 
-[ext_resource type="Shader" uid="uid://5vqryer1bud3" path="res://Vefects/Aim_Telegraph/Shaders/Telegraph_Arrow.gdshader" id="1_arrow"]
-[ext_resource type="Texture2D" uid="uid://bwbr8s6gdqts0" path="res://Vefects/Aim_Telegraph/Aim/Arrow_Aim.png" id="2_ybkr3"]
+[ext_resource type="Shader" uid="uid://5vqryer1bud3" path="res://assets/vfx/aim_telegraph/Shaders/Telegraph_Arrow.gdshader" id="1_arrow"]
+[ext_resource type="Texture2D" uid="uid://bwbr8s6gdqts0" path="res://assets/vfx/aim_telegraph/Aim/Arrow_Aim.png" id="2_ybkr3"]
 
 [resource]
 render_priority = 1

@@ -13,8 +13,13 @@ enum DirectionMode {
 }
 
 const BULLET_SCENE := preload("res://gameplay/enemies/barrel/barrel_bullet.tscn")
+const MUZZLE_INK_SCENE := preload("res://gameplay/enemies/barrel/barrel_muzzle_ink.tscn")
 
 @export_range(0.1, 100.0, 0.1) var bullet_speed: float = 8.0
+## Size of the ink blob artwork only; the hit radius is set by the bullet scene.
+@export_range(0.25, 4.0, 0.05) var bullet_visual_scale: float = 1.0
+## Push, slow and screen ink on Foxy when a blob hits.
+@export var ink_hit: BarrelInkHit
 
 @export_group("Bullet Physics")
 ## Thời gian đạn tồn tại.
@@ -134,7 +139,9 @@ func fire_single() -> void:
 		return
 	var maximum_offset := deg_to_rad(max_bullet_angle_offset_degrees)
 	var offset := randf_range(-maximum_offset, maximum_offset)
-	_fire_in_direction(_get_firing_direction().rotated(Vector3.UP, offset))
+	var direction := _get_firing_direction().rotated(Vector3.UP, offset)
+	_spit_muzzle_ink(direction)
+	_fire_in_direction(direction)
 
 
 func fire_fan_volley(count: int, arc_degrees: float) -> void:
@@ -145,6 +152,7 @@ func fire_fan_volley(count: int, arc_degrees: float) -> void:
 	var angle_step := 0.0 if bullet_count == 1 else arc_radians / float(bullet_count - 1)
 	var start_angle := -arc_radians * 0.5
 	var aim := _get_firing_direction()
+	_spit_muzzle_ink(aim)
 	for index in range(bullet_count):
 		var angle := start_angle + angle_step * index
 		_fire_in_direction(aim.rotated(Vector3.UP, angle))
@@ -176,6 +184,22 @@ func _fire_in_direction(direction: Vector3) -> void:
 	_spawn_bullet(direction, bullet_spawn.global_position)
 
 
+## Ink spat from the mouth for one volley, sized with the barrel. A zero direction sprays
+## all around.
+func _spit_muzzle_ink(direction: Vector3) -> void:
+	var parent := _get_projectile_parent()
+	var ink := MUZZLE_INK_SCENE.instantiate() as BarrelMuzzleInk
+	parent.add_child(ink)
+	ink.global_position = bullet_spawn.global_position
+	var size := visual.scale.x if is_instance_valid(visual) else 1.0
+	ink.play(direction, size)
+
+
+func _get_projectile_parent() -> Node:
+	var parent := get_tree().current_scene
+	return parent if is_instance_valid(parent) else get_tree().root
+
+
 func _spawn_bullet(direction: Vector3, spawn_position: Vector3) -> void:
 	var bullet := BULLET_SCENE.instantiate() as BarrelBullet
 	if bullet == null:
@@ -183,11 +207,10 @@ func _spawn_bullet(direction: Vector3, spawn_position: Vector3) -> void:
 	bullet.lifetime = bullet_lifetime
 	bullet.gravity = bullet_gravity
 	bullet.ground_bounce = bullet_ground_bounce
+	bullet.visual_scale = bullet_visual_scale
+	bullet.ink_hit = ink_hit
 	bullet.launch(self, team, direction, bullet_speed, data.attack_damage)
-	var projectile_parent := get_tree().current_scene
-	if not is_instance_valid(projectile_parent):
-		projectile_parent = get_tree().root
-	projectile_parent.add_child(bullet)
+	_get_projectile_parent().add_child(bullet)
 	bullet.global_position = spawn_position
 	_projectiles.append(bullet)
 	bullet.tree_exited.connect(_on_projectile_tree_exited.bind(bullet), CONNECT_ONE_SHOT)

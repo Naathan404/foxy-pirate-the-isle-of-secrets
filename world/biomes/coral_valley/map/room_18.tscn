@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="crab"]
 [ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="elite_coral_skeleton"]
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="elite_crab"]
-[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/starfish/elite_starfish.tscn" id="elite_starfish"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="elite_hermit_crab"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
 [ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="ground_shape"]
 [ext_resource type="Script" uid="uid://hmtwwikk5suy" path="res://world/gimmick/raid/raid_ground_spawner.gd" id="ground_spawner"]
@@ -35,7 +35,7 @@
 [ext_resource type="Texture2D" uid="uid://3ujdytg643gh" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_18_shore.png" id="shore_texture"]
 [ext_resource type="Script" uid="uid://b4s6vakepafv6" path="res://world/gimmick/island_raid/shuttle_director.gd" id="shuttle_director"]
 [ext_resource type="PackedScene" uid="uid://lu3usf0v5eyp" path="res://world/biomes/coral_valley/objects/raid_shuttle_platform.tscn" id="shuttle_platform"]
-[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/starfish/starfish.tscn" id="starfish"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="hermit_crab"]
 
 [sub_resource type="Environment" id="Environment_84lhg"]
 resource_local_to_scene = true
@@ -171,7 +171,7 @@ shader_parameter/cloud_shadow_strength = 0.35
 
 [sub_resource type="Resource" id="RaidW1_1"]
 script = ExtResource("raid_spawn")
-scene = ExtResource("starfish")
+scene = ExtResource("hermit_crab")
 offset_meters = Vector2(0, -5)
 
 [sub_resource type="Resource" id="RaidW1_2"]
@@ -240,19 +240,19 @@ delay_seconds = 0.15
 
 [sub_resource type="Resource" id="RaidE1_3"]
 script = ExtResource("raid_spawn")
-scene = ExtResource("starfish")
+scene = ExtResource("hermit_crab")
 offset_meters = Vector2(-2, 5)
 delay_seconds = 0.7
 
 [sub_resource type="Resource" id="RaidE1_4"]
 script = ExtResource("raid_spawn")
-scene = ExtResource("starfish")
+scene = ExtResource("hermit_crab")
 offset_meters = Vector2(2, 5)
 delay_seconds = 0.85
 
 [sub_resource type="Resource" id="RaidWave_E1"]
 script = ExtResource("raid_wave")
-intent = "Pincer: crabs rise to the north of Foxy, then starfish to the south, closing both sides."
+intent = "Pincer: crabs rise to the north of Foxy, then hermit crabs to the south, closing both sides."
 lead_in_seconds = 0.8
 spawns = [SubResource("RaidE1_1"), SubResource("RaidE1_2"), SubResource("RaidE1_3"), SubResource("RaidE1_4")]
 
@@ -297,7 +297,7 @@ offset_meters = Vector2(-3, 0)
 
 [sub_resource type="Resource" id="RaidE3_2"]
 script = ExtResource("raid_spawn")
-scene = ExtResource("elite_starfish")
+scene = ExtResource("elite_hermit_crab")
 is_elite = true
 anchor = 1
 offset_meters = Vector2(3, 0)
@@ -316,7 +316,7 @@ delay_seconds = 2.3
 
 [sub_resource type="Resource" id="RaidE3_5"]
 script = ExtResource("raid_spawn")
-scene = ExtResource("starfish")
+scene = ExtResource("hermit_crab")
 offset_meters = Vector2(4.5, 3)
 delay_seconds = 2.6
 
@@ -559,10 +559,12 @@ boarding_area = NodePath("../../MovingPlatform/Platform/BoardingArea")
 west_lever = NodePath("../../WestLever")
 east_lever = NodePath("../../EastLever")
 
-[node name="Lockdown" type="Node" parent="IslandRaid" index="5" unique_id=2142515168 node_paths=PackedStringArray("room")]
+[node name="Lockdown" type="Node" parent="IslandRaid" index="5" unique_id=2142515168 node_paths=PackedStringArray("room", "stages", "gates")]
 editor_description = "Only the west fight locks the exits and raises the boulders; the chest appears when both islands are cleared."
 script = ExtResource("raid_lockdown")
 room = NodePath("../..")
+stages = [NodePath("../WestStage"), NodePath("../EastStage")]
+gates = [NodePath("../../BoulderGate")]
 reward_chest_scene = ExtResource("island_chest")
 reward_position = Vector3(54.96115, 0.21008015, 0.5861097)
 

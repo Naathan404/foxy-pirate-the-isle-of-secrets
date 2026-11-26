@@ -20,7 +20,7 @@ gameplay/enemies/base/enemy_base.tscn
 | Enemy | Hành vi thường | Biến thể elite / lưu ý |
 | --- | --- | --- |
 | **Crab** | Nhận diện và đuổi player theo từng trục X/Z trong vùng hoạt động; tuần tra khi không có mục tiêu. Trúng projectile của player khiến Crab tức giận và tạm mở rộng vùng nhận diện/di chuyển. | **EliteCrab** kế thừa hành vi Crab, giữ telegraph, charge và slam. Một lần khi còn tối đa 50% HP, Elite phóng số trứng ngẫu nhiên; trứng rơi và nở thành Crab thường. |
-| **Starfish** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteStarfish** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Starfish thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
+| **Hermit Crab** | Tuần tra đến khi thấy Foxy; khóa vị trí Foxy, wind-up rồi dash đến vị trí đã khóa. Contact damage chỉ bật trong lúc dash. Nếu dash gặp tường hoặc mép rơi, nó dừng damage, quay đầu, xóa target và tạm tắt `TargetDetector` trong `unreachable_target_ignore_duration` (mặc định 2 giây), rồi mới quét lại player. | **EliteHermitCrab** patrol đổi ngẫu nhiên giữa trục ngang/dọc và lặp ba dash có telegraph. Mỗi dash dùng cùng chuỗi hình của Hermit Crab thường: `idle` chuẩn bị → `charge` wind-up → `attack` dash; chỉ pha `attack` bật contact damage. Nó khóa vị trí player mới cho từng dash; timeout dash được tính theo khoảng cách đến vị trí đã khóa, nên sẽ tới vùng arrival nếu không bị tường/mép rơi chặn. Sau dash nó recovery trước khi quay về patrol. Nếu dash gặp tường hoặc mép rơi, nó dừng contact damage, quay đầu và hoãn đuổi để không lặp dash tại chỗ. |
 | **Barrel** | Đứng yên, ngắm player theo hướng liên tục trên mặt phẳng, charge rồi bắn burst; độ lệch và nhịp bắn có thể cấu hình. | **EliteBarrel** bắn nhiều đợt hình quạt trong một lượt thường. Sau số lượt thường được cấu hình, nó chuyển đỏ, phình và rung; lượt tiếp theo bắn nhiều đợt tỏa đều 360°, sau đó bắt đầu đếm lại. |
 | **Coral Skeleton** | Bắt đầu ngủ; thức dậy khi player vào vùng gần, đuổi và bắn chùm hoặc liên tiếp. Mất mục tiêu thì đi quanh co về vị trí ban đầu, canh gác rồi ngủ lại. | Enemy thường; quy tắc và cấu hình chi tiết trong [business logic Coral Skeleton](./coral_skeleton_business_logic.md). |
 | **Mushroom** | Ngụy trang xen kẽ đi lang thang theo nhịp nhảy; đuổi theo và có thể nhảy xa áp sát, gồng phun mây bào tử độc (tránh sinh chồng lên mây cũ), bật lùi ngắn và phản công khi bị đánh. | **EliteMushroom** giữ toàn bộ chiêu cũ, bổ sung **hai thế đứng chuyển đổi** (`FOOTLESS <-> LEGGED` với bộ bước chân mượt, né đòn/bọc sườn và giữ cự ly), chiêu **Thổi Luồng Khói & Bào Tử Vật Lý** (`SporeStream`) và chiêu cận tử **Đại Bào Tử** (`GreatSpore`: thả bào tử bay lơ lửng đáp xuống thành bãi độc hoặc Trứng Nấm nở ra Mushroom thường). Chi tiết tại [business logic Mushroom](./mushroom_business_logic.md). |
@@ -32,6 +32,26 @@ nhịp bắn và cảnh báo. Một lượt thường bị ngắt không đượ
 biệt bị ngắt trước khi hoàn tất, Elite giữ trạng thái tích lũy và thử lại khi có
 thể tấn công. Damage của các viên vẫn lấy từ dữ liệu Elite.
 Ngưỡng trong script mặc định là 5 lượt; scene EliteBarrel hiện cấu hình 3 lượt.
+
+Đạn Barrel là cục mực (`barrel_Projectiles.png`) quay theo hướng bay, rung nhẹ khi bay và
+méo dẹt khi nảy. Mỗi loạt bắn phụt mực ở miệng (`barrel_muzzle_ink.tscn`, to theo
+`Visual.scale`). Đạn chạm đất bắn tóe giọt mực và để lại vết loang mờ dần
+(`barrel_bullet_impact.tscn`); chạm giữa không trung chỉ tóe giọt. `bullet_visual_scale`
+chỉ phóng to hình (EliteBarrel 1.5); bán kính va chạm vẫn là shape `Sweep` của đạn.
+
+Khi đạn làm Foxy **mất máu** (dash né hoặc đang miễn nhiễm sau đòn thì không), resource
+`BarrelInkHit` trong ô `ink_hit` của Barrel đẩy Foxy theo hướng đạn bay, làm chậm và bắn
+mực lên màn hình. Mực dùng `ink_overlay.gd` của bạch tuộc, không chặn thao tác.
+
+| | `barrel_ink_hit.tres` | `elite_barrel_ink_hit.tres` |
+| --- | --- | --- |
+| Đẩy lùi (`knockback_multiplier`) | 0.6 | 0.85 |
+| Làm chậm | còn 75% trong 1,2 s | còn 70% trong 1,6 s |
+| Mực: độ đậm / độ loang | 0.75 / 0.12 | 0.82 / 0.14 |
+| Mực: giữ / tan | 0,35 s / 0,9 s | 0,6 s / 1,4 s |
+
+Làm chậm dùng `Player.apply_snare`, không cộng dồn với các hiệu ứng chậm khác (lấy mức
+mạnh nhất).
 
 Đạn Barrel phản xạ trên world và thân enemy, không gây sát thương hay đẩy chúng.
 Đạn chỉ gây damage cho player, không knockback; chạm player hoặc hết thời gian
@@ -68,7 +88,7 @@ nhỏ, trắng ở lõi và cyan ở viền, bay theo quỹ đạo chậm sát q
 và mở rộng đúng mặt phẳng billboard của sprite, nên hiệu ứng luôn khớp hướng, animation frame và ảnh 2D; không
 tạo node, icon, chữ, mesh hay offset world-space cạnh enemy.
 Overlay tắt khi enemy chết. Khói trắng-xám mờ chỉ xuất hiện khi di chuyển. Vì body lớn 1.5×, EliteCrab giảm tốc
-từ 2.5 xuống 1.8 và EliteStarfish giảm từ 2.0 xuống 1.5.
+từ 2.5 xuống 1.8 và EliteHermitCrab giảm từ 2.0 xuống 1.5.
 Telegraph pulse trực tiếp trên sprite gốc của elite trong pha chuẩn bị/wind-up: sprite sáng nhẹ và nở rất ít
 theo nhịp. Đồng thời chỉ một vòng cảnh báo màu vàng-cam xuất hiện trên mặt đất, nhấp nháy trong wind-up và tắt
 ngay trước khi đòn bắt đầu. Nó chỉ cảnh báo, không có collider và không gây damage; không tạo billboard/sprite
@@ -83,14 +103,14 @@ Mỗi archetype có root script riêng, kể cả khi chỉ dùng để chứa c
 gameplay, còn script áp dụng chúng vào component lúc `_ready()`; vì vậy level design không cần
 chỉnh trực tiếp `CollisionShape3D` chỉ để đổi vùng nhận diện. Crab và EliteCrab
 dùng `player_detection_radius` để thiết lập detector riêng khi scene chạy; detector
-Crab thường được tạo khi khởi tạo. Starfish và Barrel đồng bộ collider bằng setter.
+Crab thường được tạo khi khởi tạo. Hermit Crab và Barrel đồng bộ collider bằng setter.
 
 | Script | Cấu hình đặc trưng |
 | --- | --- |
 | `crab/crab.gd` | Contact damage, nhận diện, vùng di chuyển và tức giận của Crab. |
 | `crab/elite_crab.gd` | Sinh trứng một lần và cấu hình số lượng/vị trí trứng của EliteCrab. |
-| `starfish/starfish.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector của Starfish và lớp kế thừa elite. |
-| `starfish/elite_starfish.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
+| `hermit_crab/hermit_crab.gd` | `player_detection_radius` và `unreachable_target_ignore_duration` cho TargetDetector của Hermit Crab và lớp kế thừa elite. |
+| `hermit_crab/elite_hermit_crab.gd` | Bật/tắt patrol đổi trục ngẫu nhiên và khoảng thời gian đổi trục. |
 | `barrel/barrel.gd` | `player_detection_radius`, tốc độ đạn và tham số volley Barrel. |
 | `barrel/elite_barrel.gd` | Thông số lượt thường, lượt 360°, tích lũy và cảnh báo. |
 | `coral_skeleton/coral_skeleton.gd` | Vùng nhận diện khi ngủ/thức, thời gian thức và ngủ, di chuyển về nhà và cấu hình đợt bắn. |
@@ -111,7 +131,7 @@ Player. Collider vẫn là nơi định nghĩa hình dạng và chiều cao, kh�
 charge/dash của elite sẽ hủy hoặc quay đầu theo luật state hiện có thay vì chồng lên cùng một vị trí
 của Player. `GroundRayCast3D` chỉ giữ mask `WORLD`, để enemy khác không làm sai kiểm tra mép rơi.
 
-Ví dụ sử dụng: `Crab`, `Barrel` và `Starfish` trong
+Ví dụ sử dụng: `Crab`, `Barrel` và `HermitCrab` trong
 `gameplay/enemies/`.
 
 ## HP và cân bằng damage dạng float
@@ -122,11 +142,11 @@ hiện có damage multiplier 1.0. Chưa thay đổi damage vũ khí, tốc độ
 
 | Enemy | HP cũ | HP mới | Hit Pristine 1.0 | Hit Heavy Edge 1.3 |
 | --- | --- | --- | --- | --- |
-| Starfish | 3 | 2.6 | 3 | 2 |
+| Hermit Crab | 3 | 2.6 | 3 | 2 |
 | Crab | 3 | 3.2 | 4 | 3 |
 | Barrel | 3 | 4.0 | 4 | 4 |
 
-Starfish là mục tiêu nhẹ, Crab chịu thêm một hit cơ bản, Barrel có HP cao hơn
+Hermit Crab là mục tiêu nhẹ, Crab chịu thêm một hit cơ bản, Barrel có HP cao hơn
 để bù vai trò đứng bắn. Đây là mốc cân bằng
 ban đầu theo số hit, cần đánh giá cảm giác chiến đấu trong game. Bảng không tính
 Charm, bỏ lỡ đòn hoặc Doomsday Edge đang gắn thử trên scene Foxy.
@@ -152,7 +172,7 @@ Debug label hiển thị tối đa hai chữ số thập phân; số HP dùng t�
 
 Nguyên tắc ownership: **Base sở hữu cơ chế**, state sở hữu **quyết định hành
 vi theo thời điểm**, scene enemy sở hữu **collider, animation, data và component
-tùy chọn**. Ví dụ Starfish sở hữu luật khóa vị trí Player rồi dash; Base chỉ
+tùy chọn**. Ví dụ Hermit Crab sở hữu luật khóa vị trí Player rồi dash; Base chỉ
 cung cấp target, di chuyển và contact damage.
 
 ### Enemy lớn / elite
@@ -163,7 +183,7 @@ dùng `EnemyData` riêng cho stat và chỉ override collider, state và present
 pulse trên sprite gốc, một vòng cảnh báo attack-only trên mặt đất và khói di chuyển; state riêng chỉ bật/tắt
 telegraph, còn `EnemyBase` không biết hoặc không quyết định elite.
 
-`EliteCrab`, `EliteStarfish` và `EliteBarrel` đều có 12 HP, 2 damage và 50% kháng hất văng.
+`EliteCrab`, `EliteHermitCrab` và `EliteBarrel` đều có 12 HP, 2 damage và 50% kháng hất văng.
 
 Không gán group `boss` hoặc bật `charm_grapple_large` chỉ vì enemy có kích thước lớn.
 Hai cơ chế đó thay đổi kết quả Tide Grapple, nên chỉ dùng khi game design quy định rõ
@@ -318,7 +338,7 @@ func _exit() -> void:
 ```
 
 - Không viết luật của enemy cụ thể vào `EnemyBase` hay `EnemyPatrol`. Crab đổi
-  trục sau Hit thuộc `CrabPatrol`; Starfish khóa vị trí thuộc `StarfishAttack`.
+  trục sau Hit thuộc `CrabPatrol`; Hermit Crab khóa vị trí thuộc `HermitCrabAttack`.
 - State bật `ActiveHitBox` phải tắt nó trong `_exit()`, kể cả khi Hit/Death
   ngắt giữa đòn. State sở hữu contact damage cũng phải gọi `_stop_contact_damage()`.
 - Không đổi layer/mask hoặc kích thước runtime để biểu đạt active frame; giữ
@@ -428,7 +448,7 @@ damage khi chạm, random pause và random đổi giữa trục ngang/dọc. Khi
 pause, nó đi liên tục; khi tắt random axis change, nó giữ trục hiện tại.
 
 Attack, shoot, dash, charge hoặc luật đổi quỹ đạo riêng phải nằm trong state
-riêng. Ví dụ Starfish lưu vị trí Player và dash đến vị trí đã lưu; Barrel có
+riêng. Ví dụ Hermit Crab lưu vị trí Player và dash đến vị trí đã lưu; Barrel có
 state bắn đạn. Không thêm các luật này vào `EnemyBase` hoặc `EnemyPatrol`.
 
 ## 11. Phát hiện Player
@@ -436,7 +456,7 @@ state bắn đạn. Không thêm các luật này vào `EnemyBase` hoặc `Enemy
 Enemy cần phát hiện Player thì thêm một `Area3D` **tên chính xác**
 `TargetDetector` ở root, cùng `CollisionShape3D` có bán kính/phạm vi mong muốn.
 Base tự cấu hình layer/mask và chỉ chọn node thuộc group `player`; target gần
-nhất trong vùng được lưu tại `enemy.target`. Starfish có thể tạm tắt detector sau một dash
+nhất trong vùng được lưu tại `enemy.target`. Hermit Crab có thể tạm tắt detector sau một dash
 không thể đi tiếp; khi hết cooldown, detector bật lại và quét chồng lấp hiện tại.
 
 Trong state, dùng:
@@ -513,6 +533,49 @@ hướng có thể đặt tên `idle`, `run`, `hit`, `death`.
 `enemy.play_animation(&"spawn")` chỉ cần cho clip một lần không thuộc action của state.
 Mỗi action mà state gọi phải có ít nhất một clip hợp lệ, theo hướng hoặc exact action;
 nếu thiếu, state vẫn chạy nhưng không có clip để phát.
+
+Màu toàn thân (elite đỏ rực, cua nổi giận) đặt qua `visual.set_tint(color)` /
+`visual.get_tint()`, không sửa thẳng `visual.sprite.modulate`, để dùng được cả với Spine.
+
+### Enemy dùng Spine
+
+Đổi script của `Visual` sang `EnemySpineVisual`
+([enemy_spine_visual.gd](../../../gameplay/enemies/base/enemy_spine_visual.gd)). Đang
+dùng cho Barrel (`Enemy_Barrel`), Crab và Elite Crab (`Enemy_Crab`), Hermit Crab và Elite
+Hermit Crab (`Enemy_HermitCarb`); bản elite kế thừa scene thường và chỉ phóng to `Visual`.
+
+- `AnimationPlayer` và `Sprite3D` (đã ẩn) vẫn giữ nhịp gameplay, giống Foxy: độ dài
+  pha bắn, chờ clip chết, hitstop, choáng. Hitstop và choáng dừng `AnimationPlayer`,
+  và Spine dừng theo.
+- `clip_map` ánh xạ action hoặc tên clip sang clip Spine. Tên theo hướng (`shoot_up`)
+  được ưu tiên hơn tên action (`shoot`).
+  - Action chỉ Spine có (ví dụ `charge` → `pop_up`) vẫn phát được. State nên gọi
+    action mới và fallback về clip cũ nếu `play_directional_animation` trả `false`.
+  - Action không có trong map (`hit`, `death`) giữ nguyên tư thế Spine hiện tại; hiệu
+    ứng trúng đòn và chết vẫn chạy.
+- `action_start_seconds` cho một action bắt đầu giữa clip Spine (Elite Crab vồ bằng đoạn
+  sau của `attack`). Elite Crab gọi thêm `windup`, `charge_run`, `slam`, `egg_spawn`; nếu
+  visual không có thì quay về clip sprite cũ.
+- Clip lặp hay không do code quyết định theo action: `idle`, `run`, `attack` (dash của Hermit
+  Crab) và `charge_run` thì lặp (`CONTINUOUS_ACTIONS`); clip khác chạy một lần và giữ khung
+  cuối. Không cấu hình trong scene, vì editor từng lưu đè làm mất danh sách này.
+  `mix_seconds` là thời gian hòa giữa hai clip.
+- `clip_faces_left` khai các clip vẽ quay về hướng khác với `artwork_faces_left` (đòn vung càng
+  `attack` của Crab vung sang phải). Khi đó con quái quay theo vị trí mục tiêu, không theo
+  hướng đang đi.
+- `spine_pixel_size` đặt kích thước; gốc skeleton nằm ở chân enemy, `lift_meters` nâng
+  lên khi chân vẽ thấp hơn gốc. Node Spine luôn quay về camera như billboard.
+- Lật hình: mặc định theo `Sprite3D.flip_h`. Art nhìn ngang (Crab đi ngang, HermitCrab) bật
+  `mirror_from_facing` để lật theo hướng enemy trên màn hình và giữ hướng cũ khi đi lên/xuống.
+- Cảnh báo tụ lực của elite (`EliteFeedback`) làm Spine sáng lên và phồng nhẹ qua
+  `visual.set_telegraph_pulse()`.
+- Hiệu ứng trúng đòn dùng dark color (two-color tint) của Spine để nháy màu
+  `hit_flash_color`, kèm nén giãn. Hiệu ứng chết mờ dần và thu nhỏ.
+- Build không có extension spine-godot tự quay về sprite sheet.
+
+File `.skel` xuất từ Spine 3.8 phải chuyển sang `.spine-json` 4.3 bằng
+`tools/spine/spine38_to_43.py`, giống Foxy. Xem README trong
+`assets/spine/enemies/Enemy_Barrel/`.
 
 ## 14. Raycast, Patrol và debug
 

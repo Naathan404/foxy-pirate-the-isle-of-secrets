@@ -1,9 +1,9 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://ytttraynqi7n"]
 
-[ext_resource type="Shader" uid="uid://fc4viuphwukg" path="res://Vefects/Fire_Trail/Shaders/Trail_Distortion.gdshader" id="1_6e2ef"]
-[ext_resource type="Texture2D" uid="uid://6xygblp13liu" path="res://Vefects/Fire_Trail/Textures/T_VFX_Perlin_Noise_01.tga" id="2_0fbaf"]
-[ext_resource type="Texture2D" uid="uid://dh3uyuvmafoy7" path="res://Vefects/Fire_Trail/Textures/T_VFX_Noise_08.tga" id="3_ec99f"]
-[ext_resource type="Texture2D" uid="uid://comvctx640dye" path="res://Vefects/Fire_Trail/Textures/T_VFX_Trail_Mask_03.tga" id="4_15a95"]
+[ext_resource type="Shader" uid="uid://fc4viuphwukg" path="res://assets/vfx/fire_trails/shaders/Trail_Distortion.gdshader" id="1_6e2ef"]
+[ext_resource type="Texture2D" uid="uid://6xygblp13liu" path="res://assets/vfx/fire_trails/textures/T_VFX_Perlin_Noise_01.tga" id="2_0fbaf"]
+[ext_resource type="Texture2D" uid="uid://dh3uyuvmafoy7" path="res://assets/vfx/fire_trails/textures/T_VFX_Noise_08.tga" id="3_ec99f"]
+[ext_resource type="Texture2D" uid="uid://c5excakemh1c8" path="res://assets/vfx/fire_trails/textures/T_VFX_Trail_Mask_03.tga" id="4_15a95"]
 
 [resource]
 shader = ExtResource("1_6e2ef")

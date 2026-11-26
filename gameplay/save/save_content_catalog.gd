@@ -6,6 +6,8 @@ extends RefCounted
 const ITEM_DIRECTORY := "res://data/items"
 const FORGE_DIRECTORY := "res://data/weapon/forges"
 const RESOURCE_EXTENSION := "tres"
+## Item IDs that were renamed, so older saves keep their items.
+const RENAMED_ITEM_IDS: Dictionary[String, String] = {"starfish_core": "hermit_shell"}
 
 static var _items: Dictionary[String, BaseItem] = {}
 static var _forges: Dictionary[StringName, WeaponForge] = {}
@@ -14,7 +16,7 @@ static var _scanned: bool = false
 
 static func find_item(item_id: String) -> BaseItem:
 	_ensure_scanned()
-	return _items.get(item_id) as BaseItem
+	return _items.get(RENAMED_ITEM_IDS.get(item_id, item_id)) as BaseItem
 
 
 static func find_forge(forge_id: StringName) -> WeaponForge:
