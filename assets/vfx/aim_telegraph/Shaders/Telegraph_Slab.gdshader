@@ -29,6 +29,14 @@ uniform float streak_amount = 0.45;
 uniform float rim_amount = 0.6;
 uniform vec4 rim_color : source_color = vec4(1.0, 0.18, 0.25, 1.0);
 group_uniforms;
+group_uniforms Charge_Fill;
+/** Opacity multiplier of the lane ahead of the fill front. */
+uniform float unfilled_opacity = 0.35;
+uniform float fill_soft = 0.35;
+/** Extra rim brightness riding on the fill front while charging. */
+uniform float fill_front_width = 0.5;
+uniform float fill_front_strength = 0.8;
+group_uniforms;
 
 void fragment() {
 	vec2 p = tg_local_pos(UV);
@@ -52,7 +60,9 @@ void fragment() {
 	float streak = tg_noise(vec2(p.x * 1.8 - t * flow_speed * 2.5, p.y * 5.0 + seed));
 	float k = clamp(red * 0.5 + (streak - 0.5) * streak_amount * exp(-abs(p.y) * 1.2), 0.0, 1.0);
 	vec3 col = mix(dark_color.rgb, red_color.rgb, k);
-	col = mix(col, rim_color.rgb, clamp(rim * rim_amount, 0.0, 1.0));
+	float front = tg_fill_front(p.x, fill_front_width) * fill_front_strength;
+	col = mix(col, rim_color.rgb, clamp(rim * rim_amount + front * mask, 0.0, 1.0));
+	float lit = mix(unfilled_opacity, 1.0, tg_fill_lit(p.x, fill_soft));
 	ALBEDO = col;
-	ALPHA = clamp(mask * opacity * pulse, 0.0, 1.0);
+	ALPHA = clamp(mask * opacity * pulse * lit, 0.0, 1.0);
 }

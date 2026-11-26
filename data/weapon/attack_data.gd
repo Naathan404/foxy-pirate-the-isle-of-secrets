@@ -20,6 +20,9 @@ enum DeliveryType { MELEE, PROJECTILE, AREA }
 @export var delivery_type: DeliveryType = DeliveryType.MELEE
 ## Holding prepares projectile startup; early release completes the remaining startup.
 @export var release_to_fire: bool = true
+## Shows the aim telegraph through windup for a directional attack that is not aimed by holding.
+## Held aiming and charging attacks always show it.
+@export var show_aim_telegraph: bool = false
 ## Fit anticipation/strike/recovery poses to their actual forged phase durations.
 @export var phase_driven_animation: bool = false
 @export var lock_input_during_cast: bool = false

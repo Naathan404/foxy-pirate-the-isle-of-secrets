@@ -30,7 +30,6 @@ unreachable_target_ignore_duration = 2.0
 data = ExtResource("2_data")
 initial_state_name = &"Patrol"
 destroy_on_death = true
-show_debug_health = true
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 script = ExtResource("9_spine_visual")
@@ -38,9 +37,10 @@ skeleton_data_path = "res://assets/spine/enemies/Enemy_HermitCarb/hermit_crab_sk
 clip_map = Dictionary[StringName, String]({
 &"attack": "charge_run",
 &"charge": "windup",
-&"hit": "stunned",
+&"hit": "charge_hit",
 &"idle": "idle",
-&"run": "walk"
+&"run": "walk",
+&"stun": "stunned"
 })
 looping_clips = []
 action_start_seconds = Dictionary[StringName, float]({})

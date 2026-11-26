@@ -228,7 +228,7 @@ func _test_adrenaline_surge(
 ) -> void:
 	_assert_false(
 		registry.equip_charm(ADRENALINE_SURGE.charm_id, CharmConstants.SocketId.SPACE, _actor),
-		"disabled Adrenaline Surge cannot be equipped"
+		"unowned Adrenaline Surge cannot be equipped"
 	)
 
 

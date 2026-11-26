@@ -29,6 +29,10 @@
 [ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="lm_beach_coral_orange"]
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="lm_beach_coral_pink"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="lm_stone"]
+[ext_resource type="PackedScene" path="res://world/gimmick/progression/trial_altar.tscn" id="trial_altar"]
+
+[ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
+
 [sub_resource type="Resource" id="GuaranteedNoteDrop"]
 script = ExtResource("chest_note_drop")
 note = ExtResource("chest_note")
@@ -36,7 +40,6 @@ chance = 1.0
 
 [sub_resource type="BoxShape3D" id="PlatformShape"]
 size = Vector3(4, 0.5, 4)
-
 
 [sub_resource type="Environment" id="Environment_smj7s"]
 resource_local_to_scene = true
@@ -143,7 +146,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sand_west"]
 render_priority = 0
 shader = ExtResource("sand_shader")
@@ -177,8 +179,14 @@ shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
 shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
 shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_BaseGround2_Main"]
+points = PackedVector3Array(41.550, 0.210, -10.375, 41.550, -0.600, -10.375, 41.550, 0.210, -10.604, 41.550, -0.600, -10.604, 41.582, 0.210, -10.799, 41.582, -0.600, -10.799, 41.646, 0.210, -10.981, 41.646, -0.600, -10.981, 41.742, 0.210, -11.153, 41.742, -0.600, -11.153, 41.886, 0.210, -11.332, 41.886, -0.600, -11.332, 42.125, 0.210, -11.631, 42.125, -0.600, -11.631, 42.447, 0.210, -12.033, 42.447, -0.600, -12.033, 42.851, 0.210, -12.539, 42.851, -0.600, -12.539, 43.339, 0.210, -13.149, 43.339, -0.600, -13.149, 43.743, 0.210, -13.655, 43.743, -0.600, -13.655, 44.065, 0.210, -14.057, 44.065, -0.600, -14.057, 44.304, 0.210, -14.356, 44.304, -0.600, -14.356, 44.445, 0.210, -14.530, 44.445, -0.600, -14.530, 44.580, 0.210, -14.642, 44.580, -0.600, -14.642, 44.729, 0.210, -14.713, 44.729, -0.600, -14.713, 44.902, 0.210, -14.750, 44.902, -0.600, -14.750, 45.125, 0.210, -14.750, 45.125, -0.600, -14.750, 46.188, 0.210, -14.750, 46.188, -0.600, -14.750, 48.062, 0.210, -14.750, 48.062, -0.600, -14.750, 50.750, 0.210, -14.750, 50.750, -0.600, -14.750, 54.250, 0.210, -14.750, 54.250, -0.600, -14.750, 56.938, 0.210, -14.750, 56.938, -0.600, -14.750, 58.812, 0.210, -14.750, 58.812, -0.600, -14.750, 59.875, 0.210, -14.750, 59.875, -0.600, -14.750, 60.085, 0.210, -14.750, 60.085, -0.600, -14.750, 60.177, 0.210, -14.719, 60.177, -0.600, -14.719, 60.219, 0.210, -14.677, 60.219, -0.600, -14.677, 60.250, 0.210, -14.585, 60.250, -0.600, -14.585, 60.250, 0.210, -14.375, 60.250, -0.600, -14.375, 60.250, 0.210, -12.412, 60.250, -0.600, -12.412, 60.250, 0.210, -8.738, 60.250, -0.600, -8.738, 60.250, 0.210, -3.350, 60.250, -0.600, -3.350, 60.250, 0.210, 3.750, 60.250, -0.600, 3.750, 60.250, 0.210, 9.138, 60.250, -0.600, 9.138, 60.250, 0.210, 12.812, 60.250, -0.600, 12.812, 60.250, 0.210, 14.775, 60.250, -0.600, 14.775, 60.250, 0.210, 14.985, 60.250, -0.600, 14.985, 60.219, 0.210, 15.078, 60.219, -0.600, 15.078, 60.178, 0.210, 15.119, 60.178, -0.600, 15.119, 60.085, 0.210, 15.150, 60.085, -0.600, 15.150, 59.875, 0.210, 15.150, 59.875, -0.600, 15.150, 58.812, 0.210, 15.150, 58.812, -0.600, 15.150, 56.938, 0.210, 15.150, 56.938, -0.600, 15.150, 54.250, 0.210, 15.150, 54.250, -0.600, 15.150, 50.750, 0.210, 15.150, 50.750, -0.600, 15.150, 48.062, 0.210, 15.150, 48.062, -0.600, 15.150, 46.188, 0.210, 15.150, 46.188, -0.600, 15.150, 45.125, 0.210, 15.150, 45.125, -0.600, 15.150, 44.899, 0.210, 15.150, 44.899, -0.600, 15.150, 44.720, 0.210, 15.115, 44.720, -0.600, 15.115, 44.558, 0.210, 15.044, 44.558, -0.600, 15.044, 44.408, 0.210, 14.938, 44.408, -0.600, 14.938, 44.254, 0.210, 14.774, 44.254, -0.600, 14.774, 44.011, 0.210, 14.516, 44.011, -0.600, 14.516, 43.697, 0.210, 14.182, 43.697, -0.600, 14.182, 43.311, 0.210, 13.772, 43.311, -0.600, 13.772, 42.853, 0.210, 13.286, 42.853, -0.600, 13.286, 42.467, 0.210, 12.876, 42.467, -0.600, 12.876, 42.153, 0.210, 12.542, 42.153, -0.600, 12.542, 41.910, 0.210, 12.284, 41.910, -0.600, 12.284, 41.755, 0.210, 12.118, 41.755, -0.600, 12.118, 41.651, 0.210, 11.959, 41.651, -0.600, 11.959, 41.584, 0.210, 11.789, 41.584, -0.600, 11.789, 41.550, 0.210, 11.602, 41.550, -0.600, 11.602, 41.550, 0.210, 11.375, 41.550, -0.600, 11.375, 41.550, 0.210, 9.875, 41.550, -0.600, 9.875, 41.550, 0.210, 7.125, 41.550, -0.600, 7.125, 41.550, 0.210, 3.125, 41.550, -0.600, 3.125, 41.550, 0.210, -2.125, 41.550, -0.600, -2.125, 41.550, 0.210, -6.125, 41.550, -0.600, -6.125, 41.550, 0.210, -8.875, 41.550, -0.600, -8.875)
+
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_BaseGround2_PierRock"]
+points = PackedVector3Array(64.350, 0.210, -4.975, 64.350, -0.600, -4.975, 64.350, 0.210, -5.186, 64.350, -0.600, -5.186, 64.383, 0.210, -5.287, 64.383, -0.600, -5.287, 64.431, 0.210, -5.338, 64.431, -0.600, -5.338, 64.530, 0.210, -5.377, 64.530, -0.600, -5.377, 64.740, 0.210, -5.392, 64.740, -0.600, -5.392, 65.090, 0.210, -5.414, 65.090, -0.600, -5.414, 65.540, 0.210, -5.444, 65.540, -0.600, -5.444, 66.091, 0.210, -5.480, 66.091, -0.600, -5.480, 66.742, 0.210, -5.522, 66.742, -0.600, -5.522, 67.292, 0.210, -5.558, 67.292, -0.600, -5.558, 67.742, 0.210, -5.588, 67.742, -0.600, -5.588, 68.092, 0.210, -5.610, 68.092, -0.600, -5.610, 68.301, 0.210, -5.624, 68.301, -0.600, -5.624, 68.387, 0.210, -5.600, 68.387, -0.600, -5.600, 68.421, 0.210, -5.568, 68.421, -0.600, -5.568, 68.450, 0.210, -5.484, 68.450, -0.600, -5.484, 68.450, 0.210, -5.275, 68.450, -0.600, -5.275, 68.450, 0.210, -4.475, 68.450, -0.600, -4.475, 68.450, 0.210, -3.125, 68.450, -0.600, -3.125, 68.450, 0.210, -1.225, 68.450, -0.600, -1.225, 68.450, 0.210, 1.225, 68.450, -0.600, 1.225, 68.450, 0.210, 3.125, 68.450, -0.600, 3.125, 68.450, 0.210, 4.475, 68.450, -0.600, 4.475, 68.450, 0.210, 5.275, 68.450, -0.600, 5.275, 68.450, 0.210, 5.484, 68.450, -0.600, 5.484, 68.421, 0.210, 5.568, 68.421, -0.600, 5.568, 68.387, 0.210, 5.600, 68.387, -0.600, 5.600, 68.301, 0.210, 5.624, 68.301, -0.600, 5.624, 68.092, 0.210, 5.610, 68.092, -0.600, 5.610, 67.742, 0.210, 5.588, 67.742, -0.600, 5.588, 67.292, 0.210, 5.558, 67.292, -0.600, 5.558, 66.742, 0.210, 5.522, 66.742, -0.600, 5.522, 66.091, 0.210, 5.480, 66.091, -0.600, 5.480, 65.540, 0.210, 5.444, 65.540, -0.600, 5.444, 65.090, 0.210, 5.414, 65.090, -0.600, 5.414, 64.740, 0.210, 5.392, 64.740, -0.600, 5.392, 64.530, 0.210, 5.377, 64.530, -0.600, 5.377, 64.431, 0.210, 5.338, 64.431, -0.600, 5.338, 64.383, 0.210, 5.287, 64.383, -0.600, 5.287, 64.350, 0.210, 5.186, 64.350, -0.600, 5.186, 64.350, 0.210, 4.975, 64.350, -0.600, 4.975, 64.350, 0.210, 4.212, 64.350, -0.600, 4.212, 64.350, 0.210, 2.938, 64.350, -0.600, 2.938, 64.350, 0.210, 1.150, 64.350, -0.600, 1.150, 64.350, 0.210, -1.150, 64.350, -0.600, -1.150, 64.350, 0.210, -2.938, 64.350, -0.600, -2.938, 64.350, 0.210, -4.212, 64.350, -0.600, -4.212)
+
 [node name="room_23" unique_id=1607608505 instance=ExtResource("1_base")]
-editor_description = "Timing Quiz: a fixed center platform carries one lever. The outer platform loops clockwise around eight stops. Hits alternate between stopping at the next marker and resuming clockwise travel."
+editor_description = "Timing Quiz with the Pearl of Wit: the outer platform loops clockwise around the fixed centre; the lever on the centre stops it at the next marker or sets it going. North of the N stop floats the pearl platform: reach it by stopping the loop at N (or NW/NE) and dashing over. Its own lever stops/starts the loop for the way back. The east pier stands on a rock cut off by a grapple gap: the way to the hidden room_24."
 boundary_openings = Array[Rect2]([Rect2(12.7, -2.3355203, 29.58615, 5.78)])
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_24.tscn"
@@ -285,8 +293,17 @@ material_override = SubResource("ShaderMaterial_sand_east")
 texture = ExtResource("sand_east")
 
 [node name="CollisionShape3D" parent="Environment/BaseGround2/StaticBody3D" parent_id_path=PackedInt32Array(234433943, 822018133) index="0" unique_id=87426523]
+disabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005, -0.41596794, 0.31086218)
 shape = ExtResource("ground_shape")
+
+[node name="SplitIsland_BaseGround2_Main" type="CollisionShape3D" parent="Environment/BaseGround2/StaticBody3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -21.9845, 0, 0.0764184)
+shape = SubResource("SplitIsland_BaseGround2_Main")
+
+[node name="SplitIsland_BaseGround2_PierRock" type="CollisionShape3D" parent="Environment/BaseGround2/StaticBody3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -21.9845, 0, 0.0764184)
+shape = SubResource("SplitIsland_BaseGround2_PierRock")
 
 [node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.50004, 0, -34.597424)
@@ -301,7 +318,7 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [node name="RandomSeaweed2" type="Node3D" parent="." index="6" unique_id=1491933696]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
 script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(47.78515, 0, -9.789, 50.04015, 0, -10.654, 52.22715, 0, -11.256, 54.335148, 0, -11.979, 56.22515, 0, -10.98, 58.20115, 0, -10.64, 60.13815, 0, -11.919, 60.76415, 0, -9.816, 64.27815, 0, -5.243, 64.43915, 0, 5.657, 64.512146, 0, 8.175, 63.90215, 0, 10.795, 61.787148, 0, 11.172, 59.71815, 0, 12.841, 57.40215, 0, 11.701, 54.49315, 0, 12.208, 52.07915, 0, 12.619, 49.76015, 0, 12.497, 47.75115, 0, 12.365, 46.78915, 0, 10.605, 45.29215, 0, 9.102, 44.94115, 0, 7.111, 45.40115, 0, 5.016)
+spawn_positions = PackedVector3Array(47.7852, 0, -9.789, 50.0401, 0, -10.654, 52.2272, 0, -11.256, 54.3351, 0, -11.979, 56.2251, 0, -10.98, 58.2011, 0, -10.64, 57.4021, 0, 11.701, 54.4931, 0, 12.208, 52.0791, 0, 12.619, 49.7602, 0, 12.497, 47.7512, 0, 12.365, 46.7891, 0, 10.605, 45.2921, 0, 9.102, 44.9412, 0, 7.111, 45.4012, 0, 5.016)
 fixed_spawn_count = 10
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
@@ -335,13 +352,13 @@ note_drops = Array[ExtResource("chest_note_drop")]([SubResource("GuaranteedNoteD
 
 [node name="ChestBarrels" type="Node3D" parent="."]
 position = Vector3(54.96114925, 0.21008015, 0.58610969)
-editor_description = "Two Elite Barrels to the right of the chest: top-right and bottom-right at local X/Z (5, -5) and (5, 5)."
+editor_description = "Two Elite Barrels to the right of the chest at local X/Z (3.5, -5) and (3.5, 5)."
 
 [node name="TopRight" parent="ChestBarrels" instance=ExtResource("chest_barrel")]
-position = Vector3(5, 0.05, -5)
+position = Vector3(3.5, 0.05, -5)
 
 [node name="BottomRight" parent="ChestBarrels" instance=ExtResource("chest_barrel")]
-position = Vector3(5, 0.05, 5)
+position = Vector3(3.5, 0.05, 5)
 
 [node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.753676)
@@ -378,6 +395,37 @@ transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, -7.0, 1.45, -6.55)
 
 [node name="CoralRockPink" parent="Scenery" index="2" unique_id=2017629795 instance=ExtResource("lm_beach_coral_pink")]
 transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -6.1, 1.35, -6.5)
+
+[node name="PearlPlatform" type="StaticBody3D" parent="."]
+editor_description = "Fixed platform 4 m north of the orbit N stop; holds the Pearl of Wit."
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 27.612848, -0.03991985, -17.23)
+
+[node name="Sprite3D" type="Sprite3D" parent="PearlPlatform"]
+transform = Transform3D(0.5, 0, 0, 0, -2.1855694e-08, 0.5, 0, -0.5, -2.1855694e-08, 0, 0, 0)
+alpha_cut = 1
+texture = ExtResource("platform_texture")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PearlPlatform"]
+shape = SubResource("PlatformShape")
+
+[node name="ReturnLever" parent="PearlPlatform" node_paths=PackedStringArray("target_platforms") instance=ExtResource("center_lever")]
+editor_description = "Stops or restarts the loop, for the way back."
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 1.4, 1.05, 1.2)
+target_platforms = [NodePath("../../MovingPlatform")]
+destination_mode = 4
+
+[node name="TrialAltar" parent="." instance=ExtResource("trial_altar")]
+editor_description = "Pearl of Wit on the pearl platform."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.2, 0.21, -17.6)
+pearl_flag = &"coral_valley_pearl_wit"
+
+[node name="PostToPierRock" parent="Scenery" instance=ExtResource("grapple_post")]
+editor_description = "East island side of the grapple gap to the pier rock (line z -2.6)."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.1, 0, -2.6)
+
+[node name="PostPierRock" parent="Scenery" instance=ExtResource("grapple_post")]
+editor_description = "Pier rock side, for the way back."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.5, 0, -2.6)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

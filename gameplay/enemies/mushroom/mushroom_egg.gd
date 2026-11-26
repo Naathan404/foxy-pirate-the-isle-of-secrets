@@ -93,7 +93,6 @@ func hatch_into_mushroom() -> MushroomEnemy:
 		return null
 	var spawn_world := global_position
 	hatched.position = (parent as Node3D).to_local(spawn_world) if parent is Node3D else spawn_world
-	hatched.show_debug_health = show_debug_health
 	parent.add_child(hatched)
 	hatched.global_position = spawn_world
 	hatched.home_position = spawn_world

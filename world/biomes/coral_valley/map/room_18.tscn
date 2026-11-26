@@ -40,10 +40,10 @@
 [sub_resource type="Environment" id="Environment_84lhg"]
 resource_local_to_scene = true
 background_mode = 1
-background_color = Color(0.02, 0.07, 0.11, 1)
+background_color = Color(0.1, 0.02, 0.03, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.5, 0.62, 0.66, 1)
-ambient_light_energy = 0.6
+ambient_light_color = Color(0.68, 0.5, 0.48, 1)
+ambient_light_energy = 0.62
 tonemap_mode = 2
 tonemap_white = 6.0
 glow_enabled = true
@@ -70,15 +70,15 @@ shader_parameter/shore_rect = Vector4(-23.5166, -26.1386, 102.169, 55.6635)
 shader_parameter/shore_reach_meters = 8.0
 shader_parameter/surface_height_meters = 0.21
 shader_parameter/water_noise = SubResource("NoiseTexture2D_water")
-shader_parameter/deep_color = Color(0.02, 0.07, 0.11, 1)
-shader_parameter/lagoon_color = Color(0.04, 0.23, 0.28, 1)
-shader_parameter/shallow_color = Color(0.14, 0.47, 0.47, 1)
-shader_parameter/reef_color = Color(0.28, 0.22, 0.32, 1)
-shader_parameter/caustic_color = Color(0.62, 0.95, 0.88, 1)
-shader_parameter/foam_color = Color(0.9, 0.95, 0.9, 1)
+shader_parameter/deep_color = Color(0.1, 0.02, 0.03, 1)
+shader_parameter/lagoon_color = Color(0.38, 0.06, 0.07, 1)
+shader_parameter/shallow_color = Color(0.72, 0.2, 0.16, 1)
+shader_parameter/reef_color = Color(0.25, 0.06, 0.1, 1)
+shader_parameter/caustic_color = Color(1, 0.62, 0.42, 1)
+shader_parameter/foam_color = Color(1, 0.88, 0.8, 1)
 shader_parameter/caustic_world_size_meters = 9.0
 shader_parameter/caustic_speed = 0.05
-shader_parameter/caustic_strength = 0.2
+shader_parameter/caustic_strength = 0.26
 shader_parameter/reef_world_size_meters = 26.0
 shader_parameter/reef_coverage = 0.48
 shader_parameter/reef_strength = 0.5
@@ -333,11 +333,11 @@ size = Vector3(24, 5, 28)
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
-shader_parameter/saturation = 0.98
-shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
-shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
-shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
-shader_parameter/vignette_strength = 0.3
+shader_parameter/saturation = 1.02
+shader_parameter/shadow_tint = Color(1, 0.9, 0.92, 1)
+shader_parameter/highlight_tint = Color(1.1, 0.95, 0.86, 1)
+shader_parameter/vignette_color = Color(0.14, 0.02, 0.03, 1)
+shader_parameter/vignette_strength = 0.36
 
 [node name="room_18" unique_id=1821675712 instance=ExtResource("1_base")]
 editor_description = "Island Raid: two islands joined by one shuttle platform that idles at Center. Fight each island, then strike its lever to call the shuttle. Island center offset 54.96114925 units. Shared CameraBounds."
@@ -350,8 +350,8 @@ environment = SubResource("Environment_84lhg")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
-light_color = Color(1, 0.92, 0.84, 1)
-light_energy = 1.15
+light_color = Color(1, 0.82, 0.68, 1)
+light_energy = 1.1
 shadow_enabled = true
 shadow_opacity = 0.65
 directional_shadow_mode = 0
@@ -583,12 +583,12 @@ material = SubResource("ShaderMaterial_ntl8i")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1566899533, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
-leaf_color = Color(0.95, 0.97, 0.94, 0.5)
+leaf_color = Color(1, 0.86, 0.82, 0.5)
 leaf_size = 7.0
 leaf_width_ratio = 0.85
 leaf_rotation_speed = 0.3
 trail_count = 6
-trail_color = Color(0.78, 0.95, 0.94, 0.4)
+trail_color = Color(1, 0.72, 0.66, 0.35)
 
 [node name="Scenery" type="Node3D" parent="." index="13" unique_id=1411167715]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)

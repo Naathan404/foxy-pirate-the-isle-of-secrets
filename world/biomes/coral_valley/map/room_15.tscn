@@ -1,11 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/empty_combat_after_checkpoint.tscn" id="empty_combat"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/empty_resources_after_checkpoint.tscn" id="empty_resources"]
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
-[ext_resource type="Script" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
-
-
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
@@ -17,6 +12,12 @@
 [ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
 [ext_resource type="Texture2D" uid="uid://cvcfgrq3fwe6v" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_right.png" id="pier_right"]
 [ext_resource type="PackedScene" uid="uid://d0ygcokpmdb3n" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="lm_beach_palm_01"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="wood_log"]
+
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="stone"]
+
+[ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="enemy_elite_barrel"]
+
 [sub_resource type="Environment" id="Environment_void"]
 resource_local_to_scene = true
 background_mode = 1
@@ -122,7 +123,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
 render_priority = 0
 shader = ExtResource("sand_shader")
@@ -144,10 +144,20 @@ shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
 shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
 shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_West"]
+points = PackedVector3Array(-13.450, 0.210, -10.375, -13.450, -0.600, -10.375, -13.450, 0.210, -10.604, -13.450, -0.600, -10.604, -13.418, 0.210, -10.799, -13.418, -0.600, -10.799, -13.354, 0.210, -10.981, -13.354, -0.600, -10.981, -13.258, 0.210, -11.153, -13.258, -0.600, -11.153, -13.114, 0.210, -11.332, -13.114, -0.600, -11.332, -12.875, 0.210, -11.631, -12.875, -0.600, -11.631, -12.553, 0.210, -12.033, -12.553, -0.600, -12.033, -12.149, 0.210, -12.539, -12.149, -0.600, -12.539, -11.661, 0.210, -13.149, -11.661, -0.600, -13.149, -11.257, 0.210, -13.655, -11.257, -0.600, -13.655, -10.935, 0.210, -14.057, -10.935, -0.600, -14.057, -10.696, 0.210, -14.356, -10.696, -0.600, -14.356, -10.555, 0.210, -14.530, -10.555, -0.600, -14.530, -10.420, 0.210, -14.642, -10.420, -0.600, -14.642, -10.271, 0.210, -14.713, -10.271, -0.600, -14.713, -10.098, 0.210, -14.750, -10.098, -0.600, -14.750, -9.875, 0.210, -14.750, -9.875, -0.600, -14.750, -9.294, 0.210, -14.750, -9.294, -0.600, -14.750, -8.381, 0.210, -14.750, -8.381, -0.600, -14.750, -7.137, 0.210, -14.750, -7.137, -0.600, -14.750, -5.562, 0.210, -14.750, -5.562, -0.600, -14.750, -4.319, 0.210, -14.750, -4.319, -0.600, -14.750, -3.406, 0.210, -14.750, -3.406, -0.600, -14.750, -2.825, 0.210, -14.750, -2.825, -0.600, -14.750, -2.615, 0.210, -14.750, -2.615, -0.600, -14.750, -2.523, 0.210, -14.720, -2.523, -0.600, -14.720, -2.481, 0.210, -14.677, -2.481, -0.600, -14.677, -2.450, 0.210, -14.584, -2.450, -0.600, -14.584, -2.450, 0.210, -14.375, -2.450, -0.600, -14.375, -2.450, 0.210, -12.412, -2.450, -0.600, -12.412, -2.450, 0.210, -8.738, -2.450, -0.600, -8.738, -2.450, 0.210, -3.350, -2.450, -0.600, -3.350, -2.450, 0.210, 3.750, -2.450, -0.600, 3.750, -2.450, 0.210, 9.138, -2.450, -0.600, 9.138, -2.450, 0.210, 12.812, -2.450, -0.600, 12.812, -2.450, 0.210, 14.775, -2.450, -0.600, 14.775, -2.450, 0.210, 14.984, -2.450, -0.600, 14.984, -2.481, 0.210, 15.078, -2.481, -0.600, 15.078, -2.523, 0.210, 15.119, -2.523, -0.600, 15.119, -2.615, 0.210, 15.150, -2.615, -0.600, 15.150, -2.825, 0.210, 15.150, -2.825, -0.600, 15.150, -3.406, 0.210, 15.150, -3.406, -0.600, 15.150, -4.319, 0.210, 15.150, -4.319, -0.600, 15.150, -5.562, 0.210, 15.150, -5.562, -0.600, 15.150, -7.137, 0.210, 15.150, -7.137, -0.600, 15.150, -8.381, 0.210, 15.150, -8.381, -0.600, 15.150, -9.294, 0.210, 15.150, -9.294, -0.600, 15.150, -9.875, 0.210, 15.150, -9.875, -0.600, 15.150, -10.101, 0.210, 15.150, -10.101, -0.600, 15.150, -10.280, 0.210, 15.115, -10.280, -0.600, 15.115, -10.442, 0.210, 15.044, -10.442, -0.600, 15.044, -10.592, 0.210, 14.938, -10.592, -0.600, 14.938, -10.746, 0.210, 14.774, -10.746, -0.600, 14.774, -10.989, 0.210, 14.516, -10.989, -0.600, 14.516, -11.303, 0.210, 14.182, -11.303, -0.600, 14.182, -11.689, 0.210, 13.772, -11.689, -0.600, 13.772, -12.147, 0.210, 13.286, -12.147, -0.600, 13.286, -12.533, 0.210, 12.876, -12.533, -0.600, 12.876, -12.847, 0.210, 12.542, -12.847, -0.600, 12.542, -13.090, 0.210, 12.284, -13.090, -0.600, 12.284, -13.245, 0.210, 12.118, -13.245, -0.600, 12.118, -13.349, 0.210, 11.959, -13.349, -0.600, 11.959, -13.416, 0.210, 11.789, -13.416, -0.600, 11.789, -13.450, 0.210, 11.602, -13.450, -0.600, 11.602, -13.450, 0.210, 11.375, -13.450, -0.600, 11.375, -13.450, 0.210, 9.875, -13.450, -0.600, 9.875, -13.450, 0.210, 7.125, -13.450, -0.600, 7.125, -13.450, 0.210, 3.125, -13.450, -0.600, 3.125, -13.450, 0.210, -2.125, -13.450, -0.600, -2.125, -13.450, 0.210, -6.125, -13.450, -0.600, -6.125, -13.450, 0.210, -8.875, -13.450, -0.600, -8.875)
+
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_East"]
+points = PackedVector3Array(2.450, 0.210, -14.375, 2.450, -0.600, -14.375, 2.450, 0.210, -14.584, 2.450, -0.600, -14.584, 2.481, 0.210, -14.677, 2.481, -0.600, -14.677, 2.523, 0.210, -14.720, 2.523, -0.600, -14.720, 2.615, 0.210, -14.750, 2.615, -0.600, -14.750, 2.825, 0.210, -14.750, 2.825, -0.600, -14.750, 3.406, 0.210, -14.750, 3.406, -0.600, -14.750, 4.319, 0.210, -14.750, 4.319, -0.600, -14.750, 5.562, 0.210, -14.750, 5.562, -0.600, -14.750, 7.137, 0.210, -14.750, 7.137, -0.600, -14.750, 8.381, 0.210, -14.750, 8.381, -0.600, -14.750, 9.294, 0.210, -14.750, 9.294, -0.600, -14.750, 9.875, 0.210, -14.750, 9.875, -0.600, -14.750, 10.098, 0.210, -14.750, 10.098, -0.600, -14.750, 10.271, 0.210, -14.713, 10.271, -0.600, -14.713, 10.420, 0.210, -14.642, 10.420, -0.600, -14.642, 10.555, 0.210, -14.530, 10.555, -0.600, -14.530, 10.696, 0.210, -14.356, 10.696, -0.600, -14.356, 10.935, 0.210, -14.057, 10.935, -0.600, -14.057, 11.257, 0.210, -13.655, 11.257, -0.600, -13.655, 11.661, 0.210, -13.149, 11.661, -0.600, -13.149, 12.149, 0.210, -12.539, 12.149, -0.600, -12.539, 12.553, 0.210, -12.033, 12.553, -0.600, -12.033, 12.875, 0.210, -11.631, 12.875, -0.600, -11.631, 13.114, 0.210, -11.332, 13.114, -0.600, -11.332, 13.258, 0.210, -11.153, 13.258, -0.600, -11.153, 13.354, 0.210, -10.981, 13.354, -0.600, -10.981, 13.418, 0.210, -10.799, 13.418, -0.600, -10.799, 13.450, 0.210, -10.604, 13.450, -0.600, -10.604, 13.450, 0.210, -10.375, 13.450, -0.600, -10.375, 13.450, 0.210, -8.875, 13.450, -0.600, -8.875, 13.450, 0.210, -6.125, 13.450, -0.600, -6.125, 13.450, 0.210, -2.125, 13.450, -0.600, -2.125, 13.450, 0.210, 3.125, 13.450, -0.600, 3.125, 13.450, 0.210, 7.125, 13.450, -0.600, 7.125, 13.450, 0.210, 9.875, 13.450, -0.600, 9.875, 13.450, 0.210, 11.375, 13.450, -0.600, 11.375, 13.450, 0.210, 11.602, 13.450, -0.600, 11.602, 13.416, 0.210, 11.789, 13.416, -0.600, 11.789, 13.349, 0.210, 11.959, 13.349, -0.600, 11.959, 13.245, 0.210, 12.118, 13.245, -0.600, 12.118, 13.090, 0.210, 12.284, 13.090, -0.600, 12.284, 12.847, 0.210, 12.542, 12.847, -0.600, 12.542, 12.533, 0.210, 12.876, 12.533, -0.600, 12.876, 12.147, 0.210, 13.286, 12.147, -0.600, 13.286, 11.689, 0.210, 13.772, 11.689, -0.600, 13.772, 11.303, 0.210, 14.182, 11.303, -0.600, 14.182, 10.989, 0.210, 14.516, 10.989, -0.600, 14.516, 10.746, 0.210, 14.774, 10.746, -0.600, 14.774, 10.592, 0.210, 14.938, 10.592, -0.600, 14.938, 10.442, 0.210, 15.044, 10.442, -0.600, 15.044, 10.280, 0.210, 15.115, 10.280, -0.600, 15.115, 10.101, 0.210, 15.150, 10.101, -0.600, 15.150, 9.875, 0.210, 15.150, 9.875, -0.600, 15.150, 9.294, 0.210, 15.150, 9.294, -0.600, 15.150, 8.381, 0.210, 15.150, 8.381, -0.600, 15.150, 7.137, 0.210, 15.150, 7.137, -0.600, 15.150, 5.562, 0.210, 15.150, 5.562, -0.600, 15.150, 4.319, 0.210, 15.150, 4.319, -0.600, 15.150, 3.406, 0.210, 15.150, 3.406, -0.600, 15.150, 2.825, 0.210, 15.150, 2.825, -0.600, 15.150, 2.615, 0.210, 15.150, 2.615, -0.600, 15.150, 2.523, 0.210, 15.119, 2.523, -0.600, 15.119, 2.481, 0.210, 15.078, 2.481, -0.600, 15.078, 2.450, 0.210, 14.984, 2.450, -0.600, 14.984, 2.450, 0.210, 14.775, 2.450, -0.600, 14.775, 2.450, 0.210, 12.812, 2.450, -0.600, 12.812, 2.450, 0.210, 9.138, 2.450, -0.600, 9.138, 2.450, 0.210, 3.750, 2.450, -0.600, 3.750, 2.450, 0.210, -3.350, 2.450, -0.600, -3.350, 2.450, 0.210, -8.738, 2.450, -0.600, -8.738, 2.450, 0.210, -12.412, 2.450, -0.600, -12.412)
+
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_Isthmus"]
+points = PackedVector3Array(-3.150, 0.210, -2.075, -3.150, -0.600, -2.075, -3.150, 0.210, -2.284, -3.150, -0.600, -2.284, -3.119, 0.210, -2.378, -3.119, -0.600, -2.378, -3.077, 0.210, -2.419, -3.077, -0.600, -2.419, -2.985, 0.210, -2.450, -2.985, -0.600, -2.450, -2.775, 0.210, -2.450, -2.775, -0.600, -2.450, -2.287, 0.210, -2.450, -2.287, -0.600, -2.450, -1.562, 0.210, -2.450, -1.562, -0.600, -2.450, -0.600, 0.210, -2.450, -0.600, -0.600, -2.450, 0.600, 0.210, -2.450, 0.600, -0.600, -2.450, 1.562, 0.210, -2.450, 1.562, -0.600, -2.450, 2.287, 0.210, -2.450, 2.287, -0.600, -2.450, 2.775, 0.210, -2.450, 2.775, -0.600, -2.450, 2.985, 0.210, -2.450, 2.985, -0.600, -2.450, 3.077, 0.210, -2.419, 3.077, -0.600, -2.419, 3.119, 0.210, -2.378, 3.119, -0.600, -2.378, 3.150, 0.210, -2.284, 3.150, -0.600, -2.284, 3.150, 0.210, -2.075, 3.150, -0.600, -2.075, 3.150, 0.210, -1.650, 3.150, -0.600, -1.650, 3.150, 0.210, -1.050, 3.150, -0.600, -1.050, 3.150, 0.210, -0.275, 3.150, -0.600, -0.275, 3.150, 0.210, 0.675, 3.150, -0.600, 0.675, 3.150, 0.210, 1.450, 3.150, -0.600, 1.450, 3.150, 0.210, 2.050, 3.150, -0.600, 2.050, 3.150, 0.210, 2.475, 3.150, -0.600, 2.475, 3.150, 0.210, 2.684, 3.150, -0.600, 2.684, 3.119, 0.210, 2.778, 3.119, -0.600, 2.778, 3.077, 0.210, 2.819, 3.077, -0.600, 2.819, 2.985, 0.210, 2.850, 2.985, -0.600, 2.850, 2.775, 0.210, 2.850, 2.775, -0.600, 2.850, 2.287, 0.210, 2.850, 2.287, -0.600, 2.850, 1.562, 0.210, 2.850, 1.562, -0.600, 2.850, 0.600, 0.210, 2.850, 0.600, -0.600, 2.850, -0.600, 0.210, 2.850, -0.600, -0.600, 2.850, -1.562, 0.210, 2.850, -1.562, -0.600, 2.850, -2.287, 0.210, 2.850, -2.287, -0.600, 2.850, -2.775, 0.210, 2.850, -2.775, -0.600, 2.850, -2.985, 0.210, 2.850, -2.985, -0.600, 2.850, -3.077, 0.210, 2.819, -3.077, -0.600, 2.819, -3.119, 0.210, 2.778, -3.119, -0.600, 2.778, -3.150, 0.210, 2.684, -3.150, -0.600, 2.684, -3.150, 0.210, 2.475, -3.150, -0.600, 2.475, -3.150, 0.210, 2.050, -3.150, -0.600, 2.050, -3.150, 0.210, 1.450, -3.150, -0.600, 1.450, -3.150, 0.210, 0.675, -3.150, -0.600, 0.675, -3.150, 0.210, -0.275, -3.150, -0.600, -0.275, -3.150, 0.210, -1.050, -3.150, -0.600, -1.050, -3.150, 0.210, -1.650, -3.150, -0.600, -1.650)
+
 [node name="room_15" instance=ExtResource("1_base")]
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_16.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_14.tscn"
+editor_description = "Barricade Beach: two halves joined by one narrow isthmus, shut by a driftwood barricade. Two Elite Barrels on the east half fire through the isthmus once it is open; three rocks on the west half are the cover."
 
 [node name="WorldEnvironment" parent="General" index="0" unique_id=212262502 parent_id_path=PackedInt32Array(461960862)]
 environment = SubResource("Environment_void")
@@ -236,19 +246,67 @@ trail_color = Color(0.78, 0.95, 0.94, 0.4)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
 
 [node name="TwinPalmWest" parent="Scenery" index="0" unique_id=1654296033 instance=ExtResource("lm_beach_palm_01")]
-transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, -0.6, 0.0, -13.0)
+transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, -5, 0, -12.4)
 ground_shadow = true
 
 [node name="TwinPalmEast" parent="Scenery" index="1" unique_id=167977818 instance=ExtResource("lm_beach_palm_01")]
-transform = Transform3D(2.7, 0, 0, 0, 2.7, 0, 0, 0, 2.7, 2.0, 0.0, -12.8)
+transform = Transform3D(2.7, 0, 0, 0, 2.7, 0, 0, 0, 2.7, 5.4, 0, -12.2)
 ground_shadow = true
 
-[node name="RandomEmptyType" type="Node3D" parent="."]
-script = ExtResource("random_props")
-editor_description = "Choose exactly one layout per visit: 50% combat/obstacles, 50% resources."
-spawn_positions = PackedVector3Array(0, 0, 0)
-fixed_spawn_count = 1
-prop_scenes = Array[PackedScene]([ExtResource("empty_combat"), ExtResource("empty_resources")])
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+disabled = true
+
+[node name="SplitIsland_West" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -0, 0, 0.0764184)
+shape = SubResource("SplitIsland_West")
+
+[node name="SplitIsland_East" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -0, 0, 0.0764184)
+shape = SubResource("SplitIsland_East")
+
+[node name="SplitIsland_Isthmus" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -0, 0, 0.0764184)
+shape = SubResource("SplitIsland_Isthmus")
+
+[node name="Barricade" type="Node3D" parent="."]
+editor_description = "Driftwood barricade across the isthmus; break it to pass."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+
+[node name="LogNorth" parent="Barricade" instance=ExtResource("wood_log")]
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, 0.2, 0, -1.3)
+ground_shadow = true
+
+[node name="LogSouth" parent="Barricade" instance=ExtResource("wood_log")]
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, -0.2, 0, 1.7)
+ground_shadow = true
+
+[node name="LogTop" parent="Barricade" instance=ExtResource("wood_log")]
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, 0.6, 0, 0.2)
+ground_shadow = true
+
+[node name="Cover" type="Node3D" parent="."]
+editor_description = "Rocks to hide behind from the barrels."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+
+[node name="RockNorth" parent="Cover" instance=ExtResource("stone")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -5.6, 0, -2.4)
+ground_shadow = true
+
+[node name="RockSouth" parent="Cover" instance=ExtResource("stone")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -5.6, 0, 2.9)
+ground_shadow = true
+
+[node name="RockBack" parent="Cover" instance=ExtResource("stone")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, -10, 0, -4.5)
+ground_shadow = true
+
+[node name="EliteBarrelNorth" parent="." instance=ExtResource("enemy_elite_barrel")]
+editor_description = "Fires across the isthmus from the east half."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.21, -5.5)
+
+[node name="EliteBarrelSouth" parent="." instance=ExtResource("enemy_elite_barrel")]
+editor_description = "Fires across the isthmus from the east half."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.21, 6)
 
 [editable path="Environment/BaseGround"]
 [editable path="RoomAtmosphere"]

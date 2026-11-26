@@ -93,6 +93,15 @@ func set_telegraph_pulse(strength: float, size_scale: float = 1.0) -> void:
 
 
 ## Top of the current pose, from the skeleton bones (so it follows the lid popping open).
+func get_top_position() -> Vector3:
+	if not is_instance_valid(_spine):
+		return super()
+	var bounds: Rect2 = _spine.get_skeleton().get_bounds()
+	if not bounds.has_area():
+		return super()
+	return _spine.to_global(Vector3(0.0, -bounds.position.y * spine_pixel_size, 0.0))
+
+
 func get_top_y() -> float:
 	if not is_instance_valid(_spine):
 		return super()
@@ -101,6 +110,18 @@ func get_top_y() -> float:
 		return super()
 	# Spine's y axis points down: the top is the bounds' smallest y.
 	return _spine.to_global(Vector3(0.0, -bounds.position.y * spine_pixel_size, 0.0)).y
+
+
+func get_bone_position(bone_name: String) -> Variant:
+	if not is_instance_valid(_spine):
+		return super(bone_name)
+	var bone = _spine.get_skeleton().find_bone(bone_name)
+	if bone == null:
+		return super(bone_name)
+	var pose = bone.get_applied_pose()
+	# Spine's y axis points down.
+	var local := Vector3(pose.get_world_x(), -pose.get_world_y(), 0.0) * spine_pixel_size
+	return _spine.to_global(local)
 
 
 func play_hit_feedback() -> void:

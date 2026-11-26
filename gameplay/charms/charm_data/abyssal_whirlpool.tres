@@ -15,8 +15,8 @@ effect_scene = ExtResource("2_effect")
 resource_cost = 300.0
 cooldown_seconds = 8.0
 acquisition_source = &"prototype_debug"
-content_status = 1
-tags = Array[StringName]([&"active", &"prototype", &"zone"])
+drop_chance = 0.0
+tags = Array[StringName]([&"active", &"zone"])
 effect_params = {
 "damage_multiplier": 2.5,
 "duration_seconds": 1.5,

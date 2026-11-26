@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://dlt6tk58fbo2m" path="res://gameplay/enemies/base/states/enemy_idle.gd" id="7_idle"]
 [ext_resource type="Script" uid="uid://cqq0wtkbbb4b5" path="res://gameplay/enemies/base/states/enemy_hit.gd" id="10_hit"]
 [ext_resource type="Script" uid="uid://fo0rmk0j4cmd" path="res://gameplay/enemies/base/states/enemy_death.gd" id="11_death"]
+[ext_resource type="Script" path="res://gameplay/enemies/base/enemy_health_bar.gd" id="12_health_bar"]
 
 [ext_resource type="Resource" path="res://data/items/charms/crimson_band.tres" id="item_crimson_band"]
 [ext_resource type="Resource" path="res://data/items/charms/skull_cracker.tres" id="item_skull_cracker"]
@@ -82,9 +83,7 @@ shape = SubResource("CapsuleShape3D_body")
 [node name="HealthComponent" type="Node" parent="." unique_id=1670552403]
 script = ExtResource("3_health")
 
-[node name="DebugHealthLabel" type="Label3D" parent="." unique_id=2012842134]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
-pixel_size = 0.015
-billboard = 1
-modulate = Color(0.55, 1, 0.55, 1)
-outline_size = 4
+[node name="HealthBar" type="Control" parent="." unique_id=2012842134]
+visible = false
+mouse_filter = 2
+script = ExtResource("12_health_bar")

@@ -41,7 +41,6 @@ scattershot_arc_degrees = 50.0
 data = ExtResource("3_data")
 initial_facing = 2
 destroy_on_death = true
-show_debug_health = true
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 script = ExtResource("8_spine_visual")

@@ -2,7 +2,6 @@
 
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_flat_tide"]
-[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="4_8k8c3"]
 [ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="5_8k8c3"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="PackedScene" uid="uid://d0ygcokpmdb3n" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="beach_palm_01"]
@@ -24,9 +23,24 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
 [ext_resource type="Texture2D" uid="uid://ja6hkgrt8ube" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_02_shore.png" id="shore_texture"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="tide_elite_skeleton"]
 [ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="tide_skeleton"]
 [ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
+
+[ext_resource type="Script" path="res://world/gimmick/flat_tide/tide_wave_director.gd" id="tide_wave_director"]
+
+[ext_resource type="Script" uid="uid://hmtwwikk5suy" path="res://world/gimmick/raid/raid_ground_spawner.gd" id="ground_spawner"]
+
+[ext_resource type="PackedScene" path="res://world/gimmick/raid/ground_burst_effect.tscn" id="burst_effect"]
+
+[ext_resource type="Script" uid="uid://dqrqag8qre3v0" path="res://world/gimmick/raid/raid_spawn_spec.gd" id="raid_spawn"]
+
+[ext_resource type="Script" uid="uid://cr1twsj1rn8nt" path="res://world/gimmick/raid/raid_wave.gd" id="raid_wave"]
+
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="enemy_crab"]
+
+[ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="enemy_barrel"]
+
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="enemy_elite_crab"]
 
 [sub_resource type="Environment" id="Environment_q6sa4"]
 resource_local_to_scene = true
@@ -145,16 +159,6 @@ shader_parameter/cloud_coverage = 0.45
 shader_parameter/cloud_softness = 0.18
 shader_parameter/cloud_shadow_strength = 0.35
 
-[sub_resource type="Resource" id="Resource_lx4jg"]
-script = ExtResource("4_8k8c3")
-normal_scene = ExtResource("5_8k8c3")
-metadata/_custom_type_script = "uid://juar8i43t1me"
-
-[sub_resource type="Resource" id="Resource_tide_skeleton"]
-script = ExtResource("4_8k8c3")
-normal_scene = ExtResource("tide_skeleton")
-elite_scene = ExtResource("tide_elite_skeleton")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_478hc"]
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
@@ -165,11 +169,86 @@ shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
 shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
 
+[sub_resource type="Resource" id="TideW1_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+offset_meters = Vector2(-3, -5)
+
+[sub_resource type="Resource" id="TideW1_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+offset_meters = Vector2(-3, 5)
+delay_seconds = 0.3
+
+[sub_resource type="Resource" id="TideW1_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("5_8k8c3")
+anchor = 1
+offset_meters = Vector2(-10, 0)
+delay_seconds = 0.8
+
+[sub_resource type="Resource" id="TideWave1"]
+script = ExtResource("raid_wave")
+intent = "Pincer: crabs north and south of Foxy, then a hermit crab from the west."
+lead_in_seconds = 0.6
+spawns = [SubResource("TideW1_1"), SubResource("TideW1_2"), SubResource("TideW1_3")]
+
+[sub_resource type="Resource" id="TideW2_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_barrel")
+anchor = 1
+offset_meters = Vector2(11, -7)
+
+[sub_resource type="Resource" id="TideW2_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_barrel")
+anchor = 1
+offset_meters = Vector2(11, 7)
+delay_seconds = 0.3
+
+[sub_resource type="Resource" id="TideW2_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("tide_skeleton")
+offset_meters = Vector2(0, 5)
+delay_seconds = 1
+
+[sub_resource type="Resource" id="TideWave2"]
+script = ExtResource("raid_wave")
+intent = "Firing line in the right lane: two barrels on the east rim, a skeleton at Foxy's back. The next right tide sweeps the barrels."
+lead_in_seconds = 0.6
+spawns = [SubResource("TideW2_1"), SubResource("TideW2_2"), SubResource("TideW2_3")]
+
+[sub_resource type="Resource" id="TideW3_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_elite_crab")
+is_elite = true
+anchor = 1
+offset_meters = Vector2(0, 0)
+
+[sub_resource type="Resource" id="TideW3_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("5_8k8c3")
+offset_meters = Vector2(-5, -3)
+delay_seconds = 1.2
+
+[sub_resource type="Resource" id="TideW3_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("5_8k8c3")
+offset_meters = Vector2(5, 3)
+delay_seconds = 1.4
+
+[sub_resource type="Resource" id="TideWave3"]
+script = ExtResource("raid_wave")
+intent = "Checkpoint: an elite crab in the middle, hermit crabs closing in from the sides."
+lead_in_seconds = 1.2
+spawns = [SubResource("TideW3_1"), SubResource("TideW3_2"), SubResource("TideW3_3")]
+
 [node name="room_02" unique_id=1362667654 instance=ExtResource("1_base")]
 open_exits = 14
 right_destination_scene = "res://world/biomes/coral_valley/map/room_03.tscn"
 down_destination_scene = "res://world/biomes/coral_valley/map/room_17.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_01.tscn"
+editor_description = "Tide Ambush: the left and right lanes flood in turn. Each retreat brings one scripted wave out of the wet sand (three in all, then the room stays quiet until the next rest). Wave two plants barrels in the right lane: wait for the next right tide and it sweeps them. Fixed rocks and logs are the cover."
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_q6sa4")
@@ -295,8 +374,7 @@ player = NodePath("../../Foxy")
 
 [node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
 spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
-enemies = Array[ExtResource("4_8k8c3")]([SubResource("Resource_lx4jg"), SubResource("Resource_tide_skeleton")])
-enemies_per_tide = 3
+enemies_per_tide = 0
 
 [node name="LeftShallows" type="MeshInstance3D" parent="FlatTide" index="3" unique_id=336057266]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
@@ -310,14 +388,6 @@ volume_depth = 2.0
 surface_segments_x = 30
 surface_segments_z = 30
 debug_color = Color(1, 0, 1, 1)
-
-[node name="RandomProps" type="Node3D" parent="." index="6" unique_id=2042189859]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-8, 0, -10, -8.8, 0, -4.6, -6, 0, 9, 8, 0, -9, 10.4, 0, -4.2, 8, 0, 8, -3.5, 0, -6, -5, 0, 4.6, 4, 0, -5.2, 4.5, 0, 11.5)
-prop_scenes = Array[PackedScene]([ExtResource("prop_stone"), ExtResource("prop_wood_log")])
-min_spawn_count = 7
-max_spawn_count = 10
 
 [node name="RandomSeaweed" type="Node3D" parent="." index="7" unique_id=1273164038]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
@@ -353,6 +423,43 @@ ground_shadow = true
 
 [node name="PalmLeaningNorthEast" parent="Scenery" index="2" unique_id=1188402554 instance=ExtResource("beach_palm_01")]
 transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, 5.6, 0, -10.6)
+ground_shadow = true
+
+[node name="TideWaves" type="Node" parent="." node_paths=PackedStringArray("controller", "spawner", "wave_zones")]
+editor_description = "Three scripted waves, each brought by the lane that just receded."
+script = ExtResource("tide_wave_director")
+controller = NodePath("../FlatTide")
+spawner = NodePath("../TideSpawner")
+waves = [SubResource("TideWave1"), SubResource("TideWave2"), SubResource("TideWave3")]
+wave_zones = [NodePath("../FlatTide/LeftShallows"), NodePath("../FlatTide/RightShallows"), NodePath("../FlatTide/LeftShallows")]
+
+[node name="TideSpawner" type="Node3D" parent="." node_paths=PackedStringArray("spawn_ground")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
+script = ExtResource("ground_spawner")
+spawn_extents_meters = Vector2(28, 30)
+spawn_effect_scene = ExtResource("burst_effect")
+spawn_ground = NodePath("../Environment/BaseGround/StaticBody3D")
+minimum_spacing = 3.0
+minimum_player_distance = 4.0
+
+[node name="Cover" type="Node3D" parent="."]
+editor_description = "Fixed cover, mostly facing the east rim where the barrels rise."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
+
+[node name="RockNorthEast" parent="Cover" instance=ExtResource("prop_stone")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 6, 0, -5)
+ground_shadow = true
+
+[node name="LogSouthEast" parent="Cover" instance=ExtResource("prop_wood_log")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 5.5, 0, 5.6)
+ground_shadow = true
+
+[node name="RockWest" parent="Cover" instance=ExtResource("prop_stone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.8, 0, -4.6)
+ground_shadow = true
+
+[node name="LogSouthWest" parent="Cover" instance=ExtResource("prop_wood_log")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -6, 0, 8.5)
 ground_shadow = true
 
 [editable path="Exits/DownPath"]

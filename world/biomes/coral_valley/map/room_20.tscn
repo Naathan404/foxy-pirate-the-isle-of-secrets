@@ -1,14 +1,6 @@
 [gd_scene format=3 uid="uid://b4h05r354pre7"]
 
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
-[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_flat_tide"]
-[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
-[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="3_enemy_entry"]
-[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="4_tide_enemy"]
-[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="tide_skeleton"]
-[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="tide_elite_skeleton"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="prop_stone"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="prop_wood_log"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
@@ -26,18 +18,28 @@
 [ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="lm_beach_palm_03"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="lm_stone"]
+[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="treasure_chest"]
+
+[ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
+
+[ext_resource type="Resource" path="res://data/notes/elite_crab.tres" id="elite_crab_note"]
+
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="enemy_elite_crab"]
+
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="enemy_elite_hermit_crab"]
+
 [sub_resource type="Environment" id="Environment_iqsna"]
 resource_local_to_scene = true
 background_mode = 1
-background_color = Color(0.02, 0.07, 0.11, 1)
+background_color = Color(0.03, 0.02, 0.08, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.5, 0.62, 0.66, 1)
-ambient_light_energy = 0.6
+ambient_light_color = Color(0.42, 0.4, 0.62, 1)
+ambient_light_energy = 0.55
 tonemap_mode = 2
 tonemap_white = 6.0
 glow_enabled = true
-glow_intensity = 0.6
-glow_strength = 0.9
+glow_intensity = 0.9
+glow_strength = 1.0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_water"]
 seed = 77
@@ -59,15 +61,15 @@ shader_parameter/shore_rect = Vector4(-26.6199, -30.0172, 53.449, 63.5962)
 shader_parameter/shore_reach_meters = 8.0
 shader_parameter/surface_height_meters = 0.252
 shader_parameter/water_noise = SubResource("NoiseTexture2D_water")
-shader_parameter/deep_color = Color(0.02, 0.07, 0.11, 1)
-shader_parameter/lagoon_color = Color(0.04, 0.23, 0.28, 1)
-shader_parameter/shallow_color = Color(0.14, 0.47, 0.47, 1)
-shader_parameter/reef_color = Color(0.28, 0.22, 0.32, 1)
-shader_parameter/caustic_color = Color(0.62, 0.95, 0.88, 1)
-shader_parameter/foam_color = Color(0.9, 0.95, 0.9, 1)
+shader_parameter/deep_color = Color(0.04, 0.02, 0.1, 1)
+shader_parameter/lagoon_color = Color(0.18, 0.07, 0.34, 1)
+shader_parameter/shallow_color = Color(0.42, 0.24, 0.7, 1)
+shader_parameter/reef_color = Color(0.1, 0.05, 0.2, 1)
+shader_parameter/caustic_color = Color(0.55, 1, 0.95, 1)
+shader_parameter/foam_color = Color(0.82, 0.92, 1, 1)
 shader_parameter/caustic_world_size_meters = 9.0
-shader_parameter/caustic_speed = 0.05
-shader_parameter/caustic_strength = 0.2
+shader_parameter/caustic_speed = 0.07
+shader_parameter/caustic_strength = 0.45
 shader_parameter/reef_world_size_meters = 26.0
 shader_parameter/reef_coverage = 0.32
 shader_parameter/reef_strength = 0.35
@@ -76,7 +78,7 @@ shader_parameter/swash_meters = 0.25
 shader_parameter/swash_speed = 0.9
 shader_parameter/ring_spacing_meters = 2.6
 shader_parameter/ring_speed_meters_per_second = 0.45
-shader_parameter/ring_strength = 0.22
+shader_parameter/ring_strength = 0.3
 shader_parameter/reef_rocks = ExtResource("reef_rocks")
 
 [sub_resource type="QuadMesh" id="QuadMesh_25pu1"]
@@ -132,17 +134,6 @@ size = Vector3(9.011322, 1, 2.2593918)
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="Resource" id="Resource_vs6vm"]
-resource_local_to_scene = true
-script = ExtResource("3_enemy_entry")
-normal_scene = ExtResource("4_tide_enemy")
-
-[sub_resource type="Resource" id="Resource_tide_skeleton"]
-script = ExtResource("3_enemy_entry")
-normal_scene = ExtResource("tide_skeleton")
-elite_scene = ExtResource("tide_elite_skeleton")
-
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
 render_priority = 0
 shader = ExtResource("sand_shader")
@@ -159,22 +150,27 @@ shader_parameter/cloud_shadow_strength = 0.48
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
-shader_parameter/saturation = 0.98
-shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
-shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
-shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
-shader_parameter/vignette_strength = 0.3
+shader_parameter/saturation = 1.02
+shader_parameter/shadow_tint = Color(0.88, 0.86, 1.06, 1)
+shader_parameter/highlight_tint = Color(1, 0.96, 1.08, 1)
+shader_parameter/vignette_color = Color(0.04, 0.02, 0.1, 1)
+shader_parameter/vignette_strength = 0.42
+[sub_resource type="Resource" id="EliteCrabNoteDrop"]
+script = ExtResource("chest_note_drop")
+note = ExtResource("elite_crab_note")
+
 [node name="room_20" unique_id=2133176597 instance=ExtResource("1_base")]
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_19.tscn"
+editor_description = "Sunken Reef (hidden, violet, reef ring): reached only over the low-tide sandbar of room_19. A chest in the middle of the island, guarded by an Elite Crab and an Elite Hermit Crab."
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_iqsna")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
-light_color = Color(1, 0.92, 0.84, 1)
-light_energy = 1.15
+light_color = Color(0.78, 0.78, 1, 1)
+light_energy = 0.8
 shadow_enabled = true
 shadow_opacity = 0.65
 directional_shadow_mode = 0
@@ -258,57 +254,6 @@ destination_scene = "res://world/biomes/coral_valley/map/room_19.tscn"
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_qg2sd")
 
-[node name="FlatTide" parent="." index="5" unique_id=256012692 node_paths=PackedStringArray("player", "zones") instance=ExtResource("2_flat_tide")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-player = NodePath("../Foxy")
-zones = [NodePath("LeftShallows"), NodePath("RightShallows")]
-sequential_zones = true
-low_duration = 8.0
-rise_duration = 6.0
-high_duration = 4.0
-fall_duration = 6.0
-flooded_move_multiplier = 0.5
-
-[node name="RightShallows" parent="FlatTide" index="0" unique_id=928133442]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.200718, 0.25, -4.5999727)
-size = Vector2(45, 66)
-volume_depth = 2.0
-high_duration = 6.0
-fall_duration = 6.0
-rest_duration = 6.0
-
-[node name="LeftShallows" type="MeshInstance3D" parent="FlatTide"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.200718, 0.25, -4.5999727)
-script = ExtResource("tide_zone_script")
-flow_direction = 1
-size = Vector2(45, 66)
-high_duration = 6.0
-fall_duration = 6.0
-rest_duration = 6.0
-full_coverage = 0.78
-volume_depth = 2.0
-surface_segments_x = 30
-surface_segments_z = 30
-debug_color = Color(1, 0, 1, 1)
-
-[node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
-player = NodePath("../../Foxy")
-
-; //NLVP sửa: Gán nền đảo vào ô Spawn Ground.
-[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
-spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
-enemies = Array[ExtResource("3_enemy_entry")]([SubResource("Resource_vs6vm"), SubResource("Resource_tide_skeleton")])
-enemies_per_tide = 3
-elite_chance = 10.0
-
-[node name="RandomProps" type="Node3D" parent="." index="6" unique_id=1785726482]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
-script = ExtResource("random_props")
-spawn_positions = PackedVector3Array(-8, 0, -11, -9, 0, -4.6, -6, 0, 9, 8, 0, -8, 11, 0, 4, 6, 0, 11, -3, 0, -6, -1.6, 0, 4.8, 4, 0, -2, 1, 0, 10)
-prop_scenes = Array[PackedScene]([ExtResource("prop_stone"), ExtResource("prop_wood_log")])
-min_spawn_count = 7
-max_spawn_count = 10
-
 [node name="RandomSeaweed" type="Node3D" parent="." index="7"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
@@ -331,12 +276,12 @@ material = SubResource("ShaderMaterial_grade")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(462435924, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
-leaf_color = Color(0.95, 0.97, 0.94, 0.5)
+leaf_color = Color(0.7, 1, 0.95, 0.6)
 leaf_size = 7.0
 leaf_width_ratio = 0.85
 leaf_rotation_speed = 0.3
 trail_count = 6
-trail_color = Color(0.78, 0.95, 0.94, 0.4)
+trail_color = Color(0.75, 0.6, 1, 0.35)
 
 [node name="Scenery" type="Node3D" parent="." unique_id=809878327]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
@@ -353,6 +298,21 @@ ground_shadow = true
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 3.8, 0.0, -10.6)
 ground_shadow = true
 
+[node name="TreasureChest" parent="." instance=ExtResource("treasure_chest")]
+editor_description = "Secret reward of the hidden reef."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.252, -1)
+gold_min = 30
+gold_max = 50
+note_drops = Array[ExtResource("chest_note_drop")]([SubResource("EliteCrabNoteDrop")])
+
+[node name="EliteCrab" parent="." instance=ExtResource("enemy_elite_crab")]
+editor_description = "Guards the chest from the north."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.252, -6.5)
+
+[node name="EliteHermitCrab" parent="." instance=ExtResource("enemy_elite_hermit_crab")]
+editor_description = "Guards the chest from the east."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.252, 2.5)
+
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
 [editable path="Exits/UpPath"]
@@ -363,4 +323,3 @@ ground_shadow = true
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround"]
 [editable path="RoomAtmosphere"]
-[editable path="FlatTide"]

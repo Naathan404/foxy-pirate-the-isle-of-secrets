@@ -122,7 +122,11 @@ func _apply_loadout() -> void:
 		if not registry.is_owned(charm_id) or equipped_ids.has(charm_id):
 			loadout.set_equipped_charm(socket_id, &"")
 			continue
-		if not registry.equip_charm(charm_id, socket_id, actor):
+		var equipped := registry.equip_charm(charm_id, socket_id, actor)
+		# Debug tools can equip prototype Charms; keep them equipped across scene changes too.
+		if not equipped and OS.is_debug_build():
+			equipped = registry._debug_equip_charm(charm_id, socket_id, actor)
+		if not equipped:
 			loadout.set_equipped_charm(socket_id, &"")
 			continue
 		var socket := _sockets[socket_id] as CharmSocket

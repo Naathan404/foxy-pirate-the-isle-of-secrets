@@ -10,3 +10,5 @@ note = ExtResource("note")
 
 [node name="IslandRaidRewardChest" instance=ExtResource("chest")]
 note_drops = Array[ExtResource("note_drop")]([SubResource("GuaranteedNoteDrop")])
+gold_min = 8
+gold_max = 13

@@ -20,6 +20,8 @@
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="lm_beach_coral_pink"]
 [ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="lm_beach_coral_turquoise"]
 
+[ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
+
 [sub_resource type="Environment" id="Environment_tbjtc"]
 resource_local_to_scene = true
 background_mode = 1
@@ -148,9 +150,10 @@ shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
 
 [node name="room_14" unique_id=1104197973 instance=ExtResource("1_base")]
-open_exits = 6
+open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_15.tscn"
-down_destination_scene = "res://world/biomes/coral_valley/map/room_06.tscn"
+left_destination_scene = "res://world/biomes/coral_valley/map/room_13.tscn"
+editor_description = "Coral Garden (materials): coral resources and three hermit crabs, on the way from room_13 to room_15."
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_tbjtc")
@@ -227,6 +230,11 @@ enabled = false
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
 shape = SubResource("BoxShape3D_vphkp")
 disabled = true
+
+[node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
+shaded = true
+texture = ExtResource("pier_left")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 shape = SubResource("BoxShape3D_hmpet")

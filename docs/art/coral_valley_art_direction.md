@@ -66,6 +66,9 @@ Coral Valley là bãi cát san hô giữa đầm phá, cùng thế giới với 
 11. Đi xuyên được: rong biển, san hô (mềm, thấp).
 12. Chặn: cọ (trụ nhỏ ở gốc thân, không chặn tán), đá, gỗ trôi, vỏ sò, lửa trại.
 13. Khối chặn phải nằm đúng chỗ người chơi thấy chân vật, đo từ texture, không theo tâm sprite.
+    Mép đảo và mép cầu bị tường vô hình chặn thì hiện rào cọc dây thừng: thêm node `RoomEdgeFence`
+    (`world/objects/room_edge_fence.gd`) và gán `room`. Rào chỉ để nhìn, tự dựng theo đúng tường
+    của phòng nên chỗ mở (cầu bệ, cửa) luôn khớp `boundary_openings`. Hiện dùng ở `room_03`.
     Prop cao (cọ, và mọi cây sau này) phải lấy gốc làm tâm xoay. Billboard nghiêng theo camera 45°,
     nên nếu tâm xoay ở giữa ảnh, gốc hiển thị bị kéo về phía camera và lệch khỏi khối chặn; Foxy
     sẽ đi xuyên qua thân. Cách làm, giống cỏ của Hub:
@@ -189,10 +192,10 @@ kiểu; hợp phòng Empty và NPC.
 Phòng đã áp dụng: room_00 `ripple`, room_01 `dunes`, room_02 `rock_shelf` (Bãi thường, Mobs 1),
 room_03 `dunes`, room_05 `ripple` + `wrack_line` (Bãi lửa trại), room_06 `coral_rubble`,
 room_11 `dunes` + `wrack_line`, room_12 `tide_flats` + `wrack_line`, room_13 `rock_shelf`,
-room_15 `coral_rubble`, room_16 `tide_flats`, room_17 `dunes`, room_20 `rock_shelf`,
+room_15 `coral_rubble`, room_16 `tide_flats`, room_17 `tide_flats`, room_20 `rock_shelf`,
 room_21 `coral_rubble`, room_22 `rock_shelf`, Quiz room_04 `tide_flats` + `wrack_line`,
-room_09 `tide_flats`, room_18 `coral_rubble`, room_23 `ripple` + `wrack_line`, Raid room_07
-`tide_flats`, Boss room_08 `rock_shelf` + `wrack_line`, NPC room_19 `dunes`, Materials room_10
+room_09 `tide_flats`, room_18 `coral_rubble`, room_23 `ripple` + `wrack_line`, Trại room_07
+`ripple` + `wrack_line`, Boss room_08 `rock_shelf` + `wrack_line`, NPC room_19 `dunes`, Materials room_10
 `ripple`, room_14 `tide_flats`.
 
 Phòng Materials lấy pattern theo tài nguyên của designer (room_10 dừa nên là Rừng dừa, room_14
@@ -251,7 +254,7 @@ Bộ nguyên liệu có sẵn để ghép dấu ấn:
 | room_09 | Quiz, `tide_flats` | Bãi sao biển: 12 sao biển vẽ trên nền quanh một hồ ở đảo phải (phòng không có quái sao biển) |
 | room_18 | Raid (hai đảo), `coral_rubble`, nước rạn chìm | Rừng rong khổng lồ: 4 rong scale 1,4–1,6 ở góc tây bắc đảo trái |
 | room_23 | Quiz, `ripple` + `wrack_line` | Tảng đá phủ san hô: đá lớn không phá được, hai khóm san hô mọc trên đỉnh |
-| room_07 | Raid, Bãi thường, `tide_flats` | Vòng đá đấu trường: 6 tảng đá lớn quanh mép đảo, giữa đảo để trống cho các đợt thủy triều |
+| room_07 | Trại Cuối Bờ (lửa trại 3, Silas), `ripple` + `wrack_line` | Đường đèn lồng từ cầu tàu tây sang đông, sân lửa trại, hai xác thuyền mắc cạn phía bắc, quầy Silas, ánh hoàng hôn |
 | room_08 | Boss, Bãi thường, `rock_shelf` + `wrack_line` | Đấu trường giữa biển: hai vòng cột đá, tảng đá và rêu khổng lồ vẽ tay đứng dưới nước bao quanh đảo, cầu gãy khi vào trận, biển đổi màu theo phase |
 | room_19 | NPC, Rừng dừa, `dunes` | Lùm cọ che chỗ Silas đứng, lá cọ và dừa rụng quanh quầy |
 | room_10 | Materials cua và dừa, Rừng dừa, `ripple` | Đống dừa rụng bên hai khúc gỗ ở góc đông bắc |

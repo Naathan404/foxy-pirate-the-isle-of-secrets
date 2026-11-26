@@ -2,30 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://cpq4n73dxt3vj" path="res://world/biomes/base/base_room.tscn" id="1_mf2w3"]
 [ext_resource type="Texture2D" uid="uid://bl64yrwnpyr3p" path="res://assets/sprites/biomes/beach/beach.png" id="2_aimq4"]
-[ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="3_cvepx"]
-[ext_resource type="PackedScene" uid="uid://dsu48w1p442g" path="res://world/biomes/coral_valley/objects/beach_coral_orange.tscn" id="4_i2uwp"]
-[ext_resource type="PackedScene" uid="uid://b1vtdkcix2st3" path="res://world/biomes/coral_valley/objects/beach_coral_turquoise.tscn" id="5_adkab"]
-[ext_resource type="PackedScene" uid="uid://d4kfj61xo7nds" path="res://world/biomes/coral_valley/objects/beach_palm_01.tscn" id="8_8dvq8"]
-[ext_resource type="PackedScene" uid="uid://cmp8k4pnenasl" path="res://world/biomes/coral_valley/objects/beach_palm_02.tscn" id="9_txy4b"]
-[ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="10_ryrkc"]
-[ext_resource type="Script" uid="uid://bmmcdjskrqbrf" path="res://world/objects/chest_item_drop.gd" id="11_h65mx"]
-[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="11_ryrkc"]
-[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="11_txy4b"]
-[ext_resource type="Resource" path="res://data/items/blueprints/bow_blueprint.tres" id="12_h65mx"]
-[ext_resource type="Resource" path="res://data/items/charms/arrow_rain.tres" id="13_ral77"]
-[ext_resource type="PackedScene" uid="uid://bt18ui53kscd7" path="res://gameplay/npcs/master_tortuga/master_tortuga_npc.tscn" id="15_fv4rj"]
-[ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="15_hfst8"]
-[ext_resource type="PackedScene" uid="uid://dx0oj3lwunb0t" path="res://gameplay/npcs/silas/silas_npc.tscn" id="16_fv4rj"]
-
-[sub_resource type="Resource" id="Resource_dqtxk"]
-script = ExtResource("11_h65mx")
-item = ExtResource("12_h65mx")
-metadata/_custom_type_script = "uid://bmmcdjskrqbrf"
-
-[sub_resource type="Resource" id="Resource_hfst8"]
-script = ExtResource("11_h65mx")
-item = ExtResource("13_ral77")
-metadata/_custom_type_script = "uid://bmmcdjskrqbrf"
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="4_8jkjb"]
 
 [node name="BeachTest" unique_id=1248439267 instance=ExtResource("1_mf2w3")]
 open_exits = 8
@@ -39,6 +16,9 @@ visible = false
 [node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
 visible = false
 
+[node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
+visible = false
+
 [node name="BaseGround" parent="Environment" parent_id_path=PackedInt32Array(1568171175) index="0" unique_id=858705461]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -0.19104576)
 
@@ -49,75 +29,6 @@ texture = ExtResource("2_aimq4")
 [node name="Foxy" parent="." index="3" unique_id=1350175917]
 collision_mask = 5
 
-[node name="BeachCoralPink" parent="." index="5" unique_id=917493758 instance=ExtResource("3_cvepx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.914507, -0.28897715, 0)
-
-[node name="BeachCoralPink2" parent="." index="6" unique_id=632843185 instance=ExtResource("3_cvepx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0860386, -0.24835718, 10.11347)
-
-[node name="BeachCoralOrange" parent="." index="7" unique_id=832095968 instance=ExtResource("4_i2uwp")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.635122, -0.3916645, -3.4191256)
-
-[node name="BeachCoralOrange2" parent="." index="8" unique_id=83440429 instance=ExtResource("4_i2uwp")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.055193, -0.3916645, 6.5650215)
-
-[node name="BeachCoralTurquoise" parent="." index="9" unique_id=1090038367 instance=ExtResource("5_adkab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.217375, -0.5328312, 9.242811)
-
-[node name="BeachCoralTurquoise2" parent="." index="10" unique_id=957311374 instance=ExtResource("5_adkab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8968143, -0.5328312, -9.8024845)
-
-[node name="BeachPalm01" parent="." index="11" unique_id=2038227956 instance=ExtResource("8_8dvq8")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -10.723943, -0.01902628, 9.549429)
-
-[node name="BeachPalm02" parent="." index="12" unique_id=1258651850 instance=ExtResource("9_txy4b")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -11.476313, 0.039654255, -6.721592)
-
-[node name="BeachPalm03" parent="." index="13" unique_id=263936662 instance=ExtResource("10_ryrkc")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.6550527, -0.14819193, 2.0440178)
-
-[node name="BeachPalm04" parent="." index="14" unique_id=572503273 instance=ExtResource("9_txy4b")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.020348, 0.12576628, -8.239526)
-
-[node name="FlatTide" parent="." index="15" unique_id=477601140 node_paths=PackedStringArray("player") instance=ExtResource("11_txy4b")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36796284, 0, 0)
-player = NodePath("../Foxy")
-
-[node name="NorthShallows" parent="FlatTide" index="0" unique_id=928133442]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8256235, 0.08, 0.40002728)
-shore_wave_amplitude = 0.3
-shore_detail_amplitude = 0.08
-shore_detail_length = 10.0
-
-[node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
-player = NodePath("../../Foxy")
-
-[node name="TreasureChest" parent="." index="16" unique_id=1708090331 instance=ExtResource("15_hfst8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.197239, -0.46411943, -2.6520233)
-item_drops = Array[ExtResource("11_h65mx")]([SubResource("Resource_dqtxk")])
-
-[node name="TreasureChest2" parent="." index="17" unique_id=1962611640 instance=ExtResource("15_hfst8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.197239, -0.46411943, 2.8213458)
-item_drops = Array[ExtResource("11_h65mx")]([SubResource("Resource_hfst8")])
-
-[node name="CoralSkeleton" parent="." index="18" unique_id=1531762066 instance=ExtResource("11_ryrkc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.643255, 0.2615099, 8.780067)
-can_sleep = true
-roam_when_guarding = false
-guard_roam_radius = 3.5
-guard_roam_segment_time = 1.2
-guard_roam_pause_time = 1.0
-randomize_shot_mode = true
-shot_mode = 0
-bullet_lifetime = 3.0
-aim_height_offset = 0.85
-max_aim_pitch_deg = 42.0
-
-[node name="MasterTortugaNpc" parent="." index="19" unique_id=122461608 instance=ExtResource("15_fv4rj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.563258, -0.17041826, -2.9011106)
-
-[node name="Silas" parent="." index="20" unique_id=402759795 instance=ExtResource("16_fv4rj")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -6.8508086, -0.32180452, -8.301233)
+[node name="EliteCrab" parent="." index="5" unique_id=1976613988 instance=ExtResource("4_8jkjb")]
 
 [editable path="Environment/BaseGround"]
-[editable path="FlatTide"]

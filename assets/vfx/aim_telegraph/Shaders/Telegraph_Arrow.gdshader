@@ -41,6 +41,16 @@ uniform float flicker_speed = 22.0;
 uniform float tip_glow = 0.7;
 group_uniforms;
 
+group_uniforms Charge_Fill;
+/** Brightness of the part the fill front has not reached yet. */
+uniform float unfilled_brightness = 0.22;
+/** Softness of the lit / unlit boundary (world units). */
+uniform float fill_soft = 0.25;
+/** Width and strength of the bright band on the fill front. */
+uniform float fill_front_width = 0.45;
+uniform float fill_front_strength = 1.6;
+group_uniforms;
+
 group_uniforms Color;
 uniform vec4 core_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 uniform float core_emission = 4.0;
@@ -86,10 +96,16 @@ void fragment() {
 	float tip_d = length(p - tip);
 	float tipg = exp(-tip_d / 0.55) * tip_glow;
 	float fl = 1.0 + flicker * sin(TIME * flicker_speed);
+	float lit = tg_fill_lit(p.x, fill_soft);
+	float front = tg_fill_front(p.x, fill_front_width) * fill_front_strength;
+	// The travelling sweep and tip glow only play once that part is charged.
+	sweep *= lit;
+	tipg *= lit;
 
 	vec3 rgb = core_color.rgb * core_emission * core * (1.0 + sweep * sweep_strength);
 	rgb += halo_color.rgb * halo * (1.0 + sweep * sweep_strength * 1.5);
 	rgb += mix(halo_color.rgb, core_color.rgb, 0.5) * tipg;
+	rgb *= mix(unfilled_brightness, 1.0, lit) + front;
 	// Fade to zero before the quad border so the glow never shows a rectangle.
 	float ex = min(p.x + pad, L + pad - p.x);
 	float ey = arrow_width * 0.5 - abs(p.y);

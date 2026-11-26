@@ -39,6 +39,14 @@ func lower() -> void:
 	_set_blocking(false)
 
 
+## Jumps straight to the closed state, for a gate that already stood when the room was entered.
+func set_closed_immediately() -> void:
+	_kill_tween()
+	_set_blocking(true)
+	_set_boulder_heights(0.0)
+	visible = true
+
+
 ## Jumps straight to the open state, for rooms entered after the raid was cleared.
 func set_open_immediately() -> void:
 	_kill_tween()

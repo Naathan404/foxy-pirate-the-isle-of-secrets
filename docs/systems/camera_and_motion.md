@@ -62,6 +62,12 @@ qua -1, đầu quay 360°, hông co còn 0,5. Khung bao vì vậy co từ 9,5 xu
 cũ coi đó là lỗi export và kéo dãn theo khung bao mỗi khung (tới gấp 4 lần), làm Foxy lúc dài
 ngoằng lúc bé tí. Giờ dash phát đúng như clip, với tỉ lệ cố định.
 
+Riêng dash lên/xuống, bone gốc `center_U`/`center_D` key tỉ lệ Y xuống 0,5 (X giãn ~1,1) nên
+nhìn từ camera Foxy bị ép dẹt. Trong `before_world_transforms_change`, hai key này chỉ giữ lại
+`vertical_dash_squash` (mặc định 0,4) của độ co giãn gốc, áp lên chính bone đó chứ không theo
+khung bao. Điểm thấp nhất của dash xuống từ 0,57 lên 0,79 đơn vị, dash lên từ 0,73 lên 0,88
+(idle 1,65). Chỉnh ở node `Visual/SpineIdlePreview` của `foxy.tscn`; 1 là đúng như clip.
+
 Khi animator sửa lại clip (vòng lặp khép kín, nhún mượt), có thể bỏ `RUN_BOB_BONES`.
 
 ## Hitstop và rung màn hình

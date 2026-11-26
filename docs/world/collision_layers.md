@@ -32,9 +32,16 @@ with mask 0 and an enabled 1.5 × 1.5 × 0.6 box. The body is narrower than
 the attack HurtBox so incoming attacks reach the HurtBox before the solid body.
 Opened chests retain this body. The Blubberbeard reward chest inherits it.
 
-Raid `room_07` uses `BaseRoom.set_exits_locked()` to close the existing
+Raid rooms (`room_16`, `room_18`, `room_22`) use `BaseRoom.set_exits_locked()` to close the existing
 PlayerBoundary around the island during combat. While locked, path floors are
 excluded from the player's boundary hull and exit triggers cannot transition.
 Configured paths stay visible and retain their floor collision. Enemy boundaries
 are unchanged. The interior activation area detects PlayerBody (mask 2), so the
 player enters the island before the room closes; no separate barriers are used.
+
+Elite Hermit Crab temporarily removes `PlayerBody` and `EnemyBody` from its body
+mask during its three-dash burst. Its front ray also ignores `EnemyBody`; World
+and EnemyBoundary still block it. A sweep using the authored contact shape
+breaks destructible props and shoves other enemies sideways without friendly
+damage. Body/ray masks and prop collision exceptions are restored at the final
+stun or on an interrupted attack. Other enemies keep their usual masks.

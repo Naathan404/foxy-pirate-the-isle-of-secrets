@@ -28,7 +28,7 @@ func _ready() -> void:
 	for stage in stages:
 		stage.started.connect(_on_stage_started.bind(stage))
 		stage.cleared.connect(_on_stage_cleared.bind(stage))
-	if _all_cleared():
+	if is_cleared():
 		_spawn_reward.call_deferred()
 
 
@@ -47,12 +47,13 @@ func _on_stage_cleared(stage: RaidStage) -> void:
 		room.set_exits_locked(false)
 		for gate in gates:
 			gate.lower()
-	if _all_cleared():
+	if is_cleared():
 		_spawn_reward()
 		raid_cleared.emit()
 
 
-func _all_cleared() -> bool:
+## True once every stage of the room has been cleared in this run.
+func is_cleared() -> bool:
 	for stage in stages:
 		if not stage.is_cleared():
 			return false

@@ -331,8 +331,6 @@ func _spawn_egg(parent: Node) -> MushroomEgg:
 		return null
 	var live_owner := _resolve_owner_elite()
 	egg.setup_spawned(live_owner, _egg_hatch_seconds)
-	if live_owner != null:
-		egg.show_debug_health = live_owner.show_debug_health
 	egg.position = (
 		(parent as Node3D).to_local(_landing_position) if parent is Node3D else _landing_position
 	)

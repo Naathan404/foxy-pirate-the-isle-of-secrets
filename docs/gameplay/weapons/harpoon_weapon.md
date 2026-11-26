@@ -28,7 +28,9 @@ secondary skill Forge modifiers apply through `WeaponController` snapshots.
 
 ## Pierce lifecycle
 
-1. Startup locks direction and draws a narrow rectangular gold ground telegraph.
+1. Startup locks direction and shows the shared `AimTelegraph`
+   (`show_aim_telegraph = true`), as long as the forged travel and lighting up from
+   base to tip over the forged startup.
    The player is vulnerable and a hit can cancel the attack. Existing secondary
    payment rules apply: full CP is spent when the attack is accepted.
 2. Active movement covers the forged distance over the forged active duration.

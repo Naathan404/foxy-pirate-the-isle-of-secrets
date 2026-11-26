@@ -25,6 +25,13 @@ func _ready() -> void:
 	_refresh_input()
 
 
+## Changes the word shown above the object, e.g. to show progress towards using it.
+func set_prompt_text(text: String) -> void:
+	prompt_text = text
+	if _prompt != null:
+		_prompt.text = text
+
+
 func set_interaction_enabled(value: bool) -> void:
 	_enabled = value
 	_refresh_input()

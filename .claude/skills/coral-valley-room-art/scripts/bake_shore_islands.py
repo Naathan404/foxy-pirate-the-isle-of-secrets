@@ -22,7 +22,8 @@ CHUNK = 4096
 
 
 def island_mask(cfg, qx, qz):
-    alpha = np.asarray(Image.open(cfg["source"]).convert("RGBA"))[..., 3] >= 128
+    # The baked ground keeps the silhouette, including split islands, so it is the truth here.
+    alpha = np.asarray(Image.open(cfg["out_ground"]).convert("RGBA"))[..., 3] >= 128
     h, w = alpha.shape
     x0, z0, gw, gd = cfg["ground_rect"]
     i = ((qx - x0) / gw * w).astype(int)

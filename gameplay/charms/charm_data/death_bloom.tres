@@ -12,7 +12,7 @@ description = "Enemies slain by normal attacks explode after a brief warning, da
 sprite = ExtResource("3")
 effect_scene = ExtResource("2")
 acquisition_source = &"prototype_debug"
-content_status = 1
+drop_chance = 0.0
 tags = Array[StringName]([&"passive"])
 effect_params = {
 "blast_hp": 1,

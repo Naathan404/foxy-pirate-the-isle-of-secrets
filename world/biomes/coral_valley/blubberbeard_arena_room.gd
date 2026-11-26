@@ -6,12 +6,20 @@ extends BaseRoom
 ## boss is beaten, Foxy crosses the gap with the Tide Grapple he just won (posts on both sides).
 ## Losing the fight sends Foxy to his campfire, and the next visit finds the bridge whole again.
 ##
+## Once the boss is beaten the arena becomes a safe room: a campfire flares up at its centre, so
+## Foxy can rest, save and change Charms (the Tide Grapple is needed to leave).
+##
+## The grapple posts stop catching the hook while the fight is on, so the Tide Grapple cannot
+## carry Foxy over the broken bridge before the boss is beaten.
+##
 ## The sea follows the fight: calm at first, violet from phase two, and red while the boss winds
 ## up or performs one of its signature skills.
 
 const COLLAPSE_SOUND := preload("res://gameplay/bosses/blubberbeard/boss_explosion.wav")
 const COLLAPSE_SHAKE := 8.5
 const COLLAPSE_SHAKE_SECONDS := 0.3
+const CAMPFIRE_FLARE_SECONDS := 0.8
+const CAMPFIRE_FLARE_SHAKE := 4.0
 const FURY_STATES: Array[BlubberbeardBoss.State] = [
 	BlubberbeardBoss.State.WINDUP,
 	BlubberbeardBoss.State.SKYDIVE_LEAP,
@@ -22,6 +30,9 @@ const FURY_STATES: Array[BlubberbeardBoss.State] = [
 @export var boss: BlubberbeardBoss
 @export var encounter: BossEncounter
 
+## Hidden until the boss is beaten; then the arena is a safe room with this campfire.
+@export var victory_campfire: Node3D
+
 @export_group("Bridge")
 ## Each span pivots at its outer end; the inner ends drop into the water.
 @export var bridge_spans: Array[Node3D] = []
@@ -30,6 +41,8 @@ const FURY_STATES: Array[BlubberbeardBoss.State] = [
 @export_range(0.1, 3.0, 0.05, "suffix:s") var collapse_seconds: float = 0.6
 @export var collapse_drop_meters: float = 3.2
 @export_range(0.0, 1.5, 0.01, "suffix:rad") var collapse_tilt: float = 0.6
+## Tide Grapple anchors across the gap; they only catch the hook outside the fight.
+@export var grapple_posts: Array[Node3D] = []
 
 @export_group("Sea mood")
 @export var mood: SeaMood
@@ -48,10 +61,15 @@ var _fight_active := false
 
 
 func _ready() -> void:
+	var defeated := not Engine.is_editor_hint() and _is_boss_defeated()
+	# Set before the base class grants the safe-room permission of an already won arena.
+	if defeated:
+		safe_room = true
 	super()
 	if Engine.is_editor_hint():
 		return
-	if _is_boss_defeated():
+	_set_campfire_lit(defeated)
+	if defeated:
 		_break_bridge(false)
 		return
 	if is_instance_valid(boss):
@@ -87,11 +105,47 @@ func _is_boss_defeated() -> bool:
 
 func _on_fight_started() -> void:
 	_fight_active = true
+	_set_grapple_posts_enabled(false)
 	_break_bridge(true)
 
 
 func _on_fight_finished() -> void:
 	_fight_active = false
+	if is_instance_valid(boss) and boss.dead:
+		_set_grapple_posts_enabled(true)
+		_become_safe()
+
+
+func _become_safe() -> void:
+	safe_room = true
+	_grant_safe_room()
+	_set_campfire_lit(true)
+	if victory_campfire == null:
+		return
+	var rest_scale := victory_campfire.scale
+	victory_campfire.scale = rest_scale * 0.1
+	var flare := create_tween().tween_property(
+		victory_campfire, "scale", rest_scale, CAMPFIRE_FLARE_SECONDS
+	)
+	flare.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	get_node("/root/ScreenShakeController").request(CAMPFIRE_FLARE_SHAKE, CAMPFIRE_FLARE_SECONDS)
+
+
+func _set_campfire_lit(lit: bool) -> void:
+	if victory_campfire == null:
+		return
+	victory_campfire.visible = lit
+	# Disabled nodes leave the physics space, so the hidden fire blocks and offers nothing.
+	victory_campfire.process_mode = Node.PROCESS_MODE_INHERIT if lit else Node.PROCESS_MODE_DISABLED
+
+
+# Disabled nodes leave the physics space: the post stays in view but the hook passes through.
+func _set_grapple_posts_enabled(enabled: bool) -> void:
+	for post: Node3D in grapple_posts:
+		if is_instance_valid(post):
+			post.process_mode = (
+				Node.PROCESS_MODE_INHERIT if enabled else Node.PROCESS_MODE_DISABLED
+			)
 
 
 func _break_bridge(animated: bool) -> void:

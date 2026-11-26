@@ -42,6 +42,7 @@
 [ext_resource type="Script" uid="uid://cl78s3j6pfbde" path="res://gameplay/player/bounded_follow_camera_3d.gd" id="camera_bounds_follow"]
 [ext_resource type="Resource" uid="uid://c1gtfqtbeobfm" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="charm_anchor"]
 [ext_resource type="Resource" uid="uid://du77cosi1w4r2" path="res://gameplay/charms/charm_data/arrow_rain.tres" id="charm_arrow"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/adrenaline_surge.tres" id="charm_adrenaline"]
 [ext_resource type="Resource" uid="uid://btyx2ybnfoih7" path="res://gameplay/charms/charm_data/backstabber.tres" id="charm_backstabber"]
 [ext_resource type="Resource" uid="uid://ejp6w687nhs2" path="res://gameplay/charms/charm_data/buckshot_salvo.tres" id="charm_buckshot"]
 [ext_resource type="PackedScene" path="res://gameplay/player/effects/charm_cast_animator.tscn" id="charm_cast_animator"]
@@ -869,10 +870,14 @@ metadata/_custom_type_script = "uid://b0u5ln7tkfogr"
 [sub_resource type="Resource" id="Collection_harpoon"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_harpoon")
+blueprint_unlocked = true
+owned = true
 
 [sub_resource type="Resource" id="Collection_meteor_staff"]
 script = ExtResource("weapon_collection_entry")
 definition = ExtResource("collection_meteor_staff")
+blueprint_unlocked = true
+owned = true
 
 [sub_resource type="Resource" id="Resource_ieged"]
 script = ExtResource("20_ehmwb")
@@ -1115,7 +1120,7 @@ loadout = SubResource("Resource_ieged")
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")
-definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute"), ExtResource("glacial_spikes"), ExtResource("meteor_strike"), ExtResource("devil_contract"), ExtResource("crimson_band"), ExtResource("death_bloom"), ExtResource("shadow_renment"), ExtResource("skull_cracker"), ExtResource("momentum_strike"), ExtResource("fortune_leaf")])
+definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute"), ExtResource("glacial_spikes"), ExtResource("meteor_strike"), ExtResource("devil_contract"), ExtResource("crimson_band"), ExtResource("death_bloom"), ExtResource("shadow_renment"), ExtResource("skull_cracker"), ExtResource("momentum_strike"), ExtResource("fortune_leaf"), ExtResource("charm_adrenaline")])
 
 [node name="ChaosComponent" type="Node" parent="." unique_id=2085136369]
 script = ExtResource("21_chaos")

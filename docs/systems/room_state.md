@@ -79,8 +79,11 @@ dùng PropSlot; chúng sẽ được đưa vào khi chỉnh từng phòng bằng
 
 ## Giới hạn hiện tại
 
-- Quái sinh theo đợt thủy triều (`FlatTideEnemySpawner`) và raid chưa clear không được nhớ:
-  rời phòng giữa chừng thì lần sau làm lại từ đầu.
+- Quái sinh theo đợt thủy triều và raid chưa clear không được nhớ: rời phòng giữa chừng thì lần
+  sau làm lại từ đầu. `TideWaveDirector` ghi "đã xong" vào chu kỳ hiện tại khi đợt cuối bị dọn,
+  nên phòng không chở quái lại tới lần nghỉ hoặc chết sau.
+- Cửa bí mật đã mở, cổng ngọc đã mở và ngọc đã lấy ở bệ nằm trong `story_flags`, giữ cả lượt
+  chơi ([tiến trình Coral Valley](coral_valley_progression.md)).
 - Cần gạt và bệ di chuyển (`room_04` và các phòng Quiz) vẫn về vị trí ban đầu khi vào lại phòng.
 - Lửa trại vẫn là `DestructibleProp` (100000 HP). Nếu bị phá, nó biến mất tới lần nghỉ hoặc
   chết sau. Chết luôn bắt đầu chu kỳ mới trước khi hồi sinh, nên lửa trại hồi sinh vẫn còn.

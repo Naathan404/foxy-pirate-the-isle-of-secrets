@@ -294,6 +294,9 @@ chỉ có tác dụng trong `world/tests/bow_test.tscn`.
 - Mỗi tên tốn 1 Wooden Arrow, không tốn SP. Chỉ trừ ammo khi thả phím.
 - Mỗi tên giữ damage sau forge/Charm của đòn; tối đa 6 lần damage nếu cả 6 trúng,
   mỗi projectile có dedup riêng. Tường chặn tên và các cung cong không tự tìm địch.
+- Ngoài tia dò ở độ cao bay, mỗi mũi tên quét thêm một dải dọc từ sàn của người bắn
+  lên tới mũi tên để bắt `DestructibleProp` thấp (cỏ, khúc gỗ, vỏ sò); chỉnh ở nhóm
+  export `Low Destructible Sweep` của `bow_arrow.gd`. Quái vẫn chỉ bị trúng bằng tia dò.
 - Nhấn/thả tức thì có 1 tên, không mất CP ngay khi nhấn. Thời gian giữ tính vào
   windup sau forge; thả sớm chạy nốt phần windup còn thiếu, giữ đủ thì nhả là phóng.
   Active/recovery và cooldown tiếp tục theo forge. Cooldown tính từ lúc nhả.
@@ -302,8 +305,14 @@ chỉ có tác dụng trong `world/tests/bow_test.tscn`.
 
 Bắn thường và các đòn `PROJECTILE` khác có `release_to_fire = true` cũng giữ để
 ngắm, thả để phóng sau khi hoàn thành windup đã rèn. Chi phí
-và cooldown bắt đầu lúc nhả. Dash hủy ngắm. `ranged_aim_indicator.tscn` chứa dấu
-ngắm. Nhân vật đứng yên trong lúc giữ ngắm; dash hủy ngắm để né.
+và cooldown bắt đầu lúc nhả. Dash hủy ngắm. Nhân vật đứng yên trong lúc giữ ngắm;
+dash hủy ngắm để né.
+
+Dấu ngắm là `assets/vfx/aim_telegraph/Aim_Telegraph.tscn` (`AimTelegraph`), do
+`WeaponController` tạo khi ngắm/charge, dài bằng `range_units` sau forge. Mũi tên
+sáng dần từ gốc tới mũi: đòn `hold_to_charge` theo `charge_seconds`, đòn ngắm thường
+theo windup đã rèn. Đòn không giữ ngắm nhưng có hướng (như Lightning Pierce của
+Harpoon) bật `AttackData.show_aim_telegraph` để hiện dấu này trong windup.
 
 Animation kéo/nạp, nhả và hồi phục được đồng bộ theo từng pha của controller,
 không giữ pose kéo cố định hoặc cắt bỏ startup khi thả. `charge_seconds` vẫn là
