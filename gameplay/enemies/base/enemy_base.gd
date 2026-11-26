@@ -47,12 +47,6 @@ const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive
 ## Tốc độ giảm của lực đẩy không gây sát thương.
 @export_range(0.1, 100.0, 0.1) var external_push_deceleration: float = 20.0
 
-@export_group("Debug")
-@export var show_debug_health: bool = false:
-	set(value):
-		show_debug_health = value
-		_update_debug_health()
-
 var team: int = Teams.ENEMY
 var target_group: StringName = &"player"
 var target: Node3D
@@ -85,7 +79,6 @@ var _loot_drop_index: int = 0
 @onready var initial_state: FsmState = (
 	get_node_or_null(NodePath("States/" + String(initial_state_name))) as FsmState
 )
-@onready var debug_health_label: Label3D = $DebugHealthLabel
 
 
 func _ready() -> void:
@@ -140,6 +133,11 @@ func _physics_process(delta: float) -> void:
 
 
 func _apply_external_push(push_velocity: Vector3) -> void:
+	apply_external_push(push_velocity)
+
+
+## Adds a physical shove without damage or replacing the enemy's current behavior.
+func apply_external_push(push_velocity: Vector3) -> void:
 	if dead:
 		return
 	_external_push_velocity += Vector3(push_velocity.x, 0.0, push_velocity.z)
@@ -540,7 +538,6 @@ func _validate_directional_node(node: Node, component_name: StringName) -> bool:
 
 
 func _setup_stats() -> void:
-	hp.hp_changed.connect(_on_hp_changed)
 	hp.damaged.connect(_on_damaged)
 	hp.died.connect(die)
 	hp.init(data.max_hp)
@@ -631,21 +628,6 @@ func _on_damaged(applied_hp: float) -> void:
 	damaged.emit(applied_hp)
 	if hp.is_alive() and is_instance_valid(visual):
 		visual.play_hit_feedback()
-
-
-func _on_hp_changed(_current_hp: float, _maximum_hp: float) -> void:
-	_update_debug_health()
-
-
-func _update_debug_health() -> void:
-	if not is_instance_valid(debug_health_label):
-		return
-	debug_health_label.visible = show_debug_health
-	if not is_instance_valid(hp):
-		return
-	debug_health_label.text = (
-		"HP: %s / %s" % [String.num(hp.current_hp, 2), String.num(hp.get_max_hp(), 2)]
-	)
 
 
 func _get_hit_direction(source: Node) -> Vector3:

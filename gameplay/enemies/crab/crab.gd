@@ -4,7 +4,7 @@ extends EnemyBase
 ## Crab-owned patrol tuning. The patrol state consumes these values at startup.
 
 @export_group("Crab Patrol")
-@export var patrol_contact_damage: bool = true
+@export var patrol_contact_damage: bool = false
 @export_range(0.0, 10.0, 0.1) var patrol_speed_scale: float = 1.0
 
 @export_group("Crab Chase")

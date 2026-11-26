@@ -71,7 +71,6 @@ initial_state_name = &"Dormant"
 burrow_duration_seconds = 0.4
 destroy_on_death = true
 charm_grapple_large = true
-show_debug_health = true
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 hit_pulse_scale = 1.0
@@ -118,9 +117,6 @@ script = ExtResource("11_burrow")
 [node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_body")
-
-[node name="DebugHealthLabel" parent="." index="6" unique_id=2012842134]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
 
 [node name="TargetDetector" type="Area3D" parent="." index="7" unique_id=721249310]
 

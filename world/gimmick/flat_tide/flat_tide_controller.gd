@@ -181,6 +181,26 @@ func request_cycle() -> bool:
 	return true
 
 
+## Start exactly one tide in `zone` (sequential, externally advanced controllers), for
+## gameplay that picks which lane floods, such as a lever.
+func request_cycle_for(zone: FlatTideZone) -> bool:
+	var index := zones.find(zone)
+	if not sequential_zones or index < 0:
+		return false
+	if not externally_advanced or state != State.LOW or not _cycle_waiting:
+		return false
+	# Entering RISING moves on to the next zone, so stand on the one before it.
+	_active_zone_index = posmod(index - 1, zones.size())
+	return request_cycle()
+
+
+## The zone whose tide is running or ran last (sequential mode), or null.
+func get_active_zone() -> FlatTideZone:
+	if not sequential_zones or zones.is_empty():
+		return null
+	return zones[_active_zone_index]
+
+
 ## Finish a controlled tide immediately so a cleared encounter can advance or end.
 func finish_cycle() -> void:
 	if not externally_advanced:

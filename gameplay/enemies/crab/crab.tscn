@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://do0lxthoqo85o" path="res://gameplay/enemies/crab/states/crab_patrol.gd" id="6_patrol"]
 [ext_resource type="Script" uid="uid://dnkkqx0aqleuv" path="res://gameplay/enemies/crab/crab.gd" id="7_crab"]
 [ext_resource type="Script" uid="uid://jvd33wftr8gv" path="res://gameplay/enemies/base/enemy_spine_visual.gd" id="8_spine_visual"]
+[ext_resource type="Script" path="res://gameplay/enemies/crab/states/crab_attack.gd" id="9_attack"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(2.6, 2, 2.4)
@@ -15,13 +16,16 @@ size = Vector3(2.6, 2, 2.4)
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
 size = Vector3(1.6, 1, 1.6)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_claw"]
+size = Vector3(1.4, 1.2, 1.8)
+
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
 height = 1.6801147
 radius = 0.7998047
 
 [node name="Crab" unique_id=1674830806 instance=ExtResource("1_base")]
 script = ExtResource("7_crab")
-patrol_contact_damage = true
+patrol_contact_damage = false
 patrol_speed_scale = 1.0
 chase_speed_scale = 1.5
 player_detection_radius = 4.0
@@ -36,18 +40,19 @@ data = ExtResource("2_data")
 initial_state_name = &"Patrol"
 initial_facing = 2
 destroy_on_death = true
-show_debug_health = true
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 script = ExtResource("8_spine_visual")
 skeleton_data_path = "res://assets/spine/enemies/Enemy_Crab/crab_skeleton.tres"
 clip_map = Dictionary[StringName, String]({
+&"claw": "attack",
 &"idle": "idle",
 &"idle_up": "up_idle",
 &"run": "walk",
 &"run_left": "walk_left",
 &"run_right": "walk_left",
-&"run_up": "up_idle"
+&"run_down": "walk_left",
+&"run_up": "walk_left"
 })
 looping_clips = []
 action_start_seconds = Dictionary[StringName, float]({})
@@ -87,9 +92,19 @@ script = ExtResource("5_hitbox")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_hitbox")
 
+[node name="ActiveHitBox" type="Area3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="4" unique_id=510900516]
+script = ExtResource("5_hitbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Direction/ActiveHitBox" index="0" unique_id=73062186]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 1.5)
+shape = SubResource("BoxShape3D_claw")
+
 [node name="Patrol" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=779580310]
 script = ExtResource("6_patrol")
-use_contact_damage = true
+use_contact_damage = false
+
+[node name="Attack" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1431257916]
+script = ExtResource("9_attack")
 
 [node name="CollisionShape3D" parent="." index="4" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8612366, 0)

@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bnjfx5yd2ske"]
 
+[ext_resource type="Script" uid="uid://c7idcwhbuob7k" path="res://assets/vfx/aim_telegraph/Aim_Telegraph.gd" id="1_script"]
 [ext_resource type="Material" path="res://assets/vfx/aim_telegraph/Materials/Telegraph_Slab.tres" id="2_slab"]
 [ext_resource type="Material" uid="uid://cjhsetq2opbwa" path="res://assets/vfx/aim_telegraph/Materials/Telegraph_Arrow.tres" id="3_arrow"]
 
@@ -10,6 +11,7 @@ size = Vector2(10.8, 4.8)
 size = Vector2(10.8, 4.8)
 
 [node name="Aim_Telegraph" type="Node3D" unique_id=1556809096]
+script = ExtResource("1_script")
 
 [node name="Slab" type="MeshInstance3D" parent="." unique_id=1613700483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.02, 0)

@@ -717,5 +717,9 @@ _data = {
 &"run_down": SubResource("Animation_2egjq"),
 &"run_left": SubResource("Animation_3l331"),
 &"run_right": SubResource("Animation_g5u2a"),
-&"run_up": SubResource("Animation_waotj")
+&"run_up": SubResource("Animation_waotj"),
+&"stun_down": SubResource("Animation_sb0lf"),
+&"stun_left": SubResource("Animation_vhg2y"),
+&"stun_right": SubResource("Animation_cmhef"),
+&"stun_up": SubResource("Animation_f7kt5")
 }

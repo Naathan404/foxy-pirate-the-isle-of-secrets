@@ -65,8 +65,7 @@ func restore(player: Player, restore_vitals: bool = true) -> void:
 				break
 
 	if is_instance_valid(player.charm_registry):
-		for charm_id: StringName in player.charm_registry.get_registered_ids():
-			player.charm_registry.set_owned(charm_id, owned_charms.has(charm_id))
+		player.charm_registry.restore_owned_ids(owned_charms)
 	if is_instance_valid(player.charm_socket_manager):
 		player.charm_socket_manager.restore_progression(unlocked_sockets, equipped_charms)
 

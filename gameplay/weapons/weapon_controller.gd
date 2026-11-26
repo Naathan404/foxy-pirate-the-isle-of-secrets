@@ -16,7 +16,7 @@ signal damage_dealt(damage: DamageContext, target: Node, applied_hp: float)
 enum Phase { WINDUP, ACTIVE, RECOVERY, CHARGING, AIMING }
 
 const Teams := preload("res://gameplay/combat/combat_teams.gd")
-const AIM_INDICATOR: PackedScene = preload("res://gameplay/weapons/ranged_aim_indicator.tscn")
+const AIM_TELEGRAPH: PackedScene = preload("res://assets/vfx/aim_telegraph/Aim_Telegraph.tscn")
 
 @export var default_weapon: WeaponData
 ## Optional initial forge; null preserves the unmodified starting weapon.
@@ -56,7 +56,7 @@ var _charge_elapsed: float = 0.0
 var _aim_elapsed: float = 0.0
 var _charge_spent: float = 0.0
 var _charge_budget: float = 0.0
-var _aim_indicator: RangedAimIndicator
+var _aim_telegraph: AimTelegraph
 var _combo_index: int = 0
 var _combo_remaining: float = 0.0
 var _queued_attack: AttackContext
@@ -382,8 +382,7 @@ func aim_charge(request: AttackContext) -> void:
 	_context.direction = direction.normalized()
 	_context.target_position = request.target_position
 	_context.has_target = request.has_target
-	if is_instance_valid(_aim_indicator):
-		_aim_indicator.set_aim(_context.direction, _context.charge_progress)
+	_update_aim_telegraph()
 
 
 func release_aim() -> bool:
@@ -422,7 +421,7 @@ func release_aim() -> bool:
 
 
 func _begin_aimed_release() -> void:
-	_hide_aim_indicator()
+	_hide_aim_telegraph()
 	_context.origin = actor.global_position
 	_execution.global_position = _context.origin
 	_phase = Phase.WINDUP
@@ -434,18 +433,26 @@ func _begin_aimed_release() -> void:
 		_advance_phase()
 
 
-func _show_aim_indicator() -> void:
-	_hide_aim_indicator()
-	_aim_indicator = AIM_INDICATOR.instantiate() as RangedAimIndicator
-	add_child(_aim_indicator)
-	_aim_indicator.setup(actor, _context.direction)
+func _show_aim_telegraph() -> void:
+	_hide_aim_telegraph()
+	_aim_telegraph = AIM_TELEGRAPH.instantiate() as AimTelegraph
+	add_child(_aim_telegraph)
+	_aim_telegraph.setup(actor, _context.direction, _context.range_units)
 
 
-func _hide_aim_indicator() -> void:
-	if is_instance_valid(_aim_indicator):
-		_aim_indicator.hide()
-		_aim_indicator.queue_free()
-	_aim_indicator = null
+func _hide_aim_telegraph() -> void:
+	if is_instance_valid(_aim_telegraph):
+		_aim_telegraph.hide()
+		_aim_telegraph.queue_free()
+	_aim_telegraph = null
+
+
+# Charge attacks fill over charge_seconds; others fill as their forged startup completes.
+func _update_aim_telegraph() -> void:
+	if not is_instance_valid(_aim_telegraph):
+		return
+	var fill := _context.charge_progress if is_charging() else get_attack_phase_progress()
+	_aim_telegraph.set_aim(_context.direction, fill)
 
 
 func release_charge() -> bool:
@@ -482,8 +489,7 @@ func _tick_charge(delta: float) -> void:
 	_execution.update_charge(progress)
 	if not is_charging() or _context != current:
 		return
-	if is_instance_valid(_aim_indicator):
-		_aim_indicator.set_aim(_context.direction, progress)
+	_update_aim_telegraph()
 
 
 func queue_attack(request: AttackContext) -> bool:
@@ -623,8 +629,8 @@ func try_attack(request: AttackContext) -> bool:
 	if not aiming:
 		snapshot.weapon.cooldowns[snapshot.action] = cooldown / speed
 	clear_attack_buffer()
-	if is_aiming() and _context == snapshot:
-		_show_aim_indicator()
+	if (is_aiming() or attack.show_aim_telegraph) and busy and _context == snapshot:
+		_show_aim_telegraph()
 	if busy and _context == snapshot:
 		if not is_aiming():
 			_execution.begin_windup()
@@ -748,6 +754,8 @@ func _physics_process(delta: float) -> void:
 		_aim_elapsed = minf(_windup, _aim_elapsed + maxf(0.0, delta))
 		if is_charging():
 			_tick_charge(delta)
+		else:
+			_update_aim_telegraph()
 		return
 	var budget := delta
 	# Chia delta cho từng giai đoạn để frame chậm không làm mất nhịp đánh
@@ -766,6 +774,8 @@ func _physics_process(delta: float) -> void:
 			return
 		_remaining -= step
 		budget -= step
+		if _phase == Phase.WINDUP:
+			_update_aim_telegraph()
 		if _phase == Phase.ACTIVE and _execution.has_finished_active():
 			_remaining = 0.0
 		if _remaining <= 0.000001:
@@ -782,6 +792,7 @@ func _advance_phase() -> void:
 		Phase.WINDUP:
 			_phase = Phase.ACTIVE
 			_remaining = _active
+			_hide_aim_telegraph()
 			if _charging_attack != null and not _charging_attack.hold_to_charge:
 				# Keep an unlaunched projectile hidden and suspended throughout startup.
 				_execution.process_mode = Node.PROCESS_MODE_INHERIT
@@ -808,7 +819,7 @@ func cancel() -> void:
 func _finish(interrupted: bool) -> void:
 	if not busy:
 		return
-	_hide_aim_indicator()
+	_hide_aim_telegraph()
 	var execution := _execution
 	var completed_context := _context
 	var queued := _queued_attack if not interrupted else null

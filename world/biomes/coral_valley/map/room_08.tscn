@@ -37,6 +37,10 @@
 [ext_resource type="Texture2D" uid="uid://cq6xymhhukdf5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_3.png" id="tex_rock_2"]
 [ext_resource type="Texture2D" uid="uid://byj65ay5nx1u5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_2.png" id="tex_rock_3"]
 
+[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
+
+[ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
+
 [sub_resource type="Environment" id="Environment_3v6ob"]
 resource_local_to_scene = true
 background_mode = 1
@@ -162,12 +166,13 @@ shader_parameter/corridor_darkness = 0.3
 
 [sub_resource type="QuadMesh" id="ArenaDarknessQuad"]
 
-[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "bridge_spans", "bridge_floor", "bridge_splash", "mood") instance=ExtResource("1_base")]
-editor_description = "Boss arena (wonder room). The bridge breaks when the fight starts and never comes back; after the win Foxy leaves with the Tide Grapple (posts on both sides of the gap). The sea turns violet in phase two and red during Sky Dive and Anchor Whirlwind."
+[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "victory_campfire", "bridge_spans", "bridge_floor", "bridge_splash", "grapple_posts", "mood") instance=ExtResource("1_base")]
+editor_description = "Boss arena (wonder room). The bridge breaks when the fight starts and never comes back; after the win the arena becomes a safe room (VictoryCamp campfire) and Foxy leaves with the Tide Grapple won in room_16 (posts on both sides of the gap). The sea turns violet in phase two and red during Sky Dive and Anchor Whirlwind."
 script = ExtResource("arena_script")
 boss = NodePath("CaptainBlubberbeard")
 encounter = NodePath("BossEncounter")
 bridge_spans = [NodePath("Bridge/SpanWest"), NodePath("Bridge/SpanEast")]
+grapple_posts = [NodePath("GrapplePostIsland"), NodePath("GrapplePostPier")]
 bridge_floor = NodePath("Environment/BaseGroundBridge/StaticBody3D/CollisionShape3D")
 bridge_splash = NodePath("Bridge/Splash")
 collapse_seconds = 0.6
@@ -182,6 +187,7 @@ fury_blend_seconds = 0.35
 mood_blend_seconds = 1.2
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+victory_campfire = NodePath("VictoryCamp")
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
 environment = SubResource("Environment_3v6ob")
@@ -1024,6 +1030,17 @@ spawn_positions = PackedVector3Array(11.25, 0, 2.84, 12.54, 0, 9.56, 5.75, 0, 10
 fixed_spawn_count = 8
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 props_receive_enemy_attacks = true
+
+[node name="VictoryCamp" type="Node3D" parent="."]
+editor_description = "Hidden until Blubberbeard is beaten; then the arena is a safe room and this campfire flares up."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, -6.5)
+
+[node name="Campfire" parent="VictoryCamp" instance=ExtResource("campfire")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+ground_shadow = true
+
+[node name="CampfireEmbers" parent="VictoryCamp" instance=ExtResource("campfire_embers")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 1.4)
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

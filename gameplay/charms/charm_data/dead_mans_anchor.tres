@@ -15,8 +15,8 @@ effect_scene = ExtResource("2_effect")
 resource_cost = 300.0
 cooldown_seconds = 8.0
 acquisition_source = &"prototype_debug"
-content_status = 1
-tags = Array[StringName]([&"active", &"prototype", &"recast"])
+drop_chance = 0.0
+tags = Array[StringName]([&"active", &"recast"])
 effect_params = {
 "recast_window_seconds": 5.0
 }

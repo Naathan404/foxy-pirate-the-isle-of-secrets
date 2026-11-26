@@ -207,16 +207,16 @@ Nội dung theo loại phòng (chi tiết và số lượng lấy từ tài li�
 
 | Loại phòng | Phải có | Được chỉnh khi dựng phòng | Không đụng |
 | --- | --- | --- | --- |
-| Checkpoint (`00`, `05`) | `Campfire`, `safe_room = true`, không quái | Dời lửa trại, sân lửa trại | Tên node `Campfire` |
-| Empty (`01`, `03`, `06`, `11`, `15`, `17`, `21`) | `RandomEmptyType` chọn một trong hai bố cục dùng chung; dấu ấn riêng trong `Scenery` của phòng | Vị trí ứng viên trong bố cục dùng chung, kiểm cho **mọi** phòng dùng nó; dấu ấn tránh mọi ứng viên của cả hai nhánh | Tỉ lệ 50/50, số quái, pool quái |
-| Mobs 1–6 | `FlatTide` với các vùng và pool quái theo bảng tide; vật cản ngẫu nhiên | Vị trí ứng viên vật cản, rong | Pool, số lượng, `elite_chance`; không đặt tay quái |
-| Materials (`10` cua và dừa, `14` ốc mượn hồn và san hô) | Pool tài nguyên và 3 quái đặt tay | Vị trí ứng viên tài nguyên | Thêm quái khi tài liệu không ghi; đổi loại tài nguyên |
-| Quiz (`04`, `09`, `23`) | Bệ, cần gạt, rương, Elite Barrel canh rương | Prop trang trí | Khoảng cách đảo/bệ, vị trí cần gạt, cụm Elite Barrel |
-| Raid hệ mới (`18`) | `RaidStage`, `RaidGroundSpawner`, `RaidLockdown`, cổng đá (dựng theo skill `raid-room`) | Prop không chắn cổng đá và vùng spawn | Đợt quái, rương (lockdown tự sinh) |
-| Raid hệ cũ (`07`) | `RaidEncounter`, `EntryArea`, `FlatTide` | Prop ngoài vùng thủy triều | Quái đặt tay, rương (encounter tự sinh) |
-| Boss (`08`) | Blubberbeard và `BossEncounter` | Prop ngoài vùng đánh boss | Quái khác |
-| NPC (`19`) | NPC, không quái | Prop | Vị trí NPC |
-| Farm (`24`) | Chưa chốt nội dung | — | Hỏi designer trước khi thêm gì |
+| Lửa trại (`00`, `05`, `07`) | `Campfire`, `safe_room = true`, không quái; `05` có Cổng Ngọc Triều, `07` có Silas | Dời lửa trại, sân lửa trại | Tên node `Campfire`, `TidePearlGate` |
+| Thủy triều có kịch bản (`01`, `02`) | `FlatTide`, `TideWaveDirector` + `TideSpawner`, bộ sinh ngẫu nhiên tắt | Vị trí vật cản, rong | Đợt quái, vùng triều |
+| Doi cát (`17`, `19`) | `FlatTide`, `TideSandbar`, mảnh `Sandbar` trong layout | Prop ngoài doi | Nhịp triều |
+| Chia mảnh có móc (`06`, `13`, `21`, `23`, `24`) | Cọc neo hai bờ (hoặc một bờ cho đường một chiều), `split_checks` | Prop ngoài đường móc | Bề rộng vực, vị trí cọc |
+| Câu đố bệ (`03`, `04`, `09`, `23`) | Bệ, cần gạt, `boundary_openings` | Prop trang trí | Điểm dừng, cần gạt |
+| Raid (`16`, `18`, `22`) | `RaidStage`, `RaidGroundSpawner`, `RaidLockdown`, cổng đá, biển đỏ (skill `raid-room`) | Prop không chắn cổng đá và vùng spawn | Đợt quái, rương |
+| Phục kích không khóa (`12`, `21`) | `RaidStage` `locks_room = false` | Vùng kích hoạt | Đợt quái |
+| Phòng ẩn (`12`, `20`, `24`) | `hidden = true` trên bản đồ, lối tới không đi bộ được | Prop | Rương |
+| Boss (`08`) | Blubberbeard, `BossEncounter`, `VictoryCamp` | Prop ngoài vùng đánh boss | Quái khác |
+| Còn lại | Theo bảng phòng trong tài liệu bố cục | | |
 
 Đặt hoặc dời quái theo EP:
 1. Lấy loại và số lượng từ tài liệu bố cục (E8). Không có trong tài liệu thì hỏi.
@@ -236,10 +236,10 @@ Khi người dùng muốn phòng "đặc biệt", "wow", đất chia mảnh, bi�
 
 - **Đất chia mảnh:**
   1. Thêm `islands` (đa giác lồi) và `channels` vào layout, bake với `out_islands`.
-  2. Va chạm: tắt `Environment/BaseGround/StaticBody3D/CollisionShape3D`. Thêm một
-     `CollisionShape3D` với `ConvexPolygonShape3D` cho mỗi mảnh, lấy từ outline đã lùi vào
-     0,25 m. Shape có scale 1/3 và gốc z = 0,191/3, để điểm ghi thẳng bằng mét thế giới (mặt
-     trên y = độ cao cát).
+  2. Va chạm: chạy `split_collision.py <layout> <scene>`. Nó tắt shape đảo chung và thêm một
+     `ConvexPolygonShape3D` cho mỗi mảnh (outline lùi vào 0,25 m, điểm ghi bằng mét thế giới).
+     Đa giác có cạnh dài bị làm mềm cắt góc sâu (vài mét): thêm đỉnh cách mỗi góc khoảng 1 m
+     (giữ bản gốc ở `islands_sharp`), nếu không góc đảo hụt và Foxy rơi xuống nước.
   3. Lạch: `Area3D` dùng `shallow_water_area.gd`, mỗi lạch một `BoxShape3D`.
   4. Vực: `grapple_post.tscn` ở cả hai bờ, thẳng hàng; thêm `split_checks` vào layout rồi chạy
      `check_split_islands.gd`.
@@ -324,6 +324,7 @@ tự sửa nội dung phòng trong tài liệu bố cục; đó là quyết đ�
 | `scripts/bake_reef_rocks.py` | Mặt nạ đá ngầm quanh đảo cho shader đầm phá |
 | `scripts/apply_sea_palette.py` | Bảng màu biển kỳ quan (`red_tide`, `violet_glow`) cho một phòng |
 | `scripts/make_grapple_post.py` | Vẽ ảnh cọc neo Tide Grapple |
+| `scripts/split_collision.py` | Ghi va chạm từng mảnh đảo (sau `bake_ground.py`) vào scene phòng; hỗ trợ đảo thứ hai (`ground_node`, `body_x`) |
 | `scripts/layouts/room_24.json` | Layout mẫu phòng chia mảnh (`islands`, `channels`, `split_checks`) |
 | `scripts/godot/check_split_islands.gd` | Chơi thử phòng chia mảnh: lội lạch, vực chặn, móc qua lại |
 | `scripts/godot/probe_room.gd` | Đo `ground_rect`, độ lệch hình–va chạm, danh sách prop, ngân sách |

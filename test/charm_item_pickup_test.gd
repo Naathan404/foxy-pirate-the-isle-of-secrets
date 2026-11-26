@@ -81,8 +81,10 @@ func run_tests() -> void:
 		var pickup := PICKUP.instantiate() as ItemPickup
 		pickup.item = item
 		holder.add_child(pickup)
-		if item.charm.is_prototype():
-			check(not pickup._can_attract(player), "Prototype pickup stays out of production")
+		if not item.charm.is_playable():
+			check(
+				not pickup._can_attract(player), "Prototype or disabled pickup stays out of production"
+			)
 			pickup.queue_free()
 			continue
 		check(pickup._can_attract(player), "Charm is collectible with full inventory")
@@ -143,7 +145,7 @@ func run_tests() -> void:
 		)
 		check(inventory.count_item(StringName(item.item_id)) == 0, "Charm uses no inventory slot")
 		count += 1
-	check(count == 19, "All playable Charm items are covered")
+	check(count == 25, "All playable Charm items are covered")
 	var duplicate := PICKUP.instantiate() as ItemPickup
 	duplicate.item = load("res://data/items/charms/arrow_rain.tres")
 	holder.add_child(duplicate)

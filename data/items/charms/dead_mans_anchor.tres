@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BaseItem" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://gameplay/inventory/base_item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/charms/dead_mans_anchor.png" id="2_icon"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/dead_mans_anchor.tres" id="3_charm"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "charm_dead_mans_anchor"
+display_name = "Dead Man's Anchor"
+icon = ExtResource("2_icon")
+description = "Unlocks the Dead Man's Anchor Charm."
+type = 3
+charm = ExtResource("3_charm")

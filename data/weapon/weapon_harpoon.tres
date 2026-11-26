@@ -27,6 +27,7 @@ skill_icon = ExtResource("7_uvv2e")
 display_name = "Lightning Pierce"
 description = "Step back and charge for 0.5 seconds, then pierce every enemy in a straight line. Invulnerable during the dash; walls and ledges stop the lunge."
 attack_scene = ExtResource("4_pierce")
+show_aim_telegraph = true
 phase_driven_animation = true
 damage_hp = 4.0
 stagger_multiplier = 2.0

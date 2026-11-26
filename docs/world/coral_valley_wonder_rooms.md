@@ -27,13 +27,17 @@ dung phòng vẫn theo [bố cục Coral Valley](coral_valley_layout.md); hình 
 
 Luật cho vực Tide Grapple (tầm móc 7 đơn vị, kéo Foxy tới cách vật trúng 1 đơn vị):
 
-- Vực rộng 3,5–4,5 m.
+- Vực rộng 3,5–4,5 m; nên dùng 3,6 m để còn dư tầm móc.
 - Mỗi vực có **cọc neo ở cả hai bờ**, nằm trên cùng một đường thẳng đông–tây hoặc bắc–nam (hướng
-  ngắm theo 8 hướng di chuyển). Cọc cách mép mảnh của nó ít nhất 1,5 m để Foxy đáp xuống đất.
+  ngắm theo 8 hướng di chuyển). Cọc cách mép mảnh của nó khoảng 2,4 m: thân cọc rộng 1,2 m và Foxy dừng cách bề mặt cọc 1 m,
+  nên cọc sát mép hơn thì Foxy đáp xuống nước. Người chơi đứng giữa cọc bên mình và mép vực để
+  móc sang cọc bờ kia.
+- Rong biển và vật có HurtBox trên đường móc sẽ bắt móc trước cọc; giữ đường móc trống.
   Thiếu cọc ở bờ đảo nhỏ thì người chơi kẹt lại.
-- Tide Grapple là thưởng boss ở `room_08`. Mảnh chỉ tới được bằng móc là nội dung **quay lại sau
-  boss**: người chơi thấy nó từ sớm, nhớ, rồi quay lại. Đặt phần thưởng hoặc bí mật ở đó, không
-  đặt thứ bắt buộc để đi tiếp.
+- Muốn đường một chiều thì chỉ đặt cọc ở bờ đích (`room_13`).
+- Tide Grapple có từ Raid `room_16`, giữa map. Mảnh chỉ tới được bằng móc ở các phòng trước đó
+  (`room_21`, `room_23`) là nội dung **quay lại**: người chơi thấy nó từ sớm, nhớ, rồi quay lại.
+  Phòng sau `room_16` (`room_13`, `room_06`) được dùng móc làm đường chính.
 - Kiểm bằng `check_split_islands.gd` (đi bộ qua lạch, đi vào vực bị chặn, móc qua lại).
 
 Cọc neo: `world/biomes/coral_valley/objects/grapple_post.tscn`. Cọc gỗ bạc nắng có đai sắt và một
@@ -61,18 +65,25 @@ prop. Chừa trống vùng nước trước cầu tàu (`keep_clear`).
 
 ## Phòng kỳ quan hiện có
 
+Màu biển giờ là ngôn ngữ chung của map ([bố cục](coral_valley_layout.md#ngôn-ngữ-màu)): đỏ cho
+phòng Raid, tím cho bí ẩn. Đất chia mảnh là công cụ chính của các phòng cần Tide Grapple.
+
 | Phòng | Loại | Kiểu | Nội dung |
 | --- | --- | --- | --- |
-| `room_24` | Farm | Đất chia mảnh | 3 mảnh nối bằng 2 lạch nông; đảo nhỏ phía đông có rương bí mật (30–50 vàng), đảo nhỏ phía bắc có một cây dừa đơn độc; cả hai chỉ tới được bằng Tide Grapple |
-| `room_16` | Mobs 6 (cuối nhánh) | Biển màu `red_tide` | Thủy triều 4 hướng màu đỏ |
-| `room_13` | Mobs 5 (cuối nhánh) | Biển màu `violet_glow` | Biển đêm tím, caustics phát sáng |
-| `room_20` | Mobs 3 (cuối nhánh) | Vành đá ngầm | 11 cụm đá ngầm quanh đảo |
+| `room_24` | Đảo Vỡ (ẩn) | Đất chia mảnh | 3 mảnh nối bằng 2 lạch nông; đảo nhỏ phía đông có rương bí mật (30–50 vàng), đảo nhỏ phía bắc có một cây dừa đơn độc; cả hai chỉ tới được bằng Tide Grapple |
+| `room_13` | Đền Vực Tím | Biển `violet_glow` + đất chia mảnh | Chuỗi ba vực móc tới bệ Ngọc Vực Sâu, đường về một chiều |
+| `room_12`, `room_20` | Phòng ẩn | Biển `violet_glow` (`room_20` thêm vành đá ngầm) | Kho báu canh bởi quái |
+| `room_16`, `room_18`, `room_22` | Raid | Biển `red_tide` | Vào là bị nhốt tới khi dọn xong |
+| `room_06` | Eo Biển Neo | Đất chia mảnh | Hai vực móc, đảo giữa có triều quét |
+| `room_03`, `room_15`, `room_17`, `room_19`, `room_21` | Phòng thường | Đất chia mảnh | Lạch có bệ ghép cầu; eo đất có rào; doi cát theo triều; đảo rương móc |
 
 `room_08` (Boss) gộp cả ba kiểu, theo diễn biến trận đánh:
 
 - Đảo đấu trường tròn, to khoảng 1,6 lần đảo phòng Medium, nối với cầu tàu bằng một cây cầu ngắn.
   Cầu gãy ngay khi trận đánh bắt đầu và không có lại; sau khi thắng, Foxy móc Tide Grapple qua
-  hai cọc neo hai bờ để ra.
+  hai cọc neo hai bờ để ra. Trong lúc đánh boss, hai cọc tắt va chạm (`grapple_posts` của
+  `BlubberbeardArenaRoom`), vẫn hiện nhưng móc bay xuyên qua, nên không thể dùng Tide Grapple để
+  bỏ trận. Thắng boss thì cọc móc được trở lại.
 - Biển đổi màu theo trận: thường lúc đầu, `violet_glow` từ phase 2, `red_tide` khi boss vận
   Sky Dive hoặc Anchor Whirlwind rồi trở lại (`SeaMood` + `SeaPalette`).
 - Hai vòng cột đá, tảng đá và rêu khổng lồ đứng dưới nước bao quanh đảo (ảnh vẽ tay

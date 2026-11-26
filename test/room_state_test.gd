@@ -11,10 +11,10 @@ const SANDBOX := preload("res://test/fixtures/save_test_sandbox.gd")
 const PROP_SLOT_ROOM := preload("res://test/fixtures/prop_slot_room.tscn")
 const ITEM_PICKUP := preload("res://gameplay/inventory/item_pickup.tscn")
 const HUB := "res://world/biomes/hub/map/castaway_cove.tscn"
-const RANDOM_ROOM := "res://world/biomes/coral_valley/map/room_01.tscn"
+const RANDOM_ROOM := "res://world/biomes/coral_valley/map/room_10.tscn"
 const OTHER_ROOM := "res://world/biomes/coral_valley/map/room_02.tscn"
 const CHEST_ROOM := "res://world/biomes/coral_valley/map/room_04.tscn"
-const RAID_ROOM := "res://world/biomes/coral_valley/map/room_07.tscn"
+const RAID_ROOM := "res://world/biomes/coral_valley/map/room_16.tscn"
 const CHEST_KEY := "TreasureChest"
 const KILLING_DAMAGE := 1000000.0
 const MAX_CYCLE_SEARCH := 12
@@ -208,7 +208,7 @@ func _check_chests_stay_open() -> void:
 
 func _check_raid_chest_stays_open() -> void:
 	var raid := (load(RAID_ROOM) as PackedScene).instantiate()
-	var flag: StringName = raid.get_node("RaidEncounter").encounter_id
+	var flag: StringName = raid.get_node("Raid/Stage").stage_id
 	raid.free()
 	sandbox.manager.set_story_flag(flag)
 	await _go(RAID_ROOM)
@@ -324,7 +324,7 @@ func _slots(room: Node) -> Array[PropSlot]:
 	return slots
 
 
-## Re-rolls cycles until room_01 picks a layout with an enemy (it may pick resources).
+## Re-rolls cycles until the random room has a living enemy (hand-placed in room_10).
 func _enter_cycle_with_enemy() -> void:
 	var registry: RoomStateRegistry = sandbox.manager.room_states
 	for attempt: int in MAX_CYCLE_SEARCH:
@@ -332,7 +332,7 @@ func _enter_cycle_with_enemy() -> void:
 		if not _stateful(current_scene, EnemyBase).is_empty():
 			return
 		registry.begin_new_cycle(registry.rest_location)
-	_check(false, "found a room_01 layout with enemies")
+	_check(false, "found a random-room layout with enemies")
 
 
 func _rest_in_hub_and_save() -> void:

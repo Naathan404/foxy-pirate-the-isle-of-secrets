@@ -5,6 +5,8 @@ enum AttackPhase {
 	IDLE,
 	CHARGE,
 	DASH,
+	IMPACT,
+	STUN,
 }
 
 @export_group("Attack Cycle")
@@ -16,6 +18,7 @@ enum AttackPhase {
 var _phase: AttackPhase = AttackPhase.IDLE
 var _locked_target_position: Vector3 = Vector3.ZERO
 var _patrol_direction: Vector3 = Vector3.BACK
+var _dash_unreachable := false
 
 
 func _enter() -> void:
@@ -37,6 +40,14 @@ func _update(delta: float) -> void:
 			_update_charge(delta)
 		AttackPhase.DASH:
 			_update_dash(delta)
+		AttackPhase.IMPACT:
+			enemy._set_horizontal_velocity(Vector3.ZERO)
+			if _timer_finished(delta):
+				_begin_stun()
+		AttackPhase.STUN:
+			enemy._set_horizontal_velocity(Vector3.ZERO)
+			if _timer_finished(delta):
+				_finish_recovery()
 
 
 func _begin_idle() -> void:
@@ -47,6 +58,7 @@ func _begin_idle() -> void:
 
 
 func _begin_attack_cycle() -> void:
+	_dash_unreachable = false
 	_locked_target_position = Vector3.ZERO
 	if not enemy.has_target():
 		_return_to_patrol()
@@ -81,20 +93,43 @@ func _update_charge(delta: float) -> void:
 
 
 func _update_dash(delta: float) -> void:
+	if (enemy as HermitCrab).has_dash_impact():
+		_finish_dash(true, enemy.is_front_blocked())
+		return
 	var direction := _locked_target_position - enemy.global_position
 	direction.y = 0.0
 	if direction.length() <= target_arrival_distance:
 		_finish_dash()
 		return
-	if enemy.is_front_blocked() or not enemy.is_ground_ahead():
-		_abandon_unreachable_dash()
+	if not enemy.is_ground_ahead():
+		_finish_dash(false, true)
 		return
 	enemy.move_in_direction(direction, delta, dash_speed_multiplier)
 
 
-func _finish_dash() -> void:
+func _finish_dash(impact: bool = false, unreachable: bool = false) -> void:
 	enemy._stop_contact_damage()
 	enemy.stop_movement()
+	enemy._set_horizontal_velocity(Vector3.ZERO)
+	_dash_unreachable = unreachable
+	if impact:
+		_phase = AttackPhase.IMPACT
+		timer = (enemy as HermitCrab).dash_impact_duration_seconds
+		enemy.play_directional_animation(&"hit", true)
+	else:
+		_begin_stun()
+
+
+func _begin_stun() -> void:
+	_phase = AttackPhase.STUN
+	timer = (enemy as HermitCrab).dash_stun_duration_seconds
+	enemy.play_directional_animation(&"stun", true)
+
+
+func _finish_recovery() -> void:
+	if _dash_unreachable:
+		_abandon_unreachable_dash()
+		return
 	if enemy.has_target():
 		_begin_attack_cycle()
 		return

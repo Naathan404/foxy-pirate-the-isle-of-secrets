@@ -113,21 +113,22 @@ func _test_acquisition(registry: CharmRegistry) -> void:
 	placeholder.drop_chance = 0.0
 	_assert_true(registry.register_definition(placeholder), "register blocked placeholder")
 	var pool := service.get_shop_pool(registry)
-	_assert_equal(pool.size(), 7, "shop contains seven accepted Passive Charms")
+	_assert_equal(pool.size(), 8, "shop contains eight accepted Passive Charms")
 	for definition: CharmData in pool:
 		_assert_true(definition.is_passive(), "shop excludes Active Charms")
 		_assert_true(definition.effect_scene != null, "shop excludes placeholders")
 	_assert_true(registry.set_owned(GALE_PACE.charm_id, true), "own Gale Pace")
-	_assert_equal(service.get_shop_pool(registry).size(), 6, "shop excludes owned Charm")
+	_assert_equal(service.get_shop_pool(registry).size(), 7, "shop excludes owned Charm")
 	var random := RandomNumberGenerator.new()
 	random.seed = 7007
 	var offer := service.roll_shop_offer(registry, random)
 	_assert_true(offer != null and offer.is_passive(), "seeded shop offer is playable Passive")
-	_assert_true(
+	_assert_false(
 		service.grant_fixed_boss_reward(registry, TIDE_GRAPPLE.charm_id),
-		"grant fixed Tide Grapple reward"
+		"Tide Grapple comes from a trial altar, not a boss"
 	)
-	_assert_true(registry.is_owned(TIDE_GRAPPLE.charm_id), "fixed boss reward owned")
+	# The altar pickup grants it like any Charm pickup.
+	_assert_true(registry.set_owned(TIDE_GRAPPLE.charm_id, true), "trial reward Tide Grapple owned")
 	_assert_false(
 		service.grant_fixed_boss_reward(registry, ARROW_RAIN.charm_id),
 		"non-boss metadata cannot use fixed reward"

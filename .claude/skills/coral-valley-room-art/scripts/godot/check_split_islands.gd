@@ -9,6 +9,8 @@ extends SceneTree
 ##                Foxy at least that far, onto ground.
 ## - "defeated_bosses": [encounter_id] marked defeated before the room loads (a boss arena checked
 ##                after the fight, e.g. room_08's broken bridge).
+## - "clear_enemies": true removes the room's enemies first, so shots and hits do not move Foxy
+##                while the terrain is measured.
 ## Actions are the project's input actions (left, right, up, down).
 ##
 ## godot --headless --path . --script <this> -- res://.../room_XX.tscn <layout.json>
@@ -45,6 +47,10 @@ func _run() -> void:
 	change_scene_to_file(args[0])
 	await create_timer(SETTLE_SECONDS).timeout
 	_player = current_scene.get_node("Foxy") as Player
+	if checks.get("clear_enemies", false):
+		for enemy: Node in current_scene.find_children("*", "EnemyBase", true, false):
+			enemy.queue_free()
+		await create_timer(PLACE_SECONDS).timeout
 	_player.stamina.set_regeneration_enabled(false)
 	_check(_player.charm_socket_manager.debug_equip_charm(&"tide_grapple", Q), "equip Tide Grapple")
 	for wade: Array in checks.get("wades", []):

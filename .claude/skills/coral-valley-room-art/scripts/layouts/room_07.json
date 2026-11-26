@@ -2,18 +2,89 @@
   "source": "assets/sprites/biomes/coral_valley/coral_valley_ground.png",
   "out_ground": "assets/sprites/biomes/coral_valley/coral_valley_room_07_ground.png",
   "out_shore": "assets/sprites/biomes/coral_valley/coral_valley_room_07_shore.png",
-  "ground_rect": [-18.61992, -22.01719, 37.44902, 47.59615],
+  "ground_rect": [
+    -18.61992,
+    -22.01719,
+    37.44902,
+    47.59615
+  ],
   "seed": 2007,
-  "ground_style": "tide_flats",
+  "ground_style": "ripple",
   "ripple_angle_degrees": 30.0,
   "paths": [
-    [[-17.5, -0.4], [-12.0, -0.9], [-6.5, 0.9], [0.0, 0.6]],
-    [[17.5, -0.4], [12.0, 0.7], [6.5, -0.9], [0.0, 0.6]]
+    [
+      [
+        -17.5,
+        -0.4
+      ],
+      [
+        -12.5,
+        -0.2
+      ],
+      [
+        -8.5,
+        0.3
+      ],
+      [
+        -5.2,
+        0.3
+      ]
+    ],
+    [
+      [
+        5.2,
+        0.3
+      ],
+      [
+        8.5,
+        0.3
+      ],
+      [
+        12.5,
+        -0.2
+      ],
+      [
+        17.5,
+        -0.4
+      ]
+    ]
   ],
-  "path_half_width": 1.6,
-  "plaza": null,
-  "tide_pools": [[-9.0, -4.6, 1.0, 0.6], [9.6, 4.4, 1.1, 0.65]],
+  "path_half_width": 1.7,
+  "plaza": {
+    "center": [
+      0.0,
+      0.3
+    ],
+    "radius": 5.4,
+    "scorch": true,
+    "stone_ring": true,
+    "ring_gaps_degrees": [
+      [
+        340,
+        20
+      ],
+      [
+        160,
+        200
+      ]
+    ]
+  },
+  "tide_pools": [
+    [
+      -9.5,
+      -6.5,
+      1.0,
+      0.6
+    ],
+    [
+      9.0,
+      7.5,
+      1.1,
+      0.65
+    ]
+  ],
   "starfish": [],
   "speckle_count": 2600,
-  "paw_prints": true
+  "paw_prints": true,
+  "wrack_line": true
 }

@@ -118,6 +118,30 @@ func restore_opened() -> void:
 	_hurtbox.set_deferred("monitorable", false)
 	if visual_root is Sprite3D and depleted_texture != null:
 		(visual_root as Sprite3D).texture = depleted_texture
+	_lay_out_unclaimed_charms.call_deferred()
+
+
+## A Charm is an unlock, not one-off loot: dropped loot vanishes when Foxy leaves the room, so
+## an opened chest lays its guaranteed Charms out again on each visit until Foxy owns them.
+func _lay_out_unclaimed_charms() -> void:
+	var game_manager := get_node("/root/GameManager")
+	# Progress carried into a new room is restored only after the room is built.
+	if game_manager.state == game_manager.State.TRANSITION:
+		await game_manager.scene_transition_finished
+	if not is_inside_tree() or get_parent() == null:
+		return
+	var player := game_manager.player as Player
+	if not is_instance_valid(player) or not is_instance_valid(player.charm_registry):
+		return
+	var index := 0
+	var angle := _random.randf_range(0.0, TAU)
+	for drop in item_drops:
+		if drop == null or drop.item == null or drop.item.charm == null or drop.chance < 1.0:
+			continue
+		if player.charm_registry.is_owned(drop.item.charm.charm_id):
+			continue
+		_spawn_pickup(drop.item, null, 1, angle + index * LOOT_SPREAD_ANGLE)
+		index += 1
 
 
 func _play_wobble(angle_degrees: float) -> void:

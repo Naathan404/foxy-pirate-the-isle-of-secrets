@@ -14,9 +14,9 @@ charm_type = 0
 effect_scene = ExtResource("2_effect")
 resource_cost = 150.0
 cooldown_seconds = 5.0
-acquisition_source = &"fixed_boss_reward"
+acquisition_source = &"fixed_trial_reward"
 drop_chance = 1.0
-tags = Array[StringName]([&"active", &"grapple", &"boss_reward"])
+tags = Array[StringName]([&"active", &"grapple", &"trial_reward"])
 effect_params = {
 "damage_multiplier": 2.5,
 "hook_speed": 24.0,

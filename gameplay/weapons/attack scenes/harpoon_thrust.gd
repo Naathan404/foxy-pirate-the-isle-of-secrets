@@ -41,7 +41,7 @@ func begin_windup() -> void:
 	if context == null or not is_instance_valid(context.actor):
 		return
 	_sync_transform()
-	_vfx.call("prepare", context.range_units, thrust_width * context.hitbox_multiplier, dash_attack)
+	_vfx.call("prepare", context.range_units, dash_attack)
 
 
 func tick_windup(_delta: float) -> void:
