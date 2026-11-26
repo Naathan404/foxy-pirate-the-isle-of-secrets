@@ -145,5 +145,5 @@ Mở `flat_tide_playground.tscn` và chạy (F6) để thử:
 
 - Báo hiệu, dâng, triều cao, rút.
 - Dash xuôi và ngược dòng khi sóng tới.
-- Starfish bị cuốn.
+- Hermit Crab bị cuốn.
 - Hai vùng chồng nhau, dấu chân, enemy xuất hiện khi rút.

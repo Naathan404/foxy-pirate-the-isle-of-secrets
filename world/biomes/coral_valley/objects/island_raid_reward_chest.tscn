@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="chest"]
-[ext_resource type="Resource" uid="uid://c8p2d5sfb87ah" path="res://data/notes/starfish.tres" id="note"]
+[ext_resource type="Resource" uid="uid://c8p2d5sfb87ah" path="res://data/notes/hermit_crab.tres" id="note"]
 [ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="note_drop"]
 
 [sub_resource type="Resource" id="GuaranteedNoteDrop"]

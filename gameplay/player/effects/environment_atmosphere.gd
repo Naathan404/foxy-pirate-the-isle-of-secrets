@@ -19,9 +19,9 @@ const ATMOSPHERE_SHADER: Shader = preload(
 @export_range(0.0, 0.7, 0.01) var water_edge_strength: float = 0.22
 @export_range(0.0, 0.5, 0.01) var water_shimmer_strength: float = 0.13
 @export_range(0.01, 3.0, 0.05, "suffix:s") var water_fade_in: float = 0.4
-@export_range(0.01, 3.0, 0.05, "suffix:s") var water_fade_out: float = 0.65
+@export_range(0.01, 3.0, 0.05, "suffix:s") var water_fade_out: float = 0.6
 ## Time continuously in water before visibility reaches its minimum.
-@export_range(0.1, 12.0, 0.1, "suffix:s") var water_full_obscuration_time: float = 12.0
+@export_range(0.1, 12.0, 0.1, "suffix:s") var water_full_obscuration_time: float = 15.0
 
 var _water_amount := 0.0
 var _water_elapsed := 0.0

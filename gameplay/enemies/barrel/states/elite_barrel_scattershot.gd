@@ -26,7 +26,9 @@ func _enter() -> void:
 	_phase = AttackPhase.TELEGRAPH
 	timer = telegraph_duration
 	enemy.stop_movement()
-	enemy.play_directional_animation(&"idle", true)
+	# Spine barrels open their lid while charging; the sprite sheet has no charge clip.
+	if not enemy.play_directional_animation(&"charge", true):
+		enemy.play_directional_animation(&"idle", true)
 	var feedback := _get_feedback()
 	if feedback != null and not _special_attack:
 		feedback.begin_telegraph()

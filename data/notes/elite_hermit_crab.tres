@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MonsterNote" format=3 uid="uid://cqcekbwcw20uy"]
+
+[ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/hermit_crab/hermit_crab_portrait.png" id="2"]
+[ext_resource type="Resource" uid="uid://b8e7xspmevkld" path="res://data/enemies/elite_hermit_crab_data.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+note_id = &"elite_hermit_crab"
+display_name = "Elite Hermit Crab"
+portrait = ExtResource("2")
+enemy_data = ExtResource("3")
+description = "A larger hermit crab with a heavier shell and more dangerous charges."
+behavior = "Its attack repeats in a sequence of dashes."
+strategy = "Leave room to evade each dash."

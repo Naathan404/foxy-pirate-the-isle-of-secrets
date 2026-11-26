@@ -3,4 +3,4 @@ shader_type spatial;
 render_mode unshaded, skip_vertex_transform, depth_draw_never, blend_mix, cull_back;
 
 #define VFX_STATIC_MESH
-#include "res://Vefects/Fire_Trail/Shaders/Trail_Fire.gdshaderinc"
+#include "res://assets/vfx/fire_trails/shaders/Trail_Fire.gdshaderinc"

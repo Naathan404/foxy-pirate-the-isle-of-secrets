@@ -53,7 +53,7 @@ uniform float mask_smoothstep_smoothness = 1.0;
 group_uniforms;
 
 #define VFX_NO_SCENE_DEPTH
-#include "res://Vefects/Fire_Trail/Shaders/Common.gdshaderinc"
+#include "res://assets/vfx/fire_trails/shaders/Common.gdshaderinc"
 
 void fragment() {
 	float time = overall_speed * TIME;

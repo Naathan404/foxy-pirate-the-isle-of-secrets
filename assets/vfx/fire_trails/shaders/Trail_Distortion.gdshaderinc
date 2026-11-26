@@ -61,7 +61,7 @@ uniform sampler2D screen_texture : hint_screen_texture, filter_linear, repeat_di
 /** URP Opaque Downsampling of the original project: 1 = none, 2 = 2x bilinear. */
 const int OPAQUE_DOWNSAMPLING = 2;
 
-#include "res://Vefects/Fire_Trail/Shaders/Common.gdshaderinc"
+#include "res://assets/vfx/fire_trails/shaders/Common.gdshaderinc"
 
 /** The scene behind the effect at a Godot screen UV, like URP's Opaque Texture: with 2x downsampling every half
  *  resolution texel is the mean of a 2x2 block of the screen, then sampled bilinearly. */

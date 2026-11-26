@@ -8,7 +8,7 @@ implementation covers enemy drops, collection, the runtime wallet and HUD.
 | Enemy | Drop chance | Gold per successful drop |
 | --- | --- | --- |
 | Regular enemy | 50% | 2–5 |
-| Elite crab, starfish and barrel | 100% | 9–12 |
+| Elite crab, hermit crab and barrel | 100% | 9–12 |
 
 These starting rates use the supplied potion price benchmarks: 25G for a small
 health potion and 45G for a large one. Expected direct Gold per kill is 1.75G

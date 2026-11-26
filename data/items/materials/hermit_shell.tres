@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BaseItem" format=3 uid="uid://cywjrscuemerx"]
+
+[ext_resource type="Texture2D" uid="uid://b4yosd2gu1y8f" path="res://assets/sprites/items/materials/Hermit_Crab.png" id="1_0e186"]
+[ext_resource type="Script" uid="uid://ctgfs8oma6tdq" path="res://gameplay/inventory/base_item.gd" id="1_or8jv"]
+
+[resource]
+script = ExtResource("1_or8jv")
+item_id = "hermit_shell"
+display_name = "Hermit Shell"
+icon = ExtResource("1_0e186")
+description = "A hardened shell fragment left behind by a hermit crab. Useful for forging."
+max_stack = 10
+metadata/_custom_type_script = "uid://ctgfs8oma6tdq"

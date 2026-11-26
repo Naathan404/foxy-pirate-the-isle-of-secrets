@@ -7,20 +7,24 @@
 [ext_resource type="AnimationLibrary" uid="uid://m022cu4lshu5" path="res://gameplay/enemies/barrel/barrel_anims.tres" id="5_anims"]
 [ext_resource type="Script" uid="uid://bu5d42kp3g21o" path="res://gameplay/enemies/barrel/states/barrel_idle.gd" id="6_idle"]
 [ext_resource type="Script" uid="uid://d4f1rn1adcpdy" path="res://gameplay/enemies/barrel/states/barrel_shoot.gd" id="7_shoot"]
+[ext_resource type="Script" uid="uid://jvd33wftr8gv" path="res://gameplay/enemies/base/enemy_spine_visual.gd" id="8_spine_visual"]
+[ext_resource type="Resource" path="res://gameplay/enemies/barrel/barrel_ink_hit.tres" id="ink_hit"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
-size = Vector3(1.8, 1.2, 1.8)
+size = Vector3(2, 2, 2)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_detector"]
 radius = 6.5
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_body"]
-height = 1.2
-radius = 0.75
+height = 1.9
+radius = 1.0
 
 [node name="Barrel" unique_id=1050350307 instance=ExtResource("1_base")]
 script = ExtResource("2_barrel")
 bullet_speed = 8.0
+bullet_visual_scale = 1.0
+ink_hit = ExtResource("ink_hit")
 bullet_lifetime = 4.0
 bullet_gravity = 22.0
 bullet_ground_bounce = 0.95
@@ -39,14 +43,31 @@ initial_facing = 2
 destroy_on_death = true
 show_debug_health = true
 
-[node name="Sprite3D" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="0" unique_id=718327590]
+[node name="Visual" parent="." index="0" unique_id=1278788323]
+script = ExtResource("8_spine_visual")
+skeleton_data_path = "res://assets/spine/enemies/Enemy_Barrel/barrel_skeleton.tres"
+clip_map = Dictionary[StringName, String]({
+&"charge": "pop_up",
+&"idle": "idle",
+&"shoot": "shoot",
+&"shoot_up": "shoot_up"
+})
+looping_clips = []
+action_start_seconds = Dictionary[StringName, float]({})
+spine_pixel_size = 0.005
+lift_meters = 0.0
+mix_seconds = 0.15
+artwork_faces_left = false
+mirror_from_facing = false
+
+[node name="Sprite3D" parent="Visual" index="0" unique_id=718327590]
 offset = Vector2(0, 15.5)
 texture = ExtResource("4_texture")
 hframes = 3
 vframes = 9
 frame = 2
 
-[node name="AnimationPlayer" parent="Visual" parent_id_path=PackedInt32Array(1278788323) index="1" unique_id=1154652120]
+[node name="AnimationPlayer" parent="Visual" index="1" unique_id=1154652120]
 libraries/ = ExtResource("5_anims")
 
 [node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
@@ -54,7 +75,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_hurtbox")
 
 [node name="BulletSpawn" type="Marker3D" parent="Direction" parent_id_path=PackedInt32Array(1694377466) index="3" unique_id=889465958]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1221788, 0.41019458)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0.65)
 
 [node name="Idle" parent="States" parent_id_path=PackedInt32Array(1797154631) index="0" unique_id=1302703013]
 script = ExtResource("6_idle")
@@ -73,5 +94,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_detector")
 
 [node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 shape = SubResource("CylinderShape3D_body")

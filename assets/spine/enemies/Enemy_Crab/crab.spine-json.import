@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonFileResource"
+uid="uid://3hjtk1g83swe"
+path="res://.godot/imported/crab.spine-json-4d05c84c52fd68af42b7c1e4516525c1.spjson"
+
+[deps]
+
+source_file="res://assets/spine/enemies/Enemy_Crab/crab.spine-json"
+dest_files=["res://.godot/imported/crab.spine-json-4d05c84c52fd68af42b7c1e4516525c1.spjson"]
+
+[params]
+

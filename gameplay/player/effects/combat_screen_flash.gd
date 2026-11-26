@@ -48,7 +48,7 @@ func _on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) ->
 		return
 	if target.is_in_group("boss"):
 		_play_flash(boss_color, boss_opacity, boss_seconds, 3)
-	elif target is EliteCrab or target is EliteStarfish or target is EliteBarrel:
+	elif target is EliteCrab or target is EliteHermitCrab or target is EliteBarrel:
 		get_node("/root/CombatMomentController").request(&"elite_defeat", player.camera)
 		_play_flash(elite_color, elite_opacity, elite_seconds, 2)
 

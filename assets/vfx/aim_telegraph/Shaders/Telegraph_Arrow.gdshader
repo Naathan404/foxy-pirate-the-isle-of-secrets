@@ -3,7 +3,7 @@
 shader_type spatial;
 render_mode unshaded, blend_add, depth_draw_never, cull_disabled, shadows_disabled;
 
-#include "res://Vefects/Aim_Telegraph/Shaders/Telegraph_Common.gdshaderinc"
+#include "res://assets/vfx/aim_telegraph/Shaders/Telegraph_Common.gdshaderinc"
 
 group_uniforms Shape;
 uniform float line_half = 0.08;

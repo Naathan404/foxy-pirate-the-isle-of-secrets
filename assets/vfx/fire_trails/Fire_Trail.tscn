@@ -1,11 +1,11 @@
 [gd_scene format=4 uid="uid://cmkpxi1ngpr2t"]
 
-[ext_resource type="AudioStream" uid="uid://1741qtkqk2sc" path="res://Vefects/Fire_Trail/Audio/Trail_Fire.wav" id="2_7cd5d"]
-[ext_resource type="Material" uid="uid://ytttraynqi7n" path="res://Vefects/Fire_Trail/Materials/Trail_Fire_Distortion.tres" id="3_ce67e"]
-[ext_resource type="Script" uid="uid://dv80lcam1f017" path="res://Vefects/Fire_Trail/Scripts/Trail_Renderer.gd" id="4_92ebd"]
-[ext_resource type="Material" uid="uid://csme8qoi5turw" path="res://Vefects/Fire_Trail/Materials/Trail_Fire_Body.tres" id="5_43570"]
-[ext_resource type="Material" uid="uid://bs4nc5bt2rn0m" path="res://Vefects/Fire_Trail/Materials/Trail_Fire_Smoke.tres" id="6_c00a4"]
-[ext_resource type="Material" path="res://Vefects/Fire_Trail/Materials/Trail_Fire_Outline.tres" id="7_outl"]
+[ext_resource type="AudioStream" uid="uid://1741qtkqk2sc" path="res://assets/vfx/fire_trails/audio/Vefects_SFX_Trail_Fire.wav" id="2_7cd5d"]
+[ext_resource type="Material" uid="uid://ytttraynqi7n" path="res://assets/vfx/fire_trails/materials/Trail_Fire_Distortion.tres" id="3_ce67e"]
+[ext_resource type="Script" uid="uid://dv80lcam1f017" path="res://assets/vfx/fire_trails/scripts/Trail_Renderer.gd" id="4_92ebd"]
+[ext_resource type="Material" uid="uid://csme8qoi5turw" path="res://assets/vfx/fire_trails/materials/Trail_Fire_Body.tres" id="5_43570"]
+[ext_resource type="Material" uid="uid://bs4nc5bt2rn0m" path="res://assets/vfx/fire_trails/materials/Trail_Fire_Smoke.tres" id="6_c00a4"]
+[ext_resource type="Material" path="res://assets/vfx/fire_trails/materials/Trail_Fire_Outline.tres" id="7_outl"]
 
 [sub_resource type="AudioStreamPlaylist" id="AudioStreamPlaylist_b8468"]
 fade_time = 0.0

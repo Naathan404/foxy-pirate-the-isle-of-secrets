@@ -50,8 +50,7 @@ func _process(delta: float) -> void:
 		sin(_charged_elapsed * charged_shake_frequency) * charged_shake, 0.0, 0.0
 	)
 	visual.scale = _charged_base_scale * charged_scale
-	if is_instance_valid(visual.sprite):
-		visual.sprite.modulate = _charged_base_modulate * charged_color
+	visual.set_tint(_charged_base_modulate * charged_color)
 
 
 func _validate_property(property: Dictionary) -> void:
@@ -86,6 +85,7 @@ func fire_radial_volley(count: int) -> void:
 		return
 	var bullet_count := maxi(2, count)
 	var center := Vector3(global_position.x, bullet_spawn.global_position.y, global_position.z)
+	_spit_muzzle_ink(Vector3.ZERO)
 	for index in range(bullet_count):
 		var direction := Vector3.FORWARD.rotated(Vector3.UP, TAU * float(index) / bullet_count)
 		_spawn_bullet(direction, center + direction * special_spawn_radius)
@@ -96,8 +96,7 @@ func _begin_charged_feedback() -> void:
 		return
 	_charged_base_position = visual.position
 	_charged_base_scale = visual.scale
-	if is_instance_valid(visual.sprite):
-		_charged_base_modulate = visual.sprite.modulate
+	_charged_base_modulate = visual.get_tint()
 	_charged_elapsed = 0.0
 	_charged_feedback_active = true
 
@@ -109,5 +108,4 @@ func _clear_charged_feedback() -> void:
 	if is_instance_valid(visual):
 		visual.position = _charged_base_position
 		visual.scale = _charged_base_scale
-		if is_instance_valid(visual.sprite):
-			visual.sprite.modulate = _charged_base_modulate
+		visual.set_tint(_charged_base_modulate)

@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://c5vx5024isx4p"
+path="res://.godot/imported/barrel_mimic.atlas-059b16905715f91949acd08b0e1cb467.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/enemies/Enemy_Barrel/barrel_mimic.atlas"
+dest_files=["res://.godot/imported/barrel_mimic.atlas-059b16905715f91949acd08b0e1cb467.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

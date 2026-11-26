@@ -1,0 +1,16 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://d4kp6c2cw7u2w"
+path="res://.godot/imported/crab_charge_side_adjusted.atlas-ab9fddc046dc5a0ca20c4ca852f23ba2.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/enemies/Enemy_HermitCarb/crab_charge_side_adjusted.atlas"
+dest_files=["res://.godot/imported/crab_charge_side_adjusted.atlas-ab9fddc046dc5a0ca20c4ca852f23ba2.spatlas"]
+
+[params]
+
+normal_map_prefix="n"
+specular_map_prefix="s"

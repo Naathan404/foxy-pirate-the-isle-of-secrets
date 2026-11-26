@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://6xygblp13liu"
-path.bptc="res://.godot/imported/T_VFX_Perlin_Noise_01.tga-808ab2bdb6349d791caabb68be525c2f.bptc.ctex"
+path.bptc="res://.godot/imported/T_VFX_Perlin_Noise_01.tga-0400901553e07837c02a11ed5956fc2c.bptc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Vefects/Fire_Trail/Textures/T_VFX_Perlin_Noise_01.tga"
-dest_files=["res://.godot/imported/T_VFX_Perlin_Noise_01.tga-808ab2bdb6349d791caabb68be525c2f.bptc.ctex"]
+source_file="res://assets/vfx/fire_trails/textures/T_VFX_Perlin_Noise_01.tga"
+dest_files=["res://.godot/imported/T_VFX_Perlin_Noise_01.tga-0400901553e07837c02a11ed5956fc2c.bptc.ctex"]
 
 [params]
 

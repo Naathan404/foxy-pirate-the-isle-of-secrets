@@ -69,7 +69,7 @@ foxy-pirate/
 │   │   │   └── enemy_base.gd
 │   │   │
 │   │   ├── coral_valley/
-│   │   │   ├── starfish/
+│   │   │   ├── hermit_crab/
 │   │   │   ├── crab/
 │   │   │   ├── barrel/
 │   │   │   └── coral_skeleton/

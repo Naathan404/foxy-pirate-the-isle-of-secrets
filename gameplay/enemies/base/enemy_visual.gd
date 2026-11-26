@@ -78,6 +78,30 @@ func has_animation(animation_name: StringName) -> bool:
 	return is_instance_valid(animation_player) and animation_player.has_animation(animation_name)
 
 
+## Colour multiplied into the whole enemy (elite charge glow, anger tint).
+func set_tint(color: Color) -> void:
+	if is_instance_valid(sprite):
+		sprite.modulate = color
+
+
+func get_tint() -> Color:
+	return sprite.modulate if is_instance_valid(sprite) else Color.WHITE
+
+
+## Extra wind-up warning on the artwork, 0 to 1, with its size pulse. The sprite sheet is
+## brightened by `EliteFeedback` itself, so only renderers that hide the sprite use this.
+func set_telegraph_pulse(_strength: float, _size_scale: float = 1.0) -> void:
+	pass
+
+
+## World height of the top of the artwork, or NAN when it is unknown.
+func get_top_y() -> float:
+	if not is_instance_valid(sprite) or sprite.texture == null:
+		return NAN
+	var bounds := sprite.get_aabb()
+	return sprite.to_global(Vector3(0.0, bounds.end.y, 0.0)).y
+
+
 func play_hit_feedback() -> void:
 	if not is_instance_valid(sprite):
 		return

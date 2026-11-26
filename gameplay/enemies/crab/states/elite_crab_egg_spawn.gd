@@ -8,7 +8,8 @@ func _enter() -> void:
 	enemy.stop_movement()
 	enemy._stop_contact_damage()
 	enemy.end_active_attack()
-	enemy.play_directional_animation(&"idle", true)
+	if not enemy.play_directional_animation(&"egg_spawn", true):
+		enemy.play_directional_animation(&"idle", true)
 	var crab := enemy as EliteCrab
 	if crab != null:
 		crab.launch_eggs()

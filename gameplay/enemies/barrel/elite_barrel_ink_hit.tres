@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BarrelInkHit" format=3 uid="uid://23t5dhijexs2"]
+
+[ext_resource type="Script" uid="uid://ysevoyvb8uke" path="res://gameplay/enemies/barrel/barrel_ink_hit.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+knockback_multiplier = 0.85
+slow_seconds = 1.6
+slow_speed_multiplier = 0.7
+ink_opacity = 0.82
+ink_coverage = 0.14
+ink_hold_seconds = 0.6
+ink_fade_seconds = 1.4

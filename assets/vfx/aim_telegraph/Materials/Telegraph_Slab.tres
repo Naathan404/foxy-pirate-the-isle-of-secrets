@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3]
 
-[ext_resource type="Shader" path="res://Vefects/Aim_Telegraph/Shaders/Telegraph_Slab.gdshader" id="1_slab"]
+[ext_resource type="Shader" path="res://assets/vfx/aim_telegraph/Shaders/Telegraph_Slab.gdshader" id="1_slab"]
 
 [resource]
 render_priority = 0

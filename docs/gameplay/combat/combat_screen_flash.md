@@ -4,7 +4,7 @@
 
 | Event | Color | Opacity | Fade |
 | --- | --- | --- | --- |
-| Weapon kill of EliteCrab, EliteStarfish, EliteBarrel | Gold | 0.10 | 0.14 s |
+| Weapon kill of EliteCrab, EliteHermitCrab, EliteBarrel | Gold | 0.10 | 0.14 s |
 | Weapon kill of an EnemyBase in `boss` group | Pale gold | 0.16 | 0.28 s |
 | Bow released at 100% charge with more than one arrow | Pale blue | 0.07 | 0.10 s |
 

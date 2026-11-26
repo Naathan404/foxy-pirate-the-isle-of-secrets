@@ -1,0 +1,209 @@
+
+crab.png
+size: 1712,655
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Crab_EyeClose_L
+  rotate: true
+  xy: 1068, 2
+  size: 87, 131
+  orig: 88, 134
+  offset: 1, 1
+  index: -1
+Crab_EyeClose_R
+  rotate: true
+  xy: 1068, 91
+  size: 86, 145
+  orig: 88, 147
+  offset: 1, 1
+  index: -1
+Crab_shell_Up
+  rotate: false
+  xy: 669, 387
+  size: 383, 266
+  orig: 385, 269
+  offset: 1, 1
+  index: -1
+claw_L_arm
+  rotate: false
+  xy: 673, 45
+  size: 88, 79
+  orig: 88, 79
+  offset: 0, 0
+  index: -1
+claw_L_hand
+  rotate: true
+  xy: 664, 126
+  size: 144, 238
+  orig: 144, 238
+  offset: 0, 0
+  index: -1
+claw_R_arm
+  rotate: true
+  xy: 595, 7
+  size: 108, 76
+  orig: 108, 76
+  offset: 0, 0
+  index: -1
+claw_R_hand
+  rotate: false
+  xy: 1437, 75
+  size: 204, 305
+  orig: 204, 305
+  offset: 0, 0
+  index: -1
+eye_L
+  rotate: true
+  xy: 1201, 2
+  size: 87, 131
+  orig: 88, 134
+  offset: 1, 1
+  index: -1
+eye_R
+  rotate: true
+  xy: 1215, 91
+  size: 86, 119
+  orig: 88, 120
+  offset: 1, 0
+  index: -1
+fx_alert
+  rotate: false
+  xy: 763, 45
+  size: 76, 79
+  orig: 120, 120
+  offset: 21, 20
+  index: -1
+fx_debris
+  rotate: false
+  xy: 1643, 88
+  size: 23, 24
+  orig: 30, 30
+  offset: 4, 3
+  index: -1
+fx_dust
+  rotate: true
+  xy: 904, 68
+  size: 202, 162
+  orig: 230, 190
+  offset: 15, 0
+  index: -1
+fx_glow
+  rotate: false
+  xy: 1439, 382
+  size: 271, 271
+  orig: 320, 320
+  offset: 25, 24
+  index: -1
+fx_impact
+  rotate: false
+  xy: 1089, 179
+  size: 346, 206
+  orig: 460, 340
+  offset: 70, 106
+  index: -1
+fx_ring
+  rotate: false
+  xy: 2, 12
+  size: 490, 130
+  orig: 520, 150
+  offset: 15, 10
+  index: -1
+fx_slash
+  rotate: true
+  xy: 2, 349
+  size: 304, 665
+  orig: 780, 780
+  offset: 437, 41
+  index: -1
+fx_slash2
+  rotate: true
+  xy: 2, 144
+  size: 203, 529
+  orig: 780, 780
+  offset: 493, 101
+  index: -1
+fx_speed
+  rotate: false
+  xy: 669, 272
+  size: 418, 113
+  orig: 460, 150
+  offset: 31, 19
+  index: -1
+leg_L1_a
+  rotate: false
+  xy: 1334, 2
+  size: 121, 71
+  orig: 121, 71
+  offset: 0, 0
+  index: -1
+leg_L1_b
+  rotate: false
+  xy: 1643, 248
+  size: 56, 132
+  orig: 56, 132
+  offset: 0, 0
+  index: -1
+leg_L2_a
+  rotate: false
+  xy: 533, 233
+  size: 129, 114
+  orig: 129, 114
+  offset: 0, 0
+  index: -1
+leg_L2_b
+  rotate: false
+  xy: 1336, 75
+  size: 99, 102
+  orig: 99, 102
+  offset: 0, 0
+  index: -1
+leg_R1_a
+  rotate: false
+  xy: 1457, 2
+  size: 121, 71
+  orig: 121, 71
+  offset: 0, 0
+  index: -1
+leg_R1_b
+  rotate: false
+  xy: 1643, 114
+  size: 56, 132
+  orig: 56, 132
+  offset: 0, 0
+  index: -1
+leg_R2_a
+  rotate: false
+  xy: 533, 117
+  size: 129, 114
+  orig: 129, 114
+  offset: 0, 0
+  index: -1
+leg_R2_b
+  rotate: false
+  xy: 494, 13
+  size: 99, 102
+  orig: 99, 102
+  offset: 0, 0
+  index: -1
+pupil_L
+  rotate: false
+  xy: 1580, 16
+  size: 16, 57
+  orig: 17, 58
+  offset: 1, 1
+  index: -1
+pupil_R
+  rotate: false
+  xy: 1068, 210
+  size: 16, 60
+  orig: 16, 60
+  offset: 0, 0
+  index: -1
+shell
+  rotate: false
+  xy: 1054, 387
+  size: 383, 266
+  orig: 385, 269
+  offset: 1, 1
+  index: -1

@@ -2,7 +2,7 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, cull_disabled, shadows_disabled;
 
-#include "res://Vefects/Aim_Telegraph/Shaders/Telegraph_Common.gdshaderinc"
+#include "res://assets/vfx/aim_telegraph/Shaders/Telegraph_Common.gdshaderinc"
 
 uniform float slab_half = 0.8;
 /** The slab stops this far before the arrow tip. */

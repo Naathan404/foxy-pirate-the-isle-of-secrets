@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cmg645itqwnym"
-path.bptc="res://.godot/imported/T_VFX_Trail_04.tga-ce79030c76607789061b4e57c08d657e.bptc.ctex"
+path.bptc="res://.godot/imported/T_VFX_Trail_04.tga-ee29ac5cff94d1b4464f08c33d81d6b7.bptc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Vefects/Fire_Trail/Textures/T_VFX_Trail_04.tga"
-dest_files=["res://.godot/imported/T_VFX_Trail_04.tga-ce79030c76607789061b4e57c08d657e.bptc.ctex"]
+source_file="res://assets/vfx/fire_trails/textures/T_VFX_Trail_04.tga"
+dest_files=["res://.godot/imported/T_VFX_Trail_04.tga-ee29ac5cff94d1b4464f08c33d81d6b7.bptc.ctex"]
 
 [params]
 
