@@ -97,7 +97,7 @@ cuối: móc + triều + quái) → `07` Trại Cuối Bờ (lửa trại và Si
 | `room_01` | Small | Dạy thủy triều | Một làn triều cắt ngang đường; triều rút để lại quái | trái `00`, phải `02`, trên `09` |
 | `room_02` | Medium | Phục kích theo triều | 3 đợt quái theo kịch bản tới cùng con nước; dạy sóng cuốn quái | trái `01`, phải `03`, dưới `17` |
 | `room_03` | Small, 2 mảnh | Dạy cần gạt | Hai bệ ghép thành cầu qua lạch; cần trên bệ gọi bệ kia; Barrel bắn vào đường cầu | trái `02`, phải `04`, trên `10` |
-| `room_04` | 2 đảo | Câu đố bệ xoay | +3 / −2 bước trên vòng 8 điểm dừng | trái `03`, phải `05`, trên `11`, dưới `19` |
+| `room_04` | 2 đảo | Câu đố bệ xoay | +3 / −2 bước trên vòng 8 điểm dừng; cặp cần trên bệ giữa | trái `03`, phải `05`, trên `11`, dưới `19` |
 | `room_05` | Medium | Lửa trại 2 + Cổng Ngọc Triều | Ngã tư; cổng chặn lối phải | trái `04`, trên `13`, phải `06` (cổng), dưới `21` |
 | `room_06` | Small, 3 mảnh | Eo Biển Neo | Bài thi cuối: hai vực móc, đảo giữa có triều quét, elite canh | trái `05`, phải `07` |
 | `room_07` | Medium | Trại Cuối Bờ (lửa trại 3) | Trại của Silas trước boss, bố cục riêng | trái `06`, phải `08` |
@@ -208,6 +208,22 @@ lúc người chơi gạt cần.
 
 Giữ câu đố cũ (bệ giữa cố định, bệ quay 8 điểm dừng, cần trên +3 bước, cần dưới −2 bước).
 Rương và hai Elite Barrel ở đảo phải giữ nguyên.
+
+Cơ chế (đã chạy thử bằng Foxy thật):
+
+- Bệ xoay đi vòng 8 điểm dừng quanh bệ giữa theo chiều kim đồng hồ nhìn từ camera:
+  Đông (0, chỗ bắt đầu), Đông Nam, Nam, Tây Nam, Tây (4), Tây Bắc, Bắc, Đông Bắc. Đứng trên bệ
+  thì được chở theo.
+- Chỉ điểm Tây và điểm Đông chạm được: mỗi điểm cách đảo cùng phía và bệ giữa một cú dash
+  (khe 3,6–4,3 m, dash 4 m). Đi bộ không qua được khe nào.
+- Có ba cặp cần gạt điều khiển cùng một bệ xoay: hai cặp trên hai đảo và một cặp trên bệ giữa.
+  Cần trên +3 điểm (biển cam, mũi tên theo chiều kim đồng hồ), cần dưới −2 điểm (biển xanh ngọc,
+  ngược chiều). Đánh nhiều lần thì các bước cộng dồn.
+- Đường qua: đưa bệ xoay tới Tây (từ Đông: −2 −2), dash lên bệ, dash sang bệ giữa, đánh cần
+  trên bệ giữa để đưa bệ xoay sang Đông (−2 −2, hoặc +3 bốn lần), dash lên bệ rồi dash sang đảo
+  phải. Đường về đi ngược lại. Vũ khí cận chiến cũng giải được; cần trên bệ giữa được thêm để
+  bệ giữa có vai trò và người chơi chỉ có dao không bị kẹt (trước đó phải bắn cần từ trên bệ xoay
+  bằng vũ khí tầm xa).
 
 ### room_05 Ngã Tư Lửa Trại
 

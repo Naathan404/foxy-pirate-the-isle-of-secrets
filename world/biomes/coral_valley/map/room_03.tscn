@@ -408,7 +408,7 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [editable path="Exits/LeftPath"]
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [node name="EdgeFence" type="Node3D" parent="." node_paths=PackedStringArray("room")]
-editor_description = "Rope fence drawn along the invisible player walls; follows boundary_openings."
+editor_description = "Driftwood rope fence drawn along the invisible player walls; follows boundary_openings."
 script = ExtResource("edge_fence")
 room = NodePath("..")
 

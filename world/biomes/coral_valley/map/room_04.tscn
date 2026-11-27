@@ -29,6 +29,10 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
 [ext_resource type="Texture2D" uid="uid://wllsghjfdjm4" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_04_shore.png" id="shore_texture"]
 
+[ext_resource type="Script" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
+[ext_resource type="Texture2D" path="res://assets/sprites/biomes/coral_valley/lever_sign_plus3.png" id="sign_plus3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/biomes/coral_valley/lever_sign_minus2.png" id="sign_minus2"]
+
 [sub_resource type="Environment" id="Environment_4tsbt"]
 resource_local_to_scene = true
 background_mode = 1
@@ -176,7 +180,7 @@ shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
 
 [node name="room_04" unique_id=1963513335 instance=ExtResource("1_base")]
-editor_description = "Quiz 04: fixed center platform; moving platform confined to 8 surrounding stops. Upper levers advance 3 stops clockwise; lower levers reverse 2 stops. Both islands control the same moving platform."
+editor_description = "Quiz 04: fixed center platform; the orbit platform runs a ring of 8 stops (E, SE, S, SW, W, NW, N, NE) around it and carries Foxy. Only the W and E stops touch an island and the center, a dash apart. Upper levers move it +3 stops clockwise, lower levers -2 (counterclockwise); the island pairs and the pair on the center platform all drive the same platform, so Foxy can cross island -> W -> center -> E -> island with any weapon."
 boundary_openings = Array[Rect2]([Rect2(12.7, -3.3355203, 2, 5.78), Rect2(40.286148, -3.3355203, 2, 5.78)])
 up_destination_scene = "res://world/biomes/coral_valley/map/room_11.tscn"
 right_destination_scene = "res://world/biomes/coral_valley/map/room_05.tscn"
@@ -394,6 +398,70 @@ ground_shadow = true
 [node name="LeaningPalmEast" parent="Scenery" index="2" unique_id=2026590161 instance=ExtResource("lm_beach_palm_01")]
 transform = Transform3D(2.8, 0, 0, 0, 2.8, 0, 0, 0, 2.8, 9, 0, -9.4)
 ground_shadow = true
+
+[node name="CenterUpperLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
+editor_description = "On the fixed center platform: +3 stops clockwise, so a melee Foxy standing on the center can bring the orbit platform round."
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 26.512848, 0.99347305, -1.79552)
+target_platforms = [NodePath("../MovingPlatform")]
+destination_mode = 3
+route_step_count = 3
+
+[node name="CenterLowerLever" parent="." node_paths=PackedStringArray("target_platforms") instance=ExtResource("orbit_lever")]
+editor_description = "On the fixed center platform: -2 stops counterclockwise."
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 26.512848, 0.99347305, 0.90448)
+target_platforms = [NodePath("../MovingPlatform")]
+destination_mode = 3
+route_step_count = -2
+
+[node name="LeverSigns" type="Node3D" parent="."]
+editor_description = "Plank signs above each orbit lever: +3 clockwise (orange) or -2 counterclockwise (teal)."
+
+[node name="LeftUpperLeverSign" type="Sprite3D" parent="LeverSigns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.7, 2.45, -5.4455204)
+pixel_size = 0.006
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("sign_plus3")
+
+[node name="LeftLowerLeverSign" type="Sprite3D" parent="LeverSigns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.7, 2.45, 4.5544796)
+pixel_size = 0.006
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("sign_minus2")
+
+[node name="RightUpperLeverSign" type="Sprite3D" parent="LeverSigns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.26115, 2.45, -5.4455204)
+pixel_size = 0.006
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("sign_plus3")
+
+[node name="RightLowerLeverSign" type="Sprite3D" parent="LeverSigns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.26115, 2.45, 4.5544796)
+pixel_size = 0.006
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("sign_minus2")
+
+[node name="CenterUpperLeverSign" type="Sprite3D" parent="LeverSigns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.512848, 2.45, -1.79552)
+pixel_size = 0.006
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("sign_plus3")
+
+[node name="CenterLowerLeverSign" type="Sprite3D" parent="LeverSigns"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.512848, 2.45, 0.90448)
+pixel_size = 0.006
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("sign_minus2")
+
+[node name="EdgeFence" type="Node3D" parent="." node_paths=PackedStringArray("room")]
+editor_description = "Driftwood rope fence drawn along the invisible player walls; follows boundary_openings."
+script = ExtResource("edge_fence")
+room = NodePath("..")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

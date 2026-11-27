@@ -324,6 +324,8 @@ tự sửa nội dung phòng trong tài liệu bố cục; đó là quyết đ�
 | `scripts/bake_reef_rocks.py` | Mặt nạ đá ngầm quanh đảo cho shader đầm phá |
 | `scripts/apply_sea_palette.py` | Bảng màu biển kỳ quan (`red_tide`, `violet_glow`) cho một phòng |
 | `scripts/make_grapple_post.py` | Vẽ ảnh cọc neo Tide Grapple |
+| `scripts/make_fence_post.py` | Vẽ cọc rào gỗ trôi (3 kiểu) và dây thừng cho `RoomEdgeFence`; chỗ buộc dây ở `TIE_RATIO`, phải khớp `LASHING_RATIO` trong `room_edge_fence.gd` |
+| `scripts/make_lever_sign.py` | Vẽ biển gỗ cho cần gạt đi theo vòng (`+3` theo chiều kim đồng hồ, `−2` ngược chiều) |
 | `scripts/split_collision.py` | Ghi va chạm từng mảnh đảo (sau `bake_ground.py`) vào scene phòng; hỗ trợ đảo thứ hai (`ground_node`, `body_x`) |
 | `scripts/layouts/room_24.json` | Layout mẫu phòng chia mảnh (`islands`, `channels`, `split_checks`) |
 | `scripts/godot/check_split_islands.gd` | Chơi thử phòng chia mảnh: lội lạch, vực chặn, móc qua lại |
