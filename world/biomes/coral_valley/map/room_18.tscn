@@ -37,6 +37,8 @@
 [ext_resource type="PackedScene" uid="uid://lu3usf0v5eyp" path="res://world/biomes/coral_valley/objects/raid_shuttle_platform.tscn" id="shuttle_platform"]
 [ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="hermit_crab"]
 
+[ext_resource type="Script" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
+
 [sub_resource type="Environment" id="Environment_84lhg"]
 resource_local_to_scene = true
 background_mode = 1
@@ -604,6 +606,11 @@ transform = Transform3D(1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, -6.4, 0, -11.2)
 
 [node name="GiantKelpInner" parent="Scenery" index="3" unique_id=2023046732 instance=ExtResource("lm_seaweed_1")]
 transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -7.6, 0, -7.4)
+
+[node name="EdgeFence" type="Node3D" parent="." node_paths=PackedStringArray("room")]
+editor_description = "Driftwood rope fence drawn along the invisible player walls; follows boundary_openings."
+script = ExtResource("edge_fence")
+room = NodePath("..")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

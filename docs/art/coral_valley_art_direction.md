@@ -68,7 +68,10 @@ Coral Valley là bãi cát san hô giữa đầm phá, cùng thế giới với 
 13. Khối chặn phải nằm đúng chỗ người chơi thấy chân vật, đo từ texture, không theo tâm sprite.
     Mép đảo và mép cầu bị tường vô hình chặn thì hiện rào cọc dây thừng: thêm node `RoomEdgeFence`
     (`world/objects/room_edge_fence.gd`) và gán `room`. Rào chỉ để nhìn, tự dựng theo đúng tường
-    của phòng nên chỗ mở (cầu bệ, cửa) luôn khớp `boundary_openings`. Hiện dùng ở `room_03`.
+    của phòng nên chỗ mở (cầu bệ, cửa) luôn khớp `boundary_openings`. Cọc là gỗ trôi vẽ tay
+    (`fence_post_1..3.png`, dây `fence_rope.png`, vẽ bằng `make_fence_post.py` của skill), không có
+    phao thủy tinh để khỏi nhầm với cọc neo móc được. Dùng ở các phòng có bệ/cầu: `03`, `04`, `09`,
+    `18`, `23`. Cần gạt câu đố có biển gỗ ghi số bước và chiều (`make_lever_sign.py`).
     Prop cao (cọ, và mọi cây sau này) phải lấy gốc làm tâm xoay. Billboard nghiêng theo camera 45°,
     nên nếu tâm xoay ở giữa ảnh, gốc hiển thị bị kéo về phía camera và lệch khỏi khối chặn; Foxy
     sẽ đi xuyên qua thân. Cách làm, giống cỏ của Hub:

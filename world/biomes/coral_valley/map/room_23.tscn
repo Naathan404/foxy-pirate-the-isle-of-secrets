@@ -33,6 +33,8 @@
 
 [ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
 
+[ext_resource type="Script" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
+
 [sub_resource type="Resource" id="GuaranteedNoteDrop"]
 script = ExtResource("chest_note_drop")
 note = ExtResource("chest_note")
@@ -426,6 +428,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.1, 0, -2.6)
 [node name="PostPierRock" parent="Scenery" instance=ExtResource("grapple_post")]
 editor_description = "Pier rock side, for the way back."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.5, 0, -2.6)
+
+[node name="EdgeFence" type="Node3D" parent="." node_paths=PackedStringArray("room")]
+editor_description = "Driftwood rope fence drawn along the invisible player walls; follows boundary_openings."
+script = ExtResource("edge_fence")
+room = NodePath("..")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

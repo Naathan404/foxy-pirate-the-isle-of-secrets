@@ -28,6 +28,8 @@
 [ext_resource type="Texture2D" uid="uid://plnq1drkf6ol" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_09_shore.png" id="shore_texture"]
 [ext_resource type="Resource" uid="uid://dw5w2kkpxvucr" path="res://data/notes/coral_skeleton.tres" id="skeleton_note"]
 
+[ext_resource type="Script" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
+
 [sub_resource type="Environment" id="Environment_i0jq5"]
 resource_local_to_scene = true
 background_mode = 1
@@ -405,6 +407,11 @@ leaf_width_ratio = 0.85
 leaf_rotation_speed = 0.3
 trail_count = 6
 trail_color = Color(0.78, 0.95, 0.94, 0.4)
+
+[node name="EdgeFence" type="Node3D" parent="." node_paths=PackedStringArray("room")]
+editor_description = "Driftwood rope fence drawn along the invisible player walls; follows boundary_openings."
+script = ExtResource("edge_fence")
+room = NodePath("..")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
