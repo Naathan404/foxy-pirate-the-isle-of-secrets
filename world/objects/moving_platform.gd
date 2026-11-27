@@ -98,7 +98,9 @@ func receive_damage(damage: DamageContext) -> float:
 	if damage == null or damage.source_team != CombatTeams.PLAYER or damage.amount_hp <= 0.0:
 		return 0.0
 	if not _route_markers.is_empty():
-		request_route_steps(1)
+		if not request_route_steps(1):
+			# Busy with the last command: the hit lands but the lever does not flip.
+			return damage.amount_hp
 	elif center_stop_enabled:
 		_request_stop(_center_route[_next_center_stop_index])
 		_next_center_stop_index = (_next_center_stop_index + 1) % _center_route.size()
@@ -138,23 +140,20 @@ func request_destination(at_end: bool) -> void:
 			_route_step_queue.append(current_step)
 			planned_index = posmod(planned_index + current_step, _route_markers.size())
 		var steps := posmod(destination_index - planned_index, _route_markers.size())
-		request_route_steps(steps)
+		_queue_route_steps(steps)
 		_target_end = at_end
 		_moving = not _route_step_queue.is_empty()
 		return
 	_request_stop(end_marker if at_end else start_marker)
 
 
-## Positive counts advance around the route; negative counts walk it backwards.
-## Preserve intermediate corners and queue new hits after travel already requested.
+## Positive counts advance around the route; negative counts walk it backwards. One command
+## at a time: while the platform is still carrying out the last one (or looping), the request
+## is refused and false is returned, so hitting a lever again never stacks extra steps.
 func request_route_steps(count: int) -> bool:
-	if count == 0 or _route_markers.size() < 2:
+	if _moving:
 		return false
-	var direction := 1 if count > 0 else -1
-	for step in absi(count):
-		_route_step_queue.append(direction)
-	_moving = true
-	return true
+	return _queue_route_steps(count)
 
 
 func is_targeting_end() -> bool:
@@ -178,6 +177,16 @@ func toggle_route_motion() -> void:
 	_route_looping = true
 	if not _moving:
 		request_route_steps(1)
+
+
+func _queue_route_steps(count: int) -> bool:
+	if count == 0 or _route_markers.size() < 2:
+		return false
+	var direction := 1 if count > 0 else -1
+	for step in absi(count):
+		_route_step_queue.append(direction)
+	_moving = true
+	return true
 
 
 func _request_stop(marker: Marker3D) -> void:
@@ -213,7 +222,7 @@ func _advance_route_movement(distance_remaining: float) -> void:
 		_route_index = next_index
 		_route_step_queue.pop_front()
 		if _route_looping and _route_step_queue.is_empty():
-			_route_step_queue.append(1)
+			_queue_route_steps(1)
 			if distance_remaining <= 0.0:
 				return
 	_moving = false

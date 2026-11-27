@@ -27,11 +27,11 @@ script = ExtResource("2_attack")
 animation_prefix = "attack_bow"
 skill_icon = ExtResource("7_y7u25")
 display_name = "Stormstring"
-description = "Hold to charge a fan of arrows. A full charge releases up to 6 arrows; each hit can critically strike."
+description = "Hold to charge a fan of arrows. A full charge releases up to 8 arrows; each hit can critically strike."
 attack_scene = ExtResource("4_volley")
 aim_mode = 1
 delivery_type = 1
-damage_hp = 1.5
+damage_hp = 2.0
 stagger_multiplier = 0.5
 windup_seconds = 0.3
 active_seconds = 0.04
@@ -41,6 +41,7 @@ range_units = 10.0
 ammo_id = &"wooden_arrow"
 hold_to_charge = true
 charge_seconds = 2.0
+max_projectiles = 8
 
 [resource]
 script = ExtResource("1_weapon")

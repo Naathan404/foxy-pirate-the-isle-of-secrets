@@ -10,6 +10,9 @@ enum AttackPhase { CHARGE, FIRE }
 @export_range(0.01, 10.0, 0.01, "suffix:s") var shot_interval: float = 0.2
 ## Thời gian nghỉ sau mỗi đợt bắn.
 @export_range(0.0, 30.0, 0.01, "suffix:s") var burst_cooldown: float = 3.0
+## Tắt: hướng bắn khóa lúc hết charge, cả loạt bay thẳng một đường để người chơi
+## bước ngang né được. Bật: ngắm lại người chơi trước từng viên.
+@export var retarget_each_shot: bool = false
 
 @export_group("Charge Feedback")
 ## Tỉ lệ kích thước tối đa khi charge; 1.08 là phình thêm 8%.
@@ -47,13 +50,15 @@ func _exit() -> void:
 		enemy.visual.position = _visual_position
 
 
+## Once the charge starts the burst always plays out, even if Foxy walks out of range: the
+## barrel never sits charged waiting for her to come back.
 func _update(delta: float) -> void:
 	enemy._set_horizontal_velocity(Vector3.ZERO)
 	if _phase == AttackPhase.CHARGE:
 		_update_charge(delta)
 		return
 	var barrel := enemy as Barrel
-	if barrel == null or not barrel.can_trigger_attack():
+	if barrel == null:
 		return_to_behavior()
 		return
 	_phase_remaining = maxf(0.0, _phase_remaining - maxf(0.0, delta))
@@ -84,10 +89,6 @@ func _start_burst() -> void:
 
 
 func _update_charge(delta: float) -> void:
-	var barrel := enemy as Barrel
-	if barrel != null and not barrel.can_trigger_attack():
-		return_to_behavior()
-		return
 	_phase_remaining = maxf(0.0, _phase_remaining - maxf(0.0, delta))
 	if _phase_remaining > 0.0:
 		return
@@ -96,6 +97,10 @@ func _update_charge(delta: float) -> void:
 
 func _begin_firing() -> void:
 	_phase = AttackPhase.FIRE
+	# The aim is taken here, at the end of the charge; without a target the last aim stays.
+	var barrel := enemy as Barrel
+	if barrel != null and barrel.should_aim_at_target():
+		barrel.aim_at_target()
 	_stop_feedback()
 	_phase_remaining = release_duration
 	if is_instance_valid(enemy.visual):
@@ -115,7 +120,7 @@ func _fire_next_shot() -> void:
 	if barrel == null:
 		return_to_behavior()
 		return
-	if barrel.should_aim_at_target() and enemy.has_target():
+	if retarget_each_shot and _shots_fired > 0 and barrel.should_aim_at_target():
 		barrel.aim_at_target()
 	if enemy.play_directional_animation(&"shoot", true) and is_instance_valid(enemy.visual):
 		var player := enemy.visual.animation_player

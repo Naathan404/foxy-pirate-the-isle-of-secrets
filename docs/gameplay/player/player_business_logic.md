@@ -277,7 +277,10 @@ xóa yêu cầu hành động, ngừng hồi SP, hủy đòn và dừng vận t�
 dụng ở lần cập nhật FSM tiếp theo. Nhân vật vẫn chịu gravity. Sau ít nhất
 `reload_delay` và đủ thời lượng animation, Death gọi
 `GameManager.respawn_at_last_rest()`: Foxy hồi sinh cạnh lửa trại nghỉ gần nhất, đầy HP/SP,
-giữ tiến trình, và các phòng bắt đầu chu kỳ mới. Rơi xuống void cũng gọi `die()`. Xem
+giữ tiến trình, và các phòng bắt đầu chu kỳ mới. Rơi xuống void không gọi `die()`:
+`Player.begin_void_fall()` khóa điều khiển và hurtbox trong lúc rơi, rồi
+`finish_void_fall()` đặt Foxy lại ở cửa và trừ HP; chỉ khi số HP đó gây chết mới vào Death.
+Xem
 [Trạng thái phòng và hồi sinh](../../systems/room_state.md).
 
 ## Chỉ số và hiển thị
@@ -300,6 +303,19 @@ thời gian chờ; chết mới tắt hồi. HUD nghe signal để cập nhật 
 
 PlayerVisual chọn animation `down/up/side` theo hướng nhìn so với camera và lật
 sprite khi cần. Bụi chạy, bụi dash và ghost phản hồi trạng thái của nhân vật.
+
+Bụi chạy (`gameplay/player/effects/run_dust_effect.tscn`) dùng các cụm khói vẽ tay tô
+lại màu cát trong `assets/sprites/effects/run_dust_puffs.png`. Atlas này được tạo bằng
+`tools/vfx/make_run_dust_puffs.py` từ `assets/sprites/effects/smoke/`. Hiệu ứng có:
+- một cụm bụi mỗi bước, luân phiên chân trái và phải, cứ mỗi `step_distance`;
+- một cú tung bụi lúc bắt đầu chạy;
+- bụi trượt phía trước chân khi dừng lại hoặc quay ngoắt quá 100°;
+- một dải bụi mờ giữa các bước khi chạy gần tốc độ tối đa (`trail_speed_ratio`).
+
+Mỗi cụm bụi đứng trên mặt đất từ mép dưới của nó (QuadMesh `center_offset`), nên không
+bị nền che mất nửa dưới. Vị trí lấy theo chân Foxy đang được vẽ
+(`get_global_transform_interpolated`), không phải vị trí vật lý. Bụi mặt đất khi Foxy
+trúng đòn (`player_hit_effect.gd`) dùng lại node `Puff` của scene này.
 
 ## Những điểm cần nhớ khi sửa code
 

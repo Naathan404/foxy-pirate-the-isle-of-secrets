@@ -1,9 +1,13 @@
 [gd_scene format=3 uid="uid://f1g41tw5v4it"]
 
 [ext_resource type="PackedScene" uid="uid://2jqhf2ew8c63" path="res://world/biomes/coral_valley/base_scenes/base_small_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="23_7o1t4"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
+[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="enemy_coral_skeleton"]
+[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="flat_tide"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
+[ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
 [ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
 [ext_resource type="PackedScene" uid="uid://ktoiqjrku7u8" path="res://world/biomes/coral_valley/objects/beach_coral_pink.tscn" id="lm_beach_coral_pink"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/shell.tscn" id="lm_shell"]
@@ -14,24 +18,13 @@
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
 [ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
 [ext_resource type="Texture2D" uid="uid://byukyvvacs75e" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_06_ground.png" id="sand_texture"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
 [ext_resource type="Texture2D" uid="uid://3o573th8h104" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_06_shore.png" id="shore_texture"]
 
-[ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
-
-[ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="flat_tide"]
-
-[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="enemy_elite_hermit_crab"]
-
-[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="enemy_coral_skeleton"]
-
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
-
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
-
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
-
-[sub_resource type="Environment" id="Environment_mebl1"]
+[sub_resource type="Environment" id="Environment_7fokh"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.02, 0.07, 0.11, 1)
@@ -55,7 +48,7 @@ height = 256
 noise = SubResource("FastNoiseLite_water")
 seamless = true
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_4ngaf"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f5d45"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("lagoon_shader")
@@ -82,35 +75,14 @@ shader_parameter/swash_speed = 0.9
 shader_parameter/ring_spacing_meters = 2.6
 shader_parameter/ring_speed_meters_per_second = 0.45
 shader_parameter/ring_strength = 0.22
+shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
+shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
+shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
 
-[sub_resource type="QuadMesh" id="QuadMesh_d5863"]
+[sub_resource type="QuadMesh" id="QuadMesh_bx1al"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_4ngaf")
+material = SubResource("ShaderMaterial_f5d45")
 size = Vector2(400, 400)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_1e0qy"]
-resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_8c67k"]
-resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_7o1t4"]
-resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_7fokh"]
-resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_f5d45"]
-resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_bx1al"]
-resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_uhxcq"]
 resource_local_to_scene = true
@@ -122,7 +94,7 @@ size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_47anr"]
 resource_local_to_scene = true
-size = Vector3(0.5, 2, 4)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tiafh"]
 resource_local_to_scene = true
@@ -133,6 +105,30 @@ resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_akwt1"]
+resource_local_to_scene = true
+size = Vector3(4, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kp7t3"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7j0j5"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_spowk"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_11jva"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gdxge"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v0nm0"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
@@ -148,7 +144,16 @@ shader_parameter/cloud_coverage = 0.45
 shader_parameter/cloud_softness = 0.18
 shader_parameter/cloud_shadow_strength = 0.35
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_kp7t3"]
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_West"]
+points = PackedVector3Array(-13.45, 0.21, -10.375, -13.45, -0.6, -10.375, -13.45, 0.21, -10.604, -13.45, -0.6, -10.604, -13.418, 0.21, -10.799, -13.418, -0.6, -10.799, -13.354, 0.21, -10.981, -13.354, -0.6, -10.981, -13.258, 0.21, -11.153, -13.258, -0.6, -11.153, -13.114, 0.21, -11.332, -13.114, -0.6, -11.332, -12.875, 0.21, -11.631, -12.875, -0.6, -11.631, -12.553, 0.21, -12.033, -12.553, -0.6, -12.033, -12.149, 0.21, -12.539, -12.149, -0.6, -12.539, -11.661, 0.21, -13.149, -11.661, -0.6, -13.149, -11.257, 0.21, -13.655, -11.257, -0.6, -13.655, -10.935, 0.21, -14.057, -10.935, -0.6, -14.057, -10.696, 0.21, -14.356, -10.696, -0.6, -14.356, -10.555, 0.21, -14.53, -10.555, -0.6, -14.53, -10.42, 0.21, -14.642, -10.42, -0.6, -14.642, -10.271, 0.21, -14.713, -10.271, -0.6, -14.713, -10.098, 0.21, -14.75, -10.098, -0.6, -14.75, -9.875, 0.21, -14.75, -9.875, -0.6, -14.75, -9.562, 0.21, -14.75, -9.562, -0.6, -14.75, -9.188, 0.21, -14.75, -9.188, -0.6, -14.75, -8.75, 0.21, -14.75, -8.75, -0.6, -14.75, -8.25, 0.21, -14.75, -8.25, -0.6, -14.75, -7.812, 0.21, -14.75, -7.812, -0.6, -14.75, -7.438, 0.21, -14.75, -7.438, -0.6, -14.75, -7.125, 0.21, -14.75, -7.125, -0.6, -14.75, -6.915, 0.21, -14.75, -6.915, -0.6, -14.75, -6.823, 0.21, -14.719, -6.823, -0.6, -14.719, -6.781, 0.21, -14.677, -6.781, -0.6, -14.677, -6.75, 0.21, -14.585, -6.75, -0.6, -14.585, -6.75, 0.21, -14.375, -6.75, -0.6, -14.375, -6.75, 0.21, -12.412, -6.75, -0.6, -12.412, -6.75, 0.21, -8.738, -6.75, -0.6, -8.738, -6.75, 0.21, -3.35, -6.75, -0.6, -3.35, -6.75, 0.21, 3.75, -6.75, -0.6, 3.75, -6.75, 0.21, 9.138, -6.75, -0.6, 9.138, -6.75, 0.21, 12.812, -6.75, -0.6, 12.812, -6.75, 0.21, 14.775, -6.75, -0.6, 14.775, -6.75, 0.21, 14.985, -6.75, -0.6, 14.985, -6.781, 0.21, 15.078, -6.781, -0.6, 15.078, -6.822, 0.21, 15.119, -6.822, -0.6, 15.119, -6.915, 0.21, 15.15, -6.915, -0.6, 15.15, -7.125, 0.21, 15.15, -7.125, -0.6, 15.15, -7.438, 0.21, 15.15, -7.438, -0.6, 15.15, -7.812, 0.21, 15.15, -7.812, -0.6, 15.15, -8.25, 0.21, 15.15, -8.25, -0.6, 15.15, -8.75, 0.21, 15.15, -8.75, -0.6, 15.15, -9.188, 0.21, 15.15, -9.188, -0.6, 15.15, -9.562, 0.21, 15.15, -9.562, -0.6, 15.15, -9.875, 0.21, 15.15, -9.875, -0.6, 15.15, -10.101, 0.21, 15.15, -10.101, -0.6, 15.15, -10.28, 0.21, 15.115, -10.28, -0.6, 15.115, -10.442, 0.21, 15.044, -10.442, -0.6, 15.044, -10.592, 0.21, 14.938, -10.592, -0.6, 14.938, -10.746, 0.21, 14.774, -10.746, -0.6, 14.774, -10.989, 0.21, 14.516, -10.989, -0.6, 14.516, -11.303, 0.21, 14.182, -11.303, -0.6, 14.182, -11.689, 0.21, 13.772, -11.689, -0.6, 13.772, -12.147, 0.21, 13.286, -12.147, -0.6, 13.286, -12.533, 0.21, 12.876, -12.533, -0.6, 12.876, -12.847, 0.21, 12.542, -12.847, -0.6, 12.542, -13.09, 0.21, 12.284, -13.09, -0.6, 12.284, -13.245, 0.21, 12.118, -13.245, -0.6, 12.118, -13.349, 0.21, 11.959, -13.349, -0.6, 11.959, -13.416, 0.21, 11.789, -13.416, -0.6, 11.789, -13.45, 0.21, 11.602, -13.45, -0.6, 11.602, -13.45, 0.21, 11.375, -13.45, -0.6, 11.375, -13.45, 0.21, 9.875, -13.45, -0.6, 9.875, -13.45, 0.21, 7.125, -13.45, -0.6, 7.125, -13.45, 0.21, 3.125, -13.45, -0.6, 3.125, -13.45, 0.21, -2.125, -13.45, -0.6, -2.125, -13.45, 0.21, -6.125, -13.45, -0.6, -6.125, -13.45, 0.21, -8.875, -13.45, -0.6, -8.875)
+
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_Middle"]
+points = PackedVector3Array(-2.65, 0.21, -11.375, -2.65, -0.6, -11.375, -2.65, 0.21, -11.584, -2.65, -0.6, -11.584, -2.619, 0.21, -11.677, -2.619, -0.6, -11.677, -2.577, 0.21, -11.72, -2.577, -0.6, -11.72, -2.485, 0.21, -11.75, -2.485, -0.6, -11.75, -2.275, 0.21, -11.75, -2.275, -0.6, -11.75, -1.837, 0.21, -11.75, -1.837, -0.6, -11.75, -1.212, 0.21, -11.75, -1.212, -0.6, -11.75, -0.4, 0.21, -11.75, -0.4, -0.6, -11.75, 0.6, 0.21, -11.75, 0.6, -0.6, -11.75, 1.413, 0.21, -11.75, 1.413, -0.6, -11.75, 2.038, 0.21, -11.75, 2.038, -0.6, -11.75, 2.475, 0.21, -11.75, 2.475, -0.6, -11.75, 2.685, 0.21, -11.75, 2.685, -0.6, -11.75, 2.778, 0.21, -11.719, 2.778, -0.6, -11.719, 2.819, 0.21, -11.678, 2.819, -0.6, -11.678, 2.85, 0.21, -11.585, 2.85, -0.6, -11.585, 2.85, 0.21, -11.375, 2.85, -0.6, -11.375, 2.85, 0.21, -9.812, 2.85, -0.6, -9.812, 2.85, 0.21, -6.938, 2.85, -0.6, -6.938, 2.85, 0.21, -2.75, 2.85, -0.6, -2.75, 2.85, 0.21, 2.75, 2.85, -0.6, 2.75, 2.85, 0.21, 6.938, 2.85, -0.6, 6.938, 2.85, 0.21, 9.812, 2.85, -0.6, 9.812, 2.85, 0.21, 11.375, 2.85, -0.6, 11.375, 2.85, 0.21, 11.585, 2.85, -0.6, 11.585, 2.819, 0.21, 11.678, 2.819, -0.6, 11.678, 2.778, 0.21, 11.719, 2.778, -0.6, 11.719, 2.685, 0.21, 11.75, 2.685, -0.6, 11.75, 2.475, 0.21, 11.75, 2.475, -0.6, 11.75, 2.038, 0.21, 11.75, 2.038, -0.6, 11.75, 1.413, 0.21, 11.75, 1.413, -0.6, 11.75, 0.6, 0.21, 11.75, 0.6, -0.6, 11.75, -0.4, 0.21, 11.75, -0.4, -0.6, 11.75, -1.212, 0.21, 11.75, -1.212, -0.6, 11.75, -1.837, 0.21, 11.75, -1.837, -0.6, 11.75, -2.275, 0.21, 11.75, -2.275, -0.6, 11.75, -2.485, 0.21, 11.75, -2.485, -0.6, 11.75, -2.577, 0.21, 11.72, -2.577, -0.6, 11.72, -2.619, 0.21, 11.677, -2.619, -0.6, 11.677, -2.65, 0.21, 11.584, -2.65, -0.6, 11.584, -2.65, 0.21, 11.375, -2.65, -0.6, 11.375, -2.65, 0.21, 9.812, -2.65, -0.6, 9.812, -2.65, 0.21, 6.938, -2.65, -0.6, 6.938, -2.65, 0.21, 2.75, -2.65, -0.6, 2.75, -2.65, 0.21, -2.75, -2.65, -0.6, -2.75, -2.65, 0.21, -6.938, -2.65, -0.6, -6.938, -2.65, 0.21, -9.812, -2.65, -0.6, -9.812)
+
+[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_East"]
+points = PackedVector3Array(6.95, 0.21, -14.375, 6.95, -0.6, -14.375, 6.95, 0.21, -14.584, 6.95, -0.6, -14.584, 6.981, 0.21, -14.677, 6.981, -0.6, -14.677, 7.023, 0.21, -14.72, 7.023, -0.6, -14.72, 7.115, 0.21, -14.75, 7.115, -0.6, -14.75, 7.325, 0.21, -14.75, 7.325, -0.6, -14.75, 7.625, 0.21, -14.75, 7.625, -0.6, -14.75, 7.975, 0.21, -14.75, 7.975, -0.6, -14.75, 8.375, 0.21, -14.75, 8.375, -0.6, -14.75, 8.825, 0.21, -14.75, 8.825, -0.6, -14.75, 9.225, 0.21, -14.75, 9.225, -0.6, -14.75, 9.575, 0.21, -14.75, 9.575, -0.6, -14.75, 9.875, 0.21, -14.75, 9.875, -0.6, -14.75, 10.098, 0.21, -14.75, 10.098, -0.6, -14.75, 10.271, 0.21, -14.713, 10.271, -0.6, -14.713, 10.42, 0.21, -14.642, 10.42, -0.6, -14.642, 10.555, 0.21, -14.53, 10.555, -0.6, -14.53, 10.696, 0.21, -14.356, 10.696, -0.6, -14.356, 10.935, 0.21, -14.057, 10.935, -0.6, -14.057, 11.257, 0.21, -13.655, 11.257, -0.6, -13.655, 11.661, 0.21, -13.149, 11.661, -0.6, -13.149, 12.149, 0.21, -12.539, 12.149, -0.6, -12.539, 12.553, 0.21, -12.033, 12.553, -0.6, -12.033, 12.875, 0.21, -11.631, 12.875, -0.6, -11.631, 13.114, 0.21, -11.332, 13.114, -0.6, -11.332, 13.258, 0.21, -11.153, 13.258, -0.6, -11.153, 13.354, 0.21, -10.981, 13.354, -0.6, -10.981, 13.418, 0.21, -10.799, 13.418, -0.6, -10.799, 13.45, 0.21, -10.604, 13.45, -0.6, -10.604, 13.45, 0.21, -10.375, 13.45, -0.6, -10.375, 13.45, 0.21, -8.875, 13.45, -0.6, -8.875, 13.45, 0.21, -6.125, 13.45, -0.6, -6.125, 13.45, 0.21, -2.125, 13.45, -0.6, -2.125, 13.45, 0.21, 3.125, 13.45, -0.6, 3.125, 13.45, 0.21, 7.125, 13.45, -0.6, 7.125, 13.45, 0.21, 9.875, 13.45, -0.6, 9.875, 13.45, 0.21, 11.375, 13.45, -0.6, 11.375, 13.45, 0.21, 11.602, 13.45, -0.6, 11.602, 13.416, 0.21, 11.789, 13.416, -0.6, 11.789, 13.349, 0.21, 11.959, 13.349, -0.6, 11.959, 13.245, 0.21, 12.118, 13.245, -0.6, 12.118, 13.09, 0.21, 12.284, 13.09, -0.6, 12.284, 12.847, 0.21, 12.542, 12.847, -0.6, 12.542, 12.533, 0.21, 12.876, 12.533, -0.6, 12.876, 12.147, 0.21, 13.286, 12.147, -0.6, 13.286, 11.689, 0.21, 13.772, 11.689, -0.6, 13.772, 11.303, 0.21, 14.182, 11.303, -0.6, 14.182, 10.989, 0.21, 14.516, 10.989, -0.6, 14.516, 10.746, 0.21, 14.774, 10.746, -0.6, 14.774, 10.592, 0.21, 14.938, 10.592, -0.6, 14.938, 10.442, 0.21, 15.044, 10.442, -0.6, 15.044, 10.28, 0.21, 15.115, 10.28, -0.6, 15.115, 10.101, 0.21, 15.15, 10.101, -0.6, 15.15, 9.875, 0.21, 15.15, 9.875, -0.6, 15.15, 9.575, 0.21, 15.15, 9.575, -0.6, 15.15, 9.225, 0.21, 15.15, 9.225, -0.6, 15.15, 8.825, 0.21, 15.15, 8.825, -0.6, 15.15, 8.375, 0.21, 15.15, 8.375, -0.6, 15.15, 7.975, 0.21, 15.15, 7.975, -0.6, 15.15, 7.625, 0.21, 15.15, 7.625, -0.6, 15.15, 7.325, 0.21, 15.15, 7.325, -0.6, 15.15, 7.115, 0.21, 15.15, 7.115, -0.6, 15.15, 7.023, 0.21, 15.119, 7.023, -0.6, 15.119, 6.981, 0.21, 15.078, 6.981, -0.6, 15.078, 6.95, 0.21, 14.984, 6.95, -0.6, 14.984, 6.95, 0.21, 14.775, 6.95, -0.6, 14.775, 6.95, 0.21, 12.812, 6.95, -0.6, 12.812, 6.95, 0.21, 9.138, 6.95, -0.6, 9.138, 6.95, 0.21, 3.75, 6.95, -0.6, 3.75, 6.95, 0.21, -3.35, 6.95, -0.6, -3.35, 6.95, 0.21, -8.738, 6.95, -0.6, -8.738, 6.95, 0.21, -12.412, 6.95, -0.6, -12.412)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ftfgs"]
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
@@ -158,23 +163,14 @@ shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
 shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
 
-[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_West"]
-points = PackedVector3Array(-13.450, 0.210, -10.375, -13.450, -0.600, -10.375, -13.450, 0.210, -10.604, -13.450, -0.600, -10.604, -13.418, 0.210, -10.799, -13.418, -0.600, -10.799, -13.354, 0.210, -10.981, -13.354, -0.600, -10.981, -13.258, 0.210, -11.153, -13.258, -0.600, -11.153, -13.114, 0.210, -11.332, -13.114, -0.600, -11.332, -12.875, 0.210, -11.631, -12.875, -0.600, -11.631, -12.553, 0.210, -12.033, -12.553, -0.600, -12.033, -12.149, 0.210, -12.539, -12.149, -0.600, -12.539, -11.661, 0.210, -13.149, -11.661, -0.600, -13.149, -11.257, 0.210, -13.655, -11.257, -0.600, -13.655, -10.935, 0.210, -14.057, -10.935, -0.600, -14.057, -10.696, 0.210, -14.356, -10.696, -0.600, -14.356, -10.555, 0.210, -14.530, -10.555, -0.600, -14.530, -10.420, 0.210, -14.642, -10.420, -0.600, -14.642, -10.271, 0.210, -14.713, -10.271, -0.600, -14.713, -10.098, 0.210, -14.750, -10.098, -0.600, -14.750, -9.875, 0.210, -14.750, -9.875, -0.600, -14.750, -9.562, 0.210, -14.750, -9.562, -0.600, -14.750, -9.188, 0.210, -14.750, -9.188, -0.600, -14.750, -8.750, 0.210, -14.750, -8.750, -0.600, -14.750, -8.250, 0.210, -14.750, -8.250, -0.600, -14.750, -7.812, 0.210, -14.750, -7.812, -0.600, -14.750, -7.438, 0.210, -14.750, -7.438, -0.600, -14.750, -7.125, 0.210, -14.750, -7.125, -0.600, -14.750, -6.915, 0.210, -14.750, -6.915, -0.600, -14.750, -6.823, 0.210, -14.719, -6.823, -0.600, -14.719, -6.781, 0.210, -14.677, -6.781, -0.600, -14.677, -6.750, 0.210, -14.585, -6.750, -0.600, -14.585, -6.750, 0.210, -14.375, -6.750, -0.600, -14.375, -6.750, 0.210, -12.412, -6.750, -0.600, -12.412, -6.750, 0.210, -8.738, -6.750, -0.600, -8.738, -6.750, 0.210, -3.350, -6.750, -0.600, -3.350, -6.750, 0.210, 3.750, -6.750, -0.600, 3.750, -6.750, 0.210, 9.138, -6.750, -0.600, 9.138, -6.750, 0.210, 12.812, -6.750, -0.600, 12.812, -6.750, 0.210, 14.775, -6.750, -0.600, 14.775, -6.750, 0.210, 14.985, -6.750, -0.600, 14.985, -6.781, 0.210, 15.078, -6.781, -0.600, 15.078, -6.822, 0.210, 15.119, -6.822, -0.600, 15.119, -6.915, 0.210, 15.150, -6.915, -0.600, 15.150, -7.125, 0.210, 15.150, -7.125, -0.600, 15.150, -7.438, 0.210, 15.150, -7.438, -0.600, 15.150, -7.812, 0.210, 15.150, -7.812, -0.600, 15.150, -8.250, 0.210, 15.150, -8.250, -0.600, 15.150, -8.750, 0.210, 15.150, -8.750, -0.600, 15.150, -9.188, 0.210, 15.150, -9.188, -0.600, 15.150, -9.562, 0.210, 15.150, -9.562, -0.600, 15.150, -9.875, 0.210, 15.150, -9.875, -0.600, 15.150, -10.101, 0.210, 15.150, -10.101, -0.600, 15.150, -10.280, 0.210, 15.115, -10.280, -0.600, 15.115, -10.442, 0.210, 15.044, -10.442, -0.600, 15.044, -10.592, 0.210, 14.938, -10.592, -0.600, 14.938, -10.746, 0.210, 14.774, -10.746, -0.600, 14.774, -10.989, 0.210, 14.516, -10.989, -0.600, 14.516, -11.303, 0.210, 14.182, -11.303, -0.600, 14.182, -11.689, 0.210, 13.772, -11.689, -0.600, 13.772, -12.147, 0.210, 13.286, -12.147, -0.600, 13.286, -12.533, 0.210, 12.876, -12.533, -0.600, 12.876, -12.847, 0.210, 12.542, -12.847, -0.600, 12.542, -13.090, 0.210, 12.284, -13.090, -0.600, 12.284, -13.245, 0.210, 12.118, -13.245, -0.600, 12.118, -13.349, 0.210, 11.959, -13.349, -0.600, 11.959, -13.416, 0.210, 11.789, -13.416, -0.600, 11.789, -13.450, 0.210, 11.602, -13.450, -0.600, 11.602, -13.450, 0.210, 11.375, -13.450, -0.600, 11.375, -13.450, 0.210, 9.875, -13.450, -0.600, 9.875, -13.450, 0.210, 7.125, -13.450, -0.600, 7.125, -13.450, 0.210, 3.125, -13.450, -0.600, 3.125, -13.450, 0.210, -2.125, -13.450, -0.600, -2.125, -13.450, 0.210, -6.125, -13.450, -0.600, -6.125, -13.450, 0.210, -8.875, -13.450, -0.600, -8.875)
-
-[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_Middle"]
-points = PackedVector3Array(-2.650, 0.210, -11.375, -2.650, -0.600, -11.375, -2.650, 0.210, -11.584, -2.650, -0.600, -11.584, -2.619, 0.210, -11.677, -2.619, -0.600, -11.677, -2.577, 0.210, -11.720, -2.577, -0.600, -11.720, -2.485, 0.210, -11.750, -2.485, -0.600, -11.750, -2.275, 0.210, -11.750, -2.275, -0.600, -11.750, -1.837, 0.210, -11.750, -1.837, -0.600, -11.750, -1.212, 0.210, -11.750, -1.212, -0.600, -11.750, -0.400, 0.210, -11.750, -0.400, -0.600, -11.750, 0.600, 0.210, -11.750, 0.600, -0.600, -11.750, 1.413, 0.210, -11.750, 1.413, -0.600, -11.750, 2.038, 0.210, -11.750, 2.038, -0.600, -11.750, 2.475, 0.210, -11.750, 2.475, -0.600, -11.750, 2.685, 0.210, -11.750, 2.685, -0.600, -11.750, 2.778, 0.210, -11.719, 2.778, -0.600, -11.719, 2.819, 0.210, -11.678, 2.819, -0.600, -11.678, 2.850, 0.210, -11.585, 2.850, -0.600, -11.585, 2.850, 0.210, -11.375, 2.850, -0.600, -11.375, 2.850, 0.210, -9.812, 2.850, -0.600, -9.812, 2.850, 0.210, -6.938, 2.850, -0.600, -6.938, 2.850, 0.210, -2.750, 2.850, -0.600, -2.750, 2.850, 0.210, 2.750, 2.850, -0.600, 2.750, 2.850, 0.210, 6.938, 2.850, -0.600, 6.938, 2.850, 0.210, 9.812, 2.850, -0.600, 9.812, 2.850, 0.210, 11.375, 2.850, -0.600, 11.375, 2.850, 0.210, 11.585, 2.850, -0.600, 11.585, 2.819, 0.210, 11.678, 2.819, -0.600, 11.678, 2.778, 0.210, 11.719, 2.778, -0.600, 11.719, 2.685, 0.210, 11.750, 2.685, -0.600, 11.750, 2.475, 0.210, 11.750, 2.475, -0.600, 11.750, 2.038, 0.210, 11.750, 2.038, -0.600, 11.750, 1.413, 0.210, 11.750, 1.413, -0.600, 11.750, 0.600, 0.210, 11.750, 0.600, -0.600, 11.750, -0.400, 0.210, 11.750, -0.400, -0.600, 11.750, -1.212, 0.210, 11.750, -1.212, -0.600, 11.750, -1.837, 0.210, 11.750, -1.837, -0.600, 11.750, -2.275, 0.210, 11.750, -2.275, -0.600, 11.750, -2.485, 0.210, 11.750, -2.485, -0.600, 11.750, -2.577, 0.210, 11.720, -2.577, -0.600, 11.720, -2.619, 0.210, 11.677, -2.619, -0.600, 11.677, -2.650, 0.210, 11.584, -2.650, -0.600, 11.584, -2.650, 0.210, 11.375, -2.650, -0.600, 11.375, -2.650, 0.210, 9.812, -2.650, -0.600, 9.812, -2.650, 0.210, 6.938, -2.650, -0.600, 6.938, -2.650, 0.210, 2.750, -2.650, -0.600, 2.750, -2.650, 0.210, -2.750, -2.650, -0.600, -2.750, -2.650, 0.210, -6.938, -2.650, -0.600, -6.938, -2.650, 0.210, -9.812, -2.650, -0.600, -9.812)
-
-[sub_resource type="ConvexPolygonShape3D" id="SplitIsland_East"]
-points = PackedVector3Array(6.950, 0.210, -14.375, 6.950, -0.600, -14.375, 6.950, 0.210, -14.584, 6.950, -0.600, -14.584, 6.981, 0.210, -14.677, 6.981, -0.600, -14.677, 7.023, 0.210, -14.720, 7.023, -0.600, -14.720, 7.115, 0.210, -14.750, 7.115, -0.600, -14.750, 7.325, 0.210, -14.750, 7.325, -0.600, -14.750, 7.625, 0.210, -14.750, 7.625, -0.600, -14.750, 7.975, 0.210, -14.750, 7.975, -0.600, -14.750, 8.375, 0.210, -14.750, 8.375, -0.600, -14.750, 8.825, 0.210, -14.750, 8.825, -0.600, -14.750, 9.225, 0.210, -14.750, 9.225, -0.600, -14.750, 9.575, 0.210, -14.750, 9.575, -0.600, -14.750, 9.875, 0.210, -14.750, 9.875, -0.600, -14.750, 10.098, 0.210, -14.750, 10.098, -0.600, -14.750, 10.271, 0.210, -14.713, 10.271, -0.600, -14.713, 10.420, 0.210, -14.642, 10.420, -0.600, -14.642, 10.555, 0.210, -14.530, 10.555, -0.600, -14.530, 10.696, 0.210, -14.356, 10.696, -0.600, -14.356, 10.935, 0.210, -14.057, 10.935, -0.600, -14.057, 11.257, 0.210, -13.655, 11.257, -0.600, -13.655, 11.661, 0.210, -13.149, 11.661, -0.600, -13.149, 12.149, 0.210, -12.539, 12.149, -0.600, -12.539, 12.553, 0.210, -12.033, 12.553, -0.600, -12.033, 12.875, 0.210, -11.631, 12.875, -0.600, -11.631, 13.114, 0.210, -11.332, 13.114, -0.600, -11.332, 13.258, 0.210, -11.153, 13.258, -0.600, -11.153, 13.354, 0.210, -10.981, 13.354, -0.600, -10.981, 13.418, 0.210, -10.799, 13.418, -0.600, -10.799, 13.450, 0.210, -10.604, 13.450, -0.600, -10.604, 13.450, 0.210, -10.375, 13.450, -0.600, -10.375, 13.450, 0.210, -8.875, 13.450, -0.600, -8.875, 13.450, 0.210, -6.125, 13.450, -0.600, -6.125, 13.450, 0.210, -2.125, 13.450, -0.600, -2.125, 13.450, 0.210, 3.125, 13.450, -0.600, 3.125, 13.450, 0.210, 7.125, 13.450, -0.600, 7.125, 13.450, 0.210, 9.875, 13.450, -0.600, 9.875, 13.450, 0.210, 11.375, 13.450, -0.600, 11.375, 13.450, 0.210, 11.602, 13.450, -0.600, 11.602, 13.416, 0.210, 11.789, 13.416, -0.600, 11.789, 13.349, 0.210, 11.959, 13.349, -0.600, 11.959, 13.245, 0.210, 12.118, 13.245, -0.600, 12.118, 13.090, 0.210, 12.284, 13.090, -0.600, 12.284, 12.847, 0.210, 12.542, 12.847, -0.600, 12.542, 12.533, 0.210, 12.876, 12.533, -0.600, 12.876, 12.147, 0.210, 13.286, 12.147, -0.600, 13.286, 11.689, 0.210, 13.772, 11.689, -0.600, 13.772, 11.303, 0.210, 14.182, 11.303, -0.600, 14.182, 10.989, 0.210, 14.516, 10.989, -0.600, 14.516, 10.746, 0.210, 14.774, 10.746, -0.600, 14.774, 10.592, 0.210, 14.938, 10.592, -0.600, 14.938, 10.442, 0.210, 15.044, 10.442, -0.600, 15.044, 10.280, 0.210, 15.115, 10.280, -0.600, 15.115, 10.101, 0.210, 15.150, 10.101, -0.600, 15.150, 9.875, 0.210, 15.150, 9.875, -0.600, 15.150, 9.575, 0.210, 15.150, 9.575, -0.600, 15.150, 9.225, 0.210, 15.150, 9.225, -0.600, 15.150, 8.825, 0.210, 15.150, 8.825, -0.600, 15.150, 8.375, 0.210, 15.150, 8.375, -0.600, 15.150, 7.975, 0.210, 15.150, 7.975, -0.600, 15.150, 7.625, 0.210, 15.150, 7.625, -0.600, 15.150, 7.325, 0.210, 15.150, 7.325, -0.600, 15.150, 7.115, 0.210, 15.150, 7.115, -0.600, 15.150, 7.023, 0.210, 15.119, 7.023, -0.600, 15.119, 6.981, 0.210, 15.078, 6.981, -0.600, 15.078, 6.950, 0.210, 14.984, 6.950, -0.600, 14.984, 6.950, 0.210, 14.775, 6.950, -0.600, 14.775, 6.950, 0.210, 12.812, 6.950, -0.600, 12.812, 6.950, 0.210, 9.138, 6.950, -0.600, 9.138, 6.950, 0.210, 3.750, 6.950, -0.600, 3.750, 6.950, 0.210, -3.350, 6.950, -0.600, -3.350, 6.950, 0.210, -8.738, 6.950, -0.600, -8.738, 6.950, 0.210, -12.412, 6.950, -0.600, -12.412)
-
 [node name="room_06" unique_id=868713606 instance=ExtResource("1_base")]
+editor_description = "Anchor Strait, the last test before the boss: two Tide Grapple gaps (posts on both sides), a middle islet swept by a tide from the north, an Elite Hermit Crab and two skeletons. Every skill of the valley at once."
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_05.tscn"
-editor_description = "Anchor Strait, the last test before the boss: two Tide Grapple gaps (posts on both sides), a middle islet swept by a tide from the north, an Elite Hermit Crab and two skeletons. Every skill of the valley at once."
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_mebl1")
+environment = SubResource("Environment_7fokh")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
@@ -186,30 +182,50 @@ directional_shadow_mode = 0
 directional_shadow_max_distance = 45.0
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
-mesh = SubResource("QuadMesh_d5863")
+mesh = SubResource("QuadMesh_bx1al")
+
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_1e0qy")
+shape = SubResource("BoxShape3D_uhxcq")
+disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_8c67k")
+shape = SubResource("BoxShape3D_rl2ss")
+disabled = true
 
-[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" parent_id_path=PackedInt32Array(872527392, 219025603) index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_7o1t4")
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
 
-[node name="Sprite3D" parent="Exits/UpPath" parent_id_path=PackedInt32Array(505451922) index="0" unique_id=1887481611]
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_47anr")
+disabled = true
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="Sprite3D" parent="Exits/UpPath" index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.116, -0.55)
 shaded = true
 texture = ExtResource("pier_up")
 
 [node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_7fokh")
+shape = SubResource("BoxShape3D_tiafh")
+disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_f5d45")
+shape = SubResource("BoxShape3D_xy68u")
+disabled = true
 
-[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" parent_id_path=PackedInt32Array(505451922, 219025603) index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_bx1al")
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_akwt1")
+disabled = true
 
 [node name="Sprite3D" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1, 0.116, 0)
@@ -217,13 +233,16 @@ shaded = true
 texture = ExtResource("pier_right")
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_uhxcq")
+shape = SubResource("BoxShape3D_kp7t3")
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_rl2ss")
+shape = SubResource("BoxShape3D_7j0j5")
 
-[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" parent_id_path=PackedInt32Array(1048204863, 219025603) index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_47anr")
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_spowk")
 
 [node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
@@ -231,18 +250,36 @@ shaded = true
 texture = ExtResource("pier_left")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_tiafh")
+shape = SubResource("BoxShape3D_11jva")
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_xy68u")
+shape = SubResource("BoxShape3D_gdxge")
 
-[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" parent_id_path=PackedInt32Array(192273160, 219025603) index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_akwt1")
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_05.tscn"
+
+[node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
+shape = SubResource("BoxShape3D_v0nm0")
 
 [node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.753676)
 material_override = SubResource("ShaderMaterial_sand")
 texture = ExtResource("sand_texture")
+
+[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
+disabled = true
+
+[node name="SplitIsland_West" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="1" unique_id=1479589925]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0.0764184)
+shape = SubResource("SplitIsland_West")
+
+[node name="SplitIsland_Middle" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="2" unique_id=644094672]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0.0764184)
+shape = SubResource("SplitIsland_Middle")
+
+[node name="SplitIsland_East" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="3" unique_id=1540880856]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0.0764184)
+shape = SubResource("SplitIsland_East")
 
 [node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1325313778 instance=ExtResource("sea_glints")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
@@ -250,7 +287,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
 [node name="RoomAtmosphere" parent="." index="5" unique_id=1938534569 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1938534569, 1300233738) index="0" unique_id=1611482802]
-material = SubResource("ShaderMaterial_kp7t3")
+material = SubResource("ShaderMaterial_ftfgs")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1938534569, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
@@ -292,51 +329,29 @@ ground_shadow = true
 transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 12.6, 0, 9.2)
 ground_shadow = true
 
-[node name="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D" parent_id_path=PackedInt32Array(858705461, 822018133) index="0" unique_id=87426523]
-disabled = true
+[node name="PostWest" parent="Scenery" index="7" unique_id=524854400 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.9, 0, -7.812474)
 
-[node name="SplitIsland_West" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -0, 0, 0.0764184)
-shape = SubResource("SplitIsland_West")
+[node name="PostMiddleWest" parent="Scenery" index="8" unique_id=1503092456 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19426346, 0, -0.34250736)
 
-[node name="SplitIsland_Middle" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -0, 0, 0.0764184)
-shape = SubResource("SplitIsland_Middle")
+[node name="PostEast" parent="Scenery" index="9" unique_id=1939100444 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.981787, 0, 6.8413963)
 
-[node name="SplitIsland_East" type="CollisionShape3D" parent="Environment/BaseGround/StaticBody3D"]
-transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, -0, 0, 0.0764184)
-shape = SubResource("SplitIsland_East")
-
-[node name="PostWest" parent="Scenery" instance=ExtResource("grapple_post")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.9, 0, -3)
-
-[node name="PostMiddleWest" parent="Scenery" instance=ExtResource("grapple_post")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -3)
-
-[node name="PostMiddleEast" parent="Scenery" instance=ExtResource("grapple_post")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, 4)
-
-[node name="PostEast" parent="Scenery" instance=ExtResource("grapple_post")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.1, 0, 4)
-
-[node name="FlatTide" parent="." node_paths=PackedStringArray("player", "zones") instance=ExtResource("flat_tide")]
+[node name="FlatTide" parent="." index="7" unique_id=1031338606 node_paths=PackedStringArray("player") instance=ExtResource("flat_tide")]
 editor_description = "Sweeps the middle islet from the north; walls keep Foxy on it, the wave knocks him south."
 player = NodePath("../Foxy")
-zones = [NodePath("RightShallows")]
 low_duration = 6
 rise_duration = 3
 high_duration = 4
 fall_duration = 3
-warning_seconds = 3
 flooded_move_multiplier = 0.6
 
 [node name="RightShallows" parent="FlatTide" index="0" unique_id=928133442]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.21, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.016002752, 0.21, -3)
 flow_direction = 3
 size = Vector2(7, 20)
 volume_depth = 2.0
-surface_segments_x = 30
-surface_segments_z = 30
 
 [node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
 player = NodePath("../../Foxy")
@@ -345,23 +360,45 @@ player = NodePath("../../Foxy")
 spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
 enemies_per_tide = 0
 
-[node name="EliteHermitCrab" parent="." instance=ExtResource("enemy_elite_hermit_crab")]
-editor_description = "Holds the middle islet."
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.21, 7.5)
+[node name="SkeletonMiddle" parent="." index="8" unique_id=1299742791 instance=ExtResource("enemy_coral_skeleton")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.27737, 0.21, 7.128296)
+can_sleep = true
+roam_when_guarding = false
+guard_roam_radius = 3.5
+guard_roam_segment_time = 1.2
+guard_roam_pause_time = 1.0
+randomize_shot_mode = true
+aim_height_offset = 0.85
+max_aim_pitch_deg = 42.0
 
-[node name="SkeletonMiddle" parent="." instance=ExtResource("enemy_coral_skeleton")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.21, -8.5)
-
-[node name="SkeletonEast" parent="." instance=ExtResource("enemy_coral_skeleton")]
+[node name="SkeletonEast" parent="." index="9" unique_id=590216694 instance=ExtResource("enemy_coral_skeleton")]
 editor_description = "Fires across the second gap."
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.21, -6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.149065, 0.21, -4.265928)
+can_sleep = true
+roam_when_guarding = false
+guard_roam_radius = 3.5
+guard_roam_segment_time = 1.2
+guard_roam_pause_time = 1.0
+randomize_shot_mode = true
+aim_height_offset = 0.85
+max_aim_pitch_deg = 42.0
 
-[node name="RandomSeaweed" type="Node3D" parent="."]
+[node name="RandomSeaweed" type="Node3D" parent="." index="10" unique_id=958887794]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-13.14, 0, -8.66, -11.92, 0, -11.12, -10.14, 0, -13.2, -7.48, 0, -13.24, -7.01, 0, -10.68, -7.15, 0, -7.67, -8.29, 0, 0.09, -7.97, 0, 1.9, -7.48, 0, 4.52, -7.2, 0, 7.48, -7.04, 0, 10.48, -6.99, 0, 13.47, -9.64, 0, 13.6, -11.79, 0, 12, -13.16, 0, 9.66, -12.98, 0, 6.53, -12.93, 0, -5.35, -13.13, 0, -8.45, 7.13, 0, -12.63, 9.66, 0, -13.2, 11.65, 0, -11.52, 13.14, 0, -9.14, 13, 0, -6.16, 12.92, 0, 5.72, 13.13, 0, 8.81, 7.67, 0, 13.63, 7.2, 0, 11.08, 7.34, 0, 8.07, 8.5, 0, 0.4, 8.11, 0, -1.42, 7.63, 0, -4.09, 7.37, 0, -7.07, 7.21, 0, -10.07)
 fixed_spawn_count = 10
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
+
+[node name="HermitCrab" parent="." index="11" unique_id=1294052233 instance=ExtResource("23_7o1t4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09498072, 0.4841175, 8.714277)
+dash_impact_duration_seconds = 0.84
+dash_stun_duration_seconds = 1.6
+
+[node name="HermitCrab2" parent="." index="12" unique_id=1088398136 instance=ExtResource("23_7o1t4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3889904, 0.48733616, -6.4284153)
+dash_impact_duration_seconds = 0.84
+dash_stun_duration_seconds = 1.6
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]
@@ -373,5 +410,4 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround"]
 [editable path="RoomAtmosphere"]
-
 [editable path="FlatTide"]

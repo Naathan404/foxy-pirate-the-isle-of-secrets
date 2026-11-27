@@ -180,7 +180,10 @@ Mở scene tương ứng, chọn node root, thay thông số và lưu scene trư
 
 `BowVolley → Charge Presentation → Charge Vfx Scene` trỏ tới scene tụ lực.
 `BowArrow → Hit Feedback → Impact Scene` và `Trail → Trail Scene` trỏ tới scene
-va chạm và vệt sáng. Các trường này có default PackedScene nên scene cung hiện có
+va chạm và vệt sáng. `BowArrow → Trail → Fire Trail Scene` (mặc định
+`Blue_Fire_Trail.tscn`) là vệt lửa xanh sau mũi tên, chạy qua `ProjectileFireTrail`
+(`gameplay/weapons/projectile_fire_trail.gd`, dùng chung với dao ném); đầu vệt neo ở
+`fire_trail_anchor_pixel` trên `Arrow.png`. Các trường này có default PackedScene nên scene cung hiện có
 không cần gán lại. Charge và impact dùng chung thuật toán mesh, không dùng chung
 scene để chỉnh màu/vòng của một loại không ảnh hưởng loại kia.
 

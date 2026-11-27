@@ -8,6 +8,9 @@ const DUST_TEXTURE: Texture2D = preload("res://assets/sprites/effects/Dust Parti
 const ELITE_SPRITE_GLOW_SHADER: Shader = preload(
 	"res://gameplay/enemies/elite_sprite_glow.gdshader"
 )
+## Default wind-up ring: warm orange, glowing a deeper orange.
+const TELEGRAPH_RING_COLOR := Color(1.0, 0.72, 0.24, 0.72)
+const TELEGRAPH_RING_EMISSION := Color(1.0, 0.48, 0.08)
 
 @export_group("Elite Identity")
 @export_range(0.0, 1.0, 0.01) var elite_glow_strength: float = 0.9
@@ -53,7 +56,13 @@ func _process(delta: float) -> void:
 	_update_movement_smoke()
 
 
-func begin_telegraph() -> void:
+## `ring_color` marks a different attack, for example an elite's stronger special.
+func begin_telegraph(ring_color: Color = TELEGRAPH_RING_COLOR) -> void:
+	if _telegraph_ring_material != null:
+		_telegraph_ring_material.albedo_color = ring_color
+		_telegraph_ring_material.emission = (
+			TELEGRAPH_RING_EMISSION if ring_color == TELEGRAPH_RING_COLOR else ring_color
+		)
 	if is_instance_valid(_source_sprite):
 		_telegraph_base_modulate = _source_sprite.modulate
 		_telegraph_base_scale = _source_sprite.scale
@@ -106,9 +115,9 @@ func _create_telegraph_ring() -> void:
 	_telegraph_ring_material = StandardMaterial3D.new()
 	_telegraph_ring_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_telegraph_ring_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_telegraph_ring_material.albedo_color = Color(1.0, 0.72, 0.24, 0.72)
+	_telegraph_ring_material.albedo_color = TELEGRAPH_RING_COLOR
 	_telegraph_ring_material.emission_enabled = true
-	_telegraph_ring_material.emission = Color(1.0, 0.48, 0.08)
+	_telegraph_ring_material.emission = TELEGRAPH_RING_EMISSION
 	_telegraph_ring_material.emission_energy_multiplier = 1.6
 	mesh.material = _telegraph_ring_material
 	_telegraph_ring = MeshInstance3D.new()

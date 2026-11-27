@@ -1,9 +1,11 @@
 extends SceneTree
 ## Room persistence, campfire resets and respawning, on real rooms and the real Foxy:
 ## - rooms keep killed enemies, broken props and opened chests between visits;
-## - a rest or a death (including the void) starts a new cycle that brings enemies and props
-##   back and reshuffles random layouts, while opened chests stay open and are saved;
+## - a rest or a death starts a new cycle that brings enemies and props back and reshuffles
+##   random layouts, while opened chests stay open and are saved;
 ## - death respawns beside the campfire of the latest rest, the hub before any rest;
+## - a fall into the void puts Foxy back at a door of the same room for a little HP, and only
+##   counts as a death when that HP cost would kill her;
 ## - loot left on the ground is gone after leaving; PropSlot picks are stable per cycle.
 ## Writes only under user://test_saves/ and fails if the player's real saves change.
 
@@ -39,7 +41,8 @@ func _run() -> void:
 	await _check_rooms_keep_state()
 	await _check_rest_resets_rooms()
 	await _check_death_resets_rooms()
-	await _check_void_counts_as_death()
+	await _check_void_fall_returns_to_door()
+	await _check_lethal_void_fall_is_death()
 	await _check_chests_stay_open()
 	await _check_raid_chest_stays_open()
 	_check_old_save_migrates()
@@ -154,17 +157,55 @@ func _check_death_resets_rooms() -> void:
 	)
 
 
-func _check_void_counts_as_death() -> void:
+func _check_void_fall_returns_to_door() -> void:
 	await _go(RANDOM_ROOM)
 	var room := current_scene as BaseRoom
 	var player: Player = sandbox.manager.player
-	var below := room.to_global(Vector3(0, room.void_height - VOID_DROP_METERS, 0))
-	player.global_position = below
-	await sandbox.frames(3)
-	_check(player.dead, "void: falling kills Foxy")
+	var cycle_before: int = sandbox.manager.room_states.cycle
+	var hp_before := player.hp.get_current_hp()
+	var fall_from := player.global_position
+	await _drop_into_void(room)
+	_check(player.falling_into_void, "void: the fall sequence starts")
+	var sequence := room.get_node_or_null("VoidFallSequence") as VoidFallSequence
+	_check(sequence != null, "void: the screen closes on Foxy")
+	if sequence != null:
+		await sequence.finished
+	_check(current_scene == room, "void: still in the same room")
+	_check(not player.dead and not player.falling_into_void, "void: Foxy is back in control")
+	_check(
+		is_equal_approx(player.hp.get_current_hp(), hp_before - room.void_fall_damage),
+		"void: the fall costs void_fall_damage HP"
+	)
+	var ground_mask := player.collision_mask & ~CombatLayers.PLAYER_BOUNDARY
+	var expected := room.get_void_respawn_position(fall_from, ground_mask)
+	_check(player.global_position.distance_to(expected) < SPAWN_TOLERANCE, "void: back at a door")
+	_check(sandbox.manager.room_states.cycle == cycle_before, "void: no new cycle")
+	await sandbox.frames(30)
+	_check(
+		player.is_on_floor() and not player.falling_into_void, "void: stands on ground at the door"
+	)
+
+
+func _check_lethal_void_fall_is_death() -> void:
+	await _go(RANDOM_ROOM)
+	var room := current_scene as BaseRoom
+	var player: Player = sandbox.manager.player
+	player.hp.set_current_hp(room.void_fall_damage)
+	await _drop_into_void(room)
+	var sequence := room.get_node_or_null("VoidFallSequence") as VoidFallSequence
+	while is_instance_valid(player) and not player.dead and is_instance_valid(sequence):
+		await process_frame
+	_check(is_instance_valid(player) and player.dead, "lethal void: Foxy dies")
 	await _wait_respawn()
-	_check(current_scene.scene_file_path == HUB, "void: respawn at the latest rest")
-	_check_at_rest_point("void")
+	_check(current_scene.scene_file_path == HUB, "lethal void: respawn at the latest rest")
+	_check_at_rest_point("lethal void")
+
+
+func _drop_into_void(room: BaseRoom) -> void:
+	var player: Player = sandbox.manager.player
+	player.global_position = room.to_global(Vector3(0, room.void_height - VOID_DROP_METERS, 0))
+	player.reset_physics_interpolation()
+	await sandbox.frames(3)
 
 
 func _check_chests_stay_open() -> void:

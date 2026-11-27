@@ -102,7 +102,7 @@ Xem thêm [vai trò của fixture](../../test/README.md).
 | [charm_event_passive_test.gd](../../gameplay/charms/passive/charm_event_passive_test.gd) | Passive Charm theo sự kiện và điều kiện |
 | [charm_progression_test.gd](../../gameplay/charms/progression/charm_progression_test.gd) | Safe location, socket economy, acquisition và snapshot |
 | [save_load_flow_test.gd](../../test/save_load_flow_test.gd) | Save/Load đầu-cuối qua menu chính, lửa trại và Continue |
-| [room_state_test.gd](../../test/room_state_test.gd) | Phòng giữ trạng thái, nghỉ/chết/void reset, hồi sinh ở lửa trại, PropSlot |
+| [room_state_test.gd](../../test/room_state_test.gd) | Phòng giữ trạng thái, nghỉ/chết reset, rơi void về cửa (và rơi đến chết), hồi sinh ở lửa trại, PropSlot |
 | [save_load_edge_test.gd](../../test/save_load_edge_test.gd) | Save hỏng, version, thiếu scene/lửa trại, lỗi ghi, từng nhóm dữ liệu, spawn ở mọi lửa trại |
 
 `test/chaos_test.gd` không có trong repository hiện tại. Các test ở trên không

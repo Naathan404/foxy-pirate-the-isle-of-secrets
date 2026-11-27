@@ -147,16 +147,18 @@ func _create_sparks() -> void:
 func _create_dust() -> void:
 	# Lấy cấu hình hạt bụi mà không tạo thêm controller chạy.
 	var source := DUST_SCENE.instantiate()
-	_dust = source.get_node("Particle").duplicate() as GPUParticles3D
+	_dust = source.get_node("Puff").duplicate() as GPUParticles3D
 	source.free()
 	_dust.process_material = _dust.process_material.duplicate()
 	_dust.one_shot = true
 	_dust.explosiveness = 1.0
-	_dust.amount = 12
+	_dust.amount = 7
 	_dust.amount_ratio = 1.0
-	_dust.lifetime = 0.3
+	_dust.lifetime = 0.4
 	_dust.local_coords = false
 	_dust.emitting = false
+	# Jumps to Foxy's feet for each hit; interpolated, it would slide there spraying dust.
+	_dust.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(_dust)
 	_dust.top_level = true
 

@@ -15,6 +15,8 @@ signal poison_ticked(applied_hp: float)
 signal dizzy_started(duration_seconds: float)
 
 const DIALOGUE_STATE_PRIORITY: int = 20
+## Above Hit (50), so nothing pulls Foxy out of the fall while the screen closes.
+const VOID_FALL_STATE_PRIORITY: int = 60
 const DIZZY_OVERLAY_SCRIPT: Script = preload("res://gameplay/player/effects/dizzy_swirl_overlay.gd")
 const VENOM_INK_OVERLAY_NAME := &"BlubberbeardVenomOverlay"
 const POISON_STATUS_HOLD_SECONDS: float = 1.6
@@ -74,6 +76,8 @@ var snare_remaining: float = 0.0
 var pending_free_dash: bool = false
 var pending_free_dash_direction: Vector3 = Vector3.ZERO
 var blocked: bool = false
+## Set while Foxy drops into the void and the screen closes; see begin_void_fall.
+var falling_into_void: bool = false
 ## Applied by environmental surfaces to ordinary ground movement only.
 var environment_move_speed_multiplier: float = 1.0
 ## Hệ số quãng đường dash do địa hình cung cấp; được lấy khi bắt đầu dash.
@@ -575,6 +579,7 @@ func is_charm_casting() -> bool:
 func is_gameplay_input_blocked() -> bool:
 	return (
 		blocked
+		or falling_into_void
 		or potion_selection_active
 		or (is_instance_valid(inventory_ui) and inventory_ui.is_open())
 	)
@@ -713,6 +718,11 @@ func apply_charm_grapple_pull(
 	_charm_grapple_tween.tween_property(self, "global_position", destination, duration)
 	_charm_grapple_tween.tween_callback(_on_charm_grapple_finished)
 	return true
+
+
+## True while Tide Grapple is pulling Foxy, often through the air over a gap.
+func is_grapple_pulling() -> bool:
+	return _charm_grapple_tween != null and _charm_grapple_tween.is_valid()
 
 
 # Đổi bộ xử lý đòn đánh cùng animation tương ứng
@@ -860,6 +870,51 @@ func die() -> void:
 	cancel_attack()
 	set_horizontal_velocity(Vector3.ZERO)
 	fsm.change_state(fsm.states.get("death") as FsmState)
+
+
+## Foxy has gone over an edge into the void: controls, attacks and incoming hits stop while
+## she keeps falling under gravity. The room ends it with finish_void_fall or a death.
+func begin_void_fall() -> void:
+	if dead or falling_into_void:
+		return
+	falling_into_void = true
+	clear_gameplay_input()
+	cancel_attack()
+	pending_free_dash = false
+	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
+		_charm_grapple_tween.kill()
+	_charm_grapple_tween = null
+	if is_instance_valid(_casting_charm):
+		_casting_charm.cancel_active()
+	if is_instance_valid(hurtbox):
+		hurtbox.enabled = false
+	set_horizontal_velocity(Vector3.ZERO)
+	fsm.change_state(fsm.states.get("fall") as FsmState, VOID_FALL_STATE_PRIORITY)
+
+
+## Puts Foxy back on solid ground at `at` and costs `damage` HP, flinching on the spot (no
+## push back towards the edge) with the usual post-hit grace. Damage that would empty the
+## HP bar is a death instead, which the Death state turns into a campfire respawn.
+func finish_void_fall(at: Vector3, damage: float) -> void:
+	if not falling_into_void or dead:
+		return
+	if damage > 0.0 and hp.get_current_hp() <= damage:
+		hp.take_damage(damage)
+		return
+	falling_into_void = false
+	global_position = at
+	velocity = Vector3.ZERO
+	reset_physics_interpolation()
+	if is_instance_valid(hurtbox):
+		hurtbox.enabled = true
+	_post_hit_invulnerability_remaining = post_hit_invulnerability_duration
+	if damage <= 0.0:
+		return
+	pending_hit_direction = Vector3.ZERO
+	pending_hit_knockback_multiplier = 0.0
+	pending_hit_spiral_strength = 0.0
+	pending_hit_tangent_direction = Vector3.ZERO
+	hp.take_damage(damage)
 
 
 func cancel_attack() -> void:

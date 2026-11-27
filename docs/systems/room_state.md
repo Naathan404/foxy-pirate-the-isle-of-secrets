@@ -10,7 +10,8 @@ Không còn Checkpoint: lửa trại là cơ chế duy nhất.
 | --- | --- | --- | --- | --- |
 | Đổi phòng rồi quay lại | giữ nguyên (đã chết/vỡ thì vẫn mất) | giữ | giữ nguyên | mất |
 | Nghỉ ở lửa trại (safe room), màn hình tối rồi sáng lại | hồi lại hết | giữ | xáo lại | mất |
-| Chết, kể cả rơi xuống void | hồi lại hết | giữ | xáo lại | mất |
+| Chết (hết HP) | hồi lại hết | giữ | xáo lại | mất |
+| Rơi xuống void (còn HP) | giữ nguyên | giữ | giữ nguyên | giữ |
 | New Game | hồi lại hết | đóng lại | xáo lại | mất |
 | Continue | hồi lại hết | theo save | theo save | mất |
 
@@ -19,7 +20,14 @@ Không còn Checkpoint: lửa trại là cơ chế duy nhất.
 - **Chết = nghỉ:** Foxy hồi sinh cạnh lửa trại nghỉ gần nhất, đầy HP và SP, giữ toàn bộ túi
   đồ, vàng, vũ khí và Charm. Chưa có hình phạt khi chết. Chưa nghỉ lần nào thì hồi sinh ở
   lửa trại đầu tiên của `GameManager.fallback_rest_scene` (Hub, `castaway_cove`).
-- **Rơi xuống void** dưới `void_height` của phòng được tính là chết.
+- **Rơi xuống void** không phải là chết. Rơi void là khi Foxy đang rơi mà 4 m bên dưới không
+  có mặt đất nào; dash qua khoảng trống không tính vì dash giữ độ cao. Xuống dưới
+  `void_height` (−6 m) thì luôn tính là rơi void. Camera đứng yên, Foxy rơi khỏi khung hình, bóng tối khép dần vào
+  Foxy (`VoidFallSequence`, shader `void_fall_iris.gdshader`). Sau màn đen, Foxy đứng lại
+  trước cửa đã đi vào phòng này (`GameManager.arrival_trigger_id`). Nếu Foxy không đi vào
+  qua cửa (hồi sinh, Continue, New Game), Foxy đứng ở cửa gần chỗ rơi nhất. Foxy mất
+  `void_fall_damage` HP (mặc định 1), khựng tại chỗ không bị đẩy lùi và có thời gian bất tử
+  ngắn. Nếu số HP mất đó làm Foxy chết thì đây là cái chết thường: về lửa trại, chu kỳ mới.
 - Nghỉ ở lửa trại ngoài safe room không được phép, nên không reset gì.
 - Boss đã hạ và raid đã clear vẫn theo `BossEncounter` và cờ raid như trước. Rương thưởng
   raid giờ cũng giữ trạng thái đã mở.
@@ -98,7 +106,8 @@ dùng PropSlot; chúng sẽ được đưa vào khi chỉnh từng phòng bằng
   loot rơi chưa nhặt biến mất;
 - nghỉ: đặt điểm hồi sinh, không tự ghi save, quái hồi lại; bố cục ổn định trong chu kỳ và
   xáo lại qua các chu kỳ;
-- chết và rơi void: về lửa trại nghỉ gần nhất, chu kỳ mới;
+- chết: về lửa trại nghỉ gần nhất, chu kỳ mới;
+- rơi void: về cửa của chính phòng đó, mất HP, không reset; rơi đến chết thì như chết;
 - rương thường và rương raid giữ trạng thái đã mở qua đổi phòng, nghỉ, save/Continue;
   New Game đóng lại;
 - save version 1 vẫn đọc được;

@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://6gqnx2rlvdh8"]
 
-[ext_resource type="Script" path="res://world/gimmick/progression/tide_pearl_gate.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://clsl5qn25bih3" path="res://world/gimmick/progression/tide_pearl_gate.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://b642rmm6hcss4" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_4.png" id="2_pillar"]
-[ext_resource type="Texture2D" path="res://assets/sprites/items/Tide_Pearl.png" id="3_pearl"]
+[ext_resource type="Texture2D" uid="uid://cy02a66egqblt" path="res://assets/sprites/items/Tide_Pearl.png" id="3_pearl"]
 [ext_resource type="Resource" path="res://data/items/quest/tide_pearl.tres" id="4_pearl_item"]
-[ext_resource type="Script" path="res://gameplay/npcs/base/npc_interaction_area.gd" id="5_interaction"]
+[ext_resource type="Script" uid="uid://clierd32ld0n" path="res://gameplay/npcs/base/npc_interaction_area.gd" id="5_interaction"]
 [ext_resource type="Texture2D" uid="uid://cq6xymhhukdf5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_3.png" id="6_slab"]
 
 [sub_resource type="CylinderShape3D" id="PillarShape"]
@@ -12,17 +12,16 @@ height = 3.0
 radius = 0.8
 
 [sub_resource type="CylinderShape3D" id="InteractionShape"]
-height = 2.0
 radius = 3.2
 
-[node name="TidePearlGate" type="Node3D" node_paths=PackedStringArray("interaction", "socket_pearls")]
+[node name="TidePearlGate" type="Node3D" unique_id=401418758 node_paths=PackedStringArray("interaction", "socket_pearls")]
 script = ExtResource("1_script")
-open_flag = &"coral_valley_pearl_gate_open"
 pearl_item = ExtResource("4_pearl_item")
 interaction = NodePath("InteractionArea")
 socket_pearls = [NodePath("Sockets/Left/Pearl"), NodePath("Sockets/Middle/Pearl"), NodePath("Sockets/Right/Pearl")]
+open_flag = &"coral_valley_pearl_gate_open"
 
-[node name="Slab" type="Sprite3D" parent="."]
+[node name="Slab" type="Sprite3D" parent="." unique_id=951827173]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
 offset = Vector2(0, 627)
 pixel_size = 0.0019
@@ -32,7 +31,7 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("6_slab")
 
-[node name="Pillar" type="Sprite3D" parent="."]
+[node name="Pillar" type="Sprite3D" parent="." unique_id=1216019381]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4)
 offset = Vector2(0, 768)
 pixel_size = 0.0024
@@ -42,59 +41,59 @@ alpha_cut = 1
 texture_filter = 0
 texture = ExtResource("2_pillar")
 
-[node name="Body" type="StaticBody3D" parent="."]
+[node name="Body" type="StaticBody3D" parent="." unique_id=173784747]
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body" unique_id=959844840]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.2)
 shape = SubResource("PillarShape")
 
-[node name="Sockets" type="Node3D" parent="."]
+[node name="Sockets" type="Node3D" parent="." unique_id=432583332]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 
-[node name="Left" type="Node3D" parent="Sockets"]
+[node name="Left" type="Node3D" parent="Sockets" unique_id=101751568]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.5, 0)
 
-[node name="Pearl" type="Sprite3D" parent="Sockets/Left"]
+[node name="Pearl" type="Sprite3D" parent="Sockets/Left" unique_id=881639448]
 pixel_size = 0.0005
 billboard = 1
 alpha_cut = 2
 texture = ExtResource("3_pearl")
 
-[node name="Light" type="OmniLight3D" parent="Sockets/Left/Pearl"]
+[node name="Light" type="OmniLight3D" parent="Sockets/Left/Pearl" unique_id=188645868]
 light_color = Color(0.55, 1, 0.92, 1)
 light_energy = 1.2
 omni_range = 3.5
 
-[node name="Middle" type="Node3D" parent="Sockets"]
+[node name="Middle" type="Node3D" parent="Sockets" unique_id=133252172]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
 
-[node name="Pearl" type="Sprite3D" parent="Sockets/Middle"]
+[node name="Pearl" type="Sprite3D" parent="Sockets/Middle" unique_id=917148255]
 pixel_size = 0.0005
 billboard = 1
 alpha_cut = 2
 texture = ExtResource("3_pearl")
 
-[node name="Light" type="OmniLight3D" parent="Sockets/Middle/Pearl"]
+[node name="Light" type="OmniLight3D" parent="Sockets/Middle/Pearl" unique_id=1462239392]
 light_color = Color(0.55, 1, 0.92, 1)
 light_energy = 1.2
 omni_range = 3.5
 
-[node name="Right" type="Node3D" parent="Sockets"]
+[node name="Right" type="Node3D" parent="Sockets" unique_id=1380169486]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.5, 0)
 
-[node name="Pearl" type="Sprite3D" parent="Sockets/Right"]
+[node name="Pearl" type="Sprite3D" parent="Sockets/Right" unique_id=287673825]
 pixel_size = 0.0005
 billboard = 1
 alpha_cut = 2
 texture = ExtResource("3_pearl")
 
-[node name="Light" type="OmniLight3D" parent="Sockets/Right/Pearl"]
+[node name="Light" type="OmniLight3D" parent="Sockets/Right/Pearl" unique_id=1999357741]
 light_color = Color(0.55, 1, 0.92, 1)
 light_energy = 1.2
 omni_range = 3.5
 
-[node name="InteractionArea" type="Area3D" parent="."]
+[node name="InteractionArea" type="Area3D" parent="." unique_id=1133292691]
 collision_layer = 0
 collision_mask = 2
 monitorable = false
@@ -102,6 +101,6 @@ script = ExtResource("5_interaction")
 prompt_height = 4.4
 prompt_text = "Tide Pearls"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea" unique_id=1572197069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.6)
 shape = SubResource("InteractionShape")

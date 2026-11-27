@@ -48,6 +48,9 @@ var _cut_strengths: Array[float] = []
 
 
 func _ready() -> void:
+	# Every piece here is placed by hand in _process. Physics interpolation would slide a
+	# pooled echo or burst from where it was last used to its new spot.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	var ribbon := MeshInstance3D.new()
 	ribbon.name = "EnergyRibbon"
 	ribbon.mesh = _ribbon_mesh
@@ -97,7 +100,7 @@ func start(source: AnimatedSprite3D) -> void:
 	top_level = true
 	global_transform = Transform3D.IDENTITY
 	_flying = true
-	_last_position = source.global_position
+	_last_position = _blade_transform().origin
 	_aura.show()
 	_glint.show()
 	burst(_last_position, 1.7)
@@ -132,7 +135,7 @@ func finish(caught: bool = false) -> void:
 	if not _flying:
 		return
 	if is_instance_valid(_source):
-		_last_position = _source.global_position
+		_last_position = _blade_transform().origin
 	if caught:
 		burst(_last_position, 1.8)
 	_flying = false
@@ -187,7 +190,7 @@ func _process(delta: float) -> void:
 
 
 func _update_blade(delta: float) -> void:
-	_last_position = _source.global_position
+	_last_position = _blade_transform().origin
 	_sample_clock -= delta
 	if _sample_clock <= 0.0:
 		_points.append(_last_position)
@@ -251,9 +254,15 @@ func _stamp_echo() -> void:
 	ghost.offset = _source.offset
 	ghost.flip_h = _source.flip_h
 	ghost.flip_v = _source.flip_v
-	ghost.global_transform = _source.global_transform
+	ghost.global_transform = _blade_transform()
 	ghost.modulate = Color(_color(), 0.32)
 	ghost.show()
+
+
+## Where the blade is drawn this frame. The dagger moves on physics ticks and is shown
+## interpolated between them; its plain transform runs up to a tick ahead of the art.
+func _blade_transform() -> Transform3D:
+	return _source.get_global_transform_interpolated()
 
 
 func _update_echoes(delta: float) -> void:
