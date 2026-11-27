@@ -4,6 +4,8 @@ extends WeaponAttack
 const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
 const IMPACT_SOUND: AudioStream = preload("res://assets/audio/combat/bow_impact.wav")
 const CURVE_SAMPLES: int = 32
+## Extra time after the longest ribbon has faded before the fire trail node is freed.
+const FIRE_TRAIL_FREE_MARGIN_SECONDS := 0.1
 const STORM_BURST: PackedScene = preload("res://gameplay/weapons/stormstring_burst.tscn")
 const STORM_PARTICLES: PackedScene = preload(
 	"res://gameplay/weapons/stormstring_flight_particles.tscn"
@@ -56,6 +58,16 @@ var hit_particles_scene: PackedScene = preload("res://gameplay/weapons/bow_hit_p
 
 @export_group("Trail")
 @export var trail_scene: PackedScene = preload("res://gameplay/weapons/bow_energy_trail.tscn")
+## Blue fire ribbon behind every arrow, charged or not. Empty disables it.
+@export var fire_trail_scene: PackedScene = preload(
+	"res://assets/vfx/fire_trails/Blue_Fire_Trail.tscn"
+)
+## The fire trail is authored for slow, large effects; these shrink it to arrow size.
+@export_range(0.05, 1.0, 0.01) var fire_trail_width_scale: float = 0.5
+@export_range(0.05, 1.0, 0.01) var fire_trail_time_scale: float = 0.24
+## Where the flame leaves the arrow art, in Arrow.png pixels: the back of the fletching, on the
+## shaft line (the art points left).
+@export var fire_trail_anchor_pixel: Vector2 = Vector2(1800, 618)
 
 @export_group("Range Expiry")
 @export_range(0.05, 0.5, 0.01) var expiry_fade_seconds: float = 0.18
@@ -83,6 +95,7 @@ var _control_end: Vector3
 var _end: Vector3
 var _trail: Node3D
 var _flight_particles: GPUParticles3D
+var _fire_trail: Node3D
 var _curve_lengths: PackedFloat32Array = []
 var _path_length: float = 0.0
 var _floor_height: float = 0.0
@@ -132,6 +145,7 @@ func activate() -> void:
 	_update_sprite_angle(context.direction)
 	_start = global_position
 	_previous_position = global_position
+	_spawn_fire_trail()
 	_end = _start + context.direction * context.range_units
 	if converge_on_target and context.has_target:
 		var offset := context.target_position - _start
@@ -363,6 +377,8 @@ func _process(_delta: float) -> void:
 			+ global_basis * _sprite_offset
 		)
 		_update_sprite_angle(-global_basis.z)
+		if is_instance_valid(_fire_trail):
+			_fire_trail.global_position = _fire_trail_anchor()
 
 
 func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
@@ -479,6 +495,8 @@ func _stick_in_wall(normal: Vector3, direction: Vector3) -> void:
 	# The source image's tip is left of its center; keep that tip at the contact.
 	var tip_direction := -_sprite.global_basis.x.normalized()
 	_sprite.global_position = global_position - tip_direction * wall_tip_distance + normal * 0.015
+	# After the art is placed, so the flame ends at the stuck arrow's fletching.
+	_release_fire_trail()
 	if is_instance_valid(_trail):
 		_trail.call("finish")
 		_trail = null
@@ -521,6 +539,7 @@ func _expire_projectile() -> void:
 	set_process(false)
 	_sprite.global_position = global_position + global_basis * _sprite_offset
 	_update_sprite_angle(-global_basis.z)
+	_release_fire_trail()
 	if converge_on_target:
 		_spawn_storm_burst(true)
 	if is_instance_valid(_trail):
@@ -554,6 +573,7 @@ func _finish_projectile() -> void:
 		return
 	_finished = true
 	_finish_flight_particles()
+	_release_fire_trail()
 	hitbox.end_attack()
 	set_physics_process(false)
 	queue_free()
@@ -561,6 +581,7 @@ func _finish_projectile() -> void:
 
 func _exit_tree() -> void:
 	_finish_flight_particles()
+	_release_fire_trail()
 	if is_instance_valid(_trail):
 		_trail.call("finish")
 	if is_instance_valid(hitbox):
@@ -587,6 +608,55 @@ func _spawn_storm_burst(terminal_sound: bool = false) -> void:
 		get_node("/root/AudioManager").play_sfx_3d(
 			hit_sound, global_position, hit_volume_db - 2.0, 0.8
 		)
+
+
+func _spawn_fire_trail() -> void:
+	if fire_trail_scene == null:
+		return
+	_fire_trail = fire_trail_scene.instantiate() as Node3D
+	for ribbon in _fire_trail_ribbons():
+		ribbon.set("width", float(ribbon.get("width")) * fire_trail_width_scale)
+		ribbon.set("time", float(ribbon.get("time")) * fire_trail_time_scale)
+	# Parented beside the arrow so the flame fades out on its own after the arrow is freed.
+	get_parent().add_child(_fire_trail)
+	_fire_trail.global_position = _fire_trail_anchor()
+
+
+## Stops recording points where the arrow ended, and frees the whole trail once its longest
+## ribbon has faded. (A ribbon's own autodestruct frees only its holder node, not the root.)
+func _release_fire_trail() -> void:
+	if not is_instance_valid(_fire_trail):
+		return
+	_fire_trail.global_position = _fire_trail_anchor()
+	var fade_seconds := 0.0
+	for ribbon in _fire_trail_ribbons():
+		ribbon.set("emitting", false)
+		fade_seconds = maxf(fade_seconds, float(ribbon.get("time")))
+	# A scene-tree timer outlives this arrow, which is usually freed right after.
+	get_tree().create_timer(fade_seconds + FIRE_TRAIL_FREE_MARGIN_SECONDS).timeout.connect(
+		_fire_trail.queue_free
+	)
+	_fire_trail = null
+
+
+## The fletching end of the drawn arrow in world space. The sprite is a camera-facing quad offset
+## from this node, so the flame must follow the art rather than the flight point.
+func _fire_trail_anchor() -> Vector3:
+	var texture_size := _sprite.texture.get_size()
+	var local := Vector3(
+		(fire_trail_anchor_pixel.x - texture_size.x * 0.5) * _sprite.pixel_size,
+		(texture_size.y * 0.5 - fire_trail_anchor_pixel.y) * _sprite.pixel_size,
+		0.0
+	)
+	return _sprite.global_transform * (local + Vector3(_sprite.offset.x, _sprite.offset.y, 0.0))
+
+
+func _fire_trail_ribbons() -> Array[Node]:
+	var ribbons: Array[Node] = []
+	for node in _fire_trail.find_children("*", "MeshInstance3D", true, false):
+		if "emitting" in node and "autodestruct" in node:
+			ribbons.append(node)
+	return ribbons
 
 
 func _finish_flight_particles() -> void:
