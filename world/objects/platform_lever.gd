@@ -91,6 +91,8 @@ func receive_damage(damage: DamageContext) -> float:
 	var platforms := _get_targets()
 	if platforms.is_empty():
 		return 0.0
+	# ADVANCE_ROUTE is refused by a platform still carrying out the last command.
+	var accepted := destination_mode != DestinationMode.ADVANCE_ROUTE
 	for moving_platform in platforms:
 		match destination_mode:
 			DestinationMode.START:
@@ -100,11 +102,13 @@ func receive_damage(damage: DamageContext) -> float:
 			DestinationMode.TOGGLE:
 				moving_platform.request_destination(not moving_platform.is_targeting_end())
 			DestinationMode.ADVANCE_ROUTE:
-				moving_platform.request_route_steps(route_step_count)
+				if moving_platform.request_route_steps(route_step_count):
+					accepted = true
 			DestinationMode.TOGGLE_ROUTE_LOOP:
 				moving_platform.toggle_route_motion()
-	_lever_sprite.stop()
-	_lever_sprite.play(&"active")
+	if accepted:
+		_lever_sprite.stop()
+		_lever_sprite.play(&"active")
 	return damage.amount_hp
 
 

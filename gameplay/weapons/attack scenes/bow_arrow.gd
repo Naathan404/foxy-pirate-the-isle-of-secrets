@@ -4,8 +4,6 @@ extends WeaponAttack
 const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_feedback.gd")
 const IMPACT_SOUND: AudioStream = preload("res://assets/audio/combat/bow_impact.wav")
 const CURVE_SAMPLES: int = 32
-## Extra time after the longest ribbon has faded before the fire trail node is freed.
-const FIRE_TRAIL_FREE_MARGIN_SECONDS := 0.1
 const STORM_BURST: PackedScene = preload("res://gameplay/weapons/stormstring_burst.tscn")
 const STORM_PARTICLES: PackedScene = preload(
 	"res://gameplay/weapons/stormstring_flight_particles.tscn"
@@ -95,7 +93,7 @@ var _control_end: Vector3
 var _end: Vector3
 var _trail: Node3D
 var _flight_particles: GPUParticles3D
-var _fire_trail: Node3D
+var _fire_trail: ProjectileFireTrail
 var _curve_lengths: PackedFloat32Array = []
 var _path_length: float = 0.0
 var _floor_height: float = 0.0
@@ -377,8 +375,8 @@ func _process(_delta: float) -> void:
 			+ global_basis * _sprite_offset
 		)
 		_update_sprite_angle(-global_basis.z)
-		if is_instance_valid(_fire_trail):
-			_fire_trail.global_position = _fire_trail_anchor()
+		if _fire_trail != null:
+			_fire_trail.follow(_fire_trail_anchor())
 
 
 func _on_damage_prepared(damage: DamageContext, target: Node) -> void:
@@ -613,29 +611,20 @@ func _spawn_storm_burst(terminal_sound: bool = false) -> void:
 func _spawn_fire_trail() -> void:
 	if fire_trail_scene == null:
 		return
-	_fire_trail = fire_trail_scene.instantiate() as Node3D
-	for ribbon in _fire_trail_ribbons():
-		ribbon.set("width", float(ribbon.get("width")) * fire_trail_width_scale)
-		ribbon.set("time", float(ribbon.get("time")) * fire_trail_time_scale)
-	# Parented beside the arrow so the flame fades out on its own after the arrow is freed.
-	get_parent().add_child(_fire_trail)
-	_fire_trail.global_position = _fire_trail_anchor()
-
-
-## Stops recording points where the arrow ended, and frees the whole trail once its longest
-## ribbon has faded. (A ribbon's own autodestruct frees only its holder node, not the root.)
-func _release_fire_trail() -> void:
-	if not is_instance_valid(_fire_trail):
-		return
-	_fire_trail.global_position = _fire_trail_anchor()
-	var fade_seconds := 0.0
-	for ribbon in _fire_trail_ribbons():
-		ribbon.set("emitting", false)
-		fade_seconds = maxf(fade_seconds, float(ribbon.get("time")))
-	# A scene-tree timer outlives this arrow, which is usually freed right after.
-	get_tree().create_timer(fade_seconds + FIRE_TRAIL_FREE_MARGIN_SECONDS).timeout.connect(
-		_fire_trail.queue_free
+	_fire_trail = ProjectileFireTrail.new(
+		fire_trail_scene,
+		get_parent(),
+		_fire_trail_anchor(),
+		fire_trail_width_scale,
+		fire_trail_time_scale
 	)
+
+
+## Leaves the flame's head where the arrow art ended up.
+func _release_fire_trail() -> void:
+	if _fire_trail == null:
+		return
+	_fire_trail.release(_fire_trail_anchor())
 	_fire_trail = null
 
 
@@ -649,14 +638,6 @@ func _fire_trail_anchor() -> Vector3:
 		0.0
 	)
 	return _sprite.global_transform * (local + Vector3(_sprite.offset.x, _sprite.offset.y, 0.0))
-
-
-func _fire_trail_ribbons() -> Array[Node]:
-	var ribbons: Array[Node] = []
-	for node in _fire_trail.find_children("*", "MeshInstance3D", true, false):
-		if "emitting" in node and "autodestruct" in node:
-			ribbons.append(node)
-	return ribbons
 
 
 func _finish_flight_particles() -> void:

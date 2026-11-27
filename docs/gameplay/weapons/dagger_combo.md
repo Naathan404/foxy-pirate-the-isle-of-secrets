@@ -69,6 +69,17 @@ on a step empty to reuse AttackData's existing directional animation set; a futu
 must provide valid non-looping `<prefix>_down`, `_up`, `_side` clips. No other weapon
 has been implemented as part of this change.
 
+### Throw fire trail
+
+The RMB throw (`gameplay/weapons/attack scenes/dagger_throw.tscn`) leaves a flame ribbon behind
+the blade: orange `Fire_Trail.tscn` on the way out, swapped for `Blue_Fire_Trail.tscn` when
+the dagger turns back, matching ThrowVFX's outbound/return colours. Tune it in the
+**Fire Trail** group of the DaggerThrow root: the two scenes (empty disables that leg) and
+`trail_width_scale` / `trail_time_scale`, which shrink the large authored effect to dagger
+size. The trail is a `ProjectileFireTrail` (`gameplay/weapons/projectile_fire_trail.gd`),
+the same helper the bow arrow uses; it drops the scene's looping fire sound and frees the
+whole trail once it has faded.
+
 ## Assets and limits
 
 The fallback sprite reuses one directional attack set. Spine plays `Attack_1`,

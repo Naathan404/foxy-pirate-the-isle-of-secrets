@@ -8,7 +8,7 @@
 script = ExtResource("1_data")
 charm_id = &"tide_grapple"
 display_name = "Tide Grapple"
-description = "Cast an anchor up to 7 units. Reel in and stun small enemies, or pull yourself toward a heavy target or solid terrain."
+description = "Cast an anchor up to 10 units. Reel in and stun small enemies, or pull yourself toward a heavy target or solid terrain."
 sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
@@ -18,11 +18,11 @@ acquisition_source = &"fixed_trial_reward"
 drop_chance = 1.0
 tags = Array[StringName]([&"active", &"grapple", &"trial_reward"])
 effect_params = {
-"damage_multiplier": 2.5,
-"hook_speed": 24.0,
-"pull_speed_units_per_second": 16.0,
+"damage_multiplier": 3.0,
+"hook_speed": 20.0,
+"pull_speed_units_per_second": 15.0,
 "pull_stop_distance": 1.0,
-"range_units": 7.0,
+"range_units": 10.0,
 "return_speed": 28.0,
 "stun_seconds": 1.0
 }

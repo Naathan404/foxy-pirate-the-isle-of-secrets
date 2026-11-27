@@ -18,16 +18,28 @@ const PLAYER_BOUNDARIES_NAME := &"GroundBoundaries"
 const ENEMY_BOUNDARIES_NAME := &"EnemyGroundBoundaries"
 ## Slack around floor bounds so edges that merely touch another floor are still tested.
 const EDGE_BOUNDS_MARGIN := 0.01
+## A fall is only read as one past this downward speed, so the first tick off a ledge or a
+## landing bump does not count.
+const VOID_FALL_MIN_SPEED := 1.0
+## How far below Foxy the void probe looks for ground to land on.
+const VOID_PROBE_METERS := 4.0
+## The probe starts slightly above her origin so ground she is touching still counts.
+const VOID_PROBE_LIFT_METERS := 0.2
 
 @export_tool_button("Refresh destination exits", "Reload") var refresh_destination_exits: Callable:
 	get:
 		return _refresh_destination_inspector
 
 @export_group("Void")
-## Falling below this height relative to the room origin kills Foxy, who then respawns at
-## the campfire of the latest rest like any other death.
+## Foxy falling with no ground under her is a fall into the void: the screen closes on her
+## and she comes back at the door she entered this room by (the nearest door when she did
+## not walk in), losing `void_fall_damage` HP. If that would empty her HP she dies and
+## respawns at the campfire like any other death. A dash over a gap holds its height, so it
+## is not a fall.
 @export var void_reload_enabled: bool = true
+## Last resort: below this height (relative to the room origin) any fall is a void fall.
 @export var void_height: float = -6.0
+@export_range(0.0, 10.0, 0.5, "suffix:HP") var void_fall_damage: float = 1.0
 
 @export_group("Safe room")
 ## Charms can be changed anywhere in this room (the hub, campfire rests). A campfire in this
@@ -168,10 +180,66 @@ func _physics_process(_delta: float) -> void:
 	if not is_instance_valid(active_player) or not is_ancestor_of(active_player):
 		return
 	var falling_player := active_player as Player
-	if falling_player.dead:
+	if falling_player.dead or falling_player.falling_into_void or falling_player.is_on_floor():
 		return
-	if to_local(active_player.global_position).y < void_height:
-		falling_player.die()
+	var below_floor := to_local(active_player.global_position).y < void_height
+	if below_floor or _is_falling_over_void(falling_player):
+		var sequence := VoidFallSequence.new(self, falling_player)
+		sequence.fall_damage = void_fall_damage
+		add_child(sequence)
+
+
+## Dropping (not dashing) with nothing to land on within VOID_PROBE_METERS. A Tide Grapple
+## pull crosses gaps in the air while gravity still builds up speed, so it never counts.
+func _is_falling_over_void(falling_player: Player) -> bool:
+	if falling_player.velocity.y > -VOID_FALL_MIN_SPEED or falling_player.is_grapple_pulling():
+		return false
+	return not _has_ground_below(
+		falling_player.global_position,
+		falling_player.collision_mask & ~CombatLayers.PLAYER_BOUNDARY,
+		[falling_player.get_rid()]
+	)
+
+
+func _has_ground_below(point: Vector3, mask: int, exclude: Array[RID] = []) -> bool:
+	var query := PhysicsRayQueryParameters3D.create(
+		point + Vector3.UP * VOID_PROBE_LIFT_METERS,
+		point + Vector3.DOWN * VOID_PROBE_METERS,
+		mask,
+		exclude
+	)
+	return not get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
+## Where Foxy comes back after falling into the void from `fall_position`: in front of the
+## door she entered this room by, else the open door nearest the fall, else the room's
+## campfire. A door counts only with ground in front of it: a closed exit has its path
+## hidden and would drop her straight back into the void.
+func get_void_respawn_position(fall_position: Vector3, ground_mask: int) -> Vector3:
+	var arrival_id: StringName = get_node("/root/GameManager").arrival_trigger_id
+	var nearest: SceneChangeTrigger = null
+	var nearest_distance := INF
+	for node in get_tree().get_nodes_in_group("scene_change_triggers"):
+		var trigger := node as SceneChangeTrigger
+		if trigger == null or not is_ancestor_of(trigger):
+			continue
+		if not _has_ground_below(trigger.get_exit_position(), ground_mask):
+			continue
+		if not arrival_id.is_empty() and trigger.trigger_id == arrival_id:
+			return trigger.get_exit_position()
+		if not trigger.enabled:
+			continue
+		var offset := trigger.get_exit_position() - fall_position
+		offset.y = 0.0
+		if offset.length() < nearest_distance:
+			nearest = trigger
+			nearest_distance = offset.length()
+	if nearest != null:
+		return nearest.get_exit_position()
+	for node in find_children("*", "CampfireRestPoint", true, false):
+		return (node as CampfireRestPoint).get_spawn_position()
+	push_warning("BaseRoom: no door or campfire to return Foxy to after a void fall.")
+	return global_position
 
 
 ## Restores and starts recording one stateful object. Objects present when the room becomes

@@ -32,8 +32,8 @@ trigger_mode = 0
 auto_aim_at_player = false
 direction_mode = 0
 player_detection_radius = 6.5
-min_bullets_per_volley = 1
-max_bullets_per_volley = 5
+min_bullets_per_volley = 3
+max_bullets_per_volley = 3
 max_bullet_angle_offset_degrees = 0.0
 shot_interval = 0.2
 scattershot_bullet_count = 5
@@ -51,13 +51,13 @@ clip_map = Dictionary[StringName, String]({
 &"shoot": "shoot",
 &"shoot_up": "shoot_up"
 })
-looping_clips = []
 action_start_seconds = Dictionary[StringName, float]({})
 spine_pixel_size = 0.005
 lift_meters = 0.0
 mix_seconds = 0.15
 artwork_faces_left = false
 mirror_from_facing = false
+clip_faces_left = Dictionary[StringName, float]({})
 
 [node name="Sprite3D" parent="Visual" index="0" unique_id=718327590]
 offset = Vector2(0, 15.5)
@@ -81,7 +81,7 @@ script = ExtResource("6_idle")
 
 [node name="Shoot" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="3" unique_id=1159447923]
 script = ExtResource("7_shoot")
-fire_delay = 1.0
+fire_delay = 0.7
 charge_scale = 1.15
 shake_distance = 0.05
 release_duration = 0.09
@@ -95,3 +95,7 @@ shape = SubResource("CylinderShape3D_detector")
 [node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 shape = SubResource("CylinderShape3D_body")
+
+[node name="HealthBar" parent="." index="7" unique_id=2012842134]
+layout_mode = 3
+anchors_preset = 0

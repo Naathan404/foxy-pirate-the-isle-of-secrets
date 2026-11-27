@@ -1,53 +1,41 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://smt1vyv6trcp"]
 
 [ext_resource type="PackedScene" uid="uid://p0q25uhsjrb3" path="res://world/biomes/coral_valley/base_scenes/base_medium_room.tscn" id="1_base"]
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_flat_tide"]
-[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
 [ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="4_tide_enemy"]
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="5_6kymb"]
+[ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
+[ext_resource type="PackedScene" path="res://world/gimmick/raid/raid_boulder_gate.tscn" id="boulder_gate"]
+[ext_resource type="PackedScene" path="res://world/gimmick/raid/ground_burst_effect.tscn" id="burst_effect"]
+[ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
+[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="enemy_coral_skeleton"]
+[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="enemy_crab"]
+[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="enemy_elite_crab"]
+[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="enemy_elite_hermit_crab"]
+[ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
+[ext_resource type="Script" uid="uid://hmtwwikk5suy" path="res://world/gimmick/raid/raid_ground_spawner.gd" id="ground_spawner"]
+[ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="lm_stone"]
+[ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
+[ext_resource type="Texture2D" uid="uid://cvcfgrq3fwe6v" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_right.png" id="pier_right"]
+[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_chest.tscn" id="raid_chest"]
+[ext_resource type="Script" uid="uid://272oomdwm4lc" path="res://world/gimmick/raid/raid_lockdown.gd" id="raid_lockdown"]
+[ext_resource type="Script" uid="uid://dqrqag8qre3v0" path="res://world/gimmick/raid/raid_spawn_spec.gd" id="raid_spawn"]
+[ext_resource type="Script" uid="uid://c2clcd6fo53vh" path="res://world/gimmick/raid/raid_stage.gd" id="raid_stage"]
+[ext_resource type="Script" uid="uid://cr1twsj1rn8nt" path="res://world/gimmick/raid/raid_wave.gd" id="raid_wave"]
 [ext_resource type="Script" uid="uid://8qmlqprmf5fg" path="res://world/biomes/coral_valley/objects/random_props.gd" id="random_props"]
+[ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
+[ext_resource type="Texture2D" uid="uid://clpyg8i01u2xe" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_22_ground.png" id="sand_texture"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_1.tscn" id="seaweed_1"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
-[ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
-[ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
-[ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
-[ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
-[ext_resource type="Shader" uid="uid://corjgk1dfjdvh" path="res://world/biomes/coral_valley/ground/coral_sand_ground.gdshader" id="sand_shader"]
-[ext_resource type="Texture2D" uid="uid://clpyg8i01u2xe" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_22_ground.png" id="sand_texture"]
-[ext_resource type="Texture2D" uid="uid://b0d20q5623n1w" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_22_shore.png" id="shore_texture"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
-[ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
-[ext_resource type="Texture2D" uid="uid://cvcfgrq3fwe6v" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_right.png" id="pier_right"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="lm_stone"]
+[ext_resource type="Texture2D" uid="uid://b0d20q5623n1w" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_22_shore.png" id="shore_texture"]
 [ext_resource type="PackedScene" path="res://world/gimmick/flat_tide/tide_lever.tscn" id="tide_lever"]
-
-[ext_resource type="PackedScene" path="res://world/gimmick/raid/raid_boulder_gate.tscn" id="boulder_gate"]
-
-[ext_resource type="PackedScene" path="res://world/gimmick/raid/ground_burst_effect.tscn" id="burst_effect"]
-
-[ext_resource type="Script" uid="uid://c2clcd6fo53vh" path="res://world/gimmick/raid/raid_stage.gd" id="raid_stage"]
-
-[ext_resource type="Script" uid="uid://hmtwwikk5suy" path="res://world/gimmick/raid/raid_ground_spawner.gd" id="ground_spawner"]
-
-[ext_resource type="Script" uid="uid://272oomdwm4lc" path="res://world/gimmick/raid/raid_lockdown.gd" id="raid_lockdown"]
-
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/raid_chest.tscn" id="raid_chest"]
-
-[ext_resource type="Script" uid="uid://dqrqag8qre3v0" path="res://world/gimmick/raid/raid_spawn_spec.gd" id="raid_spawn"]
-
-[ext_resource type="Script" uid="uid://cr1twsj1rn8nt" path="res://world/gimmick/raid/raid_wave.gd" id="raid_wave"]
-
-[ext_resource type="PackedScene" uid="uid://b0cb0x0phm3f4" path="res://gameplay/enemies/crab/crab.tscn" id="enemy_crab"]
-
-[ext_resource type="PackedScene" uid="uid://cc1ru3vys4du" path="res://gameplay/enemies/coral_skeleton/coral_skeleton.tscn" id="enemy_coral_skeleton"]
-
-[ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="enemy_elite_crab"]
-
-[ext_resource type="PackedScene" uid="uid://dt27usr75pcn4" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.tscn" id="enemy_elite_hermit_crab"]
 [ext_resource type="Shader" uid="uid://ddkgna0vceam3" path="res://world/gimmick/flat_tide/flat_tide_volume.gdshader" id="tide_volume_shader"]
+[ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
 
-[sub_resource type="Environment" id="Environment_pr0q3"]
+[sub_resource type="Environment" id="Environment_gewby"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.1, 0.02, 0.03, 1)
@@ -71,7 +59,7 @@ height = 256
 noise = SubResource("FastNoiseLite_water")
 seamless = true
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rw33m"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_skyqr"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("lagoon_shader")
@@ -98,57 +86,60 @@ shader_parameter/swash_speed = 0.9
 shader_parameter/ring_spacing_meters = 2.6
 shader_parameter/ring_speed_meters_per_second = 0.45
 shader_parameter/ring_strength = 0.22
+shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
+shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
+shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
 
-[sub_resource type="QuadMesh" id="QuadMesh_fl7io"]
+[sub_resource type="QuadMesh" id="QuadMesh_xe5xu"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_rw33m")
+material = SubResource("ShaderMaterial_skyqr")
 size = Vector2(400, 400)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_scuf1"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_gkaja"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_10c1p"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8vt4m"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5vjfm"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_wkl33"]
 resource_local_to_scene = true
 size = Vector3(4, 2, 0.5)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_txrli"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_s7a0t"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_23a0h"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_cwiyl"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_faxri"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_s2f8f"]
 resource_local_to_scene = true
 size = Vector3(4, 2, 0.5)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3cfxo"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_lclv5"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 12.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_erqsn"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_phg65"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_gowti"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_hw2g5"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_u5lf7"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_xuknt"]
 resource_local_to_scene = true
 size = Vector3(3.1524658, 1, 14.923569)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_hta8j"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_h04do"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_dxhdd"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_qi86q"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
@@ -163,112 +154,6 @@ shader_parameter/cloud_velocity_meters_per_second = Vector2(0.9, 0.35)
 shader_parameter/cloud_coverage = 0.45
 shader_parameter/cloud_softness = 0.18
 shader_parameter/cloud_shadow_strength = 0.48
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_grade"]
-resource_local_to_scene = true
-shader = ExtResource("grade_shader")
-shader_parameter/exposure = 1.0
-shader_parameter/saturation = 1.02
-shader_parameter/shadow_tint = Color(1, 0.9, 0.92, 1)
-shader_parameter/highlight_tint = Color(1.1, 0.95, 0.86, 1)
-shader_parameter/vignette_color = Color(0.14, 0.02, 0.03, 1)
-shader_parameter/vignette_strength = 0.36
-[sub_resource type="Resource" id="RaidW1_1"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_crab")
-anchor = 1
-offset_meters = Vector2(-11, -4)
-
-[sub_resource type="Resource" id="RaidW1_2"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_crab")
-anchor = 1
-offset_meters = Vector2(-11, 0)
-delay_seconds = 0.2
-
-[sub_resource type="Resource" id="RaidW1_3"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_crab")
-anchor = 1
-offset_meters = Vector2(-11, 4)
-delay_seconds = 0.4
-
-[sub_resource type="Resource" id="RaidWave1"]
-script = ExtResource("raid_wave")
-intent = "Warm-up: three crabs line up in the west lane. Pulling the west lever sweeps them all."
-lead_in_seconds = 0.8
-spawns = [SubResource("RaidW1_1"), SubResource("RaidW1_2"), SubResource("RaidW1_3")]
-
-[sub_resource type="Resource" id="RaidW2_1"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("4_tide_enemy")
-anchor = 1
-offset_meters = Vector2(-4, -12)
-
-[sub_resource type="Resource" id="RaidW2_2"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("4_tide_enemy")
-anchor = 1
-offset_meters = Vector2(4, -12)
-delay_seconds = 0.3
-
-[sub_resource type="Resource" id="RaidW2_3"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_coral_skeleton")
-anchor = 1
-offset_meters = Vector2(11, -3)
-delay_seconds = 0.8
-
-[sub_resource type="Resource" id="RaidW2_4"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_coral_skeleton")
-anchor = 1
-offset_meters = Vector2(11, 3)
-delay_seconds = 1
-
-[sub_resource type="Resource" id="RaidWave2"]
-script = ExtResource("raid_wave")
-intent = "Two lanes: barrels fire from the north lane while skeletons press from the east lane. One lever each."
-lead_in_seconds = 0.8
-spawns = [SubResource("RaidW2_1"), SubResource("RaidW2_2"), SubResource("RaidW2_3"), SubResource("RaidW2_4")]
-
-[sub_resource type="Resource" id="RaidW3_1"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_elite_crab")
-is_elite = true
-anchor = 1
-offset_meters = Vector2(-11, 0)
-
-[sub_resource type="Resource" id="RaidW3_2"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("5_6kymb")
-is_elite = true
-anchor = 1
-offset_meters = Vector2(0, -12)
-delay_seconds = 0.5
-
-[sub_resource type="Resource" id="RaidW3_3"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_elite_hermit_crab")
-is_elite = true
-anchor = 1
-offset_meters = Vector2(11, 0)
-delay_seconds = 1
-
-[sub_resource type="Resource" id="RaidW3_4"]
-script = ExtResource("raid_spawn")
-scene = ExtResource("enemy_crab")
-offset_meters = Vector2(0, 5)
-delay_seconds = 1.8
-
-[sub_resource type="Resource" id="RaidWave3"]
-script = ExtResource("raid_wave")
-intent = "Flood: an elite in every lane, then a crab at Foxy's back. Three levers, one tide at a time: choose the order."
-lead_in_seconds = 1.4
-spawns = [SubResource("RaidW3_1"), SubResource("RaidW3_2"), SubResource("RaidW3_3"), SubResource("RaidW3_4")]
-
-[sub_resource type="BoxShape3D" id="RaidEntryArea"]
-size = Vector3(18, 5, 34)
 
 [sub_resource type="FastNoiseLite" id="TideNoiseSource"]
 noise_type = 3
@@ -285,6 +170,12 @@ seamless = true
 render_priority = 0
 shader = ExtResource("tide_volume_shader")
 shader_parameter/zone_size = Vector2(12, 12)
+shader_parameter/flow_direction = 0
+shader_parameter/fill = 0.0
+shader_parameter/tide_time = 0.0
+shader_parameter/tide_rising = 0.0
+shader_parameter/tide_falling = 0.0
+shader_parameter/surge = 0.0
 shader_parameter/shore_wave_amplitude = 0.3
 shader_parameter/shore_wave_length = 5.0
 shader_parameter/shore_wave_speed = 1.1
@@ -322,14 +213,121 @@ shader_parameter/edge_breakup = 0.3
 shader_parameter/noise_scale = 0.12
 shader_parameter/noise_texture = SubResource("TideNoise")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_joeul"]
+resource_local_to_scene = true
+shader = ExtResource("grade_shader")
+shader_parameter/exposure = 1.0
+shader_parameter/saturation = 1.02
+shader_parameter/shadow_tint = Color(1, 0.9, 0.92, 1)
+shader_parameter/highlight_tint = Color(1.1, 0.95, 0.86, 1)
+shader_parameter/vignette_color = Color(0.14, 0.02, 0.03, 1)
+shader_parameter/vignette_strength = 0.36
+
+[sub_resource type="Resource" id="RaidW1_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+anchor = 1
+offset_meters = Vector2(-11, -4)
+
+[sub_resource type="Resource" id="RaidW1_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+anchor = 1
+offset_meters = Vector2(-11, 0)
+delay_seconds = 0.2
+
+[sub_resource type="Resource" id="RaidW1_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+anchor = 1
+offset_meters = Vector2(-11, 4)
+delay_seconds = 0.4
+
+[sub_resource type="Resource" id="RaidWave1"]
+script = ExtResource("raid_wave")
+intent = "Warm-up: three crabs line up in the west lane. Pulling the west lever sweeps them all."
+lead_in_seconds = 0.8
+spawns = Array[ExtResource("raid_spawn")]([SubResource("RaidW1_1"), SubResource("RaidW1_2"), SubResource("RaidW1_3")])
+
+[sub_resource type="Resource" id="RaidW2_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("4_tide_enemy")
+anchor = 1
+offset_meters = Vector2(-4, -12)
+
+[sub_resource type="Resource" id="RaidW2_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("4_tide_enemy")
+anchor = 1
+offset_meters = Vector2(4, -12)
+delay_seconds = 0.3
+
+[sub_resource type="Resource" id="RaidW2_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_coral_skeleton")
+anchor = 1
+offset_meters = Vector2(11, -3)
+delay_seconds = 0.8
+
+[sub_resource type="Resource" id="RaidW2_4"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_coral_skeleton")
+anchor = 1
+offset_meters = Vector2(11, 3)
+delay_seconds = 1
+
+[sub_resource type="Resource" id="RaidWave2"]
+script = ExtResource("raid_wave")
+intent = "Two lanes: barrels fire from the north lane while skeletons press from the east lane. One lever each."
+lead_in_seconds = 0.8
+spawns = Array[ExtResource("raid_spawn")]([SubResource("RaidW2_1"), SubResource("RaidW2_2"), SubResource("RaidW2_3"), SubResource("RaidW2_4")])
+
+[sub_resource type="Resource" id="RaidW3_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_elite_crab")
+is_elite = true
+anchor = 1
+offset_meters = Vector2(-11, 0)
+
+[sub_resource type="Resource" id="RaidW3_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("5_6kymb")
+is_elite = true
+anchor = 1
+offset_meters = Vector2(0, -12)
+delay_seconds = 0.5
+
+[sub_resource type="Resource" id="RaidW3_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_elite_hermit_crab")
+is_elite = true
+anchor = 1
+offset_meters = Vector2(11, 0)
+delay_seconds = 1
+
+[sub_resource type="Resource" id="RaidW3_4"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+offset_meters = Vector2(0, 5)
+delay_seconds = 1.8
+
+[sub_resource type="Resource" id="RaidWave3"]
+script = ExtResource("raid_wave")
+intent = "Flood: an elite in every lane, then a crab at Foxy's back. Three levers, one tide at a time: choose the order."
+lead_in_seconds = 1.4
+spawns = Array[ExtResource("raid_spawn")]([SubResource("RaidW3_1"), SubResource("RaidW3_2"), SubResource("RaidW3_3"), SubResource("RaidW3_4")])
+
+[sub_resource type="BoxShape3D" id="RaidEntryArea"]
+size = Vector3(18, 5, 34)
+
 [node name="room_22" unique_id=2133176597 instance=ExtResource("1_base")]
+editor_description = "Raid Dap Thuy Trieu (red): locked raid in three tide lanes (west, north, east). Each lane has a sluice lever (TideLever) that floods it at once; the surge stuns every enemy in the lane. Three scripted waves fill the lanes. Clearing it opens both piers and spawns the raid chest."
 open_exits = 10
 right_destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_21.tscn"
-editor_description = "Raid Dap Thuy Trieu (red): locked raid in three tide lanes (west, north, east). Each lane has a sluice lever (TideLever) that floods it at once; the surge stuns every enemy in the lane. Three scripted waves fill the lanes. Clearing it opens both piers and spawns the raid chest."
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_pr0q3")
+environment = SubResource("Environment_gewby")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
@@ -341,17 +339,18 @@ directional_shadow_mode = 0
 directional_shadow_max_distance = 45.0
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
-mesh = SubResource("QuadMesh_fl7io")
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.005104065, -1.2000535, 0.07036781)
+mesh = SubResource("QuadMesh_xe5xu")
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_scuf1")
+shape = SubResource("BoxShape3D_gkaja")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_10c1p")
+shape = SubResource("BoxShape3D_8vt4m")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
@@ -359,18 +358,18 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_5vjfm")
+shape = SubResource("BoxShape3D_wkl33")
 disabled = true
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_txrli")
+shape = SubResource("BoxShape3D_s7a0t")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_23a0h")
+shape = SubResource("BoxShape3D_cwiyl")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
@@ -378,11 +377,8 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_faxri")
+shape = SubResource("BoxShape3D_s2f8f")
 disabled = true
-
-[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
-visible = false
 
 [node name="Sprite3D" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -1, 0.116, 0)
@@ -390,21 +386,16 @@ shaded = true
 texture = ExtResource("pier_right")
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_3cfxo")
-disabled = true
+shape = SubResource("BoxShape3D_lclv5")
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_erqsn")
-disabled = true
+shape = SubResource("BoxShape3D_phg65")
 
-[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+[node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
-monitoring = false
-enabled = false
 
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_gowti")
-disabled = true
+shape = SubResource("BoxShape3D_hw2g5")
 
 [node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
@@ -413,44 +404,58 @@ texture = ExtResource("pier_left")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, -0.9540329)
-shape = SubResource("BoxShape3D_u5lf7")
+shape = SubResource("BoxShape3D_xuknt")
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_hta8j")
+shape = SubResource("BoxShape3D_h04do")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_21.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_dxhdd")
+shape = SubResource("BoxShape3D_qi86q")
+
+[node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
+transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.65731)
+material_override = SubResource("ShaderMaterial_sand")
+texture = ExtResource("sand_texture")
+
+[node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1038691344 instance=ExtResource("sea_glints")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
 
 [node name="FlatTide" parent="." index="5" unique_id=256012692 node_paths=PackedStringArray("player", "zones") instance=ExtResource("2_flat_tide")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 player = NodePath("../Foxy")
 zones = [NodePath("WestLane"), NodePath("NorthLane"), NodePath("RightShallows")]
 sequential_zones = true
+externally_advanced = true
 low_duration = 8.0
 rise_duration = 6.0
 high_duration = 4.0
 fall_duration = 6.0
-flooded_move_multiplier = 0.6
-externally_advanced = true
 warning_seconds = 0.0
+flooded_move_multiplier = 0.6
 
 [node name="RightShallows" parent="FlatTide" index="0" unique_id=928133442]
-water_material = SubResource("TideWonderMaterial")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 0.25, 0)
-size = Vector2(30, 40)
-volume_depth = 2.0
+editor_description = "East lane: floods x 6 to the east rim, from the east sea."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.867125, 0.25, 0)
+rise_duration = 2.5
 high_duration = 3.0
 fall_duration = 3.0
 rest_duration = 0.5
-rise_duration = 2.5
-editor_description = "East lane: floods x 6 to the east rim, from the east sea."
+size = Vector2(30, 40)
+volume_depth = 2.0
+water_material = SubResource("TideWonderMaterial")
 
-[node name="WestLane" type="MeshInstance3D" parent="FlatTide"]
+[node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
+player = NodePath("../../Foxy")
+
+[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
+spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
+enemies_per_tide = 0
+
+[node name="WestLane" type="MeshInstance3D" parent="FlatTide" index="3" unique_id=585309995]
 editor_description = "West lane: floods the west rim to x -6, from the west sea."
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.973459, 0.25, 0)
 script = ExtResource("tide_zone_script")
 rise_duration = 2.5
 high_duration = 3.0
@@ -461,12 +466,12 @@ size = Vector2(30, 40)
 volume_depth = 2.0
 surface_segments_x = 30
 surface_segments_z = 30
-debug_color = Color(1, 0, 1, 1)
 water_material = SubResource("TideWonderMaterial")
+debug_color = Color(1, 0, 1, 1)
 
-[node name="NorthLane" type="MeshInstance3D" parent="FlatTide"]
+[node name="NorthLane" type="MeshInstance3D" parent="FlatTide" index="4" unique_id=368085056]
 editor_description = "North lane: floods the north rim to z -8, from the north sea."
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -8.417484)
 script = ExtResource("tide_zone_script")
 rise_duration = 2.5
 high_duration = 3.0
@@ -477,36 +482,20 @@ size = Vector2(40, 32)
 volume_depth = 2.0
 surface_segments_x = 30
 surface_segments_z = 30
-debug_color = Color(1, 0, 1, 1)
 water_material = SubResource("TideWonderMaterial")
+debug_color = Color(1, 0, 1, 1)
 
-[node name="WaterFootsteps" parent="FlatTide" index="1" unique_id=839092960 node_paths=PackedStringArray("player")]
-player = NodePath("../../Foxy")
-
-; //NLVP sửa: Gán nền đảo vào ô Spawn Ground.
-[node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
-spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
-enemies_per_tide = 0
-
-[node name="RandomSeaweed" type="Node3D" parent="."]
+[node name="RandomSeaweed" type="Node3D" parent="." index="6" unique_id=1581070564]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(-12.22, 0, -6.448, -11.294, 0, -8.559, -7.121, 0, -13.68, -5.378, 0, -15.249, -1.999, 0, -14.383, 1.711, 0, -14.95, 4.558, 0, -14.937, 6.44, 0, -13.731, 8.398, 0, -12.977, 8.801, 0, -10.789, 10.936, 0, -9.537, 11.323, 0, -7.121, 12.665, 0, -5.428, 12.261, 0, 6.734, 12.955, 0, 8.654, 12.594, 0, 10.772, 10.65, 0, 12.073, 9.097, 0, 15.043, 6.799, 0, 14.862, 4.482, 0, 15.853, 1.378, 0, 14.886, -2.17, 0, 16.008, -4.493, 0, 15.176, -6.665, 0, 16.046, -8.407, 0, 15.013, -9.66, 0, 13.218, -11.343, 0, 11.557, -12.665, 0, 9.973, -12.812, 0, 7.307, -12.468, 0, 5.224)
 fixed_spawn_count = 14
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
-[node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
-transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.65731)
-material_override = SubResource("ShaderMaterial_sand")
-texture = ExtResource("sand_texture")
-
-[node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1038691344 instance=ExtResource("sea_glints")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
-
-[node name="RoomAtmosphere" parent="." unique_id=265208724 instance=ExtResource("atmosphere")]
+[node name="RoomAtmosphere" parent="." index="7" unique_id=265208724 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(265208724, 1300233738) index="0" unique_id=1611482802]
-material = SubResource("ShaderMaterial_grade")
+material = SubResource("ShaderMaterial_joeul")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(265208724, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
@@ -517,78 +506,77 @@ leaf_rotation_speed = 0.3
 trail_count = 6
 trail_color = Color(1, 0.72, 0.66, 0.35)
 
-[node name="Scenery" type="Node3D" parent="." unique_id=620564770]
+[node name="Scenery" type="Node3D" parent="." index="8" unique_id=620564770]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 
 [node name="GateEastNorth" parent="Scenery" index="0" unique_id=798876216 instance=ExtResource("lm_stone")]
-transform = Transform3D(1.55, 0, 0, 0, 1.55, 0, 0, 0, 1.55, 13.0, 0.0, -3.6)
+transform = Transform3D(1.55, 0, 0, 0, 1.55, 0, 0, 0, 1.55, 13, 0, -3.6)
 ground_shadow = true
 
 [node name="GateEastSouth" parent="Scenery" index="1" unique_id=216557858 instance=ExtResource("lm_stone")]
-transform = Transform3D(1.35, 0, 0, 0, 1.35, 0, 0, 0, 1.35, 13.0, 0.0, 3.8)
+transform = Transform3D(1.35, 0, 0, 0, 1.35, 0, 0, 0, 1.35, 13, 0, 3.8)
 ground_shadow = true
 
 [node name="GateWestNorth" parent="Scenery" index="2" unique_id=783066954 instance=ExtResource("lm_stone")]
-transform = Transform3D(1.45, 0, 0, 0, 1.45, 0, 0, 0, 1.45, -13.2, 0.0, -3.6)
+transform = Transform3D(1.45, 0, 0, 0, 1.45, 0, 0, 0, 1.45, -13.2, 0, -3.6)
 ground_shadow = true
 
 [node name="GateWestSouth" parent="Scenery" index="3" unique_id=847129310 instance=ExtResource("lm_stone")]
-transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -13.2, 0.0, 3.8)
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -13.2, 0, 3.8)
 ground_shadow = true
 
-[node name="WestGate" parent="." instance=ExtResource("boulder_gate")]
+[node name="WestGate" parent="." index="9" unique_id=1174801377 instance=ExtResource("boulder_gate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.4, 0.1, 0)
 
-[node name="EastGate" parent="." instance=ExtResource("boulder_gate")]
+[node name="EastGate" parent="." index="10" unique_id=1028294239 instance=ExtResource("boulder_gate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 0.1, 0)
 
-[node name="WestLever" parent="." node_paths=PackedStringArray("controller", "zone") instance=ExtResource("tide_lever")]
+[node name="WestLever" parent="." index="11" unique_id=1768840518 node_paths=PackedStringArray("controller", "zone") instance=ExtResource("tide_lever")]
 editor_description = "Floods the west lane. Stands just outside its lane."
-transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, -5, 0.252, 5)
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -8.93146, 1.3501512, 8.449311)
 controller = NodePath("../FlatTide")
 zone = NodePath("../FlatTide/WestLane")
 
-[node name="NorthLever" parent="." node_paths=PackedStringArray("controller", "zone") instance=ExtResource("tide_lever")]
+[node name="NorthLever" parent="." index="12" unique_id=1989123179 node_paths=PackedStringArray("controller", "zone") instance=ExtResource("tide_lever")]
 editor_description = "Floods the north lane. Stands just outside its lane."
-transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0.252, -6.5)
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 1.3501512, -8.263869)
 controller = NodePath("../FlatTide")
 zone = NodePath("../FlatTide/NorthLane")
 
-[node name="EastLever" parent="." node_paths=PackedStringArray("controller", "zone") instance=ExtResource("tide_lever")]
+[node name="EastLever" parent="." index="13" unique_id=1898113164 node_paths=PackedStringArray("controller", "zone") instance=ExtResource("tide_lever")]
 editor_description = "Floods the east lane. Stands just outside its lane."
-transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 5, 0.252, 5)
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 7.9319153, 1.3501512, 8.741449)
 controller = NodePath("../FlatTide")
 zone = NodePath("../FlatTide/RightShallows")
 
-[node name="Raid" type="Node3D" parent="."]
+[node name="Raid" type="Node3D" parent="." index="14" unique_id=1146781366]
 
-[node name="Stage" type="Node3D" parent="Raid" node_paths=PackedStringArray("activation_area", "spawner")]
+[node name="Stage" type="Node3D" parent="Raid" index="0" unique_id=997436111 node_paths=PackedStringArray("activation_area", "spawner")]
 script = ExtResource("raid_stage")
 stage_id = &"coral_valley_room_22_raid_cleared"
 activation_area = NodePath("EntryArea")
 spawner = NodePath("../Spawner")
-waves = [SubResource("RaidWave1"), SubResource("RaidWave2"), SubResource("RaidWave3")]
+waves = Array[ExtResource("raid_wave")]([SubResource("RaidWave1"), SubResource("RaidWave2"), SubResource("RaidWave3")])
 wave_pause_seconds = 2.0
 
-[node name="EntryArea" type="Area3D" parent="Raid/Stage"]
+[node name="EntryArea" type="Area3D" parent="Raid/Stage" index="0" unique_id=559677740]
 editor_description = "Both pier edges 7 m in, so the fight starts once Foxy is well inside."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Raid/Stage/EntryArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Raid/Stage/EntryArea" index="0" unique_id=1137442841]
 shape = SubResource("RaidEntryArea")
 
-[node name="Spawner" type="Node3D" parent="Raid" node_paths=PackedStringArray("spawn_ground")]
+[node name="Spawner" type="Node3D" parent="Raid" index="1" unique_id=906195337 node_paths=PackedStringArray("spawn_ground")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("ground_spawner")
 spawn_extents_meters = Vector2(28, 32)
 spawn_effect_scene = ExtResource("burst_effect")
 spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
-minimum_spacing = 3.0
 minimum_player_distance = 4.0
 
-[node name="Lockdown" type="Node" parent="Raid" node_paths=PackedStringArray("room", "stages", "gates")]
+[node name="Lockdown" type="Node" parent="Raid" index="2" unique_id=473286791 node_paths=PackedStringArray("room", "stages", "gates")]
 script = ExtResource("raid_lockdown")
 room = NodePath("../..")
 stages = [NodePath("../Stage")]
@@ -605,5 +593,5 @@ reward_position = Vector3(0, 0.252, 2)
 [editable path="Exits/LeftPath"]
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround"]
-[editable path="RoomAtmosphere"]
 [editable path="FlatTide"]
+[editable path="RoomAtmosphere"]

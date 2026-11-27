@@ -19,16 +19,19 @@ height = 3.6
 radius = 1.9
 
 [node name="EliteBarrel" unique_id=63146857 instance=ExtResource("1_base")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 0, 0, 0)
 script = ExtResource("6_elite_barrel")
 normal_volley_count = 2
-normal_bullets_per_volley = 3
+normal_bullets_per_volley = 4
 normal_fan_angle = 50.0
 normal_volley_interval = 0.2
+normal_stagger_volleys = true
 normal_attacks_before_special = 3
-special_volley_count = 7
-special_bullets_per_volley = 5
+special_volley_count = 4
+special_bullets_per_volley = 8
 special_volley_interval = 0.35
 special_spawn_radius = 2.3
+special_volley_stagger = 0.5
 charged_color = Color(1, 0.2, 0.2, 1)
 charged_scale = 1.2
 charged_shake = 0.06
@@ -41,7 +44,7 @@ data = ExtResource("2_data")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
-spine_pixel_size = 0.0045000000000000005
+spine_pixel_size = 0.0045
 clip_faces_left = Dictionary[String, bool]({})
 
 [node name="CollisionShape3D" parent="Direction/HurtBox" parent_id_path=PackedInt32Array(1648399047) index="0" unique_id=1991989425]
@@ -64,6 +67,10 @@ shape = SubResource("DetectorShape")
 [node name="CollisionShape3D" parent="." index="5" unique_id=1677401448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 shape = SubResource("BodyShape")
+
+[node name="HealthBar" parent="." index="7" unique_id=2012842134]
+layout_mode = 3
+anchors_preset = 0
 
 [node name="EliteFeedback" type="Node3D" parent="." index="8" unique_id=1037859984]
 script = ExtResource("3_feedback")

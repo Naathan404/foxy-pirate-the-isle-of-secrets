@@ -144,13 +144,14 @@ func fire_single() -> void:
 	_fire_in_direction(direction)
 
 
-func fire_fan_volley(count: int, arc_degrees: float) -> void:
+## `offset_degrees` turns the whole fan, so a follow-up volley can fill the gaps of the last.
+func fire_fan_volley(count: int, arc_degrees: float, offset_degrees: float = 0.0) -> void:
 	if dead or data == null:
 		return
 	var bullet_count := maxi(1, count)
 	var arc_radians := deg_to_rad(maxf(0.0, arc_degrees))
 	var angle_step := 0.0 if bullet_count == 1 else arc_radians / float(bullet_count - 1)
-	var start_angle := -arc_radians * 0.5
+	var start_angle := -arc_radians * 0.5 + deg_to_rad(offset_degrees)
 	var aim := _get_firing_direction()
 	_spit_muzzle_ink(aim)
 	for index in range(bullet_count):

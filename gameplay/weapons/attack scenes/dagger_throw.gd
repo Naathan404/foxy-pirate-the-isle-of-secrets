@@ -19,6 +19,19 @@ const SPRITE_FEEDBACK: Script = preload("res://gameplay/weapons/dagger_sprite_fe
 @export_range(0.0, 0.05, 0.001) var launch_hitstop: float = 0.022
 @export_range(0.0, 6.0, 0.1) var launch_shake: float = 1.8
 
+@export_group("Fire Trail")
+## Lửa cam khi dao bay đi, đổi sang lửa xanh khi dao quay về (cùng màu với ThrowVFX).
+## Để trống để tắt từng lượt.
+@export var outbound_trail_scene: PackedScene = preload(
+	"res://assets/vfx/fire_trails/Fire_Trail.tscn"
+)
+@export var return_trail_scene: PackedScene = preload(
+	"res://assets/vfx/fire_trails/Blue_Fire_Trail.tscn"
+)
+## Trail gốc làm cho hiệu ứng lớn và chậm; hai hệ số này thu nhỏ về cỡ con dao.
+@export_range(0.05, 1.0, 0.01) var trail_width_scale: float = 0.6
+@export_range(0.05, 1.0, 0.01) var trail_time_scale: float = 0.2
+
 var max_distance: float = 10.0
 var flight_direction: Vector3
 # tính quãng đường lượt đi
@@ -27,6 +40,7 @@ var returning: bool = false
 var thrower: Node3D
 # Thời gian đã bay
 var age: float = 0.0
+var _fire_trail: ProjectileFireTrail
 
 @onready var hit_area: HitBox = $HitBox
 @onready var _vfx: Node3D = $ThrowVFX
@@ -60,6 +74,8 @@ func activate() -> void:
 	return_speed *= context.projectile_speed_multiplier
 	max_distance = context.range_units
 	global_position = context.actor.global_position + Vector3.UP * height_offset
+	# A teleport, not motion: do not draw the blade sliding in from where it waited.
+	reset_physics_interpolation()
 	launch(context.direction, context.actor)
 
 	# setup hitbox
@@ -71,6 +87,7 @@ func activate() -> void:
 
 	_begin_damage_pass()
 	_vfx.start(_blade)
+	_switch_fire_trail(outbound_trail_scene)
 	_play_launch_feedback()
 	set_physics_process(true)
 
@@ -91,6 +108,7 @@ func _physics_process(delta: float) -> void:
 	# Dọn dao nếu foxy dead hoặc dao tồn tại quá lâu
 	if not is_instance_valid(thrower) or age >= lifetime:
 		_vfx.finish()
+		_switch_fire_trail(null)
 		queue_free()
 		return
 
@@ -99,7 +117,9 @@ func _physics_process(delta: float) -> void:
 		global_position = global_position.move_toward(target, return_speed * delta)
 		if global_position.distance_to(target) <= catch_distance:
 			_vfx.finish(true)
+			_switch_fire_trail(null)
 			queue_free()
+			return
 	else:
 		# Giới hạn bước di chuyển để dao không bay quá tầm
 		var distance: float = minf(speed * delta, max_distance - distance_travelled)
@@ -119,6 +139,12 @@ func _physics_process(delta: float) -> void:
 		distance_travelled += distance
 		if distance_travelled >= max_distance:
 			_begin_return()
+	if _fire_trail != null:
+		_fire_trail.follow(_blade.global_position)
+
+
+func _exit_tree() -> void:
+	_switch_fire_trail(null)
 
 
 func _begin_return() -> void:
@@ -127,6 +153,7 @@ func _begin_return() -> void:
 		return
 	returning = true
 	_vfx.turn()
+	_switch_fire_trail(return_trail_scene)
 	_begin_damage_pass()
 
 
@@ -182,3 +209,15 @@ func _sprite_feedback(sprite: Sprite3D) -> Node:
 func _on_body_entered(body: Node3D) -> void:
 	if launched and body is PhysicsBody3D and (body.collision_layer & CombatLayers.WORLD) != 0:
 		_begin_return()
+
+
+## Leaves the current flame to fade where the blade is and starts `scene` there; null only
+## stops the flame.
+func _switch_fire_trail(scene: PackedScene) -> void:
+	if _fire_trail != null:
+		_fire_trail.release(_blade.global_position)
+		_fire_trail = null
+	if scene != null and is_inside_tree():
+		_fire_trail = ProjectileFireTrail.new(
+			scene, get_parent(), _blade.global_position, trail_width_scale, trail_time_scale
+		)

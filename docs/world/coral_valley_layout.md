@@ -218,7 +218,8 @@ Cơ chế (đã chạy thử bằng Foxy thật):
   (khe 3,6–4,3 m, dash 4 m). Đi bộ không qua được khe nào.
 - Có ba cặp cần gạt điều khiển cùng một bệ xoay: hai cặp trên hai đảo và một cặp trên bệ giữa.
   Cần trên +3 điểm (biển cam, mũi tên theo chiều kim đồng hồ), cần dưới −2 điểm (biển xanh ngọc,
-  ngược chiều). Đánh nhiều lần thì các bước cộng dồn.
+  ngược chiều). Mỗi lần chỉ chạy một lệnh: khi bệ đang chạy, đánh thêm cần nào cũng không
+  có tác dụng (cần không bật) cho tới khi bệ dừng.
 - Đường qua: đưa bệ xoay tới Tây (từ Đông: −2 −2), dash lên bệ, dash sang bệ giữa, đánh cần
   trên bệ giữa để đưa bệ xoay sang Đông (−2 −2, hoặc +3 bốn lần), dash lên bệ rồi dash sang đảo
   phải. Đường về đi ngược lại. Vũ khí cận chiến cũng giải được; cần trên bệ giữa được thêm để

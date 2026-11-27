@@ -38,6 +38,9 @@ var debug_all_charms_granted: bool = false
 var save_slot: SaveGameFile = SaveGameFile.new(SAVE_SLOT_PATH)
 ## Visited-room changes and the campfire of the latest rest; see RoomStateRegistry.
 var room_states: RoomStateRegistry = RoomStateRegistry.new()
+## Trigger of the current room Foxy walked in through; empty after a respawn, a load or a
+## new game. A fall into the void puts her back at this door.
+var arrival_trigger_id: StringName = &""
 var _transition_pending: bool = false
 ## Validated save payload consumed by the next scene transition (Continue).
 var _pending_load: Dictionary = {}
@@ -363,6 +366,7 @@ func _transition_scene(
 			player_state.restore(player, not respawn)
 		if respawn_point != null:
 			_place_player_at_rest_point(_find_rest_point(get_tree().current_scene, respawn_point))
+		arrival_trigger_id = destination_trigger_id
 		if not destination_trigger_id.is_empty():
 			_place_player_at_trigger(destination_trigger_id)
 		# _ready/process_frame do not mean rendering has finished. Keep the first

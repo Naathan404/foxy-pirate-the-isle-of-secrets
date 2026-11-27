@@ -9,7 +9,6 @@
 [ext_resource type="Script" uid="uid://d0jtisdjsgu0u" path="res://gameplay/player/states/player_hit.gd" id="3_r3fl6"]
 [ext_resource type="Script" uid="uid://b13a4v7a0hpxx" path="res://gameplay/player/states/player_fall.gd" id="4_ki8u8"]
 [ext_resource type="Script" uid="uid://bd4tscvehscfo" path="res://gameplay/player/states/player_dash.gd" id="5_tj74x"]
-[ext_resource type="Texture2D" uid="uid://4rqwduaxp1ya" path="res://assets/sprites/effects/smoke/smoke_04.png" id="5_xsuyu"]
 [ext_resource type="Script" uid="uid://coyt7mve374li" path="res://gameplay/player/states/player_death.gd" id="6_6gmdq"]
 [ext_resource type="Script" uid="uid://dhmsjvrmvedhj" path="res://gameplay/player/states/player_run.gd" id="7_rvh5s"]
 [ext_resource type="Script" uid="uid://bn1u27bm1ho6y" path="res://gameplay/player/states/player_attack.gd" id="8_av71s"]
@@ -82,43 +81,6 @@
 [ext_resource type="Resource" uid="uid://b28d2n48fbjsd" path="res://gameplay/charms/charm_data/skull_cracker.tres" id="skull_cracker"]
 [ext_resource type="Script" uid="uid://b0u5ln7tkfogr" path="res://data/weapon/weapon_collection_entry.gd" id="weapon_collection_entry"]
 [ext_resource type="PackedScene" uid="uid://b7worldmap01k" path="res://ui/world_map/world_map.tscn" id="world_map"]
-
-[sub_resource type="Gradient" id="Gradient_1ejdq"]
-offsets = PackedFloat32Array(0, 0.12, 1)
-colors = PackedColorArray(1, 0.85, 0.55, 0, 1, 0.85, 0.55, 0.8, 0.7, 0.55, 0.35, 0)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_fi5gb"]
-gradient = SubResource("Gradient_1ejdq")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_y345g"]
-resource_local_to_scene = true
-emission_shape = 3
-emission_box_extents = Vector3(0.12, 0.01, 0.08)
-direction = Vector3(0, 0.4, 1)
-spread = 35.0
-initial_velocity_min = 0.4
-initial_velocity_max = 0.9
-gravity = Vector3(0, 0.3, 0)
-damping_min = 1.5
-damping_max = 2.5
-scale_min = 0.79999995
-scale_max = 1.5999999
-color_ramp = SubResource("GradientTexture1D_fi5gb")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s1tal"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("5_xsuyu")
-texture_filter = 0
-billboard_mode = 3
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
-
-[sub_resource type="QuadMesh" id="QuadMesh_nnacp"]
-material = SubResource("StandardMaterial3D_s1tal")
-size = Vector2(0.22, 0.22)
 
 [sub_resource type="AtlasTexture" id="Atlas_bow_0"]
 region = Rect2(113, 170, 152, 184)
@@ -917,12 +879,6 @@ player = NodePath("../..")
 [node name="RunDustEffect" parent="Effects" unique_id=2095352562 node_paths=PackedStringArray("player") instance=ExtResource("19_lqbvs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66397434, -0.10383004)
 player = NodePath("../..")
-heel_offset = 0.1
-
-[node name="Particle" parent="Effects/RunDustEffect" index="0" unique_id=1241942936]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3670205, 0)
-process_material = SubResource("ParticleProcessMaterial_y345g")
-draw_pass_1 = SubResource("QuadMesh_nnacp")
 
 [node name="CombatScreenFlash" parent="Effects" unique_id=729221954 node_paths=PackedStringArray("player", "weapons") instance=ExtResource("combat_screen_flash")]
 player = NodePath("../..")
@@ -1195,4 +1151,3 @@ horizontal_alignment = 2
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]
 
-[editable path="Effects/RunDustEffect"]
