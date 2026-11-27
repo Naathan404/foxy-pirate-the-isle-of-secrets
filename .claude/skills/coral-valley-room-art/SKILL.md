@@ -212,7 +212,7 @@ Nội dung theo loại phòng (chi tiết và số lượng lấy từ tài li�
 | Doi cát (`17`, `19`) | `FlatTide`, `TideSandbar`, mảnh `Sandbar` trong layout | Prop ngoài doi | Nhịp triều |
 | Chia mảnh có móc (`06`, `13`, `21`, `23`, `24`) | Cọc neo hai bờ (hoặc một bờ cho đường một chiều), `split_checks` | Prop ngoài đường móc | Bề rộng vực, vị trí cọc |
 | Câu đố bệ (`03`, `04`, `09`, `23`) | Bệ, cần gạt, `boundary_openings` | Prop trang trí | Điểm dừng, cần gạt |
-| Raid (`16`, `18`, `22`) | `RaidStage`, `RaidGroundSpawner`, `RaidLockdown`, cổng đá, biển đỏ (skill `raid-room`) | Prop không chắn cổng đá và vùng spawn | Đợt quái, rương |
+| Raid (`10`, `16`, `18`, `22`) | `RaidStage`, `RaidGroundSpawner`, `RaidLockdown`, cổng đá, biển đỏ (skill `raid-room`) | Prop không chắn cổng đá và vùng spawn | Đợt quái, rương |
 | Phục kích không khóa (`12`, `21`) | `RaidStage` `locks_room = false` | Vùng kích hoạt | Đợt quái |
 | Phòng ẩn (`12`, `20`, `24`) | `hidden = true` trên bản đồ, lối tới không đi bộ được | Prop | Rương |
 | Boss (`08`) | Blubberbeard, `BossEncounter`, `VictoryCamp` | Prop ngoài vùng đánh boss | Quái khác |

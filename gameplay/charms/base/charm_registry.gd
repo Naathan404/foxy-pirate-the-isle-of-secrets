@@ -199,6 +199,7 @@ func input_pressed(socket_id: int, context: CharmActivationContext) -> bool:
 	if context.actor is Player and (context.actor as Player).is_charm_casting():
 		return false
 	if runtime.cooldown_remaining > 0.0 and not runtime.effect.can_bypass_cooldown(context):
+		_reject(runtime, CharmRuntime.REJECTED_COOLDOWN)
 		return false
 	if runtime.effect.get_cooldown_policy() == &"on_activate" and not runtime.can_activate():
 		return false
@@ -206,6 +207,7 @@ func input_pressed(socket_id: int, context: CharmActivationContext) -> bool:
 		return false
 	var cost := maxf(0.0, runtime.effect.get_activation_cost(context))
 	if cost > 0.0 and not _can_consume_resource(context.actor, cost):
+		_reject(runtime, CharmRuntime.REJECTED_COST)
 		return false
 	if not runtime.effect.activate(context):
 		return false
@@ -214,7 +216,15 @@ func input_pressed(socket_id: int, context: CharmActivationContext) -> bool:
 		return false
 	if runtime.effect.get_cooldown_policy() == &"on_activate":
 		runtime.start_cooldown()
+	if runtime.definition.is_active():
+		runtime.activated.emit()
 	return true
+
+
+## Tells the HUD why an Active Charm press did nothing; passives have nothing to cast.
+func _reject(runtime: CharmRuntime, reason: StringName) -> void:
+	if runtime.definition.is_active():
+		runtime.activation_rejected.emit(reason)
 
 
 func input_held(socket_id: int, context: CharmActivationContext, delta: float) -> bool:

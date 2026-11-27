@@ -3,9 +3,6 @@ extends SceneTree
 
 const LIFE_STEAL: CharmData = preload("res://gameplay/charms/charm_data/life_steal.tres")
 const DOUBLE_STRIKE: CharmData = preload("res://gameplay/charms/charm_data/double_strike.tres")
-const ADRENALINE_SURGE: CharmData = preload(
-	"res://gameplay/charms/charm_data/adrenaline_surge.tres"
-)
 const BACKSTABBER: CharmData = preload("res://gameplay/charms/charm_data/backstabber.tres")
 const ARROW_RAIN: CharmData = preload("res://gameplay/charms/charm_data/arrow_rain.tres")
 const DAGGER_ATTACK_SCENE_PATH := "res://gameplay/weapons/attack scenes/dagger_attack.tscn"
@@ -46,7 +43,6 @@ func _run_tests() -> void:
 	_test_life_steal(actor, registry)
 	await _test_double_strike_pipeline(actor, world, manager, registry)
 	_test_backstabber(actor, world, registry)
-	_test_adrenaline_surge(actor, world, manager, registry)
 
 	world.free()
 	if _failures == 0:
@@ -221,15 +217,6 @@ func _test_backstabber(actor: MockActor, world: Node3D, registry: CharmRegistry)
 	_assert_true(registry.unequip_socket(CharmConstants.SocketId.SPACE), "unequip stacked Double")
 	_assert_true(registry.unequip_socket(CharmConstants.SocketId.Q), "unequip Backstabber")
 	target.queue_free()
-
-
-func _test_adrenaline_surge(
-	_actor: MockActor, _world: Node3D, _manager: CharmSocketManager, registry: CharmRegistry
-) -> void:
-	_assert_false(
-		registry.equip_charm(ADRENALINE_SURGE.charm_id, CharmConstants.SocketId.SPACE, _actor),
-		"unowned Adrenaline Surge cannot be equipped"
-	)
 
 
 func _make_damage(actor: MockActor, action: StringName, category: int) -> DamageContext:

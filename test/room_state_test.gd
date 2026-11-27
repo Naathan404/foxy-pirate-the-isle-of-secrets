@@ -13,7 +13,7 @@ const SANDBOX := preload("res://test/fixtures/save_test_sandbox.gd")
 const PROP_SLOT_ROOM := preload("res://test/fixtures/prop_slot_room.tscn")
 const ITEM_PICKUP := preload("res://gameplay/inventory/item_pickup.tscn")
 const HUB := "res://world/biomes/hub/map/castaway_cove.tscn"
-const RANDOM_ROOM := "res://world/biomes/coral_valley/map/room_10.tscn"
+const RANDOM_ROOM := "res://world/biomes/coral_valley/map/room_14.tscn"
 const OTHER_ROOM := "res://world/biomes/coral_valley/map/room_02.tscn"
 const CHEST_ROOM := "res://world/biomes/coral_valley/map/room_04.tscn"
 const RAID_ROOM := "res://world/biomes/coral_valley/map/room_16.tscn"
@@ -365,7 +365,7 @@ func _slots(room: Node) -> Array[PropSlot]:
 	return slots
 
 
-## Re-rolls cycles until the random room has a living enemy (hand-placed in room_10).
+## Re-rolls cycles until the random room has a living enemy (hand-placed in room_14).
 func _enter_cycle_with_enemy() -> void:
 	var registry: RoomStateRegistry = sandbox.manager.room_states
 	for attempt: int in MAX_CYCLE_SEARCH:

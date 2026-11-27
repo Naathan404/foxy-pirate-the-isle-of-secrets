@@ -17,14 +17,23 @@
 [ext_resource type="Texture2D" uid="uid://gy64enjv88tx" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_left.png" id="pier_left"]
 [ext_resource type="Texture2D" uid="uid://d3bitwwwuq2oh" path="res://assets/sprites/biomes/coral_valley/coral_valley_pier_down.png" id="pier_down"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="lm_wood_log"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="enemy_hermit_crab"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/barrel/barrel.tscn" id="enemy_barrel"]
+[ext_resource type="Script" path="res://world/gimmick/raid/raid_stage.gd" id="raid_stage"]
+[ext_resource type="Script" path="res://world/gimmick/raid/raid_ground_spawner.gd" id="raid_spawner"]
+[ext_resource type="Script" path="res://world/gimmick/raid/raid_wave.gd" id="raid_wave"]
+[ext_resource type="Script" path="res://world/gimmick/raid/raid_spawn_spec.gd" id="raid_spawn"]
+[ext_resource type="Script" path="res://world/gimmick/raid/raid_lockdown.gd" id="raid_lockdown"]
+[ext_resource type="PackedScene" path="res://world/gimmick/raid/raid_boulder_gate.tscn" id="raid_gate"]
+[ext_resource type="PackedScene" path="res://world/gimmick/raid/ground_burst_effect.tscn" id="raid_burst"]
 
 [sub_resource type="Environment" id="Environment_mhcna"]
 resource_local_to_scene = true
 background_mode = 1
-background_color = Color(0.02, 0.07, 0.11, 1)
+background_color = Color(0.1, 0.02, 0.03, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.5, 0.62, 0.66, 1)
-ambient_light_energy = 0.6
+ambient_light_color = Color(0.68, 0.5, 0.48, 1)
+ambient_light_energy = 0.62
 tonemap_mode = 2
 tonemap_white = 6.0
 glow_enabled = true
@@ -51,15 +60,15 @@ shader_parameter/shore_rect = Vector4(-23.5166, -26.1386, 47.2075, 55.6635)
 shader_parameter/shore_reach_meters = 8.0
 shader_parameter/surface_height_meters = 0.21
 shader_parameter/water_noise = SubResource("NoiseTexture2D_water")
-shader_parameter/deep_color = Color(0.02, 0.07, 0.11, 1)
-shader_parameter/lagoon_color = Color(0.04, 0.23, 0.28, 1)
-shader_parameter/shallow_color = Color(0.14, 0.47, 0.47, 1)
-shader_parameter/reef_color = Color(0.28, 0.22, 0.32, 1)
-shader_parameter/caustic_color = Color(0.62, 0.95, 0.88, 1)
-shader_parameter/foam_color = Color(0.9, 0.95, 0.9, 1)
+shader_parameter/deep_color = Color(0.1, 0.02, 0.03, 1)
+shader_parameter/lagoon_color = Color(0.38, 0.06, 0.07, 1)
+shader_parameter/shallow_color = Color(0.72, 0.2, 0.16, 1)
+shader_parameter/reef_color = Color(0.25, 0.06, 0.1, 1)
+shader_parameter/caustic_color = Color(1, 0.62, 0.42, 1)
+shader_parameter/foam_color = Color(1, 0.88, 0.8, 1)
 shader_parameter/caustic_world_size_meters = 9.0
 shader_parameter/caustic_speed = 0.05
-shader_parameter/caustic_strength = 0.2
+shader_parameter/caustic_strength = 0.26
 shader_parameter/reef_world_size_meters = 26.0
 shader_parameter/reef_coverage = 0.32
 shader_parameter/reef_strength = 0.35
@@ -139,11 +148,62 @@ shader_parameter/cloud_shadow_strength = 0.48
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
-shader_parameter/saturation = 0.98
-shader_parameter/shadow_tint = Color(0.9, 0.98, 1, 1)
-shader_parameter/highlight_tint = Color(1.07, 0.97, 0.9, 1)
-shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
-shader_parameter/vignette_strength = 0.3
+shader_parameter/saturation = 1.02
+shader_parameter/shadow_tint = Color(1, 0.9, 0.92, 1)
+shader_parameter/highlight_tint = Color(1.1, 0.95, 0.86, 1)
+shader_parameter/vignette_color = Color(0.14, 0.02, 0.03, 1)
+shader_parameter/vignette_strength = 0.36
+
+[sub_resource type="Resource" id="RaidW1_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+offset_meters = Vector2(0, -5)
+
+[sub_resource type="Resource" id="RaidW1_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+offset_meters = Vector2(-4.5, 3)
+delay_seconds = 0.35
+
+[sub_resource type="Resource" id="RaidW1_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_crab")
+offset_meters = Vector2(4.5, 3)
+delay_seconds = 0.7
+
+[sub_resource type="Resource" id="RaidWave_W1"]
+script = ExtResource("raid_wave")
+intent = "Ambush: three crabs burst from the sand in a triangle around Foxy, teaching that the raid's enemies come up from below."
+lead_in_seconds = 0.8
+spawns = Array[ExtResource("raid_spawn")]([SubResource("RaidW1_1"), SubResource("RaidW1_2"), SubResource("RaidW1_3")])
+
+[sub_resource type="Resource" id="RaidW2_1"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_barrel")
+anchor = 1
+offset_meters = Vector2(-7, -12)
+
+[sub_resource type="Resource" id="RaidW2_2"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_barrel")
+anchor = 1
+offset_meters = Vector2(7, -12)
+delay_seconds = 0.3
+
+[sub_resource type="Resource" id="RaidW2_3"]
+script = ExtResource("raid_spawn")
+scene = ExtResource("enemy_hermit_crab")
+offset_meters = Vector2(0, 5)
+delay_seconds = 1.0
+
+[sub_resource type="Resource" id="RaidWave_W2"]
+script = ExtResource("raid_wave")
+intent = "Gun line: two barrels rise on the north edge among the palms while a hermit crab closes in behind Foxy, so she cannot stand still."
+lead_in_seconds = 1.0
+spawns = Array[ExtResource("raid_spawn")]([SubResource("RaidW2_1"), SubResource("RaidW2_2"), SubResource("RaidW2_3")])
+
+[sub_resource type="BoxShape3D" id="RaidEntryArea"]
+size = Vector3(24, 5, 32.5)
 
 [node name="room_10" unique_id=1104197973 instance=ExtResource("1_base")]
 open_exits = 12
@@ -155,8 +215,8 @@ environment = SubResource("Environment_mhcna")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
-light_color = Color(1, 0.92, 0.84, 1)
-light_energy = 1.15
+light_color = Color(1, 0.82, 0.68, 1)
+light_energy = 1.1
 shadow_enabled = true
 shadow_opacity = 0.65
 directional_shadow_mode = 0
@@ -245,15 +305,6 @@ prop_scenes = Array[PackedScene]([ExtResource("palm_leaning"), ExtResource("palm
 min_spawn_count = 5
 max_spawn_count = 10
 
-[node name="Crab" parent="." index="6" unique_id=1486396212 instance=ExtResource("enemy_crab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 1)
-
-[node name="Crab2" parent="." index="7" unique_id=817976571 instance=ExtResource("enemy_crab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
-
-[node name="Crab3" parent="." index="8" unique_id=1010750704 instance=ExtResource("enemy_crab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7)
-
 [node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.753676)
 material_override = SubResource("ShaderMaterial_sand")
@@ -262,6 +313,49 @@ texture = ExtResource("sand_texture")
 [node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1709468100 instance=ExtResource("sea_glints")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
 
+[node name="RaidGateWest" parent="." instance=ExtResource("raid_gate")]
+editor_description = "Shuts the west pier (to room_09) while the raid is fought."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.3, 0.1, 0.2)
+
+[node name="RaidGateSouth" parent="." instance=ExtResource("raid_gate")]
+editor_description = "Shuts the south pier (to room_03) while the raid is fought."
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -0.53, 0.1, 21.3)
+
+[node name="Raid" type="Node3D" parent="."]
+
+[node name="Stage" type="Node3D" parent="Raid" node_paths=PackedStringArray("activation_area", "spawner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.21, 1.7)
+script = ExtResource("raid_stage")
+stage_id = &"coral_valley_room_10_raid_cleared"
+activation_area = NodePath("EntryArea")
+spawner = NodePath("../Spawner")
+waves = [SubResource("RaidWave_W1"), SubResource("RaidWave_W2")]
+
+[node name="EntryArea" type="Area3D" parent="Raid/Stage"]
+editor_description = "West and south edges 7 m in from the piers, so the fight starts once Foxy is well inside."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 1.5, -3.45)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Raid/Stage/EntryArea"]
+shape = SubResource("RaidEntryArea")
+
+[node name="Spawner" type="Node3D" parent="Raid" node_paths=PackedStringArray("spawn_ground")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.21, 1.7)
+script = ExtResource("raid_spawner")
+spawn_extents_meters = Vector2(30, 38)
+spawn_effect_scene = ExtResource("raid_burst")
+spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
+minimum_spacing = 3.5
+minimum_player_distance = 4.0
+
+[node name="Lockdown" type="Node" parent="Raid" node_paths=PackedStringArray("room", "stages", "gates")]
+editor_description = "No reward chest: clearing the raid only reopens the piers."
+script = ExtResource("raid_lockdown")
+room = NodePath("../..")
+stages = [NodePath("../Stage")]
+gates = [NodePath("../../RaidGateWest"), NodePath("../../RaidGateSouth")]
+
 [node name="RoomAtmosphere" parent="." unique_id=640934757 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(640934757, 1300233738) index="0" unique_id=1611482802]
@@ -269,12 +363,12 @@ material = SubResource("ShaderMaterial_grade")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(640934757, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
-leaf_color = Color(0.95, 0.97, 0.94, 0.5)
+leaf_color = Color(1, 0.86, 0.82, 0.5)
 leaf_size = 7.0
 leaf_width_ratio = 0.85
 leaf_rotation_speed = 0.3
 trail_count = 6
-trail_color = Color(0.78, 0.95, 0.94, 0.4)
+trail_color = Color(1, 0.72, 0.66, 0.35)
 
 [node name="Scenery" type="Node3D" parent="." unique_id=1190825686]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)

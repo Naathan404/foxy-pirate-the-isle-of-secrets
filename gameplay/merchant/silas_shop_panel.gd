@@ -18,6 +18,8 @@ const MIN_TRADE_QUANTITY := 1
 const PREVIOUS_TAB_ACTION := &"ui_page_up"
 const NEXT_TAB_ACTION := &"ui_page_down"
 const CANCEL_ACTION := &"ui_cancel"
+## Tab, the inventory key, also closes the shop.
+const INVENTORY_ACTION := &"inventory"
 const INK_PROGRESS_PARAM := &"progress"
 const INK_HIDDEN := 0.0
 const INK_SHOWN := 1.0
@@ -161,7 +163,7 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if not visible or _is_closing:
 		return
-	if event.is_action_pressed(CANCEL_ACTION):
+	if event.is_action_pressed(CANCEL_ACTION) or event.is_action_pressed(INVENTORY_ACTION):
 		close_shop()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(PREVIOUS_TAB_ACTION) or event.is_action_pressed(NEXT_TAB_ACTION):

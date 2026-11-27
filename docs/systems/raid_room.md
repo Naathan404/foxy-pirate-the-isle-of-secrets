@@ -2,7 +2,7 @@
 
 Phòng Raid là phòng mà khi Foxy đi vào, cửa ra bị chặn và quái trồi từ dưới đất lên theo
 từng đợt có kịch bản. Dọn hết đợt cuối thì cửa mở lại và (tùy chọn) rương thưởng xuất hiện.
-Code nằm trong `world/gimmick/raid/`. Phòng Raid của Coral Valley: `room_16` (Xác Tàu Neo, 4 đợt), `room_18` (hai đảo và phà), `room_22` (Đập Thủy Triều, có cần xả triều). Cả ba dùng biển đỏ `red_tide` để báo trước "vào là bị nhốt", và rương `raid_chest.tscn` (8–13 vàng) hoặc rương riêng của phòng.
+Code nằm trong `world/gimmick/raid/`. Phòng Raid của Coral Valley: `room_10` (Rừng Dừa, 2 đợt, không thưởng), `room_16` (Xác Tàu Neo, 4 đợt), `room_18` (hai đảo và phà), `room_22` (Đập Thủy Triều, có cần xả triều). Cả bốn dùng biển đỏ `red_tide` để báo trước "vào là bị nhốt". Phần thưởng là rương `raid_chest.tscn` (8–13 vàng) hoặc rương riêng của phòng; để trống `reward_chest_scene` thì dọn xong chỉ mở cửa (`room_10`).
 
 ## Luồng chơi
 

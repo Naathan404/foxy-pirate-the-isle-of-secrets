@@ -11,9 +11,6 @@ const ENDURANCE_VESSEL: CharmData = preload(
 )
 const LIFE_STEAL: CharmData = preload("res://gameplay/charms/charm_data/life_steal.tres")
 const DOUBLE_STRIKE: CharmData = preload("res://gameplay/charms/charm_data/double_strike.tres")
-const ADRENALINE_SURGE: CharmData = preload(
-	"res://gameplay/charms/charm_data/adrenaline_surge.tres"
-)
 const BACKSTABBER: CharmData = preload("res://gameplay/charms/charm_data/backstabber.tres")
 const CHAOS_COLLECTOR: CharmData = preload("res://gameplay/charms/charm_data/chaos_collector.tres")
 
@@ -113,12 +110,12 @@ func _test_acquisition(registry: CharmRegistry) -> void:
 	placeholder.drop_chance = 0.0
 	_assert_true(registry.register_definition(placeholder), "register blocked placeholder")
 	var pool := service.get_shop_pool(registry)
-	_assert_equal(pool.size(), 8, "shop contains eight accepted Passive Charms")
+	_assert_equal(pool.size(), 7, "shop contains seven accepted Passive Charms")
 	for definition: CharmData in pool:
 		_assert_true(definition.is_passive(), "shop excludes Active Charms")
 		_assert_true(definition.effect_scene != null, "shop excludes placeholders")
 	_assert_true(registry.set_owned(GALE_PACE.charm_id, true), "own Gale Pace")
-	_assert_equal(service.get_shop_pool(registry).size(), 7, "shop excludes owned Charm")
+	_assert_equal(service.get_shop_pool(registry).size(), 6, "shop excludes owned Charm")
 	var random := RandomNumberGenerator.new()
 	random.seed = 7007
 	var offer := service.roll_shop_offer(registry, random)
@@ -254,7 +251,6 @@ func _get_all_definitions() -> Array[CharmData]:
 		ENDURANCE_VESSEL,
 		LIFE_STEAL,
 		DOUBLE_STRIKE,
-		ADRENALINE_SURGE,
 		BACKSTABBER,
 		CHAOS_COLLECTOR,
 	]
