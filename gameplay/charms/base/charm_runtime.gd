@@ -5,6 +5,16 @@ extends RefCounted
 signal cooldown_changed(remaining_seconds: float)
 ## Emitted after a conditional benefit actually resolves, for equipped-slot presentation.
 signal proc_triggered(message: String, color: Color)
+## An Active Charm was cast from its socket (presentation only).
+signal activated
+## The socket was pressed but the Active Charm could not be cast; `reason` is
+## REJECTED_COOLDOWN or REJECTED_COST (presentation only).
+signal activation_rejected(reason: StringName)
+## A running cooldown reached zero, so the charm can be used again.
+signal cooldown_ready
+
+const REJECTED_COOLDOWN := &"cooldown"
+const REJECTED_COST := &"cost"
 
 var definition: CharmData
 var socket_id: int = CharmConstants.SocketId.UNASSIGNED
@@ -28,6 +38,8 @@ func advance(delta: float) -> void:
 		return
 	cooldown_remaining = maxf(0.0, cooldown_remaining - delta)
 	cooldown_changed.emit(cooldown_remaining)
+	if cooldown_remaining <= 0.0:
+		cooldown_ready.emit()
 
 
 func can_activate() -> bool:
@@ -52,5 +64,8 @@ func start_cooldown() -> void:
 
 
 func reset_cooldown() -> void:
+	var was_cooling := cooldown_remaining > 0.0
 	cooldown_remaining = 0.0
 	cooldown_changed.emit(cooldown_remaining)
+	if was_cooling:
+		cooldown_ready.emit()

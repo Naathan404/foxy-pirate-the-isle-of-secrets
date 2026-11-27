@@ -103,7 +103,7 @@ cuối: móc + triều + quái) → `07` Trại Cuối Bờ (lửa trại và Si
 | `room_07` | Medium | Trại Cuối Bờ (lửa trại 3) | Trại của Silas trước boss, bố cục riêng | trái `06`, phải `08` |
 | `room_08` | Đấu trường | Boss | Blubberbeard; an toàn sau khi thắng | trái `07` |
 | `room_09` | 2 đảo | Phà ẩn | Phà hai điểm, cần gạt giấu trong rong; rương | dưới `01`, phải `10` |
-| `room_10` | Small | Rừng dừa | Tài nguyên dừa, 3 cua đặt tay | trái `09`, dưới `03` |
+| `room_10` | Small, đỏ | Raid Rừng Dừa | Nhốt, 2 đợt quái, không thưởng; cọ dừa tài nguyên giữ nguyên | trái `09`, dưới `03` |
 | `room_11` | Small | Vách San Hô | Đấu Elite Crab đầu tiên; vách san hô nứt giấu lối ẩn | dưới `04`, phải `12` (bí mật) |
 | `room_12` | Medium, tím | Hang Kho Báu (ẩn) | Rương lớn, phục kích xương khi lại gần | trái `11` |
 | `room_13` | Medium, tím, chia mảnh | Đền Vực Tím | Đường đi bộ nối `05`–`14`; chuỗi đảo chỉ móc tới được có Ngọc Vực Sâu | dưới `05`, phải `14` |
@@ -123,7 +123,7 @@ cuối: móc + triều + quái) → `07` Trại Cuối Bờ (lửa trại và Si
 
 | Cơ chế | Dùng ở | Tài liệu / code |
 | --- | --- | --- |
-| Raid (nhốt, quái trồi theo đợt, rương) | `16`, `18`, `22` | [raid_room.md](../systems/raid_room.md), `world/gimmick/raid/` |
+| Raid (nhốt, quái trồi theo đợt, rương) | `10`, `16`, `18`, `22` | [raid_room.md](../systems/raid_room.md), `world/gimmick/raid/` |
 | Thủy triều nền phẳng | `01`, `02`, `06`, `17`, `19`, `22` | [flat_tide.md](flat_tide.md) |
 | Đợt quái theo triều (`TideWaveDirector`) | `01`, `02` | [flat_tide.md](flat_tide.md#đợt-quái-theo-kịch-bản) |
 | Doi cát (`TideSandbar`) | `17`, `19` | [flat_tide.md](flat_tide.md#doi-cát) |
@@ -257,9 +257,16 @@ khi thắng thì lửa trại đã có sẵn.
 
 Giữ câu đố phà hai điểm với cần gạt giấu trong rong, rương và bốn Elite Barrel quanh rương.
 
-### room_10 Rừng Dừa
+### room_10 Raid Rừng Dừa
 
-Giữ: tài nguyên dừa ngẫu nhiên, 3 cua đặt tay.
+Biển đỏ. Raid khóa cả hai cửa (trái về `09`, dưới về `03`) bằng cổng đá; vào sâu khoảng 7 m
+qua cầu tàu thì trận bắt đầu. Dọn hết quái thì cửa mở lại. **Không có rương thưởng.** Giữ tài
+nguyên cọ dừa ngẫu nhiên; 3 Crab đặt tay cũ được thay bằng các đợt dưới đây.
+
+| Đợt | Ý đồ | Quái |
+| --- | --- | --- |
+| 1 Phục kích | Tam giác quanh Foxy | Crab (Foxy, 0/−5, 0 s), Crab (Foxy, −4,5/3, 0,35 s), Crab (Foxy, 4,5/3, 0,7 s) |
+| 2 Hàng pháo | Barrel ở mép bắc giữa hàng cọ, ốc ép từ phía sau | Barrel (tâm, −7/−12, 0 s), Barrel (tâm, 7/−12, 0,3 s), Hermit Crab (Foxy, 0/5, 1 s) |
 
 ### room_11 Vách San Hô
 

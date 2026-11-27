@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dlo41ppcw1e4o" path="res://world/biomes/coral_valley/objects/beach_palm_03.tscn" id="beach_palm_03"]
 [ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
 [ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
-[ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/camp_lantern.tscn" id="camp_lantern"]
+[ext_resource type="PackedScene" uid="uid://beyw5jqr26w8v" path="res://world/biomes/coral_valley/objects/camp_lantern.tscn" id="camp_lantern"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
 [ext_resource type="PackedScene" uid="uid://b87qv8ygshhkn" path="res://world/biomes/coral_valley/objects/harbor_boat.tscn" id="harbor_boat"]
@@ -212,22 +212,40 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.15141487, 0.252, -9.730137
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 
 [node name="LanternWestPier" parent="Scenery" index="0" unique_id=254818799 instance=ExtResource("camp_lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, -2.9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0.7189827, -2.9)
 
 [node name="LanternWestRoad" parent="Scenery" index="1" unique_id=1485739848 instance=ExtResource("camp_lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -2.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0.7189827, -2.8)
 
 [node name="LanternWestSouth" parent="Scenery" index="2" unique_id=308685700 instance=ExtResource("camp_lantern")]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -10.2, 0, 3)
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -10.2, 0.7189827, 3)
 
 [node name="LanternEastRoad" parent="Scenery" index="3" unique_id=1326410804 instance=ExtResource("camp_lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -2.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.7189827, -2.8)
+
+[node name="Sprite3D" parent="Scenery/LanternEastRoad" index="0" unique_id=1097238905]
+flip_h = true
+
+[node name="CollisionShape3D" parent="Scenery/LanternEastRoad/Body" parent_id_path=PackedInt32Array(1326410804, 749251192) index="0" unique_id=589495490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6938057, 1, 0)
 
 [node name="LanternEastPier" parent="Scenery" index="4" unique_id=139396299 instance=ExtResource("camp_lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -2.9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0.7189827, -2.9)
+
+[node name="Sprite3D" parent="Scenery/LanternEastPier" index="0" unique_id=1097238905]
+flip_h = true
+
+[node name="CollisionShape3D" parent="Scenery/LanternEastPier/Body" parent_id_path=PackedInt32Array(139396299, 749251192) index="0" unique_id=589495490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6312084, 1, 0)
 
 [node name="LanternEastSouth" parent="Scenery" index="5" unique_id=1090630125 instance=ExtResource("camp_lantern")]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 10.4, 0, 3)
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 10.4, 0.7189827, 3)
+
+[node name="Sprite3D" parent="Scenery/LanternEastSouth" index="0" unique_id=1097238905]
+flip_h = true
+
+[node name="CollisionShape3D" parent="Scenery/LanternEastSouth/Body" parent_id_path=PackedInt32Array(1090630125, 749251192) index="0" unique_id=589495490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2199554, 0.99999994, 0)
 
 [node name="WreckWest" parent="Scenery" index="6" unique_id=66923694 instance=ExtResource("harbor_boat")]
 transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, -6, 0, -12.6)
@@ -252,19 +270,19 @@ transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 6.6, 0, -6.8)
 ground_shadow = true
 
 [node name="PalmTallNorthWest" parent="Scenery" index="12" unique_id=1151446676 instance=ExtResource("beach_palm_03")]
-transform = Transform3D(2.1, 0, 0, 0, 2.1, 0, 0, 0, 2.1, -12.5, 0, -9.5)
+transform = Transform3D(2.1, 0, 0, 0, 2.1, 0, 0, 0, 2.1, -12.5, 0.076086044, -9.5)
 ground_shadow = true
 
 [node name="PalmLeaningNorthEast" parent="Scenery" index="13" unique_id=1490072809 instance=ExtResource("beach_palm_01")]
-transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 12.8, 0, -10.6)
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 12.8, 0.076086044, -10.6)
 ground_shadow = true
 
 [node name="PalmShortSouthWest" parent="Scenery" index="14" unique_id=63907975 instance=ExtResource("beach_palm_02")]
-transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, -11.4, 0, 9)
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, -11.4, 0.076086044, 9)
 ground_shadow = true
 
 [node name="PalmShortSouthEast" parent="Scenery" index="15" unique_id=926605991 instance=ExtResource("beach_palm_02")]
-transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, 11.6, 0, 9.6)
+transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, 11.6, 0.076086044, 9.6)
 ground_shadow = true
 
 [editable path="Exits/DownPath"]
@@ -277,3 +295,6 @@ ground_shadow = true
 [editable path="Exits/LeftPath/SceneChangeTrigger"]
 [editable path="Environment/BaseGround"]
 [editable path="RoomAtmosphere"]
+[editable path="Scenery/LanternEastRoad"]
+[editable path="Scenery/LanternEastPier"]
+[editable path="Scenery/LanternEastSouth"]

@@ -260,7 +260,7 @@ Bộ nguyên liệu có sẵn để ghép dấu ấn:
 | room_07 | Trại Cuối Bờ (lửa trại 3, Silas), `ripple` + `wrack_line` | Đường đèn lồng từ cầu tàu tây sang đông, sân lửa trại, hai xác thuyền mắc cạn phía bắc, quầy Silas, ánh hoàng hôn |
 | room_08 | Boss, Bãi thường, `rock_shelf` + `wrack_line` | Đấu trường giữa biển: hai vòng cột đá, tảng đá và rêu khổng lồ vẽ tay đứng dưới nước bao quanh đảo, cầu gãy khi vào trận, biển đổi màu theo phase |
 | room_19 | NPC, Rừng dừa, `dunes` | Lùm cọ che chỗ Silas đứng, lá cọ và dừa rụng quanh quầy |
-| room_10 | Materials cua và dừa, Rừng dừa, `ripple` | Đống dừa rụng bên hai khúc gỗ ở góc đông bắc |
+| room_10 | Raid (2 đợt, không thưởng) giữ tài nguyên dừa, Rừng dừa, `ripple`, biển đỏ | Đống dừa rụng bên hai khúc gỗ ở góc đông bắc |
 | room_14 | Materials ốc mượn hồn và san hô, Rạn san hô, `tide_flats` | Cổng san hô khổng lồ: bốn khóm san hô scale 1,4–1,75 hai bên lối ra phải |
 
 ### Phòng kỳ quan

@@ -63,7 +63,7 @@ Luật hiển thị:
   bỏ qua, để double click không mua hay bán hai lần. Mọi giao dịch vẫn đi qua
   `MerchantTransactionService`.
 - **Điều khiển:** chuột; Page Up / Page Down đổi tab; phím mũi tên di chuyển giữa
-  các ô; Enter / Space chọn; Esc hoặc Back rời cửa hàng. Nút `Debug: Reroll Stock`
+  các ô; Enter / Space chọn; Esc, Tab hoặc Back rời cửa hàng (Tab không mở túi đồ cùng lúc). Nút `Debug: Reroll Stock`
   chỉ hiện trong bản debug.
 
 ## 3. Placing Silas on a map

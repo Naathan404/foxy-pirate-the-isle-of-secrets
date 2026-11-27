@@ -1,32 +1,31 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://beyw5jqr26w8v"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/biomes/coral_valley/camp_lantern.png" id="1_lantern"]
+[ext_resource type="Texture2D" uid="uid://c4pces10djj76" path="res://assets/sprites/biomes/coral_valley/camp_lantern.png" id="1_lantern"]
 
 [sub_resource type="CylinderShape3D" id="PoleShape"]
-height = 2.0
-radius = 0.2
+radius = 0.6147461
 
-[node name="CampLantern" type="Node3D"]
+[node name="CampLantern" type="Node3D" unique_id=532940700]
 editor_description = "Lantern post of the last camp before the boss. Pivot at the foot of the pole."
 
-[node name="Sprite3D" type="Sprite3D" parent="."]
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1097238905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61418223, 0, 0)
 offset = Vector2(60, 512)
 pixel_size = 0.005
 billboard = 1
-shaded = false
 alpha_cut = 2
 texture_filter = 0
 texture = ExtResource("1_lantern")
 
-[node name="Light" type="OmniLight3D" parent="."]
+[node name="Light" type="OmniLight3D" parent="." unique_id=715407311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 3.1, 0.3)
 light_color = Color(1, 0.66, 0.32, 1)
 light_energy = 2.2
 omni_range = 7.5
 
-[node name="Body" type="StaticBody3D" parent="."]
+[node name="Body" type="StaticBody3D" parent="." unique_id=749251192]
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body" unique_id=589495490]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("PoleShape")

@@ -81,8 +81,11 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Runs before GUI so Tab toggles the menu instead of moving focus.
 	if event.is_action_pressed(toggle_action):
+		var was_open := _is_open
 		toggle_inventory()
-		get_viewport().set_input_as_handled()
+		# When another menu holds the screen (the shop) the bag stays shut: leave Tab to it.
+		if was_open or _is_open:
+			get_viewport().set_input_as_handled()
 		return
 	if not _is_open or _is_closing:
 		return

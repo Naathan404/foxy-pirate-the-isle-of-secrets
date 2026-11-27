@@ -81,8 +81,8 @@ func _process(_delta: float) -> void:
 
 func _exit_tree() -> void:
 	_disconnect_registry()
-	for socket_id: int in _charm_runtimes:
-		_disconnect_charm_feedback(socket_id)
+	for socket_id: int in _charm_feedback:
+		_charm_feedback[socket_id].bind_runtime(null)
 
 
 # HUD gọi sau khi các node của Player đã ready để có loadout và registry hợp lệ
@@ -129,18 +129,8 @@ func refresh() -> void:
 func _bind_charm_feedback(socket_id: int, runtime: CharmRuntime) -> void:
 	if _charm_runtimes.get(socket_id) == runtime:
 		return
-	_disconnect_charm_feedback(socket_id)
-	_charm_feedback[socket_id].reset()
 	_charm_runtimes[socket_id] = runtime
-	if runtime != null:
-		runtime.proc_triggered.connect(_charm_feedback[socket_id].play)
-
-
-func _disconnect_charm_feedback(socket_id: int) -> void:
-	var previous := _charm_runtimes.get(socket_id) as CharmRuntime
-	var feedback := _charm_feedback[socket_id]
-	if previous != null and previous.proc_triggered.is_connected(feedback.play):
-		previous.proc_triggered.disconnect(feedback.play)
+	_charm_feedback[socket_id].bind_runtime(runtime)
 
 
 func _update_icon(socket_id: int, runtime: CharmRuntime) -> void:

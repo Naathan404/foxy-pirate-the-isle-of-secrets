@@ -230,9 +230,9 @@ Player sở hữu khóa vận theo effect để một effect kết thúc chỉ t
 
 Fixed reward dùng definition có nguồn `fixed_boss_reward`. Glacial Spikes, Meteor Strike và Devil Contract là thưởng boss 100%. Tide Grapple có nguồn riêng `fixed_trial_reward`: thưởng cố định trong rương thưởng Raid `room_16` (Coral Valley), nhặt như mọi Charm rơi. Rương boss Blubberbeard giờ cho Chìa khóa Thủy Triều. Checkout có encounter Blubberbeard. Ba boss mới chỉ có thể kiểm tra qua đường grant và pickup.
 
-Sáu charm chưa có nguồn nhận đã chốt (năm prototype cũ và Adrenaline Surge) nay là playable với
-`drop_chance = 0`: nhặt được từ pickup đặt sẵn, không tự rơi. Adrenaline Surge có nguồn
-`merchant_or_enemy_drop` nên nằm trong shop pool. Anchor đặt ấn tốn 300 SP, HUD hiện phím gọi về trong 5 s. Hồi chiêu 8 s từ lúc gọi về hoặc hết hạn. Whirlpool vận 1,5 s, kéo quái thường và nổ 2,5×, tốn 300 SP, hồi 8 s. Salute giữ chân và tiêu 100 SP/s, nhả phím hoặc cạn SP thì nổ và bắt đầu hồi 6 s. Death Bloom nổ sau 0,32 s khi hạ quái bằng đòn thường, gây 1 HP cho cả Foxy lẫn địch trong bán kính 2. Shadow Renment để bóng ở điểm bắt đầu dash, nổ 1,5× sau 0,5 s trong bán kính 2. Hai passive chưa có nguồn hoặc tỉ lệ nhận trên Sheet.
+Năm prototype cũ chưa có nguồn nhận đã chốt nay là playable với `drop_chance = 0`: nhặt được từ
+pickup đặt sẵn, không tự rơi. Adrenaline Surge đã bị bỏ khỏi game (data, item, icon, effect).
+Anchor đặt ấn tốn 300 SP, HUD hiện phím gọi về trong 5 s. Hồi chiêu 8 s từ lúc gọi về hoặc hết hạn. Whirlpool vận 1,5 s, kéo quái thường và nổ 2,5×, tốn 300 SP, hồi 8 s. Salute giữ chân và tiêu 100 SP/s, nhả phím hoặc cạn SP thì nổ và bắt đầu hồi 6 s. Death Bloom nổ sau 0,32 s khi hạ quái bằng đòn thường, gây 1 HP cho cả Foxy lẫn địch trong bán kính 2. Shadow Renment để bóng ở điểm bắt đầu dash, nổ 1,5× sau 0,5 s trong bán kính 2. Hai passive chưa có nguồn hoặc tỉ lệ nhận trên Sheet.
 
 ### 10.2 Shop pool
 
@@ -383,16 +383,35 @@ Tốc độ phóng/thu chỉnh bằng `hook_speed` / `return_speed` tại `tide_
 `CharmRuntime.proc_triggered(message, color)` là signal chỉ dành cho presentation.
 Effect phát signal sau khi lợi ích có điều kiện thực sự xảy ra. `EquipmentControl` nối
 signal cho từng runtime đang equip và ngắt khi đổi/tháo Charm hoặc HUD rời scene.
-`gameplay/player/hud/charm_proc_feedback.gd/.tscn` quản lý punch scale 1,3 lần, tint và
-nhãn nổi 0,7 giây. Tween dùng thời gian thực để vẫn rõ trong hitstop; các proc trong
-120 ms được gộp về mặt trình bày để tránh chồng animation.
+`gameplay/player/hud/charm_proc_feedback.gd/.tscn` dựng phần trình bày của một lần kích hoạt:
+- icon chớp trắng rồi nhuộm màu proc, punch scale 1,45 lần, nảy lại;
+- khung ô nảy 1,12 lần;
+- một viền hình thoi màu proc loang ra từ ô;
+- nhãn nổi phía trên ô, font chính của Inventory (`inventory_menu_theme`, Patrick Hand cỡ 26).
+  Nhãn bật to rồi bay lên, giữ khoảng 0,65 giây rồi mờ dần, và tự dịch ngang để không tràn khỏi
+  mép màn hình.
+
+Charm Chủ động có thêm phản hồi riêng. Ba signal trình bày của `CharmRuntime` do
+`CharmRegistry.input_pressed` phát:
+
+| Signal | Khi nào | HUD |
+| --- | --- | --- |
+| `activated` | Charm Chủ động kích hoạt thành công | Tên charm (in hoa) bật lên, icon chớp và phồng 1,6 lần nổi trên lớp hồi chiêu, khung nảy, hai viền hình thoi loang nối nhau. Màu lấy từ màu chủ đạo của icon charm. |
+| `activation_rejected(reason)` | Bấm khi đang hồi chiêu (`cooldown`) hoặc thiếu SP (`cost`) | Ô rung ngang, icon nháy đỏ, chữ nhỏ `NOT READY` / `NO SP`. Các lý do khác (đang thi triển charm khác, effect từ chối) không hiện gì. |
+| `cooldown_ready` | Hồi chiêu chạy về 0, hoặc bị reset | Icon nảy nhẹ 1,18 lần, chớp sáng và một viền mảnh; không có chữ. |
+
+`CharmProcFeedback.bind_runtime` tự nối và ngắt các signal này theo charm đang ở ô.
+
+Lớp phản hồi vẽ trên toàn HUD (`z_index = 20`). Ô đang kích hoạt được nâng lên trong lúc punch,
+nên nhãn và icon phồng không bị các ô bên cạnh che. Các thông số chỉnh trong nhóm Icon, Ring,
+Word và Rejection của scene. Tween dùng thời gian thực để vẫn rõ trong hitstop; các sự kiện
+trong 120 ms được gộp về mặt trình bày để tránh chồng animation.
 
 | Passive | Nhãn / điều kiện |
 | --- | --- |
 | Life Steal | `+1 HP` (hoặc lượng HP thực hồi); chỉ hiện khi `heal()` trả về giá trị dương, không hiện khi đầy HP. Mốc hit vẫn đọc từ resource, hiện là 12. |
 | Double Strike | `DOUBLE!` sau hit gây damage có kết quả proc thành công. |
 | Backstabber | `BACKSTAB` sau hit gây damage được áp dụng bonus đánh sau lưng. |
-| Adrenaline Surge | `RESET +SP` khi kill proc thành công và reset cooldown/hồi SP. |
 | Chaos Collector | `CHAOS READY` khi chính lượng Chaos cộng bởi Charm đưa thanh từ chưa đầy sang đầy; không nhấp nháy ở mọi hit. |
 
 Fortune Leaf chớp xanh ở pickup khi chính phần tăng xác suất tạo ra lượt rơi. Crimson Band chỉ báo BLEED khi bắt đầu chuỗi trên một mục tiêu. Momentum Strike và Skull Cracker báo lúc nạp và lúc gây choáng.
@@ -412,7 +431,7 @@ Các file tích hợp của phần presentation:
 | `gameplay/charms/charm_data/` | `arrow_rain.tres`, `tide_grapple.tres` | Timing loạt tên, thời gian bay và tốc độ phóng/thu móc. |
 | `assets/sprites/effects/charms/` | `tide_hook.png`, `tide_chain.png`, `buckshot_projectile.png`, `generation.json` và import tương ứng | Sprite VFX, nguồn và prompt tạo ảnh. |
 | `gameplay/charms/base/` | `charm_runtime.gd` | Signal proc cho UI. |
-| `gameplay/charms/passive/` | `life_steal_effect.gd`, `double_strike_effect.gd`, `backstabber_effect.gd`, `adrenaline_surge_effect.gd`, `chaos_collector_effect.gd` | Phát feedback tại điều kiện thực sự có hiệu lực. |
+| `gameplay/charms/passive/` | `life_steal_effect.gd`, `double_strike_effect.gd`, `backstabber_effect.gd`, `chaos_collector_effect.gd` | Phát feedback tại điều kiện thực sự có hiệu lực. |
 | `gameplay/player/hud/` | `charm_proc_feedback.gd`, `charm_proc_feedback.tscn`, `charm_proc_feedback.gd.uid`, `equipment_control.gd` | Animation icon và kết nối/ngắt runtime theo loadout. |
 | `docs/gameplay/economy/` | `charm_system.md` | Thông số, cách tích hợp và điểm chỉnh sửa. |
 
