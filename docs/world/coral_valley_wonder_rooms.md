@@ -70,7 +70,7 @@ phòng Raid, tím cho bí ẩn. Đất chia mảnh là công cụ chính của c
 
 | Phòng | Loại | Kiểu | Nội dung |
 | --- | --- | --- | --- |
-| `room_24` | Đảo Vỡ (ẩn) | Đất chia mảnh | 3 mảnh nối bằng 2 lạch nông; đảo nhỏ phía đông có rương bí mật (30–50 vàng), đảo nhỏ phía bắc có một cây dừa đơn độc; cả hai chỉ tới được bằng Tide Grapple |
+| `room_24` | Đảo Vỡ (ẩn) | Đất chia mảnh | Bãi chính liền đất (hai lạch cũ đã bỏ); đảo nhỏ phía đông có rương bí mật (30–50 vàng), đảo nhỏ phía bắc có một cây dừa đơn độc; cả hai chỉ tới được bằng Tide Grapple |
 | `room_13` | Đền Vực Tím | Biển `violet_glow` + đất chia mảnh | Chuỗi ba vực móc tới bệ Ngọc Vực Sâu, đường về một chiều |
 | `room_12`, `room_20` | Phòng ẩn | Biển `violet_glow` (`room_20` thêm vành đá ngầm) | Kho báu canh bởi quái |
 | `room_16`, `room_18`, `room_22` | Raid | Biển `red_tide` | Vào là bị nhốt tới khi dọn xong |

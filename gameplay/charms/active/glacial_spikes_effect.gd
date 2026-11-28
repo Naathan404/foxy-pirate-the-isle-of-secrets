@@ -86,6 +86,8 @@ func _physics_process(delta: float) -> void:
 		_end_cast_lock()
 		_play_cast_animation(&"slam", _forward, GlacialSpike.RISE_SECONDS, true)
 		CharmVfx.spawn(actor.get_parent(), _origin, ICE, SLAM_FLASH_RADIUS, SLAM_FLASH_SECONDS)
+		CharmFeel.shake(actor, 4.5, 0.14)
+		CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, _origin, -6.0, 1.35)
 	var last_row := maxi(1, definition.get_param_int(&"row_count") - 1)
 	var height_scale := lerpf(
 		FIRST_RANK_HEIGHT_SCALE, LAST_RANK_HEIGHT_SCALE, float(_row) / last_row
@@ -139,6 +141,8 @@ func _hit_hurtbox(hurtbox: HurtBox, site: Vector3) -> void:
 	if not _impact_reported:
 		_impact_reported = true
 		get_node("/root/ScreenShakeController").request(5.0, 0.16)
+		CharmFeel.flash(actor, ICE, 0.08, 0.14)
+		CharmFeel.hitstop(actor, 0.04, target)
 		get_node("/root/AudioManager").play_sfx_3d(
 			preload("res://assets/audio/combat/bow_impact.wav"), target.global_position, -6.0
 		)

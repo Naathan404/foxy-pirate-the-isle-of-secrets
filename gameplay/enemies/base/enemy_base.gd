@@ -23,6 +23,9 @@ const Teams := preload("res://gameplay/combat/combat_teams.gd")
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
 const DAMAGE_POPUP = preload("res://gameplay/combat/damage_popup_presenter.gd")
 const LOOT_SPREAD_ANGLE: float = 2.39996323  # Golden angle separates successive drops.
+## Loot of an enemy lost to the void lands this far back from where it last stood, away from
+## the edge it went over.
+const VOID_LOOT_INSET_METERS: float = 0.8
 
 @export var data: EnemyData
 @export var charm_loot: Array[BaseItem] = []
@@ -53,6 +56,9 @@ var target: Node3D
 var move_direction: Vector3 = Vector3.ZERO
 var last_facing_direction: Vector3 = Vector3.BACK
 var dead: bool = false
+## Whether dropping with nothing below kills this enemy. Fliers turn it off; the room's
+## lowest height still applies to them.
+var dies_falling_over_void: bool = true
 var pending_hit_direction: Vector3 = Vector3.ZERO
 var pending_knockback_multiplier: float = 1.0
 var pending_charm_stun_seconds: float = 0.0
@@ -65,6 +71,9 @@ var _charm_grapple_tween: Tween
 var _external_push_velocity: Vector3 = Vector3.ZERO
 var _loot_direction_angle: float = 0.0
 var _loot_drop_index: int = 0
+var _last_ground_position := Vector3.INF
+## Where loot drops instead of at the body; INF means at the body.
+var _loot_origin_override := Vector3.INF
 
 @onready var hp: HealthComponent = $HealthComponent
 @onready var hurtbox: HurtBox = $Direction/HurtBox
@@ -125,6 +134,8 @@ func _physics_process(delta: float) -> void:
 	elif velocity.y < 0.0:
 		velocity.y = 0.0
 	move_and_slide()
+	if is_on_floor():
+		_last_ground_position = global_position
 	if not _external_push_velocity.is_zero_approx():
 		move_and_collide(_external_push_velocity * maxf(0.0, delta))
 		_external_push_velocity = _external_push_velocity.move_toward(
@@ -470,6 +481,27 @@ func die() -> void:
 	died.emit()
 
 
+## True while Tide Grapple is pulling this enemy, often through the air over a gap.
+func is_grapple_pulled() -> bool:
+	return _charm_grapple_tween != null and _charm_grapple_tween.is_valid()
+
+
+## Lost over an edge: the enemy dies as usual (raids and waves count it), but its loot lands
+## back where it last stood so the rewards are not lost with it.
+func die_in_void() -> void:
+	if dead:
+		return
+	if _last_ground_position.is_finite():
+		var back := _last_ground_position - global_position
+		back.y = 0.0
+		_loot_origin_override = _last_ground_position + back.normalized() * VOID_LOOT_INSET_METERS
+	die()
+
+
+func _loot_origin() -> Vector3:
+	return _loot_origin_override if _loot_origin_override.is_finite() else global_position
+
+
 func request_state(state_name: StringName, priority: int = 0) -> bool:
 	if not is_instance_valid(fsm):
 		return false
@@ -663,7 +695,7 @@ func _drop_gold() -> void:
 	var pool := GoldPickupPool.for_scene(self)
 	if pool != null:
 		var amount: int = randi_range(data.min_gold_amount, data.max_gold_amount)
-		pool.spawn_gold(global_position, amount, _next_loot_direction())
+		pool.spawn_gold(_loot_origin(), amount, _next_loot_direction())
 
 
 func _prepare_loot_pools() -> void:
@@ -737,10 +769,10 @@ func _roll_item_pickup(item: BaseItem, quantity: int, chance: float, multiplier:
 	pickup.item = item
 	pickup.quantity = quantity
 	loot_parent.add_child(pickup)
-	pickup.global_position = global_position
+	pickup.global_position = _loot_origin()
 	pickup.play_drop_animation(_next_loot_direction())
 	if roll >= chance and chance < 1.0:
-		CharmVfx.spawn(loot_parent, global_position, Color.SPRING_GREEN, 0.8)
+		CharmVfx.spawn(loot_parent, _loot_origin(), Color.SPRING_GREEN, 0.8)
 
 
 func _drop_note() -> void:
@@ -756,7 +788,7 @@ func _drop_note() -> void:
 	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
 	pickup.note = note_drop
 	loot_parent.add_child(pickup)
-	pickup.global_position = global_position
+	pickup.global_position = _loot_origin()
 	pickup.play_drop_animation(_next_loot_direction())
 
 

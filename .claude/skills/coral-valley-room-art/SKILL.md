@@ -244,7 +244,7 @@ Khi người dùng muốn phòng "đặc biệt", "wow", đất chia mảnh, bi�
   4. Vực: `grapple_post.tscn` ở cả hai bờ, thẳng hàng; thêm `split_checks` vào layout rồi chạy
      `check_split_islands.gd`.
   5. Rong: sinh ứng viên dọc mép từng mảnh, không nằm trong lạch hay phần chồng.
-  `room_24` là mẫu.
+  `room_24` là mẫu chia mảnh và móc (hai lạch cũ của nó đã bỏ; ba mảnh giữa giờ liền đất).
 - **Biển màu lạ:** chạy `apply_sea_palette.py <số phòng> <bảng màu>`, rồi thêm `painted_water` vào
   layout và bake lại nền. `room_16` và `room_13` là mẫu.
 - **Đá ngầm:** thêm `reef_rocks` vào layout, chạy `bake_reef_rocks.py` sau `bake_ground.py`, rồi
@@ -327,7 +327,7 @@ tự sửa nội dung phòng trong tài liệu bố cục; đó là quyết đ�
 | `scripts/make_fence_post.py` | Vẽ cọc rào gỗ trôi (3 kiểu) và dây thừng cho `RoomEdgeFence`; chỗ buộc dây ở `TIE_RATIO`, phải khớp `LASHING_RATIO` trong `room_edge_fence.gd` |
 | `scripts/make_lever_sign.py` | Vẽ biển gỗ cho cần gạt đi theo vòng (`+3` theo chiều kim đồng hồ, `−2` ngược chiều) |
 | `scripts/split_collision.py` | Ghi va chạm từng mảnh đảo (sau `bake_ground.py`) vào scene phòng; hỗ trợ đảo thứ hai (`ground_node`, `body_x`) |
-| `scripts/layouts/room_24.json` | Layout mẫu phòng chia mảnh (`islands`, `channels`, `split_checks`) |
+| `scripts/layouts/room_24.json` | Layout mẫu phòng chia mảnh (`islands`, `split_checks`) |
 | `scripts/godot/check_split_islands.gd` | Chơi thử phòng chia mảnh: lội lạch, vực chặn, móc qua lại |
 | `scripts/godot/probe_room.gd` | Đo `ground_rect`, độ lệch hình–va chạm, danh sách prop, ngân sách |
 | `scripts/godot/check_props.gd` | Kiểm prop theo AD, có mã thoát |

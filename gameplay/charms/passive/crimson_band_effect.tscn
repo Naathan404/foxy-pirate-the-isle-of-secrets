@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bacm4pls2px64"]
 
-[ext_resource type="Script" path="res://gameplay/charms/passive/crimson_band_effect.gd" id="1"]
+[ext_resource type="Script" uid="uid://cjjsavbyo701w" path="res://gameplay/charms/passive/crimson_band_effect.gd" id="1"]
 
-[node name="CrimsonBandEffect" type="Node"]
+[node name="CrimsonBandEffect" type="Node" unique_id=273594813]
 script = ExtResource("1")

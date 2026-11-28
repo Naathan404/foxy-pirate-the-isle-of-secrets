@@ -23,12 +23,14 @@ func on_dash_finished(interrupted: bool) -> void:
 	if not interrupted:
 		_armed = true
 		runtime.proc_triggered.emit("MOMENTUM", CharmVfx.TIDE)
+		CharmVfx.spawn(actor.get_parent(), actor.global_position, CharmVfx.TIDE, 0.9)
 
 
 func _on_attack_released(attack: AttackContext) -> void:
 	if _armed and attack.action == &"normal":
 		_armed = false
 		attack.damage_hp *= definition.get_param_float(&"damage_multiplier")
+		CharmFeel.shake(actor, 3.0, 0.1)
 		CharmVfx.streak(
 			actor.get_parent(),
 			attack.origin + Vector3.UP * 0.6,

@@ -18,9 +18,9 @@ acquisition_source = &"fixed_boss_reward"
 drop_chance = 1
 tags = Array[StringName]([&"active"])
 effect_params = {
-"bleed_fraction": 0.02,
+"bleed_fraction": 0.03,
 "burn_seconds": 3,
-"damage_multiplier": 2,
+"damage_multiplier": 3.0,
 "interval_seconds": 0.18,
 "radius_units": 1.8,
 "spread_units": 1.65,

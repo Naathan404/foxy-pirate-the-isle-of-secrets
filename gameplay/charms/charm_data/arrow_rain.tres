@@ -18,7 +18,7 @@ acquisition_source = &"merchant_or_enemy_drop"
 drop_chance = 0.05
 tags = Array[StringName]([&"active", &"projectile"])
 effect_params = {
-"damage_percent": 1.0,
+"damage_percent": 1.5,
 "flight_duration_seconds": 0.34,
 "flight_height_units": 5.0,
 "impact_activation_progress": 0.52,

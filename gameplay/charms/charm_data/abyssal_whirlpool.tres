@@ -8,7 +8,7 @@
 script = ExtResource("1_data")
 charm_id = &"abyssal_whirlpool"
 display_name = "Abyssal Whirlpool"
-description = "Stand still for 1.5 seconds to draw nearby enemies into a whirlpool. The final blast deals 250% weapon damage."
+description = "Stand still for 1.5 seconds while a whirlpool drags every enemy within 6 units into its eye. The final geyser deals 375% weapon damage within 3.5 units and shatters the scenery there."
 sprite = ExtResource("3_icon")
 charm_type = 0
 effect_scene = ExtResource("2_effect")
@@ -18,7 +18,11 @@ acquisition_source = &"prototype_debug"
 drop_chance = 0.0
 tags = Array[StringName]([&"active", &"zone"])
 effect_params = {
-"damage_multiplier": 2.5,
+"damage_multiplier": 3.75,
 "duration_seconds": 1.5,
-"radius_units": 2.5
+"prop_break_max_hp": 10.0,
+"pull_radius_units": 6.0,
+"pull_speed_end": 9.0,
+"pull_speed_start": 3.0,
+"radius_units": 3.5
 }

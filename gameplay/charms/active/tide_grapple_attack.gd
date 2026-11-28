@@ -232,7 +232,10 @@ func _apply_damage(collider: Object, target: Node) -> void:
 			preload("res://assets/audio/combat/bow_impact.wav"), _hook_position, -8.0
 		)
 		context.damage_applied.emit(damage, target, applied_hp)
-		get_node("/root/HitstopController").request_local(context.actor, target as Node3D, 0.04)
+		get_node("/root/HitstopController").request_local(context.actor, target as Node3D, 0.06)
+		CharmVfx.spawn(get_parent(), _hook_position, CharmVfx.TIDE, 0.9)
+		CharmFeel.shake(self, 5.0, 0.14)
+		CharmFeel.flash(self, CharmVfx.TIDE, 0.07, 0.12)
 
 
 func _resolve_target_pull(target: Node) -> StringName:

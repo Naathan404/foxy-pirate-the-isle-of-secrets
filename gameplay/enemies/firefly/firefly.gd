@@ -167,6 +167,8 @@ var _last_reaction_kind: int = -1
 
 
 func _ready() -> void:
+	# It hovers and swoops over water on purpose.
+	dies_falling_over_void = false
 	ai = AI_CLASS.new()
 	home_position = global_position
 	orbit_sign = 1.0 if randf() >= 0.5 else -1.0

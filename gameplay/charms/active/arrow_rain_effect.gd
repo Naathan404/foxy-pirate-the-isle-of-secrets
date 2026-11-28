@@ -8,6 +8,10 @@ signal projectile_launched(
 
 const CHARM_ATTACK_SCENE = preload("res://gameplay/charms/active/arrow_rain_attack.tscn")
 const TELEGRAPH_SCENE = preload("res://gameplay/charms/active/arrow_rain_telegraph.tscn")
+const VOLLEY_COLOR := Color(1.0, 0.72, 0.3)
+## Height and reach of the bow flash at each release.
+const MUZZLE_HEIGHT_METERS := 0.9
+const MUZZLE_REACH_METERS := 0.6
 
 var _remaining_projectiles: int = 0
 var _projectile_timer: float = 0.0
@@ -178,6 +182,7 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 		return
 	_remaining_projectiles -= 1
 	_launched_projectile_count += 1
+	_play_release_feedback(execution.context.direction)
 	if _remaining_projectiles > 0:
 		_play_cast_animation(
 			&"volley",
@@ -200,6 +205,17 @@ func _spawn_projectile(context: CharmActivationContext) -> void:
 		execution.context.direction,
 		execution.context.damage_hp
 	)
+
+
+## Each arrow leaving the bow: a twang that never repeats exactly, a flash at the bow and a
+## small kick of the camera.
+func _play_release_feedback(direction: Vector3) -> void:
+	var bow := (
+		actor.global_position + Vector3.UP * MUZZLE_HEIGHT_METERS + direction * MUZZLE_REACH_METERS
+	)
+	CharmVfx.spawn(actor.get_parent(), bow, VOLLEY_COLOR, 0.45, 0.16)
+	CharmFeel.sound(actor, CharmFeel.RELEASE_SOUND, bow, -6.0, randf_range(0.92, 1.18))
+	CharmFeel.shake(actor, 1.8, 0.06)
 
 
 func _get_projectile_interval() -> float:
@@ -233,7 +249,6 @@ func _spawn_telegraph() -> void:
 		(
 			definition.get_param_float(&"volley_duration_seconds", 1.4)
 			+ definition.get_param_float(&"flight_duration_seconds", 0.8)
-			+ definition.get_param_float(&"impact_lifetime_seconds", 0.18)
 		)
 	)
 	var parent := actor.get_parent()

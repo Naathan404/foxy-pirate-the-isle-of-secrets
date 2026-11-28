@@ -8,14 +8,14 @@
 script = ExtResource("1")
 charm_id = &"shadow_renment"
 display_name = "Shadow Renment"
-description = "Leave a shadow at the start of a dash. It bursts after half a second."
+description = "Leave a shadow at the start of a dash. It bursts after half a second, hitting every enemy around it."
 sprite = ExtResource("3")
 effect_scene = ExtResource("2")
 acquisition_source = &"prototype_debug"
 drop_chance = 0.0
 tags = Array[StringName]([&"passive"])
 effect_params = {
-"damage_multiplier": 1.5,
+"damage_multiplier": 2.25,
 "delay_seconds": 0.5,
-"radius_units": 2
+"radius_units": 3
 }

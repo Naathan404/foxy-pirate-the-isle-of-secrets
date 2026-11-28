@@ -62,6 +62,19 @@ func _physics_process(delta: float) -> void:
 			_particles = PARTICLES.instantiate() as CPUParticles3D
 			actor.add_child(_particles)
 			_play_cast_animation(&"release", _direction, RELEASE_SECONDS, true)
+			CharmBlastVfx.burst(
+				actor.get_parent(),
+				actor.global_position,
+				CharmBlastVfx.Kind.SPARK,
+				2.6,
+				AURA_COLOR
+			)
+			CharmFeel.shake(actor, 6.0, 0.2)
+			CharmFeel.flash(actor, AURA_COLOR, 0.14, 0.2)
+			CharmFeel.shockwave(
+				actor, actor.global_position + Vector3.UP * 0.8, AURA_COLOR, 0.0, 0.01, 0.5
+			)
+			CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, actor.global_position, -3.0, 0.6)
 			var attack_bonus := roundi(
 				(definition.get_param_float(&"damage_multiplier") - 1.0) * 100
 			)

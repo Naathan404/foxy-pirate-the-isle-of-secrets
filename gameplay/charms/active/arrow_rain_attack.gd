@@ -1,6 +1,15 @@
 class_name ArrowRainAttack
 extends CharmActiveAttack
-## Một mũi tên Arrow Rain bay theo parabol rồi cắm xuống điểm rơi.
+## Một mũi tên Arrow Rain bay theo parabol rồi cắm xuống điểm rơi, kéo theo vệt lửa.
+
+const FIRE_TRAIL: PackedScene = preload("res://assets/vfx/fire_trails/Fire_Trail.tscn")
+## Shrinks the authored fire trail to arrow size.
+const TRAIL_WIDTH_SCALE := 0.5
+const TRAIL_TIME_SCALE := 0.24
+## The flame leaves from the fletching, this far behind the arrow's centre.
+const TRAIL_BACK_METERS := 0.45
+const LANDING_RADIUS_METERS := 0.9
+const LANDING_COLOR := Color(1.0, 0.72, 0.3)
 
 @export var flight_start: Vector3 = Vector3.ZERO
 @export var flight_control: Vector3 = Vector3.ZERO
@@ -16,6 +25,8 @@ var _impact_hold_remaining: float = 0.0
 var _impact_armed: bool = false
 var _previous_position: Vector3 = Vector3.ZERO
 var _landed: bool = false
+var _fire_trail: ProjectileFireTrail
+var _heading: Vector3 = Vector3.DOWN
 
 @onready var _sprite: Sprite3D = $Sprite3D
 @onready var _sprite_scale: Vector3 = _sprite.scale
@@ -87,9 +98,17 @@ func _physics_process(delta: float) -> void:
 			_landed = true
 			if is_instance_valid(_trail):
 				_trail.hide()
-			CharmVfx.spawn(get_parent(), flight_end, trail_color, 1.1 if volley_finisher else 0.65)
-			if volley_finisher and _impact_reported:
-				get_node("/root/ScreenShakeController").request(4.0, 0.14)
+			_release_fire_trail()
+			CharmBlastVfx.burst(
+				get_parent(),
+				flight_end,
+				CharmBlastVfx.Kind.SPARK,
+				LANDING_RADIUS_METERS,
+				LANDING_COLOR
+			)
+			CharmFeel.sound(
+				self, CharmFeel.IMPACT_SOUND, flight_end, -14.0, randf_range(1.1, 1.35)
+			)
 		_impact_hold_remaining -= step
 		if _impact_hold_remaining <= 0.0:
 			_cancel_and_free()
@@ -148,6 +167,33 @@ func _update_visual_basis(direction: Vector3) -> void:
 		* Basis(Vector3.BACK, angle)
 		* Basis.from_scale(_sprite_scale)
 	)
+
+
+func _start_trail() -> void:
+	_fire_trail = ProjectileFireTrail.new(
+		FIRE_TRAIL, get_parent(), _trail_anchor(), TRAIL_WIDTH_SCALE, TRAIL_TIME_SCALE
+	)
+
+
+func _update_trail(direction: Vector3) -> void:
+	_heading = direction.normalized()
+	if _fire_trail != null:
+		_fire_trail.follow(_trail_anchor())
+
+
+func _trail_anchor() -> Vector3:
+	return global_position - _heading * TRAIL_BACK_METERS
+
+
+func _release_fire_trail() -> void:
+	if _fire_trail != null:
+		_fire_trail.release(_trail_anchor())
+	_fire_trail = null
+
+
+func _exit_tree() -> void:
+	super._exit_tree()
+	_release_fire_trail()
 
 
 func _cancel_and_free() -> void:

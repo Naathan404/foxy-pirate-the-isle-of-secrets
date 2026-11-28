@@ -5,6 +5,9 @@ extends RefCounted
 signal cooldown_changed(remaining_seconds: float)
 ## Emitted after a conditional benefit actually resolves, for equipped-slot presentation.
 signal proc_triggered(message: String, color: Color)
+## A small gain from one hit (Chaos Collector); the HUD adds up quick ones into one word
+## such as "+6 CP" (presentation only).
+signal gain_ticked(amount: float, unit: String, color: Color)
 ## An Active Charm was cast from its socket (presentation only).
 signal activated
 ## The socket was pressed but the Active Charm could not be cast; `reason` is

@@ -8,14 +8,14 @@
 script = ExtResource("1")
 charm_id = &"death_bloom"
 display_name = "Death Bloom"
-description = "Enemies slain by normal attacks explode after a brief warning, damaging Foxy and nearby foes."
+description = "Enemies slain by normal attacks bloom and explode after a brief warning, damaging nearby foes."
 sprite = ExtResource("3")
 effect_scene = ExtResource("2")
 acquisition_source = &"prototype_debug"
 drop_chance = 0.0
 tags = Array[StringName]([&"passive"])
 effect_params = {
-"blast_hp": 1,
+"blast_hp": 1.5,
 "delay_seconds": 0.32,
-"radius_units": 2
+"radius_units": 3
 }

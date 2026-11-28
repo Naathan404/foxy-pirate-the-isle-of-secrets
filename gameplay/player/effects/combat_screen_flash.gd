@@ -1,5 +1,8 @@
 extends CanvasLayer
 ## Player-owned presentation, driven by the existing confirmed-damage and charge signals.
+## Charms reach it through the GROUP (see CharmFeel.flash).
+
+const GROUP := &"combat_screen_flash"
 
 @export var player: Player
 @export var weapons: WeaponController
@@ -28,6 +31,7 @@ var _priority: int = 0
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	if not is_instance_valid(player) or not is_instance_valid(weapons):
 		push_warning("CombatScreenFlash requires player and weapon controller")
 		return
@@ -66,6 +70,12 @@ func _on_charge_released(context: AttackContext) -> void:
 	):
 		return
 	_play_flash(bow_color, bow_opacity, bow_seconds, 1)
+
+
+## A short colour wash over the screen. Higher `priority` may replace a weaker flash at once;
+## equal or lower waits for `minimum_interval`.
+func flash(color: Color, opacity: float, seconds: float, priority: int = 1) -> void:
+	_play_flash(color, opacity, seconds, priority)
 
 
 func _play_flash(color: Color, opacity: float, seconds: float, priority: int) -> void:

@@ -3,6 +3,8 @@ extends Control
 ## Presentation of one HUD charm slot. It follows the slot's CharmRuntime and shows:
 ## - a proc (`proc_triggered`): icon flash and punch, frame bounce, a diamond ring in the proc
 ##   colour and the proc word above the slot;
+## - a small gain (`gain_ticked`): a light punch and a thin ring with a small "+N" word that
+##   adds up while gains keep coming;
 ## - a cast of an Active Charm (`activated`): the same, stronger, with a second ring and the
 ##   charm's name, all in the charm's own colour (taken from its icon);
 ## - a press that could not cast (`activation_rejected`): the slot shakes, the icon flashes red
@@ -64,6 +66,13 @@ static var _accent_cache: Dictionary = {}
 @export_range(0.1, 3.0, 0.05, "suffix:s") var word_hold_seconds: float = 0.65
 @export_range(0.05, 1.5, 0.05, "suffix:s") var word_fade_seconds: float = 0.35
 
+@export_group("Gain tick")
+@export_range(1.0, 1.6, 0.01) var tick_punch_scale: float = 1.2
+## Size of the "+N" word compared with a proc or cast word.
+@export_range(0.3, 1.0, 0.05) var tick_word_scale: float = 0.8
+## A gain within this time of the last one adds to the word instead of starting over.
+@export_range(0.2, 3.0, 0.05, "suffix:s") var tick_sum_seconds: float = 0.9
+
 @export_group("Rejection")
 @export_range(0.0, 20.0, 0.5, "suffix:px") var shake_pixels: float = 5.0
 @export_range(0.05, 0.6, 0.01, "suffix:s") var shake_seconds: float = 0.24
@@ -78,6 +87,9 @@ var _slot_rest_z: int = 0
 var _tween: Tween
 var _shake_tween: Tween
 var _last_event_msec: int = -1000
+## Sum shown by the running gain word, and when it was last added to.
+var _tick_total: float = 0.0
+var _last_tick_msec: int = -100000
 
 @onready var _ring: Panel = $Ring
 @onready var _ring_2: Panel = $Ring2
@@ -105,12 +117,15 @@ func bind_runtime(runtime: CharmRuntime) -> void:
 		return
 	if _runtime != null:
 		_runtime.proc_triggered.disconnect(play)
+		_runtime.gain_ticked.disconnect(play_tick)
 		_runtime.activated.disconnect(_on_activated)
 		_runtime.activation_rejected.disconnect(_on_activation_rejected)
 		_runtime.cooldown_ready.disconnect(_on_cooldown_ready)
 	_runtime = runtime
+	_last_tick_msec = -100000
 	if _runtime != null:
 		_runtime.proc_triggered.connect(play)
+		_runtime.gain_ticked.connect(play_tick)
 		_runtime.activated.connect(_on_activated)
 		_runtime.activation_rejected.connect(_on_activation_rejected)
 		_runtime.cooldown_ready.connect(_on_cooldown_ready)
@@ -126,6 +141,25 @@ func play(message: String, color: Color) -> void:
 	_punch_frame()
 	_spread_ring(_ring, color, 0.0)
 	_pop_word(message, color, 1.0)
+	_tween.chain().tween_callback(_finish)
+
+
+## A small gain. Quick gains restart the light pop with the running total, so a flurry of hits
+## reads as one growing number instead of a stack of words.
+func play_tick(amount: float, unit: String, color: Color) -> void:
+	if not is_instance_valid(_icon) or not _icon.visible:
+		return
+	var now := Time.get_ticks_msec()
+	var total := amount
+	if now - _last_tick_msec <= int(tick_sum_seconds * 1000.0):
+		total += _tick_total
+	reset()
+	_tick_total = total
+	_last_tick_msec = now
+	_start_tween()
+	_punch_icon(color, tick_punch_scale)
+	_spread_ring(_ring, color, 0.0)
+	_pop_word("+%s %s" % [String.num(total, 1).trim_suffix(".0"), unit], color, tick_word_scale)
 	_tween.chain().tween_callback(_finish)
 
 
@@ -178,10 +212,14 @@ func _begin() -> bool:
 		return false
 	reset()
 	_last_event_msec = now
+	_start_tween()
+	return true
+
+
+func _start_tween() -> void:
 	if is_instance_valid(_slot):
 		_slot.z_index = _slot_rest_z + LIFTED_SLOT_Z
 	_tween = create_tween().set_ignore_time_scale(true).set_parallel()
-	return true
 
 
 func _on_activated() -> void:

@@ -76,6 +76,11 @@ func _on_anchor_landed(direction: Vector3) -> void:
 	if _armed:
 		_play_cast_animation(&"land", direction, 0.0, true)
 		CharmVfx.spawn(actor.get_parent(), _return_position, CharmVfx.TIDE, 0.75)
+		CharmBlastVfx.burst(
+			actor.get_parent(), _return_position, CharmBlastVfx.Kind.TIDE, 1.2, CharmVfx.TIDE
+		)
+		CharmFeel.shake(actor, 3.0, 0.12)
+		CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, _return_position, -8.0, 0.8)
 
 
 func _recast() -> bool:
@@ -101,8 +106,15 @@ func _recast() -> bool:
 		RECALL_TRAIL_SECONDS
 	)
 	actor.global_position = destination
+	actor.reset_physics_interpolation()
 	CharmVfx.spawn(actor.get_parent(), destination, CharmVfx.TIDE, 1.35)
-	get_node("/root/ScreenShakeController").request(2.5, 0.12)
+	CharmBlastVfx.burst(
+		actor.get_parent(), destination, CharmBlastVfx.Kind.TIDE, 1.6, CharmVfx.TIDE
+	)
+	CharmFeel.shake(actor, 4.0, 0.14)
+	CharmFeel.flash(actor, CharmVfx.TIDE, 0.08, 0.12)
+	CharmFeel.shockwave(actor, destination + Vector3.UP * 0.6, CharmVfx.TIDE, 130.0)
+	CharmFeel.sound(actor, CharmFeel.WHOOSH_SOUND, destination, -5.0, 1.2)
 	runtime.start_cooldown()
 	cancel_active()
 	return true

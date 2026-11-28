@@ -444,8 +444,8 @@ func _passives() -> void:
 	var enemy_hp := crab.hp.current_hp
 	await _frames(40)
 	_check(
-		player.hp.current_hp == hp - 1.0 and crab.hp.current_hp == enemy_hp - 1.0,
-		"death bloom harms Foxy and crab"
+		player.hp.current_hp == hp and crab.hp.current_hp == enemy_hp - 1.5,
+		"death bloom harms the crab but never Foxy"
 	)
 	victim.queue_free()
 	await _frames(65)

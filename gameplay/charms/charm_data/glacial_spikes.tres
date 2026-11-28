@@ -19,7 +19,7 @@ drop_chance = 1
 tags = Array[StringName]([&"active"])
 effect_params = {
 "column_spacing": 1.45,
-"damage_multiplier": 1.5,
+"damage_multiplier": 2.25,
 "first_row_distance": 1.15,
 "radius_units": 1.25,
 "row_count": 3,
