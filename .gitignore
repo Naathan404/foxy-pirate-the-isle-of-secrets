@@ -6,4 +6,5 @@ addons/*
 !addons/spine_bridge/
 .cache_local/
 __pycache__/
+# Keep Spine runtime libraries in Git; ignore temporary DLL replacements.
 /bin/windows/~*

@@ -54,6 +54,13 @@ func present(
 	_badge.visible = badge != null
 
 
+## Changes the icon filtering for entries that mix pixel art and painted art.
+func set_icon_filter(filter: CanvasItem.TextureFilter) -> void:
+	icon_texture_filter = filter
+	if is_node_ready():
+		_icon.texture_filter = filter
+
+
 ## A non-interactive cell used to pad grids up to whole rows.
 func present_placeholder() -> void:
 	present(null, false)

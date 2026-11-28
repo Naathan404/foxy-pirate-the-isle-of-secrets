@@ -5,15 +5,17 @@
 [ext_resource type="Texture2D" uid="uid://c1526agcxx516" path="res://assets/sprites/biomes/coral_valley/boss/boss_bridge_2.png" id="21_3v6ob"]
 [ext_resource type="Shader" uid="uid://cql5r6tv66hni" path="res://world/components/arena_darkness.gdshader" id="arena_darkness_shader"]
 [ext_resource type="Script" uid="uid://cyxx63ydhrqle" path="res://world/biomes/coral_valley/blubberbeard_arena_room.gd" id="arena_script"]
-[ext_resource type="PackedScene" path="res://gameplay/inventory/item_pickup.tscn" id="kraken_pickup"]
-[ext_resource type="Resource" path="res://data/items/charms/kraken_march.tres" id="kraken_reward"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="Script" uid="uid://3rsp6bolleng" path="res://world/components/backdrop_sprite.gd" id="backdrop_sprite"]
 [ext_resource type="PackedScene" uid="uid://c60eka7xvsqh8" path="res://gameplay/bosses/blubberbeard/blubberbeard.tscn" id="boss"]
 [ext_resource type="Script" uid="uid://t35p4modmvrv" path="res://gameplay/bosses/boss_encounter.gd" id="boss_encounter"]
+[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
+[ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
 [ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
+[ext_resource type="PackedScene" uid="uid://bqt066tkjp3c1" path="res://gameplay/inventory/item_pickup.tscn" id="kraken_pickup"]
+[ext_resource type="Resource" path="res://data/items/charms/kraken_march.tres" id="kraken_reward"]
 [ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
 [ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/calm.tres" id="palette_calm"]
 [ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/red_tide.tres" id="palette_red"]
@@ -39,11 +41,7 @@
 [ext_resource type="Texture2D" uid="uid://cq6xymhhukdf5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_3.png" id="tex_rock_2"]
 [ext_resource type="Texture2D" uid="uid://byj65ay5nx1u5" path="res://assets/sprites/biomes/coral_valley/props/beach_stone_2.png" id="tex_rock_3"]
 
-[ext_resource type="PackedScene" uid="uid://bw3d3kbijk4sj" path="res://world/biomes/coral_valley/objects/campfire.tscn" id="campfire"]
-
-[ext_resource type="PackedScene" path="res://world/effects/campfire_embers.tscn" id="campfire_embers"]
-
-[sub_resource type="Environment" id="Environment_3v6ob"]
+[sub_resource type="Environment" id="Environment_bwvhn"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.02, 0.07, 0.11, 1)
@@ -67,7 +65,7 @@ height = 256
 noise = SubResource("FastNoiseLite_water")
 seamless = true
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_d0qrq"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_do1tx"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("lagoon_shader")
@@ -99,9 +97,9 @@ shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
 shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
 shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
 
-[sub_resource type="QuadMesh" id="QuadMesh_hg7go"]
+[sub_resource type="QuadMesh" id="QuadMesh_1qaxm"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_d0qrq")
+material = SubResource("ShaderMaterial_do1tx")
 size = Vector2(400, 400)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sand"]
@@ -143,7 +141,7 @@ size = Vector3(0.28, 0.22, 0.28)
 [sub_resource type="Gradient" id="SplashColors"]
 colors = PackedColorArray(0.85, 0.96, 1, 0.95, 0.62, 0.52, 0.42, 0)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_xaok0"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q4iel"]
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
@@ -173,14 +171,15 @@ editor_description = "Boss arena (wonder room). The bridge breaks when the fight
 script = ExtResource("arena_script")
 boss = NodePath("CaptainBlubberbeard")
 encounter = NodePath("BossEncounter")
+victory_campfire = NodePath("VictoryCamp")
 victory_charm = NodePath("KrakenMarchReward")
 bridge_spans = [NodePath("Bridge/SpanWest"), NodePath("Bridge/SpanEast")]
-grapple_posts = [NodePath("GrapplePostIsland"), NodePath("GrapplePostPier")]
 bridge_floor = NodePath("Environment/BaseGroundBridge/StaticBody3D/CollisionShape3D")
 bridge_splash = NodePath("Bridge/Splash")
 collapse_seconds = 0.6
 collapse_drop_meters = 3.2
 collapse_tilt = 0.6
+grapple_posts = [NodePath("GrapplePostIsland"), NodePath("GrapplePostPier")]
 mood = NodePath("SeaMood")
 calm_palette = ExtResource("palette_calm")
 phase_two_palette = ExtResource("palette_violet")
@@ -190,10 +189,9 @@ fury_blend_seconds = 0.35
 mood_blend_seconds = 1.2
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_07.tscn"
-victory_campfire = NodePath("VictoryCamp")
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_3v6ob")
+environment = SubResource("Environment_bwvhn")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
@@ -206,7 +204,7 @@ directional_shadow_max_distance = 60.0
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.023241043, -1.2184002, 0.012901783)
-mesh = SubResource("QuadMesh_hg7go")
+mesh = SubResource("QuadMesh_1qaxm")
 
 [node name="LeftPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="3" unique_id=192273160]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -46.8032, -0.09624863, 0)
@@ -268,7 +266,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, -48)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
 spawn_positions = PackedVector3Array(20.04, 0, 11.15, 18.48, 0, 13.77, 16.59, 0, 16.18, 14.43, 0, 18.29, 12.01, 0, 20.11, 6.6, 0, 22.67, 0.74, 0, 23.68, -5.17, 0, 23.07, -10.73, 0, 20.88, -15.54, 0, 17.27, -17.57, 0, 15.01, -19.3, 0, 12.49, -20.69, 0, 9.76, -21.26, 0, -8.32, -20.04, 0, -11.15, -18.48, 0, -13.77, -16.59, 0, -16.18, -14.43, 0, -18.29, -12.01, 0, -20.11, -6.6, 0, -22.67, -0.74, 0, -23.68, 5.17, 0, -23.07, 10.73, 0, -20.88, 15.54, 0, -17.27, 17.57, 0, -15.01, 19.3, 0, -12.49, 20.69, 0, -9.76)
-fixed_spawn_count = 16
+fixed_spawn_count = 24
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 props_receive_enemy_attacks = true
 
@@ -1008,7 +1006,7 @@ start_palette = ExtResource("palette_calm")
 [node name="RoomAtmosphere" parent="." index="14" unique_id=1633403622 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1633403622, 1300233738) index="0" unique_id=1611482802]
-material = SubResource("ShaderMaterial_xaok0")
+material = SubResource("ShaderMaterial_q4iel")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1633403622, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14
@@ -1034,22 +1032,21 @@ fixed_spawn_count = 8
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 props_receive_enemy_attacks = true
 
-[node name="VictoryCamp" type="Node3D" parent="."]
+[node name="VictoryCamp" type="Node3D" parent="." index="17" unique_id=1598455834]
 editor_description = "Hidden until Blubberbeard is beaten; then the arena is a safe room and this campfire flares up."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, -6.5)
 
-[node name="KrakenMarchReward" parent="." instance=ExtResource("kraken_pickup")]
-process_mode = 4
-visible = false
-position = Vector3(3, 0.3, -5)
-item = ExtResource("kraken_reward")
-
-[node name="Campfire" parent="VictoryCamp" instance=ExtResource("campfire")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+[node name="Campfire" parent="VictoryCamp" index="0" unique_id=377563541 instance=ExtResource("campfire")]
 ground_shadow = true
 
-[node name="CampfireEmbers" parent="VictoryCamp" instance=ExtResource("campfire_embers")]
+[node name="CampfireEmbers" parent="VictoryCamp" index="1" unique_id=1939867304 instance=ExtResource("campfire_embers")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 1.4)
+
+[node name="KrakenMarchReward" parent="." index="18" unique_id=1179706065 instance=ExtResource("kraken_pickup")]
+process_mode = 4
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.3, -5)
+visible = false
+item = ExtResource("kraken_reward")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

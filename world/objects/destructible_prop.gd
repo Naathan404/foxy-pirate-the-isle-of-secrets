@@ -221,6 +221,13 @@ func receive_damage(damage: DamageContext) -> float:
 	return _apply_damage(damage.amount_hp)
 
 
+## While something drags the prop along (Abyssal Whirlpool) it stops blocking movement, so
+## dragged props cannot pile into a wall. A broken prop stays non-blocking.
+func set_dragged(dragged: bool) -> void:
+	if not _destroyed and is_instance_valid(_movement_shape):
+		_movement_shape.set_deferred("disabled", dragged)
+
+
 ## Heavy charges break scenery regardless of its ordinary attack-team filter.
 func break_from_impact() -> void:
 	_apply_damage(max_hp)
