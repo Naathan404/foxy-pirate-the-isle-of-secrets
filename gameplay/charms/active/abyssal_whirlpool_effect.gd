@@ -1,11 +1,11 @@
 class_name AbyssalWhirlpoolEffect
 extends CharmEffect
-## Opens a whirlpool that drags every ordinary enemy within `pull_radius_units` towards its eye,
-## harder as it runs, then erupts in a geyser that hits every enemy within `radius_units` and
-## shatters the scenery there: props of up to `prop_break_max_hp` break outright, sturdier ones
-## (a campfire, a boat) only take the blast's damage.
-## The wide outer swirl shows the pull, a brighter inner ring the blast; the camera rumbles
-## while it turns.
+## Opens a whirlpool that drags every ordinary enemy and breakable prop within
+## `pull_radius_units` towards its eye, harder as it runs, then erupts in a geyser that hits
+## every enemy within `radius_units` and shatters the scenery there: props of up to
+## `prop_break_max_hp` break outright, sturdier ones (a campfire, a boat) stay put and only
+## take the blast's damage. The wide outer swirl shows the pull, a brighter inner ring the
+## blast; the camera rumbles while it turns.
 
 const SHOCKWAVE_DURATION := 0.5
 const SHOCKWAVE_STRENGTH := 0.02
@@ -15,6 +15,8 @@ const WATER := Color("3fb6ff")
 const FOAM := Color("9ee8ff")
 ## Pulled enemies stop this close to the eye instead of piling onto one point.
 const EYE_RADIUS_METERS := 0.7
+## A dragged prop only moves where there is ground this far below its next spot.
+const GROUND_PROBE_METERS := 3.0
 const RUMBLE_EVERY_SECONDS := 0.28
 
 var _zone: Area3D
@@ -24,6 +26,7 @@ var _duration: float = 0.0
 var _remaining: float = 0.0
 var _rumble_clock: float = 0.0
 var _exploded: bool = false
+var _dragged_props: Array[DestructibleProp] = []
 var _cast_direction: Vector3 = Vector3.BACK
 
 
@@ -69,7 +72,7 @@ func _physics_process(delta: float) -> void:
 		cancel_active()
 		return
 	var elapsed := 1.0 - _remaining / maxf(0.01, _duration)
-	_pull_enemies(delta, elapsed)
+	_pull_targets(delta, elapsed)
 	if is_instance_valid(_pull_vfx):
 		_pull_vfx.set_fuse(elapsed)
 	if is_instance_valid(_blast_vfx):
@@ -83,8 +86,9 @@ func _physics_process(delta: float) -> void:
 		_explode()
 
 
-## Drags every ordinary enemy in the pull area towards the eye, faster as the whirlpool runs.
-func _pull_enemies(delta: float, elapsed: float) -> void:
+## Drags every ordinary enemy and breakable prop in the pull area towards the eye, faster as
+## the whirlpool runs.
+func _pull_targets(delta: float, elapsed: float) -> void:
 	var speed := lerpf(
 		definition.get_param_float(&"pull_speed_start", 3.0),
 		definition.get_param_float(&"pull_speed_end", 9.0),
@@ -95,8 +99,13 @@ func _pull_enemies(delta: float, elapsed: float) -> void:
 		if hurtbox == null or not is_instance_valid(hurtbox.actor) or not hurtbox.actor is Node3D:
 			continue
 		var target := hurtbox.actor as Node3D
-		# Scenery shares the enemy hurtbox layer; only creatures are dragged in.
-		if (
+		# Scenery shares the enemy hurtbox layer: props the blast can shatter come along,
+		# sturdier ones (a campfire, a boat) stay put.
+		var prop := target as DestructibleProp
+		if prop != null:
+			if prop.max_hp > _prop_break_max_hp():
+				continue
+		elif (
 			not target.is_in_group("enemy")
 			or target.is_in_group("boss")
 			or target.is_in_group("large")
@@ -109,10 +118,33 @@ func _pull_enemies(delta: float, elapsed: float) -> void:
 		if distance <= EYE_RADIUS_METERS:
 			continue
 		var motion := to_eye / distance * minf(distance - EYE_RADIUS_METERS, delta * speed)
-		if target is CharacterBody3D:
+		if prop != null:
+			_drag_prop(prop, motion)
+		elif target is CharacterBody3D:
 			(target as CharacterBody3D).move_and_collide(motion)
 		else:
 			target.global_position += motion
+
+
+## Props slide over the ground only: dragged past the edge their loot would drop into the sea.
+func _drag_prop(prop: DestructibleProp, motion: Vector3) -> void:
+	var next := prop.global_position + motion
+	var query := PhysicsRayQueryParameters3D.create(
+		next + Vector3.UP, next + Vector3.DOWN * GROUND_PROBE_METERS, CombatLayers.WORLD
+	)
+	var movement_body := prop.get_node_or_null("MovementBody") as CollisionObject3D
+	if movement_body != null:
+		query.exclude = [movement_body.get_rid()]
+	if prop.get_world_3d().direct_space_state.intersect_ray(query).is_empty():
+		return
+	if not _dragged_props.has(prop):
+		_dragged_props.append(prop)
+		prop.set_dragged(true)
+	prop.global_position = next
+
+
+func _prop_break_max_hp() -> float:
+	return definition.get_param_float(&"prop_break_max_hp", 10.0)
 
 
 func _explode() -> void:
@@ -157,7 +189,7 @@ func _damage_props(at: Vector3, radius: float, damage: float) -> bool:
 	var scene := actor.get_tree().current_scene
 	if scene == null:
 		return false
-	var break_max_hp := definition.get_param_float(&"prop_break_max_hp", 10.0)
+	var break_max_hp := _prop_break_max_hp()
 	var hit := false
 	for node in scene.find_children("*", "DestructibleProp", true, false):
 		var prop := node as DestructibleProp
@@ -183,6 +215,11 @@ func cancel_active() -> void:
 
 
 func _clear_zone() -> void:
+	# Anything dragged but still standing (a cancelled cast) blocks the way again.
+	for prop in _dragged_props:
+		if is_instance_valid(prop):
+			prop.set_dragged(false)
+	_dragged_props.clear()
 	_end_cast_lock()
 	set_physics_process(false)
 	if is_instance_valid(_zone):

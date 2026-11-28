@@ -6,6 +6,8 @@ enum Filter { ALL, CREATURES, BOSSES }
 
 const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/menu/catalog_slot.tscn")
 const BOSS_BADGE: Texture2D = preload("res://assets/ui/HUD_Fox/Journey/Boss_Icon.png")
+## Portraits at most this wide are pixel art.
+const PIXEL_ART_MAX_PIXELS := 300
 ## Item art for notes/diaries without a portrait, matching the pickup that unlocks them.
 const NOTE_ICON: Texture2D = preload("res://assets/sprites/items/Monster_Notes.png")
 const DIARY_ICON: Texture2D = preload("res://assets/sprites/items/Boss_Diary.png")
@@ -153,6 +155,7 @@ func _refresh_grid() -> void:
 		var note := _entries[index]
 		var unlocked := is_note_unlocked(note)
 		var boss := note.layout == MonsterNote.Layout.BOSS
+		slot.set_icon_filter(_filter_for(_portrait_of(note)))
 		slot.present(
 			_portrait_of(note) if unlocked else null,
 			unlocked,
@@ -197,6 +200,7 @@ func _render_detail(note: MonsterNote) -> void:
 		return
 
 	_portrait.texture = _portrait_of(note)
+	_portrait.texture_filter = _filter_for(_portrait.texture)
 	_entry_name.text = note.display_name
 	_entry_name.tooltip_text = note.display_name
 	_entry_kind.text = "Boss encounter" if boss else "Creature record"
@@ -254,6 +258,13 @@ func _clear_sections() -> void:
 	for child in _sections.get_children():
 		_sections.remove_child(child)
 		child.queue_free()
+
+
+## Small pixel sprites stay crisp; painted portraits are smoothed as they shrink.
+func _filter_for(texture: Texture2D) -> CanvasItem.TextureFilter:
+	if texture != null and texture.get_width() > PIXEL_ART_MAX_PIXELS:
+		return CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	return CanvasItem.TEXTURE_FILTER_NEAREST
 
 
 func _portrait_of(note: MonsterNote) -> Texture2D:

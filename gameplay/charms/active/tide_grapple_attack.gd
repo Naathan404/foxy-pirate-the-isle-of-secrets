@@ -10,6 +10,11 @@ enum FlightPhase { INACTIVE, OUTBOUND, LATCHED, RETURNING }
 
 const HAND_HEIGHT: Vector3 = Vector3(0.0, 0.6, 0.0)
 const CONTACT_SECONDS: float = 0.16
+## Width of the sweep that catches breakable props too low for the hook's ray.
+const LOW_SWEEP_WIDTH_METERS: float = 0.6
+const LOW_SWEEP_BATCH: int = 16
+## How far below the caster the ground is searched for.
+const FLOOR_PROBE_METERS: float = 3.0
 
 const RESULT_MISS: StringName = &"miss"
 const RESULT_TARGET_PULLED: StringName = &"target_pulled"
@@ -25,6 +30,9 @@ var range_units: float = 4.0
 var pull_stop_distance: float = 1.0
 var pull_speed_units_per_second: float = 16.0
 var stun_seconds: float = 1.0
+## Breakable props with at most this much HP shatter on contact; sturdier ones take the
+## hook like before.
+var prop_break_max_hp: float = 10.0
 var hook_speed_units_per_second: float = 24.0
 var return_speed_units_per_second: float = 28.0
 
@@ -71,6 +79,7 @@ func activate() -> bool:
 		_target = _get_damage_target(_pending_collider) as Node3D
 		if is_instance_valid(_target):
 			_target_offset = _destination - _target.global_position
+	_catch_low_prop()
 	_flight_start = _hand_position()
 	_hook_position = _flight_start
 	_contact_hit = false
@@ -144,6 +153,53 @@ func cancel() -> void:
 	queue_free()
 
 
+## The ray flies at hand height and passes over low scenery such as a fallen log. A box from
+## the ground up to the ray, as far as the ray got, finds such a prop; the hook takes the
+## nearest one instead.
+func _catch_low_prop() -> void:
+	var origin := context.actor.global_position
+	var forward := context.direction.normalized()
+	var reach := (_destination - origin).dot(forward)
+	var space := get_world_3d().direct_space_state
+	var floor_query := PhysicsRayQueryParameters3D.create(
+		origin, origin + Vector3.DOWN * FLOOR_PROBE_METERS, CombatLayers.WORLD
+	)
+	if context.actor is CollisionObject3D:
+		floor_query.exclude = [(context.actor as CollisionObject3D).get_rid()]
+	var floor_hit := space.intersect_ray(floor_query)
+	var top := origin.y + HAND_HEIGHT.y
+	if floor_hit.is_empty() or reach <= 0.0 or top <= floor_hit.position.y:
+		return
+	var height: float = top - floor_hit.position.y
+	var box := BoxShape3D.new()
+	box.size = Vector3(LOW_SWEEP_WIDTH_METERS, height, reach)
+	var center: Vector3 = origin + forward * (reach * 0.5)
+	center.y = floor_hit.position.y + height * 0.5
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = box
+	query.transform = Transform3D(Basis.looking_at(forward, Vector3.UP), center)
+	query.collision_mask = CombatLayers.ENEMY_HURTBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var nearest: HurtBox = null
+	var nearest_along := reach
+	for hit: Dictionary in space.intersect_shape(query, LOW_SWEEP_BATCH):
+		var hurtbox := hit.collider as HurtBox
+		if _breakable_prop(hurtbox) == null or not hurtbox.enabled:
+			continue
+		var along := ((hurtbox.actor as Node3D).global_position - origin).dot(forward)
+		if along > 0.0 and along < nearest_along:
+			nearest = hurtbox
+			nearest_along = along
+	if nearest == null:
+		return
+	_pending_collider = nearest
+	_target = nearest.actor as Node3D
+	_destination = origin + forward * nearest_along + HAND_HEIGHT
+	_destination.y = _target.global_position.y + HAND_HEIGHT.y * 0.5
+	_target_offset = _destination - _target.global_position
+
+
 func _hand_position() -> Vector3:
 	return context.actor.global_position + HAND_HEIGHT + context.direction.normalized() * 0.4
 
@@ -182,6 +238,9 @@ func _arrive() -> void:
 	var pull_seconds := maxf(
 		CONTACT_SECONDS, (distance - pull_stop_distance) / maxf(0.01, pull_speed_units_per_second)
 	)
+	# A shattered prop leaves nothing to reel in or pull towards.
+	if _breakable_prop(collider) != null:
+		pull_seconds = CONTACT_SECONDS
 	_enter_phase(FlightPhase.LATCHED, &"latch", pull_seconds)
 	_visual.set_flight(_hand_position(), _hook_position, context.direction, 1, 0.0, 0.05)
 
@@ -200,6 +259,11 @@ func resolve_hit(collider: Object, hit_position: Vector3) -> StringName:
 		grapple_resolved.emit(RESULT_MISS, null)
 		return RESULT_MISS
 	get_node("/root/ScreenShakeController").request(3.5, 0.12)
+	var prop := _breakable_prop(collider)
+	if prop != null:
+		_shatter(prop)
+		grapple_resolved.emit(RESULT_TARGET_HIT, prop)
+		return RESULT_TARGET_HIT
 	var target := _get_damage_target(collider)
 	if target == null:
 		var terrain_result := _pull_actor(hit_position, RESULT_ACTOR_PULLED_TERRAIN)
@@ -218,6 +282,29 @@ func _get_damage_target(collider: Object) -> Node:
 	if collider is Node and (collider as Node).has_method("receive_damage"):
 		return collider as Node
 	return null
+
+
+## The breakable prop the hook touched, whether it met its hurtbox or the body that blocks
+## movement (which the ray would otherwise take for solid terrain). Null for anything else.
+func _breakable_prop(collider: Object) -> DestructibleProp:
+	if not is_instance_valid(collider):
+		return null
+	var node: Object = collider
+	if collider is HurtBox:
+		node = (collider as HurtBox).actor
+	elif collider is StaticBody3D:
+		node = (collider as StaticBody3D).get_parent()
+	var prop := node as DestructibleProp
+	return prop if prop != null and prop.max_hp <= prop_break_max_hp else null
+
+
+func _shatter(prop: DestructibleProp) -> void:
+	prop.break_from_impact()
+	CharmVfx.spawn(get_parent(), _hook_position, CharmVfx.TIDE, 1.1)
+	CharmFeel.sound(self, CharmFeel.IMPACT_SOUND, _hook_position, -6.0, 0.9)
+	CharmFeel.local_hitstop(self, context.actor, null, 0.06)
+	CharmFeel.shake(self, 5.0, 0.14)
+	CharmFeel.flash(self, CharmVfx.TIDE, 0.07, 0.12)
 
 
 func _apply_damage(collider: Object, target: Node) -> void:

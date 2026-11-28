@@ -59,6 +59,7 @@ func activate(context: CharmActivationContext) -> bool:
 		&"pull_speed_units_per_second"
 	)
 	execution.stun_seconds = definition.get_param_float(&"stun_seconds")
+	execution.prop_break_max_hp = definition.get_param_float(&"prop_break_max_hp", 10.0)
 	execution.hook_speed_units_per_second = definition.get_param_float(&"hook_speed", 24.0)
 	execution.return_speed_units_per_second = definition.get_param_float(&"return_speed", 28.0)
 	if execution.activate():
