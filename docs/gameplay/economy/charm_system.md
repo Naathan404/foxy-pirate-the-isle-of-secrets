@@ -1,6 +1,6 @@
 # Charm System - Business Logic
 
-Catalog ngày 27/11/2026 có 25 charm, tất cả đều playable.
+Catalog ngày 28/11/2026 có 25 charm, tất cả đều playable.
 [Bảng thông số và từng ô Sheet Config cần cập nhật](../../plans/charm-gamefeel-playtest.md).
 
 ## 1. Mục đích và phạm vi
@@ -49,6 +49,30 @@ flowchart LR
 
 Nguồn dữ liệu cân bằng duy nhất là các `.tres` trong
 `gameplay/charms/charm_data`. Effect script không được giữ một bản balance riêng.
+
+### Kraken's March — phần thưởng Blubberbeard
+
+- ID `kraken_march`, Active, 125 SP, hồi chiêu 12 giây. Cân bằng trong
+  `gameplay/charms/charm_data/kraken_march.tres`.
+- Sau khi Blubberbeard chết ở `room_08`, Charm xuất hiện gần VictoryCamp.
+  Nhặt để chạy màn hấp thụ Charm hiện có; không chiếm ô túi đồ. Nếu chưa nhặt,
+  quay lại phòng đã thắng vẫn nhận được, kể cả save đã đánh bại boss trước bản cập nhật.
+  Ownership và loadout dùng snapshot Charm hiện có, không đổi schema save.
+- Chốt hướng/vị trí chuột lúc kích hoạt, tối đa 6 xúc tu trên đường dài 8,4 đơn vị.
+  Vận 0,3 giây, mỗi xúc tu cách nhau 0,16 giây. Đường dừng trước tường hoặc vực;
+  điểm ngắm quá gần hoặc không có nền hợp lệ không tiêu hao SP/hồi chiêu.
+- Mọc lên gây 1,5 lần sát thương vũ khí và đẩy hướng ra khỏi gốc xúc tu.
+  Mỗi xúc tu tồn tại 6 giây, tìm enemy trong 2,1 đơn vị, báo đòn 0,3 giây rồi
+  quật gây 0,9 lần sát thương. Mỗi cú trúng mỗi actor tối đa một lần dù có nhiều hurtbox;
+  không đánh xuyên tường, không gây sát thương Player hoặc đồ vật.
+- Player được di chuyển/dodge sau khi thả đợt đầu. Chết, tháo Charm hoặc chuyển phòng
+  sẽ dọn toàn bộ xúc tu và dấu báo. Boss vẫn nhận damage nhưng giữ miễn đẩy của boss.
+- Icon `assets/sprites/charms/kraken_march.png`, sprite sheet 4 × 2
+  `assets/sprites/effects/charms/kraken_tentacle_sheet.png`. Dùng imagegen built-in:
+  prompt icon là xúc tu tím, giác hút ngọc lam, bọt biển, pixel art nền trong suốt;
+  prompt sheet là 8 pose mọc thấp / mọc nửa / đứng / lấy đà / quật / chạm đất /
+  hồi / rút, cùng gốc và nền trong suốt. Lượt edit cuối tách nền trắng khỏi sheet.
+  Động tác vận của Foxy tái sử dụng bộ frame Glacial Spikes qua clip riêng.
 
 ## 4. Luật dữ liệu và catalog
 

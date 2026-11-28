@@ -145,7 +145,7 @@ func run_tests() -> void:
 		)
 		check(inventory.count_item(StringName(item.item_id)) == 0, "Charm uses no inventory slot")
 		count += 1
-	check(count == 24, "All playable Charm items are covered")
+	check(count == 25, "All playable Charm items are covered")
 	var duplicate := PICKUP.instantiate() as ItemPickup
 	duplicate.item = load("res://data/items/charms/arrow_rain.tres")
 	holder.add_child(duplicate)
