@@ -78,7 +78,7 @@ func _track_pickup(index: int, pickup: ItemPickup) -> void:
 
 
 func _save_pickup(index: int) -> void:
-s	var pickup := _tracked.get(index) as ItemPickup
+	var pickup := _tracked.get(index) as ItemPickup
 	if not is_instance_valid(pickup) or _state.is_empty():
 		return
 	var items: Dictionary = _state.items
