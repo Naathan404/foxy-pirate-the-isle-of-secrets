@@ -5,6 +5,10 @@ const NOTE_ITEM: BaseItem = preload("res://data/items/quest/note.tres")
 const BOSS_DIARY_ITEM: BaseItem = preload("res://data/items/quest/boss_diary.tres")
 const CHARM_UNLOCK := preload("res://gameplay/charms/progression/charm_unlock.tscn")
 const BLUEPRINT_UNLOCK_PATH := "res://gameplay/weapons/blueprints/blueprint_unlock.tscn"
+const SHOWCASE_SOUND: AudioStream = preload("res://assets/audio/ui/charm_reveal.wav")
+const SHOWCASE_SOUND_DB := -10.0
+const CHARM_HIGHLIGHT := Color("ff4d6d")
+const UNIQUE_HIGHLIGHT := Color("ffc23d")
 
 @export var item: BaseItem
 ## A note pickup unlocks this entry instead of taking an inventory slot.
@@ -25,12 +29,24 @@ const BLUEPRINT_UNLOCK_PATH := "res://gameplay/weapons/blueprints/blueprint_unlo
 @export_range(0.05, 1.0, 0.01) var rise_duration: float = 0.18
 @export_range(0.05, 1.0, 0.01) var fall_duration: float = 0.28
 
+@export_group("Showcase Drop")
+## Higher, slower and farther than ordinary loot, so a unique reward lands clear of the coins.
+@export_range(0.5, 5.0, 0.05, "suffix:m") var showcase_height: float = 2.3
+@export_range(0.2, 2.0, 0.05, "suffix:s") var showcase_flight_seconds: float = 0.95
+@export_range(1.0, 6.0, 0.05, "suffix:m") var showcase_distance: float = 3.3
+## Stays on show this long after landing before Foxy can pull it in.
+@export_range(0.0, 3.0, 0.05, "suffix:s") var showcase_hold_seconds: float = 0.9
+@export_range(1.0, 2.0, 0.01) var showcase_scale: float = 1.25
+@export_range(0.01, 0.5, 0.01) var showcase_trail_width: float = 0.3
+
 var _idle_tween: Tween
 var _drop_tween: Tween
 var _rest_scale: Vector3
 var _rest_position: Vector3
 var _can_be_picked_up: bool = true
 var _collecting: bool = false
+var _showcasing: bool = false
+var _highlight: RewardHighlight
 
 @onready var sprite: Sprite3D = $Sprite3D
 @onready var _scatter: PickupScatter = $Scatter
@@ -85,14 +101,66 @@ func _start_idle_animation() -> void:
 	_idle_tween.parallel().tween_property(sprite, "position:y", _rest_position.y, half_cycle)
 
 
-## Called after placement; the shared scatter component moves both visual and pickup area.
-func play_drop_animation(direction: Vector3 = Vector3.ZERO) -> void:
+## One-of-a-kind rewards that should never get lost in a pile of loot.
+func is_special_reward() -> bool:
+	if note != null or item == null:
+		return false
+	return (
+		item.charm != null
+		or item.weapon_blueprint != null
+		or item.type == GlobalConstants.ItemType.QUEST
+	)
+
+
+## Waits out of sight for `delay_seconds`, then makes its own entrance toward `direction`.
+func play_showcase_drop(direction: Vector3, delay_seconds: float) -> void:
+	_stop_motion()
+	hide()
+	_drop_tween = create_tween()
+	_drop_tween.tween_interval(maxf(0.01, delay_seconds))
+	_drop_tween.tween_callback(_launch_showcase.bind(direction))
+
+
+## Marks a special reward that is already lying on the ground.
+func show_highlight() -> void:
+	# Self-lit, so it stays readable in dark rooms.
+	sprite.shaded = false
+	if _highlight == null:
+		var tint := CHARM_HIGHLIGHT if item.charm != null else UNIQUE_HIGHLIGHT
+		_highlight = RewardHighlight.attach(self, tint)
+	_highlight.burst()
+
+
+func _launch_showcase(direction: Vector3) -> void:
+	show()
+	sprite.shaded = false
+	if not _showcasing:
+		_showcasing = true
+		_rest_scale *= showcase_scale
+	_scatter.distance_min = showcase_distance
+	_scatter.distance_max = showcase_distance
+	_scatter.height_variation = 0.0
+	_scatter.duration_variation = 0.0
+	_scatter.trail_width = showcase_trail_width
+	_scatter.trail_color = (CHARM_HIGHLIGHT if item.charm != null else UNIQUE_HIGHLIGHT)
+	_stop_motion()
+	sprite.position = _rest_position
+	sprite.scale = _rest_scale
+	_scatter.launch(showcase_height, showcase_flight_seconds, direction)
+
+
+func _stop_motion() -> void:
 	_attraction.reset()
 	if _idle_tween != null and _idle_tween.is_valid():
 		_idle_tween.kill()
 	if _drop_tween != null and _drop_tween.is_valid():
 		_drop_tween.kill()
 	_can_be_picked_up = false
+
+
+## Called after placement; the shared scatter component moves both visual and pickup area.
+func play_drop_animation(direction: Vector3 = Vector3.ZERO) -> void:
+	_stop_motion()
 	sprite.position = _rest_position
 	sprite.scale = _rest_scale
 	_scatter.launch(drop_height, rise_duration + fall_duration, direction)
@@ -105,12 +173,25 @@ func _on_scatter_landed() -> void:
 	# Ép nhẹ khi chạm đất, rồi trả lại hình dáng trước khi lơ lửng.
 	_drop_tween.tween_property(sprite, "scale", _rest_scale * Vector3(1.16, 0.78, 1.0), 0.06)
 	_drop_tween.tween_property(sprite, "scale", _rest_scale, 0.12)
+	if _showcasing:
+		show_highlight()
+		var audio := get_node_or_null("/root/AudioManager")
+		if audio != null:
+			audio.play_sfx_3d(SHOWCASE_SOUND, global_position, SHOWCASE_SOUND_DB)
+		_drop_tween.tween_callback(_start_idle_animation)
+		_drop_tween.tween_interval(showcase_hold_seconds)
+		_drop_tween.tween_callback(_enable_pickup)
+		return
 	_drop_tween.tween_callback(_finish_drop_animation)
 
 
 func _finish_drop_animation() -> void:
-	_drop_tween = null
 	_start_idle_animation()
+	_enable_pickup()
+
+
+func _enable_pickup() -> void:
+	_drop_tween = null
 	_can_be_picked_up = true
 	_attraction.set_enabled(true)
 
@@ -164,6 +245,8 @@ func _on_attraction_started(target: Node3D) -> void:
 		_drop_tween.kill()
 	sprite.position = _rest_position
 	sprite.scale = _rest_scale
+	if _highlight != null:
+		_highlight.hide()
 	if item != null and item.charm != null:
 		_attraction.reset()
 		_collecting = true
@@ -189,6 +272,8 @@ func finish_reward_presentation(consumed: bool) -> void:
 		queue_free()
 		return
 	sprite.show()
+	if _highlight != null:
+		_highlight.show()
 	_collecting = false
 	_attraction.set_enabled(true)
 	_start_idle_animation()
@@ -201,6 +286,8 @@ func finish_blueprint_presentation(consumed: bool) -> void:
 
 func _on_attraction_cancelled() -> void:
 	_collecting = false
+	if _highlight != null:
+		_highlight.show()
 	_start_idle_animation()
 
 
@@ -212,7 +299,7 @@ func _collect(target: Node3D) -> void:
 	# Inventory signals may re-enter pickup code; reserve the transaction first.
 	_collecting = true
 	if note != null:
-		get_node("/root/NoteProgress").set_unlocked(note.note_id, true)
+		get_node("/root/NoteProgress").discover(note)
 		quantity = 0
 		inventory.notify_item_picked_up(item, 1)
 		_can_be_picked_up = false

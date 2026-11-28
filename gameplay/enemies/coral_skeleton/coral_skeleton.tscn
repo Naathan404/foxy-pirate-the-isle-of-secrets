@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://x6xeny51rgu8" path="res://gameplay/enemies/coral_skeleton/states/coral_shoot.gd" id="9"]
 [ext_resource type="Script" uid="uid://dqehucjpwp20p" path="res://gameplay/enemies/coral_skeleton/states/coral_sleep.gd" id="10"]
 [ext_resource type="Script" uid="uid://0rt1ob4uwdkc" path="res://gameplay/enemies/coral_skeleton/states/coral_wake.gd" id="11"]
+[ext_resource type="Resource" path="res://data/notes/coral_skeleton.tres" id="journal_entry"]
 
 [sub_resource type="CapsuleShape3D" id="Hurtbox"]
 radius = 0.65
@@ -47,6 +48,7 @@ shoot_recovery_time = 0.24
 bullet_speed = 10.0
 bullet_lifetime = 1.5
 data = ExtResource("3")
+journal_entry = ExtResource("journal_entry")
 initial_state_name = &"Sleep"
 destroy_on_death = true
 

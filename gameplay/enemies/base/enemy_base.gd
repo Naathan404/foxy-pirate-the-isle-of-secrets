@@ -34,10 +34,10 @@ const VOID_LOOT_INSET_METERS: float = 0.8
 @export var destroy_on_death: bool = false
 @export var charm_grapple_large: bool = false
 
-@export_group("Note Drop")
-## Assign a bestiary entry to drop its note (or diary for a boss entry).
-@export var note_drop: MonsterNote
-@export_range(0.0, 1.0, 0.01) var note_drop_chance: float = 1.0
+@export_group("Journal")
+## Bestiary entry learned the first time one of these dies. Boss entries are ignored here:
+## only their diary pickup reveals them.
+@export var journal_entry: MonsterNote
 
 @export_group("Damage Popup")
 ## Minimum world-space height above the enemy origin.
@@ -472,7 +472,7 @@ func die() -> void:
 	_drop_loot.call_deferred()
 	_drop_charms.call_deferred()
 	_drop_gold.call_deferred()
-	_drop_note.call_deferred()
+	_record_in_journal()
 	if _charm_grapple_tween != null and _charm_grapple_tween.is_valid():
 		_charm_grapple_tween.kill()
 	_charm_grapple_tween = null
@@ -775,21 +775,12 @@ func _roll_item_pickup(item: BaseItem, quantity: int, chance: float, multiplier:
 		CharmVfx.spawn(loot_parent, _loot_origin(), Color.SPRING_GREEN, 0.8)
 
 
-func _drop_note() -> void:
-	if note_drop == null or note_drop.note_id.is_empty() or note_drop_chance <= 0.0:
+func _record_in_journal() -> void:
+	if journal_entry == null or journal_entry.layout == MonsterNote.Layout.BOSS:
 		return
-	if note_drop_chance < 1.0 and randf() >= note_drop_chance:
-		return
-	if not is_inside_tree():
-		return
-	var loot_parent := get_parent()
-	if loot_parent == null or loot_parent.is_queued_for_deletion():
-		return
-	var pickup := ITEM_PICKUP_SCENE.instantiate() as ItemPickup
-	pickup.note = note_drop
-	loot_parent.add_child(pickup)
-	pickup.global_position = _loot_origin()
-	pickup.play_drop_animation(_next_loot_direction())
+	var progress := get_node_or_null("/root/NoteProgress")
+	if progress != null:
+		progress.discover(journal_entry)
 
 
 func _next_loot_direction() -> Vector3:

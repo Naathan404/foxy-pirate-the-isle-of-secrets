@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.gd" id="3_script"]
 [ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="4_feedback"]
 [ext_resource type="Script" path="res://gameplay/enemies/coral_skeleton/states/elite_coral_revive.gd" id="5_revive"]
+[ext_resource type="Resource" path="res://data/notes/elite_coral_skeleton.tres" id="journal_entry"]
 
 [sub_resource type="CapsuleShape3D" id="HurtShape"]
 radius = 0.975
@@ -46,6 +47,7 @@ guard_roam_pause_time = 1.0
 randomize_shot_mode = true
 bullets_per_burst = 3
 data = ExtResource("2_data")
+journal_entry = ExtResource("journal_entry")
 initial_state_name = &"Guard"
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]

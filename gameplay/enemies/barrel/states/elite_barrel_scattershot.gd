@@ -18,6 +18,8 @@ var _shots_fired: int = 0
 var _shot_remaining: float = 0.0
 var _phase: AttackPhase = AttackPhase.TELEGRAPH
 var _special_attack: bool = false
+var _warning: MeshInstance3D
+var _warning_duration: float = 0.0
 
 
 func _enter() -> void:
@@ -37,6 +39,7 @@ func _enter() -> void:
 	# Spine barrels open their lid while charging; the sprite sheet has no charge clip.
 	if not enemy.play_directional_animation(&"charge", true):
 		enemy.play_directional_animation(&"idle", true)
+	_show_warning(barrel)
 	var feedback := _get_feedback()
 	if feedback == null:
 		return
@@ -47,6 +50,7 @@ func _enter() -> void:
 
 
 func _exit() -> void:
+	_clear_warning()
 	var feedback := _get_feedback()
 	if feedback != null:
 		feedback.end_telegraph()
@@ -55,6 +59,9 @@ func _exit() -> void:
 func _update(delta: float) -> void:
 	enemy.stop_movement(delta)
 	if _phase == AttackPhase.TELEGRAPH:
+		EliteBarrelInkVfx.set_progress(
+			_warning, 1.0 - clampf(timer / maxf(0.01, _warning_duration), 0.0, 1.0)
+		)
 		if _timer_finished(delta):
 			_release()
 		return
@@ -77,7 +84,8 @@ func _release() -> void:
 	_phase = AttackPhase.RELEASE
 	shots_in_burst = (
 		maxi(1, barrel.special_volley_count)
-		if _special_attack else maxi(1, barrel.normal_volley_count)
+		if _special_attack
+		else maxi(1, barrel.normal_volley_count)
 	)
 	_shots_fired = 0
 	_shot_remaining = 0.0
@@ -85,7 +93,31 @@ func _release() -> void:
 	# Rings line their first ray up with Foxy once, at the end of the warning.
 	if barrel.should_aim_at_target():
 		barrel.aim_at_target()
+	_clear_warning()
+	# The rings are born outside the barrel, so a burst covers whoever hugs it.
+	if _special_attack:
+		barrel.erupt_ink()
 	_fire_next_shot()
+
+
+## Shows where the close-range ink will land: all around for the 360 turn, else the cone
+## under the mouth.
+func _show_warning(barrel: EliteBarrel) -> void:
+	_warning_duration = timer
+	_warning = EliteBarrelInkVfx.zone(
+		barrel,
+		barrel.global_position,
+		barrel.slam_radius if _special_attack else barrel.point_blank_radius,
+		EliteBarrelInkVfx.Zone.WARNING,
+		barrel.get_spray_direction(),
+		PI if _special_attack else barrel.point_blank_half_arc()
+	)
+
+
+func _clear_warning() -> void:
+	if is_instance_valid(_warning):
+		_warning.queue_free()
+	_warning = null
 
 
 func _fire_next_shot() -> void:

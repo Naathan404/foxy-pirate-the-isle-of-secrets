@@ -12,8 +12,6 @@
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="center_lever"]
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="chest_barrel"]
-[ext_resource type="Resource" uid="uid://88bsamrnea67" path="res://data/notes/crab.tres" id="chest_note"]
-[ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Script" uid="uid://cilt0sipla7ws" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
@@ -178,10 +176,6 @@ points = PackedVector3Array(64.35, 0.21, -4.975, 64.35, -0.6, -4.975, 64.35, 0.2
 
 [sub_resource type="BoxShape3D" id="PlatformShape"]
 size = Vector3(4, 0.5, 4)
-
-[sub_resource type="Resource" id="GuaranteedNoteDrop"]
-script = ExtResource("chest_note_drop")
-note = ExtResource("chest_note")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kw6rn"]
 resource_local_to_scene = true
@@ -395,7 +389,6 @@ route_autoplay = true
 [node name="TreasureChest" parent="." index="9" unique_id=677314662 instance=ExtResource("reward_chest")]
 editor_description = "Center of the right Quiz island."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.96115, -0.17407322, 0.5861097)
-note_drops = Array[ExtResource("chest_note_drop")]([SubResource("GuaranteedNoteDrop")])
 
 [node name="ChestBarrels" type="Node3D" parent="." index="10" unique_id=1689438056]
 editor_description = "Two Elite Barrels to the right of the chest at local X/Z (3.5, -5) and (3.5, 5)."

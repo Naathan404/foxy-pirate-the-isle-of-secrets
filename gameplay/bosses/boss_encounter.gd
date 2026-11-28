@@ -78,7 +78,7 @@ func _track_pickup(index: int, pickup: ItemPickup) -> void:
 
 
 func _save_pickup(index: int) -> void:
-	var pickup := _tracked.get(index) as ItemPickup
+s	var pickup := _tracked.get(index) as ItemPickup
 	if not is_instance_valid(pickup) or _state.is_empty():
 		return
 	var items: Dictionary = _state.items
@@ -114,4 +114,6 @@ func _restore_reward() -> void:
 		pickup.quantity = entry.quantity
 		_room.add_child(pickup)
 		pickup.position = entry.position
+		if pickup.is_special_reward():
+			pickup.show_highlight()
 		_track_pickup(index, pickup)

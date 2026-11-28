@@ -14,6 +14,11 @@ const POSES := {
 	["res://assets/spine/enemies/Enemy_HermitCarb/hermit_crab_skeleton.tres", "idle", 0.5],
 	# The lid popped open, so the mimic inside shows.
 	"barrel": ["res://assets/spine/enemies/Enemy_Barrel/barrel_skeleton.tres", "pop_up", 1.0],
+	# Elite portraits use combat poses, keeping the same ink and palette as the game.
+	"elite_crab": ["res://assets/spine/enemies/Enemy_Crab/crab_skeleton.tres", "walk_left", 0.25],
+	"elite_hermit_crab":
+	["res://assets/spine/enemies/Enemy_HermitCarb/hermit_crab_skeleton.tres", "charge_run", 0.4],
+	"elite_barrel": ["res://assets/spine/enemies/Enemy_Barrel/barrel_skeleton.tres", "shoot", 0.4],
 }
 
 

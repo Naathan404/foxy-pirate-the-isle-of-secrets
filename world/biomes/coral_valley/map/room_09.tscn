@@ -6,7 +6,6 @@
 [ext_resource type="Resource" path="res://data/items/blueprints/bow_blueprint.tres" id="bow_blueprint"]
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="chest_barrel"]
 [ext_resource type="Script" uid="uid://bmmcdjskrqbrf" path="res://world/objects/chest_item_drop.gd" id="chest_item_drop"]
-[ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
 [ext_resource type="Shape3D" path="res://world/biomes/coral_valley/base_scenes/coral_valley_ground_collision.tres" id="ground_shape"]
@@ -26,7 +25,6 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
 [ext_resource type="PackedScene" uid="uid://rj0sfun7stqd" path="res://world/objects/platform_puzzle_lever.tscn" id="shore_lever"]
 [ext_resource type="Texture2D" uid="uid://plnq1drkf6ol" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_09_shore.png" id="shore_texture"]
-[ext_resource type="Resource" uid="uid://dw5w2kkpxvucr" path="res://data/notes/coral_skeleton.tres" id="skeleton_note"]
 
 [ext_resource type="Script" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
 
@@ -165,10 +163,6 @@ size = Vector3(4, 0.5, 4)
 [sub_resource type="Resource" id="BowBlueprintDrop"]
 script = ExtResource("chest_item_drop")
 item = ExtResource("bow_blueprint")
-
-[sub_resource type="Resource" id="SkeletonNoteDrop"]
-script = ExtResource("chest_note_drop")
-note = ExtResource("skeleton_note")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0u1h1"]
 resource_local_to_scene = true
@@ -376,7 +370,6 @@ transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 48.910294, 0.2100801
 editor_description = "Center of the left Quiz island."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21008015, 0.5861097)
 item_drops = Array[ExtResource("chest_item_drop")]([SubResource("BowBlueprintDrop")])
-note_drops = Array[ExtResource("chest_note_drop")]([SubResource("SkeletonNoteDrop")])
 
 [node name="ChestBarrels" type="Node3D" parent="." index="15" unique_id=877001643]
 editor_description = "Four Elite Barrels at square corners around the chest. Local X/Z +/-5, square side 10; chest at the center."

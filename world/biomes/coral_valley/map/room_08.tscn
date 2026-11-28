@@ -14,8 +14,6 @@
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
 [ext_resource type="PackedScene" uid="uid://d3nieqgwtt6j5" path="res://world/biomes/coral_valley/objects/grapple_post.tscn" id="grapple_post"]
-[ext_resource type="PackedScene" uid="uid://bqt066tkjp3c1" path="res://gameplay/inventory/item_pickup.tscn" id="kraken_pickup"]
-[ext_resource type="Resource" path="res://data/items/charms/kraken_march.tres" id="kraken_reward"]
 [ext_resource type="Shader" uid="uid://btxo4dd57xuff" path="res://world/biomes/coral_valley/ground/coral_lagoon.gdshader" id="lagoon_shader"]
 [ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/calm.tres" id="palette_calm"]
 [ext_resource type="Resource" path="res://world/biomes/coral_valley/palettes/red_tide.tres" id="palette_red"]
@@ -166,13 +164,12 @@ shader_parameter/corridor_darkness = 0.3
 
 [sub_resource type="QuadMesh" id="ArenaDarknessQuad"]
 
-[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "victory_campfire", "victory_charm", "bridge_spans", "bridge_floor", "bridge_splash", "grapple_posts", "mood") instance=ExtResource("1_base")]
+[node name="room_08" unique_id=552203270 node_paths=PackedStringArray("boss", "encounter", "victory_campfire", "bridge_spans", "bridge_floor", "bridge_splash", "grapple_posts", "mood") instance=ExtResource("1_base")]
 editor_description = "Boss arena (wonder room). The bridge breaks when the fight starts and never comes back; after the win the arena becomes a safe room (VictoryCamp campfire) and Foxy leaves with the Tide Grapple won in room_16 (posts on both sides of the gap). The sea turns violet in phase two and red during Sky Dive and Anchor Whirlwind."
 script = ExtResource("arena_script")
 boss = NodePath("CaptainBlubberbeard")
 encounter = NodePath("BossEncounter")
 victory_campfire = NodePath("VictoryCamp")
-victory_charm = NodePath("KrakenMarchReward")
 bridge_spans = [NodePath("Bridge/SpanWest"), NodePath("Bridge/SpanEast")]
 bridge_floor = NodePath("Environment/BaseGroundBridge/StaticBody3D/CollisionShape3D")
 bridge_splash = NodePath("Bridge/Splash")
@@ -1041,12 +1038,6 @@ ground_shadow = true
 
 [node name="CampfireEmbers" parent="VictoryCamp" index="1" unique_id=1939867304 instance=ExtResource("campfire_embers")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 1.4)
-
-[node name="KrakenMarchReward" parent="." index="18" unique_id=1179706065 instance=ExtResource("kraken_pickup")]
-process_mode = 4
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.3, -5)
-visible = false
-item = ExtResource("kraken_reward")
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

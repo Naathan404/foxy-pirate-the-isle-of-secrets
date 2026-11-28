@@ -45,4 +45,4 @@ func _spawn_reward_pickup(item: BaseItem, note: MonsterNote, index: int) -> void
 	var total := rewards.size() + reward_notes.size()
 	var angle := TAU * index / maxf(1.0, float(total))
 	reward_pickup_spawned.emit(index, pickup)
-	pickup.play_drop_animation(Vector3(cos(angle), 0.0, sin(angle)))
+	_eject_pickup(pickup, Vector3(cos(angle), 0.0, sin(angle)))

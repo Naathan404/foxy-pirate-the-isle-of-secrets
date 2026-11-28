@@ -25,6 +25,7 @@
 [ext_resource type="Script" uid="uid://l383y3sp6xa1" path="res://gameplay/player/hud/chaos_indicator_feedback.gd" id="chaos_indicator"]
 [ext_resource type="Shader" uid="uid://r4ecpw76mt6y" path="res://gameplay/inventory/menu/silhouette.gdshader" id="flash_shader"]
 [ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="tooltip_theme"]
+[ext_resource type="PackedScene" path="res://gameplay/player/hud/journal_unlock_toast.tscn" id="journal_toast"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_flash"]
 shader = ExtResource("flash_shader")
@@ -762,3 +763,9 @@ theme_override_font_sizes/font_size = 32
 text = "99"
 horizontal_alignment = 1
 vertical_alignment = 2
+
+[node name="JournalToastLayer" type="CanvasLayer" parent="."]
+editor_description = "Own layer: corner anchors must not inherit the 1.25 scale of PlayerHUD."
+layer = 2
+
+[node name="JournalUnlockToast" parent="JournalToastLayer" instance=ExtResource("journal_toast")]

@@ -4,6 +4,11 @@ extends DestructibleProp
 
 const ITEM_PICKUP: PackedScene = preload("res://gameplay/inventory/item_pickup.tscn")
 const LOOT_SPREAD_ANGLE := 2.39996323
+## Special rewards leave after the gold has burst out, one beat apart.
+const SHOWCASE_DELAY_SECONDS := 0.55
+const SHOWCASE_STAGGER_SECONDS := 0.3
+## Angle between neighbouring special rewards, fanned out toward the camera.
+const SHOWCASE_FAN_RADIANS := 0.95
 
 const CAMERA_ZOOM_TWEEN_META := &"treasure_chest_zoom_tween"
 const CAMERA_ZOOM_BASE_META := &"treasure_chest_zoom_base"
@@ -57,6 +62,7 @@ const CAMERA_ZOOM_BASE_META := &"treasure_chest_zoom_base"
 var _wobble: Tween
 var _rest_rotation: Vector3
 var _random := RandomNumberGenerator.new()
+var _showcase_queue: Array[ItemPickup] = []
 
 
 func _ready() -> void:
@@ -249,4 +255,34 @@ func _spawn_pickup(item: BaseItem, note: MonsterNote, quantity: int, angle: floa
 	pickup.quantity = quantity
 	get_parent().add_child(pickup)
 	pickup.global_position = to_global(loot_origin_offset)
-	pickup.play_drop_animation(Vector3(cos(angle), 0.0, sin(angle)))
+	_eject_pickup(pickup, Vector3(cos(angle), 0.0, sin(angle)))
+
+
+## Ordinary loot scatters at once. Special rewards are gathered first, because they share one
+## fan and a subclass may add more of them in the same frame.
+func _eject_pickup(pickup: ItemPickup, direction: Vector3) -> void:
+	if not pickup.is_special_reward():
+		pickup.play_drop_animation(direction)
+		return
+	if _showcase_queue.is_empty():
+		_launch_showcase.call_deferred()
+	pickup.hide()
+	_showcase_queue.append(pickup)
+
+
+func _launch_showcase() -> void:
+	var camera := get_viewport().get_camera_3d()
+	# In front of the chest on screen, where neither its sprite nor the coins cover them.
+	var front := camera.global_basis.z if camera != null else Vector3.BACK
+	front = Vector3(front.x, 0.0, front.z).normalized()
+	var count := _showcase_queue.size()
+	for index in count:
+		var pickup := _showcase_queue[index]
+		if not is_instance_valid(pickup):
+			continue
+		var turn := (index - (count - 1) * 0.5) * SHOWCASE_FAN_RADIANS
+		pickup.play_showcase_drop(
+			front.rotated(Vector3.UP, turn),
+			SHOWCASE_DELAY_SECONDS + index * SHOWCASE_STAGGER_SECONDS
+		)
+	_showcase_queue.clear()

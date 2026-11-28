@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://bmcgcwpgw4yx4" path="res://gameplay/enemies/barrel/states/elite_barrel_scattershot.gd" id="5_scattershot"]
 [ext_resource type="Script" uid="uid://bqljh8frmigb4" path="res://gameplay/enemies/barrel/elite_barrel.gd" id="6_elite_barrel"]
 [ext_resource type="Resource" uid="uid://23t5dhijexs2" path="res://gameplay/enemies/barrel/elite_barrel_ink_hit.tres" id="elite_ink_hit"]
+[ext_resource type="Resource" path="res://data/notes/elite_barrel.tres" id="journal_entry"]
+[ext_resource type="Script" path="res://gameplay/enemies/barrel/states/elite_barrel_slam.gd" id="slam_state"]
 
 [sub_resource type="BoxShape3D" id="HurtShape"]
 size = Vector3(4, 4, 4)
@@ -30,7 +32,7 @@ normal_attacks_before_special = 3
 special_volley_count = 4
 special_bullets_per_volley = 8
 special_volley_interval = 0.35
-special_spawn_radius = 2.3
+special_spawn_radius = 1.2
 special_volley_stagger = 0.5
 charged_color = Color(1, 0.2, 0.2, 1)
 charged_scale = 1.2
@@ -41,6 +43,7 @@ ink_hit = ExtResource("elite_ink_hit")
 direction_mode = 1
 player_detection_radius = 10.0
 data = ExtResource("2_data")
+journal_entry = ExtResource("journal_entry")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
@@ -59,6 +62,9 @@ script = ExtResource("4_idle")
 
 [node name="Scattershot" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="4" unique_id=1384815200]
 script = ExtResource("5_scattershot")
+
+[node name="Slam" type="Node" parent="States" parent_id_path=PackedInt32Array(1797154631) index="5"]
+script = ExtResource("slam_state")
 
 [node name="CollisionShape3D" parent="TargetDetector" parent_id_path=PackedInt32Array(1419563400) index="0" unique_id=1785130377]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)

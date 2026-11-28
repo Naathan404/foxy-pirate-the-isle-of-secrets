@@ -20,9 +20,7 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="lm_stone"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="treasure_chest"]
 
-[ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
 
-[ext_resource type="Resource" path="res://data/notes/elite_crab.tres" id="elite_crab_note"]
 
 [ext_resource type="PackedScene" uid="uid://bew4onillst0f" path="res://gameplay/enemies/crab/elite_crab.tscn" id="enemy_elite_crab"]
 
@@ -155,10 +153,6 @@ shader_parameter/shadow_tint = Color(0.88, 0.86, 1.06, 1)
 shader_parameter/highlight_tint = Color(1, 0.96, 1.08, 1)
 shader_parameter/vignette_color = Color(0.04, 0.02, 0.1, 1)
 shader_parameter/vignette_strength = 0.42
-[sub_resource type="Resource" id="EliteCrabNoteDrop"]
-script = ExtResource("chest_note_drop")
-note = ExtResource("elite_crab_note")
-
 [node name="room_20" unique_id=2133176597 instance=ExtResource("1_base")]
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_19.tscn"
@@ -303,7 +297,6 @@ editor_description = "Secret reward of the hidden reef."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.252, -1)
 gold_min = 30
 gold_max = 50
-note_drops = Array[ExtResource("chest_note_drop")]([SubResource("EliteCrabNoteDrop")])
 
 [node name="EliteCrab" parent="." instance=ExtResource("enemy_elite_crab")]
 editor_description = "Guards the chest from the north."

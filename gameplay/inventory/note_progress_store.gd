@@ -2,6 +2,8 @@ extends Node
 ## Unlocked monster notes. Its own file keeps the latest state between launches; the game
 ## save slot is the authority on New Game (reset) and Continue (restore).
 signal changed(note_id: StringName)
+## An entry was learned during play. Restoring a save never emits this.
+signal discovered(note: MonsterNote)
 
 const SAVE_VERSION := 1
 ## Note IDs that were renamed, so older saves keep their unlocked notes.
@@ -30,6 +32,15 @@ func set_unlocked(note_id: StringName, unlocked: bool) -> bool:
 	_states[key] = unlocked
 	changed.emit(note_id)
 	return save_progress()
+
+
+## Unlocks an entry the player has just earned. Returns true only the first time.
+func discover(note: MonsterNote) -> bool:
+	if note == null or note.note_id.is_empty() or is_unlocked(note):
+		return false
+	set_unlocked(note.note_id, true)
+	discovered.emit(note)
+	return true
 
 
 func get_save_data() -> Dictionary:

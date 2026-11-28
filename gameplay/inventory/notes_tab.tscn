@@ -22,6 +22,8 @@
 [ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Journal_Icon.png" id="journal_icon"]
 [ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Weapons/Stat_Weapon_Log.png" id="panel"]
 [ext_resource type="Material" path="res://gameplay/inventory/menu/icon_glow_material.tres" id="glow_mat"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Journey/Elite_Icon.png" id="elite_icon"]
+[ext_resource type="Resource" path="res://data/notes/elite_coral_skeleton.tres" id="elite_coral_skeleton"]
 
 [sub_resource type="AtlasTexture" id="line_left"]
 atlas = ExtResource("lines")
@@ -40,7 +42,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("script")
-notes = Array[ExtResource("note_type")]([ExtResource("hermit_crab"), ExtResource("crab"), ExtResource("barrel"), ExtResource("coral_skeleton"), ExtResource("elite_hermit_crab"), ExtResource("elite_crab"), ExtResource("elite_barrel"), ExtResource("diary_ember"), ExtResource("diary_tide"), ExtResource("diary_flora"), ExtResource("diary_gale")])
+notes = Array[ExtResource("note_type")]([ExtResource("hermit_crab"), ExtResource("crab"), ExtResource("barrel"), ExtResource("coral_skeleton"), ExtResource("elite_coral_skeleton"), ExtResource("elite_hermit_crab"), ExtResource("elite_crab"), ExtResource("elite_barrel"), ExtResource("diary_ember"), ExtResource("diary_tide"), ExtResource("diary_flora"), ExtResource("diary_gale")])
 
 [node name="Title" type="HBoxContainer" parent="."]
 layout_mode = 0
@@ -227,6 +229,21 @@ offset_top = 99.0
 offset_right = 1103.0
 offset_bottom = 227.0
 mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EliteBadge" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+texture_filter = 2
+layout_mode = 0
+offset_left = 1090.0
+offset_top = 99.0
+offset_right = 1120.0
+offset_bottom = 129.0
+tooltip_text = "Elite creature"
+mouse_filter = 1
+texture = ExtResource("elite_icon")
 expand_mode = 1
 stretch_mode = 5
 

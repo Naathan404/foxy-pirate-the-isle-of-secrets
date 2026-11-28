@@ -1,0 +1,217 @@
+[gd_scene format=3 uid="uid://cgwnjsfubpk7q"]
+
+[ext_resource type="Script" uid="uid://dj4rtdodfjmbd" path="res://gameplay/player/hud/journal_unlock_toast.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://d2vl1l5pwxt3x" path="res://gameplay/inventory/menu/inventory_menu_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://byik5hayvqtwg" path="res://assets/ui/HUD_Fox/Journey/Knowledge_Toast_Paper.png" id="3_paper"]
+[ext_resource type="Texture2D" uid="uid://5ebig83031dt" path="res://assets/ui/HUD_Fox/Weapons/Picked_Slot.png" id="5_frame"]
+[ext_resource type="Texture2D" uid="uid://ma2b3ksi5acq" path="res://assets/ui/HUD_Fox/Weapons/Weapon Skill_Log.png" id="6_log"]
+[ext_resource type="Texture2D" uid="uid://bhqgucyfxovhj" path="res://assets/ui/HUD_Fox/Journey/Journey_Icon_Selected.png" id="7_book"]
+[ext_resource type="Texture2D" uid="uid://cm4q7o4y4hgyv" path="res://assets/ui/HUD_Fox/Journey/Creature_Icon.png" id="8_kind"]
+[ext_resource type="Texture2D" uid="uid://4cil6c50t34q" path="res://assets/ui/HUD_Fox/Weapons/Deco_2.png" id="9_spark"]
+[ext_resource type="Texture2D" uid="uid://br7e6kyus57k1" path="res://assets/ui/HUD_Fox/Weapons/Deco_3.png" id="10_glint"]
+[ext_resource type="Texture2D" path="res://assets/ui/HUD_Fox/Journey/Elite_Icon.png" id="11_elite"]
+
+[sub_resource type="AtlasTexture" id="Atlas_divider"]
+atlas = ExtResource("6_log")
+region = Rect2(110, 336, 600, 17)
+
+[sub_resource type="StyleBoxFlat" id="Style_badge"]
+bg_color = Color(0.17, 0.12, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.13, 0.17, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="JournalUnlockToast" type="Control" unique_id=182330744]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -386.0
+offset_right = -16.0
+grow_horizontal = 0
+mouse_filter = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Banner" type="Control" parent="." unique_id=366456401]
+anchors_preset = 0
+offset_top = 20.0
+offset_right = 370.0
+offset_bottom = 112.0
+mouse_filter = 2
+
+[node name="Paper" type="TextureRect" parent="Banner" unique_id=1682104193]
+layout_mode = 0
+offset_right = 370.0
+offset_bottom = 92.0
+mouse_filter = 2
+texture = ExtResource("3_paper")
+expand_mode = 1
+
+[node name="PortraitFrame" type="TextureRect" parent="Banner" unique_id=1821131077]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 13.0
+offset_right = 80.0
+offset_bottom = 77.0
+mouse_filter = 2
+texture = ExtResource("5_frame")
+expand_mode = 1
+
+[node name="Portrait" type="TextureRect" parent="Banner" unique_id=2102932773]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 21.0
+offset_top = 20.0
+offset_right = 73.0
+offset_bottom = 70.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EliteBadge" type="Panel" parent="Banner"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 62.0
+offset_top = 10.0
+offset_right = 86.0
+offset_bottom = 34.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_badge")
+
+[node name="Icon" type="TextureRect" parent="Banner/EliteBadge"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 20.0
+offset_bottom = 20.0
+mouse_filter = 2
+texture = ExtResource("11_elite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Book" type="TextureRect" parent="Banner" unique_id=1795455337]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 13.0
+offset_right = 106.0
+offset_bottom = 29.0
+mouse_filter = 2
+texture = ExtResource("7_book")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Header" type="Label" parent="Banner" unique_id=761929722]
+layout_mode = 0
+offset_left = 111.0
+offset_top = 11.0
+offset_right = 356.0
+offset_bottom = 31.0
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 15
+text = "NEW KNOWLEDGE UNLOCKED"
+vertical_alignment = 1
+
+[node name="Title" type="Label" parent="Banner" unique_id=720185578]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 90.0
+offset_top = 31.0
+offset_right = 356.0
+offset_bottom = 56.0
+theme_type_variation = &"NameLabel"
+theme_override_font_sizes/font_size = 18
+text = "Crab unlocked"
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Divider" type="TextureRect" parent="Banner" unique_id=461582764]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 56.0
+offset_right = 348.0
+offset_bottom = 63.0
+mouse_filter = 2
+texture = SubResource("Atlas_divider")
+expand_mode = 1
+
+[node name="KindIcon" type="TextureRect" parent="Banner" unique_id=728013556]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 90.0
+offset_top = 65.0
+offset_right = 106.0
+offset_bottom = 81.0
+mouse_filter = 2
+texture = ExtResource("8_kind")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Banner" unique_id=637155971]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 112.0
+offset_top = 63.0
+offset_right = 356.0
+offset_bottom = 83.0
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 13
+text = "Creature added to your Journal"
+vertical_alignment = 1
+
+[node name="Sparkles" type="Control" parent="Banner" unique_id=1054279933]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="SparkLeft" type="TextureRect" parent="Banner/Sparkles" unique_id=510629337]
+layout_mode = 0
+offset_left = 2.0
+offset_top = -5.0
+offset_right = 22.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("9_spark")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SparkRight" type="TextureRect" parent="Banner/Sparkles" unique_id=1354447363]
+layout_mode = 0
+offset_left = 348.0
+offset_top = 73.0
+offset_right = 366.0
+offset_bottom = 90.0
+mouse_filter = 2
+texture = ExtResource("9_spark")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GlintTop" type="TextureRect" parent="Banner/Sparkles" unique_id=172450543]
+layout_mode = 0
+offset_left = 354.0
+offset_top = -4.0
+offset_right = 366.0
+offset_bottom = 8.0
+mouse_filter = 2
+texture = ExtResource("10_glint")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GlintBottom" type="TextureRect" parent="Banner/Sparkles" unique_id=999310487]
+layout_mode = 0
+offset_left = 70.0
+offset_top = 70.0
+offset_right = 82.0
+offset_bottom = 82.0
+mouse_filter = 2
+texture = ExtResource("10_glint")
+expand_mode = 1
+stretch_mode = 5

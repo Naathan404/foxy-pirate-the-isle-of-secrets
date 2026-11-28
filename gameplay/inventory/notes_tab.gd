@@ -6,6 +6,7 @@ enum Filter { ALL, CREATURES, BOSSES }
 
 const SLOT_SCENE: PackedScene = preload("res://gameplay/inventory/menu/catalog_slot.tscn")
 const BOSS_BADGE: Texture2D = preload("res://assets/ui/HUD_Fox/Journey/Boss_Icon.png")
+const ELITE_BADGE: Texture2D = preload("res://assets/ui/HUD_Fox/Journey/Elite_Icon.png")
 ## Portraits at most this wide are pixel art.
 const PIXEL_ART_MAX_PIXELS := 300
 ## Item art for notes/diaries without a portrait, matching the pickup that unlocks them.
@@ -34,6 +35,7 @@ var _dirty: bool = true
 @onready var _counter_label: Label = %CounterLabel
 @onready var _empty_label: Label = %EmptyLabel
 @onready var _portrait: TextureRect = %Portrait
+@onready var _elite_badge: TextureRect = %EliteBadge
 @onready var _entry_name: Label = %EntryName
 @onready var _entry_kind: Label = %EntryKind
 @onready var _details_scroll: ScrollContainer = %DetailsScroll
@@ -155,13 +157,11 @@ func _refresh_grid() -> void:
 		var note := _entries[index]
 		var unlocked := is_note_unlocked(note)
 		var boss := note.layout == MonsterNote.Layout.BOSS
+		var badge: Texture2D = BOSS_BADGE if boss else null
+		if not boss and note.is_elite and unlocked:
+			badge = ELITE_BADGE
 		slot.set_icon_filter(_filter_for(_portrait_of(note)))
-		slot.present(
-			_portrait_of(note) if unlocked else null,
-			unlocked,
-			not unlocked,
-			BOSS_BADGE if boss else null
-		)
+		slot.present(_portrait_of(note) if unlocked else null, unlocked, not unlocked, badge)
 		slot.set_selected(note.note_id == _selected_id)
 		slot.tooltip_text = (
 			note.display_name if unlocked else "Undiscovered %s" % ("boss" if boss else "creature")
@@ -183,6 +183,7 @@ func _render_detail(note: MonsterNote) -> void:
 	_clear_sections()
 	_details_scroll.scroll_vertical = 0
 	_portrait.texture = null
+	_elite_badge.visible = false
 	if note == null:
 		_entry_name.text = "Journey"
 		_entry_kind.text = ""
@@ -195,15 +196,24 @@ func _render_detail(note: MonsterNote) -> void:
 		# Locked entries never reveal their name, portrait or text.
 		_entry_name.text = LOCKED_NAME
 		_entry_kind.text = "Undiscovered boss" if boss else "Undiscovered creature"
-		_add_body("Find this entry's %s to fill in this page." % ("boss diary" if boss else "note"))
+		_add_body(
+			(
+				"Find this boss's diary to fill in this page."
+				if boss
+				else "Defeat this creature to fill in this page."
+			)
+		)
 		_footer.text = ""
 		return
 
 	_portrait.texture = _portrait_of(note)
 	_portrait.texture_filter = _filter_for(_portrait.texture)
+	_elite_badge.visible = note.is_elite and not boss
 	_entry_name.text = note.display_name
 	_entry_name.tooltip_text = note.display_name
 	_entry_kind.text = "Boss encounter" if boss else "Creature record"
+	if note.is_elite and not boss:
+		_entry_kind.text = "Elite creature record"
 	if note.enemy_data != null:
 		_add_stats_line(note.enemy_data)
 	if boss:
