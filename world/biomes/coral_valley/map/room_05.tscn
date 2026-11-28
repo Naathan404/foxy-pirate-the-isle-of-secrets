@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
 [ext_resource type="Texture2D" uid="uid://cn3so0xmieh6c" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_05_shore.png" id="shore_texture"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/stone.tscn" id="stone"]
-[ext_resource type="PackedScene" path="res://world/gimmick/progression/tide_pearl_gate.tscn" id="tide_pearl_gate"]
+[ext_resource type="PackedScene" uid="uid://6gqnx2rlvdh8" path="res://world/gimmick/progression/tide_pearl_gate.tscn" id="tide_pearl_gate"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/wood_log.tscn" id="wood_log"]
 
 [sub_resource type="Environment" id="Environment_huxhj"]
@@ -267,8 +267,8 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.252, 0)
 ground_shadow = true
 
 [node name="FireLight" parent="Campfire" index="4" unique_id=994038413]
-light_color = Color(1, 0.5473551, 0.20490342, 1)
-light_energy = 7.3690004
+light_color = Color(1, 0.579464, 0.22630933, 1)
+light_energy = 7.907206
 omni_range = 14.0
 base_energy = 8.0
 
@@ -300,19 +300,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.652, 1.4)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 
 [node name="PalmTallNorthWest" parent="Scenery" index="0" unique_id=1913142053 instance=ExtResource("beach_palm_03")]
-transform = Transform3D(2.1, 0, 0, 0, 2.1, 0, 0, 0, 2.1, -7.5, 0, -9.5)
+transform = Transform3D(2.1, 0, 0, 0, 2.1, 0, 0, 0, 2.1, -7.5, 0.16714096, -9.5)
 ground_shadow = true
 
 [node name="PalmLeaningNorthEast" parent="Scenery" index="1" unique_id=742988457 instance=ExtResource("beach_palm_01")]
-transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 6.8, 0, -12.928988)
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 6.8, 0.16714096, -12.928988)
 ground_shadow = true
 
 [node name="PalmShortWest" parent="Scenery" index="2" unique_id=702372067 instance=ExtResource("beach_palm_02")]
-transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, -10, 0, -4.5)
+transform = Transform3D(2.6, 0, 0, 0, 2.6, 0, 0, 0, 2.6, -10, 0.16714096, -4.5)
 ground_shadow = true
 
 [node name="PalmShortEast" parent="Scenery" index="3" unique_id=825904025 instance=ExtResource("beach_palm_02")]
-transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, 9.256279, 0, -7.2869177)
+transform = Transform3D(2.4, 0, 0, 0, 2.4, 0, 0, 0, 2.4, -4.2097445, 0.16714096, 15.209353)
 ground_shadow = true
 
 [node name="BenchNorthWest" parent="Scenery" index="4" unique_id=1606786278 instance=ExtResource("wood_log")]
@@ -355,7 +355,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 0.1, 0)
 
 [node name="TidePearlGate" parent="." index="11" unique_id=1861707807 node_paths=PackedStringArray("room", "gate") instance=ExtResource("tide_pearl_gate")]
 editor_description = "Pearl shrine beside the east pier. Seals the way to the boss (room_06) until Foxy sets three Tide Pearls (room_13, room_16, room_23)."
-transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 14, 0.252, -5.2)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 10.791273, 0.5469667, -5.2)
 socket_fill_seconds = 0.5
 room = NodePath("..")
 gate = NodePath("../PearlGateBoulders")

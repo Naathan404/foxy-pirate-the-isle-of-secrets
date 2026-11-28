@@ -65,6 +65,7 @@
 [ext_resource type="Script" uid="uid://cvd063j1hyi7c" path="res://gameplay/player/effects/environment_atmosphere.gd" id="environment_atmosphere"]
 [ext_resource type="Resource" uid="uid://f7nqpy7cxckc" path="res://gameplay/charms/charm_data/fortune_leaf.tres" id="fortune_leaf"]
 [ext_resource type="Resource" uid="uid://da8dd510kdfi7" path="res://gameplay/charms/charm_data/glacial_spikes.tres" id="glacial_spikes"]
+[ext_resource type="Resource" path="res://gameplay/charms/charm_data/kraken_march.tres" id="kraken_march"]
 [ext_resource type="AnimationLibrary" uid="uid://cxepldwk3cva0" path="res://gameplay/player/harpoon_animations.tres" id="harpoon_animations"]
 [ext_resource type="Script" uid="uid://bxgsdpej4ktl2" path="res://gameplay/player/effects/player_hit_effect.gd" id="hit_feedback"]
 [ext_resource type="Resource" uid="uid://dcji1edjmvej" path="res://data/items/consumables/wooden_arrow.tres" id="Item_wooden_arrow"]
@@ -1075,7 +1076,7 @@ loadout = SubResource("Resource_ieged")
 
 [node name="CharmRegistry" type="Node" parent="CharmSocketManager" unique_id=112639905]
 script = ExtResource("17_charm_registry")
-definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute"), ExtResource("glacial_spikes"), ExtResource("meteor_strike"), ExtResource("devil_contract"), ExtResource("crimson_band"), ExtResource("death_bloom"), ExtResource("shadow_renment"), ExtResource("skull_cracker"), ExtResource("momentum_strike"), ExtResource("fortune_leaf")])
+definitions = Array[ExtResource("21_upw5f")]([ExtResource("charm_arrow"), ExtResource("charm_crescent"), ExtResource("charm_tide"), ExtResource("charm_gale"), ExtResource("charm_turtle"), ExtResource("charm_endurance"), ExtResource("charm_life_steal"), ExtResource("charm_double_strike"), ExtResource("charm_backstabber"), ExtResource("charm_shadow_lunge"), ExtResource("charm_buckshot"), ExtResource("charm_chaos_collector"), ExtResource("charm_anchor"), ExtResource("charm_whirlpool"), ExtResource("charm_salute"), ExtResource("glacial_spikes"), ExtResource("kraken_march"), ExtResource("meteor_strike"), ExtResource("devil_contract"), ExtResource("crimson_band"), ExtResource("death_bloom"), ExtResource("shadow_renment"), ExtResource("skull_cracker"), ExtResource("momentum_strike"), ExtResource("fortune_leaf")])
 
 [node name="ChaosComponent" type="Node" parent="." unique_id=2085136369]
 script = ExtResource("21_chaos")

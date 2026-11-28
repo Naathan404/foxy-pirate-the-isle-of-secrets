@@ -1,0 +1,20 @@
+Mode: built-in image_gen; transparent_background=true.
+
+Final project assets:
+assets/sprites/charms/kraken_march.png
+assets/sprites/effects/charms/kraken_tentacle_sheet.png
+
+Icon prompt:
+Use case: stylized-concept. Asset type: production pixel-art game HUD charm icon, square transparent PNG. Primary request: Kraken's March, a magical pirate charm earned from Captain Blubberbeard. A powerful curling purple octopus tentacle with turquoise suckers erupting from a small swirl of sea foam, with a few small gold barnacle accents. Bold dark navy outlines, chunky crisp pixel clusters, saturated violet and aqua highlights, limited palette, readable silhouette at 56x56 pixels, polished retro fantasy pirate RPG inventory icon. Centered single icon filling 85 percent of square, no frame or badge background, no letters, no text, no watermark. Background genuinely transparent. Isolated item only, no scene, no border.
+
+Sprite sheet prompt:
+Use case: stylized-concept. Asset type: production 2D pixel-art animation sprite sheet for a pirate fantasy game, transparent PNG. Create ONE sheet with exactly FOUR columns and TWO rows, eight equal square cells, no spacing between cells. Each cell is independent, with generous transparent padding. Identical purple kraken tentacle with luminous turquoise suckers and thick dark navy pixel outlines, chunky crisp pixel clusters, limited palette, sea foam at its base. Side view facing RIGHT. No characters, no words, no grid lines, no border, no cast shadow background. Animation read left to right top row then bottom row: frame0 small tentacle tip emerging from a ground foam ring; frame1 half-grown upright; frame2 fully upright tall curled tentacle; frame3 same tall tentacle drawn back left preparing to whip right; frame4 whipping right downward at a diagonal; frame5 tentacle fully SLAMMED DOWN horizontally right near the ground with turquoise impact splash; frame6 recovering into upright curl; frame7 small curling tip retracting into foam ring. CRITICAL registration: in EVERY cell the root point where tentacle exits ground is at 40 percent cell width, 88 percent cell height; fully upright tentacle extends to 12 percent cell height; horizontal slam extends to 90 percent width. Keep the entire sprite within its own cell, never bleed into adjacent cells. Same scale and same root across all frames. Background truly transparent, clean alpha. Use violet skin, aqua suckers, dark navy outlines and white teal foam, polished retro action RPG art.
+
+Final sheet edit prompt (input: generated sheet):
+Use case: background-extraction. Edit target: this eight-frame tentacle sprite sheet. Remove the entire pale white background to REAL FULL TRANSPARENCY with alpha zero outside each tentacle and splash. Preserve the exact 4 columns by 2 rows, all eight distinct tentacle poses, original colors and dark outlines. Remove soft drop shadows outside the sprites. No white canvas, no checkerboard painted on the image. Output a 2048 by 1024 PNG sprite sheet with four equal 512 by 512 columns and two rows. Keep the root of each tentacle at 40 percent cell width and 88 percent cell height. The output must be game-ready RGBA with truly transparent gaps between sprites. Do not add new elements or text.
+
+Integration notes:
+The generated sheet is 1774x887; Godot imports it with process/size_limit=1024,
+producing a 1024x512 texture with eight equal 256x256 cells. Its measured root
+is (0.38,0.92). Both final PNGs have verified alpha ranges of 0..255.
+Foxy casting reuses the existing Glacial Spikes frames through a separate clip.

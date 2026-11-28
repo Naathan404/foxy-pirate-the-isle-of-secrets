@@ -22,7 +22,7 @@ socket_pearls = [NodePath("Sockets/Left/Pearl"), NodePath("Sockets/Middle/Pearl"
 open_flag = &"coral_valley_pearl_gate_open"
 
 [node name="Slab" type="Sprite3D" parent="." unique_id=951827173]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, -0.311301, 0.2)
 offset = Vector2(0, 627)
 pixel_size = 0.0019
 billboard = 1
@@ -32,7 +32,7 @@ texture_filter = 0
 texture = ExtResource("6_slab")
 
 [node name="Pillar" type="Sprite3D" parent="." unique_id=1216019381]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, -0.4)
 offset = Vector2(0, 768)
 pixel_size = 0.0024
 billboard = 1
@@ -52,9 +52,10 @@ shape = SubResource("PillarShape")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 
 [node name="Left" type="Node3D" parent="Sockets" unique_id=101751568]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.5, 0)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -0.9, 1.5, 0)
 
 [node name="Pearl" type="Sprite3D" parent="Sockets/Left" unique_id=881639448]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, -0.9904398)
 pixel_size = 0.0005
 billboard = 1
 alpha_cut = 2
@@ -66,9 +67,10 @@ light_energy = 1.2
 omni_range = 3.5
 
 [node name="Middle" type="Node3D" parent="Sockets" unique_id=133252172]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 2.1, 0)
 
 [node name="Pearl" type="Sprite3D" parent="Sockets/Middle" unique_id=917148255]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, -0.9904398)
 pixel_size = 0.0005
 billboard = 1
 alpha_cut = 2
@@ -80,9 +82,10 @@ light_energy = 1.2
 omni_range = 3.5
 
 [node name="Right" type="Node3D" parent="Sockets" unique_id=1380169486]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.5, 0)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0.9, 1.5, 0)
 
 [node name="Pearl" type="Sprite3D" parent="Sockets/Right" unique_id=287673825]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, -0.9904398)
 pixel_size = 0.0005
 billboard = 1
 alpha_cut = 2
