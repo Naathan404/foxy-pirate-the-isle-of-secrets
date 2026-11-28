@@ -27,6 +27,10 @@ const ANIM = {
 @export_range(0.0, 1000.0) var max_sp: float = 300.0
 @export_range(0.0, 100.0) var stamina_regen_rate: float = 25.0
 @export_range(0.0, 10.0) var stamina_regen_delay: float = 1.0
+## SP recovery speeds up while Foxy does not spend any: this many SP/s are added to the rate
+## every second, up to `stamina_regen_max_rate`. Spending SP drops it back to the start.
+@export_range(0.0, 200.0) var stamina_regen_ramp: float = 35.0
+@export_range(0.0, 500.0) var stamina_regen_max_rate: float = 200.0
 
 @export_group("Chaos - CP")
 @export_range(0.0, 100.0) var max_chaos: float = 100.0

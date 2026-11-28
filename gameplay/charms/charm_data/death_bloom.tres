@@ -15,7 +15,7 @@ acquisition_source = &"prototype_debug"
 drop_chance = 0.0
 tags = Array[StringName]([&"passive"])
 effect_params = {
-"blast_hp": 1.5,
+"blast_hp": 2.0,
 "delay_seconds": 0.32,
 "radius_units": 3
 }

@@ -8,7 +8,7 @@
 script = ExtResource("1")
 charm_id = &"devil_contract"
 display_name = "Devil Contract"
-description = "Requires 300 SP. Spend all current SP to gain 30% damage and 30% movement speed for 10 seconds. SP recovery is sealed."
+description = "Requires 300 SP. Spend all current SP to gain 50% damage and 30% movement speed for 10 seconds. SP recovery is sealed."
 sprite = ExtResource("3")
 charm_type = 0
 effect_scene = ExtResource("2")
@@ -18,7 +18,7 @@ acquisition_source = &"fixed_boss_reward"
 drop_chance = 1
 tags = Array[StringName]([&"active"])
 effect_params = {
-"damage_multiplier": 1.3,
+"damage_multiplier": 1.5,
 "duration_seconds": 10,
 "move_speed_multiplier": 1.3,
 "windup_seconds": 0.32

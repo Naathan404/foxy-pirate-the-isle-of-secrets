@@ -3,8 +3,12 @@ extends Control
 
 const COIN_TEXTURE: Texture2D = preload("res://assets/sprites/items/Coin.png")
 
+@export_range(0.0, 10.0, 0.1, "suffix:s") var visible_duration_seconds := 2.0
+@export_range(0.0, 5.0, 0.05, "suffix:s") var fade_out_duration_seconds := 0.5
+
 var _wallet: GoldWallet
 var _feedback_tween: Tween
+var _visibility_tween: Tween
 
 @onready var _value: Label = $Row/Amount
 @onready var _gain: Label = $Gain
@@ -15,6 +19,7 @@ var _feedback_tween: Tween
 func _ready() -> void:
 	# Merchant menus pause the world. Currency feedback must finish while they are open.
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	hide()
 	var manager := get_node_or_null("/root/GameManager")
 	if manager == null:
 		return
@@ -29,6 +34,8 @@ func _on_balance_changed(balance: int, change: int) -> void:
 	_value.text = str(balance)
 	if change == 0:
 		return
+	if change > 0:
+		_show_temporarily()
 	_reset_feedback()
 	_gain.text = "+%d G" % change if change > 0 else "%d G" % change
 	_gain.add_theme_color_override(
@@ -43,6 +50,18 @@ func _on_balance_changed(balance: int, change: int) -> void:
 	_feedback_tween.tween_property(_gain, "position:y", _gain_rest_position.y - 12.0, 0.8)
 	_feedback_tween.tween_property(_gain, "modulate:a", 0.0, 0.45).set_delay(0.3)
 	_feedback_tween.tween_callback(_clear_gain).set_delay(0.8)
+
+
+func _show_temporarily() -> void:
+	if _visibility_tween != null and _visibility_tween.is_valid():
+		_visibility_tween.kill()
+	modulate.a = 1.0
+	show()
+	_visibility_tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_visibility_tween.set_ignore_time_scale(true)
+	_visibility_tween.tween_interval(visible_duration_seconds)
+	_visibility_tween.tween_property(self, "modulate:a", 0.0, fade_out_duration_seconds)
+	_visibility_tween.tween_callback(hide)
 
 
 func play_pickup_fly(from_world_position: Vector3) -> void:
@@ -107,6 +126,9 @@ func _reset_feedback() -> void:
 
 
 func _exit_tree() -> void:
+	if _visibility_tween != null and _visibility_tween.is_valid():
+		_visibility_tween.kill()
+	_visibility_tween = null
 	_reset_feedback()
 	if _wallet != null and _wallet.balance_changed.is_connected(_on_balance_changed):
 		_wallet.balance_changed.disconnect(_on_balance_changed)
