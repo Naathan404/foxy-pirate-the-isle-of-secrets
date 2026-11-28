@@ -1,10 +1,12 @@
 class_name KrakenMarchEffect
 extends CharmEffect
-## Grounded, staggered summons. The effect owns damage and all summon lifetimes.
+## A fissure tears toward the aim point and kraken tentacles burst from it in a fast wave. The
+## wave hits and stuns each enemy once, shatters weak props and ends in a giant tentacle; the
+## line then guards its ground. The effect owns damage and all summon lifetimes.
 
 const TENTACLE := preload("res://gameplay/charms/active/kraken_tentacle.tscn")
-const INK := Color("9960ee")
-const FOAM := Color("65eee1")
+const CRIMSON := Color("f7122f")
+const WINE := Color("63041c")
 const GROUND_PROBE_UP := 1.5
 const GROUND_PROBE_DOWN := 2.0
 const MAX_GROUND_STEP := 0.65
@@ -15,9 +17,32 @@ const QUERY_BATCH_SIZE := 32
 const TARGET_HEIGHT_UNITS := 2.4
 const IMPACT_SECONDS := 0.25
 const SITE_COUNT_EPSILON := 0.001
+## The fissure starts this far before the first tentacle and runs this far past the last one.
+const FISSURE_LEAD_UNITS := 0.6
+const FISSURE_TAIL_UNITS := 0.8
+## Cycled along the line so neighbours never look stamped from one mould.
+const HEIGHT_SCALES: Array[float] = [0.92, 1.08, 0.86, 1.16, 0.96, 1.04]
+const LEANS_RADIANS: Array[float] = [-0.12, 0.1, -0.04, 0.14, -0.16, 0.06]
+const CURL_SIDES: Array[float] = [1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0]
+const FLANK_SIDE_UNITS := 0.55
+const FLANK_ALONG_UNITS := 0.45
+const FLANK_MIN_SCALE := 0.3
+const FLANK_MAX_SCALE := 0.48
+const FLANK_LEAN_RADIANS := 0.35
+const ERUPTION_ROCKS := 6
+const FINALE_ROCKS := 16
+const SLAM_ROCKS := 4
+const PROP_ROCKS := 5
+const CAST_DIM_OPACITY := 0.16
+const CAST_DIM_SECONDS := 0.5
+const SHOCKWAVE_RADIUS_PIXELS := 260.0
 
 var _sites: Array[Vector3] = []
-var _marks: Array[CharmVfx] = []
+var _path := PackedVector3Array()
+var _fissure: KrakenFissure
+var _finale: KrakenTentacle
+var _wave_struck: Array[Node3D] = []
+var _wave_confirmed := false
 var _tentacles: Array[KrakenTentacle] = []
 var _next_site := 0
 var _spawn_clock := 0.0
@@ -51,18 +76,12 @@ func activate(context: CharmActivationContext) -> bool:
 	_next_site = 0
 	_spawn_clock = definition.get_param_float(&"windup_seconds")
 	_damage = _get_base_damage()
-	for index in _sites.size():
-		var delay := _spawn_clock + index * definition.get_param_float(&"spawn_interval_seconds")
-		var mark := CharmVfx.spawn(
-			actor.get_parent(),
-			_sites[index],
-			INK,
-			definition.get_param_float(&"eruption_radius_units"),
-			delay,
-			CharmVfx.Style.TARGET
-		)
-		mark.sustained = true
-		_marks.append(mark)
+	_wave_struck.clear()
+	_wave_confirmed = false
+	_finale = null
+	_fissure = KrakenFissure.spawn(actor.get_parent(), _path, _spawn_clock)
+	CharmFeel.flash(actor, WINE, CAST_DIM_OPACITY, CAST_DIM_SECONDS)
+	CharmFeel.shake(actor, 2.0, _spawn_clock)
 	_play_cast_animation(&"windup", _direction, _spawn_clock)
 	CharmFeel.sound(actor, CharmFeel.WHOOSH_SOUND, actor.global_position, -8.0, 0.65)
 	set_physics_process(true)
@@ -71,6 +90,7 @@ func activate(context: CharmActivationContext) -> bool:
 
 func _build_sites(context: CharmActivationContext) -> Array[Vector3]:
 	var sites: Array[Vector3] = []
+	_path = PackedVector3Array()
 	var origin := actor.global_position
 	# Foxy's body origin is above its feet; compare terrain heights with terrain.
 	var starting_ground := _ground_at(origin)
@@ -113,10 +133,27 @@ func _build_sites(context: CharmActivationContext) -> Array[Vector3]:
 			if absf(at.y - previous.y) > MAX_GROUND_STEP or _wall_between(previous, at):
 				return sites
 			previous = at
+			if sampled_distance >= first - FISSURE_LEAD_UNITS:
+				_path.append(at)
 		sites.append(previous)
 		if is_equal_approx(distance, reach):
 			break
+	_extend_path(forward)
 	return sites
+
+
+## The tail past the last tentacle is only drawn where the ground carries on.
+func _extend_path(forward: Vector3) -> void:
+	if _path.is_empty():
+		return
+	var last := _path[_path.size() - 1]
+	var beyond := last + forward * FISSURE_TAIL_UNITS
+	var ground := _ground_at(beyond)
+	if ground.is_empty():
+		return
+	var at: Vector3 = ground.position
+	if absf(at.y - last.y) <= MAX_GROUND_STEP and not _wall_between(last, at):
+		_path.append(at)
 
 
 func _ground_at(at: Vector3) -> Dictionary:
@@ -151,31 +188,73 @@ func _physics_process(delta: float) -> void:
 			_spawn_tentacle()
 			_spawn_clock += maxf(0.01, definition.get_param_float(&"spawn_interval_seconds"))
 	if _next_site >= _sites.size() and _tentacles.is_empty():
+		if is_instance_valid(_fissure):
+			_fissure.close()
+		_fissure = null
 		_sites.clear()
 		set_physics_process(false)
 
 
 func _spawn_tentacle() -> void:
-	var site := _sites[_next_site]
-	var mark := _marks[_next_site]
-	if is_instance_valid(mark):
-		mark.queue_free()
+	var index := _next_site
+	var site := _sites[index]
+	var is_finale := index == _sites.size() - 1
+	var tentacle := _create_tentacle()
+	tentacle.size_scale = (
+		definition.get_param_float(&"finale_scale")
+		if is_finale
+		else HEIGHT_SCALES[index % HEIGHT_SCALES.size()]
+	)
+	tentacle.lean = LEANS_RADIANS[index % LEANS_RADIANS.size()]
+	tentacle.curl_side = CURL_SIDES[index % CURL_SIDES.size()]
+	if is_finale:
+		_finale = tentacle
+	tentacle.target_requested.connect(_on_target_requested.bind(tentacle))
+	tentacle.struck.connect(_on_tentacle_struck.bind(tentacle))
+	_place(tentacle, site)
+	_spawn_flankers(site)
+	KrakenDebris.spawn(
+		actor.get_parent(), site, FINALE_ROCKS if is_finale else ERUPTION_ROCKS, tentacle.size_scale
+	)
+	if index == 0:
+		_end_cast_lock()
+		_play_cast_animation(&"slam", _direction, tentacle.RISE_SECONDS, true)
+		CharmFeel.shockwave(actor, site, CRIMSON, SHOCKWAVE_RADIUS_PIXELS)
+	CharmFeel.shake(actor, 4.0, 0.12)
+	CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, site, -9.0, randf_range(0.5, 0.65))
+	_next_site += 1
+	if _next_site == _sites.size():
+		_play_cast_animation(&"recover", _direction, 0.0, true)
+
+
+## Short extra tips ripping out beside a summon make the wave read as one torn seam.
+func _spawn_flankers(site: Vector3) -> void:
+	var across := _direction.cross(Vector3.UP)
+	for side: float in [-1.0, 1.0]:
+		var offset := across * FLANK_SIDE_UNITS + _direction * FLANK_ALONG_UNITS
+		var ground := _ground_at(site + offset * side)
+		if ground.is_empty() or absf((ground.position as Vector3).y - site.y) > MAX_GROUND_STEP:
+			continue
+		var flanker := _create_tentacle()
+		flanker.decorative = true
+		flanker.size_scale = randf_range(FLANK_MIN_SCALE, FLANK_MAX_SCALE)
+		flanker.lean = FLANK_LEAN_RADIANS * side
+		flanker.curl_side = side
+		_place(flanker, ground.position)
+
+
+func _create_tentacle() -> KrakenTentacle:
 	var tentacle := TENTACLE.instantiate() as KrakenTentacle
 	tentacle.definition = definition
 	tentacle.facing = _direction
-	tentacle.target_requested.connect(_on_target_requested.bind(tentacle))
-	tentacle.struck.connect(_on_tentacle_struck.bind(tentacle))
+	return tentacle
+
+
+func _place(tentacle: KrakenTentacle, at: Vector3) -> void:
 	var arena := actor.get_parent() as Node3D
-	tentacle.position = arena.to_local(site)
+	tentacle.position = arena.to_local(at)
 	arena.add_child(tentacle)
 	_tentacles.append(tentacle)
-	if _next_site == 0:
-		_end_cast_lock()
-		_play_cast_animation(&"slam", _direction, tentacle.RISE_SECONDS, true)
-	_next_site += 1
-	if _next_site == _sites.size():
-		_marks.clear()
-		_play_cast_animation(&"recover", _direction, 0.0, true)
 
 
 func _on_target_requested(tentacle: KrakenTentacle) -> void:
@@ -197,6 +276,17 @@ func _on_target_requested(tentacle: KrakenTentacle) -> void:
 
 func _targets_at(at: Vector3, radius: float) -> Array[Node3D]:
 	var targets: Array[Node3D] = []
+	for target in _hurtbox_actors_at(at, radius):
+		if not target.is_in_group(&"enemy") and not target.is_in_group(&"training_dummy"):
+			continue
+		if not _wall_between(at, target.global_position):
+			targets.append(target)
+	return targets
+
+
+## Every living opposing actor with a hurtbox in the column, listed once.
+func _hurtbox_actors_at(at: Vector3, radius: float) -> Array[Node3D]:
+	var actors: Array[Node3D] = []
 	var volume := CylinderShape3D.new()
 	volume.radius = radius
 	volume.height = TARGET_HEIGHT_UNITS
@@ -222,34 +312,82 @@ func _targets_at(at: Vector3, radius: float) -> Array[Node3D]:
 			var target := hurtbox.actor as Node3D
 			if not is_instance_valid(target) or target == actor or target.get("dead") == true:
 				continue
-			if not target.is_in_group(&"enemy") and not target.is_in_group(&"training_dummy"):
-				continue
-			if target not in targets and not _wall_between(at, target.global_position):
-				targets.append(target)
+			if target not in actors:
+				actors.append(target)
 		if hits.size() < QUERY_BATCH_SIZE:
 			break
-	return targets
+	return actors
 
 
 func _on_tentacle_struck(at: Vector3, eruption: bool, tentacle: KrakenTentacle) -> void:
 	if not is_instance_valid(actor) or not is_instance_valid(tentacle):
 		return
-	var radius := definition.get_param_float(
-		&"eruption_radius_units" if eruption else &"slam_radius_units"
-	)
-	var multiplier := definition.get_param_float(
-		&"eruption_damage_multiplier" if eruption else &"slam_damage_multiplier"
-	)
-	var push := definition.get_param_float(&"eruption_push" if eruption else &"slam_push")
+	if eruption:
+		_resolve_eruption(at, tentacle)
+	else:
+		_resolve_slam(at, tentacle)
+
+
+## One wave, one hit: overlapping eruptions never strike the same enemy twice.
+func _resolve_eruption(at: Vector3, tentacle: KrakenTentacle) -> void:
+	var is_finale := tentacle == _finale
+	var size := definition.get_param_float(&"finale_scale") if is_finale else 1.0
+	var radius := definition.get_param_float(&"eruption_radius_units") * size
+	var damage := _damage * definition.get_param_float(&"eruption_damage_multiplier")
+	var push := definition.get_param_float(&"eruption_push") * size
+	var first_hit: Node3D
+	for target in _targets_at(at, radius):
+		if target in _wave_struck:
+			continue
+		if _damage_target(target, damage, tentacle.global_position, push) <= 0.0:
+			continue
+		_wave_struck.append(target)
+		if target is EnemyBase:
+			(target as EnemyBase).apply_charm_stun(
+				definition.get_param_float(&"eruption_stun_seconds")
+			)
+		CharmVfx.spawn(actor.get_parent(), target.global_position, CRIMSON, 0.7, IMPACT_SECONDS)
+		if first_hit == null:
+			first_hit = target
+	_shatter_props(at, radius)
+	if first_hit != null:
+		CharmFeel.sound(actor, CharmFeel.HIT_SOUND, at, -8.0, 0.8)
+		if not _wave_confirmed:
+			_wave_confirmed = true
+			CharmFeel.hitstop(actor, 0.06, first_hit)
+	if is_finale:
+		CharmVfx.spawn(actor.get_parent(), at, CRIMSON, radius, IMPACT_SECONDS)
+		CharmFeel.shake(actor, 9.0, 0.28)
+		CharmFeel.flash(actor, CRIMSON, 0.12, 0.18)
+		CharmFeel.shockwave(actor, at, CRIMSON, SHOCKWAVE_RADIUS_PIXELS)
+		CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, at, -3.0, 0.4)
+
+
+func _resolve_slam(at: Vector3, tentacle: KrakenTentacle) -> void:
+	var radius := definition.get_param_float(&"slam_radius_units")
+	var damage := _damage * definition.get_param_float(&"slam_damage_multiplier")
+	var push := definition.get_param_float(&"slam_push")
 	var hit_confirmed := false
 	for target in _targets_at(at, radius):
-		if _damage_target(target, _damage * multiplier, tentacle.global_position, push) > 0.0:
+		if _damage_target(target, damage, tentacle.global_position, push) > 0.0:
 			hit_confirmed = true
-	CharmVfx.spawn(actor.get_parent(), at, FOAM, radius, IMPACT_SECONDS)
-	CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, at, -13.0, 0.7 if eruption else 0.85)
+	CharmVfx.spawn(actor.get_parent(), at, CRIMSON, radius, IMPACT_SECONDS)
+	KrakenDebris.spawn(actor.get_parent(), at, SLAM_ROCKS, 0.8)
+	CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, at, -13.0, 0.85)
 	if hit_confirmed:
 		CharmFeel.shake(actor, 2.5, 0.1)
 		CharmFeel.sound(actor, CharmFeel.HIT_SOUND, at, -10.0)
+
+
+## Only weak scenery breaks; sturdier props (a campfire, a boat) are left alone.
+func _shatter_props(at: Vector3, radius: float) -> void:
+	var break_max_hp := definition.get_param_float(&"prop_break_max_hp")
+	for node in _hurtbox_actors_at(at, radius):
+		var prop := node as DestructibleProp
+		if prop == null or prop.max_hp > break_max_hp:
+			continue
+		KrakenDebris.spawn(actor.get_parent(), prop.global_position, PROP_ROCKS)
+		prop.break_from_impact()
 
 
 func on_input_cancelled() -> void:
@@ -261,10 +399,11 @@ func on_input_cancelled() -> void:
 func cancel_active() -> void:
 	_stop_cast_animation()
 	set_physics_process(false)
-	for mark in _marks:
-		if is_instance_valid(mark):
-			mark.queue_free()
-	_marks.clear()
+	if is_instance_valid(_fissure):
+		_fissure.queue_free()
+	_fissure = null
+	_finale = null
+	_wave_struck.clear()
 	for tentacle in _tentacles:
 		if is_instance_valid(tentacle):
 			tentacle.set_physics_process(false)

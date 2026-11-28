@@ -114,4 +114,6 @@ func _restore_reward() -> void:
 		pickup.quantity = entry.quantity
 		_room.add_child(pickup)
 		pickup.position = entry.position
+		if pickup.is_special_reward():
+			pickup.show_highlight()
 		_track_pickup(index, pickup)

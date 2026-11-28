@@ -6,10 +6,17 @@
 [ext_resource type="Resource" path="res://data/notes/diary_tide.tres" id="boss_note"]
 [ext_resource type="Script" path="res://data/notes/monster_note.gd" id="note_type"]
 [ext_resource type="Resource" uid="uid://kch58xt54vpk" path="res://data/items/quest/key_tide.tres" id="7_khbls"]
+[ext_resource type="Script" path="res://world/objects/chest_item_drop.gd" id="drop_type"]
+[ext_resource type="Resource" path="res://data/items/charms/kraken_march.tres" id="kraken_reward"]
+
+[sub_resource type="Resource" id="Drop_kraken_march"]
+script = ExtResource("drop_type")
+item = ExtResource("kraken_reward")
 
 [node name="BossRewardChest" unique_id=609333493 instance=ExtResource("1")]
 script = ExtResource("2")
 gold_min = 10
 gold_max = 20
+item_drops = Array[ExtResource("drop_type")]([SubResource("Drop_kraken_march")])
 rewards = Array[ExtResource("5")]([ExtResource("7_khbls")])
 reward_notes = Array[ExtResource("note_type")]([ExtResource("boss_note")])

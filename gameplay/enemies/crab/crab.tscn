@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://dnkkqx0aqleuv" path="res://gameplay/enemies/crab/crab.gd" id="7_crab"]
 [ext_resource type="Script" uid="uid://jvd33wftr8gv" path="res://gameplay/enemies/base/enemy_spine_visual.gd" id="8_spine_visual"]
 [ext_resource type="Script" path="res://gameplay/enemies/crab/states/crab_attack.gd" id="9_attack"]
+[ext_resource type="Resource" path="res://data/notes/crab.tres" id="journal_entry"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(2.6, 2, 2.4)
@@ -37,6 +38,7 @@ anger_detection_multiplier = 1.5
 anger_movement_multiplier = 1.5
 anger_color = Color(1, 0.35, 0.35, 1)
 data = ExtResource("2_data")
+journal_entry = ExtResource("journal_entry")
 initial_state_name = &"Patrol"
 initial_facing = 2
 destroy_on_death = true

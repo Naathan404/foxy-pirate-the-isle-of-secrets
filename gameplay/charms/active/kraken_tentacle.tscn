@@ -1,17 +1,26 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b85ukekwxqo2i"]
 
-[ext_resource type="Script" path="res://gameplay/charms/active/kraken_tentacle.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/effects/charms/kraken_tentacle_sheet.png" id="2"]
+[ext_resource type="Script" uid="uid://bp1n5nejg0hfi" path="res://gameplay/charms/active/kraken_tentacle.gd" id="1"]
+[ext_resource type="Script" uid="uid://c58rxb4cs363t" path="res://gameplay/charms/active/kraken_tentacle_mesh.gd" id="2"]
+[ext_resource type="Shader" uid="uid://bquswnl4f75qf" path="res://gameplay/charms/active/kraken_tentacle.gdshader" id="3"]
 
-[node name="KrakenTentacle" type="Node3D"]
+[sub_resource type="ShaderMaterial" id="Material_flesh"]
+render_priority = 0
+shader = ExtResource("3")
+shader_parameter/rim_color = Color(1, 0.07, 0.05, 1)
+shader_parameter/rim_shade_color = Color(0.66, 0, 0.03, 1)
+shader_parameter/ink_color = Color(0.045, 0, 0.012, 1)
+shader_parameter/flesh_color = Color(0.3, 0, 0.035, 1)
+shader_parameter/sucker_color = Color(0.93, 0.06, 0.07, 1)
+shader_parameter/sucker_spacing_meters = 0.34
+shader_parameter/sucker_side = 1.0
+shader_parameter/flame_phase = 0.0
+shader_parameter/flash = 0.0
+
+[node name="KrakenTentacle" type="Node3D" unique_id=2067749221]
 script = ExtResource("1")
 
-[node name="Sprite3D" type="Sprite3D" parent="."]
-scale = Vector3(0.85, 1, 1)
+[node name="Flesh" type="MeshInstance3D" parent="." unique_id=100300434]
+material_override = SubResource("Material_flesh")
 cast_shadow = 0
-billboard = 1
-shaded = false
-texture_filter = 0
-texture = ExtResource("2")
-hframes = 4
-vframes = 2
+script = ExtResource("2")

@@ -32,8 +32,6 @@ const FURY_STATES: Array[BlubberbeardBoss.State] = [
 
 ## Hidden until the boss is beaten; then the arena is a safe room with this campfire.
 @export var victory_campfire: Node3D
-## Ownership persists through the existing Charm pickup and save flow.
-@export var victory_charm: ItemPickup
 
 @export_group("Bridge")
 ## Each span pivots at its outer end; the inner ends drop into the water.
@@ -71,7 +69,6 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	_set_campfire_lit(defeated)
-	_set_charm_available(defeated)
 	if defeated:
 		_break_bridge(false)
 		return
@@ -116,7 +113,6 @@ func _on_fight_finished() -> void:
 	_fight_active = false
 	if is_instance_valid(boss) and boss.dead:
 		_set_grapple_posts_enabled(true)
-		_set_charm_available(true)
 		_become_safe()
 
 
@@ -141,14 +137,6 @@ func _set_campfire_lit(lit: bool) -> void:
 	victory_campfire.visible = lit
 	# Disabled nodes leave the physics space, so the hidden fire blocks and offers nothing.
 	victory_campfire.process_mode = Node.PROCESS_MODE_INHERIT if lit else Node.PROCESS_MODE_DISABLED
-
-
-func _set_charm_available(available: bool) -> void:
-	if not is_instance_valid(victory_charm):
-		return
-	victory_charm.visible = available
-	var mode := Node.PROCESS_MODE_INHERIT if available else Node.PROCESS_MODE_DISABLED
-	victory_charm.set_deferred("process_mode", mode)
 
 
 # Disabled nodes leave the physics space: the post stays in view but the hook passes through.

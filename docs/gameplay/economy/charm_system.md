@@ -54,24 +54,41 @@ Nguồn dữ liệu cân bằng duy nhất là các `.tres` trong
 
 - ID `kraken_march`, Active, 125 SP, hồi chiêu 12 giây. Cân bằng trong
   `gameplay/charms/charm_data/kraken_march.tres`.
-- Sau khi Blubberbeard chết ở `room_08`, Charm xuất hiện gần VictoryCamp.
-  Nhặt để chạy màn hấp thụ Charm hiện có; không chiếm ô túi đồ. Nếu chưa nhặt,
-  quay lại phòng đã thắng vẫn nhận được, kể cả save đã đánh bại boss trước bản cập nhật.
+- Nhận từ **rương thưởng boss** sau khi hạ Blubberbeard ở `room_08`: là một mục `item_drops`
+  tỉ lệ 100% trong `gameplay/bosses/blubberbeard/reward_chest.tscn`, rơi khi mở rương
+  cùng Chìa khóa Thủy Triều, nhật ký và vàng.
+  Nhặt để chạy màn hấp thụ Charm hiện có; không chiếm ô túi đồ. Nếu chưa nhặt, rương đã
+  mở bày lại Charm mỗi lần vào phòng cho tới khi sở hữu, kể cả save đã mở rương trước
+  bản cập nhật.
   Ownership và loadout dùng snapshot Charm hiện có, không đổi schema save.
-- Chốt hướng/vị trí chuột lúc kích hoạt, tối đa 6 xúc tu trên đường dài 8,4 đơn vị.
-  Vận 0,3 giây, mỗi xúc tu cách nhau 0,16 giây. Đường dừng trước tường hoặc vực;
-  điểm ngắm quá gần hoặc không có nền hợp lệ không tiêu hao SP/hồi chiêu.
-- Mọc lên gây 1,5 lần sát thương vũ khí và đẩy hướng ra khỏi gốc xúc tu.
-  Mỗi xúc tu tồn tại 6 giây, tìm enemy trong 2,1 đơn vị, báo đòn 0,3 giây rồi
-  quật gây 0,9 lần sát thương. Mỗi cú trúng mỗi actor tối đa một lần dù có nhiều hurtbox;
-  không đánh xuyên tường, không gây sát thương Player hoặc đồ vật.
+- Chốt hướng/vị trí chuột lúc kích hoạt, tối đa 7 xúc tu trên đường dài 8,4 đơn vị.
+  Vận 0,35 giây, trong lúc đó vết nứt chạy dọc đường làm báo trước; các xúc tu trồi cách
+  nhau 0,08 giây. Đường dừng trước tường hoặc vực; điểm ngắm quá gần hoặc không có nền
+  hợp lệ không tiêu hao SP/hồi chiêu.
+- **Đợt trồi** gây 3 lần sát thương vũ khí, đẩy ra khỏi gốc xúc tu và choáng quái thường
+  1 giây. Mỗi enemy chỉ trúng một lần trong cả đợt dù vùng nổ chồng nhau; boss nhận damage
+  nhưng miễn choáng. Xúc tu cuối là xúc tu khổng lồ: cao hơn, bán kính nổ và lực đẩy
+  nhân `finale_scale` (1,45).
+- Đợt trồi đập vỡ vật phá được có tối đa `prop_break_max_hp` (10) HP; vật bền hơn không
+  bị đụng tới. Cú quật không ảnh hưởng đồ vật.
+- Sau đó mỗi xúc tu canh giữ 6 giây, tìm enemy trong 2,1 đơn vị, báo đòn 0,3 giây rồi
+  quật gây 0,9 lần sát thương, nghỉ 1,3 giây. Mỗi cú trúng mỗi actor tối đa một lần dù có
+  nhiều hurtbox; không đánh enemy xuyên tường, không gây sát thương Player.
 - Player được di chuyển/dodge sau khi thả đợt đầu. Chết, tháo Charm hoặc chuyển phòng
   sẽ dọn toàn bộ xúc tu và dấu báo. Boss vẫn nhận damage nhưng giữ miễn đẩy của boss.
-- Icon `assets/sprites/charms/kraken_march.png`, sprite sheet 4 × 2
-  `assets/sprites/effects/charms/kraken_tentacle_sheet.png`. Dùng imagegen built-in:
-  prompt icon là xúc tu tím, giác hút ngọc lam, bọt biển, pixel art nền trong suốt;
-  prompt sheet là 8 pose mọc thấp / mọc nửa / đứng / lấy đà / quật / chạm đất /
-  hồi / rút, cùng gốc và nền trong suốt. Lượt edit cuối tách nền trắng khỏi sheet.
+- Phần nhìn theo kiểu xúc tu của Cult of the Lamb, tông đỏ thẫm trên nền đen:
+  - `kraken_tentacle_mesh.gd` + `kraken_tentacle.gdshader`: dải mesh hướng camera quanh một
+    xương sống 3D, nên cú quật chạm đúng đất phía trước từ mọi góc camera. Shader vẽ thân
+    đen, viền lửa đỏ răng cưa chuyển động và giác hút; không dùng sprite sheet.
+  - `kraken_fissure.gd/.gdshader`: một vết nứt liền dọc đường đi, mở khi vận và khép khi
+    xúc tu cuối rút xuống.
+  - `kraken_debris.gd`: đá viền mực văng lên khi trồi, khi quật và khi phá vật.
+  - Hai ngọn nhỏ bên mỗi xúc tu chỉ để trang trí, không dò mục tiêu và không gây damage.
+  - Kích thước xúc tu chỉnh bằng hằng số trong `kraken_tentacle.gd`; màu chỉnh bằng uniform
+    của hai shader và `CRIMSON` / `WINE` trong script.
+- Icon `assets/sprites/charms/kraken_march.png` được đổi palette đỏ/đen từ bản imagegen gốc
+  (prompt ở `assets/sprites/effects/charms/kraken_march_art_prompts.txt`).
+  `kraken_tentacle_sheet.png` không còn được dùng.
   Động tác vận của Foxy tái sử dụng bộ frame Glacial Spikes qua clip riêng.
 
 ## 4. Luật dữ liệu và catalog
@@ -252,11 +269,19 @@ Player sở hữu khóa vận theo effect để một effect kết thúc chỉ t
 
 ### 10.1 Boss reward
 
-Fixed reward dùng definition có nguồn `fixed_boss_reward`. Glacial Spikes, Meteor Strike và Devil Contract là thưởng boss 100%. Tide Grapple có nguồn riêng `fixed_trial_reward`: thưởng cố định trong rương thưởng Raid `room_16` (Coral Valley), nhặt như mọi Charm rơi. Rương boss Blubberbeard giờ cho Chìa khóa Thủy Triều. Checkout có encounter Blubberbeard. Ba boss mới chỉ có thể kiểm tra qua đường grant và pickup.
+Fixed reward dùng definition có nguồn `fixed_boss_reward`. Glacial Spikes, Meteor Strike và Devil Contract là thưởng boss 100%. Tide Grapple có nguồn riêng `fixed_trial_reward`: thưởng cố định trong rương thưởng Raid `room_16` (Coral Valley), nhặt như mọi Charm rơi. Rương boss Blubberbeard cho Chìa khóa Thủy Triều và Kraken's March. Checkout có encounter Blubberbeard. Ba boss mới chỉ có thể kiểm tra qua đường grant và pickup.
 
 Năm prototype cũ chưa có nguồn nhận đã chốt nay là playable với `drop_chance = 0`: nhặt được từ
 pickup đặt sẵn, không tự rơi. Adrenaline Surge đã bị bỏ khỏi game (data, item, icon, effect).
 Anchor đặt ấn tốn 300 SP, HUD hiện phím gọi về trong 5 s. Hồi chiêu 8 s từ lúc gọi về hoặc hết hạn. Whirlpool vận 1,5 s, hút mọi quái thường trong bán kính 6 về tâm (3 → 9 đơn vị/s, mạnh dần, dừng cách tâm 0,7), rồi nổ 3,75× trong bán kính 3,5; tốn 300 SP, hồi 8 s. Vụ nổ phá thẳng vật phá được có tối đa `prop_break_max_hp` (10) HP trong bán kính nổ (san hô, đá, gỗ, cọ, rương); vật bền hơn (lửa trại, thuyền) chỉ nhận sát thương. Vật phá được có tối đa `prop_break_max_hp` HP cũng bị hút về tâm cùng quái (tạm tắt va chạm chắn đường, chỉ trượt trên mặt đất nên không rơi xuống biển); vật bền hơn đứng yên. Salute giữ chân và tiêu 100 SP/s, nhả phím hoặc cạn SP thì nổ 1,5× và bắt đầu hồi 6 s. Death Bloom nổ sau 0,32 s khi hạ quái bằng đòn thường, gây 1,5 HP cho địch trong bán kính 3; không gây sát thương cho Foxy. Shadow Renment để bóng ở điểm bắt đầu dash, nổ 2,25× sau 0,5 s trong bán kính 3. Cả hai hiện chữ `BLOOM` / `SHADOW` trên ô HUD khi đặt, và dùng `CharmBlastVfx` (`gameplay/charms/active/charm_blast_vfx.gd`): vòng trên đất đúng bằng bán kính nổ, lấp dần từ tâm theo thời gian chờ và nhấp nháy nhanh dần; Shadow có bóng Foxy run rẩy trên vũng khói tím rồi vỡ thành mảnh, Bloom có bông hoa nở dần rồi bung cánh. Phần sát thương vẫn ở `DelayedBlastCharm`. Hai passive chưa có nguồn hoặc tỉ lệ nhận trên Sheet.
+
+**Vật phẩm đặc biệt từ rương** (Charm, bản vẽ vũ khí, vật phẩm nhiệm vụ như chìa khóa; không
+gồm ghi chú) có kiểu văng riêng, áp dụng cho mọi `TreasureChest`, kể cả rương boss. Chúng chờ
+đợt xu tung ra, bay cao và chậm hơn rồi rơi cách rương 3,3 đơn vị về phía camera, nhiều món thì
+xòe quạt. Chạm đất có cột sáng và vòng hào quang (`reward_highlight.gd/.gdshader`: đỏ hồng cho
+Charm, vàng cho món còn lại) và tiếng báo; sau 0,9 giây Foxy mới hút được. Thông số chỉnh ở
+nhóm *Showcase Drop* của `item_pickup.tscn`; thời điểm và góc xòe là hằng số `SHOWCASE_*`
+trong `treasure_chest.gd`.
 
 ### 10.2 Shop pool
 

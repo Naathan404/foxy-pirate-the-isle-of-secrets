@@ -35,6 +35,27 @@ tính; nếu lượt đặc biệt bị ngắt trước khi hoàn tất, Elite g
 và tự thử lại sau cooldown. Damage của các viên vẫn lấy từ dữ liệu Elite.
 Ngưỡng trong script mặc định là 5 lượt; scene EliteBarrel hiện cấu hình 3 lượt.
 
+**Tầm gần của EliteBarrel.** Miệng thùng cao hơn hurtbox của Foxy nên đạn chỉ trúng khi đã bay
+đủ xa để hạ xuống. Ba cơ chế che vùng mù đó:
+
+- **Xịt mực sát miệng:** mỗi quạt xịt thêm hình nón mực xuống đất, tầm `point_blank_radius`
+  (4,8), góc `point_blank_arc_degrees` (110°). Cảnh báo là hình nón tô đầy trong lúc telegraph.
+- **Ink Slam** (state `Slam`, `states/elite_barrel_slam.gd`): Foxy vào trong
+  `slam_trigger_radius` (3,6) thì thùng nện ngay, không chờ cooldown loạt đạn. Vận 0,75 giây
+  trên vòng cảnh báo bán kính `slam_radius` (4,9), nhảy 0,3 giây, nện: gây một đòn, đẩy
+  văng (`slam_push_multiplier`) kèm làm chậm và mực dính màn hình. Sau đó khựng 0,9 giây để
+  phản công. Hồi `slam_cooldown` (4,5 giây); mỗi cú tính là một lượt thường cho việc tích lũy.
+  Chỉ hình ảnh nhảy lên, thân và hurtbox ở yên. Bị ngắt hoặc chết thì cảnh báo được dọn.
+- **Bùng mực mở đầu lượt 360°:** cảnh báo vòng đầy, nổ cùng bán kính Ink Slam rồi mới bắn
+  các vòng. Đã tích đủ thì không dùng Slam. `special_spawn_radius` là 1,2 để đạn kịp hạ tới
+  tầm người ngay ngoài vùng nổ; đổi bán kính nổ, điểm sinh hoặc vật lý đạn thì phải kiểm tra
+  lại để không hở khoảng trúng.
+
+Đòn bùng không xuyên tường (`WORLD`), chỉ trúng Player cùng cao độ; miễn nhiễm sau đòn của
+Foxy ngăn đạn và mực xịt trúng hai lần. VFX ở `elite_barrel_ink_vfx.gd` và
+`elite_barrel_ink_zone.gdshader` (cảnh báo, sóng mực, vũng loang), tái dùng tóe mực
+`barrel_bullet_impact.tscn`.
+
 Đạn Barrel là cục mực (`barrel_Projectiles.png`) quay theo hướng bay, rung nhẹ khi bay và
 méo dẹt khi nảy. Mỗi loạt bắn phụt mực ở miệng (`barrel_muzzle_ink.tscn`, to theo
 `Visual.scale`). Đạn chạm đất bắn tóe giọt mực và để lại vết loang mờ dần

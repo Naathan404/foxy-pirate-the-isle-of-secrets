@@ -4,8 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://qo4omuklhuq2" path="res://world/biomes/base/base_ground.tscn" id="2_ground"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="chest_barrel"]
-[ext_resource type="Resource" uid="uid://bnc1yqv6r37yh" path="res://data/notes/barrel.tres" id="chest_note"]
-[ext_resource type="Script" uid="uid://irqdhwbmfxsu" path="res://world/objects/chest_note_drop.gd" id="chest_note_drop"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Script" uid="uid://cilt0sipla7ws" path="res://world/objects/room_edge_fence.gd" id="edge_fence"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
@@ -166,10 +164,6 @@ shader_parameter/cloud_shadow_strength = 0.35
 
 [sub_resource type="BoxShape3D" id="QuizPlatformShape"]
 size = Vector3(4, 0.5, 4)
-
-[sub_resource type="Resource" id="GuaranteedNoteDrop"]
-script = ExtResource("chest_note_drop")
-note = ExtResource("chest_note")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sd13f"]
 resource_local_to_scene = true
@@ -360,7 +354,6 @@ route_step_count = -2
 [node name="TreasureChest" parent="." index="13" unique_id=474915638 instance=ExtResource("reward_chest")]
 editor_description = "Center of the right Quiz island."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.96115, -0.20255613, 0.5861097)
-note_drops = Array[ExtResource("chest_note_drop")]([SubResource("GuaranteedNoteDrop")])
 
 [node name="ChestBarrels" type="Node3D" parent="." index="14" unique_id=1022147945]
 editor_description = "Two Elite Barrels to the right of the chest: top-right and bottom-right at local X/Z (5, -5) and (5, 5)."

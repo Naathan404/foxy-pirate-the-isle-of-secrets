@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="MonsterNote" format=3 uid="uid://cqcekbwcw20uy"]
 
 [ext_resource type="Script" uid="uid://bpof457qldrr3" path="res://data/notes/monster_note.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dcvsivwyqdk3c" path="res://assets/sprites/enemies/portraits/elite_hermit_crab.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://buqufrgkpvmkv" path="res://assets/sprites/enemies/portraits/hermit_crab.png" id="2"]
 [ext_resource type="Resource" uid="uid://b8e7xspmevkld" path="res://data/enemies/elite_hermit_crab_data.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
 note_id = &"elite_hermit_crab"
 display_name = "Elite Hermit Crab"
+is_elite = true
 portrait = ExtResource("2")
 enemy_data = ExtResource("3")
 description = "A larger hermit crab with a heavier shell and more dangerous charges."

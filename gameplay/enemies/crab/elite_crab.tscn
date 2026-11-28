@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://v5u3xwdr8upp" path="res://gameplay/enemies/crab/states/elite_crab_charge.gd" id="6_charge"]
 [ext_resource type="Script" uid="uid://dehsy4ja64t1" path="res://gameplay/enemies/crab/elite_crab.gd" id="7_elite_crab"]
 [ext_resource type="Script" uid="uid://cf2dbu13f761k" path="res://gameplay/enemies/crab/states/elite_crab_egg_spawn.gd" id="8_egg_spawn"]
+[ext_resource type="Resource" path="res://data/notes/elite_crab.tres" id="journal_entry"]
 
 [sub_resource type="BoxShape3D" id="HurtShape"]
 size = Vector3(4, 2.8, 4)
@@ -38,6 +39,7 @@ egg_warning_duration = 0.7
 egg_shake_distance = 0.08
 egg_shake_frequency = 15.0
 data = ExtResource("2_data")
+journal_entry = ExtResource("journal_entry")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)

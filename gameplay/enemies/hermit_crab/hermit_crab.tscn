@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://dgev8bsxueeb6" path="res://gameplay/enemies/hermit_crab/states/hermit_crab_patrol.gd" id="7_patrol"]
 [ext_resource type="Script" uid="uid://b7h73fhqmpwws" path="res://gameplay/enemies/hermit_crab/hermit_crab.gd" id="8_hermit_crab"]
 [ext_resource type="Script" uid="uid://jvd33wftr8gv" path="res://gameplay/enemies/base/enemy_spine_visual.gd" id="9_spine_visual"]
+[ext_resource type="Resource" path="res://data/notes/hermit_crab.tres" id="journal_entry"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hurtbox"]
 size = Vector3(2, 2, 1.6)
@@ -28,6 +29,7 @@ script = ExtResource("8_hermit_crab")
 player_detection_radius = 6.7
 unreachable_target_ignore_duration = 2.0
 data = ExtResource("2_data")
+journal_entry = ExtResource("journal_entry")
 initial_state_name = &"Patrol"
 destroy_on_death = true
 

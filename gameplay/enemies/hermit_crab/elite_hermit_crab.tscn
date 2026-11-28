@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cmx7tu0qg4ljg" path="res://gameplay/enemies/elite_feedback.gd" id="3_feedback"]
 [ext_resource type="Script" uid="uid://cqfcfxr3o8dx2" path="res://gameplay/enemies/hermit_crab/states/elite_hermit_crab_attack.gd" id="4_attack"]
 [ext_resource type="Script" uid="uid://cbr1chjg1vwxp" path="res://gameplay/enemies/hermit_crab/elite_hermit_crab.gd" id="6_elite_hermit_crab"]
+[ext_resource type="Resource" path="res://data/notes/elite_hermit_crab.tres" id="journal_entry"]
 
 [sub_resource type="BoxShape3D" id="HurtShape"]
 size = Vector3(3, 2.1, 2.7)
@@ -27,6 +28,7 @@ axis_change_duration_min = 1.5
 axis_change_duration_max = 4.0
 player_detection_radius = 10.1
 data = ExtResource("2_data")
+journal_entry = ExtResource("journal_entry")
 
 [node name="Visual" parent="." index="0" unique_id=1278788323]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)

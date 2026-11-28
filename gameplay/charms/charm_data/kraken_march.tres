@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="CharmData" format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://crlgoiny50cqh"]
 
-[ext_resource type="Script" path="res://gameplay/charms/base/charm_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://dau3jm440ijo5" path="res://gameplay/charms/base/charm_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://gameplay/charms/active/kraken_march_effect.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/charms/kraken_march.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://cdt5sjgs20wy3" path="res://assets/sprites/charms/kraken_march.png" id="3"]
 
 [resource]
 script = ExtResource("1")
 charm_id = &"kraken_march"
 display_name = "Kraken's March"
-description = "Summon a line of kraken tentacles toward your cursor. Each erupts with damage and radial knockback, then guards its ground for 6 seconds, whipping nearby enemies. Earned by defeating Captain Blubberbeard."
+description = "Tear a fissure toward your cursor. Kraken tentacles burst from it in a wave that hits and stuns each enemy once, smashes weak scenery and ends in a giant tentacle. They then guard the line for 6 seconds, whipping nearby enemies. Earned by defeating Captain Blubberbeard."
 sprite = ExtResource("3")
 charm_type = 0
 effect_scene = ExtResource("2")
@@ -18,21 +18,24 @@ acquisition_source = &"fixed_boss_reward"
 drop_chance = 1.0
 tags = Array[StringName]([&"active", &"summon", &"kraken"])
 effect_params = {
-"eruption_damage_multiplier": 1.5,
-"eruption_push": 1.4,
-"eruption_radius_units": 1.2,
+"eruption_damage_multiplier": 3.0,
+"eruption_push": 1.0,
+"eruption_radius_units": 1.25,
+"eruption_stun_seconds": 1.0,
+"finale_scale": 1.45,
 "first_distance_units": 0.9,
 "lifetime_seconds": 6.0,
-"max_tentacles": 6,
+"max_tentacles": 7,
+"prop_break_max_hp": 10.0,
 "range_units": 8.4,
 "seek_radius_units": 2.1,
 "slam_damage_multiplier": 0.9,
-"slam_interval_seconds": 1.1,
+"slam_interval_seconds": 1.3,
 "slam_push": 0.65,
 "slam_radius_units": 1.35,
 "slam_reach_units": 0.8,
 "slam_windup_seconds": 0.3,
-"spacing_units": 1.5,
-"spawn_interval_seconds": 0.16,
-"windup_seconds": 0.3
+"spacing_units": 1.25,
+"spawn_interval_seconds": 0.08,
+"windup_seconds": 0.35
 }
