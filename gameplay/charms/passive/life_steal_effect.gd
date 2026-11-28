@@ -24,6 +24,13 @@ func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) ->
 	if healed > 0.0:
 		var amount := str(int(healed)) if healed == roundf(healed) else String.num(healed, 2)
 		runtime.proc_triggered.emit("+%s HP" % amount, Color(0.4, 1.0, 0.55))
+		CharmBlastVfx.burst(
+			actor.get_parent(),
+			actor.global_position,
+			CharmBlastVfx.Kind.SPARK,
+			1.0,
+			Color(0.4, 1.0, 0.55)
+		)
 
 
 func cancel_active() -> void:

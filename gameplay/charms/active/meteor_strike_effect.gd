@@ -83,8 +83,18 @@ func _launch_next() -> void:
 
 
 func _on_landed(site: Vector3, hit_target: bool) -> void:
+	CharmBlastVfx.burst(
+		actor.get_parent(),
+		site,
+		CharmBlastVfx.Kind.SPARK,
+		definition.get_param_float(&"radius_units"),
+		FIRE
+	)
+	CharmFeel.shake(actor, 5.0, 0.16)
+	CharmFeel.shockwave(actor, site + Vector3.UP * 0.3, FIRE, 140.0, 0.012, 0.4)
 	if hit_target and not _heavy_hit:
 		_heavy_hit = true
+		CharmFeel.flash(actor, FIRE, 0.12, 0.16)
 		get_node("/root/HitstopController").request(CharmVfx.HEAVY_HITSTOP_SECONDS)
 		get_node("/root/ScreenShakeController").request(
 			CharmVfx.HEAVY_SHAKE_PIXELS, CharmVfx.HEAVY_SHAKE_SECONDS

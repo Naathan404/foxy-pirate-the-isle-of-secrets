@@ -1,8 +1,13 @@
 class_name BuckshotSalvoEffect
 extends CharmEffect
-## Radial burst; each pellet has independent target reservation.
+## Radial burst; each pellet has independent target reservation. The shot is a big muzzle
+## blast around Foxy: a ring burst, a shake, an orange flash and a refraction wave.
 
 const RECOIL_SECONDS := 0.18
+const BLAST_COLOR := Color(1.0, 0.55, 0.18)
+const MUZZLE_WIDTH_METERS := 2.8
+## Pellet hit area relative to the base hitbox: wider and longer to match the larger shot.
+const PELLET_HITBOX_SCALE := Vector3(0.7, 1.0, 1.1)
 const ATTACK_SCENE := preload("res://gameplay/charms/active/buckshot_projectile_attack.tscn")
 const PROJECTILE_SHEET: Texture2D = preload(
 	"res://assets/sprites/effects/charms/buckshot_projectile.png"
@@ -63,10 +68,16 @@ func _fire() -> void:
 		actor.global_position + Vector3.UP * 0.65,
 		PROJECTILE_SHEET,
 		2,
-		1.7,
+		MUZZLE_WIDTH_METERS,
 		0.24
 	)
-	get_node("/root/ScreenShakeController").request(3.5, 0.12)
+	CharmBlastVfx.burst(
+		actor.get_parent(), actor.global_position, CharmBlastVfx.Kind.SPARK, 2.2, BLAST_COLOR
+	)
+	CharmFeel.shake(actor, 6.0, 0.16)
+	CharmFeel.flash(actor, BLAST_COLOR, 0.1, 0.12)
+	CharmFeel.shockwave(actor, actor.global_position + Vector3.UP * 0.6, BLAST_COLOR, 170.0)
+	CharmFeel.sound(actor, CharmFeel.RELEASE_SOUND, actor.global_position, -3.0, 0.62)
 	for index in count:
 		var angle := base_angle + TAU * float(index) / float(count)
 		var direction := Vector3(sin(angle), 0.0, cos(angle))
@@ -91,7 +102,7 @@ func _fire() -> void:
 			_get_base_damage() * definition.get_param_float(&"damage_percent", 0.5)
 		)
 		execution.global_position = actor.global_position
-		execution.hitbox_scale = Vector3(0.35, 1.0, 0.7)
+		execution.hitbox_scale = PELLET_HITBOX_SCALE
 		execution.forward_offset = 0.4
 		execution.travel_speed_units_per_second = definition.get_param_float(
 			&"projectile_speed", 14.0
@@ -109,10 +120,9 @@ func _on_pellet_hit(at: Vector3) -> void:
 	if _impact_reported:
 		return
 	_impact_reported = true
-	get_node("/root/ScreenShakeController").request(5.5, 0.14)
-	get_node("/root/AudioManager").play_sfx_3d(
-		preload("res://assets/audio/combat/bow_impact.wav"), at, -6.0
-	)
+	CharmFeel.shake(actor, 7.0, 0.16)
+	CharmFeel.hitstop(actor, 0.04)
+	CharmFeel.sound(actor, CharmFeel.IMPACT_SOUND, at, -4.0)
 
 
 func cancel_active() -> void:

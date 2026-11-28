@@ -28,6 +28,12 @@ Không còn Checkpoint: lửa trại là cơ chế duy nhất.
   qua cửa (hồi sinh, Continue, New Game), Foxy đứng ở cửa gần chỗ rơi nhất. Foxy mất
   `void_fall_damage` HP (mặc định 1), khựng tại chỗ không bị đẩy lùi và có thời gian bất tử
   ngắn. Nếu số HP mất đó làm Foxy chết thì đây là cái chết thường: về lửa trại, chu kỳ mới.
+- **Quái rơi void thì chết.** Điều kiện giống Foxy (đang rơi mà bên dưới không có đất, tia dò
+  quái dài 8 m vì quái nhảy cao hơn), hoặc xuống dưới `void_height`. Quái đang bị Tide Grapple
+  kéo thì không tính. Quái bay (Firefly, `dies_falling_over_void = false`) chỉ chết khi xuống
+  dưới `void_height`. Boss (`BossBase`) không áp dụng. Đây là cái chết thường: đợt raid và đợt
+  triều đếm con đó, phòng nhớ là đã hạ; vàng và đồ rơi xuống chỗ quái đứng lần cuối, lùi
+  0,8 m khỏi mép, nên không mất theo.
 - Nghỉ ở lửa trại ngoài safe room không được phép, nên không reset gì.
 - Boss đã hạ và raid đã clear vẫn theo `BossEncounter` và cờ raid như trước. Rương thưởng
   raid giờ cũng giữ trạng thái đã mở.

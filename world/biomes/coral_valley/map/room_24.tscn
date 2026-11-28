@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://kpvlv3ynpooi"]
 
 [ext_resource type="PackedScene" uid="uid://ckrqfv8x6ugc8" path="res://world/biomes/coral_valley/base_scenes/farm_room.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://dx1ldxngraxhr" path="res://world/gimmick/progression/trial_altar.tscn" id="19_vv1vk"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="Texture2D" uid="uid://ewpm415oij0y" path="res://world/biomes/hub/ground/hub_cloud_noise.tres" id="cloud_noise"]
 [ext_resource type="Shader" uid="uid://xgawwnrr4b35" path="res://world/biomes/coral_valley/effects/coral_grade.gdshader" id="grade_shader"]
@@ -15,7 +16,6 @@
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_2.tscn" id="seaweed_2"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/objects/seaweed_3.tscn" id="seaweed_3"]
 [ext_resource type="PackedScene" path="res://world/biomes/coral_valley/effects/sea_glints.tscn" id="sea_glints"]
-[ext_resource type="Script" uid="uid://b7g1bvgwmkaf" path="res://world/components/shallow_water_area.gd" id="shallow_water"]
 [ext_resource type="Texture2D" uid="uid://b3pc2s1elykns" path="res://assets/sprites/biomes/coral_valley/coral_valley_room_24_shore.png" id="shore_texture"]
 [ext_resource type="PackedScene" uid="uid://f5db4eqg3ocu" path="res://world/objects/treasure_chest.tscn" id="treasure_chest"]
 
@@ -106,12 +106,6 @@ points = PackedVector3Array(12.423, 0.252, -9.561, 12.423, -0.6, -9.561, 13.275,
 [sub_resource type="ConvexPolygonShape3D" id="IslandN"]
 points = PackedVector3Array(-3.65, 0.252, -18.424, -3.65, -0.6, -18.424, -3.056, 0.252, -19.322, -3.056, -0.6, -19.322, -2.261, 0.252, -20.007, -2.261, -0.6, -20.007, -1.272, 0.252, -20.476, -1.272, -0.6, -20.476, -0.105, 0.252, -20.731, -0.105, -0.6, -20.731, 1.22, 0.252, -20.8, 1.22, -0.6, -20.8, 2.395, 0.252, -20.729, 2.395, -0.6, -20.729, 3.452, 0.252, -20.482, 3.452, -0.6, -20.482, 4.377, 0.252, -20.036, 4.377, -0.6, -20.036, 5.157, 0.252, -19.39, 5.157, -0.6, -19.39, 5.601, 0.252, -18.79, 5.601, -0.6, -18.79, 5.7, 0.252, -18.246, 5.7, -0.6, -18.246, 5.453, 0.252, -17.762, 5.453, -0.6, -17.762, 4.86, 0.252, -17.344, 4.86, -0.6, -17.344, 4.161, 0.252, -17.029, 4.161, -0.6, -17.029, 3.36, 0.252, -16.821, 3.36, -0.6, -16.821, 2.472, 0.252, -16.722, 2.472, -0.6, -16.722, 1.523, 0.252, -16.72, 1.523, -0.6, -16.72, 0.571, 0.252, -16.711, 0.571, -0.6, -16.711, -0.464, 0.252, -16.705, -0.464, -0.6, -16.705, -1.585, 0.252, -16.753, -1.585, -0.6, -16.753, -2.767, 0.252, -16.866, -2.767, -0.6, -16.866, -3.508, 0.252, -17.188, -3.508, -0.6, -17.188, -3.802, 0.252, -17.709, -3.802, -0.6, -17.709)
 
-[sub_resource type="BoxShape3D" id="Channel0"]
-size = Vector3(17, 2, 2.1)
-
-[sub_resource type="BoxShape3D" id="Channel1"]
-size = Vector3(6.923, 2, 2)
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2tj51"]
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
@@ -123,7 +117,7 @@ shader_parameter/vignette_color = Color(0.02, 0.09, 0.12, 1)
 shader_parameter/vignette_strength = 0.3
 
 [node name="room_24" unique_id=1755732746 instance=ExtResource("1_base")]
-editor_description = "Wonder room: split-island farm. W, C and S are joined by wadeable channels; the E and N islets are cut off by water and reached only with the Tide Grapple Charm (posts on both sides of each gap)."
+editor_description = "Wonder room: split-island farm. W, C and S form one stretch of sand; the E and N islets are cut off by water and reached only with the Tide Grapple Charm (posts on both sides of each gap)."
 open_exits = 8
 left_destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
 
@@ -142,10 +136,61 @@ directional_shadow_max_distance = 45.0
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
 mesh = SubResource("QuadMesh_1rcqa")
 
+[node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
+[node name="RightPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="2" unique_id=1048204863]
+visible = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
+disabled = true
+
+[node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
+disabled = true
+
+[node name="SceneChangeTrigger" parent="Exits/RightPath" index="2" unique_id=219025603]
+monitoring = false
+enabled = false
+
+[node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
+disabled = true
+
 [node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
 shaded = true
 texture = ExtResource("pier_left")
+
+[node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
+destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
 
 [node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.65731)
@@ -178,6 +223,9 @@ shape = SubResource("IslandN")
 [node name="SeaGlints" parent="Foxy" parent_id_path=PackedInt32Array(1350175917) index="23" unique_id=1824700 instance=ExtResource("sea_glints")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -1.5)
 
+[node name="CornerB" parent="CameraBounds" parent_id_path=PackedInt32Array(1592807299) index="1" unique_id=258800514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.747017, 0, -44.313046)
+
 [node name="RandomSeaweed" type="Node3D" parent="." index="5" unique_id=139254622]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 script = ExtResource("random_props")
@@ -185,43 +233,29 @@ spawn_positions = PackedVector3Array(-15.36, 0, -4.67, -14.32, 0, -7.02, -12.24,
 fixed_spawn_count = 12
 prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed_2"), ExtResource("seaweed_3")])
 
-[node name="ShallowWater" type="Area3D" parent="." index="6" unique_id=1824800]
-script = ExtResource("shallow_water")
-
-[node name="Channel0" type="CollisionShape3D" parent="ShallowWater" index="0" unique_id=1824400]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -4.8, 1.252, -1.8)
-shape = SubResource("Channel0")
-
-[node name="Channel1" type="CollisionShape3D" parent="ShallowWater" index="1" unique_id=1824401]
-transform = Transform3D(0.97926, 0, -0.20261, 0, 1, 0, 0.20261, 0, 0.97926, 2.5, 1.252, 4.1)
-shape = SubResource("Channel1")
-
-[node name="Scenery" type="Node3D" parent="." index="7" unique_id=1824900]
+[node name="Scenery" type="Node3D" parent="." index="6" unique_id=1824900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.252, 0)
 
 [node name="GrapplePostEastIslet" parent="Scenery" index="0" unique_id=1824500 instance=ExtResource("grapple_post")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.895666, 0, -7.765879)
 
-[node name="GrapplePostEastReturn" parent="Scenery" index="1" unique_id=1824501 instance=ExtResource("grapple_post")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 0, -4.5)
-
-[node name="GrapplePostNorthIslet" parent="Scenery" index="2" unique_id=1824502 instance=ExtResource("grapple_post")]
+[node name="GrapplePostNorthIslet" parent="Scenery" index="1" unique_id=1824502 instance=ExtResource("grapple_post")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9917853, 0, -18.65918)
 
-[node name="GrapplePostNorthReturn" parent="Scenery" index="3" unique_id=1824503 instance=ExtResource("grapple_post")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5614755, 0, -11.360321)
+[node name="GrapplePostNorthReturn" parent="Scenery" index="2" unique_id=1824503 instance=ExtResource("grapple_post")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5614755, 0, -10.089717)
 
-[node name="LonePalmNorthIslet" parent="Scenery" index="4" unique_id=1824600 instance=ExtResource("palm_tall")]
-transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 3, 0, -19.8)
+[node name="LonePalmNorthIslet" parent="Scenery" index="3" unique_id=1824600 instance=ExtResource("palm_tall")]
+transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 4.735551, 0.073829174, -18.607058)
 ground_shadow = true
 
-[node name="TreasureChest" parent="." index="8" unique_id=1825000 instance=ExtResource("treasure_chest")]
+[node name="TreasureChest" parent="." index="7" unique_id=1825000 instance=ExtResource("treasure_chest")]
 editor_description = "Secret reward on the east islet, reachable only with the Tide Grapple."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 0.252, -3.9404807)
 gold_min = 30
 gold_max = 50
 
-[node name="RoomAtmosphere" parent="." index="9" unique_id=1825100 instance=ExtResource("atmosphere")]
+[node name="RoomAtmosphere" parent="." index="8" unique_id=1825100 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(1825100, 1300233738) index="0" unique_id=1611482802]
 material = SubResource("ShaderMaterial_2tj51")
@@ -234,6 +268,11 @@ leaf_width_ratio = 0.85
 leaf_rotation_speed = 0.3
 trail_count = 6
 trail_color = Color(0.78, 0.95, 0.94, 0.4)
+
+[node name="TrialAltar" parent="." index="9" unique_id=1296883599 instance=ExtResource("19_vv1vk")]
+editor_description = "Pearl of Wit on the pearl platform."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1507168, 0.041197732, -19.279295)
+pearl_flag = &"coral_valley_pearl_wit"
 
 [editable path="Exits/DownPath"]
 [editable path="Exits/DownPath/SceneChangeTrigger"]

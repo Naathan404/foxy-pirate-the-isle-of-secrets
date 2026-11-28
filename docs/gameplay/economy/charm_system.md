@@ -192,13 +192,13 @@ Khi max HP/SP giảm, current HP/SP bị clamp về max mới và component phá
 
 | Charm | Acquisition | SP | Cooldown | Business effect |
 | --- | --- | ---: | ---: | --- |
-| Arrow Rain | Merchant/enemy drop 5% | 100 | 6 s | Đứng yên tới phát cuối. Bắn 8 mũi trong 1 s, mỗi mũi 1× sát thương cơ bản. |
-| Crescent Cleave | Merchant/enemy drop 5% | 100 | 4 s | Giữ chân qua cú quét 0,12 s, bán nguyệt 180°, bán kính 2,8. Mỗi mục tiêu nhận 2× một lần. |
-| Shadow Lunge | Merchant/enemy drop 5% | 125 | 6 s | Lướt tối đa 5 đơn vị trong 0,18 s, dừng ở địa hình hoặc địch đầu tiên. Đâm 3× và có thể bị ngắt khi nhận đòn. |
-| Buckshot Salvo | Merchant/enemy drop 5% | 150 | 7 s | Giữ chân 0,18 s rồi bắn 8 viên theo 8 hướng, tầm 8 đơn vị, 0,5× mỗi viên. |
-| Tide Grapple | Rương thưởng Raid `room_16` (Coral Valley) | 150 | 5 s | Tầm 7 đơn vị, 2,5× khi móc chạm. Kéo quái nhỏ và choáng 1 s. Kéo Foxy tới cách boss, địch lớn hoặc địa hình 1 đơn vị. Cọc neo (`grapple_post.tscn`) là địa hình móc được, dùng để vượt vực ở các [phòng kỳ quan](../../world/coral_valley_wonder_rooms.md) và là chìa khóa giữa map Coral Valley ([tiến trình](../../systems/coral_valley_progression.md)). |
-| Glacial Spikes | Borelis | 125 | 7 s | Vận 0,28 s. Chốt hướng nhìn lúc nhấn, chông mọc từ gần ra xa theo ba hàng 1–2–3, cách nhau 0,12 s. Mỗi chông kiểm tra va chạm với hurtbox mục tiêu ngay lúc trồi lên. Mỗi mục tiêu nhận 1,5× một lần, quái thường choáng 1 s. |
-| Meteor Strike | Cinderclaw | 250 | 10 s | Vận 0,38 s, ba thiên thạch 2× mỗi viên. Vùng lửa tồn tại 3 s, mỗi giây gây Bleed bằng 2% HP tối đa. Các vùng giao nhau dùng chung một tick cho mỗi mục tiêu. |
+| Arrow Rain | Merchant/enemy drop 5% | 100 | 6 s | Đứng yên tới phát cuối. Bắn 8 mũi trong 1 s, mỗi mũi 1,5× sát thương cơ bản. |
+| Crescent Cleave | Merchant/enemy drop 5% | 100 | 4 s | Giữ chân qua cú quét 0,12 s, bán nguyệt 180°, bán kính 2,8. Mỗi mục tiêu nhận 3× một lần. |
+| Shadow Lunge | Merchant/enemy drop 5% | 125 | 6 s | Lướt tối đa 8 đơn vị trong 0,24 s, **xuyên qua quái** và đâm mỗi con trên đường 4,5× một lần (bán kính trúng 1 đơn vị quanh đường lướt). Chỉ tường và mép phòng chặn lại. Có thể bị ngắt khi nhận đòn. |
+| Buckshot Salvo | Merchant/enemy drop 5% | 150 | 7 s | Giữ chân 0,18 s rồi bắn 8 viên to theo 8 hướng, tốc độ 18, tầm 12 đơn vị, 0,75× mỗi viên. |
+| Tide Grapple | Rương thưởng Raid `room_16` (Coral Valley) | 150 | 5 s | Tầm 10 đơn vị, 4,5× khi móc chạm. Kéo quái nhỏ và choáng 1 s. Kéo Foxy tới cách boss, địch lớn hoặc địa hình 1 đơn vị. Cọc neo (`grapple_post.tscn`) là địa hình móc được, dùng để vượt vực ở các [phòng kỳ quan](../../world/coral_valley_wonder_rooms.md) và là chìa khóa giữa map Coral Valley ([tiến trình](../../systems/coral_valley_progression.md)). |
+| Glacial Spikes | Borelis | 125 | 7 s | Vận 0,28 s. Chốt hướng nhìn lúc nhấn, chông mọc từ gần ra xa theo ba hàng 1–2–3, cách nhau 0,12 s. Mỗi chông kiểm tra va chạm với hurtbox mục tiêu ngay lúc trồi lên. Mỗi mục tiêu nhận 2,25× một lần, quái thường choáng 1 s. |
+| Meteor Strike | Cinderclaw | 250 | 10 s | Vận 0,38 s, ba thiên thạch 3× mỗi viên. Vùng lửa tồn tại 3 s, mỗi giây gây Bleed bằng 3% HP tối đa. Các vùng giao nhau dùng chung một tick cho mỗi mục tiêu. |
 | Devil Contract | Queen Seraphina | Toàn bộ SP, cần ≥300 | 20 s | Ký khế ước trong 0,32 s. Trong 10 s sau khi ký, tàn lửa đỏ bao quanh Foxy, sát thương và tốc độ chạy đều ×1,3. Hồi SP tự nhiên và từ vật phẩm đều bị khóa. |
 
 Player sở hữu khóa vận theo effect để một effect kết thúc chỉ trả khóa của chính nó. Foxy tiếp tục chịu trọng lực và nhận đòn trong lúc vận. Hit, chết hoặc tháo charm giải phóng khóa. Hệ thống vẫn nhận thao tác nhả phím của Salute.
@@ -232,7 +232,7 @@ Fixed reward dùng definition có nguồn `fixed_boss_reward`. Glacial Spikes, M
 
 Năm prototype cũ chưa có nguồn nhận đã chốt nay là playable với `drop_chance = 0`: nhặt được từ
 pickup đặt sẵn, không tự rơi. Adrenaline Surge đã bị bỏ khỏi game (data, item, icon, effect).
-Anchor đặt ấn tốn 300 SP, HUD hiện phím gọi về trong 5 s. Hồi chiêu 8 s từ lúc gọi về hoặc hết hạn. Whirlpool vận 1,5 s, kéo quái thường và nổ 2,5×, tốn 300 SP, hồi 8 s. Salute giữ chân và tiêu 100 SP/s, nhả phím hoặc cạn SP thì nổ và bắt đầu hồi 6 s. Death Bloom nổ sau 0,32 s khi hạ quái bằng đòn thường, gây 1 HP cho cả Foxy lẫn địch trong bán kính 2. Shadow Renment để bóng ở điểm bắt đầu dash, nổ 1,5× sau 0,5 s trong bán kính 2. Hai passive chưa có nguồn hoặc tỉ lệ nhận trên Sheet.
+Anchor đặt ấn tốn 300 SP, HUD hiện phím gọi về trong 5 s. Hồi chiêu 8 s từ lúc gọi về hoặc hết hạn. Whirlpool vận 1,5 s, hút mọi quái thường trong bán kính 6 về tâm (3 → 9 đơn vị/s, mạnh dần, dừng cách tâm 0,7), rồi nổ 3,75× trong bán kính 3,5; tốn 300 SP, hồi 8 s. Vụ nổ phá thẳng vật phá được có tối đa `prop_break_max_hp` (10) HP trong bán kính nổ (san hô, đá, gỗ, cọ, rương); vật bền hơn (lửa trại, thuyền) chỉ nhận sát thương. Chỉ quái bị hút, vật trang trí đứng yên. Salute giữ chân và tiêu 100 SP/s, nhả phím hoặc cạn SP thì nổ 1,5× và bắt đầu hồi 6 s. Death Bloom nổ sau 0,32 s khi hạ quái bằng đòn thường, gây 1,5 HP cho địch trong bán kính 3; không gây sát thương cho Foxy. Shadow Renment để bóng ở điểm bắt đầu dash, nổ 2,25× sau 0,5 s trong bán kính 3. Cả hai hiện chữ `BLOOM` / `SHADOW` trên ô HUD khi đặt, và dùng `CharmBlastVfx` (`gameplay/charms/active/charm_blast_vfx.gd`): vòng trên đất đúng bằng bán kính nổ, lấp dần từ tâm theo thời gian chờ và nhấp nháy nhanh dần; Shadow có bóng Foxy run rẩy trên vũng khói tím rồi vỡ thành mảnh, Bloom có bông hoa nở dần rồi bung cánh. Phần sát thương vẫn ở `DelayedBlastCharm`. Hai passive chưa có nguồn hoặc tỉ lệ nhận trên Sheet.
 
 ### 10.2 Shop pool
 
@@ -348,14 +348,33 @@ Collision shape vẫn giữ nhiệm vụ hit detection; VFX không quyết đị
 
 | Charm | Phần nhìn và impact |
 | --- | --- |
-| Arrow Rain | Telegraph vàng, vệt sáng theo hướng bay, tia va chạm từng mũi và nhịp kết mạnh hơn. Hitstop cục bộ lên mục tiêu, không ngắt cả loạt tên. |
+| Arrow Rain | Mỗi mũi rời cung: tiếng dây cung (cao độ lệch ngẫu nhiên), phụt sáng ở tay, rung nhẹ. Mũi tên to hơn, kéo vệt lửa `Fire_Trail`. Mỗi mũi cắm xuống nổ một vòng nhỏ. Vùng rơi là vòng tia nắng vàng (`ArrowRainTelegraph`) đầy dần theo loạt bắn và bùng nổ đúng lúc mũi cuối cắm xuống: rung 7 px, chớp vàng, sóng khúc xạ. Hitstop cục bộ lên mục tiêu, không ngắt cả loạt tên. |
 | Crescent Cleave | Tái sử dụng `MeleeSlashVFX` cho vệt chém 180 độ, lõi sáng và vệt phụ. Hit đầu mỗi lần cast gọi global hitstop 80 ms, rung 8 px. |
-| Shadow Lunge | Vệt năng lượng tím nhiều lớp theo quãng lướt thực tế, burst ở đầu/cuối và va chạm. Hit đầu gọi hitstop 80 ms, rung 8 px. |
-| Buckshot Salvo | Sprite viên đạn kim loại có đuôi lửa tỏa tròn, khói thuốc tại nòng và atlas spark/mảnh đạn khi trúng; hitstop cục bộ khi trúng. |
+| Shadow Lunge | Vệt năng lượng tím theo quãng lướt, dải bóng ma Foxy để lại dọc đường, vòng nổ bóng tối ở đầu và cuối. Mỗi quái trúng: vết chém tím ngang qua, hitstop cục bộ. Quái đầu tiên: rung 6,5 px, chớp tím. Kết thúc có trúng: hitstop toàn cục 50 ms và sóng khúc xạ. |
+| Buckshot Salvo | Viên đạn to (2 đơn vị) kéo vệt lửa `Fire_Trail`. Phát bắn: phụt nòng lớn, vòng nổ cam quanh Foxy, rung 6 px, chớp cam, sóng khúc xạ. Mỗi viên trúng: spark/mảnh đạn và hitstop cục bộ; viên trúng đầu tiên thêm rung 7 px và hitstop toàn cục 40 ms. |
 | Tide Grapple | Móc thép phóng ra cùng dây xích có mắt kim loại. Trúng: flash bám, dây căng theo mục tiêu đang bị kéo rồi thu về. Hụt: móc rỗng chúc xuống, dây chùng và thu về, không có flash trúng. |
-| Abyssal Whirlpool | Các nhánh nước xoắn vào tâm, kết thúc bằng sóng nổ và rung; chỉ hitstop khi có damage thực tế. |
+| Abyssal Whirlpool | Xoáy nước ba nhánh phủ vùng hút 6 đơn vị, giọt nước bị hút từ mép vào, một vòng sáng hơn đánh dấu vùng nổ 3,5. Camera rung nhẹ liên tục, mạnh dần. Nổ: cột nước phun, sóng khúc xạ, chớp xanh, rung 9 px; hitstop 80 ms chỉ khi có damage thực tế. |
 | Dead Man's Anchor | Sprite mỏ neo rơi xuống điểm đặt. Phím gọi về hiện cạnh ô trang bị. Viền lam rút theo chiều kim đồng hồ từ đỉnh ô, theo đúng phần thời gian gọi về còn lại. Sau 2,5 s còn nửa chu vi. Gọi về thành công hoặc hết 5 s thì ô chuyển sang cooldown. Khi gọi về, hiện đường sáng và burst. |
-| Dead Man's Salute | Vòng năng lượng co vào khi charge, bám theo người chơi và mở rộng đúng radius; sóng nổ khi thả, impact tăng theo thời gian charge. |
+| Dead Man's Salute | Khi giữ: vòng tia nắng vàng bám theo Foxy, mở rộng đúng bán kính, lấp đầy theo lực tụ (đầy sau 2,5 s), tia sáng hút từ mép vào; tiếng tick cao dần và rung nhẹ theo nhịp. Khi thả: vòng nổ bung đúng bán kính, mảnh vàng văng ra, chớp vàng, sóng khúc xạ; rung, độ chớp và hitstop tăng theo lực tụ. |
+
+Các charm còn lại cũng có phản hồi qua `CharmFeel`:
+
+| Charm | Bổ sung |
+| --- | --- |
+| Crescent Cleave | Tiếng vung và rung 2,5 px khi chém; cú trúng đầu thêm chớp vàng và sóng khúc xạ. |
+| Glacial Spikes | Rung 4,5 px và tiếng khi dậm; cú trúng đầu thêm chớp băng và hitstop 40 ms. |
+| Meteor Strike | Mỗi lần rơi: vòng nổ lửa đúng bán kính cháy, rung 5 px, sóng khúc xạ; trúng lần đầu thêm chớp cam. |
+| Tide Grapple | Trúng: nổ nhỏ ở mỏ neo, rung 5 px, chớp xanh, hitstop cục bộ 60 ms. |
+| Dead Man's Anchor | Neo cắm: vòng nước nhỏ và rung. Gọi về: vòng nước ở điểm đến, rung, chớp xanh, sóng khúc xạ. |
+| Devil Contract | Kích hoạt: vòng nổ đỏ, rung 6 px, chớp đỏ, sóng khúc xạ toàn màn hình. |
+| Double Strike | Proc: chớp vàng tại mục tiêu, hitstop cục bộ, rung 4 px. |
+| Backstabber | Proc: vết chém tím ngang lưng mục tiêu, hitstop cục bộ, rung 3 px. |
+| Life Steal | Hồi máu: vòng xanh lá quanh Foxy. |
+| Momentum Strike | Nạp: vòng xanh quanh Foxy. Đòn được tăng: rung 3 px. |
+
+Phản hồi va chạm dùng chung qua `CharmFeel` (`gameplay/charms/active/charm_feel.gd`): `shake`, `hitstop`, `local_hitstop`, `flash` (chớp màu qua `CombatScreenFlash` của Foxy, nhóm `combat_screen_flash`), `shockwave` và `sound`. Mỗi lệnh tự bỏ qua khi thiếu autoload hoặc lớp chớp (test headless).
+
+`CharmBlastVfx` (`gameplay/charms/active/charm_blast_vfx.gd`, shader `charm_blast_ground.gdshader` và `charm_blast_sprite.gdshader`) vẽ vùng tác dụng trên đất. Có ba cách dùng: `plant` (đếm ngược rồi `detonate`), `charge` (charm tự đẩy `set_fuse` và `set_radius`, rồi `detonate` hoặc `dismiss`) và `burst` (nổ ngay). Kiểu `SHADOW`, `BLOOM`, `GOLD`, `TIDE`, `SPARK` đổi hoa văn, vật trung tâm (bóng Foxy, bông hoa) và mảnh văng.
 
 `CharmVfx` tại `gameplay/charms/active/charm_vfx.gd/.tscn` dùng
 `charm_energy.gdshader` cho burst, stream, vortex, anchor, charge và telegraph.
@@ -412,7 +431,7 @@ trong 120 ms được gộp về mặt trình bày để tránh chồng animatio
 | Life Steal | `+1 HP` (hoặc lượng HP thực hồi); chỉ hiện khi `heal()` trả về giá trị dương, không hiện khi đầy HP. Mốc hit vẫn đọc từ resource, hiện là 12. |
 | Double Strike | `DOUBLE!` sau hit gây damage có kết quả proc thành công. |
 | Backstabber | `BACKSTAB` sau hit gây damage được áp dụng bonus đánh sau lưng. |
-| Chaos Collector | `CHAOS READY` khi chính lượng Chaos cộng bởi Charm đưa thanh từ chưa đầy sang đầy; không nhấp nháy ở mọi hit. |
+| Chaos Collector | Mỗi hit thực sự cộng được CP: đốm Chaos (`ChaosMotesVfx`) bay từ quái về Foxy, và ô HUD nảy nhẹ với chữ nhỏ `+2 CP` cộng dồn khi đánh liên tiếp trong 0,9 s (signal `gain_ticked`, nhóm Gain tick của scene). Hit đưa thanh từ chưa đầy sang đầy chỉ hiện `CHAOS READY`. Thanh đã đầy thì không có phản hồi. |
 
 Fortune Leaf chớp xanh ở pickup khi chính phần tăng xác suất tạo ra lượt rơi. Crimson Band chỉ báo BLEED khi bắt đầu chuỗi trên một mục tiêu. Momentum Strike và Skull Cracker báo lúc nạp và lúc gây choáng.
 

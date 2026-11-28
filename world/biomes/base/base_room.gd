@@ -25,12 +25,16 @@ const VOID_FALL_MIN_SPEED := 1.0
 const VOID_PROBE_METERS := 4.0
 ## The probe starts slightly above her origin so ground she is touching still counts.
 const VOID_PROBE_LIFT_METERS := 0.2
+## Enemies leap and swoop higher than Foxy, so their probe looks further down.
+const ENEMY_VOID_PROBE_METERS := 8.0
 
 @export_tool_button("Refresh destination exits", "Reload") var refresh_destination_exits: Callable:
 	get:
 		return _refresh_destination_inspector
 
 @export_group("Void")
+## Enemies of this room that fall the same way, or below `void_height`, die there; their loot
+## stays on the ground they fell from.
 ## Foxy falling with no ground under her is a fall into the void: the screen closes on her
 ## and she comes back at the door she entered this room by (the nearest door when she did
 ## not walk in), losing `void_fall_damage` HP. If that would empty her HP she dies and
@@ -175,6 +179,7 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	if Engine.is_editor_hint() or not void_reload_enabled:
 		return
+	_check_enemy_void_falls()
 	var manager := get_node("/root/GameManager")
 	var active_player := manager.player as Node3D
 	if not is_instance_valid(active_player) or not is_ancestor_of(active_player):
@@ -189,6 +194,28 @@ func _physics_process(_delta: float) -> void:
 		add_child(sequence)
 
 
+func _check_enemy_void_falls() -> void:
+	for node in get_tree().get_nodes_in_group(&"enemy"):
+		var enemy := node as EnemyBase
+		if enemy == null or enemy.dead or not is_ancestor_of(enemy):
+			continue
+		if to_local(enemy.global_position).y < void_height or _is_enemy_over_void(enemy):
+			enemy.die_in_void()
+
+
+func _is_enemy_over_void(enemy: EnemyBase) -> bool:
+	if (
+		not enemy.dies_falling_over_void
+		or enemy.velocity.y > -VOID_FALL_MIN_SPEED
+		or enemy.is_on_floor()
+		or enemy.is_grapple_pulled()
+	):
+		return false
+	return not _has_ground_below(
+		enemy.global_position, CombatLayers.WORLD, [enemy.get_rid()], ENEMY_VOID_PROBE_METERS
+	)
+
+
 ## Dropping (not dashing) with nothing to land on within VOID_PROBE_METERS. A Tide Grapple
 ## pull crosses gaps in the air while gravity still builds up speed, so it never counts.
 func _is_falling_over_void(falling_player: Player) -> bool:
@@ -201,10 +228,12 @@ func _is_falling_over_void(falling_player: Player) -> bool:
 	)
 
 
-func _has_ground_below(point: Vector3, mask: int, exclude: Array[RID] = []) -> bool:
+func _has_ground_below(
+	point: Vector3, mask: int, exclude: Array[RID] = [], depth: float = VOID_PROBE_METERS
+) -> bool:
 	var query := PhysicsRayQueryParameters3D.create(
 		point + Vector3.UP * VOID_PROBE_LIFT_METERS,
-		point + Vector3.DOWN * VOID_PROBE_METERS,
+		point + Vector3.DOWN * depth,
 		mask,
 		exclude
 	)

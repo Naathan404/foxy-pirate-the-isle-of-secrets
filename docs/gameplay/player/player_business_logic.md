@@ -289,7 +289,7 @@ Xem
 | --- | --- |
 | HP / SP tối đa | 8 / 350 |
 | CP tối đa / CP mỗi hit gây sát thương | 100 / 100 (resource Foxy override) |
-| Hồi SP | 25 SP/giây, chờ 1 giây sau khi tiêu SP |
+| Hồi SP | Chờ 1 giây sau khi tiêu SP, rồi bắt đầu 25 SP/giây và tăng thêm 35 SP/giây mỗi giây, tối đa 200 SP/giây (`stamina_regen_rate`, `stamina_regen_ramp`, `stamina_regen_max_rate` trong `FoxyData`). Tiêu SP hoặc bị khóa hồi (Devil Contract, chết) thì tốc độ quay về mức đầu. |
 | Tốc độ chạy | 8 đơn vị/giây |
 | Gia tốc / giảm tốc | 25 / 25 |
 | Dash | 5 đơn vị trong 0,2 giây; tốn 50 SP |

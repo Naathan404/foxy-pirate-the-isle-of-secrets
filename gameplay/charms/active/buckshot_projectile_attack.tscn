@@ -6,5 +6,5 @@
 [node name="BuckshotProjectileAttack" instance=ExtResource("1_base")]
 script = ExtResource("2_script")
 local_hitstop = true
-hitstop_seconds = 0.025
+hitstop_seconds = 0.05
 shake_pixels = 2.5

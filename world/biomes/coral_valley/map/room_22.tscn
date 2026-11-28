@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://dm08r13abppf3" path="res://world/gimmick/flat_tide/flat_tide.tscn" id="2_flat_tide"]
 [ext_resource type="PackedScene" uid="uid://rp5mbciko3vn" path="res://gameplay/enemies/barrel/barrel.tscn" id="4_tide_enemy"]
 [ext_resource type="PackedScene" uid="uid://bvsrg4nhhl11v" path="res://assets/spine/enemies/Enemy_Barrel/elite_barrel.tscn" id="5_6kymb"]
+[ext_resource type="Script" uid="uid://juar8i43t1me" path="res://world/gimmick/flat_tide/flat_tide_enemy_entry.gd" id="12_gkaja"]
+[ext_resource type="PackedScene" uid="uid://dxap5702u8brd" path="res://gameplay/enemies/hermit_crab/hermit_crab.tscn" id="14_8vt4m"]
+[ext_resource type="PackedScene" path="res://gameplay/enemies/coral_skeleton/elite_coral_skeleton.tscn" id="17_wkl33"]
 [ext_resource type="PackedScene" uid="uid://d2iseqdcsafil" path="res://world/effects/room_atmosphere.tscn" id="atmosphere"]
 [ext_resource type="PackedScene" path="res://world/gimmick/raid/raid_boulder_gate.tscn" id="boulder_gate"]
 [ext_resource type="PackedScene" path="res://world/gimmick/raid/ground_burst_effect.tscn" id="burst_effect"]
@@ -35,7 +38,7 @@
 [ext_resource type="Shader" uid="uid://ddkgna0vceam3" path="res://world/gimmick/flat_tide/flat_tide_volume.gdshader" id="tide_volume_shader"]
 [ext_resource type="Script" uid="uid://cfpb5jdg1myr3" path="res://world/gimmick/flat_tide/flat_tide_zone.gd" id="tide_zone_script"]
 
-[sub_resource type="Environment" id="Environment_gewby"]
+[sub_resource type="Environment" id="Environment_s7a0t"]
 resource_local_to_scene = true
 background_mode = 1
 background_color = Color(0.1, 0.02, 0.03, 1)
@@ -59,7 +62,7 @@ height = 256
 noise = SubResource("FastNoiseLite_water")
 seamless = true
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_skyqr"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cwiyl"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("lagoon_shader")
@@ -90,34 +93,10 @@ shader_parameter/rock_color = Color(0.3, 0.27, 0.32, 1)
 shader_parameter/rock_light_color = Color(0.56, 0.5, 0.53, 1)
 shader_parameter/rock_ink_color = Color(0.21, 0.13, 0.15, 1)
 
-[sub_resource type="QuadMesh" id="QuadMesh_xe5xu"]
+[sub_resource type="QuadMesh" id="QuadMesh_s2f8f"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_skyqr")
+material = SubResource("ShaderMaterial_cwiyl")
 size = Vector2(400, 400)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_gkaja"]
-resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_8vt4m"]
-resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_wkl33"]
-resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_s7a0t"]
-resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 12.923569)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_cwiyl"]
-resource_local_to_scene = true
-size = Vector3(9.011322, 1, 2.2593918)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_s2f8f"]
-resource_local_to_scene = true
-size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_lclv5"]
 resource_local_to_scene = true
@@ -129,17 +108,41 @@ size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hw2g5"]
 resource_local_to_scene = true
-size = Vector3(0.5, 2, 4)
+size = Vector3(4, 2, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xuknt"]
 resource_local_to_scene = true
-size = Vector3(3.1524658, 1, 14.923569)
+size = Vector3(3.1524658, 1, 12.923569)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_h04do"]
 resource_local_to_scene = true
 size = Vector3(9.011322, 1, 2.2593918)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_qi86q"]
+resource_local_to_scene = true
+size = Vector3(4, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_joeul"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 12.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_umtgw"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a1a56"]
+resource_local_to_scene = true
+size = Vector3(0.5, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oao01"]
+resource_local_to_scene = true
+size = Vector3(3.1524658, 1, 14.923569)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h8me1"]
+resource_local_to_scene = true
+size = Vector3(9.011322, 1, 2.2593918)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l3vhy"]
 resource_local_to_scene = true
 size = Vector3(0.5, 2, 4)
 
@@ -213,7 +216,24 @@ shader_parameter/edge_breakup = 0.3
 shader_parameter/noise_scale = 0.12
 shader_parameter/noise_texture = SubResource("TideNoise")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_joeul"]
+[sub_resource type="Resource" id="Resource_flat_enemy_hermit_crab"]
+script = ExtResource("12_gkaja")
+normal_scene = ExtResource("14_8vt4m")
+elite_scene = ExtResource("enemy_elite_hermit_crab")
+
+[sub_resource type="Resource" id="Resource_f0ypn"]
+script = ExtResource("12_gkaja")
+normal_scene = ExtResource("enemy_crab")
+elite_scene = ExtResource("enemy_elite_crab")
+metadata/_custom_type_script = "uid://juar8i43t1me"
+
+[sub_resource type="Resource" id="Resource_7sxmq"]
+script = ExtResource("12_gkaja")
+normal_scene = ExtResource("enemy_coral_skeleton")
+elite_scene = ExtResource("17_wkl33")
+metadata/_custom_type_script = "uid://juar8i43t1me"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_id44b"]
 resource_local_to_scene = true
 shader = ExtResource("grade_shader")
 shader_parameter/exposure = 1.0
@@ -327,7 +347,7 @@ right_destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
 left_destination_scene = "res://world/biomes/coral_valley/map/room_21.tscn"
 
 [node name="WorldEnvironment" parent="General" parent_id_path=PackedInt32Array(461960862) index="0" unique_id=212262502]
-environment = SubResource("Environment_gewby")
+environment = SubResource("Environment_s7a0t")
 
 [node name="DirectionalLight3D" parent="General" parent_id_path=PackedInt32Array(461960862) index="1" unique_id=1545493744]
 transform = Transform3D(0.38176, 0.569032, -0.728328, 0, 0.788011, 0.615661, 0.924261, -0.235035, 0.300831, 0, 14, 12)
@@ -340,17 +360,17 @@ directional_shadow_max_distance = 45.0
 
 [node name="VoidSmoke" parent="General" parent_id_path=PackedInt32Array(461960862) index="2" unique_id=593468596]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0.005104065, -1.2000535, 0.07036781)
-mesh = SubResource("QuadMesh_xe5xu")
+mesh = SubResource("QuadMesh_s2f8f")
 
 [node name="DownPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="0" unique_id=872527392]
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_gkaja")
+shape = SubResource("BoxShape3D_lclv5")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/DownPath/StaticBody3D" parent_id_path=PackedInt32Array(872527392, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_8vt4m")
+shape = SubResource("BoxShape3D_phg65")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/DownPath" index="2" unique_id=219025603]
@@ -358,18 +378,18 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/DownPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_wkl33")
+shape = SubResource("BoxShape3D_hw2g5")
 disabled = true
 
 [node name="UpPath" parent="Exits" parent_id_path=PackedInt32Array(2100215242) index="1" unique_id=505451922]
 visible = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_s7a0t")
+shape = SubResource("BoxShape3D_xuknt")
 disabled = true
 
 [node name="CollisionShape3D2" parent="Exits/UpPath/StaticBody3D" parent_id_path=PackedInt32Array(505451922, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_cwiyl")
+shape = SubResource("BoxShape3D_h04do")
 disabled = true
 
 [node name="SceneChangeTrigger" parent="Exits/UpPath" index="2" unique_id=219025603]
@@ -377,7 +397,7 @@ monitoring = false
 enabled = false
 
 [node name="CollisionShape3D" parent="Exits/UpPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_s2f8f")
+shape = SubResource("BoxShape3D_qi86q")
 disabled = true
 
 [node name="Sprite3D" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="0" unique_id=1887481611]
@@ -386,16 +406,16 @@ shaded = true
 texture = ExtResource("pier_right")
 
 [node name="CollisionShape3D" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="0" unique_id=1059153531]
-shape = SubResource("BoxShape3D_lclv5")
+shape = SubResource("BoxShape3D_joeul")
 
 [node name="CollisionShape3D2" parent="Exits/RightPath/StaticBody3D" parent_id_path=PackedInt32Array(1048204863, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_phg65")
+shape = SubResource("BoxShape3D_umtgw")
 
 [node name="SceneChangeTrigger" parent="Exits/RightPath" parent_id_path=PackedInt32Array(1048204863) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_23.tscn"
 
 [node name="CollisionShape3D" parent="Exits/RightPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_hw2g5")
+shape = SubResource("BoxShape3D_a1a56")
 
 [node name="Sprite3D" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="0" unique_id=1887481611]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 1, 0.116, 0)
@@ -404,16 +424,16 @@ texture = ExtResource("pier_left")
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="0" unique_id=1059153531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07182312, -0.38388157, -0.9540329)
-shape = SubResource("BoxShape3D_xuknt")
+shape = SubResource("BoxShape3D_oao01")
 
 [node name="CollisionShape3D2" parent="Exits/LeftPath/StaticBody3D" parent_id_path=PackedInt32Array(192273160, 2124921856) index="1" unique_id=2046027508]
-shape = SubResource("BoxShape3D_h04do")
+shape = SubResource("BoxShape3D_h8me1")
 
 [node name="SceneChangeTrigger" parent="Exits/LeftPath" parent_id_path=PackedInt32Array(192273160) index="2" unique_id=219025603]
 destination_scene = "res://world/biomes/coral_valley/map/room_21.tscn"
 
 [node name="CollisionShape3D" parent="Exits/LeftPath/SceneChangeTrigger" index="0" unique_id=482012259]
-shape = SubResource("BoxShape3D_qi86q")
+shape = SubResource("BoxShape3D_l3vhy")
 
 [node name="Sprite3D" parent="Environment/BaseGround" parent_id_path=PackedInt32Array(858705461) index="0" unique_id=516185212]
 transform = Transform3D(0.995455, 0, 0, 0, 0, 1, 0, -1.265182, 0, 0.034864, 0.084, 0.65731)
@@ -451,7 +471,12 @@ player = NodePath("../../Foxy")
 
 [node name="EnemySpawner" parent="FlatTide" index="2" unique_id=888280207 node_paths=PackedStringArray("spawn_ground")]
 spawn_ground = NodePath("../../Environment/BaseGround/StaticBody3D")
-enemies_per_tide = 0
+enemies = Array[ExtResource("12_gkaja")]([SubResource("Resource_flat_enemy_hermit_crab"), SubResource("Resource_f0ypn"), SubResource("Resource_7sxmq")])
+enemies_per_tide = 3
+wave_chance = 66.7
+elite_chance = 5.0
+minimum_spacing = 5.0
+minimum_player_distance = 5.0
 
 [node name="WestLane" type="MeshInstance3D" parent="FlatTide" index="3" unique_id=585309995]
 editor_description = "West lane: floods the west rim to x -6, from the west sea."
@@ -495,7 +520,7 @@ prop_scenes = Array[PackedScene]([ExtResource("seaweed_1"), ExtResource("seaweed
 [node name="RoomAtmosphere" parent="." index="7" unique_id=265208724 instance=ExtResource("atmosphere")]
 
 [node name="Vintage" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(265208724, 1300233738) index="0" unique_id=1611482802]
-material = SubResource("ShaderMaterial_joeul")
+material = SubResource("ShaderMaterial_id44b")
 
 [node name="WindAndLeaves" parent="RoomAtmosphere/Overlay" parent_id_path=PackedInt32Array(265208724, 1300233738) index="1" unique_id=1448896067]
 leaf_count = 14

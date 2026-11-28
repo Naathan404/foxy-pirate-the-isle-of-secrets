@@ -117,7 +117,7 @@ cuối: móc + triều + quái) → `07` Trại Cuối Bờ (lửa trại và Si
 | `room_21` | Small, chia mảnh | Bãi Cọc Neo | Ốc phục kích khi qua giữa bãi; đảo rương chỉ móc tới được | trên `05`, phải `22` |
 | `room_22` | Medium, đỏ | Raid Đập Thủy Triều | Nhốt; người chơi gạt cần xả triều cuốn quái | trái `21`, phải `23` |
 | `room_23` | 2 đảo | Vòng Thời Gian | Bệ quay tự động, dừng đúng lúc để nhảy sang bệ ngọc; Ngọc Trí Tuệ | trái `22`, phải `24` (móc) |
-| `room_24` | Medium, chia mảnh | Đảo Vỡ (ẩn) | Ba mảnh nối bằng lạch; hai đảo nhỏ chỉ móc tới | trái `23` |
+| `room_24` | Medium, chia mảnh | Đảo Vỡ (ẩn) | Một bãi chính; hai đảo nhỏ chỉ móc tới | trái `23` |
 
 ## Cơ chế dùng chung
 
@@ -379,7 +379,7 @@ một mỏm đá tách khỏi đảo phải bởi một vực 4,5 m, có cọc n
 
 ### room_24 Đảo Vỡ (ẩn)
 
-Giữ phòng chia mảnh cũ: ba mảnh nối bằng lạch, hai đảo nhỏ chỉ móc tới, rương bí mật 30–50 vàng.
+Giữ phòng chia mảnh cũ: một bãi chính liền đất (không còn lạch nước), hai đảo nhỏ chỉ móc tới, rương bí mật 30–50 vàng.
 
 ## Định danh scene
 

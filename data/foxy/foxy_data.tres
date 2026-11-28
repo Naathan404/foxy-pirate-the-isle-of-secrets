@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_cu3kv")
-max_sp = 350.0
+max_sp = 1000.0
 chaos_per_hit = 10.0
 move_speed = 10.0
 acceleration = 50.0

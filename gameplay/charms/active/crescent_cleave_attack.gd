@@ -81,6 +81,8 @@ func activate() -> bool:
 	_slash.setup(step, radius_units / 1.15)
 	_remaining_seconds = maxf(0.01, active_seconds)
 	_active = true
+	CharmFeel.sound(self, CharmFeel.WHOOSH_SOUND, global_position, -4.0, 0.85)
+	CharmFeel.shake(self, 2.5, 0.1)
 	set_physics_process(true)
 	return true
 
@@ -131,6 +133,8 @@ func _try_hit(area: Area3D) -> void:
 			get_node("/root/HitstopController").request(0.065, hurtbox.actor)
 			get_node("/root/ScreenShakeController").request(6.0, 0.18)
 			CharmVfx.heavy_impact(get_parent(), at, CharmVfx.GOLD)
+			CharmFeel.flash(self, CharmVfx.GOLD, 0.08, 0.12)
+			CharmFeel.shockwave(self, at, CharmVfx.GOLD, 130.0, 0.01, 0.35)
 
 
 func _finish() -> void:

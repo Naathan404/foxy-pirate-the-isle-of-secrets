@@ -17,7 +17,7 @@ acquisition_source = &"prototype_debug"
 drop_chance = 0.0
 tags = Array[StringName]([&"active", &"channel"])
 effect_params = {
-"damage_multiplier": 1.0,
+"damage_multiplier": 2.0,
 "min_radius_units": 0.75,
 "radius_per_second": 1.5,
 "sp_per_second": 100.0

@@ -1149,4 +1149,3 @@ horizontal_alignment = 2
 
 [connection signal="dash_finished" from="." to="Effects/DashEffect" method="_on_foxy_dash_finished"]
 [connection signal="dash_started" from="." to="Effects/DashEffect" method="_on_foxy_dash_started"]
-

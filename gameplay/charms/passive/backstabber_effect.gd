@@ -27,12 +27,19 @@ func modify_outgoing_damage(amount_hp: float, damage: DamageContext) -> float:
 	return maxf(0.0, amount_hp * multiplier) if is_behind else amount_hp
 
 
-func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) -> void:
+func on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	if damage == null or damage.source != actor or applied_hp <= 0.0:
 		return
 	var result: Dictionary = damage.proc_results.get(definition.charm_id, {})
 	if bool(result.get(&"success", false)):
 		runtime.proc_triggered.emit("BACKSTAB", Color(0.8, 0.55, 1.0))
+		if target is Node3D:
+			# A cut across the back of the target.
+			var at := (target as Node3D).global_position + Vector3.UP * 0.7
+			var across := Vector3(0.9, 0.35, 0.0)
+			CharmVfx.streak(actor.get_parent(), at - across, at + across, CharmVfx.SHADOW, 0.5)
+			CharmFeel.local_hitstop(actor, null, target as Node3D, 0.06)
+			CharmFeel.shake(actor, 3.0, 0.1)
 
 
 func _is_behind_target(damage: DamageContext) -> bool:

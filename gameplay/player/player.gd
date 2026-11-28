@@ -199,7 +199,13 @@ func _setup_stats() -> void:
 
 	if is_instance_valid(stamina):
 		stamina.stamina_changed.connect(_on_stamina_changed)
-		stamina.init(data.max_sp, data.stamina_regen_rate, data.stamina_regen_delay)
+		stamina.init(
+			data.max_sp,
+			data.stamina_regen_rate,
+			data.stamina_regen_delay,
+			data.stamina_regen_ramp,
+			data.stamina_regen_max_rate
+		)
 
 
 # HitBox gây damage, HurtBox nhận damage

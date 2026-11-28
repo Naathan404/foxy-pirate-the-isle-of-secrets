@@ -36,9 +36,14 @@ func cancel_active() -> void:
 	super.cancel_active()
 
 
-func on_damage_dealt(damage: DamageContext, _target: Node, applied_hp: float) -> void:
+func on_damage_dealt(damage: DamageContext, target: Node, applied_hp: float) -> void:
 	if damage == null or damage.source != actor or applied_hp <= 0.0:
 		return
 	var result: Dictionary = damage.proc_results.get(definition.charm_id, {})
 	if bool(result.get(&"success", false)):
 		runtime.proc_triggered.emit("DOUBLE!", Color(1.0, 0.76, 0.25))
+		if target is Node3D:
+			var at := (target as Node3D).global_position + Vector3.UP * 0.7
+			CharmVfx.spawn(actor.get_parent(), at, CharmVfx.GOLD, 1.1)
+			CharmFeel.local_hitstop(actor, null, target as Node3D, 0.07)
+			CharmFeel.shake(actor, 4.0, 0.12)

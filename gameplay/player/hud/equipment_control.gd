@@ -157,7 +157,7 @@ func _update_cooldown(socket_id: int, runtime: CharmRuntime) -> void:
 	if recall_fraction > 0.0:
 		_show_recall_border(_slots[socket_id], recall_fraction)
 		overlay.hide()
-		recall_hint.text = "[%s]  RECALL" % _binding_text(socket_id)
+		recall_hint.text = "[%s] RECALL" % _binding_text(socket_id)
 		recall_hint.show()
 		label.hide()
 		return

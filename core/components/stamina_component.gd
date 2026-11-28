@@ -16,6 +16,11 @@ var _max_modifiers: Dictionary[StringName, float] = {}
 ### hồi phục sp
 var _regen_rate: float = 0.0
 var _regen_delay: float = 0.0
+## Recovery speeds up the longer it runs undisturbed: SP/s gained per second, up to the cap.
+var _regen_ramp: float = 0.0
+var _regen_max_rate: float = 0.0
+## Seconds of recovery since SP was last spent or recovery was last stopped.
+var _regen_elapsed: float = 0.0
 var _recovery_blocks: Dictionary[StringName, bool] = {}
 var _regeneration_enabled: bool = true
 # thời gian chờ thêm trước khi bắt đầu hồi thể lực
@@ -24,7 +29,15 @@ var _delay_remaining: float = 0.0
 var _configured: bool = false
 
 
-func init(max_sp: float, regen_sp_per_sec: float, regen_delay_sec: float) -> void:
+## `regen_sp_per_sec` is the starting rate; it grows by `regen_ramp_per_sec` every second of
+## undisturbed recovery until `regen_max_sp_per_sec`. Leave both at 0 for a constant rate.
+func init(
+	max_sp: float,
+	regen_sp_per_sec: float,
+	regen_delay_sec: float,
+	regen_ramp_per_sec: float = 0.0,
+	regen_max_sp_per_sec: float = 0.0
+) -> void:
 	if _configured:
 		push_error("StaminaComponent: init() chỉ được gọi 1 lần")
 		return
@@ -34,6 +47,8 @@ func init(max_sp: float, regen_sp_per_sec: float, regen_delay_sec: float) -> voi
 	_current_sp = _max_sp
 	_regen_rate = maxf(0.0, regen_sp_per_sec)
 	_regen_delay = maxf(0.0, regen_delay_sec)
+	_regen_ramp = maxf(0.0, regen_ramp_per_sec)
+	_regen_max_rate = maxf(_regen_rate, regen_max_sp_per_sec)
 
 	_configured = true
 
@@ -75,6 +90,7 @@ func try_consume(cost_sp: float) -> bool:
 	if cost_sp > 0.0:
 		_current_sp -= cost_sp
 		_delay_remaining = _regen_delay
+		_regen_elapsed = 0.0
 		stamina_changed.emit(_current_sp, _max_sp)
 	return true
 
@@ -94,12 +110,20 @@ func restore(amount_sp: float) -> float:
 func set_recovery_block(source: StringName, blocked: bool) -> void:
 	if blocked:
 		_recovery_blocks[source] = true
+		_regen_elapsed = 0.0
 	else:
 		_recovery_blocks.erase(source)
 
 
 func set_regeneration_enabled(enabled: bool) -> void:
 	_regeneration_enabled = enabled
+	if not enabled:
+		_regen_elapsed = 0.0
+
+
+## SP/s recovery runs at right now (the starting rate until some time has passed).
+func get_current_regen_rate() -> float:
+	return minf(_regen_max_rate, _regen_rate + _regen_ramp * _regen_elapsed)
 
 
 # Update để hồi stamina
@@ -116,7 +140,11 @@ func _physics_process(delta: float) -> void:
 	_delay_remaining = maxf(0.0, _delay_remaining - delta)
 	if regen_delta > 0.0 and _current_sp < _max_sp:
 		var previous_sp := _current_sp
-		_current_sp = minf(_max_sp, _current_sp + _regen_rate * regen_delta)
+		# Rate at the middle of this step, so the ramp adds up the same at any frame rate.
+		var rate_at_start := get_current_regen_rate()
+		_regen_elapsed += regen_delta
+		var rate := (rate_at_start + get_current_regen_rate()) * 0.5
+		_current_sp = minf(_max_sp, _current_sp + rate * regen_delta)
 		if _current_sp != previous_sp:
 			stamina_changed.emit(_current_sp, _max_sp)
 
